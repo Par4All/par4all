@@ -18,7 +18,7 @@ POINTS TO for "dependence13"
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 struct my_struct  dependence13()
 {

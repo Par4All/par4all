@@ -1,0 +1,5 @@
+francois@ibarron:~/MYPIPS/validation/Rice$ more pointer10.diff 
+96c96
+< //             <may be written>: *HEAP*_l_11[i]
+---
+> //             <may be written>: *HEAP*_l_11[0][i]

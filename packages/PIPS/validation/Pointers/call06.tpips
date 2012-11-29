@@ -1,0 +1,27 @@
+setenv WS=call06
+delete $WS
+create $WS $WS.c
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+
+echo
+echo POINTS TO for "$WS"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[$WS]
+
+echo
+echo POINTS TO for "main"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+
+close
+delete $WS
+quit

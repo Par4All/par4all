@@ -35,4 +35,4 @@ int global09()
 
    return *p;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[global09] (global_source_to_sinks) Initialization of global variable "qa" is ignored because the "const" qualifier is not used.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[global09] (global_source_to_sinks) Initialization of global variable "qa" is ignored because the "const" qualifier is not used.

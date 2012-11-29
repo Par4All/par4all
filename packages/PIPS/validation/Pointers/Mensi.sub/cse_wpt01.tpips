@@ -17,6 +17,12 @@ echo Initial code
 echo
 display PRINTED_FILE[cse_wpt01]
 
+echo 
+echo PROPER  EFFECTS 
+echo
+activate PROPER_EFFECTS<
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
 
 echo 
 echo POINTS-TO

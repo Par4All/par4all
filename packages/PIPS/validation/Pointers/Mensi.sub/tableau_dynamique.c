@@ -5,7 +5,7 @@ typedef struct {int dim; float * data;} darray_t, * parray_t;
 
 void allocate_array(parray_t pa) {
   pa->data = (float *) malloc(pa->dim*sizeof(float));
-  // return;
+  return;
 }
 
 void init_array(parray_t pa) {
@@ -17,9 +17,9 @@ void init_array(parray_t pa) {
 }
 
 int main() {
-  parray_t ma = (parray_t)malloc(sizeof(darray_t));
+  parray_t ma = (parray_t) malloc(sizeof(darray_t));
   allocate_array(ma);
-  //init_array(ma);
+  init_array(ma);
 
   return 0;
 }

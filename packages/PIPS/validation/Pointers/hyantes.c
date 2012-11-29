@@ -51,7 +51,7 @@ towns read_towns(const char fname[])
     fclose(fd);
     the_towns.data=realloc(the_towns.data,curr*sizeof(town));
     the_towns.nb=curr;
-    fprintf(stderr,"parsed %d towns\n",curr);
+    fprintf(stderr,"parsed %d towns\n", (int) curr);
     /*
     for(curr=0;curr<the_towns.nb;curr++)
         fprintf(stderr,OUTPUT_FORMAT,the_towns.data[curr][0],the_towns.data[curr][1],the_towns.data[curr][2]);
@@ -66,11 +66,11 @@ towns run(towns t,data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t ste
     size_t k;
     size_t rangex=( (xmax - xmin )/step ),
         rangey=( (ymax - ymin )/step );
-    int nb = 1+  rangex*rangey;
+    int nb = 1 + rangex*rangey;
     towns tout = { nb , malloc(sizeof(town)*nb) };;
     fprintf(stderr,"begin computation ...\n");
-    fprintf(stderr,"xrange: " OUTPUT_FORMAT ,xmin,xmax,rangex);
-    fprintf(stderr,"yrange: " OUTPUT_FORMAT ,ymin,ymax,rangey);
+    fprintf(stderr,"xrange: " OUTPUT_FORMAT ,xmin,xmax,(double) rangex);
+    fprintf(stderr,"yrange: " OUTPUT_FORMAT ,ymin,ymax, (double) rangey);
 
     for(i=0;i<rangex;i++)
         for(j=0;j<rangey;j++)

@@ -8,6 +8,7 @@ Points-to for properties04
 
 
 // Points To OUT:
+// _q_1[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // _q_1[0] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 int properties04(int **q)
@@ -25,6 +26,7 @@ int properties04(int **q)
    *q = &i;
 
 // Points To:
+// _q_1[*] -> i , MAY
 // _q_1[0] -> i , EXACT
 // q -> _q_1[0] , EXACT
 

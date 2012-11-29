@@ -1,0 +1,63 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete scalarization06
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty CONSTANT_PATH_EFFECTS TRUE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
+##TODO: explain
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+create scalarization06 scalarization06.c
+
+## Needed for substracting set approximations
+activate MUST_REGIONS
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[main]
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+echo 
+echo PROPER  EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+
+echo
+echo RW regions
+echo
+activate PRINT_CODE_PROPER_REGIONS
+display PRINTED_FILE[main]
+
+#echo
+#echo IN regions
+#echo
+#activate PRINT_CODE_IN_REGIONS
+#display PRINTED_FILE[main]
+
+#echo
+#echo Privatized regions
+#echo
+#activate PRINT_CODE_PRIVATIZED_REGIONS
+#display PRINTED_FILE[main]
+
+echo
+echo Code after scalarization
+echo
+apply SCALARIZATION[main]
+activate PRINT_CODE
+display PRINTED_FILE[main]
+
+close
+delete scalarization06
+quit

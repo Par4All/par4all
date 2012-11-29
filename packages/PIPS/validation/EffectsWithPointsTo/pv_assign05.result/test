@@ -1,6 +1,4 @@
 
-PROPER  EFFECTS 
-
 int main()
 {
    mystruct s1, s2;
@@ -8,117 +6,8 @@ int main()
 //             <    is read   >: s1.a
 //             <    is written>: s2.a
    s2.a = s1.a;
-//             <    is read   >: s1.b[0]
-//             <    is written>: s2.b[0]
    (s2.b)[0] = (s1.b)[0];
-//             <    is read   >: s1.a
-//             <    is written>: tab_s[0].a
    tab_s[0].a = s1.a;
-//             <    is read   >: s1.b[0]
-//             <    is written>: tab_s[0].b[0]
-   (tab_s[0].b)[0] = (s1.b)[0];
-   return 0;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   mystruct s1, s2;
-
-// Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   mystruct tab_s[2];
-
-// Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   s2.a = s1.a;
-
-// Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   (s2.b)[0] = (s1.b)[0];
-
-// Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.b[0] -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   tab_s[0].a = s1.a;
-
-// Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.b[0] -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// tab_s[0].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   (tab_s[0].b)[0] = (s1.b)[0];
-
-// Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.b[0] -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// tab_s[0].b[0] -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// tab_s[0].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
-int main()
-{
-   mystruct s1, s2;
-   mystruct tab_s[2];
-//             <    is read   >: s1.a
-//             <    is written>: s2.a
-   s2.a = s1.a;
-//             <    is read   >: s1.b[0]
-//             <    is written>: s2.b[0]
-   (s2.b)[0] = (s1.b)[0];
-//             <    is read   >: s1.a
-//             <    is written>: tab_s[0].a
-   tab_s[0].a = s1.a;
-//             <    is read   >: s1.b[0]
-//             <    is written>: tab_s[0].b[0]
    (tab_s[0].b)[0] = (s1.b)[0];
    return 0;
 }

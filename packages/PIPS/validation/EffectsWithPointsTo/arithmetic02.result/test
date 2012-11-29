@@ -70,7 +70,7 @@ int main()
 // Points To:
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // pdeb -> t[0] , EXACT
-// pfin -> t[10-1] , EXACT
+// pfin -> t[9] , EXACT
 
    /*   repère le dernier élément de t   */
    
@@ -79,48 +79,55 @@ int main()
 // Points To:
 // p -> t[0] , EXACT
 // pdeb -> t[0] , EXACT
-// pfin -> t[10-1] , EXACT
+// pfin -> t[9] , EXACT
 
    while (p<=pfin) {
 
 // Points To:
-// p -> t[0] , MAY
 // p -> t[*] , MAY
+// p -> t[0] , MAY
+// p -> t[1] , MAY
+// p -> t[2] , MAY
+// p -> t[3] , MAY
 // pdeb -> t[0] , EXACT
-// pfin -> t[10-1] , EXACT
+// pfin -> t[9] , EXACT
 
       if (*p==0)
 
 // Points To:
-// p -> t[0] , MAY
 // p -> t[*] , MAY
+// p -> t[0] , MAY
+// p -> t[1] , MAY
+// p -> t[2] , MAY
+// p -> t[3] , MAY
 // pdeb -> t[0] , EXACT
-// pfin -> t[10-1] , EXACT
+// pfin -> t[9] , EXACT
 
          printf("%d ", p-pdeb);
 
 // Points To:
-// p -> t[0] , MAY
 // p -> t[*] , MAY
+// p -> t[0] , MAY
+// p -> t[1] , MAY
+// p -> t[2] , MAY
+// p -> t[3] , MAY
 // pdeb -> t[0] , EXACT
-// pfin -> t[10-1] , EXACT
+// pfin -> t[9] , EXACT
 
       p++;
    }
 
 // Points To:
-// p -> t[0] , MAY
-// p -> t[*] , MAY
+// p -> t[*] , EXACT
 // pdeb -> t[0] , EXACT
-// pfin -> t[10-1] , EXACT
+// pfin -> t[9] , EXACT
 
    printf("\n");
 
 // Points To:
-// p -> t[0] , MAY
-// p -> t[*] , MAY
+// p -> t[*] , EXACT
 // pdeb -> t[0] , EXACT
-// pfin -> t[10-1] , EXACT
+// pfin -> t[9] , EXACT
 
    return 0;
 }
@@ -143,7 +150,7 @@ int main()
    p = pdeb;
 //             <    is read   >: p pfin
    while (p<=pfin) {
-//             <may be read   >: t[0] t[*]
+//             <may be read   >: t[0] t[1] t[2] t[3] t[*]
 //             <    is read   >: p
       if (*p==0)
 //             <may be read   >: stdout[0]
@@ -162,51 +169,3 @@ int main()
    printf("\n");
    return 0;
 }
-
- *********************** Use-Def Chains *********************
-
-	-1 --> -1 with conflicts
-		from <p-W-EXACT> to <p-W-EXACT>
-		from <p-W-EXACT> to <p-R-EXACT>
-		from <p-R-EXACT> to <p-W-EXACT>
-	-1 --> 14 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	-1 --> 14 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	-1 --> -1 with conflicts
-		from <p-R-EXACT> to <p-W-EXACT>
-	-1 --> -1 with conflicts
-		from <p-W-EXACT> to <p-W-EXACT>
-		from <p-W-EXACT> to <p-R-EXACT>
-	-1 --> -1 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	-1 --> 14 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	-1 --> 14 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	10 --> -1 with conflicts
-		from <pdeb-W-EXACT> to <pdeb-R-EXACT>
-	10 --> 14 with conflicts
-		from <pdeb-W-EXACT> to <pdeb-R-EXACT>
-	11 --> -1 with conflicts
-		from <pfin-W-EXACT> to <pfin-R-EXACT>
-	14 --> -1 with conflicts
-		from <p-R-EXACT> to <p-W-EXACT>
-	14 --> 14 with conflicts
-		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-	14 --> 15 with conflicts
-		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-	14 --> -1 with conflicts
-		from <p-R-EXACT> to <p-W-EXACT>
-
-****************** End of Dependence Graph ******************

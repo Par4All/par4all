@@ -1,0 +1,48 @@
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: unreachable
+
+int main()
+{
+
+// Points To: none
+
+   int **a;
+
+// Points To:
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int b;
+
+// Points To:
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   a = (int **) (void *) 0;
+
+// Points To:
+// a -> *NULL_POINTER* , EXACT
+
+   a[0] = &b;
+
+// Points To: unreachable
+
+   return b;
+}
+
+Proper effects with points-to for "main"
+
+int main()
+{
+   int **a;
+   int b;
+//             <    is written>: a
+   a = (int **) (void *) 0;
+//             <    is read   >: a
+   a[0] = &b;
+   return b;
+}

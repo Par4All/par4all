@@ -1,22 +1,4 @@
 
-PROPER  EFFECTS
-
-void pointer01(int n, float *p, float *q)
-{
-   int i;
-//             <    is read   >: p q
-   if (p!=(void *) 0&&q!=(void *) 0)
-//             <    is read   >: n
-//             <    is written>: i
-      // FI: simplified for debugging
-      // if(p!=NULL) {
-      for(i = 0; i <= n-1; i += 1)
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-         p[i] = q[i];
-   return;
-}
-
 POINTS-TO
 
 

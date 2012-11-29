@@ -18,14 +18,20 @@ void chain(ilp_t c1, ilp_t c2)
 // c2 -> _c2_2 , EXACT
 
    c1->next = c2;
+
+// Points To:
+// _c1_1.next -> _c2_2 , EXACT
+// c1 -> _c1_1 , EXACT
+// c2 -> _c2_2 , EXACT
+
+
+   return;
 }
 
 // Points To IN: none
 
 
-// Points To OUT:
-// *HEAP*_l_12.next -> *NULL_POINTER* , MAY
-// *HEAP*_l_13.next -> *NULL_POINTER* , MAY
+// Points To OUT: none
 
 int main()
 {
@@ -35,37 +41,39 @@ int main()
    ilp_t x1 = (ilp_t) malloc(sizeof(il_t));
 
 // Points To:
-// x1 -> *HEAP*_l_12 , MAY
+// x1 -> *HEAP*_l_17 , MAY
 
    ilp_t x2 = (ilp_t) malloc(sizeof(il_t));
 
 // Points To:
-// x1 -> *HEAP*_l_12 , MAY
-// x2 -> *HEAP*_l_13 , MAY
+// x1 -> *HEAP*_l_17 , MAY
+// x2 -> *HEAP*_l_18 , MAY
 
    x1->next = (void *) 0;
 
 // Points To:
-// *HEAP*_l_12.next -> *NULL_POINTER* , MAY
-// x1 -> *HEAP*_l_12 , MAY
-// x2 -> *HEAP*_l_13 , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// x1 -> *HEAP*_l_17 , MAY
+// x2 -> *HEAP*_l_18 , MAY
 
    x2->next = (void *) 0;
 
 // Points To:
-// *HEAP*_l_12.next -> *NULL_POINTER* , MAY
-// *HEAP*_l_13.next -> *NULL_POINTER* , MAY
-// x1 -> *HEAP*_l_12 , MAY
-// x2 -> *HEAP*_l_13 , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_18.next -> *NULL_POINTER* , MAY
+// x1 -> *HEAP*_l_17 , MAY
+// x2 -> *HEAP*_l_18 , MAY
 
 
    chain(x1, x2);
 
 // Points To:
-// *HEAP*_l_12.next -> *NULL_POINTER* , MAY
-// *HEAP*_l_13.next -> *NULL_POINTER* , MAY
-// x1 -> *HEAP*_l_12 , MAY
-// x2 -> *HEAP*_l_13 , MAY
+// *HEAP*_l_17.next -> *HEAP*_l_18 , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_18.next -> *NULL_POINTER* , MAY
+// x1 -> *HEAP*_l_17 , MAY
+// x2 -> *HEAP*_l_18 , MAY
+
 
    return 0;
 }
@@ -77,6 +85,8 @@ void chain(ilp_t c1, ilp_t c2)
 //             <    is read   >: c1 c2
 //             <    is written>: _c1_1.next
    c1->next = c2;
+
+   return;
 }
 int main()
 {
@@ -86,16 +96,17 @@ int main()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: x2 _MALLOC_EFFECTS:_MALLOC_
    ilp_t x2 = (ilp_t) malloc(sizeof(il_t));
-//             <may be written>: *HEAP*_l_12.next
+//             <may be written>: *HEAP*_l_17.next
 //             <    is read   >: x1
    x1->next = (void *) 0;
-//             <may be written>: *HEAP*_l_13.next
+//             <may be written>: *HEAP*_l_18.next
 //             <    is read   >: x2
    x2->next = (void *) 0;
 //             <    is read   >: x1 x2
-//             <    is written>: chain:_c1_1.next
+//             <    is written>: *HEAP*_l_17.next
 
    chain(x1, x2);
+
    return 0;
 }
 
@@ -108,10 +119,11 @@ void chain(ilp_t c1, ilp_t c2)
 //             <    is read   >: c1 c2
 //             <    is written>: _c1_1.next
    c1->next = c2;
+
+   return;
 }
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
-//                               chain:_c1_1.next
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 int main()
 {
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
@@ -120,16 +132,17 @@ int main()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: x2 _MALLOC_EFFECTS:_MALLOC_
    ilp_t x2 = (ilp_t) malloc(sizeof(il_t));
-//             <may be written>: *HEAP*_l_12.next
+//             <may be written>: *HEAP*_l_17.next
 //             <    is read   >: x1
    x1->next = (void *) 0;
-//             <may be written>: *HEAP*_l_13.next
+//             <may be written>: *HEAP*_l_18.next
 //             <    is read   >: x2
    x2->next = (void *) 0;
 //             <    is read   >: x1 x2
-//             <    is written>: chain:_c1_1.next
+//             <    is written>: *HEAP*_l_17.next
 
    chain(x1, x2);
+
    return 0;
 }
 
@@ -152,4 +165,63 @@ void chain(ilp_t c1, ilp_t c2)
 // c2 -> _c2_2 , EXACT
 
    c1->next = c2;
+
+// Points To:
+// _c1_1.next -> _c2_2 , EXACT
+// c1 -> _c1_1 , EXACT
+// c2 -> _c2_2 , EXACT
+
+
+   return;
 }
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   ilp_t x1 = (ilp_t) malloc(sizeof(il_t));
+
+// Points To:
+// x1 -> *HEAP*_l_17 , MAY
+
+   ilp_t x2 = (ilp_t) malloc(sizeof(il_t));
+
+// Points To:
+// x1 -> *HEAP*_l_17 , MAY
+// x2 -> *HEAP*_l_18 , MAY
+
+   x1->next = (void *) 0;
+
+// Points To:
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// x1 -> *HEAP*_l_17 , MAY
+// x2 -> *HEAP*_l_18 , MAY
+
+   x2->next = (void *) 0;
+
+// Points To:
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_18.next -> *NULL_POINTER* , MAY
+// x1 -> *HEAP*_l_17 , MAY
+// x2 -> *HEAP*_l_18 , MAY
+
+
+   chain(x1, x2);
+
+// Points To:
+// *HEAP*_l_17.next -> *HEAP*_l_18 , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_18.next -> *NULL_POINTER* , MAY
+// x1 -> *HEAP*_l_17 , MAY
+// x2 -> *HEAP*_l_18 , MAY
+
+
+   return 0;
+}
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

@@ -85,8 +85,9 @@ int main()
    (s2->b)[0] = &i;
 
 // Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s1.b[*] -> i , MAY
 // s1.b[0] -> i , EXACT
 // s1.a -> j , EXACT
 // s2 -> s1 , EXACT

@@ -33,8 +33,7 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT:
-// *HEAP*_l_11.p -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// Points To OUT: none
 
 int main()
 {

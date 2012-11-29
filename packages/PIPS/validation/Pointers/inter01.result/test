@@ -48,4 +48,4 @@ void inter01()
       m = 5;
    }
 }
-INIT_POINTS_TO_ANALYSIS[inter01] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

@@ -58,23 +58,28 @@ void pointer14()
 
 // Points To:
 // a[*][*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
-// t[*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// t[*][*] -> *ANY_MODULE*:*NOWHERE* , MAY
+// t[*][*] -> a , MAY
 // t[1][2] -> a , EXACT
 
    a[1][2][3] = &z;
 
 // Points To:
-// a[*][*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a[*][*][*] -> *ANY_MODULE*:*NOWHERE* , MAY
+// a[*][*][*] -> z , MAY
 // a[1][2][3] -> z , EXACT
-// t[*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// t[*][*] -> *ANY_MODULE*:*NOWHERE* , MAY
+// t[*][*] -> a , MAY
 // t[1][2] -> a , EXACT
 
    foo(t);
 
 // Points To:
-// a[*][*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a[*][*][*] -> *ANY_MODULE*:*NOWHERE* , MAY
+// a[*][*][*] -> z , MAY
 // a[1][2][3] -> z , EXACT
-// t[*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// t[*][*] -> *ANY_MODULE*:*NOWHERE* , MAY
+// t[*][*] -> a , MAY
 // t[1][2] -> a , EXACT
 
    return;

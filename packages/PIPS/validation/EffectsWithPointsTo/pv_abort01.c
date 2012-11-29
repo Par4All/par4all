@@ -1,4 +1,5 @@
-// dereferencing an unitialized pointer yields a user error
+// dereferencing an uninitialized pointer yields a user error
+
 int main()
 {
   int **a;

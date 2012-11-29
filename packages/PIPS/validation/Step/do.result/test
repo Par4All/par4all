@@ -1,4 +1,4 @@
-###################### do/do.database/Src/MY_DO_PAR_HYBRID.f ######################
+###################### do-STEP/do.database/Src/MY_DO_PAR_HYBRID.f ######################
       SUBROUTINE MY_DO_PAR_HYBRID(N, A, I)
       implicit none
       include "STEP.h"
@@ -28,10 +28,6 @@ C BEGIN WORK
 !$omp end parallel
 C END WORK
 !$omp master
-
-C     Communicating data to other nodes
-C     3 communication shemes for all-to-all personalized broadcast :
-C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
       CALL STEP_ALLTOALL_FULL(A, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT
      &)
       CALL STEP_FLUSH
@@ -39,7 +35,7 @@ C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
 !$omp end master
 !$omp barrier
       END
-###################### do/do.database/Src/MY_DO_PAR_HYBRID_DO_HYBRID.f ######################
+###################### do-STEP/do.database/Src/MY_DO_PAR_HYBRID_DO_HYBRID.f ######################
       SUBROUTINE MY_DO_PAR_HYBRID_DO_HYBRID(N, A, I)
       implicit none
       include "STEP.h"
@@ -87,7 +83,7 @@ C END WORK
 !$omp end master
 !$omp barrier
       END
-###################### do/do.database/Src/MY_DO_PAR_HYBRID_DO_HYBRID_1.f ######################
+###################### do-STEP/do.database/Src/MY_DO_PAR_HYBRID_DO_HYBRID_1.f ######################
       SUBROUTINE MY_DO_PAR_HYBRID_DO_HYBRID_1(N, A, I)
       implicit none
       include "STEP.h"
@@ -104,10 +100,10 @@ C SEND REGIONS
       DO IDX = 1, STEP_COMM_SIZE
          CALL STEP_GET_LOOPBOUNDS(IDX-1, STEP_I_LOW, STEP_I_UP)
 
-C  <A(PHI1,PHI2)-W-EXACT-{PHI2==2, 1<=PHI1, PHI1<=10,
-C    STEP_I_LOW<=PHI1, PHI1<=STEP_I_UP}>
+C  <A(PHI1,PHI2)-W-EXACT-{PHI2==2, PHI1<=10, STEP_I_LOW<=PHI1,
+C    PHI1<=STEP_I_UP}>
 
-         STEP_SR_A(STEP_INDEX_SLICE_LOW,1,IDX) = MAX(1, STEP_I_LOW)
+         STEP_SR_A(STEP_INDEX_SLICE_LOW,1,IDX) = STEP_I_LOW
          STEP_SR_A(STEP_INDEX_SLICE_UP,1,IDX) = MIN(10, STEP_I_UP)
          STEP_SR_A(STEP_INDEX_SLICE_LOW,2,IDX) = 2
          STEP_SR_A(STEP_INDEX_SLICE_UP,2,IDX) = 2
@@ -134,7 +130,7 @@ C END WORK
 !$omp end master
 !$omp barrier
       END
-###################### do/do.database/Src/do.f ######################
+###################### do-STEP/do.database/Src/do.f ######################
 !
 ! do.f
 !

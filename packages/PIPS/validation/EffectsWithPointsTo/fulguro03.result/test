@@ -1,170 +1,11 @@
 
-PROPER  EFFECTS 
-
-void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
-{
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: array_s
-   fgUINT16 *array_s = (fgUINT16 *) vct->array;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: array_d
-   fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: I_0
-   int I_0 = vct->spp;
-   {
-      register fgUINT16 val;
-      register int i;
-      register int k;
-      unsigned short _return0;
-//             <    is read   >: I_0 col
-//             <    is written>: i
-      i = col*I_0;
-//             <    is read   >: I_0
-//             <    is written>: k
-      for(k = 0; k <= I_0-1; k += 1) {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: _return0
-         _return0 = array_s[k];
-//             <    is read   >: I_0 _return0
-//             <    is written>: val
-         val = _return0;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: I_0 array_d i val
-         array_d[i] = val;
-//             <    is read   >: I_0 i
-//             <    is written>: i
-         i++;
-      }
-   }
-}
-
-POINTS-TO
-
-
-// Points To IN:
-// dat -> _dat_1[0] , EXACT
-// vct -> _vct_4[0] , EXACT
-
-
-// Points To OUT: none
-
-void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
-{
-
-// Points To:
-// dat -> _dat_1[0] , EXACT
-// vct -> _vct_4[0] , EXACT
-
-   fgUINT16 *array_s = (fgUINT16 *) vct->array;
-
-// Points To:
-// array_s -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// dat -> _dat_1[0] , EXACT
-// vct -> _vct_4[0] , EXACT
-
-   fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];
-
-// Points To:
-// array_d -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// array_s -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// dat -> _dat_1[0] , EXACT
-// vct -> _vct_4[0] , EXACT
-
-   int I_0 = vct->spp;
-   {
-
-// Points To:
-// array_d -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// array_s -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// dat -> _dat_1[0] , EXACT
-// vct -> _vct_4[0] , EXACT
-
-      register fgUINT16 val;
-
-// Points To:
-// array_d -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// array_s -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// dat -> _dat_1[0] , EXACT
-// vct -> _vct_4[0] , EXACT
-
-      register int i;
-
-// Points To:
-// array_d -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// array_s -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// dat -> _dat_1[0] , EXACT
-// vct -> _vct_4[0] , EXACT
-
-      register int k;
-
-// Points To:
-// array_d -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// array_s -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// dat -> _dat_1[0] , EXACT
-// vct -> _vct_4[0] , EXACT
-
-      unsigned short _return0;
-
-// Points To:
-// array_d -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// array_s -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// dat -> _dat_1[0] , EXACT
-// vct -> _vct_4[0] , EXACT
-
-      i = col*I_0;
-
-// Points To:
-// array_d -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// array_s -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// dat -> _dat_1[0] , EXACT
-// vct -> _vct_4[0] , EXACT
-
-      for(k = 0; k <= I_0-1; k += 1) {
-
-// Points To:
-// array_d -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// array_s -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// dat -> _dat_1[0] , EXACT
-// vct -> _vct_4[0] , EXACT
-
-         _return0 = array_s[k];
-
-// Points To:
-// array_d -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// array_s -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// dat -> _dat_1[0] , EXACT
-// vct -> _vct_4[0] , EXACT
-
-         val = _return0;
-
-// Points To:
-// array_d -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// array_s -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// dat -> _dat_1[0] , EXACT
-// vct -> _vct_4[0] , EXACT
-
-         array_d[i] = val;
-
-// Points To:
-// array_d -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// array_s -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// dat -> _dat_1[0] , EXACT
-// vct -> _vct_4[0] , EXACT
-
-         i++;
-      }
-   }
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
 {
 //             <    is read   >: _vct_4[0].array vct
 //             <    is written>: array_s
    fgUINT16 *array_s = (fgUINT16 *) vct->array;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _dat_1[0].array _dat_1_1__1[0][row] 
+//                               dat row
 //             <    is written>: array_d
    fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];
 //             <    is read   >: _vct_4[0].spp vct
@@ -181,13 +22,13 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 //             <    is read   >: I_0
 //             <    is written>: k
       for(k = 0; k <= I_0-1; k += 1) {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: I_0 _vct_4_3__4[0][k] array_s k
 //             <    is written>: _return0
          _return0 = array_s[k];
 //             <    is read   >: I_0 _return0
 //             <    is written>: val
          val = _return0;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: _dat_1_1__1_1[0][*][i]
 //             <    is read   >: I_0 array_d i val
          array_d[i] = val;
 //             <    is read   >: I_0 i
@@ -205,31 +46,15 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 		from <i-R-EXACT> to <i-W-EXACT>
 	-1 --> 26 with conflicts
 		from <i-W-EXACT> to <i-R-EXACT>
-		from <I_0-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	-1 --> -1 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 		from <i-W-EXACT> to <i-R-EXACT>
 	-1 --> 26 with conflicts
 		from <i-W-EXACT> to <i-R-EXACT>
-		from <col-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <I_0-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	15 --> 16 with conflicts
-		from <array_s-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	15 --> 24 with conflicts
-		from <array_s-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	15 --> 26 with conflicts
-		from <array_s-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <vct-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <_vct_4[0].array-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	16 --> 17 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <I_0-W-EXACT>
-	16 --> 24 with conflicts
-		from <array_d-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_return0-W-EXACT>
+		from <array_s-W-EXACT> to <array_s-R-EXACT>
 	16 --> 26 with conflicts
-		from <array_d-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <array_d-W-EXACT> to <array_d-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	17 --> -1 with conflicts
 		from <I_0-W-EXACT> to <I_0-R-EXACT>
 	17 --> -1 with conflicts
@@ -237,48 +62,26 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 	17 --> 23 with conflicts
 		from <I_0-W-EXACT> to <I_0-R-EXACT>
 	17 --> 24 with conflicts
-		from <I_0-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <I_0-W-EXACT> to <I_0-R-EXACT>
 	17 --> 25 with conflicts
 		from <I_0-W-EXACT> to <I_0-R-EXACT>
 	17 --> 26 with conflicts
-		from <I_0-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <I_0-W-EXACT> to <I_0-R-EXACT>
-		from <vct-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <_vct_4[0].spp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	23 --> 26 with conflicts
-		from <I_0-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	24 --> 24 with conflicts
 		from <_return0-W-EXACT> to <_return0-W-EXACT>
-		from <_return0-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_return0-W-EXACT>
 	24 --> 25 with conflicts
 		from <_return0-W-EXACT> to <_return0-R-EXACT>
-	24 --> 26 with conflicts
-		from <_return0-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	25 --> 24 with conflicts
 		from <_return0-R-EXACT> to <_return0-W-EXACT>
 	25 --> 25 with conflicts
 		from <val-W-EXACT> to <val-W-EXACT>
 	25 --> 26 with conflicts
 		from <val-W-EXACT> to <val-R-EXACT>
-		from <_return0-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <I_0-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	26 --> -1 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <I_0-R-EXACT>
 		from <i-R-EXACT> to <i-W-EXACT>
-	26 --> 24 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_return0-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	26 --> 25 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_return0-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <I_0-R-EXACT>
 		from <val-R-EXACT> to <val-W-EXACT>
 	26 --> 26 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <array_d-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <I_0-R-EXACT>
-		from <array_d-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <I_0-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_dat_1_1__1_1[0][*][i]-W-MAY> to <_dat_1_1__1_1[0][*][i]-W-MAY>
 
 ****************** End of Dependence Graph ******************

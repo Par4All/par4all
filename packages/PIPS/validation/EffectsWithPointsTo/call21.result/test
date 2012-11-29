@@ -1,91 +1,12 @@
 
-PROPER  EFFECTS 
-
-pointer alloc_pointer(int v)
-{
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-   pointer p = malloc(sizeof(int));
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p v
-   *p = v;
-//             <    is read   >: p
-   return p;
-}
-int main(void)
-{
-//             <    is written>: i1 i2 i3
-   int i1 = 13, i2 = 17, i3 = 19;
-   pointer p1, p2, p3;
-//             <    is written>: p1
-
-   p1 = &i1;
-//             <    is written>: p2
-   p2 = &i2;
-//             <    is written>: p3
-   p3 = &i3;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   
-   // no pointer assigned! can keep all points-to
-   pointer_add(p1, p2, p3);
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   // 36 17 19
-   // no pointer assigned
-   fprintf(stdout, "p1=%d p2=%d p3=%d\n", pointer_get(p1), pointer_get(p2), pointer_get(p3));
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p3
-   
-   // no pointer assigned! can keep all points-to
-   pointer_set(p3, 23);
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   
-   // no pointer assigned! can keep all points-to
-   pointer_add(p3, p2, p1);
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   
-   // 36 17 53
-   // no pointer assigned
-   fprintf(stdout, "p1=%d p2=%d p3=%d\n", pointer_get(p1), pointer_get(p2), pointer_get(p3));
-}
-void pointer_add(pointer q1, const pointer q2, const pointer q3)
-{
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   *q1 = *q2+*q3;
-}
-void pointer_free(pointer p)
-{
-//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   free(p);
-}
-int pointer_get(const pointer p)
-{
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-   return *p;
-}
-void pointer_set(pointer p, int v)
-{
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p v
-   *p = v;
-}
-
 POINTS-TO
 
 
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// alloc_pointer -> *HEAP*_l_6 , MAY
 
 pointer alloc_pointer(int v)
 {
@@ -95,12 +16,12 @@ pointer alloc_pointer(int v)
    pointer p = malloc(sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_6 , EXACT
+// p -> *HEAP*_l_6 , MAY
 
    *p = v;
 
 // Points To:
-// p -> *HEAP*_l_6 , EXACT
+// p -> *HEAP*_l_6 , MAY
 
    return p;
 }
@@ -191,9 +112,12 @@ int main(void)
 }
 
 // Points To IN:
-// q1 -> _q1_1[0] , EXACT
-// q2 -> _q2_2[0] , EXACT
-// q3 -> _q3_3[0] , EXACT
+// q1 -> *NULL_POINTER* , MAY
+// q1 -> _q1_1[0] , MAY
+// q2 -> *NULL_POINTER* , MAY
+// q2 -> _q2_2[0] , MAY
+// q3 -> *NULL_POINTER* , MAY
+// q3 -> _q3_3[0] , MAY
 
 
 // Points To OUT: none
@@ -202,30 +126,37 @@ void pointer_add(pointer q1, const pointer q2, const pointer q3)
 {
 
 // Points To:
-// q1 -> _q1_1[0] , EXACT
-// q2 -> _q2_2[0] , EXACT
-// q3 -> _q3_3[0] , EXACT
+// q1 -> *NULL_POINTER* , MAY
+// q1 -> _q1_1[0] , MAY
+// q2 -> *NULL_POINTER* , MAY
+// q2 -> _q2_2[0] , MAY
+// q3 -> *NULL_POINTER* , MAY
+// q3 -> _q3_3[0] , MAY
 
    *q1 = *q2+*q3;
 }
 
 // Points To IN:
-// p -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 void pointer_free(pointer p)
 {
 
 // Points To:
-// p -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
    free(p);
 }
 
 // Points To IN:
-// p -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
 
 // Points To OUT: none
@@ -234,13 +165,15 @@ int pointer_get(const pointer p)
 {
 
 // Points To:
-// p -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
    return *p;
 }
 
 // Points To IN:
-// p -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
 
 // Points To OUT: none
@@ -249,7 +182,8 @@ void pointer_set(pointer p, int v)
 {
 
 // Points To:
-// p -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
    *p = v;
 }
@@ -261,8 +195,8 @@ pointer alloc_pointer(int v)
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
    pointer p = malloc(sizeof(int));
+//             <may be written>: *HEAP*_l_6
 //             <    is read   >: p v
-//             <    is written>: *HEAP*_l_6
    *p = v;
 //             <    is read   >: p
    return p;
@@ -279,28 +213,33 @@ int main(void)
    p2 = &i2;
 //             <    is written>: p3
    p3 = &i3;
-//             <    is read   >: p1 p2 p3
+//             <    is read   >: i2 i3 p1 p2 p3
+//             <    is written>: i1
    
    // no pointer assigned! can keep all points-to
    pointer_add(p1, p2, p3);
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: p1 p2 p3 stdout __IO_EFFECTS:LUNS[1]
+//             <    is read   >: i1 i2 i3 p1 p2 p3 stdout 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    // 36 17 19
    // no pointer assigned
    fprintf(stdout, "p1=%d p2=%d p3=%d\n", pointer_get(p1), pointer_get(p2), pointer_get(p3));
 //             <    is read   >: p3
+//             <    is written>: i3
    
    // no pointer assigned! can keep all points-to
    pointer_set(p3, 23);
-//             <    is read   >: p1 p2 p3
+//             <    is read   >: i1 i2 p1 p2 p3
+//             <    is written>: i3
    
    // no pointer assigned! can keep all points-to
    pointer_add(p3, p2, p1);
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: p1 p2 p3 stdout __IO_EFFECTS:LUNS[1]
+//             <    is read   >: i1 i2 i3 p1 p2 p3 stdout 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    
    // 36 17 53
@@ -333,6 +272,19 @@ void pointer_set(pointer p, int v)
 
  *********************** Use-Def Chains *********************
 
+	08 --> 16 with conflicts
+		from <i1-W-EXACT> to <i1-W-EXACT>
+		from <i3-W-EXACT> to <i3-R-EXACT>
+		from <i2-W-EXACT> to <i2-R-EXACT>
+	08 --> 19 with conflicts
+		from <i3-W-EXACT> to <i3-R-EXACT>
+		from <i2-W-EXACT> to <i2-R-EXACT>
+	08 --> 22 with conflicts
+		from <i3-W-EXACT> to <i3-W-EXACT>
+	08 --> 25 with conflicts
+		from <i2-W-EXACT> to <i2-R-EXACT>
+	08 --> 29 with conflicts
+		from <i2-W-EXACT> to <i2-R-EXACT>
 	11 --> 16 with conflicts
 		from <p1-W-EXACT> to <p1-R-EXACT>
 	11 --> 19 with conflicts
@@ -359,6 +311,16 @@ void pointer_set(pointer p, int v)
 		from <p3-W-EXACT> to <p3-R-EXACT>
 	13 --> 29 with conflicts
 		from <p3-W-EXACT> to <p3-R-EXACT>
+	16 --> 19 with conflicts
+		from <i1-W-EXACT> to <i1-R-EXACT>
+	16 --> 22 with conflicts
+		from <i3-R-EXACT> to <i3-W-EXACT>
+	16 --> 25 with conflicts
+		from <i1-W-EXACT> to <i1-R-EXACT>
+	16 --> 29 with conflicts
+		from <i1-W-EXACT> to <i1-R-EXACT>
+	19 --> 22 with conflicts
+		from <i3-R-EXACT> to <i3-W-EXACT>
 	19 --> 29 with conflicts
 		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
@@ -366,5 +328,9 @@ void pointer_set(pointer p, int v)
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	22 --> 25 with conflicts
+		from <i3-W-EXACT> to <i3-W-EXACT>
+	25 --> 29 with conflicts
+		from <i3-W-EXACT> to <i3-R-EXACT>
 
 ****************** End of Dependence Graph ******************

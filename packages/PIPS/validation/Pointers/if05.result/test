@@ -61,5 +61,5 @@ int main()
 
    return 0;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_condition_to_points_to) Dead code detected.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_condition_to_points_to) Dead code detected.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_condition_to_points_to) Dead code detected.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_condition_to_points_to) Dead code detected.

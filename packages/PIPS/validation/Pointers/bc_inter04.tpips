@@ -10,6 +10,10 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 
 activate PRINT_CODE_POINTS_TO_LIST
 
+echo POINTS TO for "foo"
+echo
+display PRINTED_FILE[foo]
+
 echo POINTS TO for "main"
 echo
 display PRINTED_FILE[main]

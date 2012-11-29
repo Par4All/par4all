@@ -20,4 +20,5 @@ void assign07()
 void foo()
 {
   assign07();
+  return;
 }

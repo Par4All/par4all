@@ -1,0 +1,3 @@
+user warning in check_type_of_points_to_cells: Maybe an issue with a dynamic memory allocation.
+[stack_head] (/home/francois/MYPIPS/prod/newgen/src/genC/stack.c:424) assertion failed
+Aborted

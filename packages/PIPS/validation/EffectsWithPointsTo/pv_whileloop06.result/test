@@ -1,6 +1,4 @@
 
-PROPER  EFFECTS 
-
 int main()
 {
    int i;
@@ -16,117 +14,10 @@ int main()
    i = 0;
 //             <    is read   >: i
    while (i<10) {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-      *p++ = 2**q++;
-//             <    is read   >: i
-//             <    is written>: i
-      i++;
-   }
-   return 0;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   int i;
-
-// Points To: none
-
-   int *p, *q;
-
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   int a[10];
-
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   int b[10];
-
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-
-   p = &a[0];
-
-// Points To:
-// p -> a[0] , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   q = &b[0];
-
-// Points To:
-// p -> a[0] , EXACT
-// q -> b[0] , EXACT
-
-   i = 0;
-
-// Points To:
-// p -> a[0] , EXACT
-// q -> b[0] , EXACT
-
-   while (i<10) {
-
-// Points To:
-// p -> a[0] , MAY
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// q -> b[0] , MAY
-// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-
-      *p++ = 2**q++;
-
-// Points To:
-// p -> a[0] , MAY
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// q -> b[0] , MAY
-// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-
-      i++;
-   }
-
-// Points To:
-// p -> a[0] , MAY
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// q -> b[0] , MAY
-// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
-int main()
-{
-   int i;
-   int *p, *q;
-   int a[10];
-   int b[10];
-//             <    is written>: p
-
-   p = &a[0];
-//             <    is written>: q
-   q = &b[0];
-//             <    is written>: i
-   i = 0;
-//             <    is read   >: i
-   while (i<10) {
-//             <may be read   >: b[0] *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: a[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: b[0] b[1] b[2] b[3] b[*]
+//             <may be written>: a[0] a[1] a[2] a[3] a[*]
+//             <    is read   >: p q
+//             <    is written>: p q
       *p++ = 2**q++;
 //             <    is read   >: i
 //             <    is written>: i
@@ -138,41 +29,38 @@ int main()
  *********************** Use-Def Chains *********************
 
 	11 --> 16 with conflicts
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
 	12 --> 16 with conflicts
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <q-W-EXACT> to <q-W-EXACT>
+		from <q-W-EXACT> to <q-R-EXACT>
 	13 --> 14 with conflicts
 		from <i-W-EXACT> to <i-R-EXACT>
-	13 --> 16 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	13 --> 17 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 		from <i-W-EXACT> to <i-R-EXACT>
-	14 --> 16 with conflicts
-		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	14 --> 17 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	16 --> 16 with conflicts
+		from <q-W-EXACT> to <q-W-EXACT>
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <a[3]-W-MAY> to <a[3]-W-MAY>
+		from <a[3]-W-MAY> to <a[*]-W-MAY>
+		from <a[2]-W-MAY> to <a[2]-W-MAY>
+		from <a[2]-W-MAY> to <a[*]-W-MAY>
+		from <a[1]-W-MAY> to <a[1]-W-MAY>
+		from <a[1]-W-MAY> to <a[*]-W-MAY>
 		from <a[0]-W-MAY> to <a[0]-W-MAY>
-		from <a[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <a[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <b[0]-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <b[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <a[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	16 --> 17 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <i-W-EXACT>
-	17 --> 16 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <a[0]-W-MAY> to <a[*]-W-MAY>
+		from <a[*]-W-MAY> to <a[3]-W-MAY>
+		from <a[*]-W-MAY> to <a[2]-W-MAY>
+		from <a[*]-W-MAY> to <a[1]-W-MAY>
+		from <a[*]-W-MAY> to <a[0]-W-MAY>
+		from <a[*]-W-MAY> to <a[*]-W-MAY>
+		from <q-W-EXACT> to <q-R-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+		from <q-R-EXACT> to <q-W-EXACT>
+		from <p-R-EXACT> to <p-W-EXACT>
 	17 --> 17 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 		from <i-W-EXACT> to <i-R-EXACT>

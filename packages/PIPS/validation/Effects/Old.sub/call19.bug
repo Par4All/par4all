@@ -1,0 +1,8 @@
+  CUMULATED_POINTER_EFFECTS      building   CUMULATED_POINTER_EFFECTS(main)
+[gen_nthcdr] (/home/francois/MYPIPS/prod/newgen/src/genC/list.c:703) assertion failed
+
+ valid n not verified
+
+Aborted
+
+Should be linked to an extra subscript appearing in proper effects.

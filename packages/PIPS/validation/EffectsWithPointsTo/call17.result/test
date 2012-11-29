@@ -1,22 +1,10 @@
 
-PROPER  EFFECTS 
-
-void call17(int *x)
-{
-   /* check aliases */
-//             <    is read   >: x
-//             <    is written>: y
-   int *y = x;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: y
-   y[0] = 1;
-}
-
-POINTS-TO
+Points-to for call17
 
 
 // Points To IN:
-// x -> _x_1[0] , EXACT
+// x -> *NULL_POINTER* , MAY
+// x -> _x_1[0] , MAY
 
 
 // Points To OUT: none
@@ -26,18 +14,28 @@ void call17(int *x)
    /* check aliases */
 
 // Points To:
-// x -> _x_1[0] , EXACT
+// x -> *NULL_POINTER* , MAY
+// x -> _x_1[0] , MAY
 
    int *y = x;
 
 // Points To:
-// x -> _x_1[0] , EXACT
-// y -> _x_1[0] , EXACT
+// x -> *NULL_POINTER* , MAY
+// x -> _x_1[0] , MAY
+// y -> *NULL_POINTER* , MAY
+// y -> _x_1[0] , MAY
 
    y[0] = 1;
+
+// Points To:
+// x -> *NULL_POINTER* , MAY
+// x -> _x_1[0] , MAY
+// y -> _x_1[0] , EXACT
+
+   return;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+Proper effects with points-to for call17
 
 void call17(int *x)
 {
@@ -48,11 +46,21 @@ void call17(int *x)
 //             <    is read   >: y
 //             <    is written>: _x_1[0]
    y[0] = 1;
+   return;
 }
 
- *********************** Use-Def Chains *********************
+Cumulated effects with points-to for call17
 
-	04 --> 05 with conflicts
-		from <y-W-EXACT> to <y-R-EXACT>
-
-****************** End of Dependence Graph ******************
+//             <    is read   >: x
+//             <    is written>: _x_1[0]
+void call17(int *x)
+{
+   /* check aliases */
+//             <    is read   >: x
+//             <    is written>: y
+   int *y = x;
+//             <    is read   >: y
+//             <    is written>: _x_1[0]
+   y[0] = 1;
+   return;
+}

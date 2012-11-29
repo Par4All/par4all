@@ -21,8 +21,8 @@ int main()
    swap(&pi, &pj);
 
 // Points To:
-// pi -> i , EXACT
-// pj -> j , EXACT
+// pi -> j , EXACT
+// pj -> i , EXACT
 
 
    return 0;
@@ -82,8 +82,8 @@ int main()
 {
 //             <    is written>: i j pi pj
    int i = 1, j = 2, *pi = &i, *pj = &j;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: swap:_p_1 swap:_q_2
+//             <    is read   >: pj
+//             <    is written>: pi pj
    swap(&pi, &pj);
 
    return 0;
@@ -107,19 +107,17 @@ int main();
 
 CUMULATED  EFFECTS WITH POINTS TO
 
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: swap:_p_1 swap:_q_2
 int main()
 {
 //             <    is written>: i j pi pj
    int i = 1, j = 2, *pi = &i, *pj = &j;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: swap:_p_1 swap:_q_2
+//             <    is read   >: pj
+//             <    is written>: pi pj
    swap(&pi, &pj);
 
    return 0;
 }
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _q_2 p q
 //             <    is written>: _p_1 _q_2
 void swap(int **p, int **q)
 {
@@ -216,17 +214,4 @@ void swap(int **p, int **q)
 }
 C_PARSER[main] (simplify_C_expression) Variable "i" is probably used before it is defined
 C_PARSER[main] (simplify_C_expression) Variable "j" is probably used before it is defined
-INIT_POINTS_TO_ANALYSIS[main] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INIT_POINTS_TO_ANALYSIS[swap] (init_points_to_analysis) Property ALIASING_ACROSS_TYPES is ignored
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_p_1_1".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_p_1_1".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_p_1_1".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_p_1_1".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_p_1_1".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_p_1_1".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "_q_2_2".
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

@@ -37,7 +37,7 @@ POINTS-TO
 
 
 // Points To OUT:
-// *HEAP*_l_11[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// bmatrix -> *HEAP*_l_11[0] , MAY
 
 char * * bmatrix(long int nrl, long int nrh, long int ncl, long int nch)
 {
@@ -58,19 +58,17 @@ char * * bmatrix(long int nrl, long int nrh, long int ncl, long int nch)
    m = (char **) malloc((size_t) ((nrow+ncol)*sizeof(char *)));
 
 // Points To:
-// m -> *HEAP*_l_11[0] , EXACT
+// m -> *HEAP*_l_11[0] , MAY
 
    for(i = nrl+1; i <= nrh; i += 1)
 
 // Points To:
-// *HEAP*_l_11[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// m -> *HEAP*_l_11[0] , EXACT
+// m -> *HEAP*_l_11[0] , MAY
 
       m[i] = m[i-1]+ncol;
 
 // Points To:
-// *HEAP*_l_11[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// m -> *HEAP*_l_11[0] , EXACT
+// m -> *HEAP*_l_11[0] , MAY
 
    /* return pointer to array of pointers to rows */
    return m;
@@ -97,8 +95,9 @@ char * * bmatrix(long int nrl, long int nrh, long int ncl, long int nch)
 //             <    is written>: i
 //             <    is referenced>: i nrh nrl
    for(i = nrl+1; i <= nrh; i += 1)
-//             <    is read   >: *HEAP*_l_11[i-1] i m ncol nrh nrl
-//             <    is written>: *HEAP*_l_11[i]
+//             <may be read   >: *HEAP*_l_11[i-1]
+//             <may be written>: *HEAP*_l_11[i]
+//             <    is read   >: i m ncol nrh nrl
 //             <    is referenced>: i m ncol nrh nrl
       m[i] = m[i-1]+ncol;
 //             <    is read   >: m
@@ -131,9 +130,9 @@ char * * bmatrix(long int nrl, long int nrh, long int ncl, long int nch)
 	11 --> 15 with conflicts
 		from <m-W-EXACT> to <m-R-EXACT>
 	13 --> 13 with conflicts
-		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
-		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i-1]-R-EXACT>
-		from <*HEAP*_l_11[i-1]-R-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
+		from <*HEAP*_l_11[i]-W-MAY> to <*HEAP*_l_11[i]-W-MAY>
+		from <*HEAP*_l_11[i]-W-MAY> to <*HEAP*_l_11[i-1]-R-MAY>
+		from <*HEAP*_l_11[i-1]-R-MAY> to <*HEAP*_l_11[i]-W-MAY>
 
 ****************** End of Dependence Graph ******************
 

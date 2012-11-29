@@ -1,28 +1,4 @@
 
-PROPER  EFFECTS 
-
-int main()
-{
-   int **c, **a, **b, *y;
-//             <    is written>: p x z
-   int x = 1, z = 2, p = 1;
-//             <    is written>: a
-
-   a = &x;
-//             <    is written>: b
-   b = &y;
-//             <    is read   >: p
-   if (p)
-//             <    is written>: y
-      y = &z;
-   else
-//             <    is written>: y
-      y = &x;
-//             <    is written>: c
-   c = &y;
-   return 0;
-}
-
 POINTS-TO
 
 
@@ -52,19 +28,12 @@ int main()
 // c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
-
-   a = &x;
-
-// Points To:
-// a -> x , EXACT
-// b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-
+   
+   //a = &x;
    b = &y;
 
 // Points To:
-// a -> x , EXACT
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // b -> y , EXACT
 // c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
@@ -72,7 +41,7 @@ int main()
    if (p)
 
 // Points To:
-// a -> x , EXACT
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // b -> y , EXACT
 // c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
@@ -81,7 +50,7 @@ int main()
    else
 
 // Points To:
-// a -> x , EXACT
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // b -> y , EXACT
 // c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
@@ -89,20 +58,20 @@ int main()
       y = &x;
 
 // Points To:
-// a -> x , EXACT
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // b -> y , EXACT
 // c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> z , MAY
 // y -> x , MAY
+// y -> z , MAY
 
    c = &y;
 
 // Points To:
-// a -> x , EXACT
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // b -> y , EXACT
 // c -> y , EXACT
-// y -> z , MAY
 // y -> x , MAY
+// y -> z , MAY
 
    return 0;
 }
@@ -114,10 +83,9 @@ int main()
    int **c, **a, **b, *y;
 //             <    is written>: p x z
    int x = 1, z = 2, p = 1;
-//             <    is written>: a
-
-   a = &x;
 //             <    is written>: b
+   
+   //a = &x;
    b = &y;
 //             <    is read   >: p
    if (p)
@@ -133,9 +101,9 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	04 --> 08 with conflicts
+	06 --> 10 with conflicts
 		from <p-W-EXACT> to <p-R-EXACT>
-	09 --> 11 with conflicts
+	11 --> 13 with conflicts
 		from <y-W-EXACT> to <y-W-EXACT>
 
 ****************** End of Dependence Graph ******************

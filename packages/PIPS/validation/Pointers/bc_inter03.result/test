@@ -14,9 +14,13 @@ POINTS TO for "exchange"
 
 
 // Points To OUT:
+// _p_1[*] -> *NULL_POINTER* , MAY
 // _p_1[0] -> *NULL_POINTER* , MAY
+// _p_1[*] -> _q_2_2[0][0] , MAY
 // _p_1[0] -> _q_2_2[0][0] , MAY
+// _q_2[*] -> *NULL_POINTER* , MAY
 // _q_2[0] -> *NULL_POINTER* , MAY
+// _q_2[*] -> _p_1_1[0][0] , MAY
 // _q_2[0] -> _p_1_1[0][0] , MAY
 
 void exchange(int **p, int **q)
@@ -50,7 +54,9 @@ void exchange(int **p, int **q)
    *p = *q;
 
 // Points To:
+// _p_1[*] -> *NULL_POINTER* , MAY
 // _p_1[0] -> *NULL_POINTER* , MAY
+// _p_1[*] -> _q_2_2[0][0] , MAY
 // _p_1[0] -> _q_2_2[0][0] , MAY
 // _q_2[0] -> *NULL_POINTER* , MAY
 // _q_2[0] -> _q_2_2[0][0] , MAY

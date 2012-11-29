@@ -1,3 +1,7 @@
+/* This code is bugged because p is uninitialized...
+ *
+ * Is this test case useful?
+ */
 
 int main()
 {

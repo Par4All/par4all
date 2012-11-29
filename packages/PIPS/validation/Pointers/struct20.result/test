@@ -1,5 +1,46 @@
 
-POINTS-TO "main"
+Points-to "read_towns"
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// read_towns.data -> *HEAP*_l_30 , MAY
+
+towns read_towns(const  char fname[])
+{
+
+// Points To: none
+
+   FILE *fd = fopen(fname, "r");
+   /* = { 1 , malloc(sizeof(town)) }*/
+
+// Points To:
+// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+   towns the_towns;
+
+// Points To:
+// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// the_towns.data -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   the_towns.nb = 1;
+
+// Points To:
+// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// the_towns.data -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   the_towns.data = (town *) malloc(sizeof(town));
+
+// Points To:
+// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// the_towns.data -> *HEAP*_l_30 , MAY
+
+   return the_towns;
+}
+
+Points-to "main"
 
 
 // Points To IN: none
@@ -15,11 +56,12 @@ int main(int argc, char *argv[])
    towns t = read_towns(argv[1]);
 
 // Points To:
-// t.data -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
+// t.data -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
 
-   return 0;
+   return (int) t.nb;
 }
 
 Warnings
 
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (binary_intrinsic_call_to_points_to_sinks) Fopen() not precisely implemented.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (binary_intrinsic_call_to_points_to_sinks) Fopen() not precisely implemented.
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active

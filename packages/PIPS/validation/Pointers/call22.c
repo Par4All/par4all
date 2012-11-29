@@ -8,7 +8,7 @@ int * call22(int k)
   return p;
 }
 
-main()
+int main()
 {
   int * q;
 

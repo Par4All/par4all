@@ -1,6 +1,4 @@
 
-PROPER  EFFECTS 
-
 int main()
 {
    int i;
@@ -8,78 +6,9 @@ int main()
    int *p = 0;
 //             <    is written>: q
    int **q = 0;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
 
    *p = 1;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: q
-   *q = &i;
-
-   return 0;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   int i;
-
-// Points To: none
-
-   int *p = 0;
-
-// Points To:
-// p -> *NULL_POINTER* , EXACT
-
-   int **q = 0;
-
-// Points To:
-// p -> *NULL_POINTER* , EXACT
-// q -> *NULL_POINTER* , EXACT
-
-
-   *p = 1;
-
-// Points To:
-// p -> *NULL_POINTER* , EXACT
-// q -> *NULL_POINTER* , EXACT
-
-   *q = &i;
-
-// Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> i , EXACT
-// p -> *NULL_POINTER* , EXACT
-// q -> *NULL_POINTER* , EXACT
-
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
-int main()
-{
-   int i;
-//             <    is written>: p
-   int *p = 0;
-//             <    is written>: q
-   int **q = 0;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-
-   *p = 1;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: q
    *q = &i;
 
    return 0;
@@ -88,18 +17,6 @@ int main()
  *********************** Use-Def Chains *********************
 
 	07 --> 10 with conflicts
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <p-W-EXACT> to <p-R-EXACT>
-	07 --> 11 with conflicts
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	08 --> 10 with conflicts
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	08 --> 11 with conflicts
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <q-W-EXACT> to <q-R-EXACT>
-	10 --> 11 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 
 ****************** End of Dependence Graph ******************

@@ -1,44 +1,11 @@
 
-PROPER EFFECTS
-
-void assign05()
-{
-   int *r;
-   int i;
-//             <    is read   >: i
-//             <    is written>: r
-
-   r = bar(i);
-//             <    is written>: i
-   i = 1;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: r
-   *r = 0;
-}
-int * bar(int j)
-{
-   return &j;
-}
-void foo()
-{
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   assign05();
-}
-
-PROPER POINTER EFFECTS
-
-void foo()
-{
-   assign05();
-}
-
 POINTS TO
 
 
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 void assign05()
 {
@@ -58,15 +25,17 @@ void assign05()
 
    r = bar(i);
 
-// Points To:
-// r -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// Points To: unreachable
 
    i = 1;
 
-// Points To:
-// r -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// Points To: unreachable
 
    *r = 0;
+
+// Points To: unreachable
+
+   return;
 }
 
 // Points To IN: none
@@ -86,7 +55,7 @@ int * bar(int j)
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 void foo()
 {
@@ -94,4 +63,8 @@ void foo()
 // Points To: none
 
    assign05();
+
+// Points To: unreachable
+
+   return;
 }

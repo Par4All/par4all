@@ -4,9 +4,9 @@ POINTS-TO
 
 Warnings
 
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (offset_points_to_cell) user error
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (offset_points_to_cell) Use of pointer arithmetic on "*HEAP*_l_15" at line 16 is not standard-compliant.
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (set_debug_stack_pointer) debug level stack is set to 2
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (offset_points_to_cell) user error
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (offset_points_to_cell) Use of pointer arithmetic on "*HEAP*_l_15" at line 16 is not standard-compliant.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (set_debug_stack_pointer) debug level stack is set to 2
 unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module main.
 unknown[unknown] (display_a_resource) user error
 unknown[unknown] (display_a_resource) Cannot build view file PRINTED_FILE

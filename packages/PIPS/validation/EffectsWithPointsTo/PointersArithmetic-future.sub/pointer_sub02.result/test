@@ -1,0 +1,110 @@
+
+POINTS TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int n = 4, m = 3;
+
+// Points To: none
+
+   int a[4][3];
+
+// Points To: none
+
+   int (*p)[3] = a;
+
+// Points To:
+// p -> a[0] , EXACT
+
+   // p == &a[0]
+   p += 1;
+
+// Points To:
+// p -> a[1] , EXACT
+
+   // p == &a[1]
+   (*p)[2] = 99;
+
+// Points To:
+// p -> a[1] , EXACT
+
+   // a[1][2] = 99
+   n = p-a;
+
+// Points To:
+// p -> a[1] , EXACT
+
+   // n == 1
+   printf("n = %d", n);
+
+// Points To:
+// p -> a[1] , EXACT
+
+   return 0;
+}
+
+Proper effects with points-to
+
+int main()
+{
+//             <    is written>: m n
+//             <    is referenced>: m n
+//             <    is declared>: m n
+   int n = 4, m = 3;
+//             <    is declared>: a
+   int a[4][3];
+//             <    is written>: p
+//             <    is referenced>: a p
+//             <    is declared>: p
+   int (*p)[3] = a;
+//             <    is read   >: p
+//             <    is written>: p
+//             <    is referenced>: p
+   // p == &a[0]
+   p += 1;
+//             <    is read   >: p
+//             <    is written>: a[1][2]
+//             <    is referenced>: p
+   // p == &a[1]
+   (*p)[2] = 99;
+//             <    is read   >: p
+//             <    is written>: n
+//             <    is referenced>: a n p
+   // a[1][2] = 99
+   n = p-a;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: n stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+//             <    is referenced>: n
+   // n == 1
+   printf("n = %d", n);
+   return 0;
+}
+
+Parallel code
+
+int main()
+{
+   int n = 4, m = 3;
+   int a[4][3];
+   int (*p)[3] = a;
+   // p == &a[0]
+   p += 1;
+   // p == &a[1]
+   (*p)[2] = 99;
+   // a[1][2] = 99
+   n = p-a;
+   // n == 1
+   printf("n = %d", n);
+   return 0;
+}

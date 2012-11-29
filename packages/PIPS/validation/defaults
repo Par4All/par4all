@@ -13,6 +13,8 @@ C_syntax
 C99_syntax
 F95_syntax
 Effects
+# Points-to analysis
+Pointers
 # Specific directory for Effects of C intrinsics
 CIntrinsics
 # Preconditions and transformers, using PIPS initial default options

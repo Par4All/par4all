@@ -15,6 +15,32 @@ int cse_wpt01()
    // END BLOCK
 }
 
+PROPER  EFFECTS 
+
+int cse_wpt01()
+{
+   // BEGIN BLOCK
+//             <    is written>: i
+   int i = 0;
+//             <    is written>: j
+   int j = 1;
+   int k;
+//             <    is written>: p
+   int *p = &j;
+//             <    is written>: q
+   int *q = &k;
+//             <    is read   >: j
+//             <    is written>: i
+   i = 2*(j+2);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   *p = *q;
+//             <    is read   >: j
+//             <    is written>: k
+   k = 3*(j+2);
+   // END BLOCK
+}
+
 POINTS-TO
 
 

@@ -1,88 +1,10 @@
-
-Proper effects for "main"
-
-int main()
-{
-   int ***a1;
-   int ***a2;
-
-   int **b3;
-   int *c4;
-   int **l;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: a1 _MALLOC_EFFECTS:_MALLOC_
-
-   a1 = (int ***) malloc(sizeof(int * *));
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: a1 _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   *a1 = (int **) malloc(sizeof(int *));
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   **a1 = (int *) malloc(sizeof(int));
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-
-   ***a1 = 1;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: a2 _MALLOC_EFFECTS:_MALLOC_
-
-   a2 = (int ***) malloc(sizeof(int * *));
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   *a2 = *a1;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: b3 _MALLOC_EFFECTS:_MALLOC_
-
-   b3 = (int **) malloc(sizeof(int *));
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: b3 _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   *b3 = (int *) malloc(sizeof(int));
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   **b3 = 3;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: c4 _MALLOC_EFFECTS:_MALLOC_
-
-   c4 = (int *) malloc(sizeof(int));
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: c4
-   *c4 = 4;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: l
-
-   l = *a2;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: a1 b3
-   *a1 = b3;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: c4 l
-   *l = c4;
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-
-   printf("%d\n", ***a1);
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   printf("%d\n", ***a2);
-
-   return 0;
-}
 POINTS TO for "main"
 
 
 // Points To IN: none
 
 
-// Points To OUT:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
+// Points To OUT: none
 
 int main()
 {
@@ -129,7 +51,7 @@ int main()
    a1 = (int ***) malloc(sizeof(int * *));
 
 // Points To:
-// a1 -> *ANY_MODULE*:*HEAP* , EXACT
+// a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
@@ -138,8 +60,9 @@ int main()
    *a1 = (int **) malloc(sizeof(int *));
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// a1 -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
@@ -148,8 +71,9 @@ int main()
    **a1 = (int *) malloc(sizeof(int));
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// a1 -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
@@ -159,8 +83,9 @@ int main()
    ***a1 = 1;
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// a1 -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
@@ -170,9 +95,10 @@ int main()
    a2 = (int ***) malloc(sizeof(int * *));
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// a1 -> *ANY_MODULE*:*HEAP* , EXACT
-// a2 -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // l -> *ANY_MODULE*:*NOWHERE* , EXACT
@@ -180,9 +106,10 @@ int main()
    *a2 = *a1;
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// a1 -> *ANY_MODULE*:*HEAP* , EXACT
-// a2 -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // l -> *ANY_MODULE*:*NOWHERE* , EXACT
@@ -191,30 +118,33 @@ int main()
    b3 = (int **) malloc(sizeof(int *));
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// a1 -> *ANY_MODULE*:*HEAP* , EXACT
-// a2 -> *ANY_MODULE*:*HEAP* , EXACT
-// b3 -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// b3 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // l -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    *b3 = (int *) malloc(sizeof(int));
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// a1 -> *ANY_MODULE*:*HEAP* , EXACT
-// a2 -> *ANY_MODULE*:*HEAP* , EXACT
-// b3 -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// b3 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // l -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    **b3 = 3;
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// a1 -> *ANY_MODULE*:*HEAP* , EXACT
-// a2 -> *ANY_MODULE*:*HEAP* , EXACT
-// b3 -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// b3 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
 // l -> *ANY_MODULE*:*NOWHERE* , EXACT
 
@@ -222,74 +152,81 @@ int main()
    c4 = (int *) malloc(sizeof(int));
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// a1 -> *ANY_MODULE*:*HEAP* , EXACT
-// a2 -> *ANY_MODULE*:*HEAP* , EXACT
-// b3 -> *ANY_MODULE*:*HEAP* , EXACT
-// c4 -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// b3 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// c4 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // l -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    *c4 = 4;
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// a1 -> *ANY_MODULE*:*HEAP* , EXACT
-// a2 -> *ANY_MODULE*:*HEAP* , EXACT
-// b3 -> *ANY_MODULE*:*HEAP* , EXACT
-// c4 -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// b3 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// c4 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // l -> *ANY_MODULE*:*NOWHERE* , EXACT
 
 
    l = *a2;
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// a1 -> *ANY_MODULE*:*HEAP* , EXACT
-// a2 -> *ANY_MODULE*:*HEAP* , EXACT
-// b3 -> *ANY_MODULE*:*HEAP* , EXACT
-// c4 -> *ANY_MODULE*:*HEAP* , EXACT
-// l -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// b3 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// c4 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// l -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 
    *a1 = b3;
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// a1 -> *ANY_MODULE*:*HEAP* , EXACT
-// a2 -> *ANY_MODULE*:*HEAP* , EXACT
-// b3 -> *ANY_MODULE*:*HEAP* , EXACT
-// c4 -> *ANY_MODULE*:*HEAP* , EXACT
-// l -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// b3 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// c4 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// l -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 
    *l = c4;
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// a1 -> *ANY_MODULE*:*HEAP* , EXACT
-// a2 -> *ANY_MODULE*:*HEAP* , EXACT
-// b3 -> *ANY_MODULE*:*HEAP* , EXACT
-// c4 -> *ANY_MODULE*:*HEAP* , EXACT
-// l -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// b3 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// c4 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// l -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 
 
    printf("%d\n", ***a1);
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// a1 -> *ANY_MODULE*:*HEAP* , EXACT
-// a2 -> *ANY_MODULE*:*HEAP* , EXACT
-// b3 -> *ANY_MODULE*:*HEAP* , EXACT
-// c4 -> *ANY_MODULE*:*HEAP* , EXACT
-// l -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// b3 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// c4 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// l -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 
    printf("%d\n", ***a2);
 
 // Points To:
-// *ANY_MODULE*:*HEAP* -> *ANY_MODULE*:*HEAP* , EXACT
-// a1 -> *ANY_MODULE*:*HEAP* , EXACT
-// a2 -> *ANY_MODULE*:*HEAP* , EXACT
-// b3 -> *ANY_MODULE*:*HEAP* , EXACT
-// c4 -> *ANY_MODULE*:*HEAP* , EXACT
-// l -> *ANY_MODULE*:*HEAP* , EXACT
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
+// a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// b3 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// c4 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// l -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 
 
    return 0;

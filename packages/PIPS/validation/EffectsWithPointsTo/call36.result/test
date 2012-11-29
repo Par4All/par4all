@@ -1,0 +1,127 @@
+
+Points-to for call36
+
+
+// Points To IN:
+// q[*] -> *NULL_POINTER* , MAY
+// q[*] -> _q_2[*][0] , MAY
+
+
+// Points To OUT: none
+
+void call36(int i, int *q[10])
+{
+
+// Points To:
+// q[*] -> *NULL_POINTER* , MAY
+// q[*] -> _q_2[*][0] , MAY
+
+   /* This is going to lead to _q_2[*][0] since any pointer points
+        implicitly to an array */
+   *q[i] = 3;
+
+// Points To:
+// q[*] -> _q_2[*][0] , EXACT
+
+   return;
+}
+
+Proper effects with points-to for call36
+
+void call36(int i, int *q[10])
+{
+//             <may be written>: _q_2[*][0]
+//             <    is read   >: i q[i]
+   /* This is going to lead to _q_2[*][0] since any pointer points
+        implicitly to an array */
+   *q[i] = 3;
+   return;
+}
+
+Cumulated effects with points-to for call36
+
+//             <may be read   >: q[*]
+//             <may be written>: _q_2[*][0]
+//             <    is read   >: i
+void call36(int i, int *q[10])
+{
+//             <may be read   >: q[*]
+//             <may be written>: _q_2[*][0]
+//             <    is read   >: i
+   /* This is going to lead to _q_2[*][0] since any pointer points
+        implicitly to an array */
+   *q[i] = 3;
+   return;
+}
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int a = 1, i;
+
+// Points To: none
+
+   int aa[10];
+
+// Points To: none
+
+   int *ap[10];
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap[*] -> aa[*] , MAY
+
+      ap[i] = &aa[i];
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap[*] -> aa[*] , MAY
+
+
+   call36(a, ap);
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap[*] -> aa[*] , MAY
+
+   return a;
+}
+
+Proper effects with points-to for "main"
+
+int main()
+{
+//             <    is written>: a
+   int a = 1, i;
+   int aa[10];
+   int *ap[10];
+//             <    is written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//             <    is read   >: i
+//             <    is written>: ap[i]
+      ap[i] = &aa[i];
+//             <may be read   >: ap[*]
+//             <may be written>: aa[*]
+//             <    is read   >: a
+
+   call36(a, ap);
+//             <    is read   >: a
+   return a;
+}

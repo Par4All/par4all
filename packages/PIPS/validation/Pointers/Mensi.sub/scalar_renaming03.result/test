@@ -118,28 +118,37 @@ int scalar_renaming03()
 }
 int scalar_renaming03()
 {
+//             <    is declared>: A B C D T i p
    int *p, i, T, A[100], B[100], C[100], D[100];                        /*0004*/
 //             <    is written>: p
+//             <    is referenced>: T p
    p = &T;                                                              /*0005*/
 //             <    is written>: i
+//             <    is referenced>: i
    for(i = 0; i <= 99; i += 1) {                                        /*0006*/
 //             <    is read   >: A[i] B[i] i
 //             <    is written>: T
+//             <    is referenced>: A B T i
       T = A[i]+B[i];                                                    /*0007*/
 //             <    is read   >: T i
 //             <    is written>: C[i]
+//             <    is referenced>: C T i
       C[i] = T+T;                                                       /*0008*/
 //             <    is read   >: B[i] D[i] i
 //             <    is written>: T
+//             <    is referenced>: B D T i
       T = D[i]-B[i];                                                    /*0009*/
 //             <    is read   >: p
 //             <    is written>: T
+//             <    is referenced>: p
       *p = 1;                                                           /*0010*/
 //             <    is read   >: T i
 //             <    is written>: A[i]
+//             <    is referenced>: A T i
       A[i] = T*T;                                                       /*0011*/
    }
 //             <    is read   >: T
+//             <    is referenced>: T
 
    return T;                                                            /*0014*/
 }

@@ -1,0 +1,1 @@
+swap02.tpips, pointer_malloc01.tpips, if04.tpips, message_error01.tpips : making interprocedural analysis using inlining instead of summaries.

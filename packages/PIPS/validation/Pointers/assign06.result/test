@@ -89,10 +89,14 @@ void assign06()
    *ppi = &m;
 
 // Points To:
-// pi -> m , EXACT
+// pi -> i , MAY
+// pi -> j , MAY
+// pi -> m , MAY
 // ppi -> pi , MAY
 // ppi -> qi , MAY
-// qi -> m , EXACT
+// qi -> k , MAY
+// qi -> l , MAY
+// qi -> m , MAY
 
    return;
 }

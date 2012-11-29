@@ -30,21 +30,25 @@ int main()
    a[0] = &b;
 
 // Points To:
-// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> b , MAY
 // a[0] -> b , EXACT
 
    a[1] = &b;
 
 // Points To:
-// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> b , MAY
 // a[0] -> b , EXACT
 // a[1] -> b , EXACT
 
    a[1] = &c;
 
 // Points To:
-// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> b , MAY
 // a[0] -> b , EXACT
+// a[*] -> c , MAY
 // a[1] -> c , EXACT
 
    return 0;

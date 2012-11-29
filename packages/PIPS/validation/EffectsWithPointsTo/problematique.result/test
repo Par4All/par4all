@@ -1,6 +1,4 @@
 
-PROPER  EFFECTS 
-
 int main()
 {
    int *a, *b, *c;
@@ -31,196 +29,22 @@ int main()
    
    /* Initialisation du tableau b */
    for(i = 0; i <= 19; i += 1)
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *HEAP*_l_10[i]
 //             <    is read   >: b i
       b[i] = i;
 //             <    is written>: i
    
    /* Initialisation du tableau c */
    for(i = 0; i <= 19; i += 1)
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *HEAP*_l_11[i]
 //             <    is read   >: c i
       c[i] = 1;
 //             <    is written>: i
    /* Initialisation du tableau a */
    for(i = 0; i <= 19; i += 1)
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-      a[i] = b[i];
-   return 0;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   int *a, *b, *c;
-
-// Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   int i;
-
-// Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   i = 0;
-
-// Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   /* Allocation dynamiques des tableaux */
-   a = (int *) malloc(20*sizeof(int));
-
-// Points To:
-// a -> *HEAP*_l_9[0] , EXACT
-// b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   b = (int *) malloc(20*sizeof(int));
-
-// Points To:
-// a -> *HEAP*_l_9[0] , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
-// c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   c = (int *) malloc(20*sizeof(int));
-
-// Points To:
-// a -> *HEAP*_l_9[0] , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
-// c -> *HEAP*_l_11[0] , EXACT
-
-   /* Creation d'alias entre a et b */
-   a = b;
-
-// Points To:
-// a -> *HEAP*_l_10[0] , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
-// c -> *HEAP*_l_11[0] , EXACT
-
-   
-   /* Suppression de l'ancien alias entre a et b, creation d'un nouveau
-    * entre a et c */
-   a = c;
-
-// Points To:
-// a -> *HEAP*_l_11[0] , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
-// c -> *HEAP*_l_11[0] , EXACT
-
-   
-   /* Initialisation du tableau b */
-   for(i = 0; i <= 19; i += 1)
-
-// Points To:
-// a -> *HEAP*_l_11[0] , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
-// c -> *HEAP*_l_11[0] , EXACT
-
-      b[i] = i;
-
-// Points To:
-// a -> *HEAP*_l_11[0] , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
-// c -> *HEAP*_l_11[0] , EXACT
-
-   
-   /* Initialisation du tableau c */
-   for(i = 0; i <= 19; i += 1)
-
-// Points To:
-// a -> *HEAP*_l_11[0] , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
-// c -> *HEAP*_l_11[0] , EXACT
-
-      c[i] = 1;
-
-// Points To:
-// a -> *HEAP*_l_11[0] , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
-// c -> *HEAP*_l_11[0] , EXACT
-
-   /* Initialisation du tableau a */
-   for(i = 0; i <= 19; i += 1)
-
-// Points To:
-// a -> *HEAP*_l_11[0] , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
-// c -> *HEAP*_l_11[0] , EXACT
-
-      a[i] = b[i];
-
-// Points To:
-// a -> *HEAP*_l_11[0] , EXACT
-// b -> *HEAP*_l_10[0] , EXACT
-// c -> *HEAP*_l_11[0] , EXACT
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
-int main()
-{
-   int *a, *b, *c;
-   int i;
-//             <    is written>: i
-   i = 0;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: a _MALLOC_EFFECTS:_MALLOC_
-   /* Allocation dynamiques des tableaux */
-   a = (int *) malloc(20*sizeof(int));
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: b _MALLOC_EFFECTS:_MALLOC_
-   b = (int *) malloc(20*sizeof(int));
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: c _MALLOC_EFFECTS:_MALLOC_
-   c = (int *) malloc(20*sizeof(int));
-//             <    is read   >: b
-//             <    is written>: a
-   /* Creation d'alias entre a et b */
-   a = b;
-//             <    is read   >: c
-//             <    is written>: a
-   
-   /* Suppression de l'ancien alias entre a et b, creation d'un nouveau
-    * entre a et c */
-   a = c;
-//             <    is written>: i
-   
-   /* Initialisation du tableau b */
-   for(i = 0; i <= 19; i += 1)
-//             <    is read   >: b i
-//             <    is written>: *HEAP*_l_10[i]
-      b[i] = i;
-//             <    is written>: i
-   
-   /* Initialisation du tableau c */
-   for(i = 0; i <= 19; i += 1)
-//             <    is read   >: c i
-//             <    is written>: *HEAP*_l_11[i]
-      c[i] = 1;
-//             <    is written>: i
-   /* Initialisation du tableau a */
-   for(i = 0; i <= 19; i += 1)
-//             <    is read   >: *HEAP*_l_10[i] a b i
-//             <    is written>: *HEAP*_l_11[i]
+//             <may be read   >: *HEAP*_l_10[i]
+//             <may be written>: *HEAP*_l_11[i]
+//             <    is read   >: a b i
       a[i] = b[i];
    return 0;
 }
@@ -268,22 +92,22 @@ int main()
 	20 --> 27 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 	21 --> 21 with conflicts
-		from <*HEAP*_l_10[i]-W-EXACT> to <*HEAP*_l_10[i]-W-EXACT>
+		from <*HEAP*_l_10[i]-W-MAY> to <*HEAP*_l_10[i]-W-MAY>
 	21 --> 24 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	21 --> 27 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	21 --> 28 with conflicts
-		from <*HEAP*_l_10[i]-W-EXACT> to <*HEAP*_l_10[i]-R-EXACT>
+		from <*HEAP*_l_10[i]-W-MAY> to <*HEAP*_l_10[i]-R-MAY>
 	24 --> 27 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 	25 --> 25 with conflicts
-		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
+		from <*HEAP*_l_11[i]-W-MAY> to <*HEAP*_l_11[i]-W-MAY>
 	25 --> 27 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	25 --> 28 with conflicts
-		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
+		from <*HEAP*_l_11[i]-W-MAY> to <*HEAP*_l_11[i]-W-MAY>
 	28 --> 28 with conflicts
-		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
+		from <*HEAP*_l_11[i]-W-MAY> to <*HEAP*_l_11[i]-W-MAY>
 
 ****************** End of Dependence Graph ******************

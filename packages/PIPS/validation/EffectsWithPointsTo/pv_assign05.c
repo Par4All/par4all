@@ -1,5 +1,11 @@
 // assignment with subscripted and field expressions 
+
+// FI: bug at the first assignment, s1.a is undefined and should not
+// be used as right hand side expression (according to PJ if not to
+// the C standard)
+
 typedef struct {int *a; int *b[10]; int (*c)[10];} mystruct;
+
 int main()
 {
   mystruct s1, s2;

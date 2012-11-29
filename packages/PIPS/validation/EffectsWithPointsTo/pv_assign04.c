@@ -1,5 +1,9 @@
 // assignment of elements arrays of aggregate structure containing pointers 
+
+// FI: s1 and s2 are not initialized; then cannot be assigned to tab_s
+
 typedef struct {int *a; int *b[10]; int (*c)[10];} mystruct;
+
 int main()
 {
   mystruct s1, s2;

@@ -2,6 +2,8 @@ setenv WSPACE=list00
 delete $WSPACE
 create $WSPACE $WSPACE.c
 
+activate INTRAPROCEDURAL_POINTS_TO_ANALYSIS
+
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"

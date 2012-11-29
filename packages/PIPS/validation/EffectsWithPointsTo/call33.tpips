@@ -1,0 +1,40 @@
+setenv WSPACE=call33
+delete $WSPACE
+create $WSPACE $WSPACE.c 
+activate C_PARSER
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+# Failure with both intra- and inter-procedural analyses
+activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
+
+echo
+echo Points-to for "$WSPACE"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[$WSPACE]
+
+echo 
+echo Points-to for \""$WSPACE"_caller\"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE["$WSPACE"_caller]
+
+echo 
+echo Proper effects with points-to for \""$WSPACE"_caller\"
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE["$WSPACE"_caller]
+
+echo 
+echo Cumulated effects with points-to for \""$WSPACE"_caller\"
+echo
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE["$WSPACE"_caller]
+
+
+close
+delete $WSPACE
+quit

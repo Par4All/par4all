@@ -1,0 +1,502 @@
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+
+Points-to information for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(int argc, char **argv)
+{
+
+// Points To: none
+
+   int a_d1, a_d2;
+
+// Points To: none
+
+   int i, j;
+
+// Points To: none
+
+   void *toto;
+
+// Points To:
+// toto -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   a_d1 = a_d2 = 5;
+
+// Points To:
+// toto -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   // a_d1*a_d2 must be parenthesized because of the limited number of
+   // patterns checked by the abstract heap stub generator
+   toto = malloc(sizeof(double)*a_d1*a_d2);
+
+// Points To:
+// toto -> *HEAP*_l_14[0] , MAY
+
+
+   for(i = 0; i <= a_d1-1; i += 1)
+
+// Points To:
+// toto -> *HEAP*_l_14[0] , MAY
+
+      for(j = 0; j <= a_d2-1; j += 1)
+
+// Points To:
+// toto -> *HEAP*_l_14[0] , MAY
+
+         ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
+
+// Points To:
+// toto -> *HEAP*_l_14[0] , MAY
+
+
+   free(toto);
+
+// Points To:
+// toto -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   
+   
+   a_d1 = a_d2 = 10;
+
+// Points To:
+// toto -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   toto = malloc(sizeof(double)*a_d1*a_d2);
+
+// Points To:
+// toto -> *HEAP*_l_26[0] , MAY
+
+
+   for(i = 0; i <= a_d1-1; i += 1)
+
+// Points To:
+// toto -> *HEAP*_l_26[0] , MAY
+
+      for(j = 0; j <= a_d2-1; j += 1)
+
+// Points To:
+// toto -> *HEAP*_l_26[0] , MAY
+
+         ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
+
+// Points To:
+// toto -> *HEAP*_l_26[0] , MAY
+
+
+   free(toto);
+
+// Points To:
+// toto -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   
+   
+   return 0;
+}
+
+Check the proper effects for "main"
+
+int main(int argc, char **argv)
+{
+//             <    is declared>: a_d1 a_d2
+   int a_d1, a_d2;
+//             <    is declared>: i j
+   int i, j;
+//             <    is declared>: toto
+   void *toto;
+//             <    is written>: a_d1 a_d2
+//             <    is referenced>: a_d1 a_d2
+
+   a_d1 = a_d2 = 5;
+//             <    is read   >: a_d1 a_d2 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: toto _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: a_d1 a_d2 toto
+   // a_d1*a_d2 must be parenthesized because of the limited number of
+   // patterns checked by the abstract heap stub generator
+   toto = malloc(sizeof(double)*a_d1*a_d2);
+//             <    is read   >: a_d1
+//             <    is written>: i
+//             <    is referenced>: a_d1 i
+
+   for(i = 0; i <= a_d1-1; i += 1)
+//             <    is read   >: a_d1 a_d2
+//             <    is written>: j
+//             <    is referenced>: a_d1 a_d2 j
+      for(j = 0; j <= a_d2-1; j += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: a_d1 a_d2 i j
+//             <    is referenced>: a_d1 a_d2 i j toto
+         ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
+//             <    is read   >: toto _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: toto
+
+   free(toto);
+//             <    is written>: a_d1 a_d2
+//             <    is referenced>: a_d1 a_d2
+   
+   
+   a_d1 = a_d2 = 10;
+//             <    is read   >: a_d1 a_d2 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: toto _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: a_d1 a_d2 toto
+   toto = malloc(sizeof(double)*a_d1*a_d2);
+//             <    is read   >: a_d1
+//             <    is written>: i
+//             <    is referenced>: a_d1 i
+
+   for(i = 0; i <= a_d1-1; i += 1)
+//             <    is read   >: a_d1 a_d2
+//             <    is written>: j
+//             <    is referenced>: a_d1 a_d2 j
+      for(j = 0; j <= a_d2-1; j += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: a_d1 a_d2 i j
+//             <    is referenced>: a_d1 a_d2 i j toto
+         ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
+//             <    is read   >: toto _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: toto
+
+   free(toto);
+   
+   
+   return 0;
+}
+
+Check the transformers for "main"
+
+
+//  T(main) {main==0}
+
+int main(int argc, char **argv)
+{
+
+//  T(a_d1,a_d2) {}
+
+   int a_d1, a_d2;
+
+//  T(i,j) {}
+
+   int i, j;
+
+//  T() {}
+
+   void *toto;
+
+//  T(a_d1,a_d2) {a_d1==5, a_d2==5}
+
+
+   a_d1 = a_d2 = 5;
+
+//  T() {a_d1==5, a_d2==5}
+
+   // a_d1*a_d2 must be parenthesized because of the limited number of
+   // patterns checked by the abstract heap stub generator
+   toto = malloc(sizeof(double)*a_d1*a_d2);
+
+//  T(a_d1,a_d2,argc,i,j) {a_d1#init==5, a_d2#init==5}
+
+
+   for(i = 0; i <= a_d1-1; i += 1)
+
+//  T(a_d1,a_d2,argc,i,j) {0<=i#init}
+
+      for(j = 0; j <= a_d2-1; j += 1)
+
+//  T(a_d1,a_d2,argc,i,j) {0<=j#init}
+
+         ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
+
+//  T() {}
+
+
+   free(toto);
+
+//  T(a_d1,a_d2) {a_d1==10, a_d2==10}
+
+   
+   
+   a_d1 = a_d2 = 10;
+
+//  T() {a_d1==10, a_d2==10}
+
+   toto = malloc(sizeof(double)*a_d1*a_d2);
+
+//  T(a_d1,a_d2,argc,i,j) {a_d1#init==10, a_d2#init==10}
+
+
+   for(i = 0; i <= a_d1-1; i += 1)
+
+//  T(a_d1,a_d2,argc,i,j) {0<=i#init}
+
+      for(j = 0; j <= a_d2-1; j += 1)
+
+//  T(a_d1,a_d2,argc,i,j) {0<=j#init}
+
+         ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
+
+//  T() {}
+
+
+   free(toto);
+
+//  T(main) {main==0}
+
+   
+   
+   return 0;
+}
+
+Check the preconditions for "main"
+
+
+//  P() {}
+
+int main(int argc, char **argv)
+{
+
+//  P() {}
+
+   int a_d1, a_d2;
+
+//  P(a_d1,a_d2) {}
+
+   int i, j;
+
+//  P(a_d1,a_d2,i,j) {}
+
+   void *toto;
+
+//  P(a_d1,a_d2,i,j) {}
+
+
+   a_d1 = a_d2 = 5;
+
+//  P(a_d1,a_d2,i,j) {a_d1==5, a_d2==5}
+
+   // a_d1*a_d2 must be parenthesized because of the limited number of
+   // patterns checked by the abstract heap stub generator
+   toto = malloc(sizeof(double)*a_d1*a_d2);
+
+//  P(a_d1,a_d2,i,j) {a_d1==5, a_d2==5}
+
+
+   for(i = 0; i <= a_d1-1; i += 1)
+
+//  P(a_d1,a_d2,argc,i,j) {0<=i}
+
+      for(j = 0; j <= a_d2-1; j += 1)
+
+//  P(a_d1,a_d2,argc,i,j) {0<=j}
+
+         ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
+
+//  P(a_d1,a_d2,argc,i,j) {}
+
+
+   free(toto);
+
+//  P(a_d1,a_d2,argc,i,j) {}
+
+   
+   
+   a_d1 = a_d2 = 10;
+
+//  P(a_d1,a_d2,argc,i,j) {a_d1==10, a_d2==10}
+
+   toto = malloc(sizeof(double)*a_d1*a_d2);
+
+//  P(a_d1,a_d2,argc,i,j) {a_d1==10, a_d2==10}
+
+
+   for(i = 0; i <= a_d1-1; i += 1)
+
+//  P(a_d1,a_d2,argc,i,j) {0<=i}
+
+      for(j = 0; j <= a_d2-1; j += 1)
+
+//  P(a_d1,a_d2,argc,i,j) {0<=j}
+
+         ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
+
+//  P(a_d1,a_d2,argc,i,j) {}
+
+
+   free(toto);
+
+//  P(a_d1,a_d2,argc,i,j) {}
+
+   
+   
+   return 0;
+}
+
+See the source code of "main" after partial evaluation
+
+int main(int argc, char **argv)
+{
+   int a_d1, a_d2;
+   int i, j;
+   void *toto;
+
+   a_d1 = a_d2 = 5;
+   // a_d1*a_d2 must be parenthesized because of the limited number of
+   // patterns checked by the abstract heap stub generator
+   toto = malloc(25*sizeof(double));
+
+   for(i = 0; i <= 4; i += 1)
+      for(j = 0; j <= a_d2-1; j += 1)
+         ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
+
+   free(toto);
+   
+   
+   a_d1 = a_d2 = 10;
+   toto = malloc(100*sizeof(double));
+
+   for(i = 0; i <= 9; i += 1)
+      for(j = 0; j <= a_d2-1; j += 1)
+         ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
+
+   free(toto);
+   
+   
+   return 0;
+}
+
+Points-to information for "main" after partial evaluation
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(int argc, char **argv)
+{
+
+// Points To: none
+
+   int a_d1, a_d2;
+
+// Points To: none
+
+   int i, j;
+
+// Points To: none
+
+   void *toto;
+
+// Points To:
+// toto -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   a_d1 = a_d2 = 5;
+
+// Points To:
+// toto -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   // a_d1*a_d2 must be parenthesized because of the limited number of
+   // patterns checked by the abstract heap stub generator
+   toto = malloc(25*sizeof(double));
+
+// Points To:
+// toto -> *HEAP*_l_14[0] , MAY
+
+
+   for(i = 0; i <= 4; i += 1)
+
+// Points To:
+// toto -> *HEAP*_l_14[0] , MAY
+
+      for(j = 0; j <= a_d2-1; j += 1)
+
+// Points To:
+// toto -> *HEAP*_l_14[0] , MAY
+
+         ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
+
+// Points To:
+// toto -> *HEAP*_l_14[0] , MAY
+
+
+   free(toto);
+
+// Points To:
+// toto -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   
+   
+   a_d1 = a_d2 = 10;
+
+// Points To:
+// toto -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   toto = malloc(100*sizeof(double));
+
+// Points To:
+// toto -> *HEAP*_l_26[0] , MAY
+
+
+   for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// toto -> *HEAP*_l_26[0] , MAY
+
+      for(j = 0; j <= a_d2-1; j += 1)
+
+// Points To:
+// toto -> *HEAP*_l_26[0] , MAY
+
+         ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
+
+// Points To:
+// toto -> *HEAP*_l_26[0] , MAY
+
+
+   free(toto);
+
+// Points To:
+// toto -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   
+   
+   return 0;
+}
+int main(int argc, char **argv)
+{
+   int a_d1, a_d2;
+   int i, j;
+   void *toto;
+
+   a_d1 = a_d2 = 5;
+   // a_d1*a_d2 must be parenthesized because of the limited number of
+   // patterns checked by the abstract heap stub generator
+   toto = malloc(25*sizeof(double));
+
+   for(i = 0; i <= 4; i += 1)
+      for(j = 0; j <= a_d2-1; j += 1)
+         ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
+
+   free(toto);
+   
+   
+   a_d1 = a_d2 = 10;
+   toto = malloc(100*sizeof(double));
+
+   for(i = 0; i <= 9; i += 1)
+      for(j = 0; j <= a_d2-1; j += 1)
+         ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
+
+   free(toto);
+   
+   
+   return 0;
+}

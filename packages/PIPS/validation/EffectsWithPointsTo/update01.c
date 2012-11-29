@@ -2,10 +2,10 @@
 
 void update01()
 {
-  int i;
+  int i[2];
   int * p;
 
-  p = &i;
+  p = &i[0];
   p++;
-  i = 2;
+  i[0] = 2;
 }

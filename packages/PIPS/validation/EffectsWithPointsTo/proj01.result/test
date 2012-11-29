@@ -1,39 +1,11 @@
 
-PROPER  EFFECTS 
-
-int main(void)
-{
-   int i, j;
-   int **pp;
-   {
-//             <    is written>: pi
-      int *pi = &i;
-//             <    is written>: pp
-      pp = &pi;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-      **pp = 1;
-   }
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   
-   // pp points to a dead value in the stack
-   // should generate an error
-   **pp = 0;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: pp
-   // segfault?
-   *pp = &j;
-   return 0;
-}
-
 POINTS-TO
 
 
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 int main(void)
 {
@@ -73,20 +45,17 @@ int main(void)
    // should generate an error
    **pp = 0;
 
-// Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// Points To: unreachable
 
    // segfault?
    *pp = &j;
 
-// Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> j , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// Points To: unreachable
 
    return 0;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 int main(void)
 {
@@ -101,48 +70,17 @@ int main(void)
 //             <    is written>: i
       **pp = 1;
    }
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: pp
    
    // pp points to a dead value in the stack
    // should generate an error
    **pp = 0;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: pp
    // segfault?
    *pp = &j;
    return 0;
 }
 
- *********************** Use-Def Chains *********************
+Warnings
 
-	10 --> 12 with conflicts
-		from <pi-W-EXACT> to <pi-R-EXACT>
-	10 --> 17 with conflicts
-		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	10 --> 18 with conflicts
-		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	11 --> 12 with conflicts
-		from <pp-W-EXACT> to <pp-R-EXACT>
-	11 --> 17 with conflicts
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	11 --> 18 with conflicts
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-W-EXACT> to <pp-R-EXACT>
-	12 --> 17 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pi-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	12 --> 18 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pi-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	17 --> 18 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <pp-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-
-****************** End of Dependence Graph ******************
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_set_block_projection) Dangling pointer "pp" towards "pi".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_dereferencing_to_points_to) Null or undefined pointer may be dereferenced because of "pp".

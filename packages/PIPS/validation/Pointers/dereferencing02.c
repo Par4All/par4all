@@ -23,7 +23,7 @@ double dereferencing02()
 
 int main()
 {
-  dereferencing02();
+  (void) dereferencing02();
   return 1;
 }
 

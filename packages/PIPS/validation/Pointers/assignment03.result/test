@@ -22,7 +22,7 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 void assignment03()
 {
@@ -53,9 +53,7 @@ void assignment03()
 
    p = q;
 
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// Points To: unreachable
 
 
    return;

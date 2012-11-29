@@ -1,4 +1,4 @@
-#include "list.c"
+#include "list.src/list.c"
 
 int main(void)
 {

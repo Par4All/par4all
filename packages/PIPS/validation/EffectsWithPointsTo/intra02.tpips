@@ -1,34 +1,49 @@
 delete intra02
-create intra02 intra01.c 
-
+create intra02 intra02.c 
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
-
-#setenv POINTER_VALUES_DEBUG_LEVEL 2
-
-
 echo 
 echo POINTS-TO
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[bar]
 
 echo 
 echo PROPER  EFFECTS WITH POINTS TO
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[bar]
 
 echo 
 echo CUMULATED  EFFECTS WITH POINTS TO
 echo
 activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[bar]
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[foo]
+
+echo 
+echo PROPER  EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[foo]
+
+echo 
+echo CUMULATED  EFFECTS WITH POINTS TO
+echo
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[foo]
 
 
 close

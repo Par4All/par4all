@@ -57,7 +57,8 @@ int main()
       p[i] = &a[i];
 
 // Points To:
-// p[*] -> a[*] , EXACT
+// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> a[*] , MAY
 
       i++;
    }

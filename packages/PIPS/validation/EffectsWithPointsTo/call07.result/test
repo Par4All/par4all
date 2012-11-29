@@ -1,36 +1,10 @@
 
-PROPER  EFFECTS 
-
-void call07(int r, int m, int *x)
-{
-   int j;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: r x
-
-   x[4] = 10*r+4;
-}
-int main()
-{
-//             <    is written>: d1
-   int d1 = 4;
-//             <    is written>: d2
-   int d2 = 4;
-   int y[d1][d2];
-   int i, j;
-//             <    is read   >: d1
-//             <    is written>: i
-
-   for(i = 0; i <= d1-1; i += 1)
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: d1 d2 i
-      call07(i, d2, &y[i][0]);
-}
-
 POINTS-TO
 
 
 // Points To IN:
-// x -> _x_3[0] , EXACT
+// x -> *NULL_POINTER* , MAY
+// x -> _x_3[0] , MAY
 
 
 // Points To OUT: none
@@ -38,13 +12,13 @@ POINTS-TO
 void call07(int r, int m, int *x)
 {
 
-// Points To:
-// x -> _x_3[0] , EXACT
+// Points To: none
 
    int j;
 
 // Points To:
-// x -> _x_3[0] , EXACT
+// x -> *NULL_POINTER* , MAY
+// x -> _x_3[0] , MAY
 
 
    x[4] = 10*r+4;
@@ -107,6 +81,7 @@ int main()
 
    for(i = 0; i <= d1-1; i += 1)
 //             <    is read   >: d1 d2 i
+//             <    is written>: y[i][4]
       call07(i, d2, &y[i][0]);
 }
 
@@ -118,5 +93,7 @@ int main()
 		from <d1-W-EXACT> to <d1-R-EXACT>
 	13 --> 18 with conflicts
 		from <d2-W-EXACT> to <d2-R-EXACT>
+	18 --> 18 with conflicts
+		from <y[i][4]-W-EXACT> to <y[i][4]-W-EXACT>
 
 ****************** End of Dependence Graph ******************

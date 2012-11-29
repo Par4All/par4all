@@ -1,27 +1,102 @@
 
-PROPER  EFFECTS
+POINTS-TO
+
+
+// Points To IN:
+// _l_1.next -> *NULL_POINTER* , MAY
+// _l_1.next -> _l_1_2__1 , MAY
+// _l_1_2__1.next -> *NULL_POINTER* , MAY
+// _l_1_2__1.next -> _l_1_2__1 , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1 , MAY
+
+
+// Points To OUT:
+// _l_1.next -> *NULL_POINTER* , MAY
+// _l_1.next -> _l_1_2__1 , MAY
+// _l_1_2__1.next -> *NULL_POINTER* , MAY
+// _l_1_2__1.next -> _l_1_2__1 , MAY
 
 void list_free(list l)
 {
-//             <    is read   >: l
-//             <    is written>: n p
+
+// Points To:
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1 , MAY
+
    list n = l, p = l;
-//             <    is read   >: n
+
+// Points To:
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1 , MAY
+// n -> *NULL_POINTER* , MAY
+// n -> _l_1 , MAY
+// p -> *NULL_POINTER* , MAY
+// p -> _l_1 , MAY
+
    //while (n!=nil) {
    // FI: to simplify the analysis...
    while (n) {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: n
+
+// Points To:
+// _l_1.next -> *NULL_POINTER* , MAY
+// _l_1.next -> _l_1_2__1 , MAY
+// _l_1_2__1.next -> *NULL_POINTER* , MAY
+// _l_1_2__1.next -> _l_1_2__1 , MAY
+// l -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1 , MAY
+// n -> _l_1 , MAY
+// n -> _l_1_2__1 , MAY
+// p -> *NULL_POINTER* , MAY
+// p -> _l_1 , MAY
+// p -> _l_1_2__1 , MAY
+
       n = n->next;
-//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+// Points To:
+// _l_1.next -> *NULL_POINTER* , MAY
+// _l_1.next -> _l_1_2__1 , MAY
+// _l_1_2__1.next -> *NULL_POINTER* , MAY
+// _l_1_2__1.next -> _l_1_2__1 , MAY
+// l -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1 , MAY
+// n -> *NULL_POINTER* , MAY
+// n -> _l_1_2__1 , MAY
+// p -> *NULL_POINTER* , MAY
+// p -> _l_1 , MAY
+// p -> _l_1_2__1 , MAY
+
       free(p);
-//             <    is read   >: n
-//             <    is written>: p
+
+// Points To:
+// _l_1.next -> *NULL_POINTER* , MAY
+// _l_1.next -> _l_1_2__1 , MAY
+// _l_1_2__1.next -> *NULL_POINTER* , MAY
+// _l_1_2__1.next -> _l_1_2__1 , MAY
+// l -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1 , MAY
+// n -> *NULL_POINTER* , MAY
+// n -> _l_1_2__1 , MAY
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
       p = n;
    }
+
+// Points To:
+// _l_1.next -> *NULL_POINTER* , MAY
+// _l_1.next -> _l_1_2__1 , MAY
+// _l_1_2__1.next -> *NULL_POINTER* , MAY
+// _l_1_2__1.next -> _l_1_2__1 , MAY
+// l -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1 , MAY
+// n -> *NULL_POINTER* , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _l_1 , MAY
+// p -> _l_1_2__1 , MAY
+
    return;
 }
-
-POINTS-TO
-

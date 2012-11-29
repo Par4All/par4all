@@ -45,12 +45,12 @@ void assign03()
    double *p = (double *) malloc(10*sizeof(double));
 
 // Points To:
-// p -> *HEAP*_l_4[0] , EXACT
+// p -> *HEAP*_l_4[0] , MAY
 
    int j = 2;
 
 // Points To:
-// p -> *HEAP*_l_4[0] , EXACT
+// p -> *HEAP*_l_4[0] , MAY
 
 
    p[j] = 1.;
@@ -94,8 +94,8 @@ void assign03()
    double *p = (double *) malloc(10*sizeof(double));
 //             <    is written>: j
    int j = 2;
+//             <may be written>: *HEAP*_l_4[j]
 //             <    is read   >: j p
-//             <    is written>: *HEAP*_l_4[j]
 
    p[j] = 1.;
 }
