@@ -127,11 +127,7 @@ int formal_parameter01(int **pi)
 Points-to for "main"
 
 
-// Points To IN:
-// formal_parameter01:_pi_1[*] -> *NULL_POINTER* , MAY
-// formal_parameter01:_pi_1[1] -> *NULL_POINTER* , MAY
-// formal_parameter01:_pi_1[*] -> _pi_1_1[*][0] , MAY
-// formal_parameter01:_pi_1[1] -> _pi_1_1[1][0] , MAY
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -157,20 +153,12 @@ int main()
 
 // Points To:
 // aipp -> ip , EXACT
-// formal_parameter01:_pi_1[*] -> *NULL_POINTER* , MAY
-// formal_parameter01:_pi_1[1] -> *NULL_POINTER* , MAY
-// formal_parameter01:_pi_1[*] -> _pi_1_1[*][0] , MAY
-// formal_parameter01:_pi_1[1] -> _pi_1_1[1][0] , MAY
 // ip -> i , EXACT
 
    i = formal_parameter01(aipp);
 
 // Points To:
 // aipp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// formal_parameter01:_pi_1[*] -> *NULL_POINTER* , MAY
-// formal_parameter01:_pi_1[1] -> *NULL_POINTER* , MAY
-// formal_parameter01:_pi_1[*] -> _pi_1_1[*][0] , MAY
-// formal_parameter01:_pi_1[1] -> _pi_1_1[1][0] , MAY
 // ip[*] -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
 // ip[1] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // ip -> i , EXACT

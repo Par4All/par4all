@@ -1,32 +1,5 @@
 
-PROPER  EFFECTS
-
-void bar(int **pp, int **qq)
-{
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   *pp = *qq;
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   printf("pointers exchanged");
-   return;
-}
-void foo()
-{
-//             <    is written>: i j p pp q qq
-   int i = 0, j = 1, *p = &i, *q = &j, **pp = &p, **qq = &q;
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-
-   bar(pp, qq);
-   return;
-}
-
-POINTS-TO
+Points-to for "bar"
 
 
 // Points To IN:
@@ -84,14 +57,13 @@ void bar(int **pp, int **qq)
    return;
 }
 
-// Points To IN:
-// bar:_pp_1[*] -> *NULL_POINTER* , MAY
-// bar:_pp_1[*] -> _pp_1_1[*][0] , MAY
+Points-to for "foo"
 
 
-// Points To OUT:
-// bar:_pp_1[*] -> *NULL_POINTER* , MAY
-// bar:_pp_1[*] -> _pp_1_1[*][0] , MAY
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void foo()
 {
@@ -101,8 +73,6 @@ void foo()
    int i = 0, j = 1, *p = &i, *q = &j, **pp = &p, **qq = &q;
 
 // Points To:
-// bar:_pp_1[*] -> *NULL_POINTER* , MAY
-// bar:_pp_1[*] -> _pp_1_1[*][0] , MAY
 // p -> i , EXACT
 // pp -> p , EXACT
 // q -> j , EXACT
@@ -112,8 +82,6 @@ void foo()
    bar(pp, qq);
 
 // Points To:
-// bar:_pp_1[*] -> *NULL_POINTER* , MAY
-// bar:_pp_1[*] -> _pp_1_1[*][0] , MAY
 // p -> *NULL_POINTER* , MAY
 // p -> j , MAY
 // pp -> p , EXACT

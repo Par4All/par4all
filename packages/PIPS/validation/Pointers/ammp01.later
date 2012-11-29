@@ -1,0 +1,7 @@
+Il faut analyser le code a la main.
+
+Quel est le role de lastmatched?
+
+Test sur ap==ap->next est toujours impossible sous une hypothese de non-sharing.
+
+Call to a_m_serial(i1) always returns NULL?
