@@ -124,15 +124,17 @@ int main()
    exchange(&pa, &pb);
 
 // Points To:
-// pa -> a , EXACT
-// pb -> b , EXACT
+// pa -> *NULL_POINTER* , MAY
+// pa -> b , MAY
+// pb -> *NULL_POINTER* , MAY
+// pb -> a , MAY
 
 
    printf("*pa = %d, *pb = %d\n", *pa, *pb);
 
 // Points To:
-// pa -> a , EXACT
-// pb -> b , EXACT
+// pa -> b , EXACT
+// pb -> a , EXACT
 
    return 0;
 }
