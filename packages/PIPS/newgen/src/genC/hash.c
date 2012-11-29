@@ -564,6 +564,24 @@ void hash_table_fprintf(FILE * f, gen_string_func_t key_to_string,
     }
 }
 
+void hash_table_dump(const hash_table htp)
+{
+    size_t i;
+
+    hash_table_print_header (htp,stderr);
+
+    for (i = 0; i < htp->size; i++) {
+	hash_entry he = htp->array[i];
+
+	if (he.key != HASH_ENTRY_FREE && he.key != HASH_ENTRY_FREE_FOR_PUT)
+	  fprintf(stderr, "%zd: %p -> %p\n", i, he.key, he.val);
+	else if(he.key == HASH_ENTRY_FREE && he.key != HASH_ENTRY_FREE_FOR_PUT)
+	  fprintf(stderr, "%zd: FREE\n", i);
+	else
+	  fprintf(stderr, "%zd: FREE FOR PUT\n", i);
+    }
+}
+
 /* function to enlarge the hash_table htp.
  * the new size will be first number in the array prime_numbers_for_table_size
  * that will be greater or equal to the actual size
@@ -822,7 +840,6 @@ hash_key_type hash_table_type(hash_table htp)
  * After you give the previous hentryp and so on
  * at the end NULL is returned
  */
-
 void *
 hash_table_scan(hash_table htp,
 		void * hentryp_arg,
@@ -841,7 +858,7 @@ hash_table_scan(hash_table htp,
     if ((key !=HASH_ENTRY_FREE) && (key !=HASH_ENTRY_FREE_FOR_PUT))
     {
       *pkey = key;
-      *pval = hentryp->val;
+      if (pval) *pval = hentryp->val;
       return hentryp + 1;
     }
     hentryp++;
