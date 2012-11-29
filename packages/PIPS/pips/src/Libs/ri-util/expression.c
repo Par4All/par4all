@@ -423,9 +423,18 @@ application expression_application(expression e)
   return(syntax_application(expression_syntax(e)));
 }
 
+/* The expression is of kind "s.a", where "s" is a struct and a "a" field. */
 bool expression_field_p(expression e)
 {
-    return expression_call_p(e) && ENTITY_FIELD_P(call_function(expression_call(e)));
+  return expression_call_p(e)
+    && ENTITY_FIELD_P(call_function(expression_call(e)));
+}
+
+/* The expression is of kind "a", where "a" is a field of some struct "s". */
+bool field_expression_p(expression e)
+{
+  return expression_reference_p(e)
+    && entity_field_p(reference_variable(expression_reference(e)));
 }
 /* we get the type of the expression by calling expression_to_type()
  * which allocates a new one. Then we call ultimate_type() to have
@@ -1295,6 +1304,14 @@ string expression_to_string(expression e) {
     return out;
 }
 
+string reference_to_string(reference r) {
+    list l = words_reference(r,NIL) ;
+    string out = words_to_string(l);
+    FOREACH(STRING,w,l) free(w);
+    gen_free_list(l);
+    return out;
+}
+
 
 void print_expressions(list le)
 {
@@ -1366,6 +1383,7 @@ void print_normalized(normalized n)
 	   ever added to linear library */
 	vect_debug((Pvecteur)normalized_linear(n));
 }
+
 bool expression_equal_p(expression e1, expression e2)
 {
   syntax s1, s2;
@@ -1382,6 +1400,26 @@ bool expression_equal_p(expression e1, expression e2)
   s2 = expression_syntax(e2);
 
   return syntax_equal_p(s1, s2);
+}
+
+// FI: renamed because of gcc
+//bool expressions_equal_p(list l1, list l2)
+bool expression_lists_equal_p(list l1, list l2)
+{
+  bool equal_p = true;
+  list cl1 = l1, cl2 = l2;
+  while(!ENDP(cl1) && !ENDP(cl2)) {
+    expression e1 = EXPRESSION(CAR(cl1));
+    expression e2 = EXPRESSION(CAR(cl2));
+    if(!expression_equal_p(e1, e2)) {
+      equal_p = false;
+      break;
+    }
+    POP(cl1), POP(cl2);
+  }
+  if(equal_p)
+    equal_p = ENDP(cl1) && ENDP(cl2);
+  return equal_p;
 }
 
 /* this is slightly different from expression_equal_p, as it will return true for

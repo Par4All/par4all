@@ -5,7 +5,7 @@
 
 %%\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
 
-\title{STEP \\ structure des données}
+\title{STEP \\ structures de données}
 \author{Alain Muller\\
                 \\
         Télécom SudParis}
@@ -14,6 +14,8 @@
 \maketitle
 \sloppy
 
+\section{Imported domains}
+%\label{sec:import}
 
 \domain{import entity from "ri.newgen"}
 
@@ -23,25 +25,52 @@
 
 \domain{import statement from "ri.newgen"}
 
+
+\section{STEP domains}
+
+\subsection{The step\_directives resource}
+
+The resource \texttt{MODULE.step\_directives} is produced par the
+\texttt{step\_parser} phase and used by the \texttt{step\_analyse} and
+\texttt{step\_compile} phases.
+
+The \texttt{map\_entity\_int} domain is used in \texttt{step\_bison\_parser.c}.
+
 \domain{map_entity_int = entity->int}
 
-\domain{step_clause = reduction:map_entity_int + private:entity* + shared:entity* + transformation:int + nowait:unit}
+Domains used in \texttt{step\_bison\_parser.c}, \texttt{parser.c},
+\texttt{directives.c}, \texttt{compile.c}
+
+\domain{step_clause = reduction:map_entity_int + private:entity* + shared:entity* + transformation:int + nowait:unit + threadprivate:entity* + copyin:entity* + firstprivate:entity* + schedule:string* }
+
+Domains used in  \texttt{step\_bison\_parser.c},  \texttt{parser.c}, \texttt{directives.c},  \texttt{analyse.c},  \texttt{compile.c}
 
 \domain{step_directive = type : int x persistent block : statement x clauses : step_clause*}
 
 \domain{step_directives = persistent statement->step_directive}
 
+
+\subsection{The step\_comm resource}
+The resource \texttt{PROGRAM.step\_comm} is initialized by the
+\texttt{step\_analyse\_init} phase, updated by the
+\texttt{step\_analyse} phase and used by the \texttt{step\_compile}
+phase.
+
+
+Domains used in \texttt{analyse.c}
+
 \domain{map_effect_bool = persistent effect -> bool}
 
-The propagation origines of the SEND (and RECV) region is tracked by the
- \texttt{step\_point} and \texttt{map\_step\_point} domains. For a SEND (or RECV) region,
-the \texttt{step\_point} associated in the \texttt{map\_step\_point} table gives the
-original SEND (or RECV) region before propagation (fields module, stmt and data).
+The origins of a SEND (and RECV) region is tracked by the
+ \texttt{step\_point} and \texttt{map\_effect\_step\_point} domains. For a SEND (or RECV) region,
+the \texttt{step\_point} associated in the \texttt{map\_effect\_step\_point} table gives the
+previous SEND (or RECV) region before propagation (fields module, stmt and data).
 
 \domain{step_point = module : entity x persistent stmt : statement x persistent data : effect}
 
-\domain{map_step_point = persistent effect -> step_point}
+\domain{map_effect_step_point = persistent effect -> step_point}
 
-\domain{step_comm = path: map_step_point x interlaced: map_effect_bool x partial: map_effect_bool}
+Domains used in \texttt{analyse.c}, \texttt{compile.c}
+\domain{step_comm = path: map_effect_step_point x interlaced: map_effect_bool x partial: map_effect_bool}
 
 \end{document}

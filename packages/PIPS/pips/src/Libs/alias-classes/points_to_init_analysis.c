@@ -153,27 +153,34 @@ entity create_stub_entity(entity e, string fs, type t)
   // FI: the stub entity already exists?
   string formal_name = strdup(concatenate(get_current_module_name(),
 					  MODULE_SEP_STRING, s, NULL));
+  entity m = get_current_module_entity();
   entity stub = gen_find_entity(formal_name);
   // FI: I expect here a pips_assert("The stub cannot exist",
   // entity_undefined_p(stub));
  
   // If entity "stub" does not already exist, create it.
-  if(entity_undefined_p(stub)) { // FI: the stubs could be allocated in the still non-existing FORMAL_AREA
-    entity DummyTarget = FindOrCreateEntity(get_current_module_name(),
+  if(entity_undefined_p(stub)) {
+    entity fa = FindOrCreateEntity(get_current_module_name(),
 					    FORMAL_AREA_LOCAL_NAME);
-    if(type_undefined_p(entity_type(DummyTarget))) {
-      entity_type(DummyTarget) = make_type(is_type_area, make_area(0, NIL));
-      entity_storage(DummyTarget) = make_storage(is_storage_rom, UU);
-      entity_initial(DummyTarget) = make_value(is_value_unknown, UU);
+    if(type_undefined_p(entity_type(fa))) {
+      // entity a = module_to_heap_area(f);
+      entity_type(fa) = make_type(is_type_area, make_area(0, NIL));
+      
+      //ram r = make_ram(f, a, DYNAMIC_RAM_OFFSET, NIL);
+      entity_storage(fa) = make_storage_rom();
+      entity_initial(fa) = make_value(is_value_unknown, UU);
       // FI: DO we want to declare it abstract location?
-      entity_kind(DummyTarget) = ABSTRACT_LOCATION | ENTITY_FORMAL_AREA;
-      //entity_kind(DummyTarget) = ENTITY_FORMAL_AREA;
+      entity_kind(fa) = ABSTRACT_LOCATION | ENTITY_FORMAL_AREA;
+      //entity_kind(fa) = ENTITY_FORMAL_AREA;
+      AddEntityToDeclarations(fa, m);
     }
     stub = make_entity(formal_name,
 		       copy_type(t),
-		       make_storage_ram(make_ram(get_current_module_entity(),DummyTarget, UNKNOWN_RAM_OFFSET, NIL)),
+		       make_storage_ram(make_ram(m, fa, DYNAMIC_RAM_OFFSET, NIL)),
 		       make_value_unknown());
-  
+    (void) add_C_variable_to_area(fa, stub);
+
+    AddEntityToDeclarations(stub, m);
   }
   else {
     /* FI: we are in deep trouble because the stub entity has already
@@ -254,18 +261,44 @@ cell create_scalar_stub_sink_cell(entity v, // source entity
     int td = variable_dimension_number(type_variable(t));
     pips_assert("The target dimension is greater than or equal to the source dimension", d<=td);
     int i;
-    list tl = NIL;
-    /* FI: use 0 for all proper target dimensions */
-    /* FI: adding 0 subscripts is similar to a dereferencing. We do
-       not know at this level if the dereferencing has been
-       requested. See pointer_reference02. The handling fo eval_p must
-       be modified correspondingly by adding 0 subscripts when the
-       source is an array. Or evaluation must be skipped. */
-    for(i=d;i<td;i++) {
-      tl = CONS(EXPRESSION, make_zero_expression(), tl);
+    //if(false) {
+    if(true) {
+      list tl = NIL;
+      /* FI: use 0 for all proper target dimensions */
+      /* FI: adding 0 subscripts is similar to a dereferencing. We do
+	 not know at this level if the dereferencing has been
+	 requested. See pointer_reference02. The handling fo eval_p must
+	 be modified correspondingly by adding 0 subscripts when the
+	 source is an array. Or evaluation must be skipped. */
+      for(i=d;i<td;i++) {
+	tl = CONS(EXPRESSION, make_zero_expression(), tl);
+      }
+      sl = gen_nconc(sl, tl);
+      sink_ref = make_reference(stub_entity, sl);
     }
-    sl = gen_nconc(sl, tl);
-    sink_ref = make_reference(stub_entity, sl);
+    else {
+      sink_ref = make_reference(stub_entity, sl);
+      bool e_to_be_freed;
+      type ept = points_to_reference_to_type(sink_ref, &e_to_be_freed);
+      i = d;
+      while(!array_pointer_type_equal_p(pt, ept)
+	    && !(type_void_p(pt) && overloaded_type_p(ept))
+	    && i<td) {
+	if(e_to_be_freed) free_type(ept);
+	list tl = CONS(EXPRESSION, make_zero_expression(), NIL);
+	reference_indices(sink_ref) =
+	  gen_nconc(reference_indices(sink_ref), tl);
+	ept = points_to_reference_to_type(sink_ref, &e_to_be_freed);
+	i++;
+      }
+      if(!array_pointer_type_equal_p(pt, ept)
+	 && !(type_void_p(pt) && overloaded_type_p(ept)))
+	pips_internal_error("The stub and expected types are incompatible.\n");
+      else {
+	;
+      }
+      if(e_to_be_freed) free_type(ept);
+    }
   }
   else if(type_void_p(t)) {
     pips_assert("Implemented", false);
@@ -326,10 +359,21 @@ void points_to_indices_to_unbounded_indices(list sl)
   for(csl = sl; !ENDP(csl); POP(csl)) {
     expression se = EXPRESSION(CAR(csl));
     if(!expression_reference_p(se)) {
-      if(!unbounded_expression_p(se)) {
+      if(unbounded_expression_p(se))
+	;
+      else if(expression_is_constant_p(se))
+	;
+      else {
 	free_expression(se);
 	EXPRESSION_(CAR(csl)) = make_unbounded_expression();
       }
+    }
+    else {
+      reference r = expression_reference(se);
+      entity v = reference_variable(r);
+      if(!entity_field_p(v))
+	free_expression(se);
+	EXPRESSION_(CAR(csl)) = make_unbounded_expression();
     }
   }
   return; // Useful for gdb?

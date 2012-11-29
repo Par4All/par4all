@@ -308,9 +308,15 @@ static void end_directive(void)
   free(directive_type);
 }
 
+/*
+ * For fortran programs
+ * converting comments into pragmas
+ *
+*/
+
 void step_comment2pragma_handle(statement stmt)
 {
-  pips_debug(1,"#### CONVERTION COMMENTAIRE en PRAGMA ####\n");
+  pips_debug(1,"begin\n");
   if(!statement_undefined_p(stmt))
     {
       string comment = statement_comments(stmt);
@@ -349,4 +355,5 @@ void step_comment2pragma_handle(statement stmt)
 	  pips_debug(1,"Declaration txt : Empty\n");
 	}
     }
+  pips_debug(1,"end\n");
 }

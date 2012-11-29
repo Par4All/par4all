@@ -128,6 +128,12 @@ int points_to_context_statement_line_number()
   return statement_number(s);
 }
 
+pt_map points_to_context_statement_in()
+{
+  pt_map in = (pt_map) stack_head(statement_points_to_context);
+  return in;
+}
+
 pt_map pop_statement_points_to_context(void)
 {
   (void) stack_pop(current_statement_points_to_context);
@@ -138,6 +144,11 @@ void reset_statement_points_to_context()
 {
   stack_free(&statement_points_to_context);
   statement_points_to_context = stack_undefined;
+}
+
+bool statement_points_to_context_defined_p()
+{
+  return statement_points_to_context != stack_undefined;
 }
 
 /* See points_to_statement()
@@ -269,6 +280,8 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 	  type it = compute_basic_concrete_type(expression_to_type(exp_init));
 	  // See C standard for type compatibility + PIPS idiosyncrasies
 	  // This should be extended to cope with the C type hierarchy
+	  // accept side effects
+	  pt_out = expression_to_points_to(exp_init, pt_out, true);
 	  if(array_pointer_type_equal_p(et, it)
 	     || type_void_star_p(et) || type_void_star_p(it)
 	     || integer_type_p(it)
@@ -316,6 +329,15 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
 	}
       }
     }
+    else {
+      /* The initialization expression may use pointers, directly or
+	 indirectly via struct and arrays. */
+      expression ie = variable_initial_expression(e);
+      if(!expression_undefined_p(ie)) {
+	pt_out = expression_to_points_to(ie, pt_out, true);
+	free_expression(ie);
+      }
+    }
     /* Take care of expressions in array sizing (see array12.c) */
     if(array_type_p(et)) {
       variable ev = type_variable(et);
@@ -323,8 +345,8 @@ pt_map declaration_statement_to_points_to(statement s, pt_map pt_in)
       FOREACH(DIMENSION, d, dl) {
 	expression l = dimension_lower(d);
 	expression u = dimension_upper(d);
-	pt_out = expression_to_points_to(l, pt_out);
-	pt_out = expression_to_points_to(u, pt_out);
+	pt_out = expression_to_points_to(l, pt_out, true);
+	pt_out = expression_to_points_to(u, pt_out, true);
       }
     }
   }
@@ -371,7 +393,7 @@ pt_map instruction_to_points_to(instruction i, pt_map pt_in)
     if(points_to_graph_bottom(pt_in))
       pt_out = pt_in;
     else
-      pt_out = call_to_points_to(c, pt_out);
+      pt_out = call_to_points_to(c, pt_out, NIL, true);
     break;
   }
   case is_instruction_unstructured: {
@@ -393,7 +415,7 @@ pt_map instruction_to_points_to(instruction i, pt_map pt_in)
     if(points_to_graph_bottom(pt_in))
       pt_out = pt_in;
     else
-      pt_out = expression_to_points_to(e, pt_in);
+      pt_out = expression_to_points_to(e, pt_in, true);
     break;
   }
   default:
@@ -438,8 +460,18 @@ pt_map test_to_points_to(test t, pt_map pt_in)
    * effects or simply because of dereferencements.
    *
    * This cannot be done here because of side-effects.
+   *
+   * FI: because the conditions must be evaluated for true and false?
    */
   //pt_in = expression_to_points_to(c, pt_in);
+  //list el = expression_to_proper_constant_path_effects(c);
+  //if(!effects_write_p(el))
+  // pt_in = expression_to_points_to(c, pt_in, true);
+  //gen_free_list(el);
+
+  // The side effects won't be taken into account when the condition
+  // is evaluated
+  pt_in = expression_to_points_to(c, pt_in, true);
 
   pt_map pt_in_t = full_copy_pt_map(pt_in);
   pt_map pt_in_f = full_copy_pt_map(pt_in);
@@ -506,6 +538,8 @@ pt_map whileloop_to_points_to(whileloop wl, pt_map pt_in)
   //bool store = false;
   if (evaluation_before_p(whileloop_evaluation(wl))) {
     //pt_out = points_to_whileloop(wl, pt_in, store);
+    //pt_out = expression_to_points_to(c, pt_out, false);
+    pt_out = expression_to_points_to(c, pt_out, true);
     pt_out = any_loop_to_points_to(b,
 				   expression_undefined,
 				   c,
@@ -568,7 +602,7 @@ pt_map any_loop_to_points_to(statement b,
 
     /* First, enter or skip the loop: initialization + condition check */
     if(!expression_undefined_p(init))
-      pt_out = expression_to_points_to(init, pt_out);
+      pt_out = expression_to_points_to(init, pt_out, true);
     pt_map pt_out_skip = full_copy_pt_map(pt_out);
     if(!expression_undefined_p(c)) {
       pt_out = condition_to_points_to(c, pt_out, true);
@@ -601,7 +635,7 @@ pt_map any_loop_to_points_to(statement b,
       // storage and update for each substatement at each iteration k
       pt_out = statement_to_points_to(b, prev);
       if(!expression_undefined_p(inc))
-	pt_out = expression_to_points_to(inc, pt_out);
+	pt_out = expression_to_points_to(inc, pt_out, true);
       // FI: should be condition_to_points_to() for conditions such as
       // while(p!=q);
       // The condition is not always defined (do loops)
@@ -626,7 +660,7 @@ pt_map any_loop_to_points_to(statement b,
 
       pips_assert("", consistent_points_to_graph_p(pt_out));
 	if(!expression_undefined_p(inc))
-	  pt_out = expression_to_points_to(inc, pt_out);
+	  pt_out = expression_to_points_to(inc, pt_out, true);
 
       pips_assert("", consistent_points_to_graph_p(pt_out));
 	if(!expression_undefined_p(c))
@@ -704,7 +738,7 @@ pt_map new_any_loop_to_points_to(statement b,
 
     /* First, enter or skip the loop: initialization + condition check */
     if(!expression_undefined_p(init))
-      pt_out = expression_to_points_to(init, pt_out);
+      pt_out = expression_to_points_to(init, pt_out, true);
     pt_map pt_out_skip = full_copy_pt_map(pt_out);
     if(!expression_undefined_p(c)) {
       pt_out = condition_to_points_to(c, pt_out, true);
@@ -743,7 +777,7 @@ pt_map new_any_loop_to_points_to(statement b,
       // storage and update for each substatement at each iteration k
       pt_iter = statement_to_points_to(b, prev);
       if(!expression_undefined_p(inc))
-	pt_iter = expression_to_points_to(inc, pt_iter);
+	pt_iter = expression_to_points_to(inc, pt_iter, true);
       // FI: should be condition_to_points_to() for conditions such as
       // while(p!=q);
       // The condition is not always defined (do loops)
@@ -765,7 +799,7 @@ pt_map new_any_loop_to_points_to(statement b,
 	   exiting the loop */
 	pt_out = statement_to_points_to(b, pt_out_prev);
 	if(!expression_undefined_p(inc))
-	  pt_out = expression_to_points_to(inc, pt_out);
+	  pt_out = expression_to_points_to(inc, pt_out, true);
 	if(!expression_undefined_p(c))
 	  pt_out = condition_to_points_to(c, pt_out, false);
 	break;

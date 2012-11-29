@@ -3292,7 +3292,7 @@ static hash_table entity_types_to_bctypes = hash_table_undefined;
   Init and reset functions for the basic_concrete_types table.  They
   are currently called by pipsmake (and callgraph) before and after
   performing a phase on a module. This could also be done after
-  parsing and just before closing the database, however, I feard that
+  parsing and just before closing the database, however, I feared that
   it would grow too much to be efficient, and I lack time to check
   this assumtion. BC.
  */
@@ -4968,6 +4968,26 @@ list derived_type_fields(type t)
     }
   return l;
 }
+
+
+/**
+ @param t is a type of kind "variable" with a basic of kind "derived"
+ @return the list of fields of the input type
+ */
+list derived_type_to_fields(type t)
+{
+  list l = NIL;
+  variable v = type_variable(t);
+  basic b = variable_basic(v);
+  if(basic_derived_p(b)) {
+    entity est = basic_derived(b);
+    type st = entity_type(est);
+    l = derived_type_fields(st);
+  }
+  else
+    pips_internal_error("Called with an improper argument.\n");
+  return l;
+}
 
 bool qualifier_equal_p(qualifier q1, qualifier q2)
 {
@@ -5321,6 +5341,15 @@ bool char_star_constant_function_type_p(type t)
   return char_star_p;
 }
 
+list struct_type_to_fields(type lt)
+{
+  pips_assert("lt is the type of a struct", type_variable_p(lt)
+	      && basic_derived_p(variable_basic(type_variable(lt))));
+  entity ste = basic_derived(variable_basic(type_variable(lt)));
+  type st = entity_type(ste); // structure type
+  list fl = type_struct(st); // field list
+  return fl;
+}
 /*
  *  that is all
  */

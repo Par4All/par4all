@@ -187,6 +187,8 @@ void reset_points_to_context()
  */
 void add_arc_to_points_to_context(points_to pt)
 {
+  pips_assert("points_to_context is defined",
+	      !pt_map_undefined_p(points_to_context));
   (void) add_arc_to_pt_map(pt, points_to_context);
   points_to npt = copy_points_to(pt);
   add_arc_to_statement_points_to_context(npt);
@@ -195,6 +197,26 @@ void add_arc_to_points_to_context(points_to pt)
 pt_map get_points_to_context()
 {
   return points_to_context;
+}
+
+void clean_up_points_to_stubs(entity module)
+{
+  code c = value_code(entity_initial(module));
+  list dl = code_declarations(c);
+  list sl = NIL;
+
+  FOREACH(ENTITY, v, dl) {
+    if(stub_entity_of_module_p(v, module) || entity_heap_location_p(v)) {
+      sl = CONS(ENTITY, v, sl);
+      fprintf(stderr, "Removed stub: %s\n", entity_name(v));
+    }
+  }
+
+  gen_list_and_not(&code_declarations(c), sl);
+
+  GenericCleanEntities(sl, module, false);
+
+  gen_free_list(sl);
 }
 
 #define FRANCOIS 1
@@ -219,7 +241,17 @@ static bool generic_points_to_analysis(char * module_name) {
   set_current_module_statement((statement) db_get_memory_resource(DBR_CODE,
                                                                   module_name, true));
   module_stat = get_current_module_statement();
-  
+
+  /* In case we need effects to generate all necessary points-to information */
+  // These initializations are not sufficient. We also need at least a
+  // stack of statements
+  //set_constant_paths_p(true);
+  //set_pointer_info_kind(with_points_to);
+  //set_methods_for_proper_simple_effects();
+
+  /* Clean-up formal context stubs and heap model variables */
+  clean_up_points_to_stubs(module);
+
   /* Stack for on-demand update of in points-to information */
   init_statement_points_to_context();
 
@@ -252,14 +284,18 @@ static bool generic_points_to_analysis(char * module_name) {
   init_points_to_context(pt_in);
 #endif
 
-  /* Compute the points-to relations using the pt_in as input.*/
-#if !FRANCOIS
-  // FI: old version
-  pts_to_out = points_to_statement(module_stat, pt_in);
+  /* Necessary to compute memory effects
+   *
+   * Memory effects may be computed to avoid issues with side effects
+   * Three possible options: 1) a new expression_to_points_to() that
+   * does not take side effects into account, 2) an extension of
+   * condition_to_points_to() to take care of dereferencing as in
+   * expression_to_points_to(), or use memory effects to deal with
+   * side effect free expressions only.
+   */
+  // set_methods_for_simple_effects();
 
-#else  // FI: new version
   pts_to_out = statement_to_points_to(module_stat, pt_in);
-#endif
   /* Store the points-to relations */
   DB_PUT_MEMORY_RESOURCE(DBR_POINTS_TO, module_name, get_pt_to_list());
 
@@ -270,8 +306,18 @@ static bool generic_points_to_analysis(char * module_name) {
   // pts_to_out = remove_unreachable_vertices_in_points_to_graph(pts_to_out);
   /* Filter OUT points-to by deleting local variables, including the
      formal paprameters */
-  points_to_graph_set(pts_to_out) =
-    points_to_function_projection(points_to_graph_set(pts_to_out));
+  if(entity_main_module_p(module)) {
+    /* FI: you would have to be much more specific about was is kept
+       or not when the main function is exited... I am not sure it is
+       a good idea. Potentially useful information about argv is
+       lost. As well as useless information about memory leaks
+       occuring at the end of the execution. Motsly an issue for
+       validation. */
+    clear_pt_map(pts_to_out);
+  }
+  else
+    points_to_graph_set(pts_to_out) =
+      points_to_function_projection(points_to_graph_set(pts_to_out));
 
   /* Save IN points-to relations */
 #if !FRANCOIS
@@ -290,7 +336,8 @@ static bool generic_points_to_analysis(char * module_name) {
     /* Save OUT points-to relations */
   list  l_out =
     gen_full_copy_list(set_to_list(points_to_graph_set(pts_to_out)));
-  points_to_list out_list = make_points_to_list(false, l_out); // SG: baaaaaaad copy, let us hope AM will fix her code :p
+  bool out_bottom_p = points_to_graph_bottom(pts_to_out);
+  points_to_list out_list = make_points_to_list(out_bottom_p, l_out); // SG: baaaaaaad copy, let us hope AM will fix her code :p
 
   DB_PUT_MEMORY_RESOURCE(DBR_POINTS_TO_OUT, module_name, out_list);
 
@@ -303,6 +350,7 @@ static bool generic_points_to_analysis(char * module_name) {
   reset_current_module_entity();
   reset_current_module_statement();
   reset_effects_private_current_context_stack();
+  //generic_effects_reset_all_methods();
   debug_off();
   bool good_result_p = true;
 

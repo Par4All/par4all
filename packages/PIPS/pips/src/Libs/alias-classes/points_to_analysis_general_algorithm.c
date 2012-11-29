@@ -879,8 +879,10 @@ set points_to_intrinsic(statement s,
     /* The call is never returned from. No information is available
        for the dead code that follows. pt_out is already set to the
        empty set. */
+    //points_to_graph_bottom(pt_out) = true;
     set_clear(pt_out);
-  } else if (ENTITY_C_RETURN_P(e)) {
+  }
+  else if (ENTITY_C_RETURN_P(e)) {
     /* The call is never returned from. No information is available
        for the dead code that follows. pt_out is already set to the
        empty set. */

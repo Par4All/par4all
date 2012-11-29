@@ -20,6 +20,7 @@ typedef struct
   size_t elt_size;
 }Array;
 
+#define array_ready_p(array) ((array)->elt_size!=0)
 #define array_set(array,type) array_sized_set(array, sizeof(type));
 INLINE void array_sized_set(Array *array, const size_t elt_size)
 {array->elt_size = elt_size;array->data = NULL;array->len = 0;array->alloc = 0;}

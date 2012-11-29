@@ -429,7 +429,7 @@ static list effects_generic_inf_difference_op(effect eff1, effect eff2,
   There is a strong assumption on l1 and l2 effects: two effects of l1
   (resp. l2) are not combinable wrt r1_r2_combinable_p.  The algorithm
   relies on this assumption to avoid unecessary comparisons of effects
-  when possible, for performance reasons ((the asymptotic complexity is
+  when possible, for performance reasons (the asymptotic complexity is
   o(n1*n2), but taking into account this assumption reduces the average
   complexity).
 
@@ -1090,11 +1090,12 @@ bool cells_combinable_p(cell c1, cell c2)
   entity e1 = reference_variable(r1);
   entity e2 = reference_variable(r2);
 
+  list l1 = reference_indices(r1);
+  list l2 = reference_indices(r2);
+
   if (same_entity_p(e1, e2))
     {
       /* let us check the indices */
-      list l1 = reference_indices(r1);
-      list l2 = reference_indices(r2);
       
       if (gen_length(l1) != gen_length(l2))
 	combinable_p = false;
@@ -1206,12 +1207,30 @@ bool cells_combinable_p(cell c1, cell c2)
 	      else if ((al1_p && entity_all_locations_p(e1))
 		    || (al2_p && entity_all_locations_p(e2)))
 		  combinable_p = true;
-	      else if ((al1_p && undefined_pointer_value_entity_p(e1))
-		      || (al2_p && undefined_pointer_value_entity_p(e2)))
+	      else if (al1_p && (undefined_pointer_value_entity_p(e1)
+				 || entity_nowhere_locations_p(e1)
+				 || entity_typed_nowhere_locations_p(e1))) {
+		if(al2_p && (undefined_pointer_value_entity_p(e2)
+			     || entity_nowhere_locations_p(e2)
+			     || entity_typed_nowhere_locations_p(e2)))
+		  combinable_p = true;
+		else
+		  combinable_p = false;
+	      }
+		else if (al2_p && (undefined_pointer_value_entity_p(e2)
+				   || entity_nowhere_locations_p(e2)
+				   || entity_typed_nowhere_locations_p(e2))) {
+		  combinable_p = false;
+	      }
+	      else if (al1_p && entity_null_locations_p(e1)) {
+		if(al2_p && entity_null_locations_p(e2))
+		  combinable_p = true;
+		else
+		  combinable_p = false;
+	      }
+	      else if (al2_p && entity_null_locations_p(e2)) {
 		combinable_p = false;
-	      else if ((al1_p && entity_null_locations_p(e1))
-		      || (al2_p && entity_null_locations_p(e2)))
-		combinable_p = false;
+	      }
 	      else if ( (al1_p && al2_p)
 		       || (al1_p && ENDP(reference_indices(r2)))
 		       || (al2_p && ENDP(reference_indices(r1))))
@@ -1255,9 +1274,19 @@ bool cells_combinable_p(cell c1, cell c2)
 			{
 			  /* here we should consider the type of the non abstract location reference,
 			     whether there is a dereferencement or not to guess the memory area, ... */
-			  pips_internal_error("case not handled yet (c1 = %s, c2 = %s)\n",
-					      effect_reference_to_string(r1),
-					      effect_reference_to_string(r2));
+			  // FI: we end up here with c1 = *ANY_MODULE*:*ANYWHERE*_b0.next, c2 = _ll_1.next
+			  if(expression_lists_equal_p(l1, l2)) {
+			    reference nr1 = make_reference(e1, NIL);
+			    reference nr2 = make_reference(e2, NIL);
+			    cell nc1 = make_cell_reference(nr1);
+			    cell nc2 = make_cell_reference(nr2);
+			    combinable_p = cells_combinable_p(nc1, nc2);
+			    free_cell(nc1), free_cell(nc2);
+			  }
+			  else
+			    pips_internal_error("case not handled yet (c1 = %s, c2 = %s)\n",
+						effect_reference_to_string(r1),
+						effect_reference_to_string(r2));
 			}
 		    }
 	    }
@@ -1298,6 +1327,26 @@ bool effects_scalars_and_same_action_p(effect eff1, effect eff2)
       same_p = false;
     else
       same_p = (effect_scalar_p(eff1) || effect_scalar_p(eff2)) && effects_combinable_p(eff1, eff2);
+#if 0
+    else {
+      // FI->BC: s.f and s.f is not recognized as scalar effect
+      // because they are encoded as s[f], which does not appear scalar
+      // Also effects_combinable_p() may redo some of the work
+      // performed above
+      // same_p = (effect_scalar_p(eff1) || effect_scalar_p(eff2))
+      //   && effects_combinable_p(eff1, eff2);
+      same_p = (atomic_effect_p(eff1) || atomic_effect_p(eff2))
+	&& effects_combinable_p(eff1, eff2);
+    //FI : a[*] and a[*] in EffectsWithPointsTo/call10.c
+      if(!same_p) {
+	cell c1 = effect_cell(eff1);
+	cell c2 = effect_cell(eff2);
+	reference r1 = cell_any_reference(c1);
+	reference r2 = cell_any_reference(c2);
+	same_p = reference_equal_p(r1, r2);
+      }
+    }
+#endif
   }
 
   return same_p;

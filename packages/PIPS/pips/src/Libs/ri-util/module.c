@@ -517,21 +517,32 @@ bool fortran95_language_module_p(entity m)
 }
 
 /* Returns the entity rv that carries the value returned by module m,
- * when m is not a C void function or a Fortran subroutine.
+ * when m is not a C void function or a Fortran subroutine. If safe_p,
+ * abort if the function is void. Otherwise, return an
+ * undefined_entity.
  *
  * rv is supposed to be allocated early by the parser.
  */
-entity function_to_return_value(entity m)
+entity generic_function_to_return_value(entity m, bool safe_p)
 {
-  type ft = ultimate_type(entity_type(m));
+  type ft = entity_basic_concrete_type(m);
   entity rv = entity_undefined;
-
-  if(type_functional_p(ft)) {
+  if(compilation_unit_entity_p(m)) {
+    if(safe_p)
+      pips_user_error("A return value is requested for compilation unit"
+		      " \"%s\".\n", entity_user_name(m));
+    else
+      rv = entity_undefined;
+  }
+  else if(type_functional_p(ft)) {
     functional f = type_functional(ft);
-    type r = functional_result(f);
+    type r = compute_basic_concrete_type(functional_result(f));
     if(type_void_p(r)) {
-      pips_user_error("A return value is used for void function \"%s\".\n",
-		      entity_user_name(m));
+      if(safe_p)
+	pips_user_error("A return value is used for void function \"%s\".\n",
+			entity_user_name(m));
+      else
+	rv = entity_undefined;
     }
     else {
       const char* mn = entity_local_name(m);
@@ -545,6 +556,23 @@ entity function_to_return_value(entity m)
 			" \"%s\".\n", entity_user_name(m));
 
   return rv;
+}
+
+/* Returns the entity rv that carries the value returned by module m,
+ * when m is not a C void function or a Fortran subroutine.
+ *
+ * rv is supposed to be allocated early by the parser.
+ */
+entity function_to_return_value(entity m)
+{
+  return generic_function_to_return_value(m, true);
+}
+
+/* Same as function_to_return_value(), but returns value_undefined
+   when m is a C void function or a Fortran subroutine. */
+entity any_function_to_return_value(entity m)
+{
+  return generic_function_to_return_value(m, false);
 }
 
 /* Check if m is a C void function or a Fortran subroutine. No

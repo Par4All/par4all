@@ -1,4 +1,11 @@
-step_api.tmp: step_api.h 
+# missing dependencies for am?
+#step_lexer.c: step_lexer.l step_bison_parser.h
+#step_bison_parser.h: step_bison_parser.c
+#step_bison_parser.c: step_bison_parser.y
+#.NOTPARALLEL:
+
+# hacks
+step_api.tmp: step_api.h
 	grep '^[ \t]*extern[ \t]*void[ \t]*STEP_API' $^		 |	\
 	sed 's/^[^(]*(step\([^)]*\))[ \t]*(\(.*\));/\1, \2/g'	 |	\
 	sed 's/[ \t]*,[ \t]*/,/g' | sort > $@
@@ -6,7 +13,7 @@ step_api.tmp: step_api.h
 STEP_name.h: STEP_name_variable.h step_api.tmp step_common.h Makefile
 	cp $(srcdir)/STEP_name_variable.h $@ && chmod u+w $@ && \
 	echo "/* Runtime MACRO (generated from step_common.h ) */" >> $@ && \
-	grep "^#define[ \t]*STEP_" $(srcdir)/step_common.h |grep -v STEP_COMMON_H_ | sed 's/^#define[ \t]*\([^ \t]*\).*/#define \1_NAME "\1"/g' |sort >> $@ && \
+	grep "^#define[ \t]*STEP_" $(srcdir)/step_common.h |grep -v STEP_COMMON_H_ | sed 's/^#define[ \t]*\([^ \t(]*\).*/#define \1_NAME "\1"/g' |sort >> $@ && \
 	echo "/* Runtime MACRO (end) */" >> $@ && \
 	awk 'BEGIN{FS=","; printf ("/* Runtime API intrinsic name (generated from step_api.h ) */\n") >> "$@"}\
 	{\
