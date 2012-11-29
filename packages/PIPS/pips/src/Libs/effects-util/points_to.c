@@ -166,7 +166,13 @@ void print_points_to_cells(list cl)
   if(ENDP(cl))
     fprintf(stderr, "Empty cell list");
   else {
+    entity m = get_current_module_entity();
     FOREACH(CELL, c, cl) {
+      reference r = cell_any_reference(c);
+      entity v = reference_variable(r);
+      entity mv =  module_name_to_entity(entity_module_name(v));
+      if(m!=mv)
+	fprintf(stderr,"%s" MODULE_SEP_STRING, entity_local_name(mv));
       print_points_to_cell(c);
       if(!ENDP(CDR(cl)))
 	fprintf(stderr, ", ");

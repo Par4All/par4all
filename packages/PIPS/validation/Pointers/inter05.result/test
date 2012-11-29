@@ -57,14 +57,10 @@ void bar(int ***ppp, int ***qqq)
    return;
 }
 
-// Points To IN:
-// bar:_ppp_1_1[*][*] -> *NULL_POINTER* , MAY
-// bar:_ppp_1_1[*][*] -> _ppp_1_1_1[*][*][0] , MAY
+// Points To IN: none
 
 
-// Points To OUT:
-// bar:_ppp_1_1[*][*] -> *NULL_POINTER* , MAY
-// bar:_ppp_1_1[*][*] -> _ppp_1_1_1[*][*][0] , MAY
+// Points To OUT: none
 
 void inter05()
 {
@@ -84,8 +80,6 @@ void inter05()
    int k = 2, *r = &k;
 
 // Points To:
-// bar:_ppp_1_1[*][*] -> *NULL_POINTER* , MAY
-// bar:_ppp_1_1[*][*] -> _ppp_1_1_1[*][*][0] , MAY
 // p -> i , EXACT
 // pp -> p , EXACT
 // ppp -> pp , EXACT
@@ -97,8 +91,6 @@ void inter05()
    bar(ppp, qqq);
 
 // Points To:
-// bar:_ppp_1_1[*][*] -> *NULL_POINTER* , MAY
-// bar:_ppp_1_1[*][*] -> _ppp_1_1_1[*][*][0] , MAY
 // p -> *NULL_POINTER* , MAY
 // p -> j , MAY
 // pp -> p , EXACT

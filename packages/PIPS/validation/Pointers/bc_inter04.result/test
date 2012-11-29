@@ -1,3 +1,78 @@
+POINTS TO for "foo"
+
+
+// Points To IN:
+// _p2_2[0] -> *NULL_POINTER* , MAY
+// _p2_2[0] -> _p2_2_2[0][0] , MAY
+// p1 -> *NULL_POINTER* , MAY
+// p1 -> _p1_1[0] , MAY
+// p2 -> *NULL_POINTER* , MAY
+// p2 -> _p2_2[0] , MAY
+// q3 -> *NULL_POINTER* , MAY
+// q3 -> _q3_3[0] , MAY
+// r4 -> *NULL_POINTER* , MAY
+// r4 -> _r4_4[0] , MAY
+
+
+// Points To OUT:
+// _p1_1[*] -> *NULL_POINTER* , MAY
+// _p1_1[0] -> *NULL_POINTER* , MAY
+// _p1_1[*] -> _q3_3[0] , MAY
+// _p1_1[0] -> _q3_3[0] , MAY
+// _p2_2[0] -> *NULL_POINTER* , MAY
+// _p2_2[0] -> _p2_2_2[0][0] , MAY
+// _p2_2_2[*][*] -> *NULL_POINTER* , MAY
+// _p2_2_2[0][0] -> *NULL_POINTER* , MAY
+// _p2_2_2[*][*] -> _r4_4[0] , MAY
+// _p2_2_2[0][0] -> _r4_4[0] , MAY
+
+void foo(int ***p1, int ***p2, int **q3, int *r4)
+{
+
+// Points To: none
+
+   int **l;
+
+// Points To:
+// _p2_2[0] -> *NULL_POINTER* , MAY
+// _p2_2[0] -> _p2_2_2[0][0] , MAY
+// l -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> *NULL_POINTER* , MAY
+// p2 -> _p2_2[0] , MAY
+
+   l = *p2;
+
+// Points To:
+// _p2_2[0] -> *NULL_POINTER* , MAY
+// _p2_2[0] -> _p2_2_2[0][0] , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _p2_2_2[0][0] , MAY
+// p1 -> *NULL_POINTER* , MAY
+// p1 -> _p1_1[0] , MAY
+// p2 -> _p2_2[0] , EXACT
+// q3 -> *NULL_POINTER* , MAY
+// q3 -> _q3_3[0] , MAY
+
+   *p1 = q3;
+
+// Points To:
+// _p1_1[*] -> *NULL_POINTER* , MAY
+// _p1_1[0] -> *NULL_POINTER* , MAY
+// _p1_1[*] -> _q3_3[0] , MAY
+// _p1_1[0] -> _q3_3[0] , MAY
+// _p2_2[0] -> *NULL_POINTER* , MAY
+// _p2_2[0] -> _p2_2_2[0][0] , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _p2_2_2[0][0] , MAY
+// p1 -> _p1_1[0] , EXACT
+// p2 -> _p2_2[0] , EXACT
+// q3 -> *NULL_POINTER* , MAY
+// q3 -> _q3_3[0] , MAY
+// r4 -> *NULL_POINTER* , MAY
+// r4 -> _r4_4[0] , MAY
+
+   *l = r4;
+}
 POINTS TO for "main"
 
 
@@ -180,11 +255,18 @@ int main()
 
    printf("%d\n", ***a1);
 
-// Points To: unreachable
+// Points To:
+// *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// a1 -> *ANY_MODULE*:*ANYWHERE* , MAY
+// c4 -> *HEAP*_l_35 , MAY
 
    printf("%d\n", ***a2);
 
-// Points To: unreachable
+// Points To:
+// *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// a1 -> *ANY_MODULE*:*ANYWHERE* , MAY
+// a2 -> *ANY_MODULE*:*ANYWHERE* , MAY
+// c4 -> *HEAP*_l_35 , MAY
 
 
    return 0;

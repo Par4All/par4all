@@ -697,9 +697,7 @@ void init4(mys *p[5])
 Points-to for "main"
 
 
-// Points To IN:
-// init:_m_1[*].tab2 -> *NULL_POINTER* , MAY
-// init:_m_1[*].tab2 -> _m_1_3__1[*][0] , MAY
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -758,8 +756,6 @@ int main()
       s[i] = &s4[i];
 
 // Points To:
-// init:_m_1[*].tab2 -> *NULL_POINTER* , MAY
-// init:_m_1[*].tab2 -> _m_1_3__1[*][0] , MAY
 // p -> s1 , EXACT
 // q -> s2 , EXACT
 // r -> q , EXACT
@@ -774,10 +770,6 @@ int main()
    init(p);
 
 // Points To:
-// *NULL_POINTER*[0].tab2 -> init:*HEAP*_l_21[0] , MAY
-// _m_1_3__1[*][0][0].tab2 -> init:*HEAP*_l_21[0] , MAY
-// init:_m_1[*].tab2 -> *NULL_POINTER* , MAY
-// init:_m_1[*].tab2 -> _m_1_3__1[*][0] , MAY
 // p -> s1 , EXACT
 // q -> s2 , EXACT
 // r -> q , EXACT
@@ -792,10 +784,6 @@ int main()
    init2(q);
 
 // Points To:
-// *NULL_POINTER*[0].tab2 -> init:*HEAP*_l_21[0] , MAY
-// _m_1_3__1[*][0][0].tab2 -> init:*HEAP*_l_21[0] , MAY
-// init:_m_1[*].tab2 -> *NULL_POINTER* , MAY
-// init:_m_1[*].tab2 -> _m_1_3__1[*][0] , MAY
 // p -> s1 , EXACT
 // q -> s2 , EXACT
 // r -> q , EXACT
@@ -810,10 +798,6 @@ int main()
    q = &s3;
 
 // Points To:
-// *NULL_POINTER*[0].tab2 -> init:*HEAP*_l_21[0] , MAY
-// _m_1_3__1[*][0][0].tab2 -> init:*HEAP*_l_21[0] , MAY
-// init:_m_1[*].tab2 -> *NULL_POINTER* , MAY
-// init:_m_1[*].tab2 -> _m_1_3__1[*][0] , MAY
 // p -> s1 , EXACT
 // q -> s3 , EXACT
 // r -> q , EXACT
@@ -828,10 +812,6 @@ int main()
    init3(r);
 
 // Points To:
-// *NULL_POINTER*[0].tab2 -> init:*HEAP*_l_21[0] , MAY
-// _m_1_3__1[*][0][0].tab2 -> init:*HEAP*_l_21[0] , MAY
-// init:_m_1[*].tab2 -> *NULL_POINTER* , MAY
-// init:_m_1[*].tab2 -> _m_1_3__1[*][0] , MAY
 // p -> s1 , EXACT
 // q -> s3 , EXACT
 // r -> q , EXACT
@@ -846,10 +826,6 @@ int main()
    init4(s);
 
 // Points To:
-// *NULL_POINTER*[0].tab2 -> init:*HEAP*_l_21[0] , MAY
-// _m_1_3__1[*][0][0].tab2 -> init:*HEAP*_l_21[0] , MAY
-// init:_m_1[*].tab2 -> *NULL_POINTER* , MAY
-// init:_m_1[*].tab2 -> _m_1_3__1[*][0] , MAY
 // p -> s1 , EXACT
 // q -> s3 , EXACT
 // r -> q , EXACT
