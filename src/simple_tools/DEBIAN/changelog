@@ -1,4 +1,4 @@
-2012-09-05 Ronan Keryell <Ronan.Keryell@wild-systems.com>
+2012-11-29 Ronan Keryell <Ronan.Keryell@wild-systems.com>
 
  * Par4All 1.4.3
 
@@ -8,6 +8,13 @@
      functions to transform and generate XML descriptors
 
    * Improve outlining
+
+   * Fix documentation
+
+   * Improve compilation documentation for OpenSuse
+
+   * Fix post-processing in the OpenCL back-end for Thales TRT in SMECY
+     project
 
 
 2012-06-22 Ronan Keryell <Ronan.Keryell@wild-systems.com>
