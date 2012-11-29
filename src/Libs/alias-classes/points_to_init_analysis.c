@@ -134,7 +134,8 @@ entity create_stub_entity(entity e, string fs, type t)
     int off = formal_offset(f);
     s = strdup(concatenate("_", en, fs,"_", i2a(off), NULL));
   }
-  else if(top_level_entity_p(e)){ // FI: global_variable_p()
+  else if(top_level_entity_p(e) && !entity_stub_sink_p(e)) {
+    // FI: global_variable_p()
     // Naming for sinks of global variable: use their offsets
     int off = ram_offset(storage_ram(entity_storage(e)));
     s = strdup(concatenate("_", en, fs,"_", i2a(off), NULL));
@@ -151,17 +152,24 @@ entity create_stub_entity(entity e, string fs, type t)
   }
   
   // FI: the stub entity already exists?
-  string formal_name = strdup(concatenate(get_current_module_name(),
+
+  // This is not OK in an interprocedural setting
+  //entity m = get_current_module_entity();
+  // entity m = entity_to_module_entity(e);
+  entity m = module_name_to_entity(entity_module_name(e));
+
+  //string formal_name = strdup(concatenate(get_current_module_name(),
+  //					  MODULE_SEP_STRING, s, NULL));
+  string formal_name = strdup(concatenate(entity_local_name(m),
 					  MODULE_SEP_STRING, s, NULL));
-  entity m = get_current_module_entity();
   entity stub = gen_find_entity(formal_name);
   // FI: I expect here a pips_assert("The stub cannot exist",
   // entity_undefined_p(stub));
  
   // If entity "stub" does not already exist, create it.
   if(entity_undefined_p(stub)) {
-    entity fa = FindOrCreateEntity(get_current_module_name(),
-					    FORMAL_AREA_LOCAL_NAME);
+    entity fa = FindOrCreateEntity(entity_local_name(m),
+				   FORMAL_AREA_LOCAL_NAME);
     if(type_undefined_p(entity_type(fa))) {
       // entity a = module_to_heap_area(f);
       entity_type(fa) = make_type(is_type_area, make_area(0, NIL));

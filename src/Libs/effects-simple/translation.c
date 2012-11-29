@@ -205,6 +205,10 @@ void simple_cell_reference_with_address_of_cell_reference_translation
   }
   else { // Beatrice's code
 
+    // For instance, we enter with nb_common_indices==0
+    // input_ref == m[0][tab2][0]
+    // address_of_ref == _m_1[0], which means m->_m_1[0]
+
   /* assume exactness */
   *exact_p = true;
 
