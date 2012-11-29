@@ -1,4 +1,7 @@
-/* Bug in memory management */
+/* Bug in memory management
+ *
+ * p->q cannot be evaluated because q is not initialized.
+ */
 
 #include<stdio.h>
 #include<stdlib.h>

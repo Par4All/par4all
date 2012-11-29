@@ -1,0 +1,111 @@
+
+Points-to for call29
+
+
+// Points To IN:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_1[0] , MAY
+
+
+// Points To OUT: unreachable
+
+void call29(int *q)
+{
+
+// Points To:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_1[0] , MAY
+
+   *q = 1;
+
+// Points To:
+// q -> _q_1[0] , EXACT
+
+   exit(1);
+
+// Points To: unreachable
+
+   *q = 2;
+
+// Points To: unreachable
+
+   return;
+}
+
+Proper effects with points-to for call29
+
+void call29(int *q)
+{
+//             <may be written>: _q_1[0]
+//             <    is read   >: q
+   *q = 1;
+   exit(1);
+   *q = 2;
+   return;
+}
+
+Cumulated effects with points-to for call29
+
+//             <may be written>: _q_1[0]
+//             <    is read   >: q
+void call29(int *q)
+{
+//             <may be written>: _q_1[0]
+//             <    is read   >: q
+   *q = 1;
+   exit(1);
+   *q = 2;
+   return;
+}
+
+Points-to for "call29_caller"
+
+
+// Points To IN:
+// qq -> *NULL_POINTER* , MAY
+// qq -> _qq_1[0] , MAY
+
+
+// Points To OUT: unreachable
+
+int call29_caller(int *qq)
+{
+
+// Points To: none
+
+   int i = 0;
+
+// Points To:
+// qq -> *NULL_POINTER* , MAY
+// qq -> _qq_1[0] , MAY
+
+   call29(qq);
+
+// Points To: unreachable
+
+   return i++;
+}
+
+Proper effects with points-to for "call29_caller"
+
+int call29_caller(int *qq)
+{
+//             <    is written>: i
+   int i = 0;
+//             <may be written>: _qq_1[0]
+//             <    is read   >: qq
+   call29(qq);
+   return i++;
+}
+
+Cumulated effects with points-to for "call29_caller"
+
+int call29_caller(int *qq)
+{
+//             <    is written>: i
+   int i = 0;
+//             <may be written>: _qq_1[0]
+//             <    is read   >: qq
+   call29(qq);
+   return i++;
+}

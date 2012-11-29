@@ -1,5 +1,5 @@
-Information about the points-to validation suite:
-------------------------------------------------
+Information about the effects with points-to validation suite:
+--------------------------------------------------------------
 
 statement01->statement07 : Basic cases of points-to, computing points-to relations for assignements of type <x = &i>, <x = y>, <x = &a[]> where x is of type pointer or double pointer.
 
@@ -17,3 +17,5 @@ For compatibility with Effects validation:
 ------------------------------------------
 
 call04
+
+call29: check what happens when the callee does not return

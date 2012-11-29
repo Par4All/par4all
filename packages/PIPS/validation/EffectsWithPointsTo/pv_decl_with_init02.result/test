@@ -1,49 +1,4 @@
 
-PROPER  EFFECTS 
-
-int main()
-{
-   mystruct s1;
-//             <may be read   >: s1.b[*]
-//             <may be written>: s2.b[*]
-//             <    is read   >: s1.a s1.c
-//             <    is written>: s2.a s2.c
-   mystruct s2 = s1;
-   return 0;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   mystruct s1;
-
-// Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   mystruct s2 = s1;
-
-// Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
 int main()
 {
    mystruct s1;

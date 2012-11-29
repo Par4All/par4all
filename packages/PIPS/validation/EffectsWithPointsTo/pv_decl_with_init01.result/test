@@ -1,41 +1,4 @@
 
-PROPER  EFFECTS 
-
-int main()
-{
-   int a;
-//             <    is written>: b
-   int *b = &a;
-   return 0;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   int a;
-
-// Points To: none
-
-   int *b = &a;
-
-// Points To:
-// b -> a , EXACT
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
 int main()
 {
    int a;

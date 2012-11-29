@@ -1,5 +1,7 @@
 /* Same as mehdi02.c but different tpips script: here
  * context-sensitive is set to false.
+ *
+ * p->q cannot be evaluated because q is not initialized.
  */
 
 #include<stdio.h>

@@ -1,0 +1,28 @@
+setenv WSPACE=fpointer03
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+#setenv POINTER_VALUES_DEBUG_LEVEL 2
+
+echo
+echo Points-to for "$WSPACE"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE [$WSPACE]
+
+echo
+echo Proper effects with points-to for "$WSPACE"
+echo
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE [$WSPACE]
+
+close
+
+delete $WSPACE
+quit

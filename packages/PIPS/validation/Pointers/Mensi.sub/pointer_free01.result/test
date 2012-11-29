@@ -1,0 +1,114 @@
+
+INLINING "pointer_free"
+
+int main(void)
+{
+   pointer p1, p2;
+   p1 = malloc(sizeof(int));
+   p2 = p1;
+   free(p1);
+
+   return;
+}
+
+POINTS TO for pointer_free01
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   pointer p1, p2;
+
+// Points To:
+// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   p1 = malloc(sizeof(int));
+
+// Points To:
+// p1 -> *HEAP*_l_4 , MAY
+// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   p2 = p1;
+
+// Points To:
+// p1 -> *HEAP*_l_4 , MAY
+// p2 -> *HEAP*_l_4 , MAY
+
+   free(p1);
+
+// Points To:
+// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+
+   return;
+}
+
+// Points To IN:
+// p -> _p_1 , EXACT
+
+
+// Points To OUT:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+void pointer_free(pointer p)
+{
+
+// Points To:
+// p -> _p_1 , EXACT
+
+   free(p);
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   return;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main(void)
+{
+   pointer p1, p2;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
+   p1 = malloc(sizeof(int));
+//             <    is read   >: p1
+//             <    is written>: p2
+   p2 = p1;
+//             <    is read   >: p1 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(p1);
+
+   return;
+}
+
+CUMULATED  EFFECTS WITH POINTS TO
+
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+int main(void)
+{
+   pointer p1, p2;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
+   p1 = malloc(sizeof(int));
+//             <    is read   >: p1
+//             <    is written>: p2
+   p2 = p1;
+//             <    is read   >: p1 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(p1);
+
+   return;
+}
+unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Dangling pointer "main:0`p2".

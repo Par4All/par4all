@@ -1,5 +1,10 @@
-/* FI looking for recursive calls */
+/* FI looking for recursive calls
+ *
+ * 
+ */
+
 #include <stdio.h>
+
 double a[100];
 int foo(int *p) {
   int b[100];

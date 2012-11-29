@@ -1,4 +1,4 @@
-###################### barrier/barrier.database/Src/BARRIER_PARDO_HYBRID.f ######################
+###################### barrier-STEP/barrier.database/Src/BARRIER_PARDO_HYBRID.f ######################
       SUBROUTINE BARRIER_PARDO_HYBRID(N, A, I)
       implicit none
       include "STEP.h"
@@ -39,10 +39,6 @@ C BEGIN WORK
 !$omp end parallel do
 C END WORK
 !$omp master
-
-C     Communicating data to other nodes
-C     3 communication shemes for all-to-all personalized broadcast :
-C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
       CALL STEP_ALLTOALL_FULL(A, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT
      &)
       CALL STEP_FLUSH
@@ -50,7 +46,7 @@ C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
 !$omp end master
 !$omp barrier
       END
-###################### barrier/barrier.database/Src/BARRIER_PARDO_HYBRID_BARRIER_HYBRID.f ######################
+###################### barrier-STEP/barrier.database/Src/BARRIER_PARDO_HYBRID_BARRIER_HYBRID.f ######################
       SUBROUTINE BARRIER_PARDO_HYBRID_BARRIER_HYBRID
       implicit none
       include "STEP.h"
@@ -60,7 +56,7 @@ C BEGIN WORK
       CALL STEP_BARRIER
 C END WORK
       END
-###################### barrier/barrier.database/Src/barrier.f ######################
+###################### barrier-STEP/barrier.database/Src/barrier.f ######################
 !
 ! barrier program
 !

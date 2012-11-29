@@ -1,4 +1,7 @@
-// Check the sorting function
+/* Check the sorting function
+ *
+ * 
+ */
 
 int * foo()
 {
@@ -9,9 +12,13 @@ void sort01()
 {
   int a[10];
   int *p=foo(), *q=foo();
+
+  a[0] = 1;
+
   if(p==q)
     p = &a[4];
   else
     p = &a[2];
+
   return;
 }

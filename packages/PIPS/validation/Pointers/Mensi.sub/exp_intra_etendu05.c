@@ -1,9 +1,11 @@
 #include<stdlib.h>
 #include<stdio.h>
+
 typedef struct LinkedList{
   int *val;
   struct LinkedList *next;
-}list;
+} list;
+
 list* initialize()
 {
   int *pi, i;
@@ -12,7 +14,7 @@ list* initialize()
     scanf("%d",&i);
     pi = malloc(sizeof(int));
     *pi = i;
-    nl = malloc(sizeof(list*));
+    nl = malloc(sizeof(list));
     nl->val = pi;
     nl->next = l;
     l = nl;

@@ -1,5 +1,5 @@
 delete intra04
-create intra04 intra01.c 
+create intra04 intra04.c 
 
 
 setproperty ABORT_ON_USER_ERROR TRUE

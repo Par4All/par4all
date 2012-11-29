@@ -1,31 +1,11 @@
 
-PROPER  EFFECTS 
-
-void dereferencing05()
-{
-   double *p;
-   int i;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-   *p++ = 0.;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-   *p-- = 0.;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-   *++p = 0.;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-   *--p = 0.;
-}
-
-POINTS-TO
+Points-to for dereferencing05
 
 
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 void dereferencing05()
 {
@@ -44,67 +24,47 @@ void dereferencing05()
 
    *p++ = 0.;
 
-// Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// Points To: none
 
    *p-- = 0.;
 
-// Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// Points To: unreachable
 
    *++p = 0.;
 
-// Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// Points To: unreachable
 
    *--p = 0.;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+Proper effects with points-to for dereferencing05
 
 void dereferencing05()
 {
    double *p;
    int i;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
+//             <    is written>: p
    *p++ = 0.;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
+//             <    is written>: p
    *p-- = 0.;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
    *++p = 0.;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
    *--p = 0.;
 }
 
- *********************** Use-Def Chains *********************
+Cumulated effects with points-to for dereferencing05
 
-	06 --> 07 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	06 --> 08 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	06 --> 09 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	07 --> 08 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	07 --> 09 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	08 --> 09 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-
-****************** End of Dependence Graph ******************
+void dereferencing05()
+{
+   double *p;
+   int i;
+//             <    is read   >: p
+//             <    is written>: p
+   *p++ = 0.;
+//             <    is read   >: p
+//             <    is written>: p
+   *p-- = 0.;
+   *++p = 0.;
+   *--p = 0.;
+}

@@ -28,8 +28,8 @@ PROPER EFFECTS
 
 int store01(int *p, int i)
 {
-//             <may be written>: _p_1[0]
 //             <    is read   >: i p
+//             <    is written>: _p_1[0]
    *p = i;
    return;
 }

@@ -1,0 +1,46 @@
+setenv WS=message_error01
+delete $WS
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+
+create $WS $WS.c
+
+echo
+echo  INLINING "msg_error"
+echo
+apply INLINING[msg_error]
+activate PRINT_CODE
+display PRINTED_FILE[main]
+
+
+
+echo
+echo POINTS TO for "$WS"
+echo
+#activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+echo 
+echo PROPER  EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+
+echo 
+echo CUMULATED  EFFECTS WITH POINTS TO
+echo
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+
+
+close
+shell cat $WS.database/Warnings
+delete $WS
+quit

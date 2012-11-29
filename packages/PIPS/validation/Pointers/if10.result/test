@@ -1,0 +1,43 @@
+
+POINTS TO for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p, i, j;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+
+   p = &i;
+
+// Points To:
+// p -> i , EXACT
+
+   if (p==(void *) 0)
+
+// Points To: unreachable
+
+      p = &i;
+   else
+
+// Points To:
+// p -> i , EXACT
+
+      p = &j;
+
+// Points To:
+// p -> j , EXACT
+
+
+   return 0;
+}

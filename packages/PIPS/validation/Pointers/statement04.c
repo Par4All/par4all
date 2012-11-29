@@ -1,3 +1,5 @@
+/* Buggy source code: x is not initialized. */
+
 #include <stdio.h>
 int main() {
   int **x, *y, k, h;

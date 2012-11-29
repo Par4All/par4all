@@ -1,11 +1,11 @@
-###################### init/init.database/Src/init.cpp_processed.c ######################
+###################### init-STEP/init.database/Src/init.cpp_processed.c ######################
 #include "init.cpp_processed.h"
 #include "step_api.h"
 void main_PARFOR_HYBRID(int array[10], int i_0[1]);
 void main_PARFOR_HYBRID(int array[10], int i_0[1])
 {
    //PIPS generated variable
-   int i, STEP_COMM_SIZE, STEP_i_LOW, STEP_i_UP, STEP_COMM_RANK, IDX, STEP_SR_array[STEP_MAX_NB_LOOPSLICES][1][STEP_INDEX_SLICE_UP];
+   int i, STEP_COMM_SIZE, STEP_i_LOW, STEP_i_UP, STEP_COMM_RANK, STEP_SR_array[STEP_MAX_NB_LOOPSLICES][1][STEP_INDEX_SLICE_UP], IDX;
 #pragma omp master
    {
       i = *i_0;
@@ -43,10 +43,6 @@ void main_PARFOR_HYBRID(int array[10], int i_0[1])
    ;
 #pragma omp master
    {
-      
-      //C     Communicating data to other nodes
-      //C     3 communication shemes for all-to-all personalized broadcast :
-      //C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
       STEP_ALLTOALL_FULL(array, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT);
       STEP_FLUSH();
       STEP_CONSTRUCT_END(STEP_PARALLEL_DO);
@@ -58,15 +54,17 @@ void main_PARFOR_HYBRID(int array[10], int i_0[1])
 }
 int main(void)
 {
-   int array[10];
-   int i;
    STEP_INIT_C_ORDER();
-   main_PARFOR_HYBRID(array, &i);
+   {
+      int array[10];
+      int i;
+      main_PARFOR_HYBRID(array, &i);
 
-   for(i = 0; i <= 9; i += 1)
-      printf("%d ", array[i]);
+      for(i = 0; i <= 9; i += 1)
+         printf("%d ", array[i]);
 
-   printf("\n");
-   STEP_FINALIZE();
-   return 0;
+      printf("\n");
+      STEP_FINALIZE();
+      return 0;
+   }
 }

@@ -1,42 +1,4 @@
 
-PROPER  EFFECTS 
-
-int main()
-{
-   char *s;
-//             <    is written>: s
-   s = "hello\n";
-   return 0;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   char *s;
-
-// Points To:
-// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   s = "hello\n";
-
-// Points To:
-// s -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
 int main()
 {
    char *s;

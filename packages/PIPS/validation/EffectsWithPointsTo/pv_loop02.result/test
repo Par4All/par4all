@@ -1,6 +1,4 @@
 
-PROPER  EFFECTS 
-
 int main()
 {
    int i;
@@ -12,69 +10,8 @@ int main()
 //             <    is written>: i
 
    for(i = 0; i <= 9; i += 1)
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *HEAP*_l_7[i]
 //             <    is read   >: i p
-      p[i] = i;
-   return 0;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   int i;
-
-// Points To: none
-
-   int *p;
-
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-
-   p = (int *) malloc(10*sizeof(int));
-
-// Points To:
-// p -> *HEAP*_l_7[0] , EXACT
-
-
-   for(i = 0; i <= 9; i += 1)
-
-// Points To:
-// p -> *HEAP*_l_7[0] , EXACT
-
-      p[i] = i;
-
-// Points To:
-// p -> *HEAP*_l_7[0] , EXACT
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
-int main()
-{
-   int i;
-   int *p;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-
-   p = (int *) malloc(10*sizeof(int));
-//             <    is written>: i
-
-   for(i = 0; i <= 9; i += 1)
-//             <    is read   >: i p
-//             <    is written>: *HEAP*_l_7[i]
       p[i] = i;
    return 0;
 }
@@ -84,6 +21,6 @@ int main()
 	07 --> 10 with conflicts
 		from <p-W-EXACT> to <p-R-EXACT>
 	10 --> 10 with conflicts
-		from <*HEAP*_l_7[i]-W-EXACT> to <*HEAP*_l_7[i]-W-EXACT>
+		from <*HEAP*_l_7[i]-W-MAY> to <*HEAP*_l_7[i]-W-MAY>
 
 ****************** End of Dependence Graph ******************

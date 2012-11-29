@@ -1,98 +1,4 @@
 
-Proper effects for "main"
-
-int main()
-{
-   struct p_s {
-      struct q_s *q;
-   };
-   struct q_s {
-      int r;
-   };
-   struct p_s *p;
-   struct q_s *b;
-   struct q_s *u;
-   struct q_s *x;
-   struct q_s **z;
-//             <    is written>: a
-   int a = 0;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: u _MALLOC_EFFECTS:_MALLOC_
-   u = (struct q_s *) malloc(sizeof(struct q_s ));
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: b _MALLOC_EFFECTS:_MALLOC_
-   b = (struct q_s *) malloc(sizeof(struct q_s ));
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-   p = (struct p_s *) malloc(sizeof(struct p_s ));
-//             <    is read   >: b
-//             <    is written>: x
-   x = b;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p x
-   p->q = x;
-//             <    is read   >: p
-//             <    is written>: z
-   z = &p->q;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: b p
-   p->q = b;
-//             <    is written>: z
-   z = &u;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-
-   p->q->r = a;
-   return 0;
-}
-
-Proper Pointer effects for "main"
-
-int main()
-{
-   struct p_s {
-      struct q_s *q;
-   };
-   struct q_s {
-      int r;
-   };
-   struct p_s *p;
-   struct q_s *b;
-   struct q_s *u;
-   struct q_s *x;
-   struct q_s **z;
-//             <    is written>: a
-   int a = 0;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: u _MALLOC_EFFECTS:_MALLOC_
-   u = (struct q_s *) malloc(sizeof(struct q_s ));
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: b _MALLOC_EFFECTS:_MALLOC_
-   b = (struct q_s *) malloc(sizeof(struct q_s ));
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-   p = (struct p_s *) malloc(sizeof(struct p_s ));
-//             <    is read   >: b
-//             <    is written>: x
-   x = b;
-//             <    is read   >: p x
-//             <    is written>: p[0].q
-   p->q = x;
-//             <    is read   >: p
-//             <    is written>: z
-   z = &p->q;
-//             <    is read   >: b p
-//             <    is written>: p[0].q
-   p->q = b;
-//             <    is written>: z
-   z = &u;
-//             <    is read   >: a p p[0].q
-//             <    is written>: p[0].q[0].r
-
-   p->q->r = a;
-   return 0;
-}
-
 POINTS TO
 
 
@@ -201,7 +107,8 @@ int main()
    p->q = x;
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
 // b -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
@@ -211,27 +118,30 @@ int main()
    z = &p->q;
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
 // b -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // x -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// z -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// z -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 
    p->q = b;
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
 // b -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // x -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// z -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// z -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 
    z = &u;
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
 // b -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
@@ -242,7 +152,8 @@ int main()
    p->q->r = a;
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
+//     , MAY
 // b -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY

@@ -1,36 +1,10 @@
 
-PROPER  EFFECTS 
-
-void call08(int r, int m, int *x)
-{
-   int j;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: r x
-
-   x[4] = 10*r+4;
-}
-int main()
-{
-//             <    is written>: d1
-   int d1 = 4;
-//             <    is written>: d2
-   int d2 = 4;
-   int y[d1][d2];
-   int i, j;
-//             <    is read   >: d1
-//             <    is written>: i
-
-   for(i = 0; i <= d1-1; i += 1)
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: d1 d2 i
-      call08(i, d2, &y[i][1]);
-}
-
 POINTS-TO
 
 
 // Points To IN:
-// x -> _x_3[0] , EXACT
+// x -> *NULL_POINTER* , MAY
+// x -> _x_3[0] , MAY
 
 
 // Points To OUT: none
@@ -39,15 +13,17 @@ void call08(int r, int m, int *x)
 {
 
 // Points To:
-// x -> _x_3[0] , EXACT
+// x -> *NULL_POINTER* , MAY
+// x -> _x_3[0] , MAY
 
-   int j;
+   // int j;
+   
+   x[4] = 10*r+4;
 
 // Points To:
 // x -> _x_3[0] , EXACT
 
-
-   x[4] = 10*r+4;
+   return;
 }
 
 // Points To IN: none
@@ -72,27 +48,41 @@ int main()
 
 // Points To: none
 
-   int i, j;
+   int i;
 
 // Points To: none
 
-
+   //int j;
+   
    for(i = 0; i <= d1-1; i += 1)
 
 // Points To: none
 
       call08(i, d2, &y[i][1]);
+
+// Points To: none
+
+   
+   /*
+     for(i=0;i<d1;i++) {
+       for(j=0;j<d2;j++)
+         printf("y[%d][%d] = %d\t", i, j, y[i][j]);
+       printf("\n");
+     }
+     */
+   return 0;
 }
 
 PROPER  EFFECTS WITH POINTS TO
 
 void call08(int r, int m, int *x)
 {
-   int j;
 //             <    is read   >: r x
 //             <    is written>: _x_3[4]
-
+   // int j;
+   
    x[4] = 10*r+4;
+   return;
 }
 int main()
 {
@@ -101,22 +91,35 @@ int main()
 //             <    is written>: d2
    int d2 = 4;
    int y[d1][d2];
-   int i, j;
+   int i;
 //             <    is read   >: d1
 //             <    is written>: i
-
+   //int j;
+   
    for(i = 0; i <= d1-1; i += 1)
 //             <    is read   >: d1 d2 i
+//             <    is written>: y[i][5]
       call08(i, d2, &y[i][1]);
+   
+   /*
+     for(i=0;i<d1;i++) {
+       for(j=0;j<d2;j++)
+         printf("y[%d][%d] = %d\t", i, j, y[i][j]);
+       printf("\n");
+     }
+     */
+   return 0;
 }
 
  *********************** Use-Def Chains *********************
 
-	12 --> 17 with conflicts
+	13 --> 19 with conflicts
 		from <d1-W-EXACT> to <d1-R-EXACT>
-	12 --> 18 with conflicts
+	13 --> 20 with conflicts
 		from <d1-W-EXACT> to <d1-R-EXACT>
-	13 --> 18 with conflicts
+	14 --> 20 with conflicts
 		from <d2-W-EXACT> to <d2-R-EXACT>
+	20 --> 20 with conflicts
+		from <y[i][5]-W-EXACT> to <y[i][5]-W-EXACT>
 
 ****************** End of Dependence Graph ******************

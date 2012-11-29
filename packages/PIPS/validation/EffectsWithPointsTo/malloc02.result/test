@@ -1,26 +1,8 @@
 
-PROPER  EFFECTS 
-
-int main(int argc, char *argv[])
-{
-   int *pi;
-   float *px;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: pi _MALLOC_EFFECTS:_MALLOC_
-
-   pi = (int *) malloc(sizeof(int));
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: px _MALLOC_EFFECTS:_MALLOC_
-   px = (float *) malloc(sizeof(int));
-
-   return 0;
-}
-
 POINTS-TO
 
 
-// Points To IN:
-// argv[*] -> _argv_2[0] , EXACT
+// Points To IN: none
 
 
 // Points To OUT: none
@@ -28,19 +10,16 @@ POINTS-TO
 int main(int argc, char *argv[])
 {
 
-// Points To:
-// argv[*] -> _argv_2[0] , EXACT
+// Points To: none
 
    int *pi;
 
 // Points To:
-// argv[*] -> _argv_2[0] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    float *px;
 
 // Points To:
-// argv[*] -> _argv_2[0] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -48,16 +27,14 @@ int main(int argc, char *argv[])
    pi = (int *) malloc(sizeof(int));
 
 // Points To:
-// argv[*] -> _argv_2[0] , EXACT
-// pi -> *HEAP*_l_10 , EXACT
+// pi -> *HEAP*_l_13 , MAY
 // px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
-   px = (float *) malloc(sizeof(int));
+   px = (float *) malloc(sizeof(float));
 
 // Points To:
-// argv[*] -> _argv_2[0] , EXACT
-// pi -> *HEAP*_l_10 , EXACT
-// px -> *HEAP*_l_11 , EXACT
+// pi -> *HEAP*_l_13 , MAY
+// px -> *HEAP*_l_14 , MAY
 
 
    return 0;
@@ -75,14 +52,14 @@ int main(int argc, char *argv[])
    pi = (int *) malloc(sizeof(int));
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: px _MALLOC_EFFECTS:_MALLOC_
-   px = (float *) malloc(sizeof(int));
+   px = (float *) malloc(sizeof(float));
 
    return 0;
 }
 
  *********************** Use-Def Chains *********************
 
-	10 --> 11 with conflicts
+	13 --> 14 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>

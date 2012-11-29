@@ -1,39 +1,4 @@
 
-PROPER  EFFECTS 
-
-int main()
-{
-//             <    is written>: i
-   int i = 5;
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   printf("i=%d", i);
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   int i = 5;
-
-// Points To: none
-
-   printf("i=%d", i);
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
 int main()
 {
 //             <    is written>: i

@@ -1,4 +1,7 @@
-/* To be out of Emami's patterns */
+/* To be out of Emami's patterns
+ *
+ * assign04 segfaults...
+ */
 
 void assign04()
 {
@@ -12,9 +15,11 @@ void assign04()
   p = &q;
   **p = r;
   ***p = 0;
+  return;
 }
 
 void foo()
 {
   assign04();
+  return;
 }

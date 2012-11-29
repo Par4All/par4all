@@ -27,7 +27,7 @@ rec reverse_copy(rec p)
   rec r = NULL;
   rec q = p;
   while(q!=NULL) {
-    rec t = (rec) malloc(sizeof(rec));
+    rec t = (rec) malloc(sizeof(struct rec_st));
     t->i = q->i;
     t->n = r;
     q = q->n;

@@ -1,0 +1,136 @@
+
+Points-to for "list_next"
+
+
+// Points To IN:
+// _nl_1.next -> *NULL_POINTER* , MAY
+// _nl_1.next -> _nl_1_2__1 , MAY
+// nil -> *NULL_POINTER* , EXACT
+// nl -> *NULL_POINTER* , MAY
+// nl -> _nl_1 , MAY
+
+
+// Points To OUT:
+// _nl_1.next -> *NULL_POINTER* , MAY
+// _nl_1.next -> _nl_1_2__1 , MAY
+// list_next -> *NULL_POINTER* , MAY
+// list_next -> _nl_1_2__1 , MAY
+// nil -> *NULL_POINTER* , EXACT
+
+list list_next(list nl)
+{
+
+// Points To: none
+
+   list n;
+
+// Points To:
+// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nil -> *NULL_POINTER* , EXACT
+// nl -> *NULL_POINTER* , MAY
+// nl -> _nl_1 , MAY
+
+   if (nl==nil)
+
+// Points To:
+// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nil -> *NULL_POINTER* , EXACT
+// nl -> *NULL_POINTER* , EXACT
+
+      n = nil;
+   else
+
+// Points To:
+// _nl_1.next -> *NULL_POINTER* , MAY
+// _nl_1.next -> _nl_1_2__1 , MAY
+// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nil -> *NULL_POINTER* , EXACT
+// nl -> _nl_1 , EXACT
+
+      n = nl->next;
+
+// Points To:
+// _nl_1.next -> *NULL_POINTER* , MAY
+// _nl_1.next -> _nl_1_2__1 , MAY
+// n -> *NULL_POINTER* , MAY
+// n -> _nl_1_2__1 , MAY
+// nil -> *NULL_POINTER* , EXACT
+// nl -> *NULL_POINTER* , MAY
+// nl -> _nl_1 , MAY
+
+   return n;
+}
+
+Points-to for "list_len"
+
+
+// Points To IN:
+// _ll_1.next -> *NULL_POINTER* , MAY
+// _ll_1.next -> _ll_1_2__1 , MAY
+// ll -> *NULL_POINTER* , MAY
+// ll -> _ll_1 , MAY
+// nil -> *NULL_POINTER* , EXACT
+
+
+// Points To OUT:
+// _ll_1.next -> *NULL_POINTER* , MAY
+// _ll_1.next -> _ll_1_2__1 , MAY
+// nil -> *NULL_POINTER* , EXACT
+
+int list_len(list ll)
+{
+
+// Points To: none
+
+   int n = 0;
+
+// Points To:
+// ll -> *NULL_POINTER* , MAY
+// ll -> _ll_1 , MAY
+
+   list c = ll;
+
+// Points To:
+// c -> *NULL_POINTER* , MAY
+// c -> _ll_1 , MAY
+// ll -> *NULL_POINTER* , MAY
+// ll -> _ll_1 , MAY
+// nil -> *NULL_POINTER* , EXACT
+
+   //while (c!=nil)
+   if (c!=nil) {
+
+// Points To:
+// _ll_1.next -> *NULL_POINTER* , MAY
+// _ll_1.next -> _ll_1_2__1 , MAY
+// c -> _ll_1 , EXACT
+// ll -> *NULL_POINTER* , MAY
+// ll -> _ll_1 , MAY
+// nil -> *NULL_POINTER* , EXACT
+
+      // we know that c!=nil...
+      c = list_next(c);
+
+// Points To:
+// _ll_1.next -> *NULL_POINTER* , MAY
+// _ll_1.next -> _ll_1_2__1 , MAY
+// c -> *NULL_POINTER* , MAY
+// c -> _ll_1_2__1 , MAY
+// ll -> *NULL_POINTER* , MAY
+// ll -> _ll_1 , MAY
+// nil -> *NULL_POINTER* , EXACT
+
+      n++;
+   }
+
+// Points To:
+// _ll_1.next -> *NULL_POINTER* , MAY
+// _ll_1.next -> _ll_1_2__1 , MAY
+// c -> *NULL_POINTER* , MAY
+// c -> _ll_1_2__1 , MAY
+// ll -> *NULL_POINTER* , MAY
+// ll -> _ll_1 , MAY
+// nil -> *NULL_POINTER* , EXACT
+
+   return n;
+}

@@ -1,4 +1,9 @@
-/**/
+/*
+ *
+ * Note: the second loop is not recognized as a do loop because the
+ * address of the index "i" is taken. Heuristics in
+ * guess_write_effect_on_entity_walker().
+ */
 
 #include <stdlib.h>
 

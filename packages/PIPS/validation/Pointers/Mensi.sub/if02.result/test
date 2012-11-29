@@ -1,0 +1,202 @@
+
+POINTS TO for if02
+
+
+// Points To IN:
+// p -> _p_1 , EXACT
+
+
+// Points To OUT: none
+
+void init(int *p)
+{
+
+// Points To:
+// p -> _p_1 , EXACT
+
+   if (p==(void *) 0)
+
+// Points To:
+// p -> *NULL_POINTER* , EXACT
+
+      exit(1);
+   else
+
+// Points To:
+// p -> _p_1 , EXACT
+
+      *p = 0;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int init_p = 1;
+
+// Points To: none
+
+   int *q = (void *) 0;
+
+// Points To:
+// q -> *NULL_POINTER* , EXACT
+
+   if (init_p)
+
+// Points To:
+// q -> *NULL_POINTER* , EXACT
+
+      q = (int *) malloc(4*sizeof(int));
+
+// Points To:
+// q -> *HEAP*_l_17[0] , MAY
+// q -> *NULL_POINTER* , MAY
+
+   init(q);
+
+// Points To:
+// q -> *HEAP*_l_17[0] , MAY
+// q -> *NULL_POINTER* , MAY
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void init(int *p)
+{
+//             <    is read   >: p
+   if (p==(void *) 0)
+      exit(1);
+   else
+//             <    is read   >: p
+//             <    is written>: _p_1
+      *p = 0;
+}
+int main()
+{
+//             <    is written>: init_p
+   int init_p = 1;
+//             <    is written>: q
+   int *q = (void *) 0;
+//             <    is read   >: init_p
+   if (init_p)
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: q _MALLOC_EFFECTS:_MALLOC_
+      q = (int *) malloc(4*sizeof(int));
+//             <may be written>: *HEAP*_l_17[0]
+//             <    is read   >: q
+   init(q);
+   return 0;
+}
+
+CUMULATED  EFFECTS WITH POINTS TO
+
+//             <may be written>: _p_1
+//             <    is read   >: p
+void init(int *p)
+{
+//             <may be written>: _p_1
+//             <    is read   >: p
+   if (p==(void *) 0)
+      exit(1);
+   else
+//             <    is read   >: p
+//             <    is written>: _p_1
+      *p = 0;
+}
+//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: _MALLOC_EFFECTS:_MALLOC_
+int main()
+{
+//             <    is written>: init_p
+   int init_p = 1;
+//             <    is written>: q
+   int *q = (void *) 0;
+//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: q _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: init_p
+   if (init_p)
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: q _MALLOC_EFFECTS:_MALLOC_
+      q = (int *) malloc(4*sizeof(int));
+//             <may be written>: *HEAP*_l_17[0]
+//             <    is read   >: q
+   init(q);
+   return 0;
+}
+
+POINTS TO for if02
+
+
+// Points To IN:
+// p -> _p_1 , EXACT
+
+
+// Points To OUT: none
+
+void init(int *p)
+{
+
+// Points To:
+// p -> _p_1 , EXACT
+
+   if (p==(void *) 0)
+
+// Points To:
+// p -> *NULL_POINTER* , EXACT
+
+      exit(1);
+   else
+
+// Points To:
+// p -> _p_1 , EXACT
+
+      *p = 0;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int init_p = 1;
+
+// Points To: none
+
+   int *q = (void *) 0;
+
+// Points To:
+// q -> *NULL_POINTER* , EXACT
+
+   if (init_p)
+
+// Points To:
+// q -> *NULL_POINTER* , EXACT
+
+      q = (int *) malloc(4*sizeof(int));
+
+// Points To:
+// q -> *HEAP*_l_17[0] , MAY
+// q -> *NULL_POINTER* , MAY
+
+   init(q);
+
+// Points To:
+// q -> *HEAP*_l_17[0] , MAY
+// q -> *NULL_POINTER* , MAY
+
+   return 0;
+}
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

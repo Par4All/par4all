@@ -1,51 +1,38 @@
 
-PROPER  EFFECTS
+Points-to for "pointer_free"
 
-pointer alloc_pointer(int v)
-{
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-   pointer p = malloc(sizeof(int));
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p v
-   *p = v;
-//             <    is read   >: p
-   return p;
-}
-int main(void)
-{
-   pointer p1, p2;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   
-   // could differentiate allocs based on call path?
-   p1 = alloc_pointer(13);
-//             <    is read   >: p1
-//             <    is written>: p2
-   p2 = p1;
-//             <    is read   >: p1 _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   pointer_free(p1);
 
-   return;
-}
+// Points To IN:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+
+
+// Points To OUT:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 void pointer_free(pointer p)
 {
-//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+
    free(p);
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    return;
 }
 
-POINTS-TO
+Points-to for "alloc_pointer"
 
 
 // Points To IN: none
 
 
 // Points To OUT:
-// alloc_pointer -> *HEAP*_l_7 , MAY
+// alloc_pointer -> *HEAP*_l_8 , MAY
 
 pointer alloc_pointer(int v)
 {
@@ -55,15 +42,44 @@ pointer alloc_pointer(int v)
    pointer p = malloc(sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_7 , MAY
+// p -> *HEAP*_l_8 , MAY
 
    *p = v;
 
 // Points To:
-// p -> *HEAP*_l_7 , MAY
+// p -> *HEAP*_l_8 , MAY
 
    return p;
 }
+
+Points-to for "pointer_free"
+
+
+// Points To IN:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+
+
+// Points To OUT:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+void pointer_free(pointer p)
+{
+
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+
+   free(p);
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   return;
+}
+
+Points-to for "main"
+
 
 // Points To IN: none
 
@@ -86,43 +102,21 @@ int main(void)
    p1 = alloc_pointer(13);
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p1 -> alloc_pointer:*HEAP*_l_8 , MAY
 // p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    p2 = p1;
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p1 -> alloc_pointer:*HEAP*_l_8 , MAY
+// p2 -> alloc_pointer:*HEAP*_l_8 , MAY
 
    pointer_free(p1);
 
 // Points To:
-// p1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p2 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> alloc_pointer:*HEAP*_l_8 , MAY
 
-
-   return;
-}
-
-// Points To IN:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1[0] , MAY
-
-
-// Points To OUT: none
-
-void pointer_free(pointer p)
-{
-
-// Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1[0] , MAY
-
-   free(p);
-
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    return;
 }

@@ -1,60 +1,10 @@
 
-PROPER  EFFECTS 
-
-int bla(int *p)
-{
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-   *p = 13;
-   return 17;
-}
-int call19(int *q)
-{
-   int i, k;
-   something st;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: q
-   // bla(int *)
-   i = bla(q);
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: i
-   i += *q;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: i
-   i += bla(&k);
-//             <    is read   >: i k
-//             <    is written>: i
-   i += k;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: i
-   i += bla(&st.data);
-//             <    is read   >: i st.data
-//             <    is written>: i
-   i += st.data;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: i
-   // foo(int)
-   i += foo(*q);
-//             <    is read   >: i k
-//             <    is written>: i
-   i += foo(k);
-//             <    is read   >: i st.data
-//             <    is written>: i
-   i += foo(st.data);
-//             <    is read   >: i
-   return i;
-}
-int foo(int a)
-{
-//             <    is read   >: a
-   return a*3;
-}
-
 POINTS-TO
 
 
 // Points To IN:
-// p -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
 
 // Points To OUT: none
@@ -63,7 +13,8 @@ int bla(int *p)
 {
 
 // Points To:
-// p -> _p_1[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
    *p = 13;
 
@@ -74,7 +25,8 @@ int bla(int *p)
 }
 
 // Points To IN:
-// q -> _q_1[0] , EXACT
+// q -> *NULL_POINTER* , MAY
+// q -> _q_1[0] , MAY
 
 
 // Points To OUT: none
@@ -82,24 +34,24 @@ int bla(int *p)
 int call19(int *q)
 {
 
-// Points To:
-// q -> _q_1[0] , EXACT
+// Points To: none
 
    int i, k;
 
-// Points To:
-// q -> _q_1[0] , EXACT
+// Points To: none
 
    something st;
 
 // Points To:
-// q -> _q_1[0] , EXACT
+// q -> *NULL_POINTER* , MAY
+// q -> _q_1[0] , MAY
 
    // bla(int *)
    i = bla(q);
 
 // Points To:
-// q -> _q_1[0] , EXACT
+// q -> *NULL_POINTER* , MAY
+// q -> _q_1[0] , MAY
 
    i += *q;
 
@@ -172,20 +124,20 @@ int call19(int *q)
    int i, k;
    something st;
 //             <    is read   >: q
-//             <    is written>: i
+//             <    is written>: _q_1[0] i
    // bla(int *)
    i = bla(q);
 //             <    is read   >: _q_1[0] i q
 //             <    is written>: i
    i += *q;
 //             <    is read   >: i
-//             <    is written>: i
+//             <    is written>: i k
    i += bla(&k);
 //             <    is read   >: i k
 //             <    is written>: i
    i += k;
 //             <    is read   >: i
-//             <    is written>: i
+//             <    is written>: i st.data
    i += bla(&st.data);
 //             <    is read   >: i st.data
 //             <    is written>: i

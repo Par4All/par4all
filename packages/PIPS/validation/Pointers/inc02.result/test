@@ -95,14 +95,14 @@ int main()
 
 // Points To:
 // p -> i[0] , EXACT
-// q -> i[0] , EXACT
+// q -> i[1] , EXACT
 
    // The loaded value is not used
    printf("i=%d, p=%p, q=%p\n", i[0], p, q);
 
 // Points To:
 // p -> i[0] , EXACT
-// q -> i[0] , EXACT
+// q -> i[1] , EXACT
 
    return j;
 }

@@ -35,6 +35,8 @@ POINTS-TO
 
 // Points To OUT:
 // _p_1 -> _p_1_1 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 int foo(int **p, int *q)
 {

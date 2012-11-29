@@ -1,4 +1,4 @@
-###################### paralleldo/paralleldo.database/Src/PARALLEL_DO_PARDO_HYBRID.f ######################
+###################### paralleldo-STEP/paralleldo.database/Src/PARALLEL_DO_PARDO_HYBRID.f ######################
       SUBROUTINE PARALLEL_DO_PARDO_HYBRID(N, A, I)
       implicit none
       include "STEP.h"
@@ -37,10 +37,6 @@ C BEGIN WORK
 !$omp end parallel do
 C END WORK
 !$omp master
-
-C     Communicating data to other nodes
-C     3 communication shemes for all-to-all personalized broadcast :
-C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
       CALL STEP_ALLTOALL_FULL(A, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT
      &)
       CALL STEP_FLUSH
@@ -48,7 +44,7 @@ C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
 !$omp end master
 !$omp barrier
       END
-###################### paralleldo/paralleldo.database/Src/paralleldo.f ######################
+###################### paralleldo-STEP/paralleldo.database/Src/paralleldo.f ######################
 !
 ! sum program_do
 !

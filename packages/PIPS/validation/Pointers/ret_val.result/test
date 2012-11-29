@@ -15,7 +15,9 @@ int main(int argc, char **argv)
 POINTS-TO
 
 
-// Points To IN: none
+// Points To IN:
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 
 
 // Points To OUT: none
@@ -23,11 +25,15 @@ POINTS-TO
 int main(int argc, char **argv)
 {
 
-// Points To: none
+// Points To:
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 
    long long int size = get_result(argc, argv);
 
-// Points To: none
+// Points To:
+// argv -> *NULL_POINTER* , MAY
+// argv -> _argv_2[0] , MAY
 
    return size;
 }

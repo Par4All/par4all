@@ -1,5 +1,9 @@
 // elimination of local array of aggregate structure containing pointers
+
+// FI: s1 and s2 should be initialized before they are assigned
+
 typedef struct {int *a; int *b[10]; int (*c)[10];} mystruct;
+
 int main()
 {
   int i;

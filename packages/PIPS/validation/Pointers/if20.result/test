@@ -44,15 +44,22 @@ int main()
 // r -> *ANY_MODULE*:*NOWHERE* , EXACT
 
 
-   if (p!=q)
+   if (p!=q) {
 
 // Points To:
 // p -> i , EXACT
 // q -> *ANY_MODULE*:*NOWHERE* , MAY
 // r -> *ANY_MODULE*:*NOWHERE* , EXACT
 
+      // This assignment cannot be executed according to C standard
+      // because the value of q is unknown
       r = q;
-   else
+
+// Points To: unreachable
+
+      i++;
+   }
+   else {
 
 // Points To:
 // p -> i , EXACT
@@ -63,11 +70,18 @@ int main()
 
 // Points To:
 // p -> i , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , MAY
-// q -> i , MAY
-// r -> *ANY_MODULE*:*NOWHERE* , MAY
-// r -> i , MAY
+// q -> i , EXACT
+// r -> i , EXACT
+
+      i++;
+   }
+
+// Points To:
+// p -> i , EXACT
+// q -> i , EXACT
+// r -> i , EXACT
 
 
    return 0;
 }
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Assignment of an undefined value at line 25.

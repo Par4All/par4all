@@ -2,17 +2,19 @@
 
 void call08(int r, int m, int *x)
 {
-  int j;
+  // int j;
 
-      x[4] = 10*r+4;
+  x[4] = 10*r+4;
+  return;
 }
 
-main()
+int main()
 {
   int d1 = 4;
   int d2 = 4;
   int y[d1][d2];
-  int i, j;
+  int i;
+  //int j;
 
   for(i=0;i<d1;i++)
     call08(i, d2, &(y[i][1]));
@@ -24,4 +26,5 @@ main()
     printf("\n");
   }
   */
+  return 0;
 }

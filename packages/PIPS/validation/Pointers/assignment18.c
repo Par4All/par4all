@@ -1,4 +1,4 @@
-/* Chasing bugs related no non-strict pointer typing
+/* Chasing bugs related to non-strict pointer typing
  *
  * Simplified version of assignment12.c to find bugs related to qq
 */

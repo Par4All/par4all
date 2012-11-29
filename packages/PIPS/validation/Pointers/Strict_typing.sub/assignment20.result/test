@@ -1,0 +1,34 @@
+
+POINTS TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *a[2], i, j;
+
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   a[i] = &i;
+
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> i , MAY
+
+   a[j] = &j;
+
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> i , MAY
+// a[*] -> j , MAY
+
+   return 0;
+}

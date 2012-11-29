@@ -1,30 +1,12 @@
 
-PROPER  EFFECTS 
-
-void call15(int *pi, tf_t *q)
-{
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: pi
-   *pi = 1;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: q
-   q->one = 1;
-}
-int main()
-{
-   int i;
-   tf_t s;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-
-   call15(&i, &s);
-}
-
-POINTS-TO
+Points-to for "call15"
 
 
 // Points To IN:
-// pi -> _pi_1[0] , EXACT
-// q -> _q_2[0] , EXACT
+// pi -> *NULL_POINTER* , MAY
+// pi -> _pi_1[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _q_2[0] , MAY
 
 
 // Points To OUT: none
@@ -33,17 +15,47 @@ void call15(int *pi, tf_t *q)
 {
 
 // Points To:
-// pi -> _pi_1[0] , EXACT
-// q -> _q_2[0] , EXACT
+// pi -> *NULL_POINTER* , MAY
+// pi -> _pi_1[0] , MAY
 
    *pi = 1;
 
 // Points To:
 // pi -> _pi_1[0] , EXACT
-// q -> _q_2[0] , EXACT
+// q -> *NULL_POINTER* , MAY
+// q -> _q_2[0] , MAY
 
    q->one = 1;
 }
+
+Proper effects with points-to for "call15"
+
+void call15(int *pi, tf_t *q)
+{
+//             <    is read   >: pi
+//             <    is written>: _pi_1[0]
+   *pi = 1;
+//             <    is read   >: q
+//             <    is written>: _q_2[0].one
+   q->one = 1;
+}
+
+Cumulated effects with points-to for "call15"
+
+//             <    is read   >: pi q
+//             <    is written>: _pi_1[0] _q_2[0].one
+void call15(int *pi, tf_t *q)
+{
+//             <    is read   >: pi
+//             <    is written>: _pi_1[0]
+   *pi = 1;
+//             <    is read   >: q
+//             <    is written>: _q_2[0].one
+   q->one = 1;
+}
+
+Points-to for "main"
+
 
 // Points To IN: none
 
@@ -67,26 +79,13 @@ int main()
    call15(&i, &s);
 }
 
-PROPER  EFFECTS WITH POINTS TO
+Proper effects with points-to for "main"
 
-void call15(int *pi, tf_t *q)
-{
-//             <    is read   >: pi
-//             <    is written>: _pi_1[0]
-   *pi = 1;
-//             <    is read   >: q
-//             <    is written>: _q_2[0].one
-   q->one = 1;
-}
 int main()
 {
    int i;
    tf_t s;
+//             <    is written>: i s.one
 
    call15(&i, &s);
 }
-
- *********************** Use-Def Chains *********************
-
-
-****************** End of Dependence Graph ******************

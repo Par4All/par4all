@@ -39,7 +39,8 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 int bar(int *p)
 {
@@ -66,7 +67,8 @@ int bar(int *p)
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 int foo(int *p)
 {
@@ -93,7 +95,8 @@ int foo(int *p)
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 int toto(int *p)
 {

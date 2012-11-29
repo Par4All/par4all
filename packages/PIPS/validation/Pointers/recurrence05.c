@@ -7,11 +7,11 @@
 
 typedef struct list { int * content; struct list * next;} * list;
 
-void recurrence05(void)
+list recurrence05(void)
 {
   int i = 0;
   list l = (list) malloc(sizeof(list *));
   l->content = &i;
   l->next = NULL;
-   return;
+  return l;
 }

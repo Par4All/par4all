@@ -1,62 +1,5 @@
 
-PROPER  EFFECTS 
-
-void call09(int i, int j)
-{
-//             <    is read   >: i j
-//             <    is written>: i
-   i = i+j;
-}
-int main()
-{
-   tf_t s;
-//             <    is written>: sp
-   tf_t *sp = &s;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-
-   call09(s.one, sp->one);
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-void call09(int i, int j)
-{
-
-// Points To: none
-
-   i = i+j;
-}
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   tf_t s;
-
-// Points To: none
-
-   tf_t *sp = &s;
-
-// Points To:
-// sp -> s , EXACT
-
-
-   call09(s.one, sp->one);
-}
-
-PROPER  EFFECTS WITH POINTS TO
+Proper effects with points-to
 
 void call09(int i, int j)
 {
@@ -74,9 +17,12 @@ int main()
    call09(s.one, sp->one);
 }
 
+Use-def chains
+
+
  *********************** Use-Def Chains *********************
 
-	15 --> 17 with conflicts
+	20 --> 22 with conflicts
 		from <sp-W-EXACT> to <sp-R-EXACT>
 
 ****************** End of Dependence Graph ******************

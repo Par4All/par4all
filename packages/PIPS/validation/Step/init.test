@@ -1,6 +1,6 @@
 FILE=init
 LANG=c
 run_step.script $FILE.$LANG
-for f in $FILE/$FILE.database/Src/*.$LANG ; do echo "###################### $f ######################"; cat $f; done
-rm -rf $FILE
+for f in $FILE-STEP/$FILE.database/Src/*.$LANG ; do echo "###################### $f ######################"; cat $f; done
+rm -rf $FILE-STEP
 exit 0;

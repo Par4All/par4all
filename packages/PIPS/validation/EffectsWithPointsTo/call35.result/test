@@ -1,0 +1,37 @@
+
+Points-to for call35
+
+
+// Points To IN:
+// q[*] -> *NULL_POINTER* , MAY
+// q[0] -> *NULL_POINTER* , MAY
+// q[*] -> _q_2[*][0] , MAY
+// q[0] -> _q_2[0][0] , MAY
+
+
+// Points To OUT: unreachable
+
+void call35(int i, int *q[10])
+{
+
+// Points To:
+// q[0] -> *NULL_POINTER* , MAY
+// q[0] -> _q_2[0][0] , MAY
+
+   *q[0] = 1;
+
+// Points To:
+// q[*] -> *NULL_POINTER* , MAY
+// q[*] -> _q_2[*][0] , MAY
+// q[0] -> _q_2[0][0] , EXACT
+
+   // added to check effects
+   free(q[i]);
+
+// Points To: unreachable
+
+   return;
+}
+
+Points-to for "call35_caller"
+

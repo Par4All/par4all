@@ -1,0 +1,210 @@
+
+PROPER  EFFECTS 
+
+list * initialize()
+{
+   int *pi, i;
+//             <    is written>: l
+   list *l = (void *) 0, *nl;
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+   while (!feof(stdin)) {
+//             <may be read   >: stdin[0]
+//             <may be written>: i stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+      scanf("%d", &i);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: pi _MALLOC_EFFECTS:_MALLOC_
+      pi = malloc(sizeof(int));
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i pi
+      *pi = i;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: nl _MALLOC_EFFECTS:_MALLOC_
+      nl = malloc(sizeof(list));
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: nl pi
+      nl->val = pi;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: l nl
+      nl->next = l;
+//             <    is read   >: nl
+//             <    is written>: l
+      l = nl;
+   }
+//             <    is read   >: l
+   return l;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
+// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// initialize -> *HEAP*_l_17 , MAY
+// initialize -> *NULL_POINTER* , MAY
+
+list * initialize()
+{
+
+// Points To: none
+
+   int *pi, i;
+
+// Points To:
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   list *l = (void *) 0, *nl;
+
+// Points To:
+// l -> *NULL_POINTER* , EXACT
+// nl -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   while (!feof(stdin)) {
+
+// Points To:
+// *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
+// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// l -> *HEAP*_l_17 , MAY
+// l -> *NULL_POINTER* , MAY
+// nl -> *HEAP*_l_17 , MAY
+// nl -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// pi -> *HEAP*_l_15 , MAY
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+      scanf("%d", &i);
+
+// Points To:
+// *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
+// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// l -> *HEAP*_l_17 , MAY
+// l -> *NULL_POINTER* , MAY
+// nl -> *HEAP*_l_17 , MAY
+// nl -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// pi -> *HEAP*_l_15 , MAY
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+      pi = malloc(sizeof(int));
+
+// Points To:
+// *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
+// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// l -> *HEAP*_l_17 , MAY
+// l -> *NULL_POINTER* , MAY
+// nl -> *HEAP*_l_17 , MAY
+// nl -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// pi -> *HEAP*_l_15 , MAY
+
+      *pi = i;
+
+// Points To:
+// *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
+// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// l -> *HEAP*_l_17 , MAY
+// l -> *NULL_POINTER* , MAY
+// nl -> *HEAP*_l_17 , MAY
+// nl -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// pi -> *HEAP*_l_15 , MAY
+
+      nl = malloc(sizeof(list));
+
+// Points To:
+// *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
+// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// l -> *HEAP*_l_17 , MAY
+// l -> *NULL_POINTER* , MAY
+// nl -> *HEAP*_l_17 , MAY
+// pi -> *HEAP*_l_15 , MAY
+
+      nl->val = pi;
+
+// Points To:
+// *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
+// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// l -> *HEAP*_l_17 , MAY
+// l -> *NULL_POINTER* , MAY
+// nl -> *HEAP*_l_17 , MAY
+// pi -> *HEAP*_l_15 , MAY
+
+      nl->next = l;
+
+// Points To:
+// *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
+// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// l -> *HEAP*_l_17 , MAY
+// l -> *NULL_POINTER* , MAY
+// nl -> *HEAP*_l_17 , MAY
+// pi -> *HEAP*_l_15 , MAY
+
+      l = nl;
+   }
+
+// Points To:
+// *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
+// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// l -> *HEAP*_l_17 , MAY
+// l -> *NULL_POINTER* , MAY
+// nl -> *HEAP*_l_17 , MAY
+// nl -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// pi -> *HEAP*_l_15 , MAY
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+   return l;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+list * initialize()
+{
+   int *pi, i;
+//             <    is written>: l
+   list *l = (void *) 0, *nl;
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+   while (!feof(stdin)) {
+//             <may be read   >: stdin[0]
+//             <may be written>: i stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+      scanf("%d", &i);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: pi _MALLOC_EFFECTS:_MALLOC_
+      pi = malloc(sizeof(int));
+//             <may be written>: *HEAP*_l_15
+//             <    is read   >: i pi
+      *pi = i;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: nl _MALLOC_EFFECTS:_MALLOC_
+      nl = malloc(sizeof(list));
+//             <may be written>: *HEAP*_l_17.val
+//             <    is read   >: nl pi
+      nl->val = pi;
+//             <may be written>: *HEAP*_l_17.next
+//             <    is read   >: l nl
+      nl->next = l;
+//             <    is read   >: nl
+//             <    is written>: l
+      l = nl;
+   }
+//             <    is read   >: l
+   return l;
+}

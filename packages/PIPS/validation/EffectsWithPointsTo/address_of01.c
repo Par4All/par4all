@@ -1,13 +1,11 @@
-/* FI looking for recursive calls */
-/* AM: missing recursive descent in points_to_init_variable()*/
+/* Use offset and & operator
+ *
+ * Bug in effects_with_points_to: wrong indexing for "*p"
+*/
 
-int foo()
+int address_of01()
 {
-  int *p, i=1;
-  p = 1+&i;
-  return 0;
+  int *p, i[10];
+  p = 1+&i[0];
+  return *p;
 }
-
-
- 
-

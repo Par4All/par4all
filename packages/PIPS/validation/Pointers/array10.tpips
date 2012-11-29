@@ -10,17 +10,6 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 # Key property for this test case
 # setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
-#module main
-
-
-echo 
-echo PROPER  EFFECTS
-echo
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
-
-
-
 echo 
 echo POINTS-TO
 echo

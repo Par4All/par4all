@@ -1,113 +1,10 @@
 
-PROPER  EFFECTS 
-
-int foo(float (*b)[3])
-{
-   float c;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: b
-   (*b)[3] = 2.0;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: c
-   c = (*b)[3];
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: b
-   b[1][3] = 2.0;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: c
-   c = b[1][3];
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   (*b)[3]++;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   (*b)[3] += 5.0;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   b[1][3]++;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   b[1][3] += 5.0;
-   return 1;
-}
-int foo2(float b[5][3])
-{
-   float c;
-//             <    is written>: b[0][3]
-   (*b)[3] = 2.0;
-//             <    is read   >: b[0][3]
-//             <    is written>: c
-   c = (*b)[3];
-//             <    is written>: b[1][3]
-   b[1][3] = 2.0;
-//             <    is read   >: b[1][3]
-//             <    is written>: c
-   c = b[1][3];
-//             <    is read   >: b[0][3]
-//             <    is written>: b[0][3]
-   (*b)[3]++;
-//             <    is read   >: b[0][3]
-//             <    is written>: b[0][3]
-   (*b)[3] += 5.0;
-//             <    is read   >: b[1][3]
-//             <    is written>: b[1][3]
-   b[1][3]++;
-//             <    is read   >: b[1][3]
-//             <    is written>: b[1][3]
-   b[1][3] += 5.0;
-
-   return 1;
-}
-int foo3()
-{
-   float c;
-//             <    is written>: d[0][3]
-   (*d)[3] = 2.0;
-//             <    is read   >: d[0][3]
-//             <    is written>: c
-   c = (*d)[3];
-//             <    is written>: d[1][3]
-   d[1][3] = 2.0;
-//             <    is read   >: d[1][3]
-//             <    is written>: c
-   c = d[1][3];
-//             <    is read   >: d[0][3]
-//             <    is written>: d[0][3]
-   (*d)[3]++;
-//             <    is read   >: d[0][3]
-//             <    is written>: d[0][3]
-   (*d)[3] += 5.0;
-//             <    is read   >: d[1][3]
-//             <    is written>: d[1][3]
-   d[1][3]++;
-//             <    is read   >: d[1][3]
-//             <    is written>: d[1][3]
-   d[1][3] += 5.0;
-
-   return 1;
-}
-int main()
-{
-   float a[5][3], ret;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-
-   ret = foo(a);
-//             <    is read   >: a[0][3] a[1][3]
-//             <    is written>: a[0][3] a[1][3] ret
-   ret = foo2(a);
-//             <    is read   >: d[0][3] d[1][3]
-//             <    is written>: d[0][3] d[1][3] ret
-   ret = foo3();
-
-   return 1;
-}
-
-POINTS-TO
+Points-to for "foo"
 
 
 // Points To IN:
-// b -> _b_1[0] , EXACT
+// b -> *NULL_POINTER* , MAY
+// b -> _b_1[0] , MAY
 
 
 // Points To OUT: none
@@ -115,13 +12,13 @@ POINTS-TO
 int foo(float (*b)[3])
 {
 
-// Points To:
-// b -> _b_1[0] , EXACT
+// Points To: none
 
    float c;
 
 // Points To:
-// b -> _b_1[0] , EXACT
+// b -> *NULL_POINTER* , MAY
+// b -> _b_1[0] , MAY
 
    (*b)[3] = 2.0;
 
@@ -166,55 +63,8 @@ int foo(float (*b)[3])
    return 1;
 }
 
-// Points To IN: none
+Points-to for "foo3"
 
-
-// Points To OUT: none
-
-int foo2(float b[5][3])
-{
-
-// Points To: none
-
-   float c;
-
-// Points To: none
-
-   (*b)[3] = 2.0;
-
-// Points To: none
-
-   c = (*b)[3];
-
-// Points To: none
-
-   b[1][3] = 2.0;
-
-// Points To: none
-
-   c = b[1][3];
-
-// Points To: none
-
-   (*b)[3]++;
-
-// Points To: none
-
-   (*b)[3] += 5.0;
-
-// Points To: none
-
-   b[1][3]++;
-
-// Points To: none
-
-   b[1][3] += 5.0;
-
-// Points To: none
-
-
-   return 1;
-}
 
 // Points To IN: none
 
@@ -266,38 +116,7 @@ int foo3()
    return 1;
 }
 
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   float a[5][3], ret;
-
-// Points To: none
-
-
-   ret = foo(a);
-
-// Points To: none
-
-   ret = foo2(a);
-
-// Points To: none
-
-   ret = foo3();
-
-// Points To: none
-
-
-   return 1;
-}
-
-PROPER  EFFECTS WITH POINTS TO
+Proper effects
 
 int foo(float (*b)[3])
 {

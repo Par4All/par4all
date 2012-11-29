@@ -90,6 +90,8 @@ int use_def_elim01()
 }
 int use_def_elim01()
 {
+//             <    is declared>: i x y
+   int i, *x, *y;                                                       /*0005*/
 
 
 //             <    is written>: x

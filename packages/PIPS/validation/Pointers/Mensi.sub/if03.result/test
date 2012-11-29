@@ -1,0 +1,210 @@
+
+Points-to for "init"
+
+
+// Points To IN:
+// p -> _p_1 , EXACT
+
+
+// Points To OUT: none
+
+void init(int *p)
+{
+
+// Points To:
+// p -> _p_1 , EXACT
+
+   if (p==(void *) 0)
+
+// Points To:
+// p -> *NULL_POINTER* , EXACT
+
+      exit(1);
+   else
+
+// Points To:
+// p -> _p_1 , EXACT
+
+      *p = 0;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int init_p = 1;
+
+// Points To: none
+
+   int *q = (void *) 0;
+
+// Points To:
+// q -> *NULL_POINTER* , EXACT
+
+   if (init_p)
+
+// Points To:
+// q -> *NULL_POINTER* , EXACT
+
+      q = (int *) malloc(4*sizeof(int));
+
+// Points To:
+// q -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// q -> *NULL_POINTER* , MAY
+
+   init(q);
+
+// Points To:
+// q -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// q -> *NULL_POINTER* , MAY
+
+   return *q;
+}
+
+Proper effects with points-to for "init"
+
+void init(int *p)
+{
+//             <    is read   >: p
+   if (p==(void *) 0)
+      exit(1);
+   else
+//             <    is read   >: p
+//             <    is written>: _p_1
+      *p = 0;
+}
+
+Cumulated effects with points-to for "init"
+
+//             <may be written>: _p_1
+//             <    is read   >: p
+void init(int *p)
+{
+//             <may be written>: _p_1
+//             <    is read   >: p
+   if (p==(void *) 0)
+      exit(1);
+   else
+//             <    is read   >: p
+//             <    is written>: _p_1
+      *p = 0;
+}
+
+Points-to for "main"
+
+
+// Points To IN:
+// p -> _p_1 , EXACT
+
+
+// Points To OUT: none
+
+void init(int *p)
+{
+
+// Points To:
+// p -> _p_1 , EXACT
+
+   if (p==(void *) 0)
+
+// Points To:
+// p -> *NULL_POINTER* , EXACT
+
+      exit(1);
+   else
+
+// Points To:
+// p -> _p_1 , EXACT
+
+      *p = 0;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int init_p = 1;
+
+// Points To: none
+
+   int *q = (void *) 0;
+
+// Points To:
+// q -> *NULL_POINTER* , EXACT
+
+   if (init_p)
+
+// Points To:
+// q -> *NULL_POINTER* , EXACT
+
+      q = (int *) malloc(4*sizeof(int));
+
+// Points To:
+// q -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// q -> *NULL_POINTER* , MAY
+
+   init(q);
+
+// Points To:
+// q -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// q -> *NULL_POINTER* , MAY
+
+   return *q;
+}
+
+Proper effects with points-to for "main"
+
+int main()
+{
+//             <    is written>: init_p
+   int init_p = 1;
+//             <    is written>: q
+   int *q = (void *) 0;
+//             <    is read   >: init_p
+   if (init_p)
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: q _MALLOC_EFFECTS:_MALLOC_
+      q = (int *) malloc(4*sizeof(int));
+//             <may be written>: *ANY_MODULE*:*HEAP**ANYWHERE*
+//             <    is read   >: q
+   init(q);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   return *q;
+}
+
+Cumulated effects with points-to for "main"
+
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: _MALLOC_EFFECTS:_MALLOC_
+int main()
+{
+//             <    is written>: init_p
+   int init_p = 1;
+//             <    is written>: q
+   int *q = (void *) 0;
+//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: q _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: init_p
+   if (init_p)
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: q _MALLOC_EFFECTS:_MALLOC_
+      q = (int *) malloc(4*sizeof(int));
+//             <may be written>: *ANY_MODULE*:*HEAP**ANYWHERE*
+//             <    is read   >: q
+   init(q);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   return *q;
+}
