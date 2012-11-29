@@ -56,9 +56,12 @@ def patch_opencl_kernel_declaration(matchobj):
     patched_decls=[]
     # Patch all declarations
     for decl in decls:
-        patched_decl=re.sub('\s+((?:\w\s?)+)\s*\*\s*(\w+)', "P4A_accel_global_address \\1 *\\2", decl)
-        patched_decl=re.sub('\s+((?:\w\s?)+)\s*(\w+)\s*((?:\[\w*\])+)\s*', "P4A_accel_global_address \\1 \\2 \\3", patched_decl)
+        patched_decl=re.sub('\s*((?:\w\s?)+)\s*\*\s*(\w+)', "P4A_accel_global_address \\1 *\\2", decl)
+        patched_decl=re.sub('\s*((?:\w\s?)+)\s*(\w+)\s*((?:\[\w*\])+)\s*', "P4A_accel_global_address \\1 \\2 \\3", patched_decl)
         patched_decls+=[patched_decl]
+        print "*********************************************"
+        print decl
+        print patched_decl
     return head+", ".join(patched_decls)
 
 
