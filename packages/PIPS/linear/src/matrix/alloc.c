@@ -48,3 +48,11 @@ int n,m;
     a->coefficients = (Value *) malloc(sizeof(Value)*((n*m)+1));
     return (a);
 }
+
+void matrix_rm(Pmatrix a)
+{
+  if (a) {
+    free(a->coefficients);
+    free(a);
+  }
+}
