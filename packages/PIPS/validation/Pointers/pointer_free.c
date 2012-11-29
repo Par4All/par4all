@@ -1,4 +1,5 @@
 #include<stdlib.h>
+
 typedef int * pointer;
 
 // should catch that returned value is malloc'ed there
@@ -14,9 +15,6 @@ void pointer_free(pointer p)
   free(p);
   return;
 }
-
-
-
 
 int main(void)
 {

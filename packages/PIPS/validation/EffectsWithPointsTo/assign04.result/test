@@ -19,8 +19,12 @@ void assign04()
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
    ***p = 0;
+   return;
 }
-/* To be out of Emami's patterns */
+/* To be out of Emami's patterns
+ *
+ * assign04 segfaults...
+ */
 
 void assign04();
 
@@ -30,6 +34,7 @@ void foo()
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
    assign04();
+   return;
 }
 
 POINTS-TO
@@ -38,7 +43,7 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 void assign04()
 {
@@ -88,13 +93,13 @@ void assign04()
 
    **p = r;
 
-// Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> i , EXACT
-// p -> q , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// r -> i , EXACT
+// Points To: unreachable
 
    ***p = 0;
+
+// Points To: unreachable
+
+   return;
 }
 
 // Points To IN: none
@@ -102,7 +107,10 @@ void assign04()
 
 // Points To OUT: none
 
-/* To be out of Emami's patterns */
+/* To be out of Emami's patterns
+ *
+ * assign04 segfaults...
+ */
 
 
 // Points To: none
@@ -117,7 +125,7 @@ void foo();
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 void foo()
 {
@@ -125,6 +133,10 @@ void foo()
 // Points To: none
 
    assign04();
+
+// Points To: unreachable
+
+   return;
 }
 
 PROPER  EFFECTS WITH POINTS TO
@@ -141,23 +153,23 @@ void assign04()
 //             <    is written>: p
    //q = &r;
    p = &q;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p q r
    **p = r;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    ***p = 0;
+   return;
 }
-/* To be out of Emami's patterns */
+/* To be out of Emami's patterns
+ *
+ * assign04 segfaults...
+ */
 
 void assign04();
 
 void foo();
 void foo()
 {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    assign04();
+   return;
 }
 
  *********************** Use-Def Chains *********************

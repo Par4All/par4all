@@ -125,5 +125,5 @@ void foo(struct s *ps)
    // S4
    return;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[foo] (points_to_set_block_projection) Dangling pointer "_ps_1_1__1" towards "i".
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[foo] (points_to_set_block_projection) Dangling pointer "_ps_1_2__1" towards "j".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (points_to_set_block_projection) Dangling pointer "_ps_1_1__1" towards "i".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (points_to_set_block_projection) Dangling pointer "_ps_1_2__1" towards "j".

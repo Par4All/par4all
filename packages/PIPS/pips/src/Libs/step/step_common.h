@@ -38,13 +38,16 @@
 /**
  * Handled construction
  */
-#define STEP_PARALLEL          0
-#define STEP_DO                1
-#define STEP_PARALLEL_DO       2
-#define STEP_MASTER            3
-#define STEP_CRITICAL          4
-#define STEP_BARRIER           5
-#define STEP_SINGLE            6
+
+
+#define STEP_PARALLEL          100
+#define STEP_DO                101
+#define STEP_PARALLEL_DO       102
+#define STEP_MASTER            103
+//#define STEP_CRITICAL          104
+#define STEP_BARRIER           105
+#define STEP_SINGLE            106
+#define STEP_THREADPRIVATE     107
 
 #define STEP_NOWAIT            0
 #define STEP_WAIT              1
@@ -85,11 +88,11 @@
 /**
 * Supported reduction operators
 */
-#define STEP_PROD            0
-#define STEP_MAX             1
-#define STEP_MIN             2
-#define STEP_SUM             3
-#define STEP_OP_UNDEFINED    4
+#define STEP_PROD_REDUCE     0
+#define STEP_MAX_REDUCE      1
+#define STEP_MIN_REDUCE      2
+#define STEP_SUM_REDUCE      3
+#define STEP_UNDEF_REDUCE    4
 //#define STEP_LAND            4
 //#define STEP_BAND            5
 //#define STEP_LOR             6

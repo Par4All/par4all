@@ -28,9 +28,9 @@ PROPER EFFECTS WITH POINTS-TO
 
 void fprintf02(int *p)
 {
-//             <may be read   >: _p_1[0] stdout[0]
+//             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: p stdout __IO_EFFECTS:LUNS[1]
+//             <    is read   >: _p_1[0] p stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%d", *p);
    return;

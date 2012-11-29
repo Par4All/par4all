@@ -11,16 +11,92 @@ License.
 #endif
 
 #include "defines-local.h" // for STEP_DEBUG_STATEMENT
-#include "control.h" // for module_reorder
-
-extern void step_directive_parser(statement body);
 
 GENERIC_LOCAL_FUNCTION(directives, step_directives);
 
-void step_directives_init()
+void get_step_directive_name(step_directive drt, string *directive_txt)
 {
-  const char *module_name = entity_user_name(get_current_module_entity());
-  set_directives((step_directives)db_get_memory_resource(DBR_STEP_DIRECTIVES, module_name, true));
+  pips_debug(2, "begin\n");
+
+  switch(step_directive_type(drt))
+    {
+    case STEP_PARALLEL:
+      *directive_txt = strdup(STEP_PARALLEL_NAME);
+      break;
+    case STEP_DO:
+      *directive_txt = strdup(STEP_DO_NAME);
+      break;
+    case STEP_PARALLEL_DO:
+      *directive_txt = strdup(STEP_PARALLEL_DO_NAME);
+      break;
+    case STEP_MASTER:
+      *directive_txt = strdup(STEP_MASTER_NAME);
+      break;
+    case STEP_SINGLE:
+      *directive_txt = strdup(STEP_SINGLE_NAME);
+      break;
+    case STEP_BARRIER:
+      *directive_txt = string_undefined;
+      break;
+    case STEP_THREADPRIVATE:
+      *directive_txt = string_undefined;
+      break;
+    default: assert(0);
+    }
+
+  pips_debug(2, "end\n");
+}
+
+void step_directive_type_print(step_directive drt)
+{
+  switch(step_directive_type(drt))
+    {
+    case STEP_PARALLEL:
+      pips_debug(1, "step_directive_type = STEP_PARALLEL\n");
+      break;
+    case STEP_PARALLEL_DO:
+      pips_debug(1, "step_directive_type = STEP_PARALLEL_DO\n");
+      break;
+    case STEP_DO:
+      pips_debug(1, "step_directive_type = STEP_DO\n");
+      break;
+    case STEP_MASTER:
+      pips_debug(1, "step_directive_type = STEP_MASTER\n");
+      break;
+    case STEP_BARRIER:
+      pips_debug(1, "step_directive_type = STEP_BARRIER\n");
+      break;
+    case STEP_THREADPRIVATE:
+      pips_debug(1, "step_directive_type = STEP_THREADPRIVATE\n");
+      break;
+    default:
+      pips_debug(1, "step_directive_type = UNKNOWN\n");
+      break;
+    }
+}
+
+void step_directives_print()
+{
+  STEP_DIRECTIVES_MAP(block_stmt, d,
+		      {
+			assert(!statement_undefined_p(block_stmt));
+			step_directive_print(d);
+		      }, get_directives()); 
+}
+
+void step_directives_init(bool first_p)
+{
+  pips_debug(4, "begin first_p = %d\n", first_p);
+
+  if (first_p)
+    init_directives();
+  else
+    {
+      const char *module_name = entity_user_name(get_current_module_entity());
+      set_directives((step_directives)db_get_memory_resource(DBR_STEP_DIRECTIVES, module_name, true));
+    }
+
+  pips_debug(4, "end\n");
 }
 
 void step_directives_reset()
@@ -28,7 +104,7 @@ void step_directives_reset()
   reset_directives();
 }
 
-static void step_directives_save()
+void step_directives_save()
 {
   const char *module_name = entity_user_name(get_current_module_entity());
   DB_PUT_MEMORY_RESOURCE(DBR_STEP_DIRECTIVES, module_name, get_directives());
@@ -36,7 +112,7 @@ static void step_directives_save()
 }
 
 
-step_directive step_directives_get(statement stmt)
+step_directive step_directives_load(statement stmt)
 {
   return load_directives(stmt);
 }
@@ -97,28 +173,46 @@ bool step_directive_to_strings(step_directive d, bool is_fortran, string *begin_
       block_directive = false;
       end_directive = false;
       break;
+    case STEP_THREADPRIVATE:
+      directive_txt = strdup("threadprivate");
+      block_directive = false;
+      end_directive = false;
+      break;
     default: assert(0);
     }
 
   /*  clause */
+  set copyin_l = set_make(set_pointer);
   set private_l = set_make(set_pointer);
   set shared_l = set_make(set_pointer);
+  set threadprivate_l = set_make(set_pointer);
+  set firstprivate_l = set_make(set_pointer);
+  list schedule_l = list_undefined;
   bool nowait = false;
 
   int op;
-  set reductions_l[STEP_OP_UNDEFINED];
-  for(op=0; op<STEP_OP_UNDEFINED; op++)
+  set reductions_l[STEP_UNDEF_REDUCE];
+  for(op=0; op<STEP_UNDEF_REDUCE; op++)
     reductions_l[op] = set_make(set_pointer);
 
   FOREACH(STEP_CLAUSE, c, step_directive_clauses(d))
     {
       switch (step_clause_tag(c))
 	{
+	case is_step_clause_copyin:
+	  set_append_list(copyin_l, step_clause_copyin(c));
+	  break;
 	case is_step_clause_private:
 	  set_append_list(private_l, step_clause_private(c));
 	  break;
 	case is_step_clause_shared:
 	  set_append_list(shared_l, step_clause_shared(c));
+	  break;
+	case is_step_clause_threadprivate:
+	  set_append_list(threadprivate_l, step_clause_threadprivate(c));
+	  break;
+	case is_step_clause_firstprivate:
+	  set_append_list(firstprivate_l, step_clause_firstprivate(c));
 	  break;
 	case is_step_clause_nowait:
 	  nowait = true;
@@ -128,7 +222,11 @@ bool step_directive_to_strings(step_directive d, bool is_fortran, string *begin_
 	      set_add_element(reductions_l[op], reductions_l[op], variable);
 	    }, step_clause_reduction(c));
 	  break;
+	case is_step_clause_schedule:
+	  schedule_l = step_clause_schedule(c);
+	  break;
 	case is_step_clause_transformation:
+	  /* transformation clause is not printed */
 	  break;
 	default: assert(0);
 	}
@@ -143,11 +241,28 @@ bool step_directive_to_strings(step_directive d, bool is_fortran, string *begin_
   string_buffer sb = string_buffer_make(false);
   string_buffer_cat(sb, strdup("omp "), strdup(directive_txt), NULL);
 
+  SB_LIST_VARIABLE(sb, copyin_l, " copyin(");
   SB_LIST_VARIABLE(sb, private_l, " private(");
   SB_LIST_VARIABLE(sb, shared_l, " shared(");
+  SB_LIST_VARIABLE(sb, threadprivate_l, "(");
+  SB_LIST_VARIABLE(sb, firstprivate_l, " firstprivate(");
 
-  string op_txt[STEP_OP_UNDEFINED]={" reduction(*: "," reduction(max: "," reduction(min: "," reduction(+: "};
-  for(op=0; op<STEP_OP_UNDEFINED; op++)
+  if(!list_undefined_p(schedule_l))
+    {
+      string s = string_undefined;
+      FOREACH(STRING, str, schedule_l)
+	{
+	  if(s == string_undefined)
+	    s=strdup(concatenate(" schedule(", str, NULL));
+	  else
+	    s=strdup(concatenate(", ", str, NULL));
+	  string_buffer_append(sb, s);
+	}
+      string_buffer_append(sb, strdup(")"));
+    }
+
+  string op_txt[STEP_UNDEF_REDUCE]={" reduction(*: "," reduction(max: "," reduction(min: "," reduction(+: "};
+  for(op=0; op<STEP_UNDEF_REDUCE; op++)
     SB_LIST_VARIABLE(sb, reductions_l[op], op_txt[op]);
 
   if(nowait && !end_directive)
@@ -169,6 +284,7 @@ bool step_directive_to_strings(step_directive d, bool is_fortran, string *begin_
 statement step_directive_basic_workchunk(step_directive d)
 {
   statement stmt = step_directive_block(d);
+  pips_debug(3, "begin\n");
 
   switch(step_directive_type(d))
     {
@@ -195,6 +311,7 @@ statement step_directive_basic_workchunk(step_directive d)
       }
     }
 
+  pips_debug(3, "end\n");
   return stmt;
 }
 
@@ -203,6 +320,7 @@ list step_directive_basic_workchunk_index(step_directive d)
   list index_l = NIL;
   statement stmt = step_directive_block(d);
 
+  pips_debug(4, "begin\n");
   switch(step_directive_type(d))
     {
     case STEP_DO:
@@ -235,6 +353,7 @@ list step_directive_basic_workchunk_index(step_directive d)
       }
     }
 
+  pips_debug(4, "end\n");
   return gen_nreverse(index_l);
 }
 
@@ -246,7 +365,7 @@ void step_directive_print(step_directive d)
   bool is_fortran = fortran_module_p(get_current_module_entity());
   bool is_block_construct = step_directive_to_strings(d, is_fortran, &begin_txt, &end_txt);
 
-  pips_debug(1, "====> TYPE %d : \nNB clauses : %d\n\tdirective begin : %s\n",
+  pips_debug(1, "begin ====> TYPE %d : \nNB clauses : %d\n\tdirective begin : %s\n",
 	     type, (int)gen_length(clauses), begin_txt);
   if (is_block_construct && !empty_comments_p(end_txt)) pips_debug(1,"\tdirective end : %s\n", end_txt);
 
@@ -258,6 +377,7 @@ void step_directive_print(step_directive d)
       print_statement(stmt);
       pips_debug(1, "\n");
     }
+  /*
   ifdebug(2)
     {
       statement stmt = step_directive_basic_workchunk(d);
@@ -273,42 +393,38 @@ void step_directive_print(step_directive d)
       pips_debug(2, "\n----> basic workchunk (index : [%s] )\n", index_str);
       print_statement(stmt);
       pips_debug(2, "\n");
-    }
+      }
+  */
+  pips_debug(1, "end\n");
 }
 
-bool step_parser(const char* module_name)
+
+static list step_directive_omp_get_private_entities(step_directive directive)
 {
-  debug_on("STEP_PARSER_DEBUG_LEVEL");
-  pips_debug(1, "%d module_name = %s\n", __LINE__, module_name);
-
-  statement stmt = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
-  set_current_module_entity(local_name_to_top_level_entity(module_name));
-
-  init_directives();
-
-  step_directive_parser(stmt);
-
-  ifdebug(1)
+  pips_debug(4, "begin\n");
+  list private_l = NIL;
+  list clauses = step_directive_clauses(directive);
+  FOREACH(STEP_CLAUSE,c,clauses)
     {
-      STEP_DIRECTIVES_MAP(block_stmt, d,
-			  {
-			    assert(!statement_undefined_p(block_stmt));
-			    step_directive_print(d);
-			  }, get_directives());
+      switch (step_clause_tag(c))
+	{
+	case is_step_clause_private:
+	  private_l = gen_append(step_clause_private(c), private_l);
+	  break;
+	default:
+	  break;
+	}
     }
+  pips_debug(4, "end\n");
+  return private_l;
+}
 
-  step_directives_save();
-  reset_current_module_entity();
-
-
-  module_reorder(stmt);
-  if(ordering_to_statement_initialized_p())
-    reset_ordering_to_statement();
-
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, stmt);
-
-  pips_debug(1, "Fin step_directives\n");
-  debug_off();
-
-  return true;
+bool step_private_p(statement stmt, entity e)
+{
+  pips_debug(4, "begin\n");
+  step_directive d = step_directives_load(stmt);
+  list private_l;
+  private_l = step_directive_omp_get_private_entities(d);
+  pips_debug(4, "end\n");
+  return gen_in_list_p(e, private_l);
 }

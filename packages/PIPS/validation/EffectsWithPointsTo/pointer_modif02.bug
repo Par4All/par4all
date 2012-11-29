@@ -1,0 +1,6 @@
+  PROPER_EFFECTS_WITH_POINTS_TO  building   PROPER_EFFECTS(main)
+puser warning in source_to_sinks: 
+Uninitialized or null pointer dereferenced: Sink missing for a source based on "p".
+Update points-to property POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING and/or POINTS_TO_UNINITIALIZED_NULL_DEREFERENCING according to needs.
+[stack_head] (/home/francois/MYPIPS/prod/newgen/src/genC/stack.c:424) assertion failed
+Aborted

@@ -1,0 +1,32 @@
+
+Proper effects with points-to for "main"
+
+int main()
+{
+   mystruct s1, s2, s3;
+//             <    is written>: b c d
+   int b = 1, c = 2, d = 3;
+//             <    is written>: s2.a
+
+   s2.a = &b;
+//             <    is written>: s3.a
+   s3.a = &c;
+//             <may be read   >: s2.a s2.b[*] s2.c s3.a s3.b[*] s3.c
+//             <may be written>: s1.b[*]
+//             <    is read   >: c d
+//             <    is written>: s1.a s1.c
+   s1 = c==d?s2:s3;
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	08 --> 12 with conflicts
+		from <d-W-EXACT> to <d-R-EXACT>
+		from <c-W-EXACT> to <c-R-EXACT>
+	10 --> 12 with conflicts
+		from <s2.a-W-EXACT> to <s2.a-R-MAY>
+	11 --> 12 with conflicts
+		from <s3.a-W-EXACT> to <s3.a-R-MAY>
+
+****************** End of Dependence Graph ******************

@@ -1,0 +1,57 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   int *p[5];
+   int q[10][5];
+//             <    is read   >: q[0][0]
+//             <    is written>: p[3]
+   p[3] = q[0][0];
+
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: unreachable
+
+int main()
+{
+
+// Points To: none
+
+   int *p[5];
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int q[10][5];
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   p[3] = q[0][0];
+
+// Points To: unreachable
+
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int *p[5];
+   int q[10][5];
+//             <    is read   >: q[0][0]
+//             <    is written>: p[3]
+   p[3] = q[0][0];
+
+   return 0;
+}

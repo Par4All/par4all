@@ -1,74 +1,13 @@
 
-PROPER  EFFECTS 
-
 int main()
 {
    int *a;
-   int *b[10];
 //             <    is written>: i
    int i = 5;
-//             <    is read   >: b[i] i
-//             <    is written>: a
-   a = b[i];
-//             <    is read   >: a i
-//             <    is written>: b[++i] i
-   b[++i] = a;
-   return 0;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   int *a;
-
-// Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
    int *b[10];
-
-// Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   int i = 5;
-
-// Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   a = b[i];
-
-// Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   b[++i] = a;
-
-// Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
-int main()
-{
-   int *a;
-   int *b[10];
-//             <    is written>: i
-   int i = 5;
+//             <    is read   >: i
+//             <    is written>: b[i]
+   b[i] = &i;
 //             <    is read   >: b[i] i
 //             <    is written>: a
    a = b[i];
@@ -80,12 +19,19 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	12 --> 13 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
 	12 --> 14 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	12 --> 15 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	12 --> 16 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 		from <i-W-EXACT> to <i-R-EXACT>
-	13 --> 14 with conflicts
+	14 --> 15 with conflicts
+		from <b[i]-W-EXACT> to <b[i]-R-EXACT>
+	14 --> 16 with conflicts
+		from <b[i]-W-EXACT> to <b[++i]-W-EXACT>
+		from <i-R-EXACT> to <i-W-EXACT>
+	15 --> 16 with conflicts
 		from <a-W-EXACT> to <a-R-EXACT>
 		from <i-R-EXACT> to <i-W-EXACT>
 		from <b[i]-R-EXACT> to <b[++i]-W-EXACT>

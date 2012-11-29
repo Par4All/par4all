@@ -6,27 +6,30 @@ setproperty ABORT_ON_USER_ERROR TRUE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
-##TODO: explain
 
-echo 
-echo PROPER EFFECTS
-echo
-
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
-
-echo 
-echo PROPER POINTER EFFECTS
-echo
-activate PRINT_CODE_PROPER_POINTER_EFFECTS
-display PRINTED_FILE
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
 
 echo
-echo POINTS TO
+echo Points-to for \"$WS\"
 echo
 
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[$WS]
+
+echo
+echo Cumulated effects for \"$WS\"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[$WS]
+
+echo
+echo Points-to for "main"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
 
 
 close

@@ -1,37 +1,4 @@
 
-PROPER  EFFECTS 
-
-void lhs03()
-{
-   int i;
-//             <    is written>: i
-
-   i = 2;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-void lhs03()
-{
-
-// Points To: none
-
-   int i;
-
-// Points To: none
-
-
-   i = 2;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
 void lhs03()
 {
    int i;

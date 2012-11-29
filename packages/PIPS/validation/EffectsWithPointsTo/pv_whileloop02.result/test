@@ -1,6 +1,4 @@
 
-PROPER  EFFECTS 
-
 int main()
 {
 //             <    is written>: i
@@ -13,80 +11,8 @@ int main()
 //             <    is read   >: i
 
    while (i<10) {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *HEAP*_l_7[i]
 //             <    is read   >: i p
-      p[i] = i;
-//             <    is read   >: i
-//             <    is written>: i
-      i++;
-   }
-   return 0;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   int i = 0;
-
-// Points To: none
-
-   int *p;
-
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-
-   p = (int *) malloc(10*sizeof(int));
-
-// Points To:
-// p -> *HEAP*_l_7[0] , EXACT
-
-
-   while (i<10) {
-
-// Points To:
-// p -> *HEAP*_l_7[0] , EXACT
-
-      p[i] = i;
-
-// Points To:
-// p -> *HEAP*_l_7[0] , EXACT
-
-      i++;
-   }
-
-// Points To:
-// p -> *HEAP*_l_7[0] , EXACT
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
-int main()
-{
-//             <    is written>: i
-   int i = 0;
-   int *p;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-
-   p = (int *) malloc(10*sizeof(int));
-//             <    is read   >: i
-
-   while (i<10) {
-//             <    is read   >: i p
-//             <    is written>: *HEAP*_l_7[i]
       p[i] = i;
 //             <    is read   >: i
 //             <    is written>: i
@@ -109,7 +35,7 @@ int main()
 	09 --> 12 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	11 --> 11 with conflicts
-		from <*HEAP*_l_7[i]-W-EXACT> to <*HEAP*_l_7[i]-W-EXACT>
+		from <*HEAP*_l_7[i]-W-MAY> to <*HEAP*_l_7[i]-W-MAY>
 	11 --> 12 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	12 --> 11 with conflicts

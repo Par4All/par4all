@@ -1,6 +1,4 @@
 
-PROPER  EFFECTS 
-
 int main()
 {
    int i;
@@ -9,98 +7,10 @@ int main()
 //             <    is written>: p
 
    p = 0;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   **q = 0;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-
-   *p = 1;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: q
-   *q = &i;
-
-   return 0;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   int i;
-
-// Points To: none
-
-   int *p;
-
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   int **q;
-
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-
-
-   p = 0;
-
-// Points To:
-// p -> *NULL_POINTER* , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-
    **q = 0;
 
-// Points To:
-// p -> *NULL_POINTER* , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-
-
    *p = 1;
-
-// Points To:
-// p -> *NULL_POINTER* , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-
-   *q = &i;
-
-// Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> i , EXACT
-// p -> *NULL_POINTER* , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
-int main()
-{
-   int i;
-   int *p;
-   int **q;
-//             <    is written>: p
-
-   p = 0;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   **q = 0;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-
-   *p = 1;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: q
    *q = &i;
 
    return 0;
@@ -108,25 +18,5 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	11 --> 12 with conflicts
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	11 --> 14 with conflicts
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <p-W-EXACT> to <p-R-EXACT>
-	11 --> 15 with conflicts
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	12 --> 14 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	12 --> 15 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	14 --> 15 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 
 ****************** End of Dependence Graph ******************

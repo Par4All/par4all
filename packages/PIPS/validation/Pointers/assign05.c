@@ -17,9 +17,11 @@ void assign05()
   r = bar(i);
   i = 1;
   *r = 0;
+  return;
 }
 
 void foo()
 {
   assign05();
+  return;
 }

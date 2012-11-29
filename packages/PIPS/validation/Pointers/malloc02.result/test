@@ -1,25 +1,10 @@
 
-PROPER  EFFECTS
-
-int main(int argc, char *argv[])
-{
-   int *pi;
-   float *px;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: pi _MALLOC_EFFECTS:_MALLOC_
-
-   pi = (int *) malloc(sizeof(int));
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: px _MALLOC_EFFECTS:_MALLOC_
-   px = (float *) malloc(sizeof(float));
-
-   return 0;
-}
-
 POINTS-TO
 
 
-// Points To IN: none
+// Points To IN:
+// argv[0] -> *NULL_POINTER* , MAY
+// argv[0] -> _argv_2[0][0] , MAY
 
 
 // Points To OUT: none
@@ -37,6 +22,18 @@ int main(int argc, char *argv[])
    float *px;
 
 // Points To:
+// argv[0] -> *NULL_POINTER* , MAY
+// argv[0] -> _argv_2[0][0] , MAY
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   char *pc = argv[0];
+
+// Points To:
+// argv[0] -> *NULL_POINTER* , MAY
+// argv[0] -> _argv_2[0][0] , MAY
+// pc -> *NULL_POINTER* , MAY
+// pc -> _argv_2[0][0] , MAY
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
@@ -44,15 +41,110 @@ int main(int argc, char *argv[])
    pi = (int *) malloc(sizeof(int));
 
 // Points To:
-// pi -> *HEAP*_l_10 , MAY
+// argv[0] -> *NULL_POINTER* , MAY
+// argv[0] -> _argv_2[0][0] , MAY
+// pc -> *NULL_POINTER* , MAY
+// pc -> _argv_2[0][0] , MAY
+// pi -> *HEAP*_l_11 , MAY
 // px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    px = (float *) malloc(sizeof(float));
 
 // Points To:
-// pi -> *HEAP*_l_10 , MAY
-// px -> *HEAP*_l_11 , MAY
+// argv[0] -> *NULL_POINTER* , MAY
+// argv[0] -> _argv_2[0][0] , MAY
+// pc -> *NULL_POINTER* , MAY
+// pc -> _argv_2[0][0] , MAY
+// pi -> *HEAP*_l_11 , MAY
+// px -> *HEAP*_l_12 , MAY
 
 
-   return 0;
+   return (int) *pc;
 }
+main
+
+Declarations for module "main" with type "int x char * -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 56
+	Declared entity "main:*DYNAMIC*" with type "area" with size 34
+	Declared entity "main:*FORMAL*" with type "area" with size 1
+	Declared entity "main:*HEAP*" with type "area" with size 8
+	Declared entity "main:*HEAP*_l_11" with type "variable" "int"
+	Declared entity "main:*HEAP*_l_12" with type "variable" "float"
+	Declared entity "main:*STACK*" with type "area" with size 0
+	Declared entity "main:*STATIC*" with type "area" with size 0
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "main:0`__func__" with type "variable" "char *"
+	Declared entity "main:0`pc" with type "variable" "char *"
+	Declared entity "main:0`pi" with type "variable" "int *"
+	Declared entity "main:0`px" with type "variable" "float *"
+	Declared entity "main:_argv_2" with type "variable" "char"
+	Declared entity "main:argc" with type "variable" "int"
+	Declared entity "main:argv" with type "variable" "char *"
+	Declared entity "main:main" with type "variable" "int"
+	Declared entity "malloc02!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable main:argc	offset = 1
+	Variable main:argv	offset = 2
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 56:
+	External Variable "TOP-LEVEL:_IO_2_1_stdin_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:_IO_2_1_stdout_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:_IO_2_1_stderr_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:stdin"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:stdout"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:stderr"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:sys_nerr"	offset = UNKNOWN,	size = 4
+	External Variable "TOP-LEVEL:sys_errlist"	offset = UNKNOWN,	size = 8
+	Variable "TOP-LEVEL:__morecore"	offset = 0	size = 8
+	Variable "TOP-LEVEL:__malloc_initialize_hook"	offset = 8	size = 8
+	Variable "TOP-LEVEL:__free_hook"	offset = 16	size = 8
+	Variable "TOP-LEVEL:__malloc_hook"	offset = 24	size = 8
+	Variable "TOP-LEVEL:__realloc_hook"	offset = 32	size = 8
+	Variable "TOP-LEVEL:__memalign_hook"	offset = 40	size = 8
+	Variable "TOP-LEVEL:__after_morecore_hook"	offset = 48	size = 8
+
+
+Layout for memory area "main:*DYNAMIC*" of size 34:
+	Variable "main:0`pi"	offset = 10	size = 8
+	Variable "main:0`px"	offset = 18	size = 8
+	Variable "main:0`pc"	offset = 26	size = 8
+	Variable "main:0`__func__"	offset = 0	size = 5
+	Variable "main:0`__FUNCTION__"	offset = 5	size = 5
+
+
+Layout for memory area "main:*FORMAL*" of size 1:
+	Dynamic Variable "main:_argv_2"	offset = UNKNOWN, 	size = DYNAMIC
+
+
+Layout for memory area "main:*HEAP*" of size 8:
+	Dynamic Variable "main:*HEAP*_l_11"	offset = UNKNOWN, 	size = DYNAMIC
+	Dynamic Variable "main:*HEAP*_l_12"	offset = UNKNOWN, 	size = DYNAMIC
+
+
+Layout for memory area "main:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "malloc02!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module main
+

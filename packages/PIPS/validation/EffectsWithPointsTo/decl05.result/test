@@ -1,44 +1,4 @@
 
-PROPER  EFFECTS 
-
-int main()
-{
-//             <may be written>: tab[*]
-   int tab[3] = {0, 1, 2};
-//             <    is read   >: tab[0]
-//             <    is written>: tab[0]
-
-   tab[0] = tab[0]+2;
-   return 0;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   int tab[3] = {0, 1, 2};
-
-// Points To: none
-
-
-   tab[0] = tab[0]+2;
-
-// Points To: none
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
 int main()
 {
 //             <may be written>: tab[*]

@@ -1,0 +1,28 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int assignment16(struct array s)
+{
+
+// Points To: none
+
+   int *q = (s.a)[5];
+
+// Points To:
+// q -> s.a[5][0] , EXACT
+
+
+   q += 3;
+
+// Points To:
+// q -> s.a[5][3] , EXACT
+
+
+   return *q;
+}

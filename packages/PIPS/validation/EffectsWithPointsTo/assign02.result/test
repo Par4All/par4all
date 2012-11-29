@@ -135,17 +135,17 @@ s_t make_s(int i, float x)
    p = (s_t *) malloc(sizeof(s_t));
 
 // Points To:
-// p -> *HEAP*_l_8 , EXACT
+// p -> *HEAP*_l_8 , MAY
 
    p->entier = i;
 
 // Points To:
-// p -> *HEAP*_l_8 , EXACT
+// p -> *HEAP*_l_8 , MAY
 
    p->reel = x;
 
 // Points To:
-// p -> *HEAP*_l_8 , EXACT
+// p -> *HEAP*_l_8 , MAY
 
    return *p;
 }
@@ -188,13 +188,14 @@ s_t make_s(int i, float x)
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
 
    p = (s_t *) malloc(sizeof(s_t));
+//             <may be written>: *HEAP*_l_8.entier
 //             <    is read   >: i p
-//             <    is written>: *HEAP*_l_8.entier
    p->entier = i;
+//             <may be written>: *HEAP*_l_8.reel
 //             <    is read   >: p x
-//             <    is written>: *HEAP*_l_8.reel
    p->reel = x;
-//             <    is read   >: *HEAP*_l_8.entier *HEAP*_l_8.reel p
+//             <may be read   >: *HEAP*_l_8.entier *HEAP*_l_8.reel
+//             <    is read   >: p
    return *p;
 }
 
@@ -207,8 +208,8 @@ s_t make_s(int i, float x)
 	08 --> 11 with conflicts
 		from <p-W-EXACT> to <p-R-EXACT>
 	09 --> 11 with conflicts
-		from <*HEAP*_l_8.entier-W-EXACT> to <*HEAP*_l_8.entier-R-EXACT>
+		from <*HEAP*_l_8.entier-W-MAY> to <*HEAP*_l_8.entier-R-MAY>
 	10 --> 11 with conflicts
-		from <*HEAP*_l_8.reel-W-EXACT> to <*HEAP*_l_8.reel-R-EXACT>
+		from <*HEAP*_l_8.reel-W-MAY> to <*HEAP*_l_8.reel-R-MAY>
 
 ****************** End of Dependence Graph ******************

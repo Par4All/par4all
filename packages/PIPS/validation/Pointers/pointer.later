@@ -1,0 +1,1 @@
+Several problems are shown. Heap information is not preserved precisely. Calls to free are not properly handled. The fact that a pointer cannot point to NULL after a call is not exploited.

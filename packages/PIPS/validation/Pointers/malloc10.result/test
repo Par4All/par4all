@@ -19,7 +19,7 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 int main()
 {
@@ -40,5 +40,5 @@ int main()
    return 0;
 }
 C_PARSER[main] (simplify_C_expression) Variable "i" is probably used before it is defined
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Free of a non-heap allocated address.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Free of a non-heap allocated address.
 Or bug in the points-to analysis...

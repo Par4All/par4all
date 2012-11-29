@@ -1,0 +1,46 @@
+
+Points-to for fpointer03
+
+
+// Points To IN:
+// col -> *NULL_POINTER* , MAY
+// col -> _col_2[0] , MAY
+
+
+// Points To OUT: none
+
+void fpointer03(char c, int *col, int indent, int *nbout)
+{
+
+// Points To:
+// col -> *NULL_POINTER* , MAY
+// col -> _col_2[0] , MAY
+
+   /* The reading of _col_2 was lost here... */
+   while (*col<indent)
+
+// Points To:
+// col -> _col_2[0] , EXACT
+
+      (*col)++;
+
+// Points To:
+// col -> _col_2[0] , EXACT
+
+   (*col)++;
+}
+
+Proper effects with points-to for fpointer03
+
+void fpointer03(char c, int *col, int indent, int *nbout)
+{
+//             <    is read   >: _col_2[0] col indent
+   /* The reading of _col_2 was lost here... */
+   while (*col<indent)
+//             <    is read   >: _col_2[0] col
+//             <    is written>: _col_2[0]
+      (*col)++;
+//             <    is read   >: _col_2[0] col
+//             <    is written>: _col_2[0]
+   (*col)++;
+}

@@ -1,13 +1,13 @@
 
 PROPER  EFFECTS 
 
-int foo()
+int address_of01()
 {
-//             <    is written>: i
-   int *p, i = 1;
+   int *p, i[10];
 //             <    is written>: p
-   p = 1+&i;
-   return 0;
+   p = 1+&i[0];
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   return *p;
 }
 
 POINTS-TO
@@ -18,36 +18,38 @@ POINTS-TO
 
 // Points To OUT: none
 
-int foo()
+int address_of01()
 {
 
 // Points To: none
 
-   int *p, i = 1;
+   int *p, i[10];
 
 // Points To:
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
-   p = 1+&i;
+   p = 1+&i[0];
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p -> i[1] , EXACT
 
-   return 0;
+   return *p;
 }
 
 PROPER  EFFECTS WITH POINTS TO
 
-int foo()
+int address_of01()
 {
-//             <    is written>: i
-   int *p, i = 1;
+   int *p, i[10];
 //             <    is written>: p
-   p = 1+&i;
-   return 0;
+   p = 1+&i[0];
+//             <    is read   >: i[1] p
+   return *p;
 }
 
  *********************** Use-Def Chains *********************
 
+	09 --> 10 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
 
 ****************** End of Dependence Graph ******************

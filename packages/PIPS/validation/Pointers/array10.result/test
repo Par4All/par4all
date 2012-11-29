@@ -1,45 +1,12 @@
 
-PROPER  EFFECTS
-
-int bar(int *p)
-{
-   int b[100];
-//             <    is written>: p
-   p = &b[0];
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: a[*p++] p
-   a[*p++] = 2.;
-   return 0;
-}
-int foo(int *p)
-{
-   int b[100];
-//             <    is written>: p
-   p = &b[0];
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: a[*p+1]
-   a[*p+1] = 2.;
-   return 0;
-}
-int toto(int *p)
-{
-   int *q;
-   int b[100];
-//             <    is written>: p
-   p = &b[0];
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: a[*(q = p++)] p q
-   a[*(q = p++)] = 2.;
-   return 0;
-}
-
 POINTS-TO
 
 
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 int bar(int *p)
 {
@@ -66,7 +33,8 @@ int bar(int *p)
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 int foo(int *p)
 {
@@ -93,7 +61,8 @@ int foo(int *p)
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 int toto(int *p)
 {

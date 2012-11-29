@@ -1,6 +1,11 @@
-/* #include<stdio.h> */
+/* To obtain two read effects on sp and sp.one and a warning abount
+ *  ineffective update of i in call09
+ *
+ * Bug: normalization issue for s.one and sp->one because of the
+ * implicit array assumption for pointers.
+ */
 
-/* To obtain two read effects on a and b and a warning abount inneffective update of i invall02 */
+/* #include<stdio.h> */
 
 typedef struct two_fields{int one; int two[10];} tf_t;
 

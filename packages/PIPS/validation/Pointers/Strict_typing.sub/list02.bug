@@ -1,3 +1,0 @@
-26. The consistency check does not check that the set is empty when bottom is true.
-
-27. In Strict_typing.sub/list02, in "main", the points-to obtained on exit of the while loop is declared "unreachable".

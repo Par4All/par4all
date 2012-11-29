@@ -2360,7 +2360,7 @@ graph (CFG).
 
 \begin{PipsPass}{proper_effects}
 The proper memory effects of a statement basically are a list of variables
-that may be read or written by the statement. They are used to build use-def
+that may be read (used) or written (defined) by the statement. They are used to build use-def
 chains (see~\cite{ASU86} or a later edition) and then the dependence graph.
 
 Proper means that the effects of a compound statement do not include the
@@ -2420,6 +2420,27 @@ proper_effects                  > MODULE.proper_effects
         < MODULE.code
         < CALLEES.summary_effects
 \end{PipsMake}
+
+When pointers are used, points-to information is useful to obtain
+precise proper memory effects.
+
+Because points-to analysis is able to detect some cases of segfaults,
+variables that are not defined/written can nevertheless have a
+different abstract value at the beginning and at the end of a piece of
+code.
+
+This leads to difficulties with memory effects. Firstly, if a piece of
+code is not reachable because a segfault always occurs before it is
+executed, it has no memory effects (as usual, the PIPS output is
+pretty surprising...). Secondly, cumulated memory effects can either
+be any effect that is linked to any execution of a piece of code or
+any effect that happens when the executions reach the end of the piece
+of code.
+
+So EffectsWithPointsTo contains weird results either because the code
+always segfault somewhere or because the code might segfault because a
+function argument is not checked before it is used. Hence, effects
+disappear or must effects become may effects.
 
 \begin{PipsMake}
 proper_effects_with_points_to > MODULE.proper_effects
@@ -5446,6 +5467,59 @@ init_points_to_analysis > MODULE.init_points_to_list
            < MODULE.code
 \end{PipsMake}
 
+\subsection{Interprocedural Points to Analysis}
+\label{subsection-interprocedural-points-to-analysis}
+\index{Interprocedural Points-to Analysis}
+
+\begin{PipsPass}{interprocedural_points_to_analysis}
+This pass is being implemented by Amira \textsc{Mensi}.
+The \PipsPassRef{interprocedural_points_to_analysis} is implemented in order to
+compute points-to relations in an interprocedural way, based on \textsc{Wilson} algorithm. This phase computes
+both Gen and Kill sets at the level of the call site.It requires another resource which is computed by \PipsPassRef{intraprocedural_points_to_analysis}.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias interprocedural_points_to_analysis  'Interprocedural Points To Analysis'
+
+interprocedural_points_to_analysis > MODULE.points_to
+                   > MODULE.points_to_out
+                   > MODULE.points_to_in
+        ! SELECT.proper_effects_with_points_to
+        ! SELECT.cumulated_effects_with_points_to           
+        < PROGRAM.entities
+        < MODULE.code
+        < CALLEES.summary_effects
+        < CALLEES.points_to_out
+        < CALLEES.points_to_in
+\end{PipsMake}
+
+
+\subsection{Fast Interprocedural Points to Analysis}
+\label{subsection-fast-interprocedural-points-to-analysis}
+\index{Interprocedural Points to Analysis}
+
+\begin{PipsPass}{fast_interprocedural_points_to_analysis}
+This pass is being implemented by Amira \textsc{Mensi}.
+The \PipsPassRef{fast_interprocedural_points_to_analysis} is implemented in order to
+compute points-to relations in an interprocedural way, based on \textsc{Wilson} algorithm. This phase computes only
+Kill sets at the call site level. It requires another resource which is computed by \PipsPassRef{intraprocedural_points_to_analysis}.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias fast_interprocedural_points_to_analysis  'Fast Interprocedural Points To Analysis'
+
+fast_interprocedural_points_to_analysis > MODULE.points_to
+                   > MODULE.points_to_out
+                   > MODULE.points_to_in
+        ! SELECT.proper_effects_with_points_to
+        ! SELECT.cumulated_effects_with_points_to           
+        < PROGRAM.entities
+        < MODULE.code
+        < CALLEES.summary_effects
+        < CALLEES.points_to_out
+        < CALLEES.points_to_in
+\end{PipsMake}
+
 \subsection{Intraprocedural Points to Analysis}
 \label{subsection-intraprocedural-points-to-analysis}
 \label{subsection-points-to-analysis}
@@ -5474,8 +5548,11 @@ alias intraprocedural_points_to_analysis  'Intraprocedural Points To Analysis'
 intraprocedural_points_to_analysis > MODULE.points_to
                    > MODULE.points_to_out
                    > MODULE.points_to_in
+        ! SELECT.proper_effects_with_points_to
+        ! SELECT.cumulated_effects_with_points_to           
         < PROGRAM.entities
         < MODULE.code
+        < CALLEES.summary_effects
         < CALLEES.points_to_out
         < CALLEES.points_to_in
 \end{PipsMake}
@@ -5483,61 +5560,6 @@ intraprocedural_points_to_analysis > MODULE.points_to
 The pointer effects are useful, but they are recomputed for each
 expression and subexpression by the points-to analysis.
 
-
-\subsection{Interprocedural Points to Analysis}
-\label{subsection-interprocedural-points-to-analysis}
-\index{Interprocedural Points to Analysis}
-
-\begin{PipsPass}{interprocedural_points_to_analysis}
-This pass is being implemented by Amira \textsc{Mensi}.
-The \PipsPassRef{interprocedural_points_to_analysis} is implemented in order to
-compute points-to relations in an interprocedural way, based on \textsc{Wilson} algorithm. This phase computes
-both Gen and Kill sets at the level of the call site.It requires another resource which is computed by \PipsPassRef{intraprocedural_points_to_analysis}.
-\end{PipsPass}
-
-\begin{PipsMake}
-alias interprocedural_points_to_analysis  'Interprocedural Points To Analysis'
-
-interprocedural_points_to_analysis > MODULE.points_to
-                   > MODULE.points_to_out
-                   > MODULE.points_to_in
-        ! SELECT.proper_effects_with_points_to
-        ! SELECT.cumulated_effects_with_points_to           
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.init_points_to_list
-        < CALLEES.summary_effects
-        < CALLEES.points_to_out
-        < CALLEES.points_to_in
-\end{PipsMake}
-
-
-\subsection{Fast Interprocedural Points to Analysis}
-\label{subsection-fast-interprocedural-points-to-analysis}
-\index{Interprocedural Points to Analysis}
-
-\begin{PipsPass}{fast_interprocedural_points_to_analysis}
-This pass is being implemented by Amira \textsc{Mensi}.
-The \PipsPassRef{fast_interprocedural_points_to_analysis} is implemented in order to
-compute points-to relations in an interprocedural way, based on \textsc{Wilson} algorithm. This phase computes only
-Kill sets at the call site level. It requires another resource which is computed by \PipsPassRef{intraprocedural_points_to_analysis}.
-\end{PipsPass}
-
-\begin{PipsMake}
-alias fast_interprocedural_points_to_analysis  'Fast Interprocedural Points To Analysis'
-
-fast_interprocedural_points_to_analysis > MODULE.points_to
-                   > MODULE.points_to_out
-                   > MODULE.points_to_in
-        ! SELECT.proper_effects_with_points_to
-        ! SELECT.cumulated_effects_with_points_to           
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.init_points_to_list
-        < CALLEES.summary_effects
-        < CALLEES.points_to_out
-        < CALLEES.points_to_in
-\end{PipsMake}
 
 \subsection{Pointer Values Analyses}
 \label{subsection-pointer-values}
@@ -5675,13 +5697,14 @@ allocated in each function to modelize the heap.
 
 In the "flow-sensitive" case, the statement numbers of the malloc()
 call sites are used to subscribe this array, as well as all indices of
-the surrounding loops [Two improvements in one property...].
+the surrounding loops [Two improvements in one property...]. Only the
+first half of the property is implemented.
 
 In the "context\_sensitive" case, the interprocedural translation of
 memory acces paths based on the abstract heap are prefixed by the same
 information regarding the call site: function containing the call
 site, statement number of the call site and indices of surrounding
-loops.
+loops. This is not implemented.
 
 Note that the naming of options is not fully compatible with
 the usual notations in pointer analyses. Note also that the

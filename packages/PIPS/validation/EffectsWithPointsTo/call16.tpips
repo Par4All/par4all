@@ -1,5 +1,6 @@
-delete call16
-create call16 call16.c 
+setenv WSPACE=call16
+delete $WSPACE
+create $WSPACE $WSPACE.c 
 activate C_PARSER
 
 setproperty ABORT_ON_USER_ERROR TRUE
@@ -12,32 +13,51 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 #setenv POINTER_VALUES_DEBUG_LEVEL 2
 
-echo 
-echo PROPER  EFFECTS 
+activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
+
 echo
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALL]
-
-
-#module main
-echo 
-echo POINTS-TO
+echo Points-to for "$WSPACE"
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[$WSPACE]
 
 echo 
-echo PROPER  EFFECTS WITH POINTS TO
+echo Proper effects with points-to for "$WSPACE"
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[$WSPACE]
 
+echo 
+echo Cumulated effects with points-to for "$WSPACE"
+echo
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[$WSPACE]
 
-activate PRINT_CHAINS_GRAPH
-display DG_FILE 
+# quit
+
+echo 
+echo Points-to for "dotprod"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[dotprod]
+
+echo 
+echo Proper effects with points-to for "dotprod"
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[dotprod]
+
+echo 
+echo Cumulated effects with points-to for "dotprod"
+echo
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[dotprod]
 
 
 close
-delete call16
+delete $WSPACE
 quit

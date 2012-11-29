@@ -1,0 +1,73 @@
+
+POINTS TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   float *a, *p;
+
+// Points To:
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int i;
+
+// Points To:
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   a = (float *) malloc(10*sizeof(float));
+
+// Points To:
+// a -> *HEAP*_l_8[0] , MAY
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   p = a, i = 0;
+
+// Points To:
+// a -> *HEAP*_l_8[0] , MAY
+// p -> *HEAP*_l_8[0] , MAY
+
+   while (i<4) {
+
+// Points To:
+// a -> *HEAP*_l_8[0] , MAY
+// p -> *HEAP*_l_8[*] , MAY
+// p -> *HEAP*_l_8[0] , MAY
+// p -> *HEAP*_l_8[1] , MAY
+// p -> *HEAP*_l_8[2] , MAY
+// p -> *HEAP*_l_8[3] , MAY
+
+      *p = 1.0;
+
+// Points To:
+// a -> *HEAP*_l_8[0] , MAY
+// p -> *HEAP*_l_8[*] , MAY
+// p -> *HEAP*_l_8[0] , MAY
+// p -> *HEAP*_l_8[1] , MAY
+// p -> *HEAP*_l_8[2] , MAY
+// p -> *HEAP*_l_8[3] , MAY
+
+      p++;
+   }
+
+// Points To:
+// a -> *HEAP*_l_8[0] , MAY
+// p -> *HEAP*_l_8[*] , MAY
+// p -> *HEAP*_l_8[0] , MAY
+// p -> *HEAP*_l_8[1] , MAY
+// p -> *HEAP*_l_8[2] , MAY
+// p -> *HEAP*_l_8[3] , MAY
+
+   return 0;
+}

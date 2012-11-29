@@ -3,9 +3,6 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create recurrence05 recurrence05.c
 
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
-setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
-
 activate PRINT_CODE_POINTS_TO_LIST
 
 echo

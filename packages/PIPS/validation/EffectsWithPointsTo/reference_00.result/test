@@ -1,47 +1,4 @@
 
-PROPER  EFFECTS 
-
-void reference_00(void)
-{
-//             <    is written>: i
-   int i = 0;
-   int a[10];
-   // effects on empty references...
-   i;
-   a[i];
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-void reference_00(void)
-{
-
-// Points To: none
-
-   int i = 0;
-
-// Points To: none
-
-   int a[10];
-
-// Points To: none
-
-   // effects on empty references...
-   i;
-
-// Points To: none
-
-   a[i];
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
 void reference_00(void)
 {
 //             <    is written>: i

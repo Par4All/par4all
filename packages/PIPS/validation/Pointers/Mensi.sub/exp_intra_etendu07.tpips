@@ -1,4 +1,4 @@
-setenv WS=exp_intra_etendu06
+setenv WS=exp_intra_etendu07
 delete $WS
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE

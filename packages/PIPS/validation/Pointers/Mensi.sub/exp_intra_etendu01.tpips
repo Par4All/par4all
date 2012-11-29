@@ -1,5 +1,6 @@
-delete exp_intra_etendu01
-create exp_intra_etendu01 exp_intra_etendu01.c 
+setenv WSPACE=exp_intra_etendu01
+delete $WSPACE
+create $WSPACE $WSPACE.c 
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
@@ -29,5 +30,5 @@ display PRINTED_FILE[%ALLFUNC]
 
 
 close
-delete exp_intra_etendu01
+delete $WSPACE
 quit

@@ -4,35 +4,28 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create malloc02 malloc02.c
 
-#setenv C_SYNTAX_DEBUG_LEVEL 9
-
 # mandatory for A&K (Rice) parallization on C files
 setproperty MEMORY_EFFECTS_ONLY FALSE
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate CUMULATED_EFFECTS_WITH_POINTS_TO
 
-#activate C_PARSER
-
-#setproperty PRETTYPRINT_LANGUAGE "C"
-#setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
-
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+#setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 
 setproperty PARALLELIZATION_IGNORE_THREAD_SAFE_VARIABLES TRUE
 activate MUST_REGIONS
 
-#echo
-#echo Parser output
-#echo
+echo
+echo Parser output
+echo
 
-#display PARSED_PRINTED_FILE[malloc02]
+display PARSED_PRINTED_FILE[malloc02]
 
 echo
 echo Controlizer output
 echo
 
 display PRINTED_FILE[malloc02]
-
+quit
 echo
 echo Preconditions
 echo

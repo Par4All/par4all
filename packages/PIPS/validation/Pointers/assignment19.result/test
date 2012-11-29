@@ -1,0 +1,28 @@
+
+POINTS TO for assignment19
+
+
+// Points To IN: none
+
+
+// Points To OUT: unreachable
+
+void assignment19()
+{
+
+// Points To: none
+
+   int *p, *q;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   p = q;
+
+// Points To: unreachable
+
+   // the value of q is unknown, the assignment is meaningless
+   return;
+}
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[assignment19] (pointer_assignment_to_points_to) Assignment of an undefined value at line 8.

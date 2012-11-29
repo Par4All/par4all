@@ -1,36 +1,4 @@
 
-PROPER  EFFECTS 
-
-void lhs04()
-{
-   float x;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   *((int *) &x) &= 0x7fffffff;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-void lhs04()
-{
-
-// Points To: none
-
-   float x;
-
-// Points To: none
-
-   *((int *) &x) &= 0x7fffffff;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
 void lhs04()
 {
    float x;

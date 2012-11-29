@@ -15,13 +15,13 @@ typedef struct
   void *userArray;            // @ of the array (used as key)
   void *savedUserArray;            // copy of array in case of interlaced communications
 
-  uint32_t type;          // type of the array's data 
-  composedRegion boundsRegions;         // index bounds of the array which dimension is rg_get_userArrayDims(boundsRegions) 
+  uint32_t type;          // type of the array's data
+  composedRegion boundsRegions;         // index bounds of the array which dimension is rg_get_userArrayDims(boundsRegions)
 
   /* size of Array: NB_NODES
      an element of Array has the type composedRegion representing a union of "regions of userArray"
    */
-  Array uptodateArray;         
+  Array uptodateArray;
   /* size of Array: NB_NODES
 
      an element of Array has the type composedRegion representing a union of
@@ -32,7 +32,7 @@ typedef struct
 }Descriptor_userArray;
 
 
-typedef enum {parallel_work, do_work, master_work,critical_work} worksharing_type;
+typedef enum {parallel_work, do_work, master_work, undefined_work} worksharing_type;
 
 typedef struct
 {
@@ -75,8 +75,8 @@ typedef struct
     Region needed for each workchunk (receiveRegions.len == nb_workchunk, sendRegions.len == nb_workchunk)
     Each simpleRegion will match a workchunk. Order is significant.
    */
-  composedRegion receiveRegions;   
-  composedRegion sendRegions;      
+  composedRegion receiveRegions;
+  composedRegion sendRegions;
   bool interlaced_p;        // true if send regions are interlaced
   Array pending_alltoall;       // alltoall requests that have not been processed yet
 }Descriptor_shared;
@@ -91,30 +91,24 @@ typedef struct
   uint32_t tag;
 }Alltoall_descriptor;
 
-
-typedef struct
-{
-  uint32_t commsize;          // The number of processes
-  uint32_t rank;          // The rank of current process
-  uint32_t language;      // The calling language (C or Fortran)
-  uint32_t parallel_level;// The current nesting parallel level
-  uint32_t initialized;    // Did the current process called step_init
-  Descriptor_worksharing *current_worksharing;
-}Step_internals;
-
-extern Step_internals steprt_params;
-
-#define IS_INITIALIZED (steprt_params.initialized)
 #define CURRENTWORKSHARING (steprt_params.current_worksharing)
 #define NB_WORKCHUNKS (rg_get_nb_simpleRegions(&(CURRENTWORKSHARING->workchunkRegions)))
-#define NB_NODES (steprt_params.commsize)
-#define MYRANK (steprt_params.rank)
+#define NB_NODES (communications_NB_NODES)
+#define MYRANK (communications_MY_RANK)
+#define LANGUAGE_ORDER (communications_LANGUAGE_ORDER)
 
 #ifdef STEP_DEBUG
 #undef STEP_DEBUG
 #define STEP_DEBUG(code) {code}
 #else
 #define STEP_DEBUG(code) {}
+#endif
+
+#ifdef STEP_COMMUNICATIONS_VERBOSE
+#undef STEP_COMMUNICATIONS_VERBOSE
+#define STEP_COMMUNICATIONS_VERBOSE(code) {code}
+#else
+#define STEP_COMMUNICATIONS_VERBOSE(code) {}
 #endif
 
 #endif //__STEP_LOCAL_H__

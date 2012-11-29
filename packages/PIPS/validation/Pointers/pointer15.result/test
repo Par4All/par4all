@@ -8,6 +8,7 @@ POINTS TO for pointer15
 
 
 // Points To OUT:
+// _t_1[*][*][*][*][*][*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // _t_1[1][2][0][3][4][5] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 void pointer15(double *(*t[3][4])[5][6][7])
@@ -24,15 +25,17 @@ void pointer15(double *(*t[3][4])[5][6][7])
    (((*t[1][2])[3])[4])[5] = &z;
 
 // Points To:
+// _t_1[*][*][*][*][*][*] -> z , MAY
 // _t_1[1][2][0][3][4][5] -> z , EXACT
 // t[1][2] -> _t_1[1][2][0][0][0][0] , EXACT
 
    *(((*t[1][2])[3])[4])[5] = 2.5;
 
 // Points To:
+// _t_1[*][*][*][*][*][*] -> z , MAY
 // _t_1[1][2][0][3][4][5] -> z , EXACT
 // t[1][2] -> _t_1[1][2][0][0][0][0] , EXACT
 
    return;
 }
-INTRAPROCEDURAL_POINTS_TO_ANALYSIS[pointer15] (points_to_set_block_projection) Dangling pointer "_t_1" towards "z".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer15] (points_to_set_block_projection) Dangling pointer "_t_1" towards "z".

@@ -1001,6 +1001,21 @@ bool effects_write_variable_p(list el, entity v)
   return result;
 }
 
+bool effects_write_p(list el)
+{
+  bool result = false;
+
+  FOREACH(EFFECT, e, el) {
+    action a  = effect_action(e);
+    if (action_write_p(a) && store_effect_p(e)) {
+      result = true;
+      break;
+    }
+  }
+
+  return result;
+}
+
 bool effects_read_variable_p(list el, entity v)
 {
   bool result = false;
@@ -1101,7 +1116,7 @@ tag approximation_or(tag t1, tag t2)
 
 
 /** CELLS */
-/* test if two cells are equal, celles are supposed to be
+/* test if two cells are equal; cells are supposed to be
    references. */
 
 bool cell_equal_p(cell c1, cell c2)
@@ -1110,6 +1125,14 @@ bool cell_equal_p(cell c1, cell c2)
   reference r1 = cell_to_reference(c1);
   reference r2 = cell_to_reference(c2);
   return reference_equal_p(r1, r2);
+}
+
+bool cell_entity_equal_p(cell c1, cell c2)
+{
+  /* Has to be extended for GAPs */
+  reference r1 = cell_to_reference(c1);
+  reference r2 = cell_to_reference(c2);
+  return reference_variable(r1)==reference_variable(r2);
 }
 
 /* FI->FC/AM: some elements of the lattice must be exploited here... */
@@ -1121,10 +1144,10 @@ bool points_to_reference_included_p(reference r1, reference r2)
 
   list dims1 = reference_indices(r1);
   list dims2 = reference_indices(r2);
-  list cdims2 = dims2;
 
   if(v1 == v2) {
     if(gen_length(dims1)==gen_length(dims2)) {
+      list cdims2 = dims2;
       FOREACH(EXPRESSION, s1, dims1) {
 	expression s2 = EXPRESSION(CAR(cdims2));
 	if(!expression_equal_p(s1,s2)) {
@@ -1136,8 +1159,22 @@ bool points_to_reference_included_p(reference r1, reference r2)
 	cdims2 = CDR(cdims2);
       }
     }
-    else
+    else if(gen_length(dims1)>gen_length(dims2)) {
+      list cdims1 = dims1;
+      FOREACH(EXPRESSION, s2, dims2) {
+	expression s1 = EXPRESSION(CAR(cdims1));
+	if(!expression_equal_p(s1,s2)) {
+	  if(!unbounded_expression_p(s2)) {
+	    included_p = false;
+	    break;
+	  }
+	}
+	cdims1 = CDR(cdims1);
+      }
+    }
+    else {
       included_p = false;
+    }
   }
   else {
     // pips_internal_error("Abstract location lattice not implemented here.\n");
@@ -1190,7 +1227,7 @@ reference cell_to_reference(cell c) {
   else if (cell_preference_p(c))
     r = preference_reference(cell_preference(c));
   else
-    pips_internal_error("unexpected cell tag");
+    pips_internal_error("GAPs not implemented yet or unexpected cell tag.\n");
 
   return r;
 }
@@ -1346,7 +1383,7 @@ reference reference_add_field_dimension(reference r, entity f)
     bool to_be_freed = false;
     type t = points_to_reference_to_type(r, &to_be_freed);
     //type t = ultimate_type(entity_type(v));
-    type ut = ultimate_type(t);
+    type ut = compute_basic_concrete_type(t);
 
     if(struct_type_p(ut)) {
       entity ste = basic_derived(variable_basic(type_variable(t)));
@@ -1376,6 +1413,7 @@ reference reference_add_field_dimension(reference r, entity f)
       }
     }
     else {
+      /* Take care of special cases */
       if(entity_all_module_heap_locations_p(v)
 	 || entity_all_heap_locations_p(v)) {
 	/* Nothing done when the heap is modeled by a unique entity */
@@ -1393,6 +1431,11 @@ reference reference_add_field_dimension(reference r, entity f)
 	  pips_assert("No indices yet.\n", ENDP(reference_indices(r)));
 	  reference_indices(r) = CONS(EXPRESSION, z, CONS(EXPRESSION, s, NIL));
 	}
+      }
+      else if(overloaded_type_p(ut) && entity_typed_anywhere_locations_p(v)) {
+	expression s = entity_to_expression(f);
+	pips_assert("No indices yet.\n", ENDP(reference_indices(r)));
+	reference_indices(r) = CONS(EXPRESSION, s, NIL);
       }
       else
 	pips_internal_error("Attempt at adding a field to an object that is not"
@@ -1412,7 +1455,11 @@ reference reference_add_field_dimension(reference r, entity f)
       reference_variable(r) = ne;
       reference_add_zero_subscripts(r, nt);
     }
-    else if(entity_all_heap_locations_p(v)) {
+    else if(entity_all_heap_locations_p(v)
+	    && !get_bool_property("ALIASING_ACROSS_TYPES")) {
+      /* FI: This piece of code should be useless because the
+	 all_heap_locations entity is used only when
+	 ALIASING_ACROSS_TYPES is true. */
       entity ne = entity_all_heap_locations_typed(nt);
       reference_variable(r) = ne;
       reference_add_zero_subscripts(r, nt);
@@ -1468,4 +1515,88 @@ void points_to_cell_add_zero_subscripts(cell c)
 void points_to_cell_add_unbounded_subscripts(cell c)
 {
   points_to_cell_add_fixed_subscripts(c, false);
+}
+
+bool atomic_effect_p(effect e)
+{
+  bool atomic_p = effect_scalar_p(e);
+  if(!atomic_p) {
+    /* Maybe it is an effect on a structure field */
+    cell c = effect_cell(e);
+    atomic_p = atomic_points_to_cell_p(c);
+  }
+  return atomic_p;
+}
+
+// static list recursive_cell_to_pointer_cells(cell c)
+list recursive_cell_to_pointer_cells(cell c)
+{
+  list children = NIL;
+  // Too strong for recursive calls
+  //pips_assert("Cell \"c\" has no subscripts.",
+  //	      ENDP(reference_indices(cell_any_reference(c))));
+  bool to_be_freed;
+  type ct = points_to_cell_to_type(c, &to_be_freed);
+
+  if(pointer_type_p(ct)) {
+    children = CONS(CELL, copy_cell(c), NIL);
+  }
+  else if(array_type_p(ct)) {
+    /* Go down if it is an array of pointers or an array of struct */
+    if(array_of_pointers_type_p(ct) || array_of_struct_type_p(ct)) {
+      /* add indices to cell c */
+      cell n_c = copy_cell(c);
+      /* Add subscripts to reach array elements */
+      points_to_cell_add_unbounded_subscripts(n_c);
+      children = recursive_cell_to_pointer_cells(n_c);
+      free_cell(n_c);
+    }
+    else {
+      ; // No children
+    }
+  }
+  else if(struct_type_p(ct)) {
+    /* Look for fields that are either pointers, or arrays or structs */
+    basic b = variable_basic(type_variable(ct));
+    entity dte = basic_derived(b);
+    type dt = entity_type(dte);
+    list fields = type_struct(dt);
+    FOREACH(ENTITY, f, fields) {
+      type ft = entity_basic_concrete_type(f);
+      if(pointer_type_p(ft)
+	 || array_type_p(ft)
+	 || struct_type_p(ft)) {
+	cell n_c = copy_cell(c);
+	/* Add field subscript to reference */
+	points_to_cell_add_field_dimension(n_c, f);
+	children = recursive_cell_to_pointer_cells(n_c);
+	free_cell(n_c);
+      }
+    }
+  }
+
+  // Too strong for recursive calls
+  //pips_assert("Cell \"c\" has children, "
+  //	      "or this function would not have been called.", !ENDP(children));
+  return children;
+}
+
+/* If the reference in "c" is not a pointer, see if it can be
+ * transformed into a pointer reference by adding subscripts, field
+ * subscripts or a combination of both...
+ *
+ * The "children" list is built with new cells. No sharing is created
+ * between "c" and "children".
+ */
+list cell_to_pointer_cells(cell c)
+{
+  list children = NIL;
+  pips_assert("Cell \"c\" has no subscripts.",
+  	      ENDP(reference_indices(cell_any_reference(c))));
+
+  children = recursive_cell_to_pointer_cells(c);
+
+  pips_assert("Cell \"c\" has children, "
+  	      "or this function would not have been called.", !ENDP(children));
+  return children;
 }

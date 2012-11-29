@@ -10,17 +10,17 @@ struct cons_t {
 };
 
 // alloc/free
-list list_cons(double v, list l)
+list list_cons(double v, list lc)
 {
   list n = (list) malloc(sizeof(struct cons_t));
   n->value = v;
-  n->next = l;
+  n->next = lc;
   return n;
 }
 
-void list_free(list l)
+void list_free(list fl)
 {
-  list n = l, p = l;
+  list n = fl, p = fl;
   while (n!=nil)
   {
     n = n->next;
@@ -39,40 +39,40 @@ void list_clean(list * p)
 
 // getter
 // FI: double return...
-list list_next(list l)
+list list_next(list nl)
 {
   //if (l==nil)
   //  return nil;
   //else
   //  return l->next;
   list n;
-  if (l==nil)
+  if (nl==nil)
     n = nil;
   else
-    n = l->next;
+    n = nl->next;
   return n;
 }
 
 // FI: same issue as above, double return, would be could tests for unstructured
-double list_value(list l)
+double list_value(list lv)
 {
   /* if (l==nil) */
   /*   return 0.0; */
   /* else */
   /*   return l->value; */
   double v;
-  if (l==nil)
+  if (lv==nil)
     v = 0.0;
   else
-    v = l->value;
+    v = lv->value;
   return v;
 }
 
 // observer
-int list_len(list l)
+int list_len(list ll)
 {
   int n = 0;
-  list c = l;
+  list c = ll;
   while (c!=nil)
   {
     // we know that c!=nil...

@@ -178,7 +178,7 @@ void pointer_reference_dereferencing_to_points_to(reference r, pt_map in)
 {
   expression pae = pointer_reference_to_expression(r);
   // FI: assume side effects are OK...
-  (void) expression_to_points_to(pae, in);
+  (void) expression_to_points_to(pae, in, true);
   free_expression(pae);
 }
 

@@ -1,1 +1,1 @@
-arguments of printf are not exploited to generate points-to information
+The result should be checked. I am surprised initializations to NOWHERE are now lost.

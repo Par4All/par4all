@@ -27,6 +27,9 @@ regroupement de la majorité des includes
 #include "ri-util.h"
 #include "text-util.h" // for text_to_string
 #include "effects-util.h" // for action_equal_p, statement_mapping, ...
+#include "effects-generic.h" // needed by effects-convex.h for descriptor
+#include "effects-simple.h" // for effect_to_string
+#include "effects-convex.h" // for region
 
 #include "step_common.h" // for STEP_PARALLEL, ...
 #include "STEP_name.h" // for  STEP_PROD_NAME, STEP_MAX_NB_REQUEST_NAME, ...
@@ -39,11 +42,7 @@ extern int the_current_debug_level;
 #define STEP_DEBUG_STATEMENT(D, W, S) GEN_DEBUG(D, W, print_statement(S))
 #define STEP_DEBUG_DIRECTIVE(D, W, DRT) GEN_DEBUG(D, W, step_print_directive(DRT))
 
-#ifdef PIPS_RUNTIME_DIR
-    #define STEP_DEFAULT_RT_H "step/c"
-#else
-    #define STEP_DEFAULT_RT_H "src/Runtimes/step/c"
-#endif
+#define STEP_DEFAULT_RT_H "step/c"
 
 /* STEP sentinelle */
 #define STEP_SENTINELLE "STEP "

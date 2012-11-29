@@ -9,33 +9,29 @@ void dereferencing02()
 
 // Pointer values: none
 
-   double x = 1.;
+   double x[2] = {1., 2.};
 
 // Pointer values: none
 
-   double *p = &x;
+   double *p[1] = {&x[0]};
+
+// Pointer values: none
+
+   double **q = &p[0];
 
 // Pointer values:
-// p == &x (exact);
-
-   double **q = &p;
-
-// Pointer values:
-// p == &x (exact);
-// q == &p (exact);
+// q == &p[0] (exact);
 
    double **w;
 
 // Pointer values:
-// p == &x (exact);
-// q == &p (exact);
+// q == &p[0] (exact);
 // w == *ANY_MODULE*:*UNDEFINED* (exact);
 
    int i = 1;
 
 // Pointer values:
-// p == &x (exact);
-// q == &p (exact);
+// q == &p[0] (exact);
 // w == *ANY_MODULE*:*UNDEFINED* (exact);
 
    
@@ -43,39 +39,47 @@ void dereferencing02()
    **q = 2.;
 
 // Pointer values:
-// p == &x (exact);
-// q == &p (exact);
+// q == &p[0] (exact);
 // w == *ANY_MODULE*:*UNDEFINED* (exact);
 
    **(q+(i = 0)) = 3.;
 
 // Pointer values:
-// p == &x (exact);
-// q == &p (exact);
+// q == &p[0] (exact);
 // w == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   w = q;
+
+// Pointer values:
+// q == &p[0] (exact);
+// w == q (exact);
 
    **(w+(i = 2)) = 4.;
 
 // Pointer values:
-// p == &x (exact);
-// q == &p (exact);
-// w == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == &p[0] (exact);
+// w == q (exact);
 
-   x = **q;
+   x[0] = **q;
 
 // Pointer values:
-// p == &x (exact);
-// q == &p (exact);
-// w == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == &p[0] (exact);
+// w == q (exact);
 
    q++;
 
 // Pointer values:
-// p == &x (exact);
-// q == &*ANY_MODULE*:*ANYWHERE* (may);
-// w == *ANY_MODULE*:*UNDEFINED* (exact);
+// q == &w[1] (exact);
+// w == &p[0] (exact);
 
-   *q++;
+   p[1] = *q++;
+
+// Pointer values:
+// p[1] == q[0] (exact);
+// q == &w[2] (exact);
+// w == &p[0] (exact);
+
+   return;
 }
 
 // IN Pointer values: none
@@ -96,35 +100,38 @@ int main()
 }
 void dereferencing02()
 {
-//             <    is written>: x
-   double x = 1.;
-//             <    is written>: p
-   double *p = &x;
+//             <may be written>: x[*]
+   double x[2] = {1., 2.};
+//             <may be written>: p[*]
+   double *p[1] = {&x[0]};
 //             <    is written>: q
-   double **q = &p;
+   double **q = &p[0];
    double **w;
 //             <    is written>: i
    int i = 1;
-//             <    is read   >: p q
-//             <    is written>: x
+//             <    is read   >: p[0] q
    
    
    **q = 2.;
-//             <    is read   >: p q
-//             <    is written>: i x
+//             <    is read   >: p[0] q
+//             <    is written>: i
    **(q+(i = 0)) = 3.;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
+//             <    is written>: w
+   w = q;
+//             <    is read   >: p[2] w
+//             <    is written>: i
    **(w+(i = 2)) = 4.;
-//             <    is read   >: p q x
-//             <    is written>: x
-   x = **q;
+//             <    is read   >: p[0] q
+//             <    is written>: x[0]
+   x[0] = **q;
 //             <    is read   >: q
 //             <    is written>: q
    q++;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: q
-   *q++;
+//             <    is read   >: p[1] q
+//             <    is written>: p[1] q
+   p[1] = *q++;
+   return;
 }
 int main()
 {
@@ -134,59 +141,65 @@ int main()
 void dereferencing02()
 {
 
-//  <x-W-EXACT-{}>
+//  <x[PHI1]-W-MAY-{}>
 
-   double x = 1.;
+   double x[2] = {1., 2.};
 
-//  <p-W-EXACT-{}>
+//  <p[PHI1]-W-MAY-{}>
 
-   double *p = &x;
+   double *p[1] = {&x[0]};
 
 //  <q-W-EXACT-{}>
 
-   double **q = &p;
+   double **q = &p[0];
    double **w;
 
 //  <i-W-EXACT-{}>
 
    int i = 1;
 
-//  <p-R-EXACT-{i==1}>
+//  <p[PHI1]-R-EXACT-{PHI1==0, i==1}>
 //  <q-R-EXACT-{}>
-//  <x-W-EXACT-{}>
 
    
    
    **q = 2.;
 
 //  <i-W-EXACT-{}>
-//  <p-R-EXACT-{i==1}>
+//  <p[PHI1]-R-EXACT-{PHI1==0, i==1}>
 //  <q-R-EXACT-{}>
-//  <x-W-EXACT-{}>
 
    **(q+(i = 0)) = 3.;
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <q-R-EXACT-{}>
+//  <w-W-EXACT-{}>
+
+   w = q;
+
+//  <i-W-EXACT-{}>
+//  <p[PHI1]-R-EXACT-{PHI1==2, i==0}>
+//  <w-R-EXACT-{}>
 
    **(w+(i = 2)) = 4.;
 
-//  <p-R-EXACT-{}>
+//  <p[PHI1]-R-EXACT-{PHI1==0, i==2}>
 //  <q-R-EXACT-{}>
-//  <x-R-EXACT-{}>
-//  <x-W-EXACT-{}>
+//  <x[PHI1]-W-EXACT-{PHI1==0, i==2}>
 
-   x = **q;
+   x[0] = **q;
 
 //  <q-R-EXACT-{}>
 //  <q-W-EXACT-{}>
 
    q++;
 
+//  <p[PHI1]-R-EXACT-{PHI1==1, i==2}>
+//  <p[PHI1]-W-EXACT-{PHI1==1, i==2}>
+//  <q-R-EXACT-{}>
 //  <q-W-EXACT-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 
-   *q++;
+   p[1] = *q++;
+   return;
 }
 int main()
 {
@@ -196,59 +209,65 @@ int main()
 void dereferencing02()
 {
 
-//  <x-W-EXACT-{}>
+//  <x[PHI1]-W-MAY-{}>
 
-   double x = 1.;
+   double x[2] = {1., 2.};
 
-//  <p-W-EXACT-{}>
+//  <p[PHI1]-W-MAY-{}>
 
-   double *p = &x;
+   double *p[1] = {&x[0]};
 
 //  <q-W-EXACT-{}>
 
-   double **q = &p;
+   double **q = &p[0];
    double **w;
 
 //  <i-W-EXACT-{}>
 
    int i = 1;
 
-//  <p-R-EXACT-{i==1}>
+//  <p[PHI1]-R-EXACT-{PHI1==0, i==1}>
 //  <q-R-EXACT-{}>
-//  <x-W-EXACT-{}>
 
    
    
    **q = 2.;
 
 //  <i-W-EXACT-{}>
-//  <p-R-EXACT-{i==1}>
+//  <p[PHI1]-R-EXACT-{PHI1==0, i==1}>
 //  <q-R-EXACT-{}>
-//  <x-W-EXACT-{}>
 
    **(q+(i = 0)) = 3.;
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <q-R-EXACT-{}>
+//  <w-W-EXACT-{}>
+
+   w = q;
+
+//  <i-W-EXACT-{}>
+//  <p[PHI1]-R-EXACT-{PHI1==2, i==0}>
+//  <w-R-EXACT-{}>
 
    **(w+(i = 2)) = 4.;
 
-//  <p-R-EXACT-{}>
+//  <p[PHI1]-R-EXACT-{PHI1==0, i==2}>
 //  <q-R-EXACT-{}>
-//  <x-R-EXACT-{}>
-//  <x-W-EXACT-{}>
+//  <x[PHI1]-W-EXACT-{PHI1==0, i==2}>
 
-   x = **q;
+   x[0] = **q;
 
 //  <q-R-EXACT-{}>
 //  <q-W-EXACT-{}>
 
    q++;
 
+//  <p[PHI1]-R-EXACT-{PHI1==1, i==2}>
+//  <p[PHI1]-W-EXACT-{PHI1==1, i==2}>
+//  <q-R-EXACT-{}>
 //  <q-W-EXACT-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 
-   *q++;
+   p[1] = *q++;
+   return;
 }
 int main()
 {

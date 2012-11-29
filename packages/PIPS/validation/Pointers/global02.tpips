@@ -9,21 +9,6 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 # Assume pointers points to array by default and generate indexing
 setproperty POINTS_TO_STRICT_POINTER_TYPES FALSE
 
-##TODO: explain
-
-echo 
-echo PROPER EFFECTS
-echo
-
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
-
-echo 
-echo PROPER POINTER EFFECTS
-echo
-activate PRINT_CODE_PROPER_POINTER_EFFECTS
-display PRINTED_FILE
-
 echo
 echo POINTS TO
 echo

@@ -13,17 +13,18 @@ void foo(int *p)
 }
 
 
+/* Modified to be OK with gcc */
 
 int main() 
 {
-  int *x;
+  int *x[10];
   int tab[10];
   int *tab2[10];
   int tab3[10][10];
-  int **tab4;
+  int **tab4=&x[0];
   int y;
   
-
+  x[0] = &y;
   foo(x);
   foo(tab);
   foo(tab2[4]);

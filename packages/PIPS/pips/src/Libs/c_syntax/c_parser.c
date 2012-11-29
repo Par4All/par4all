@@ -185,6 +185,9 @@ void init_keyword_typedef_table()
   hash_put(keyword_typedef_table,"__builtin_va_list", (char *) TK_NAMED_TYPE);
   hash_put(keyword_typedef_table,"_Bool", (char *) TK_NAMED_TYPE);
 
+  /* AM: en attendant mieux... */
+  hash_put(keyword_typedef_table,"STEP_ARG", (char *) TK_NAMED_TYPE);
+
   /* typedef names are added lately */
 }
 

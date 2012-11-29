@@ -1,0 +1,19 @@
+setenv WSPACE=dereferencing02
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+# The source code is bugged, the error detection is wanted
+# setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[dereferencing02]
+
+close
+delete $WSPACE
+quit

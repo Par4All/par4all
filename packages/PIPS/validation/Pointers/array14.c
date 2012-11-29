@@ -26,3 +26,12 @@ int array14(float b[N][M])
 
   return 1;
 }
+
+int main() 
+{
+  float a[N][M], ret;
+  
+  ret = array14(a);
+  
+  return (int) ret;
+}

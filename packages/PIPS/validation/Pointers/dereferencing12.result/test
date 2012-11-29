@@ -36,14 +36,16 @@ int main(int argc, char **argv)
 // p -> *NULL_POINTER* , MAY
 // p -> argc , MAY
 
-
+   
+   // Here, p must point toward undefined, NULL or argc
+   
    *p = 1;
 
 // Points To:
 // p -> argc , EXACT
 
    
-   // Here, p must points toward argc
+   // Here, p must point toward argc
    
    return 0;
 }

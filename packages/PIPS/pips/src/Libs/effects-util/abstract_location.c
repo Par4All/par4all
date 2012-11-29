@@ -65,7 +65,7 @@ bool entity_heap_location_p(entity b)
   bool bucket_p = entity_all_heap_locations_p(b) ||
     entity_all_module_heap_locations_p(b);
 
-  if(!bucket_p) {
+  if(!heap_area_p(b) && !bucket_p) {
       const char* ln = entity_local_name(b);
       const char* found = strstr(ln, HEAP_AREA_LOCAL_NAME);
       bucket_p = found != NULL;
@@ -85,7 +85,8 @@ entity entity_flow_or_context_sentitive_heap_location(int stmt_number, type t)
   if(type_undefined_p(entity_type(e))) {
     entity f = get_current_module_entity();
     entity a = module_to_heap_area(f);
-    ram r = make_ram(f, a, UNKNOWN_RAM_OFFSET, NIL);
+    //ram r = make_ram(f, a, UNKNOWN_RAM_OFFSET, NIL);
+    ram r = make_ram(f, a, DYNAMIC_RAM_OFFSET, NIL);
 
     /* FI: Beware, the symbol table is updated but this is not
        reflected in pipsmake.rc */
@@ -95,6 +96,11 @@ entity entity_flow_or_context_sentitive_heap_location(int stmt_number, type t)
     entity_initial(e) = make_value_unknown();
     entity_kind(e) = ABSTRACT_LOCATION;
     (void) add_C_variable_to_area(a, e);
+    /* We need to keep track of these pseudo-variables to destroy them
+       before a module is reanalyzed after a code transformation, for
+       instance a constant propagation that changed dependent types
+       into cosntant types. */
+    AddEntityToDeclarations(e, f);
   }
   else {
     /* We might be in trouble, unless a piece of code is

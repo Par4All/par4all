@@ -15,7 +15,12 @@ void assign05()
 //             <    is read   >: r
    *r = 0;
 }
-/* To be out of Emami's patterns with a user call */
+/* To be out of Emami's patterns with a user call
+ *
+ * FI: this is not a good example beause "bar" it flawed.  We should
+ * at least use a global variable instead of "return &j".
+ *
+ */
 
 int *bar(int j);
 
@@ -38,7 +43,7 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 void assign05()
 {
@@ -58,13 +63,11 @@ void assign05()
 
    r = bar(i);
 
-// Points To:
-// r -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// Points To: unreachable
 
    i = 1;
 
-// Points To:
-// r -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// Points To: unreachable
 
    *r = 0;
 }
@@ -74,7 +77,12 @@ void assign05()
 
 // Points To OUT: none
 
-/* To be out of Emami's patterns with a user call */
+/* To be out of Emami's patterns with a user call
+ *
+ * FI: this is not a good example beause "bar" it flawed.  We should
+ * at least use a global variable instead of "return &j".
+ *
+ */
 
 
 // Points To: none
@@ -94,7 +102,8 @@ void foo();
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// bar -> j , EXACT
 
 int * bar(int j)
 {
@@ -107,7 +116,7 @@ int * bar(int j)
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 void foo()
 {
@@ -127,13 +136,15 @@ void assign05()
 //             <    is written>: r
 
    r = bar(i);
-//             <    is written>: i
    i = 1;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: r
    *r = 0;
 }
-/* To be out of Emami's patterns with a user call */
+/* To be out of Emami's patterns with a user call
+ *
+ * FI: this is not a good example beause "bar" it flawed.  We should
+ * at least use a global variable instead of "return &j".
+ *
+ */
 
 int *bar(int j);
 
@@ -146,7 +157,6 @@ int * bar(int j)
 }
 void foo()
 {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    assign05();
 }
 

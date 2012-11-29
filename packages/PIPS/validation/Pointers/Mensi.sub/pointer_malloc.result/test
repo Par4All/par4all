@@ -1,0 +1,149 @@
+
+POINTS TO for pointer_malloc
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// alloc_pointer -> *HEAP*_l_7 , MAY
+
+pointer alloc_pointer(int v)
+{
+
+// Points To: none
+
+   pointer p = malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_7 , MAY
+
+   *p = v;
+
+// Points To:
+// p -> *HEAP*_l_7 , MAY
+
+   return p;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   pointer p1;
+
+// Points To:
+// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   p1 = alloc_pointer(13);
+
+// Points To:
+// p1 -> alloc_pointer:*HEAP*_l_7 , MAY
+
+   return;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+pointer alloc_pointer(int v)
+{
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   pointer p = malloc(sizeof(int));
+//             <may be written>: *HEAP*_l_7
+//             <    is read   >: p v
+   *p = v;
+//             <    is read   >: p
+   return p;
+}
+int main(void)
+{
+   pointer p1;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
+   p1 = alloc_pointer(13);
+   return;
+}
+
+CUMULATED  EFFECTS WITH POINTS TO
+
+//             <    is read   >: v _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+pointer alloc_pointer(int v)
+{
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   pointer p = malloc(sizeof(int));
+//             <may be written>: *HEAP*_l_7
+//             <    is read   >: p v
+   *p = v;
+//             <    is read   >: p
+   return p;
+}
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+int main(void)
+{
+   pointer p1;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
+   p1 = alloc_pointer(13);
+   return;
+}
+
+POINTS TO for pointer_malloc
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// alloc_pointer -> *HEAP*_l_7 , MAY
+
+pointer alloc_pointer(int v)
+{
+
+// Points To: none
+
+   pointer p = malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_7 , MAY
+
+   *p = v;
+
+// Points To:
+// p -> *HEAP*_l_7 , MAY
+
+   return p;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   pointer p1;
+
+// Points To:
+// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+
+   p1 = alloc_pointer(13);
+
+// Points To:
+// p1 -> alloc_pointer:*HEAP*_l_7 , MAY
+
+   return;
+}
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

@@ -3,7 +3,7 @@
 F.sh = run_step.script step_install step_filtre_include
 
 step_install:step_install.in
-	sed -e 's,@datadir@,$$PIPS_ROOT/src/Runtimes,g' $< > $@
+	sed -e 's,@datadir@,$(CURDIR)/../../Runtimes,g' $< > $@
 	chmod +x $@
 
 clean: local-clean

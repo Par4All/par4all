@@ -1,16 +1,21 @@
-/* linearization of call04 */
+/* Linearization of call04: 2-D array y is initialized as a 1-D array
+ * using pointer x.
+ *
+ * Bug: the points-to stub _x_3 is not translated back into y[*][*]
+ */
 
 #include<stdio.h>
 
 void call14(int n, int m, int *x)
 {
-  int i, j;
+  int i;
 
   for(i=0; i<n*m;i++)
       x[i] = i;
+  return;
 }
 
-main()
+int main()
 {
   int d1 = 4;
   int d2 = 4;
@@ -24,4 +29,5 @@ main()
       printf("y[%d][%d] = %d\t", i, j, y[i][j]);
     printf("\n");
   }
+  return 0;
 }

@@ -1,31 +1,13 @@
 
-PROPER  EFFECTS 
-
-int main()
-{
-   int i;
-   int *p;
-   int **q;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-
-   *p = 1;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: q
-   *q = &i;
-
-   return 0;
-}
-
-POINTS-TO
+Points-to for nowhere01
 
 
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
-int main()
+int nowhere01()
 {
 
 // Points To: none
@@ -48,44 +30,42 @@ int main()
 
    *p = 1;
 
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// Points To: unreachable
 
    *q = &i;
 
-// Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> i , EXACT
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// Points To: unreachable
 
 
    return 0;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+Proper effects with points-to for nowhere01
 
-int main()
+int nowhere01()
 {
    int i;
    int *p;
    int **q;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
 
    *p = 1;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: q
    *q = &i;
 
    return 0;
 }
 
- *********************** Use-Def Chains *********************
+Cumulated effects with points-to for nowhere01
 
-	10 --> 11 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+int nowhere01()
+{
+   int i;
+   int *p;
+   int **q;
+//             <    is read   >: p
 
-****************** End of Dependence Graph ******************
+   *p = 1;
+   *q = &i;
+
+   return 0;
+}

@@ -1,5 +1,6 @@
-delete address_of01
-create address_of01 address_of01.c
+setenv WSPACE=address_of01
+delete $WSPACE
+create $WSPACE $WSPACE.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
@@ -33,5 +34,5 @@ display DG_FILE
 
 
 close
-delete address_of01
+delete $WSPACE
 quit

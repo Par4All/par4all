@@ -33,7 +33,7 @@ int main()
    return 0;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 int main()
 {
@@ -43,8 +43,3 @@ int main()
    
    return 0;
 }
-
- *********************** Use-Def Chains *********************
-
-
-****************** End of Dependence Graph ******************

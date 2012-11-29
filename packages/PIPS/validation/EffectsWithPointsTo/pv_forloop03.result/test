@@ -1,6 +1,4 @@
 
-PROPER  EFFECTS 
-
 int main()
 {
    float *a, *p;
@@ -15,97 +13,9 @@ int main()
    p = a, i = 0;
 //             <    is read   >: i
    while (i<10) {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-      *p = 1.0;
-//             <    is read   >: p
-//             <    is written>: p
-      p++;
-   }
-   return 0;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   float *a, *p;
-
-// Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   int i;
-
-// Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-
-   a = (float *) malloc(10*sizeof(float));
-
-// Points To:
-// a -> *HEAP*_l_8[0] , EXACT
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-
-   p = a, i = 0;
-
-// Points To:
-// a -> *HEAP*_l_8[0] , EXACT
-// p -> *HEAP*_l_8[0] , EXACT
-
-   while (i<10) {
-
-// Points To:
-// a -> *HEAP*_l_8[0] , EXACT
-// p -> *HEAP*_l_8[0] , MAY
-// p -> *HEAP*_l_8[*] , MAY
-
-      *p = 1.0;
-
-// Points To:
-// a -> *HEAP*_l_8[0] , EXACT
-// p -> *HEAP*_l_8[0] , MAY
-// p -> *HEAP*_l_8[*] , MAY
-
-      p++;
-   }
-
-// Points To:
-// a -> *HEAP*_l_8[0] , EXACT
-// p -> *HEAP*_l_8[*] , MAY
-// p -> *HEAP*_l_8[0] , MAY
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
-int main()
-{
-   float *a, *p;
-   int i;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: a _MALLOC_EFFECTS:_MALLOC_
-
-   a = (float *) malloc(10*sizeof(float));
-//             <    is read   >: a
-//             <    is written>: i p
-
-   p = a, i = 0;
-//             <    is read   >: i
-   while (i<10) {
-//             <may be written>: *HEAP*_l_8[0] *HEAP*_l_8[*]
+//             <may be written>: *HEAP*_l_8[0] *HEAP*_l_8[1] 
+//                               *HEAP*_l_8[2] *HEAP*_l_8[3] 
+//                               *HEAP*_l_8[*]
 //             <    is read   >: p
       *p = 1.0;
 //             <    is read   >: p
@@ -135,8 +45,17 @@ int main()
 	11 --> -1 with conflicts
 		from <p-R-EXACT> to <p-W-EXACT>
 	11 --> 11 with conflicts
+		from <*HEAP*_l_8[3]-W-MAY> to <*HEAP*_l_8[3]-W-MAY>
+		from <*HEAP*_l_8[3]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
+		from <*HEAP*_l_8[2]-W-MAY> to <*HEAP*_l_8[2]-W-MAY>
+		from <*HEAP*_l_8[2]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
+		from <*HEAP*_l_8[1]-W-MAY> to <*HEAP*_l_8[1]-W-MAY>
+		from <*HEAP*_l_8[1]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
 		from <*HEAP*_l_8[0]-W-MAY> to <*HEAP*_l_8[0]-W-MAY>
 		from <*HEAP*_l_8[0]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
+		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[3]-W-MAY>
+		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[2]-W-MAY>
+		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[1]-W-MAY>
 		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[0]-W-MAY>
 		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
 

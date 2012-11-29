@@ -1,0 +1,147 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   int *a[10];
+//             <    is written>: i
+   int i = 0;
+//             <    is written>: a[0]
+   a[0] = &i;
+//             <    is written>: a[1]
+   a[1] = &i;
+//             <    is written>: a[2]
+   a[2] = &i;
+//             <    is written>: a[3]
+   a[3] = &i;
+//             <    is written>: a[4]
+   a[4] = &i;
+//             <    is written>: a[5]
+   a[5] = &i;
+//             <    is written>: a[6]
+   a[6] = &i;
+
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *a[10];
+
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int i = 0;
+
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   a[0] = &i;
+
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> i , MAY
+// a[0] -> i , EXACT
+
+   a[1] = &i;
+
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> i , MAY
+// a[0] -> i , EXACT
+// a[1] -> i , EXACT
+
+   a[2] = &i;
+
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> i , MAY
+// a[0] -> i , EXACT
+// a[1] -> i , EXACT
+// a[2] -> i , EXACT
+
+   a[3] = &i;
+
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> i , MAY
+// a[0] -> i , EXACT
+// a[1] -> i , EXACT
+// a[2] -> i , EXACT
+// a[3] -> i , EXACT
+
+   a[4] = &i;
+
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> i , MAY
+// a[0] -> i , EXACT
+// a[1] -> i , EXACT
+// a[2] -> i , EXACT
+// a[3] -> i , EXACT
+// a[4] -> i , EXACT
+
+   a[5] = &i;
+
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> i , MAY
+// a[0] -> i , EXACT
+// a[1] -> i , EXACT
+// a[2] -> i , EXACT
+// a[3] -> i , EXACT
+// a[4] -> i , EXACT
+// a[5] -> i , EXACT
+
+   a[6] = &i;
+
+// Points To:
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> i , MAY
+// a[0] -> i , EXACT
+// a[1] -> i , EXACT
+// a[2] -> i , EXACT
+// a[3] -> i , EXACT
+// a[4] -> i , EXACT
+// a[5] -> i , EXACT
+// a[6] -> i , EXACT
+
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int *a[10];
+//             <    is written>: i
+   int i = 0;
+//             <    is written>: a[0]
+   a[0] = &i;
+//             <    is written>: a[1]
+   a[1] = &i;
+//             <    is written>: a[2]
+   a[2] = &i;
+//             <    is written>: a[3]
+   a[3] = &i;
+//             <    is written>: a[4]
+   a[4] = &i;
+//             <    is written>: a[5]
+   a[5] = &i;
+//             <    is written>: a[6]
+   a[6] = &i;
+
+   return 0;
+}

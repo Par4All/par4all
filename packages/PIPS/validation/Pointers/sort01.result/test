@@ -1,5 +1,22 @@
 
-POINTS-TO
+Points-to for "foo"
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// foo -> *NULL_POINTER* , EXACT
+
+int * foo()
+{
+
+// Points To: none
+
+   return (void *) 0;
+}
+
+Points-to for "sort01"
 
 
 // Points To IN: none
@@ -14,33 +31,40 @@ void sort01()
 
    int a[10];
 
-// Points To: none
+// Points To:
+// p -> *NULL_POINTER* , EXACT
 
    int *p = foo(), *q = foo();
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p -> *NULL_POINTER* , EXACT
+// q -> *NULL_POINTER* , EXACT
+
+
+   a[0] = 1;
+
+// Points To:
+// p -> *NULL_POINTER* , EXACT
+// q -> *NULL_POINTER* , EXACT
+
 
    if (p==q)
 
 // Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p -> *NULL_POINTER* , EXACT
+// q -> *NULL_POINTER* , EXACT
 
       p = &a[4];
    else
 
-// Points To:
-// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// Points To: unreachable
 
       p = &a[2];
 
 // Points To:
-// p -> a[2] , MAY
-// p -> a[4] , MAY
-// q -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p -> a[4] , EXACT
+// q -> *NULL_POINTER* , EXACT
+
 
    return;
 }

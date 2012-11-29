@@ -17,7 +17,7 @@ typedef struct
 } Timer;
 
 
-// time in mico seconds
+// time in micro seconds
 static void tick(uint64_t *usec)
 {
   struct timeval tv;
@@ -76,7 +76,7 @@ void STEP_API(step_timer_dump)(size_t *timer_, char *filename, STEP_ARG *id_file
   snprintf(file_name, len, "%s%Lu", filename_, (unsigned long long)*id_file);
 
   fd = fopen(file_name,"a+");
-  
+
   for(id_event=0; id_event<timer->events.len; id_event++)
     {
       uint64_t time = array_get_data_from_index(&(timer->events), uint64_t, id_event);
@@ -108,42 +108,3 @@ void STEP_API(step_timer_reset)(size_t *timer_)
   array_reset(&(timer->events), NULL, 0);
   tick(&(timer->last_start));
 }
-
-#ifdef TEST_TIMER_C
-#include <stdio.h>
-#define NBLOOPS 100000
-#define FILE_NAME "test_timer"
-
-int main(void)
-{
-  size_t clock;
-  STEP_ARG id_file;
-  int i;
-  float result;
-
-  step_timer_init_(&clock);
-
-  result = 0;
-  for (i = 0; i < NBLOOPS; i ++)
-    result += i * 2.3;
-
-  step_timer_event_(&clock);
-
-  id_file = 0;
-  step_timer_dump_(&clock, FILE_NAME, &id_file, strlen(FILE_NAME));
-  id_file = 1;
-  step_timer_dump_(&clock, FILE_NAME, &id_file, strlen(FILE_NAME));
-
-  step_timer_reset_(&clock);
-
-  for (i = 0; i < NBLOOPS; i ++)
-    result += i * 2.3;
-
-  id_file = 2;
-  step_timer_dump_(&clock, FILE_NAME, &id_file, strlen(FILE_NAME));
-
-  step_timer_finalize_(&clock);
-
-  return EXIT_SUCCESS;
-}
-#endif

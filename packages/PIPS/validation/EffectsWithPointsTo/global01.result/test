@@ -1,47 +1,4 @@
 
-PROPER  EFFECTS 
-
-int global01()
-{
-//             <    is written>: i
-   i = &k;
-//             <    is read   >: i
-//             <    is written>: j
-   j = i;
-   return 0;
-}
-
-POINTS-TO
-
-
-// Points To IN: none
-
-
-// Points To OUT:
-// i -> k , EXACT
-// j -> k , EXACT
-
-int global01()
-{
-
-// Points To: none
-
-   i = &k;
-
-// Points To:
-// i -> k , EXACT
-
-   j = i;
-
-// Points To:
-// i -> k , EXACT
-// j -> k , EXACT
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
 int global01()
 {
 //             <    is written>: i

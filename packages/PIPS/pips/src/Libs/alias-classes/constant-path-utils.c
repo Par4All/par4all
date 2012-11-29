@@ -965,6 +965,9 @@ bool opkill_must_reference(cell c1, cell c2)
 }
 
 
+/* FI: really weird and unefficient. Also I asummed that vreference
+   was limited to the subscript list... FI->AM: to be checked wrt your
+   dissertation. */
 bool opkill_may_vreference(cell c1, cell c2)
 {
   int i = 0;
@@ -976,35 +979,45 @@ bool opkill_may_vreference(cell c1, cell c2)
   // FI: memory leak? generation of a new string?
   extern const char* entity_minimal_user_name(entity);
 
+  // FI: why not compare the entities v1==v2?
   i = strcmp(entity_minimal_user_name(v1), entity_minimal_user_name(v2));
   if ( i==0 ) {
     sl1 = reference_indices(r1);
     sl2 = reference_indices(r2);
-    for (;i==0 && !ENDP(sl1) && ! ENDP(sl2) ; POP(sl1), POP(sl2))
-      {
-	expression se1 = EXPRESSION(CAR(sl1));
-	expression se2 = EXPRESSION(CAR(sl2));
-	if (unbounded_expression_p(se2) && expression_constant_p(se1))
-	  i = 0;
-	else if ( expression_constant_p(se1) && expression_constant_p(se2) ) {
-	  int i1 = expression_to_int(se1);
-	  int i2 = expression_to_int(se2);
-	  i = i2>i1? 1 : (i2<i1? -1 : 0);
+    for (;i==0 && !ENDP(sl1) && ! ENDP(sl2) ; POP(sl1), POP(sl2)) {
+      expression se1 = EXPRESSION(CAR(sl1));
+      expression se2 = EXPRESSION(CAR(sl2));
+      if (unbounded_expression_p(se2) && expression_constant_p(se1))
+	i = 0;
+      else if (unbounded_expression_p(se1) && expression_constant_p(se2))
+	i = 0;
+      else if (expression_constant_p(se1) && expression_constant_p(se2) ) {
+	int i1 = expression_to_int(se1);
+	int i2 = expression_to_int(se2);
+	i = i2>i1? 1 : (i2<i1? -1 : 0);
 
-	  if ( i==0 ) {
-	    string s1 = words_to_string(words_expression(se1, NIL));
-	    string s2 = words_to_string(words_expression(se2, NIL));
-	    i = strcmp(s1, s2);
-	    }
-	  }
-
+	// FI: this piece of code seems out of place, if i==0, i==0
+	if ( i==0 ) {
+	  string s1 = words_to_string(words_expression(se1, NIL));
+	  string s2 = words_to_string(words_expression(se2, NIL));
+	  i = strcmp(s1, s2);
+	}
       }
+      else if(field_expression_p(se1) && field_expression_p(se2))
+	i = expression_equal_p(se1,se2)? 0 : 1;
     }
+  }
 
   return (i==0? true: false);
 }
 
-/* returns true if c2 kills c1 */
+/* returns true if c2 must kills c1 because of the subscript expressions
+ *
+ * This function should be rewritten from scratch, with a defined
+ * semantics for "*" as a subscript and possibly a larger use of
+ * expression_equal_p(). Also, we need to specify if the scopes for
+ * each rereference are equal or not.
+ */
 bool opkill_must_vreference(cell c1, cell c2)
 {
   int i = 0;
@@ -1016,36 +1029,44 @@ bool opkill_must_vreference(cell c1, cell c2)
   // FI: memory leak? generation of a new string?
   extern const char* entity_minimal_user_name(entity);
 
+  // FI: this step could be assumed performed earlier
   i = strcmp(entity_minimal_user_name(v1), entity_minimal_user_name(v2));
   if (i==0) {
     sl1 = reference_indices(r1);
     sl2 = reference_indices(r2);
     for (;i==0 && !ENDP(sl1) && ! ENDP(sl2) ; POP(sl1), POP(sl2)){
-	expression se1 = EXPRESSION(CAR(sl1));
-	expression se2 = EXPRESSION(CAR(sl2));
-	if(expression_constant_p(se2) && unbounded_expression_p(se1)){
-	  //i = 0;
-	  i = 1;
-	}
-	else if(expression_constant_p(se1) && unbounded_expression_p(se2)){
-	  i = 0;
-	  //i = 1;
-	}
-	else if (expression_constant_p(se1) && expression_constant_p(se2)){
-	  int i1 = expression_to_int(se1);
-	  int i2 = expression_to_int(se2);
-	  i = i2>i1? 1 : (i2<i1? -1 : 0);
-	  if (i==0){
-	    string s1 = words_to_string(words_expression(se1, NIL));
-	    string s2 = words_to_string(words_expression(se2, NIL));
-	    i = strcmp(s1, s2);
-	}
+      expression se1 = EXPRESSION(CAR(sl1));
+      expression se2 = EXPRESSION(CAR(sl2));
+      if(expression_constant_p(se2) && unbounded_expression_p(se1)){
+	//i = 0;
+	i = 1;
       }
-	else {
+      else if(expression_constant_p(se1) && unbounded_expression_p(se2)){
+	//i = 0; could be true if * is interpreted as "forall"
+	i = 1;
+      }
+      else if (expression_constant_p(se1) && expression_constant_p(se2)){
+	int i1 = expression_to_int(se1);
+	int i2 = expression_to_int(se2);
+	i = i2>i1? 1 : (i2<i1? -1 : 0);
+	if (i==0){ // FI->AM: I do not understand this step
 	  string s1 = words_to_string(words_expression(se1, NIL));
 	  string s2 = words_to_string(words_expression(se2, NIL));
 	  i = strcmp(s1, s2);
-    }
+	}
+      }
+      else {
+	// FI->AM: very dangerous; only true if both references appear
+	// exactly in the same scope; and "*" were not dealt with!
+	if(unbounded_expression_p(se1)||unbounded_expression_p(se2))
+	  i = 1;
+	else {
+	  //string s1 = words_to_string(words_expression(se1, NIL));
+	  //string s2 = words_to_string(words_expression(se2, NIL));
+	  //i = strcmp(s1, s2);
+	  i = expression_equal_p(se1, se2)? 0 : 1;
+	}
+      }
     }
   }
 
@@ -1080,7 +1101,7 @@ bool opkill_may_constant_path(cell c1, cell c2)
   return kill_may_p;
 }
 
-/* returns true if c2 kills c1*/
+/* returns true if c2 kills c1 */
 bool opkill_must_constant_path(cell c1, cell c2)
 {
   bool kill_must_p;
@@ -1105,44 +1126,72 @@ bool opkill_must_constant_path(cell c1, cell c2)
   /*     t2 = simple_effect_reference_type(r2); */
   /*   type_equal_p = opkill_must_type(t1,t2); */
   /* } */
-  kill_must_p =opkill_must_module(c1,c2) && opkill_must_name(c1,c2) &&
+  kill_must_p = opkill_must_module(c1,c2) && opkill_must_name(c1,c2) &&
     equal_p && opkill_must_vreference(c1,c2);
 
    return kill_must_p;
 }
 
 
+/* Compute the set of arcs in the input points-to relation "in" whose
+ * approximation must be changed from "exact" to "may".
+ *
+ * This set is linked to set "gen_may1", although consistency would be
+ * easier to maintain if only "kill_may" were used to generate the new arcs...
+ *
+ * kill_may = { pt in "in"| exact(pt) ^ \exists l in L conflict(l, source(pt))}
+ *
+ * The restriction to !atomic does not seem useful.
+ */
 set kill_may_set(list L, set in_may)
 {
   set kill_may = set_generic_make(set_private, points_to_equal_p,
 			     points_to_rank);
-  FOREACH(cell, l, L){
-     SET_FOREACH(points_to, pt, in_may){
-       if (opkill_may_constant_path(points_to_source(pt),l)) {
-	 points_to npt = make_points_to(points_to_source(pt), points_to_sink(pt), 
-					make_approximation_may(), make_descriptor_none());
-	 set_add_element(kill_may, kill_may,(void*)npt);
-     }
-  }
+  FOREACH(cell, l, L) {
+    SET_FOREACH(points_to, pt, in_may) {
+      cell pt_source = points_to_source(pt);
+      if (opkill_may_constant_path(points_to_source(pt),l)) {
+	points_to npt = make_points_to(points_to_source(pt),
+				       points_to_sink(pt), 
+				       make_approximation_exact(),
+				       make_descriptor_none());
+	set_add_element(kill_may, kill_may, (void*)npt);
+      }
+    }
   }
   return kill_may;
 }
 
 
+/* Generate the set of exact arcs that must be removed from the
+ * current points-to graph.
+ *
+ * Set "in_must" is the subset of set "in" with exact points-to arcs only.
+ *
+ * kill_1 = kill_must = {pt in "in" | source(pt) in L ^ |L|=1 ^ atomic(L) }
+ *
+ * where "atomic(L)" is a short cut for "atomic(l) forall l in L"
+ *
+ * Here, correctly, the atomicity is not checked directly, but
+ * properly, using an operator of the lattice.
+ */
 set kill_must_set(list L, set in_must)
 {
   set kill_must = set_generic_make(set_private, points_to_equal_p,
 			     points_to_rank);
+  int nL = (int) gen_length(L);
 
-  FOREACH(cell, l, L){
-     SET_FOREACH(points_to, s, in_must){
-       if(opkill_must_constant_path(points_to_source(s),l))
-	 set_add_element(kill_must, kill_must,(void*)s);
-     }
+  if(nL==1) {
+    FOREACH(cell, l, L){
+      SET_FOREACH(points_to, s, in_must){
+	if(opkill_must_constant_path(points_to_source(s),l))
+	  set_add_element(kill_must, kill_must,(void*)s);
+      }
+    }
   }
   return kill_must;
 }
-
+
 /* returns a set which contains all the MAY points to */
 set points_to_may_filter(set in)
 {
@@ -1167,7 +1216,7 @@ set points_to_must_filter(set in)
   }
   return in_must;
 }
-
+
 /* shoud be moved to expression.c*/
 bool address_of_expression_p(expression e)
 {
@@ -1198,33 +1247,78 @@ bool expression_null_locations_p(expression e)
 }
 
 /*
- * create a set of points-to relations of the form:
+ * Create a new set of points-to arcs "may" from an input points-to
+ * set "in_may" (in fact, "in"), a list of assigned points-to cells,
+ * L, and a list of value cells, R. In fact, "may" is the set "gen"
+ * for the assignment of R to L.
  *
- * element_L -> & element_R, MAY
+ * The arcs in "may" belongs either to subset "may1", which is derived
+ * from "in_may", or to subset "may2", which is derived from couples
+ * (l,r) in L x R, or to subset "may3", which is derived from couples
+ * (l',r) in L' x R, where L' is the set or lower elements of L. In
+ * other words:
  *
- * FI: it would be nice to have the equation or a formula
- * I do not understand why gen_may1 is built from in_may
-*/
+ * L'(l) = { l' | for all x<l in CP l'<l and x,=l' }
+ *
+ * This is used for element of pointer arrays.If a[1] is updated, then
+ * a[*] must be updated too. This is generalized to a[*][*]..[*] for
+ * multi-dimensional arrays. No distinction is made for a[1][*] and
+ * a[*][2]. They are not considered and are both replaced by a[*][*].
+ *
+ * For "may1":
+ *
+ * may1 = {pt=(l,r,may) | exists pt'=(l,r,a') in in_may and l in L U L'}
+ *
+ * For "may2":
+ *
+ * may2 = {pt=(l,r,a) | exists l in L, exists r in R,
+ *                      a=(|L|==1 and |R|==1 and atomic(l) and atomic(r) }
+ *
+ * For "may3":
+ * 
+ * may3 = {pt=(l',r,may) | exists l in L, l' in L'(l), exists r in R}
+ *
+ * Hence, may = may1 U may2 U may3.
+ *
+ * Note the disymetry between L and R as far as may3 is concerned. If
+ * a[1] points toward b, then a[*] points toward b. If a points toward
+ * b[1], then we do not generate an arc from a to b[*].
+ *
+ * Note also that "may1" must be consistent with "kill_may" in
+ * list_assignment_to_points_to() in order to generate a consistent
+ * pt_out.
+ */
 set gen_may_set(list L, list R, set in_may, bool *address_of_p)
 {
   set gen_may1 = set_generic_make(set_private, points_to_equal_p,
 				  points_to_rank);
   set gen_may2 = set_generic_make(set_private, points_to_equal_p,
 				  points_to_rank);
+  set gen_may3 = set_generic_make(set_private, points_to_equal_p,
+				  points_to_rank);
   int len = (int) gen_length(L);
 
-  if(len > 1) {
-    /* If the source is not precisely known */
-    FOREACH(cell, l, L){
+  //if(len > 1) {
+  ///* If the source is not precisely known */
+  /* It is easier not to have to maintain the consistency between
+     gen_may1 and kill_may. */
+  if(false) {
+    FOREACH(cell, l, L) {
       SET_FOREACH(points_to, pt, in_may){
-	if(points_to_compare_cell(points_to_source(pt),l)){
-	  // FI: it would be much easier/efficient to modify the approximation of pt
-	  // But it is incompatible with the implementation of sets...
-	  points_to npt = make_points_to(copy_cell(l), copy_cell(points_to_sink(pt)),
-					 make_approximation_may(),
-					 make_descriptor_none());
-	  set_add_element(gen_may1, gen_may1, (void*)npt);
-	  set_del_element(gen_may1, gen_may1, (void*)pt);
+	if(approximation_exact_p(points_to_approximation(pt))) {
+	  //if(!atomic_points_to_cell_p(points_to_source(pt))) {
+	    //if(points_to_compare_cell(points_to_source(pt),l)) {
+	    if(cells_may_conflict_p(points_to_source(pt),l)) {
+	      // FI: it would be much easier/efficient to modify the approximation of pt
+	      // But it is incompatible with the implementation of sets...
+	      points_to npt = make_points_to(copy_cell(points_to_source(pt)),
+					     copy_cell(points_to_sink(pt)),
+					     make_approximation_may(),
+					     make_descriptor_none());
+	      set_add_element(gen_may1, gen_may1, (void*)npt);
+	      //set_del_element(gen_may1, gen_may1, (void*)pt);
+	    }
+	    //	  }
 	}
       }
     }
@@ -1263,16 +1357,28 @@ set gen_may_set(list L, list R, set in_may, bool *address_of_p)
       set_union(gen_may2, gen_may2, gen_l);
     }
     else {
-    // FI: memory leak due to call to call to gen_may_constant_paths()
-    set gen_l = gen_may_constant_paths(l, R, in_may, address_of_p, len);
-    // FI: be careful, the union does not preserve consistency because
-    // the same arc may appear with different approximations
-    set_union(gen_may2, gen_may2, gen_l);
-    // free_set(gen_l);
+      // FI: memory leak due to call to call to gen_may_constant_paths()
+      set gen_l = gen_may_constant_paths(l, R, in_may, address_of_p, len);
+      // FI: be careful, the union does not preserve consistency because
+      // the same arc may appear with different approximations
+      set_union(gen_may2, gen_may2, gen_l);
+      // free_set(gen_l);
+    }
+  }
+
+  FOREACH(cell, l, L) {
+    // Hopefully, l' will be empty most of the time!
+    list L_prime = points_to_cell_to_upper_bound_points_to_cells(l);
+    FOREACH(cell, l_prime, L_prime) {
+      // FI: memory leak due to call to call to gen_may_constant_paths()
+      set gen_l = gen_may_constant_paths(l_prime, R, in_may, address_of_p, len);
+      set_union(gen_may3, gen_may3, gen_l);
+      // free_set(gen_l);
     }
   }
 
   set_union(gen_may2, gen_may2, gen_may1);
+  set_union(gen_may2, gen_may2, gen_may3);
 
   return gen_may2;
 }
@@ -1429,6 +1535,7 @@ set gen_may_constant_paths(cell l,
     int Rc = (int) gen_length(R);
     FOREACH(cell, r, R){
       // FI: check the unicity of the locations
+      // FI: relationship with atomic_points_to_cell_p()?
       approximation a = (Lc+Rc>2
 			 || !unique_location_cell_p(l)
 			 || !unique_location_cell_p(r)) ?
