@@ -91,6 +91,10 @@ do
   type $exe || error "no such executable, please install: $exe"
 done
 
+# check for readline
+[ -d /usr/include/readline -o -d /usr/local/include/readline ] ||
+  error "readline headers seem to be missing: /usr/include/readline"
+
 # check cproto version... 4.6 is still available on many distributions
 [[ $(cproto -V 2>&1) = 4.7* ]] || \
   error "Pips compilation requires at least cproto 4.7c"
