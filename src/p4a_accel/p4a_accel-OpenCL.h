@@ -342,11 +342,11 @@ extern cl_kernel p4a_kernel;
 #define P4A_NARG_(...) P4A_ARG_N(__VA_ARGS__)
 
 
-/** Positional parameters are expands before inserting the macro
-expansion.  The expansion of parametres list followed by the reverse
-enumeration results in the returned value N that equals the exact
-number of paramters.
- */
+/** Positional parameters are expanded before inserting the macro
+    expansion.  The expansion of parameter list followed by the reverse
+    enumeration results in the returned value N that equals the exact
+    number of parameters.
+*/
 #define P4A_ARG_N( \
           _1, _2, _3, _4, _5, _6, _7, _8, _9,_10, \
          _11,_12,_13,_14,_15,_16,_17,_18,_19,_20, \
@@ -356,7 +356,7 @@ number of paramters.
          _51,_52,_53,_54,_55,_56,_57,_58,_59,_60, \
          _61,_62,_63,N,...) N
 
-/** A reverse enumeration used to calculate the argument number up to 63.
+/** A reverse enumeration used to compute the argument number up to 63.
  */
 #define P4A_RSEQ_N() \
          63,62,61,60,                   \
@@ -367,13 +367,12 @@ number of paramters.
          19,18,17,16,15,14,13,12,11,10, \
          9,8,7,6,5,4,3,2,1,0
 
-/** When the number of arguments is known, automatic call by
-    concatenation to the function P4A_argn, where n is the number of
-    arguments.
+/** Once the number of arguments is known, automatic call by concatenation
+    the function P4A_argn, where n is the number of arguments.
  */
 #define P4A_argN(...) P4A_CONCATN(P4A_arg,P4A_NARG(__VA_ARGS__))(0,__VA_ARGS__)
 
-/** Forcing the interpretation of two fields that have to be concatenate.
+/** Forcing the interpretation of two fields that have to be concatenated.
  */
 #define P4A_CONCATN(a,b) P4A_CONCAT(a,b)
 
