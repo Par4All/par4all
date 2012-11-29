@@ -1610,9 +1610,9 @@ transformer fortran_user_call_to_transformer(entity f,
 }
 
 transformer user_call_to_transformer(entity f,
-					    list pc,
-					    transformer pre,
-					    list ef)
+				     list pc,
+				     transformer pre,
+				     list ef)
 {
   transformer t_caller = transformer_undefined;
 

@@ -6,7 +6,9 @@ FC=mpif77
 CC=mpicc
 
 
-FLAGS = -g -O2 -I$(DIR_STEP)
+FLAGS += -g -O3 -I$(DIR_STEP) -I.
+
+FLAGS += $(PIPS_CPP_FLAGS)
 
 export COMPILER = gnu
 export STEP_KIND = 4
@@ -43,7 +45,12 @@ DIR_STEP=step_rt
 all: gnu
 
 $(BIN) : $(DIR_STEP)/$(LIB_STEP) compile_c compile_f
-	if ls  >/dev/null 2>&1 *.o ; then $(FC) $(OBJFILES) $(OpenMP_FLAG) $(LDFLAGS) -lstep -L$(DIR_STEP) -Wl,-rpath=$(DIR_STEP) -o $@; fi
+	if ls >/dev/null 2>&1 *.o ; then \
+		if ls >/dev/null 2>&1 *.f ; \
+		then $(FC) $(OBJFILES) $(OpenMP_FLAG) $(LDFLAGS) -lstep -L$(DIR_STEP) -Wl,-rpath=$(DIR_STEP) -o $@ ; \
+		else $(CC) $(OBJFILES) $(OpenMP_FLAG) $(LDFLAGS) -lstep -L$(DIR_STEP) -Wl,-rpath=$(DIR_STEP) -o $@ ; \
+		fi; \
+	fi
 
 compile_c: $(DIR_STEP)/step_api.h
 	if ls  >/dev/null 2>&1 *.c ; then $(CC) $(OpenMP_FLAG) $(CFLAGS) -c $(CSOURCES); fi
@@ -52,7 +59,7 @@ compile_f: $(DIR_STEP)/STEP.h
 	if ls  >/dev/null 2>&1 *.f ; then $(FC) $(OpenMP_FLAG) $(FFLAGS) -c $(FSOURCES); fi
 
 $(DIR_STEP)/$(LIB_STEP):
-	$(MAKE) -C $(DIR_STEP) $(LIB_STEP) STEP.h critical_pcoord_program
+	$(MAKE) -C $(DIR_STEP) $(LIB_STEP) STEP.h
 
 clean:
 	$(MAKE) -C $(DIR_STEP) $@

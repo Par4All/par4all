@@ -546,6 +546,20 @@ type points_to_expression_to_type(expression e, bool * to_be_freed)
   return t;
 }
 
+/* The type returned is stored in a hash-table. It should not be
+ * freed. See compute_basic_concrete_type().
+ *
+ * This function is useful to avoid the conditional free.
+ */
+type points_to_expression_to_concrete_type(expression e)
+{
+  bool * to_be_freed;
+  type t = points_to_expression_to_type(e, &to_be_freed);
+  type ct = compute_basic_concrete_type(t);
+  if(to_be_freed) free_type(t);
+  return ct;
+}
+
 /* Return a new allocated type "t" of the address pointed by expression "e", if
  * expression "e" denotes an address.
  *

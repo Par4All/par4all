@@ -136,12 +136,27 @@ bool reference_typed_anywhere_locations_p(reference r)
 }
 
 
-/* test if an entity is the bottom of the lattice*/
+/* Test if an entity is the bottom of the lattice. Not really since it
+ * is typed...
+ *
+ * The typed anywhere locations have names like ANYWHERE_LOCATION_bxxx
+ *
+ * Beware, because the string ANYWHERE_LOCATION is also used for the
+ * heap, *HEAP**ANYWHERE*.
+ *
+ * Also, this does not check for the module: is it ANYMODULE or a
+ * specific module?
+ */
 bool entity_typed_anywhere_locations_p(entity e)
 {
+  bool typed_anywhere_p = false;
   string ln = (string) entity_local_name(e);
   string p = strstr(ln, ANYWHERE_LOCATION);
-  return p!=NULL;
+  if(p==ln) {
+    // if the two strings are equal, we have the non-typed anywhere location
+    typed_anywhere_p = strcmp(ln, ANYWHERE_LOCATION);
+  }
+  return typed_anywhere_p;
 }
 
 /* return *ANY_MODULE*:*NOWHERE* */
@@ -566,28 +581,45 @@ bool entity_stub_sink_p(entity e)
   char penultimate = en[strlen(en) - 2];
   if(dummy_target_p && first == '_' && penultimate == '_')
     stub_sink_p = true;
-
+
   return stub_sink_p;
+}
+
+bool stub_entity_of_module_p(entity s, entity m)
+{
+  bool stub_p = entity_stub_sink_p(s);
+  if(stub_p) {
+    /* There are several ways to decide if entity "s" is local to "m":
+       its module name, its belonging to the declarations of m, its
+       storage,... Let's avoir string comparisons and list scans... */
+    storage ss = entity_storage(s);
+    if(storage_ram_p(ss)) {
+      ram rss = storage_ram(ss);
+      entity f = ram_function(rss);
+      stub_p = m==f;
+    }
+  }
+  return stub_p;
 }
 
 bool entity_abstract_location_p(entity al)
 {
 #ifndef NDEBUG
-        const char * en = entity_name(al);
-        const char * module_sep = strchr(en,MODULE_SEP_CHAR);
-        bool abstract_locations_p = (   0 == strncmp(en,ANY_MODULE_NAME,module_sep++ - en) // << FI: this may change in the future and may not be a strong enough condition
-                ||   0 == strncmp(module_sep, ANYWHERE_LOCATION, sizeof(ANYWHERE_LOCATION)-1)
-                ||   0 == strncmp(module_sep, STATIC_AREA_LOCAL_NAME, sizeof(STATIC_AREA_LOCAL_NAME)-1)
-                ||   0 == strncmp(module_sep, DYNAMIC_AREA_LOCAL_NAME, sizeof(DYNAMIC_AREA_LOCAL_NAME)-1)
-                ||   0 == strncmp(module_sep, STACK_AREA_LOCAL_NAME, sizeof(STACK_AREA_LOCAL_NAME)-1)
-                ||   0 == strncmp(module_sep, HEAP_AREA_LOCAL_NAME, sizeof(HEAP_AREA_LOCAL_NAME)-1)
-                ||   0 == strncmp(module_sep, FORMAL_AREA_LOCAL_NAME, sizeof(HEAP_AREA_LOCAL_NAME)-1)
-                ||   0 == strncmp(module_sep, NULL_POINTER_NAME, sizeof(NULL_POINTER_NAME)-1)
-                )
-            ;
-        pips_assert("entity_kind is consistent",abstract_locations_p == ((entity_kind(al)&ABSTRACT_LOCATION)==ABSTRACT_LOCATION));
+  const char * en = entity_name(al);
+  const char * module_sep = strchr(en,MODULE_SEP_CHAR);
+  bool abstract_locations_p = (   0 == strncmp(en,ANY_MODULE_NAME,module_sep++ - en) // << FI: this may change in the future and may not be a strong enough condition
+				  ||   0 == strncmp(module_sep, ANYWHERE_LOCATION, sizeof(ANYWHERE_LOCATION)-1)
+				  ||   0 == strncmp(module_sep, STATIC_AREA_LOCAL_NAME, sizeof(STATIC_AREA_LOCAL_NAME)-1)
+				  ||   0 == strncmp(module_sep, DYNAMIC_AREA_LOCAL_NAME, sizeof(DYNAMIC_AREA_LOCAL_NAME)-1)
+				  ||   0 == strncmp(module_sep, STACK_AREA_LOCAL_NAME, sizeof(STACK_AREA_LOCAL_NAME)-1)
+				  ||   0 == strncmp(module_sep, HEAP_AREA_LOCAL_NAME, sizeof(HEAP_AREA_LOCAL_NAME)-1)
+				  ||   0 == strncmp(module_sep, FORMAL_AREA_LOCAL_NAME, sizeof(HEAP_AREA_LOCAL_NAME)-1)
+				  ||   0 == strncmp(module_sep, NULL_POINTER_NAME, sizeof(NULL_POINTER_NAME)-1)
+				  )
+    ;
+  pips_assert("entity_kind is consistent",abstract_locations_p == ((entity_kind(al)&ABSTRACT_LOCATION)==ABSTRACT_LOCATION));
 #endif
-    return entity_kind(al) & ABSTRACT_LOCATION;
+  return (entity_kind(al) & ABSTRACT_LOCATION) ? true : false;
 }
 
 
@@ -703,11 +735,13 @@ entity abstract_locations_max(entity al1, entity al2)
       char* mn2 = strdup(entity_module_name(al2));
       const char* ln;
       const char* mn;
+      static int mc = 0; // Message count: to avoid multiple repetitions
 
-      if(!get_bool_property("ALIASING_ACROSS_TYPES")) {
+      if(mc==0 && !get_bool_property("ALIASING_ACROSS_TYPES")) {
 	//pips_internal_error("Option not implemented yet.");
 	pips_user_warning("property \"ALIASING_ACROSS_TYPES\" is assumed true"
 			  " for abstract locations.\n");
+	mc++;
       }
 
       if(strcmp(ln1, ln2)==0)

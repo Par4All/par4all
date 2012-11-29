@@ -394,8 +394,13 @@ bool atomic_points_to_cell_p(cell c)
  * Note: it is assumed that the reference is a points-to
  * reference. All subscripts are constants, field references or
  * unbounded expressions.
+ *
+ * Note: FI, I have a probleme when calling this function from a
+ * proper effects environment. In that case, stubs might be assumed to
+ * be unique memory locations. The exactness information can be
+ * derived from the numer of targets in the matching list.
  */
-bool atomic_points_to_reference_p(reference r)
+bool generic_atomic_points_to_reference_p(reference r, bool strict_p)
 {
   bool atomic_p = false;
   entity v = reference_variable(r);
@@ -407,7 +412,7 @@ bool atomic_points_to_reference_p(reference r)
      && !entity_heap_location_p(v)) {
     list sl = reference_indices(r);
     entity v = reference_variable(r);
-    if(!entity_stub_sink_p(v)) {
+    if(!entity_stub_sink_p(v) || !strict_p) {
       atomic_p = true;
       FOREACH(EXPRESSION, se, sl) {
 	if(unbounded_expression_p(se)) {
@@ -419,6 +424,11 @@ bool atomic_points_to_reference_p(reference r)
   }
 
   return atomic_p;
+}
+
+bool atomic_points_to_reference_p(reference r)
+{
+  return generic_atomic_points_to_reference_p(r, true);
 }
 
 /* points-to cells use abstract addresses, hence the proper comparison
@@ -670,4 +680,149 @@ bool cells_may_not_point_to_null_p(list cl)
     }
   }
   return may_not_p;
+}
+
+
+/* Does cell "source" points toward a non null fully defined cell in
+ * points-to set pts?
+ *
+ * The function name is not well chosen. Something like
+ * cell_points_to_defined_cell_p()/
+ */
+bool cell_points_to_non_null_sink_in_set_p(cell source, set pts)
+{
+  bool non_null_p = false;
+  SET_FOREACH(points_to, pt, pts) {
+    cell pt_source = points_to_source(pt);
+    //if(cell_equal_p(pt_source, source)) {
+    if(cell_equivalent_p(pt_source, source)) {
+      cell pt_sink = points_to_sink(pt);
+      if(null_cell_p(pt_sink))
+	;
+      else if(nowhere_cell_p(pt_sink))
+	;
+      else {
+	non_null_p = true;
+	break;
+      }
+    }
+  }
+  return non_null_p;
+}
+bool cell_points_to_null_sink_in_set_p(cell source, set pts)
+{
+  bool null_p = false;
+  SET_FOREACH(points_to, pt, pts) {
+    cell pt_source = points_to_source(pt);
+    if(cell_equal_p(pt_source, source)) {
+      cell pt_sink = points_to_sink(pt);
+      if(null_cell_p(pt_sink)) {
+	null_p = true;
+	break;
+      }
+    }
+  }
+  return null_p;
+}
+
+bool points_to_cell_equal_p(cell c1, cell c2)
+{
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
+  return reference_equal_p(r1,r2);
+}
+
+/* See if an arc like "spt" exists in set "in", regardless of its
+ * approximation. If yes, returns the approximation of the arc found
+ * in "in".
+ *
+ * See also arc_in_points_to_set_p(), which requires full identity
+ */
+bool similar_arc_in_points_to_set_p(points_to spt, set in, approximation * pa)
+{
+  bool in_p = false;
+  cell spt_source = points_to_source(spt);
+  cell spt_sink = points_to_sink(spt);
+  SET_FOREACH(points_to, pt, in) {
+    if(points_to_cell_equal_p(spt_source, points_to_source(pt))
+       && points_to_cell_equal_p(spt_sink, points_to_sink(pt))) {
+      *pa = points_to_approximation(pt);
+      in_p = true;
+      break;
+    }
+  }
+  return in_p;
+}
+
+/* Return a list of cells that are larger than cell "c" in the
+ * points-to cell lattice.
+ *
+ * This goal is quite open because a[1][2] is dominated by both
+ * a[*][2] and a[1][*], then by a[*][*]. Assuming "a" is variable of
+ * function "foo", then we have "foo:*STACK*_b0",
+ * "*ANYMODULE*:*STACK*_b0", "foo:*ANYWHERE*_b0",
+ * "*ANYMODULE*:*ANYWHERE*_b0", "*ANYMODULE*:*ANYWHERE*".
+ *
+ * They would all be useful to guarantee the consistency of the
+ * points-to information wrt the points-to cell lattice, but we'd
+ * rather maintain a partially consistent points-to graph and rely on
+ * functions using it to add the necessary points-to arcs.
+ *
+ * A lattice-consistent points-to graph would contain too many arcs as
+ * x->y implies x'->y' for all x' bigger than x and y' bigger then
+ * y...
+ *
+ * For the time being, we only need to convert a[i][j][k] into a[*][*][*]
+ * when i, j and k are real subscript expressions, not fields.
+ *
+ * We return an empty list when cell "c" does not need any upper
+ * bound, as is the case with a, a[f] where f is a field, a[*] and all
+ * the abstract locations.
+ *
+ * So, for the time being, this function returns a list with one or
+ * zero elements.
+ */
+list points_to_cell_to_upper_bound_points_to_cells(cell c)
+{
+  list ubl = NIL; // upper bound list
+  reference r = cell_any_reference(c);
+  entity v = reference_variable(r);
+  if(!entity_abstract_location_p(v)) {
+    list sel = reference_indices(r); // subscript expression list
+    list nsel = NIL; // new subscript expression list
+    bool new_cell_p = false;
+    FOREACH(EXPRESSION, se, sel) {
+      expression nse = expression_undefined;
+      if(integer_expression_p(se)) {
+	nse = make_unbounded_expression();
+	new_cell_p = true;
+      }
+      else
+	nse = copy_expression(se);
+      nsel = CONS(EXPRESSION, nse, nsel);
+    }
+    if(new_cell_p) {
+      nsel = gen_nreverse(nsel);
+      reference nr = make_reference(v, nsel);
+      cell nc = make_cell_reference(nr);
+      ubl = CONS(CELL, nc, ubl);
+    }
+    else
+      gen_full_free_list(nsel);
+  }
+  return ubl;
+}
+
+/* Add to list "l" cells that are upper bound cells of the cells
+ * already in list "l" and return list "l".
+ */
+list points_to_cells_to_upper_bound_points_to_cells(list cl)
+{
+  list ubl = NIL;
+  FOREACH(CELL, c, cl) {
+    list cubl = points_to_cell_to_upper_bound_points_to_cells(c);
+    ubl = gen_nconc(ubl, cubl);
+  }
+  ubl = gen_nconc(cl, ubl);
+  return ubl;
 }

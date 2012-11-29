@@ -24,10 +24,25 @@ do
 	    sed 's,!       implicit none,      implicit none,g' | \
 	    sed 's,! MIL-STD-1753 Fortran extension not in PIPS\n,,' >$INSTAL_DIR/step.tmp
     else
+	[ -d $INSTAL_DIR/preprocessed_include ] || mkdir $INSTAL_DIR/preprocessed_include
 	l=$(grep -n "#include \"step_api.h\"" $f|cut -d: -f1);
 	if [ ! -z $l ]; then
 	    base=$(basename $f .c);
-	    head -n $[$l-1] $f >$INSTAL_DIR/$base.h;
+	    head -n $[$l-1] $f | awk -v INSTAL_DIR=$INSTAL_DIR '
+BEGIN{include_lvl=0;}
+$0 ~ /# [^"]+"[^"]+" 1/ {include_lvl++;
+    if (include_lvl==1 && match($0,"\"[^\"]+\"")) {
+	path_file = substr($0, RSTART+1, RLENGTH-2);
+	if (match(path_file,"[^/]+$")) {
+	    file = substr(path_file, RSTART, RLENGTH);
+	    outclude_file = "./preprocessed_include/" file;
+	    printf("#include <%s> // outclude to %s\n", file, outclude_file);
+	}
+    }
+}
+include_lvl!=0 {print >> INSTAL_DIR"/"outclude_file;}
+include_lvl==0 && $0 !~ /^# / {print;}
+$0 ~ /# [^"]+"[^"]+" 2/ {include_lvl--;}' >$INSTAL_DIR/$base.h;
 	    echo "#include \"$base.h\"" >$INSTAL_DIR/step.tmp;
 	    tail -n $[ $(wc -l $f |cut -d' ' -f1) - $l + 1] $f >> $INSTAL_DIR/step.tmp;
 	fi;
