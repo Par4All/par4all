@@ -187,9 +187,9 @@ string points_to_cell_name(cell source)
  * "main" module, but the information would have to be passed down
  * thru an extra parameter.
  *
- * Side-effects on argument "pts".
+ * Side-effects on argument "pts" which is returned.
  */
-set points_to_set_block_projection(set pts, list  l, bool main_p)
+set points_to_set_block_projection(set pts, list  l, bool main_p, bool body_p)
 {
   list pls = NIL; // Possibly lost sinks
   list new_l = NIL; // new arcs to add
@@ -232,9 +232,10 @@ set points_to_set_block_projection(set pts, list  l, bool main_p)
 	    // FI: this may be transient if the source is a formal
 	    // parameter and if the projected block is the function
 	    // statement
-	    pips_user_warning("Dangling pointer \"%s\" towards \"%s\".\n",
-			      entity_user_name(e_sr),
-			      entity_user_name(e_sk));
+	    if(!body_p || !formal_parameter_p(e_sr))
+	      pips_user_warning("Dangling pointer \"%s\" towards \"%s\".\n",
+				entity_user_name(e_sr),
+				entity_user_name(e_sk));
 	  }
 	  // list lhs = CONS(CELL, source, NIL);
 	  // pts = points_to_nowhere_typed(lhs, pts);

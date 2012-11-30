@@ -350,6 +350,14 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
 	  if(!null_cell_p(fc)) {
 	    FOREACH(CELL, ac, al) {
 	      if(!null_cell_p(ac) && !nowhere_cell_p(ac)) {
+		type fc_t = points_to_cell_to_concrete_type(fc);
+		type ac_t = points_to_cell_to_concrete_type(ac);
+		if(!type_equal_p(fc_t, ac_t)) {
+		  points_to_cell_add_zero_subscript(ac);
+		  type ac_nt = points_to_cell_to_concrete_type(ac);
+		  if(!type_equal_p(fc_t, ac_nt))
+		    pips_internal_error("translation failure.\n");
+		}
 		points_to tr = make_points_to(copy_cell(fc), copy_cell(ac), 
 					      copy_approximation(a),
 					      make_descriptor_none());
@@ -368,6 +376,9 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
       // pips_internal_error("Translation error.\n");
     }
   }
+
+  pips_assert("The points-to translation mapping is well typed",
+	      points_to_translation_mapping_is_typed_p(translation));
 
   /* Now, we have to call about the same function recursively on the
      list of formal sinks */
@@ -459,6 +470,21 @@ set filter_formal_context_according_to_actual_context(list fpcl,
       if(!null_cell_p(fc)) {
 	FOREACH(CELL, ac, al) {
 	  if(!null_cell_p(ac) && !nowhere_cell_p(ac)) {
+	    type fc_t = points_to_cell_to_concrete_type(fc);
+	    type ac_t = points_to_cell_to_concrete_type(ac);
+	    if(!type_equal_p(fc_t, ac_t)) {
+	      points_to_cell_add_zero_subscript(ac);
+	      type ac_nt = points_to_cell_to_concrete_type(ac);
+	      if(!type_equal_p(fc_t, ac_nt) && !overloaded_type_p(ac_nt)) {
+		// Pointers/pointer14.c
+		// FI: I am not sure it is the best translaration
+		// It might be better to remove some zero subscripts from fc
+		points_to_cell_add_zero_subscripts(ac);
+		type ac_nnt = points_to_cell_to_concrete_type(ac);
+		if(!type_equal_p(fc_t, ac_nnt) && !overloaded_type_p(ac_nnt))
+		  pips_internal_error("translation failure.\n");
+	      }
+	    }
 	    points_to tr = make_points_to(copy_cell(fc), copy_cell(ac), a,
 					  make_descriptor_none());
 	    add_arc_to_simple_pt_map(tr, translation);
@@ -475,6 +501,9 @@ set filter_formal_context_according_to_actual_context(list fpcl,
     pips_debug(8, "First translation set for call site:\n");
     print_points_to_set("", translation);
   }
+
+  pips_assert("The points-to translation mapping is well typed",
+	      points_to_translation_mapping_is_typed_p(translation));
 
   /* Now, we have to call about the same function recursively on the
      list of formal sinks */
@@ -668,6 +697,24 @@ void points_to_translation_of_struct_formal_parameter(cell fc,
 
 }
 
+bool points_to_translation_mapping_is_typed_p(set translation)
+{
+  bool typed_p = true;
+  SET_FOREACH(points_to, pt, translation) {
+    cell source = points_to_source(pt);
+    cell sink = points_to_sink(pt);
+    type source_t = points_to_cell_to_concrete_type(source);
+    type sink_t = points_to_cell_to_concrete_type(sink);
+    if(!array_pointer_type_equal_p(source_t, sink_t)
+       && !overloaded_type_p(sink_t)) {
+      typed_p = false;
+      pips_internal_error("Badly typed points-to translation mapping.\n");
+      break;
+    }
+  }
+  return typed_p;
+}
+
 /* Lits al and fpcl are assumed consistent, and consistent with the
    formal parameter ranks. */
 void points_to_translation_of_formal_parameters(list fpcl, 
@@ -696,14 +743,43 @@ void points_to_translation_of_formal_parameters(list fpcl,
       make_approximation_may();
     FOREACH(CELL, ac, acl) {
       cell source = copy_cell(fc);
-      bool to_be_freed;
-      type a_source_t = points_to_cell_to_type(source, &to_be_freed);
-      type source_t = compute_basic_concrete_type(a_source_t);
+      //bool to_be_freed;
+      //type a_source_t = points_to_cell_to_type(ac, &to_be_freed);
+      //type source_t = compute_basic_concrete_type(a_source_t);
+      type source_t = points_to_cell_to_concrete_type(source);
       if(pointer_type_p(source_t)) {
 	cell n_source = copy_cell(fc);
 	cell n_sink = copy_cell(ac);
+	type sink_t = points_to_cell_to_concrete_type(n_sink);
 	//reference n_sink_r = cell_any_reference(n_sink);
 	// points_to_indices_to_unbounded_indices(reference_indices(n_sink_r));
+	if(!type_equal_p(source_t, sink_t)) {
+	  if(array_pointer_type_equal_p(source_t, sink_t))
+	    ; // do nothing: a 1D array is equivalent to a pointer
+	  else if(array_type_p(sink_t)) {
+	    // FI: I do not remember in which case I needed this
+	    points_to_cell_add_zero_subscript(n_sink);
+	  }
+	  else if(scalar_type_p(sink_t)) {
+	    // Pointers/dereferencing11.c:
+	    // "i", double *, and "fifi[3][0]", double [2][3]
+	    reference n_sink_r = cell_any_reference(n_sink);
+	    list n_sink_sl = reference_indices(n_sink_r);
+	    bool succeed_p = false;
+	    if(!ENDP(n_sink_sl)) {
+	      expression ls = EXPRESSION(CAR(gen_last(n_sink_sl)));
+	      if(zero_expression_p(ls)) {
+		// points_to_cell_remove_last_zero_subscript(n_sink);
+		gen_remove_once(&reference_indices(n_sink_r), ls);
+		succeed_p = true;
+	      }
+	    }
+	    if(!succeed_p)
+	      pips_internal_error("Not implemented yet.\n");
+	  }
+	  else
+	    pips_internal_error("Not implemented yet.\n");
+	}
 	points_to pt = make_points_to(n_source, n_sink, copy_approximation(ap),
 				      make_descriptor_none());
 	add_arc_to_simple_pt_map(pt, translation);
@@ -743,10 +819,12 @@ void points_to_translation_of_formal_parameters(list fpcl,
       else {
 	; // No need
       }
-      if(to_be_freed) free_type(a_source_t);
+      //if(to_be_freed) free_type(a_source_t);
     }
     free_approximation(ap);
   }
+  pips_assert("The points-to translation mapping is well typed",
+	      points_to_translation_mapping_is_typed_p(translation));
 }
 
 /* add arcs of set "pt_in_s" to set "pts_kill" if their origin cell is
@@ -941,7 +1019,7 @@ pt_map user_call_to_points_to_interprocedural(call c,
 
     /* We have to test if pts_binded is compatible with pt_in_callee */
     /* We have to start by computing all the elements of E (stubs) */
-    list stubs = stubs_list(pt_in_callee, pt_out_callee);
+    //list stubs = stubs_list(pt_in_callee, pt_out_callee);
     bool compatible_p = true;
     // FI: I do not understand Amira's test
     // = sets_binded_and_in_compatible_p(stubs, fpcl, pts_binded,

@@ -222,18 +222,25 @@ reference expression_to_reference(expression e)
 
 /* Add a set of zero subscripts to a reference "r" by side effect.
  *
- * Used when array names are used to convert to the first array element
+ * Used when array names or partial array references have to to
+ * converted to the first array element.
  */
 void generic_reference_add_fixed_subscripts(reference r, type t, bool zero_p)
 {
   pips_assert("type is of kind variable", type_variable_p(t));
   variable v = type_variable(t);
+  //list rsl = reference_indices(r);
 
   // FI: this assert makes sense within the ri-util framework but is
   // too strong for the kind of references used in effects-util
   // pips_assert("scalar type", ENDP(reference_indices(r)));
 
   list dl = variable_dimensions(v);
+  //
+  //pips_assert("Reference r is correct", gen_length(dl)>=gen_length(rsl));
+  //
+  //FOREACH(EXPRESSION, rs, rsl)
+  //  POP(dl);
   list sl = NIL; // subscript list
   FOREACH(DIMENSION, d, dl) {
     expression s = zero_p? int_to_expression(0) : make_unbounded_expression();
@@ -246,6 +253,14 @@ void generic_reference_add_fixed_subscripts(reference r, type t, bool zero_p)
 void reference_add_zero_subscripts(reference r, type t)
 {
   generic_reference_add_fixed_subscripts(r, t, true);
+}
+
+/* No check on reference r. This may generate an illegal reference if not called properly */
+void reference_add_zero_subscript(reference r)
+{
+  expression z = int_to_expression(0);
+  reference_indices(r) = gen_nconc(reference_indices(r),
+				   CONS(EXPRESSION, z, NIL));
 }
 
 void reference_add_unbounded_subscripts(reference r, type t)

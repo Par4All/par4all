@@ -162,6 +162,7 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
   pt_map pt_out = new_pt_map();
   pt_out = full_copy_pt_map(pt_in);
   instruction i = statement_instruction(s);
+
   if(points_to_graph_bottom(pt_in)) {
     // The information about dead code must be propagated downwards
     pt_out = instruction_to_points_to(i, pt_out);
@@ -220,9 +221,10 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
     statement ms = get_current_module_statement();
     entity m = get_current_module_entity();
     bool main_p = ms==s && entity_main_module_p(m);
+    bool body_p = ms==s;
     list dl = statement_declarations(s);
     points_to_graph_set(pt_out) =
-      points_to_set_block_projection(points_to_graph_set(pt_out), dl, main_p);
+      points_to_set_block_projection(points_to_graph_set(pt_out), dl, main_p, body_p);
   }
 
   /* Because arc removals do not update the approximations of the

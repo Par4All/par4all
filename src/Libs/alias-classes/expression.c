@@ -911,14 +911,32 @@ void offset_array_reference(reference r, expression delta, type et)
  */
 void offset_cells(cell source, list sinks, expression delta, type et, pt_map in)
 {
+  // FI: it would be easier to use two lists of arcs rather than sets.
+  // FI: should we assert that expression delta!=0?
   pt_map old = new_pt_map();
   pt_map new = new_pt_map();
   FOREACH(CELL, sink, sinks) {
     if(!anywhere_cell_p(sink) && !cell_typed_anywhere_locations_p(sink)) {
       points_to pt = find_arc_in_points_to_set(source, sink, in);
-      add_arc_to_pt_map(pt, old);
-      points_to npt = offset_cell(pt, delta, et);
-      add_arc_to_pt_map(npt, new);
+      // FI: the arc may not be found; for instance, you know that
+      // _pp_1[1] points towards *NULL_POINTER*, but this is due to an arc
+      // _pp_1[*]->*NULL_POINTER*; this arc does not have to be updated
+      if(!points_to_undefined_p(pt)) {
+	add_arc_to_pt_map(pt, old);
+	points_to npt = offset_cell(pt, delta, et);
+	add_arc_to_pt_map(npt, new);
+      }
+      else {
+	// Another option would be to generate nothing in this case
+	// since it is taken care of by the lattice...
+
+	// Since pt has not been found in "in", the approximation must be may
+	pt = make_points_to(copy_cell(source), copy_cell(sink),
+			    make_approximation_may(),
+			    make_descriptor_none());
+	points_to npt = offset_cell(pt, delta, et);
+	add_arc_to_pt_map(npt, new);
+      }
     }
   }
   difference_of_pt_maps(in, in, old);

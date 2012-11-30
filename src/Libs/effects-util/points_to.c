@@ -832,3 +832,24 @@ list points_to_cells_to_upper_bound_points_to_cells(list cl)
   ubl = gen_nconc(cl, ubl);
   return ubl;
 }
+
+/* See if the subscript list sl is precise, i.e. if is does not
+ * contain any unbuounded expression.
+ *
+ * It is assumed that it is a points-to subscript list. Each subscript
+ * is either an integer constant, or a field reference or an unbounded
+ * expression.
+ *
+ * This function may have been defined several times...
+ */
+bool exact_points_to_subscript_list_p(list sl)
+{
+  bool exact_p = true;
+  FOREACH(EXPRESSION, s, sl) {
+    if(unbounded_expression_p(s)) {
+      exact_p = false;
+      break;
+    }
+  }
+  return exact_p;
+}

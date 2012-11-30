@@ -235,8 +235,13 @@ pt_map reference_dereferencing_to_points_to(reference r,
     if(n==0) {
       clear_pt_map(in);
       points_to_graph_bottom(in) = true;
-      pips_user_warning("Null or undefined pointer may be dereferenced because of \"%s\".\n",
-			effect_reference_to_string(r));
+      if(statement_points_to_context_defined_p())
+	pips_user_warning("Null or undefined pointer may be dereferenced because of \"%s\" at line %d.\n",
+			  effect_reference_to_string(r),
+			  points_to_context_statement_line_number());
+      else
+	pips_user_warning("Null or undefined pointer may be dereferenced because of \"%s\".\n",
+			  effect_reference_to_string(r));
     }
 
     gen_free_list(sinks);

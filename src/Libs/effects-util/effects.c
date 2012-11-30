@@ -1512,6 +1512,12 @@ void points_to_cell_add_zero_subscripts(cell c)
   points_to_cell_add_fixed_subscripts(c, true);
 }
 
+void points_to_cell_add_zero_subscript(cell c)
+{
+  reference r = cell_any_reference(c);
+  reference_add_zero_subscript(r);
+}
+
 void points_to_cell_add_unbounded_subscripts(cell c)
 {
   points_to_cell_add_fixed_subscripts(c, false);

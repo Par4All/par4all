@@ -553,7 +553,7 @@ type points_to_expression_to_type(expression e, bool * to_be_freed)
  */
 type points_to_expression_to_concrete_type(expression e)
 {
-  bool * to_be_freed;
+  bool to_be_freed;
   type t = points_to_expression_to_type(e, &to_be_freed);
   type ct = compute_basic_concrete_type(t);
   if(to_be_freed) free_type(t);
@@ -608,6 +608,24 @@ type points_to_cell_to_type(cell c, bool *to_be_freed)
   t = points_to_reference_to_type(ref, to_be_freed);
 
   return t;
+}
+
+type points_to_cell_to_concrete_type(cell c)
+{
+  bool to_be_freed;
+  type t = points_to_cell_to_type(c, &to_be_freed);
+  type ct = compute_basic_concrete_type(t);
+  if(to_be_freed) free_type(t);
+  return ct;
+}
+
+type points_to_reference_to_concrete_type(reference r)
+{
+  bool to_be_freed;
+  type t = points_to_reference_to_type(r, &to_be_freed);
+  type ct = compute_basic_concrete_type(t);
+  if(to_be_freed) free_type(t);
+  return ct;
 }
 
 /**

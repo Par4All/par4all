@@ -130,22 +130,47 @@ bool simple_cell_reference_with_address_of_cell_reference_translation_fi
     int nis = (int) gen_length(isl);
     int nas = (int) gen_length(asl);
     if(nis==nas) {
-      bool i_to_be_freed;
-      type it = points_to_reference_to_type(input_ref, &i_to_be_freed);
-      type cit = compute_basic_concrete_type(it);
-      if(i_to_be_freed) free_type(it);
-      bool a_to_be_freed;
-      type at = points_to_reference_to_type(address_of_ref, &a_to_be_freed);
-      type cat = compute_basic_concrete_type(at);
-      if(a_to_be_freed) free_type(at);
+      type cit = points_to_reference_to_concrete_type(input_ref);
+      type cat = points_to_reference_to_concrete_type(address_of_ref);
       if(type_equal_p(cit, cat)) {
-	//*output_ref = copy_reference(address_of_ref);
 	*output_ref = make_reference(reference_variable(address_of_ref), NIL);
-	//list osl = reference_indices(*output_ref);
 	list osl = NIL;
-	// Apply an offset
 	*exact_p = add_points_to_subscript_lists(&osl, asl, isl);
 	reference_indices(*output_ref) = osl;
+      }
+      else
+	ok_p = false;
+    }
+    else if(nis==nas+1) {
+      // Not sure this is useful
+      type cit = points_to_reference_to_concrete_type(input_ref);
+      type cat = points_to_reference_to_concrete_type(address_of_ref);
+      if(type_equal_p(cit, cat)) {
+	*output_ref = make_reference(reference_variable(address_of_ref), NIL);
+	list osl = NIL;
+	*exact_p = add_points_to_subscript_lists(&osl, asl, CDR(isl));
+	reference_indices(*output_ref) = osl;
+      }
+      else
+	ok_p = false;
+    }
+    else if(nis>0 && nas==0) {
+      // EffectsWithPointsTo/array05a: input_ref "r[0][0][0][0]" and
+      // address_of_ref "t" where "r" is a pointer towards a 3-D array "t"
+      expression fs = EXPRESSION(CAR(isl));
+      if(zero_expression_p(fs)) {
+	reference n_input_ref = make_reference(reference_variable(input_ref),
+					       CONS(EXPRESSION, copy_expression(fs), NIL));
+	type cit = points_to_reference_to_concrete_type(n_input_ref);
+	free_reference(n_input_ref);
+	type cat = points_to_reference_to_concrete_type(address_of_ref);
+	if(type_equal_p(cit, cat)) {
+	  *output_ref = copy_reference(address_of_ref); // No subscripts
+	  *exact_p = exact_points_to_subscript_list_p(CDR(isl));
+	  reference_indices(*output_ref) = gen_full_copy_list(CDR(isl));
+	}
+	else
+	  ok_p = false;
       }
       else
 	ok_p = false;
