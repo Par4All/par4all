@@ -249,4 +249,3 @@ int main()
 
    return 0;
 }
-unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
