@@ -1,5 +1,6 @@
-delete array10
-create array10 array10.c
+setenv WSPACE=array10
+delete $WSPACE
+create $WSPACE $WSPACE.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
@@ -7,33 +8,45 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 #setenv POINTER_VALUES_DEBUG_LEVEL 2
 set POINTS_TO_STRICT_POINTER_TYPES TRUE
 
-
 echo 
-echo PROPER  EFFECTS 
-echo
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE [%ALLFUNC]
-
-
-#module main
-echo 
-echo POINTS-TO
+echo Points-to for "foo"
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE [%ALLFUNC]
+display PRINTED_FILE [foo]
 
 echo 
-echo PROPER  EFFECTS WITH POINTS TO
+echo Proper effects with points-to for "foo"
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE [%ALLFUNC]
+display PRINTED_FILE [foo]
 
+echo 
+echo Points-to for "bar"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE [bar]
 
-activate PRINT_CHAINS_GRAPH
-display DG_FILE 
+echo 
+echo Proper effects with points-to for "bar"
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE [bar]
 
+echo 
+echo Points-to for "toto"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE [toto]
+
+echo 
+echo Proper effects with points-to for "toto"
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE [toto]
 
 close
-delete array10
+delete $WSPACE
 quit

@@ -1,0 +1,44 @@
+
+Points-to for "bar"
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+int bar(int *p)
+{
+
+// Points To: none
+
+   int b[100];
+
+// Points To: none
+
+   p = &b[0];
+
+// Points To:
+// p -> b[0] , EXACT
+
+   a[*p++] = 2.;
+
+// Points To:
+// p -> b[1] , EXACT
+
+   return 0;
+}
+
+Proper effects with points-to for "bar"
+
+int bar(int *p)
+{
+   int b[100];
+//             <    is written>: p
+   p = &b[0];
+//             <    is read   >: b[0] p
+//             <    is written>: a[*p++] p
+   a[*p++] = 2.;
+   return 0;
+}

@@ -4,7 +4,7 @@ Points-to for "foo"
 
 // Points To IN:
 // b -> *NULL_POINTER* , MAY
-// b -> _b_1[0] , MAY
+// b -> _b_1[0][0] , MAY
 
 
 // Points To OUT: none
@@ -18,47 +18,47 @@ int foo(float (*b)[3])
 
 // Points To:
 // b -> *NULL_POINTER* , MAY
-// b -> _b_1[0] , MAY
+// b -> _b_1[0][0] , MAY
 
    (*b)[3] = 2.0;
 
 // Points To:
-// b -> _b_1[0] , EXACT
+// b -> _b_1[0][0] , EXACT
 
    c = (*b)[3];
 
 // Points To:
-// b -> _b_1[0] , EXACT
+// b -> _b_1[0][0] , EXACT
 
    b[1][3] = 2.0;
 
 // Points To:
-// b -> _b_1[0] , EXACT
+// b -> _b_1[0][0] , EXACT
 
    c = b[1][3];
 
 // Points To:
-// b -> _b_1[0] , EXACT
+// b -> _b_1[0][0] , EXACT
 
    (*b)[3]++;
 
 // Points To:
-// b -> _b_1[0] , EXACT
+// b -> _b_1[0][0] , EXACT
 
    (*b)[3] += 5.0;
 
 // Points To:
-// b -> _b_1[0] , EXACT
+// b -> _b_1[0][0] , EXACT
 
    b[1][3]++;
 
 // Points To:
-// b -> _b_1[0] , EXACT
+// b -> _b_1[0][0] , EXACT
 
    b[1][3] += 5.0;
 
 // Points To:
-// b -> _b_1[0] , EXACT
+// b -> _b_1[0][0] , EXACT
 
    return 1;
 }
@@ -206,14 +206,18 @@ int foo3()
 int main()
 {
    float a[5][3], ret;
+//             <may be read   >: a[*][3]
+//             <may be written>: a[*][3]
 //             <    is written>: ret
 
    ret = foo(a);
-//             <    is read   >: a[0][3] a[1][3]
-//             <    is written>: a[0][3] a[1][3] ret
+//             <may be read   >: a[*][3]
+//             <may be written>: a[*][3]
+//             <    is written>: ret
    ret = foo2(a);
-//             <    is read   >: d[0][3] d[1][3]
-//             <    is written>: d[0][3] d[1][3] ret
+//             <may be read   >: d[*][3]
+//             <may be written>: d[*][3]
+//             <    is written>: ret
    ret = foo3();
 
    return 1;
@@ -223,6 +227,9 @@ int main()
 
 	63 --> 64 with conflicts
 		from <ret-W-EXACT> to <ret-W-EXACT>
+		from <a[*][3]-W-MAY> to <a[*][3]-W-MAY>
+		from <a[*][3]-W-MAY> to <a[*][3]-R-MAY>
+		from <a[*][3]-R-MAY> to <a[*][3]-W-MAY>
 	64 --> 65 with conflicts
 		from <ret-W-EXACT> to <ret-W-EXACT>
 

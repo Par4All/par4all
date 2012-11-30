@@ -1,4 +1,272 @@
 
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int t[100][10][3];
+
+
+// Points To: none
+
+   int (*p)[3];
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int *pu;
+
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pu -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   int (*q)[10][3];
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pu -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+   int (*qu)[3];
+
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pu -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int (*r)[100][10][3];
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pu -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
+
+   int (*ru)[10][3];
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pu -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
+// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+   
+   
+   p = &t[1][2];
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
+// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+   (*p)[1] = 0;
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
+// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+   p[1][1] = 0;
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
+// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+
+   pu = &t[1][2][0];
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
+// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+   *pu = 0;
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
+// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+   pu[2] = 0;
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
+// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+
+   q = &t[1];
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
+// q -> t[1] , EXACT
+// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
+// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+   ((*q)[2])[3] = 0;
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
+// q -> t[1] , EXACT
+// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
+// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+   q[1][2][3] = 0;
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
+// q -> t[1] , EXACT
+// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
+// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+
+   qu = &t[1][0];
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
+// q -> t[1] , EXACT
+// qu -> t[1][0] , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
+// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+   (*qu)[1] = 0;
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
+// q -> t[1] , EXACT
+// qu -> t[1][0] , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
+// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+   qu[1][1] = 0;
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
+// q -> t[1] , EXACT
+// qu -> t[1][0] , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
+// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+
+   r = &t;
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
+// q -> t[1] , EXACT
+// qu -> t[1][0] , EXACT
+// r -> t , EXACT
+// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+   (((*r)[0])[0])[0] = 0;
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
+// q -> t[1] , EXACT
+// qu -> t[1][0] , EXACT
+// r -> t , EXACT
+// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+   (((*r)[1])[2])[3] = 0;
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
+// q -> t[1] , EXACT
+// qu -> t[1][0] , EXACT
+// r -> t , EXACT
+// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
+
+   ru = &t[0];
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
+// q -> t[1] , EXACT
+// qu -> t[1][0] , EXACT
+// r -> t , EXACT
+// ru -> t[0] , EXACT
+
+   ((*ru)[0])[0] = 0;
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
+// q -> t[1] , EXACT
+// qu -> t[1][0] , EXACT
+// r -> t , EXACT
+// ru -> t[0] , EXACT
+
+   ru[0][0][0] = 0;
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
+// q -> t[1] , EXACT
+// qu -> t[1][0] , EXACT
+// r -> t , EXACT
+// ru -> t[0] , EXACT
+
+   ru[1][2][1] = 0;
+
+// Points To:
+// p -> t[1][2] , EXACT
+// pu -> t[1][2][0] , EXACT
+// q -> t[1] , EXACT
+// qu -> t[1][0] , EXACT
+// r -> t , EXACT
+// ru -> t[0] , EXACT
+
+
+   return 0;
+}
+
+Proper effects for "main"
+
 int main()
 {
    int t[100][10][3];
@@ -72,44 +340,3 @@ int main()
 
    return 0;
 }
-
- *********************** Use-Def Chains *********************
-
-	17 --> 18 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	17 --> 19 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	18 --> 40 with conflicts
-		from <t[1][2][1]-W-EXACT> to <t[1][2][1]-W-EXACT>
-	21 --> 22 with conflicts
-		from <pu-W-EXACT> to <pu-R-EXACT>
-	21 --> 23 with conflicts
-		from <pu-W-EXACT> to <pu-R-EXACT>
-	25 --> 26 with conflicts
-		from <q-W-EXACT> to <q-R-EXACT>
-	25 --> 27 with conflicts
-		from <q-W-EXACT> to <q-R-EXACT>
-	26 --> 35 with conflicts
-		from <t[1][2][3]-W-EXACT> to <t[1][2][3]-W-EXACT>
-	29 --> 30 with conflicts
-		from <qu-W-EXACT> to <qu-R-EXACT>
-	29 --> 31 with conflicts
-		from <qu-W-EXACT> to <qu-R-EXACT>
-	33 --> 34 with conflicts
-		from <r-W-EXACT> to <r-R-EXACT>
-	33 --> 35 with conflicts
-		from <r-W-EXACT> to <r-R-EXACT>
-	34 --> 38 with conflicts
-		from <t[0][0][0]-W-EXACT> to <t[0][0][0]-W-EXACT>
-	34 --> 39 with conflicts
-		from <t[0][0][0]-W-EXACT> to <t[0][0][0]-W-EXACT>
-	37 --> 38 with conflicts
-		from <ru-W-EXACT> to <ru-R-EXACT>
-	37 --> 39 with conflicts
-		from <ru-W-EXACT> to <ru-R-EXACT>
-	37 --> 40 with conflicts
-		from <ru-W-EXACT> to <ru-R-EXACT>
-	38 --> 39 with conflicts
-		from <t[0][0][0]-W-EXACT> to <t[0][0][0]-W-EXACT>
-
-****************** End of Dependence Graph ******************

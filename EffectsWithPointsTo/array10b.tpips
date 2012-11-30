@@ -1,4 +1,4 @@
-setenv WSPACE=array11
+setenv WSPACE=array10b
 delete $WSPACE
 create $WSPACE $WSPACE.c
 
@@ -9,32 +9,18 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 set POINTS_TO_STRICT_POINTER_TYPES TRUE
 
 echo 
-echo Points-to for "titi"
+echo Points-to for "bar"
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE [titi]
+display PRINTED_FILE [bar]
 
-echo
-echo Proper effects with points-to for "titi"
+echo 
+echo Proper effects with points-to for "bar"
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE [titi]
-
-echo
-echo Dependence graph for "titi"
-echo
-
-activate PRINT_CHAINS_GRAPH
-display DG_FILE 
+display PRINTED_FILE [bar]
 
 close
-
-echo
-echo Warnings and errors
-echo
-
-shell cat $WSPACE.database/Warnings
-
 delete $WSPACE
 quit
