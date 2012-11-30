@@ -1952,7 +1952,7 @@ set points_to_recursive_statement(statement current,
                                          pt_in, store);
     statement ls = forloop_body(instruction_forloop(i));
     if(statement_block_p(ls) && !ENDP(dl=statement_declarations(ls)))
-      pt_out = points_to_set_block_projection(pt_out, dl, false);
+      pt_out = points_to_set_block_projection(pt_out, dl, false, false);
   }
     break;
   case is_instruction_expression: {
