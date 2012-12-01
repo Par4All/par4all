@@ -938,7 +938,10 @@ list cast_to_points_to_sinks(cast c,
 	      // type is reached.
 	      reference r = cell_any_reference(c);
 	      complete_points_to_reference_with_zero_subscripts(r);
-	      adapt_reference_to_type(r, pt);
+	      if(adapt_reference_to_type(r, pt))
+		;
+	      else
+		pips_internal_error("Cast handling failure 1.\n");
 	      if(to_be_freed) free_type(mct);
 	      mct = points_to_cell_to_type(c, &m_to_be_freed);
 
@@ -976,7 +979,10 @@ list cast_to_points_to_sinks(cast c,
 	    if(pointer_type_p(t) && array_type_p(cct)) {
 	      reference r = cell_any_reference(c);
 	      complete_points_to_reference_with_zero_subscripts(r);
-	      adapt_reference_to_type(r, t);
+	      if(adapt_reference_to_type(r, t))
+		;
+	      else
+		pips_internal_error("Cast handling failure 2.\n");
 	    }
 	    else
 	      pips_internal_error("Not implemented yet: stub with proper type needed.\n");
@@ -1247,8 +1253,9 @@ expression pointer_subscript_to_expression(cell c, list csl)
  * remove the excessive subscripts of "r" with respect to type
  * "at"...
  */
-void adapt_reference_to_type(reference r, type et)
+bool adapt_reference_to_type(reference r, type et)
 {
+  bool succeed_p = true;
   bool to_be_freed;
   type at = compute_basic_concrete_type(et);
   type rt = points_to_reference_to_type(r, &to_be_freed);
@@ -1269,12 +1276,14 @@ void adapt_reference_to_type(reference r, type et)
     type nrt = points_to_reference_to_type(r, &to_be_freed);
     t = compute_basic_concrete_type(nrt);
   }
-  if(!array_pointer_type_equal_p(at, t)) {
+  if(!array_pointer_string_type_equal_p(at, t)) {
     pips_user_warning("There may be a typing error at line %d (e.g. improper malloc call).",
 		      points_to_context_statement_line_number());
-    pips_internal_error("Cell type mismatch.");
+    //pips_internal_error("Cell type mismatch.");
+    succeed_p = false;
   }
   if(to_be_freed) free_type(t);
+  return succeed_p;
 }
 
  /* Generate the corresponding points-to reference(s). All access
@@ -1341,9 +1350,12 @@ list subscript_to_points_to_sinks(subscript s,
 
 	  // FI: an horror... fixing a design mistake by a kludge...
 	  // useful for argv03, disastrous for dereferencing08
-	  if(!points_to_array_reference_p(r))
-	    adapt_reference_to_type(r, at);
-
+	  if(!points_to_array_reference_p(r)) {
+	    if(adapt_reference_to_type(r, at))
+	      ;
+	    else
+	      pips_internal_error("Subscript handling failure 1.\n");
+	  }
 	  // FI: the update depends on the sink model
 	  // points_to_reference_update_final_subscripts(r, ncsl);
 	  reference_indices(r) = gen_nconc(reference_indices(r), ncsl);
@@ -1357,7 +1369,11 @@ list subscript_to_points_to_sinks(subscript s,
 	  // the new indices (Strict_typing.sub/assignment11.c
 
 	  // FI: an horror... fixing a design mistake by a kludge...
-	  adapt_reference_to_type(r, at);
+	  if(adapt_reference_to_type(r, at))
+	    ;
+	  else
+	      pips_internal_error("Subscript handling failure 1.\n");
+
 	  reference_indices(r) = gen_nconc(reference_indices(r), ncsl);
 	}
 

@@ -393,6 +393,42 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
   return;
 }
 
+/* We have to handle constant strings such as "Hello!"  and not to
+ * forget functional parameters or other types. Basically, type "t" is
+ * returned unchanged, unless "t" is a functional type "void->string".
+ *
+ * The initial implementation of this function used the cell "ac" and the
+ * variable "a" whose type is sought and was safer:
+ *
+ *  reference ar = cell_any_reference(ac);
+ *  entity a = reference_variable(ar);
+ *  if(constant_string_entity_p(a))
+ *     nt = ...
+ *
+ * Any function of type "void->string" is considered a "string"
+ * object. Let's hope it is ok in the points-to environment. Else, an
+ * additional parameter must be passed.
+ *
+ * This function is located in the points-to library because it is
+ * where it is useful. It would be even more useful if it returned a
+ * "char *" or a "char[]", but this would imply a type allocation. As
+ * it is, no new type is allocated.
+ *
+ * To be fully effective, the argument must be a basic concrete type.
+ */
+static type constant_string_type_to_string_type(type t)
+{
+  type nt = t; // default returned value: no change
+  if(type_functional_p(t)) {
+    functional f = type_functional(t);
+    type rt = functional_result(f);
+    list pl = functional_parameters(f);
+    if(ENDP(pl) && string_type_p(rt))
+      nt = rt;
+  }
+  return nt;
+}
+
 /* Filter pt_in_callee according to pts_binded. For instance, a
    formal parameter can point to NULL in pt_in_callee only if it
    also points to NULL in pts_binded. In the same way, a formal
@@ -471,18 +507,45 @@ set filter_formal_context_according_to_actual_context(list fpcl,
 	FOREACH(CELL, ac, al) {
 	  if(!null_cell_p(ac) && !nowhere_cell_p(ac)) {
 	    type fc_t = points_to_cell_to_concrete_type(fc);
-	    type ac_t = points_to_cell_to_concrete_type(ac);
-	    if(!type_equal_p(fc_t, ac_t)) {
-	      points_to_cell_add_zero_subscript(ac);
-	      type ac_nt = points_to_cell_to_concrete_type(ac);
-	      if(!type_equal_p(fc_t, ac_nt) && !overloaded_type_p(ac_nt)) {
-		// Pointers/pointer14.c
-		// FI: I am not sure it is the best translaration
-		// It might be better to remove some zero subscripts from fc
-		points_to_cell_add_zero_subscripts(ac);
-		type ac_nnt = points_to_cell_to_concrete_type(ac);
-		if(!type_equal_p(fc_t, ac_nnt) && !overloaded_type_p(ac_nnt))
-		  pips_internal_error("translation failure.\n");
+	    type iac_t = points_to_cell_to_concrete_type(ac);
+	    type ac_t = constant_string_type_to_string_type(iac_t);
+	    /* We have to handle constant strings such as "Hello!"
+	       and not to forget functional parameters. */
+	    if(type_functional_p(ac_t)) {
+	      reference ar = cell_any_reference(ac);
+	      entity a = reference_variable(ar);
+	      if(constant_string_entity_p(a)) {
+		ac_t = functional_result(type_functional(iac_t));
+	      }
+	    }
+	    if(!array_pointer_string_type_equal_p(fc_t, ac_t)
+	       && !overloaded_type_p(ac_t)) {
+	      if(array_type_p(ac_t)) {
+		points_to_cell_add_zero_subscript(ac);
+		type ac_nt = points_to_cell_to_concrete_type(ac);
+		if(!type_equal_p(fc_t, ac_nt) && !overloaded_type_p(ac_nt)) {
+		  // Pointers/pointer14.c
+		  // FI: I am not sure it is the best translaration
+		  // It might be better to remove some zero subscripts from fc
+		  points_to_cell_complete_with_zero_subscripts(ac);
+		  type ac_nnt = points_to_cell_to_concrete_type(ac);
+		  if(!type_equal_p(fc_t, ac_nnt) && !overloaded_type_p(ac_nnt))
+		    pips_internal_error("translation failure for an array.\n");
+		}
+	      }
+	      else {
+		reference fr = cell_any_reference(fc);
+		if(adapt_reference_to_type(fr, ac_t))
+		  ;
+		else {
+		  reference ar = cell_any_reference(ac);
+		  pips_user_error
+		    ("Translation failure for actual parameter \"%s\" at line %d.\n"
+		     "Maybe property POINTS_TO_STRICT_POINTER_TYPES should be reset.\n",
+		     reference_to_string(ar),
+		     points_to_context_statement_line_number());
+		  // pips_internal_error("translation failure.\n");
+		}
 	      }
 	    }
 	    points_to tr = make_points_to(copy_cell(fc), copy_cell(ac), a,
@@ -704,8 +767,18 @@ bool points_to_translation_mapping_is_typed_p(set translation)
     cell source = points_to_source(pt);
     cell sink = points_to_sink(pt);
     type source_t = points_to_cell_to_concrete_type(source);
-    type sink_t = points_to_cell_to_concrete_type(sink);
-    if(!array_pointer_type_equal_p(source_t, sink_t)
+    type isink_t = points_to_cell_to_concrete_type(sink);
+    type sink_t = constant_string_type_to_string_type(isink_t);
+#if 0
+    if(type_functional_p(isink_t)) {
+      reference ar = cell_any_reference(ac);
+      entity a = reference_variable(ar);
+      if(constant_string_entity_p(a)) {
+	sink_t = ...;
+      }
+    }
+#endif
+    if(!array_pointer_string_type_equal_p(source_t, sink_t)
        && !overloaded_type_p(sink_t)) {
       typed_p = false;
       pips_internal_error("Badly typed points-to translation mapping.\n");
@@ -1114,8 +1187,8 @@ pt_map user_call_to_points_to_interprocedural(call c,
   }
   else {
     // FI: I do not think we want this warning in general!
-    pips_user_warning("Function has no side effect on its formal context "
-		      "via pointer variables.\n");
+    pips_user_warning("Function \"%s\" has no side effect on its formal context "
+		      "via pointer variables.\n", entity_user_name(f));
   }
 
   /* This cannot be performed earlier because the points-to

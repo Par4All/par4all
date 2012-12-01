@@ -263,6 +263,32 @@ void reference_add_zero_subscript(reference r)
 				   CONS(EXPRESSION, z, NIL));
 }
 
+/* Reference r to an array maybe partial, as is possible in C: with
+   declaration "int a[10][10]", references "a", "a[i]" and "a[i][j]"
+   are all legal. The subscript list of reference r is completed with
+   0 subscript to reference an array element. */
+void reference_complete_with_zero_subscripts(reference r)
+{
+  list rsl = reference_indices(r);
+  entity e = reference_variable(r);
+  type t = entity_basic_concrete_type(e);
+  pips_assert("t is a type of kind variable", type_variable_p(t));
+  variable v = type_variable(t);
+  list dl = variable_dimensions(v);
+
+  if(gen_length(dl)>gen_length(rsl)) {
+    FOREACH(EXPRESSION, rs, rsl)
+      POP(dl);
+    list sl = NIL; // subscript list
+    FOREACH(DIMENSION, d, dl) {
+      // expression s = zero_p? int_to_expression(0) : make_unbounded_expression();
+      expression s = int_to_expression(0);
+      sl = CONS(EXPRESSION, s, sl);
+    }
+    reference_indices(r) = gen_nconc(reference_indices(r), sl);
+  }
+}
+
 void reference_add_unbounded_subscripts(reference r, type t)
 {
   generic_reference_add_fixed_subscripts(r, t, false);
@@ -2393,8 +2419,7 @@ bool expression_string_constant_p(expression exp) {
   if(expression_constant_p(exp) && expression_call_p(exp) ) {
     call c = expression_call(exp);
     entity operator = call_function(c);
-    const char * eun = entity_user_name(operator);
-    return ( eun[0]=='"' && eun[strlen(eun)-1] == '"' ) ;
+    constant_string_entity_p(operator);
   }
   return false;
 }

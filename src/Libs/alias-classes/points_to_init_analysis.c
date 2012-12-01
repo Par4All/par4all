@@ -136,9 +136,15 @@ entity create_stub_entity(entity e, string fs, type t)
   }
   else if(top_level_entity_p(e) && !entity_stub_sink_p(e)) {
     // FI: global_variable_p()
-    // Naming for sinks of global variable: use their offsets
+    // Naming for sinks of global variables: use their offsets
     int off = ram_offset(storage_ram(entity_storage(e)));
-    s = strdup(concatenate("_", en, fs,"_", i2a(off), NULL));
+    /* FI: I assume all unknown offsets defined in ri-util-local.h to
+       be strictly negative. */
+    if(off>=0)
+      s = strdup(concatenate("_", en, fs, "_", i2a(off), NULL));
+    else
+      /* FI: we could use a 0 as default offset for clarity? */
+      s = strdup(concatenate("_", en, fs, "_", NULL));
   }
   else if(static_global_variable_p(e)){ // "static int i;"
     // Naming for sinks of static global variable: use their offsets

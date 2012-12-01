@@ -513,6 +513,33 @@ bool array_pointer_type_equal_p(type t1, type t2)
   return equal_p;
 }
 
+/* Assume that a pointer to type x is equal to a 1-D array of x. And
+   do not forget the PIPS "string" exception. Constants strings are given type string instead of char[n] or char *. */
+bool array_pointer_string_type_equal_p(type t1, type t2)
+{
+  bool equal_p = true;
+  if(string_type_p(t1))
+    if(string_type_p(t2))
+      equal_p = type_equal_p(t1,t2);
+    else {
+      /* Convert t1 */
+      type nt1 = make_scalar_char_pointer_type();
+      equal_p = array_pointer_type_equal_p(nt1, t2);
+      free_type(nt1);
+    }
+  else
+    if(string_type_p(t2)) {
+      /* Convert t2 */
+      type nt2 = make_scalar_char_pointer_type();
+      equal_p = array_pointer_type_equal_p(t1, nt2);
+      free_type(nt2);
+    }
+    else
+      equal_p = array_pointer_type_equal_p(t1, t2);
+
+  return equal_p;
+}
+
 /* is "et" the type of an element of an array of type "at"? */
 bool array_element_type_p(type at, type et)
 {
@@ -4829,6 +4856,17 @@ type make_char_array_type(int n)
 
   return t;
 }
+
+/* Allocate a char * pointer type */
+type make_scalar_char_pointer_type()
+{
+  type pt = make_scalar_integer_type(DEFAULT_CHARACTER_TYPE_SIZE);
+  basic b = make_basic_pointer(pt);
+  variable v = make_variable(b, NIL, NIL);
+  type t = make_type_variable(v);
+  return t;
+}
+
 bool overloaded_parameters_p(list lparams)
 {
   bool overloaded_p = true;
