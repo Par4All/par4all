@@ -2,10 +2,14 @@
 Points-to for "init_s"
 
 
-// Points To IN: none
+// Points To IN:
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
 
 void init_s(s_t s, int max)
 {
@@ -22,6 +26,8 @@ void init_s(s_t s, int max)
 
 // Points To:
 // s.tab -> *HEAP*_l_14[0] , MAY
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
 
    fprintf(stderr, "In init_s, s.tab=%p\n", s.tab);
 }
@@ -85,10 +91,12 @@ void compute_s(s_t s, int max)
 Points-to for "main"
 
 
-// Points To IN: none
+// Points To IN:
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 int main()
 {
@@ -109,18 +117,17 @@ int main()
    init_s(s, 10);
 
 // Points To:
-// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
 
    fprintf(stderr, "In main, s.tab=%p\n", s.tab);
 
-// Points To:
-// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// Points To: unreachable
 
 
    compute_s(s, 10);
 
-// Points To:
-// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// Points To: unreachable
 
    
    
@@ -147,7 +154,6 @@ int main()
 //             <    is read   >: s.tab stderr __IO_EFFECTS:LUNS[2]
 //             <    is written>: __IO_EFFECTS:LUNS[2]
    fprintf(stderr, "In main, s.tab=%p\n", s.tab);
-//             <    is read   >: s.max s.tab
 
    compute_s(s, 10);
    
@@ -169,12 +175,23 @@ int main()
 
 Warnings (A memory leak should be detected when exiting init_s)
 
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[init_s] (CSafeSizeOfArray) Varying size for array "pointer_modif04!:_IO_FILE^_unused2"
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[init_s] (CSafeSizeOfArray) Not yet supported properly by PIPS
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[init_s] (points_to_function_projection) Memory cell *HEAP*_l_14[0] leaked.
 unknown[unknown] (activate_phase) Rule `PROPER_EFFECTS_WITH_POINTS_TO' already active
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function has no side effect on its formal context via pointer variables.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Assignment of an undefined value at line 34.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) 
+Uninitialized or null pointer dereferenced: Sink missing for a source based on "s".
+Update points-to property POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING and/or POINTS_TO_UNINITIALIZED_NULL_DEREFERENCING according to needs.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (binary_intrinsic_call_to_points_to_sinks) Some kind of execution error has been encountered.
 unknown[unknown] (activate_phase) Rule `PROPER_EFFECTS_WITH_POINTS_TO' already active
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function has no side effect on its formal context via pointer variables.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function has no side effect on its formal context via pointer variables.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function has no side effect on its formal context via pointer variables.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Assignment of an undefined value at line 34.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) 
+Uninitialized or null pointer dereferenced: Sink missing for a source based on "s".
+Update points-to property POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING and/or POINTS_TO_UNINITIALIZED_NULL_DEREFERENCING according to needs.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (binary_intrinsic_call_to_points_to_sinks) Some kind of execution error has been encountered.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Assignment of an undefined value at line 34.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) 
+Uninitialized or null pointer dereferenced: Sink missing for a source based on "s".
+Update points-to property POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING and/or POINTS_TO_UNINITIALIZED_NULL_DEREFERENCING according to needs.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (binary_intrinsic_call_to_points_to_sinks) Some kind of execution error has been encountered.

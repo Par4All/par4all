@@ -26,7 +26,9 @@ pointer alloc_pointer(int v)
    return p;
 }
 
-// Points To IN: none
+// Points To IN:
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_[0] , MAY
 
 
 // Points To OUT: none
@@ -77,6 +79,8 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_[0] , MAY
 
    // 36 17 19
    // no pointer assigned
@@ -86,6 +90,8 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_[0] , MAY
 
    
    // no pointer assigned! can keep all points-to
@@ -95,6 +101,8 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_[0] , MAY
 
    
    // no pointer assigned! can keep all points-to
@@ -104,6 +112,8 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_[0] , MAY
 
    
    // 36 17 53
