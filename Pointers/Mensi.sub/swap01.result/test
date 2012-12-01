@@ -12,13 +12,14 @@ int main()
 
 // Points To: none
 
-   int i = 1, j = 2, *pi = &i, *pj = &j, **ppi = &pi, **ppj = &pj;
+   int i = 1, j = 2, z = 3, *pi = &i, *pj = &j, *pz = &z, **ppi = &pi, **ppj = &pj;
 
 // Points To:
 // pi -> i , EXACT
 // pj -> j , EXACT
 // ppi -> pi , EXACT
 // ppj -> pj , EXACT
+// pz -> z , EXACT
 
    swap01(ppi, ppj);
 
@@ -27,6 +28,7 @@ int main()
 // pj -> i , EXACT
 // ppi -> pi , EXACT
 // ppj -> pj , EXACT
+// pz -> z , EXACT
 
 
    return 0;
@@ -84,8 +86,8 @@ PROPER  EFFECTS WITH POINTS TO
 
 int main()
 {
-//             <    is written>: i j pi pj ppi ppj
-   int i = 1, j = 2, *pi = &i, *pj = &j, **ppi = &pi, **ppj = &pj;
+//             <    is written>: i j pi pj ppi ppj pz z
+   int i = 1, j = 2, z = 3, *pi = &i, *pj = &j, *pz = &z, **ppi = &pi, **ppj = &pj;
 //             <    is read   >: pj ppi ppj
 //             <    is written>: pi pj
    swap01(ppi, ppj);
@@ -113,8 +115,8 @@ CUMULATED  EFFECTS WITH POINTS TO
 
 int main()
 {
-//             <    is written>: i j pi pj ppi ppj
-   int i = 1, j = 2, *pi = &i, *pj = &j, **ppi = &pi, **ppj = &pj;
+//             <    is written>: i j pi pj ppi ppj pz z
+   int i = 1, j = 2, z = 3, *pi = &i, *pj = &j, *pz = &z, **ppi = &pi, **ppj = &pj;
 //             <    is read   >: pj ppi ppj
 //             <    is written>: pi pj
    swap01(ppi, ppj);
@@ -153,13 +155,14 @@ int main()
 
 // Points To: none
 
-   int i = 1, j = 2, *pi = &i, *pj = &j, **ppi = &pi, **ppj = &pj;
+   int i = 1, j = 2, z = 3, *pi = &i, *pj = &j, *pz = &z, **ppi = &pi, **ppj = &pj;
 
 // Points To:
 // pi -> i , EXACT
 // pj -> j , EXACT
 // ppi -> pi , EXACT
 // ppj -> pj , EXACT
+// pz -> z , EXACT
 
    swap01(ppi, ppj);
 
@@ -168,6 +171,7 @@ int main()
 // pj -> i , EXACT
 // ppi -> pi , EXACT
 // ppj -> pj , EXACT
+// pz -> z , EXACT
 
 
    return 0;
@@ -222,4 +226,5 @@ void swap01(int **p, int **q)
 }
 C_PARSER[main] (simplify_C_expression) Variable "i" is probably used before it is defined
 C_PARSER[main] (simplify_C_expression) Variable "j" is probably used before it is defined
+C_PARSER[main] (simplify_C_expression) Variable "z" is probably used before it is defined
 unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

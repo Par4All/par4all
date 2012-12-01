@@ -49,7 +49,8 @@ int main()
    return 0;
 }
 
-// Points To IN: none
+// Points To IN:
+// msg -> _msg_1 , EXACT
 
 
 // Points To OUT: unreachable
@@ -57,11 +58,13 @@ int main()
 void msg_error(char *msg)
 {
 
-// Points To: none
+// Points To:
+// msg -> _msg_1 , EXACT
 
    printf("%s", msg);
 
-// Points To: none
+// Points To:
+// msg -> _msg_1 , EXACT
 
    exit(1);
 }
@@ -86,7 +89,7 @@ int main()
 }
 void msg_error(char *msg)
 {
-//             <may be read   >: stdout[0]
+//             <may be read   >: _msg_1 stdout[0]
 //             <may be written>: stdout[0]
 //             <    is read   >: msg stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
@@ -116,13 +119,13 @@ int main()
 
    return 0;
 }
-//             <may be read   >: stdout[0]
+//             <may be read   >: _msg_1 stdout[0]
 //             <may be written>: stdout[0]
 //             <    is read   >: msg stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 void msg_error(char *msg)
 {
-//             <may be read   >: stdout[0]
+//             <may be read   >: _msg_1 stdout[0]
 //             <may be written>: stdout[0]
 //             <    is read   >: msg stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]

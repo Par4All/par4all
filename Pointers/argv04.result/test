@@ -3,8 +3,16 @@ POINTS-TO
 
 
 // Points To IN:
+// _argv_2[*] -> *NULL_POINTER* , MAY
 // _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[1] -> *NULL_POINTER* , MAY
+// _argv_2[2] -> *NULL_POINTER* , MAY
+// _argv_2[3] -> *NULL_POINTER* , MAY
+// _argv_2[*] -> _argv_2_2[*][0] , MAY
 // _argv_2[0] -> _argv_2_2[0][0] , MAY
+// _argv_2[1] -> _argv_2_2[1][0] , MAY
+// _argv_2[2] -> _argv_2_2[2][0] , MAY
+// _argv_2[3] -> _argv_2_2[3][0] , MAY
 // argv -> *NULL_POINTER* , MAY
 // argv -> _argv_2[0] , MAY
 
@@ -36,8 +44,16 @@ int main(int argc, char **argv)
    for(i = 0; i <= argc-1; i += 1) {
 
 // Points To:
+// _argv_2[*] -> *NULL_POINTER* , MAY
 // _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[1] -> *NULL_POINTER* , MAY
+// _argv_2[2] -> *NULL_POINTER* , MAY
+// _argv_2[3] -> *NULL_POINTER* , MAY
+// _argv_2[*] -> _argv_2_2[*][0] , MAY
 // _argv_2[0] -> _argv_2_2[0][0] , MAY
+// _argv_2[1] -> _argv_2_2[1][0] , MAY
+// _argv_2[2] -> _argv_2_2[2][0] , MAY
+// _argv_2[3] -> _argv_2_2[3][0] , MAY
 // argv -> _argv_2[*] , MAY
 // argv -> _argv_2[0] , MAY
 // argv -> _argv_2[1] , MAY
@@ -49,8 +65,16 @@ int main(int argc, char **argv)
       printf("%s\n", *argv);
 
 // Points To:
+// _argv_2[*] -> *NULL_POINTER* , MAY
 // _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[1] -> *NULL_POINTER* , MAY
+// _argv_2[2] -> *NULL_POINTER* , MAY
+// _argv_2[3] -> *NULL_POINTER* , MAY
+// _argv_2[*] -> _argv_2_2[*][0] , MAY
 // _argv_2[0] -> _argv_2_2[0][0] , MAY
+// _argv_2[1] -> _argv_2_2[1][0] , MAY
+// _argv_2[2] -> _argv_2_2[2][0] , MAY
+// _argv_2[3] -> _argv_2_2[3][0] , MAY
 // argv -> _argv_2[*] , MAY
 // argv -> _argv_2[0] , MAY
 // argv -> _argv_2[1] , MAY
@@ -63,8 +87,16 @@ int main(int argc, char **argv)
    }
 
 // Points To:
+// _argv_2[*] -> *NULL_POINTER* , MAY
 // _argv_2[0] -> *NULL_POINTER* , MAY
+// _argv_2[1] -> *NULL_POINTER* , MAY
+// _argv_2[2] -> *NULL_POINTER* , MAY
+// _argv_2[3] -> *NULL_POINTER* , MAY
+// _argv_2[*] -> _argv_2_2[*][0] , MAY
 // _argv_2[0] -> _argv_2_2[0][0] , MAY
+// _argv_2[1] -> _argv_2_2[1][0] , MAY
+// _argv_2[2] -> _argv_2_2[2][0] , MAY
+// _argv_2[3] -> _argv_2_2[3][0] , MAY
 // argv -> _argv_2[*] , MAY
 // argv -> _argv_2[0] , MAY
 // argv -> _argv_2[1] , MAY
