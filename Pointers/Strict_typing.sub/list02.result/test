@@ -848,6 +848,8 @@ double list_value(list lv)
 
 // Points To IN:
 // nil -> *NULL_POINTER* , EXACT
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_ , MAY
 
 
 // Points To OUT: none
@@ -896,6 +898,8 @@ int main(void)
 // l -> list_cons:*HEAP*_l_15 , MAY
 // l -> *NULL_POINTER* , MAY
 // nil -> *NULL_POINTER* , EXACT
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_ , MAY
 
    fprintf(stdout, "n=%d", n);
 
@@ -903,12 +907,16 @@ int main(void)
 // l -> list_cons:*HEAP*_l_15 , MAY
 // l -> *NULL_POINTER* , MAY
 // nil -> *NULL_POINTER* , EXACT
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_ , MAY
 
    list_clean(&l);
 
 // Points To:
 // l -> *NULL_POINTER* , EXACT
 // nil -> *NULL_POINTER* , EXACT
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_ , MAY
 
    return 0;
 }

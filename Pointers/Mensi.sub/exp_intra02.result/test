@@ -6,7 +6,9 @@ int main()
 
 //             <    is written>: m n
    int n = 4, m = 3;
+//             <    is read   >: m n
    int a[n][m];
+//             <    is read   >: m
 //             <    is written>: p
    int (*p)[m] = a;
 //             <    is read   >: p
@@ -61,7 +63,9 @@ int main()
 
 //             <    is written>: m n
    int n = 4, m = 3;
+//             <    is read   >: m n
    int a[n][m];
+//             <    is read   >: m
 //             <    is written>: p
    int (*p)[m] = a;
 //             <    is read   >: p
@@ -79,7 +83,9 @@ int main()
 
 //             <    is written>: m n
    int n = 4, m = 3;
+//             <    is read   >: m n
    int a[n][m];
+//             <    is read   >: m
 //             <    is written>: p
    int (*p)[m] = a;
 //             <    is read   >: p

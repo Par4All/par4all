@@ -1,4 +1,8 @@
-/*  */
+/* Same as global03.c, but different tpips script 
+ *
+ * Check points-to analysis for computation unit, initial points-to
+ * and program points-to.
+ */
 
 typedef struct two_fields{int one; int two[10];} tf_t;
 
@@ -7,7 +11,7 @@ tf_t s;
 int *pi = &i[0];
 tf_t *q = &s;
 
-int global03()
+int global03a()
 {
   int * p = i;
   *pi = 1;

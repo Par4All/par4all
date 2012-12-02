@@ -1,0 +1,96 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: unreachable
+
+double dereferencing13()
+{
+
+// Points To: none
+
+   double x[3] = {1., 2., 3.};
+
+// Points To: none
+
+   double *p[3] = {&x[0], &x[1], &x[2]};
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+   double **q = &p[0];
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> p[0] , EXACT
+
+   double **w;
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> p[0] , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int i = 1;
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> p[0] , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   
+   
+   **q = 2.;
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> p[0] , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   **(q+(i = 0)) = 3.;
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> p[0] , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   // w is used unitialized and this is not detected by the points-to analysis
+   **(w+(i = 2)) = 4.;
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> p[0] , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   x[0] = **q;
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> p[0] , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   q++;
+   // *q++;
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> p[1] , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   double *z1 = *q++;
+
+// Points To: unreachable
+
+   double *z2;
+
+// Points To: unreachable
+
+   z2 = *q++;
+
+// Points To: unreachable
+
+   return *z1+*z2-**w;
+}

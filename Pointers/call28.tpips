@@ -1,0 +1,40 @@
+setenv WSPACE=call28
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+
+# For provisional interprocedural analysis, two properties
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
+echo 
+echo Points-to for "call28"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[call28]
+
+echo 
+echo Points-to for "main"
+echo
+
+activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+echo 
+echo Proper effects with points-to for "main"
+echo
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+close
+delete $WSPACE
+quit

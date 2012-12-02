@@ -1,0 +1,70 @@
+
+Points-to for "call27"
+
+
+// Points To IN:
+// ppp -> _ppp_1 , EXACT
+
+
+// Points To OUT:
+// _ppp_1 -> *NULL_POINTER* , EXACT
+
+void call27(int ***ppp)
+{
+
+// Points To:
+// ppp -> _ppp_1 , EXACT
+
+   *ppp = (void *) 0;
+
+// Points To:
+// _ppp_1 -> *NULL_POINTER* , EXACT
+// ppp -> _ppp_1 , EXACT
+
+   return;
+}
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   int *p = &i;
+
+// Points To:
+// p -> i , EXACT
+
+   int **pp = &p;
+
+// Points To:
+// p -> i , EXACT
+// pp -> p , EXACT
+
+   int ***ppp = &pp;
+
+// Points To:
+// p -> i , EXACT
+// pp -> p , EXACT
+// ppp -> pp , EXACT
+
+   call27(ppp);
+
+// Points To:
+// p -> i , EXACT
+// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppp -> pp , EXACT
+
+   return 0;
+}

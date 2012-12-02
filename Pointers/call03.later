@@ -1,0 +1,5 @@
+A global pointer is used.
+
+A new phase to compute the initial points-to information is needed.
+
+Should be similar to what is done for preconditions.

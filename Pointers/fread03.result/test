@@ -267,7 +267,9 @@ byte * * bmatrix(int nrl, int nrh, int ncl, int nch)
    return m;
 }
 
-// Points To IN: none
+// Points To IN:
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
 
 
 // Points To OUT: unreachable
@@ -275,19 +277,27 @@ byte * * bmatrix(int nrl, int nrh, int ncl, int nch)
 void nrerror(char error_text[])
 {
 
-// Points To: none
+// Points To:
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
 
    fprintf(stderr, "Numerical Recipes run-time error...\n");
 
-// Points To: none
+// Points To:
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
 
    fprintf(stderr, "%s\n", error_text);
 
-// Points To: none
+// Points To:
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
 
    fprintf(stderr, "...now exiting to system...\n");
 
-// Points To: none
+// Points To:
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
 
    exit(1);
 }

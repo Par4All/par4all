@@ -8,27 +8,33 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
-##TODO: explain
-
-#echo 
-#echo PROPER EFFECTS
-#echo
-#
-#activate PRINT_CODE_PROPER_EFFECTS
-#display PRINTED_FILE[%ALLFUNC]
-#
-#echo 
-#echo PROPER POINTER EFFECTS
-#echo
-#activate PRINT_CODE_PROPER_POINTER_EFFECTS
-#display PRINTED_FILE
-
 echo
-echo POINTS TO
+echo Points-to for "f2"
 echo
 
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[f2]
+
+echo
+echo Points-to for "f4"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[f4]
+
+echo
+echo Points-to for "f3"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[f3]
+
+echo
+echo Points-to for "main"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
 
 
 close

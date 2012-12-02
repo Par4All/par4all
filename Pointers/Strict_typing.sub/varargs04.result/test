@@ -1,11 +1,17 @@
 
-POINTS TO
+Points-to for "f2"
 
 
-// Points To IN: none
+// Points To IN:
+// array[*] -> *NULL_POINTER* , MAY
+// array[*] -> _array_2[*] , MAY
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_ , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_ , MAY
 
 void f2(int n_ptrs, char *array[31])
 {
@@ -18,10 +24,67 @@ void f2(int n_ptrs, char *array[31])
 
    for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
 
-// Points To: none
+// Points To:
+// array[*] -> *NULL_POINTER* , MAY
+// array[*] -> _array_2[*] , MAY
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_ , MAY
 
       fprintf(stderr, "%s\n", array[ptr_no]);
+
+// Points To:
+// array[*] -> *NULL_POINTER* , MAY
+// array[*] -> _array_2[*] , MAY
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_ , MAY
+
+   return;
 }
+
+Points-to for "f4"
+
+
+// Points To IN:
+// array[*] -> *NULL_POINTER* , MAY
+// array[*] -> _array_2[*] , MAY
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_ , MAY
+
+
+// Points To OUT:
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_ , MAY
+
+void f4(int n_ptrs, char *array[31])
+{
+
+// Points To: none
+
+   int ptr_no;
+
+// Points To: none
+
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+
+// Points To:
+// array[*] -> *NULL_POINTER* , MAY
+// array[*] -> _array_2[*] , MAY
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_ , MAY
+
+      fprintf(stdout, "%s\n", array[ptr_no]);
+
+// Points To:
+// array[*] -> *NULL_POINTER* , MAY
+// array[*] -> _array_2[*] , MAY
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_ , MAY
+
+   return;
+}
+
+Points-to for "f3"
+
 
 // Points To IN: none
 
@@ -125,28 +188,16 @@ void f3(int n_ptrs, int f4_after, ...)
 // array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
    f4(n_ptrs, array);
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+   return;
 }
 
-// Points To IN: none
+Points-to for "main"
 
-
-// Points To OUT: none
-
-void f4(int n_ptrs, char *array[31])
-{
-
-// Points To: none
-
-   int ptr_no;
-
-// Points To: none
-
-   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
-
-// Points To: none
-
-      fprintf(stdout, "%s\n", array[ptr_no]);
-}
 
 // Points To IN: none
 

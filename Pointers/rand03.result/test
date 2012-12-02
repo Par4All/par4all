@@ -5,9 +5,11 @@ int main()
 {
 //             <    is written>: nx ny
    int ny = 10, nx = 10;
+//             <    is read   >: nx ny
    Cplfloat pt_in[ny][nx];
 //             <    is written>: Sigma2
    float Sigma2 = 0.;
+//             <    is read   >: nx ny
    Cplfloat pt_out[ny][nx];
 //             <may be read   >: pt_in[*][*].im pt_in[*][*].re 
 //                               _RANDOM_EFFECTS:GEN_SEED
