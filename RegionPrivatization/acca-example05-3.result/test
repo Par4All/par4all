@@ -37,6 +37,9 @@ void compute(int p, int n, float a[n][n])
 //  <p-R-EXACT-{}>
 
    // BEGIN BLOCK
+
+//  <n-R-EXACT-{}>
+
    int t[n];
 
 //  <k-W-EXACT-{}>
@@ -196,6 +199,9 @@ void compute(int p, int n, float a[n][n])
 //  <p-IN-EXACT-{}>
 
    // BEGIN BLOCK
+
+//  <n-IN-EXACT-{}>
+
    int t[n];
 
 //  <n-IN-EXACT-{}>
