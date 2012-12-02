@@ -1,0 +1,232 @@
+
+POINTS-TO
+
+
+// Points To IN:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+
+
+// Points To OUT: none
+
+void foo(int *p)
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+
+   for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+
+      p[i] = i;
+
+// Points To:
+// p -> _p_1[0] , EXACT
+
+   return;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int tab[10];
+
+// Points To: none
+
+   int *tab2[10];
+
+// Points To:
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int tab3[10][10];
+
+// Points To:
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int **tab4;
+
+// Points To:
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   int tab5[15];
+
+
+// Points To:
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   int i;
+
+// Points To:
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+
+   foo(tab);
+
+// Points To:
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   printf("%s\n", "tab");
+
+// Points To:
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   myprint(tab);
+
+// Points To:
+// tab2[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab4 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   
+   
+   /* foo(tab2[4]); */
+   /* foo(tab3[5]); */
+   /* foo(tab4[6]); */
+   /* foo(&(tab[0])); */
+   /* foo(&tab5[3]); */
+   
+   /* printf("%s:\n", "tab2[4]"); */
+   /* myprint(tab2[4]); */
+   /* printf("%s\n", "tab3[5]"); */
+   /* myprint(tab3[5]); */
+   /* printf("%s\n", "tab4[6]"); */
+   /* myprint(tab4[6]); */
+   /* printf("%s\n", "tab"); */
+   /* myprint(&(tab[0])); */
+   /* printf("%s\n", "tab5"); */
+   /* myprint(&(tab5[3])); */
+   return 1;
+}
+
+// Points To IN:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+
+
+// Points To OUT: none
+
+void myprint(int *p)
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+
+   for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+
+      printf("\t%d\n", p[i]);
+
+// Points To:
+// p -> _p_1[0] , EXACT
+
+   return;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void foo(int *p)
+{
+   int i;
+//             <    is written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//             <    is read   >: i p
+//             <    is written>: _p_1[i]
+      p[i] = i;
+   return;
+}
+int main()
+{
+   int tab[10];
+   int *tab2[10];
+   int tab3[10][10];
+   int **tab4;
+   int tab5[15];
+
+   int i;
+//             <may be written>: tab[*]
+
+   foo(tab);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%s\n", "tab");
+//             <may be read   >: stdout[0] tab[*]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   myprint(tab);
+   
+   
+   /* foo(tab2[4]); */
+   /* foo(tab3[5]); */
+   /* foo(tab4[6]); */
+   /* foo(&(tab[0])); */
+   /* foo(&tab5[3]); */
+   
+   /* printf("%s:\n", "tab2[4]"); */
+   /* myprint(tab2[4]); */
+   /* printf("%s\n", "tab3[5]"); */
+   /* myprint(tab3[5]); */
+   /* printf("%s\n", "tab4[6]"); */
+   /* myprint(tab4[6]); */
+   /* printf("%s\n", "tab"); */
+   /* myprint(&(tab[0])); */
+   /* printf("%s\n", "tab5"); */
+   /* myprint(&(tab5[3])); */
+   return 1;
+}
+void myprint(int *p)
+{
+   int i;
+//             <    is written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: _p_1[i] i p stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("\t%d\n", p[i]);
+   return;
+}
+
+ *********************** Use-Def Chains *********************
+
+	37 --> 39 with conflicts
+		from <tab[*]-W-MAY> to <tab[*]-R-MAY>
+	38 --> 39 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+
+****************** End of Dependence Graph ******************

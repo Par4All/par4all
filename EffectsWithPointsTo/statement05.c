@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 int main() {
   int **x, **y, *z, *t;
   int i, j;
@@ -10,6 +11,8 @@ int main() {
   
   z = t;
   *x = z;
+
   printf(" x = %p\n",x);
+
   return 0;
 }

@@ -1,0 +1,68 @@
+
+Points-to for "titi"
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+int titi(int *p)
+{
+
+// Points To: none
+
+   int *q;
+
+// Points To:
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int b[100];
+
+// Points To:
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   p = &b[0];
+
+// Points To:
+// p -> b[0] , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   a[*(q = p)] = 2.;
+
+// Points To:
+// p -> b[0] , EXACT
+// q -> b[0] , EXACT
+
+   return 0;
+}
+
+Proper effects with points-to for "titi"
+
+int titi(int *p)
+{
+   int *q;
+   int b[100];
+//             <    is written>: p
+   p = &b[0];
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: a[*(q = p)] q
+   a[*(q = p)] = 2.;
+   return 0;
+}
+
+Dependence graph for "titi"
+
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 13 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+
+****************** End of Dependence Graph ******************
+
+Warnings and errors
+
+PROPER_EFFECTS_WITH_POINTS_TO[titi] (generic_proper_effects_of_complex_address_call_expression) PIPS currently does not know how to precisely handle address values used in complex call expressions expression
+PROPER_EFFECTS_WITH_POINTS_TO[titi] (generic_proper_effects_of_complex_address_call_expression) PIPS currently does not know how to precisely handle address values used in complex call expressions expression

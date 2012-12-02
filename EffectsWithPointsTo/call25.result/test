@@ -1,0 +1,70 @@
+
+Points-to for call25
+
+
+// Points To IN:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_1[0] , MAY
+
+
+// Points To OUT: none
+
+void call25(int *q)
+{
+
+// Points To:
+// q -> *NULL_POINTER* , MAY
+// q -> _q_1[0] , MAY
+
+   *q = 3;
+}
+
+Proper effects with points-to for call25
+
+void call25(int *q)
+{
+//             <may be written>: _q_1[0]
+//             <    is read   >: q
+   *q = 3;
+}
+
+Cumulated effects with points-to for call25
+
+//             <may be written>: _q_1[0]
+//             <    is read   >: q
+void call25(int *q)
+{
+//             <may be written>: _q_1[0]
+//             <    is read   >: q
+   *q = 3;
+}
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i, *ip = (void *) 0;
+
+// Points To:
+// ip -> *NULL_POINTER* , EXACT
+
+
+   call25(ip);
+
+// Points To:
+// ip -> *NULL_POINTER* , EXACT
+
+   return 0;
+}
+
+Proper effects with points-to for "main"
+

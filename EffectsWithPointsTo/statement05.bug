@@ -1,1 +1,1 @@
-Missing intrinsics effect for x in call to printf.
+Unreachable code is detected by points-to analysis but is not fully exploited by the effect analysis.
