@@ -60,6 +60,7 @@ int main()
    int d1 = 4;
 //             <    is written>: d2
    int d2 = 4;
+//             <    is read   >: d1 d2
    int y[d1][d2];
    int i, j;
 //             <may be written>: y[*][*]
@@ -97,6 +98,7 @@ int main()
    int d1 = 4;
 //             <    is written>: d2
    int d2 = 4;
+//             <    is read   >: d1 d2
    int y[d1][d2];
    int i, j;
 //             <may be written>: y[*][*]

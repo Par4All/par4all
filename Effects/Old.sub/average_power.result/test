@@ -130,6 +130,7 @@ int main(int argc, char *argv[])
 //             <    is written>: rg th v
    th = 14, rg = 13, v = 12;
    {
+//             <    is read   >: rg th v
       Cplfloat in[th][rg][v], pow[th];
 //             <may be read   >: i j k rg v
 //             <may be written>: in[*][*][*].im in[*][*][*].re j k
@@ -192,6 +193,11 @@ int main(int argc, char *argv[])
 
    th = 14, rg = 13, v = 12;
    {
+
+//  <rg-R-EXACT-{}>
+//  <th-R-EXACT-{}>
+//  <v-R-EXACT-{}>
+
       Cplfloat in[th][rg][v], pow[th];
 
 //  <i-R-EXACT-{}>
