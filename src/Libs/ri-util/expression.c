@@ -2416,12 +2416,13 @@ constant expression_constant(expression exp)
 }
 
 bool expression_string_constant_p(expression exp) {
+  bool constant_p = false;
   if(expression_constant_p(exp) && expression_call_p(exp) ) {
     call c = expression_call(exp);
     entity operator = call_function(c);
-    constant_string_entity_p(operator);
+    constant_p = constant_string_entity_p(operator);
   }
-  return false;
+  return constant_p;
 }
 
 /* returns a newly allocated string! */

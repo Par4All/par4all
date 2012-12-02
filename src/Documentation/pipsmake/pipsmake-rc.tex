@@ -5561,6 +5561,40 @@ The pointer effects are useful, but they are recomputed for each
 expression and subexpression by the points-to analysis.
 
 
+\subsection{Initial Points-to or Program Points-to}
+\label{subsubsection-initial-points-to}
+\index{Points-to (Initial)}
+\index{Initial Points-to}
+
+Because no top-down points-to analysis is available, this two passes
+are useless. A top-down points-to analysis would be useful to check
+that the restrict assumption about formal parameters is met by the
+actual parameters. It might make possible a slighlty more precise
+points-to information in the functions. Hopefully, the formal context
+and the points-to stubs provide enough equivalent information to the
+passes that use points-to information.
+
+\begin{PipsMake}
+initial_points_to     > MODULE.initial_points_to
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.points_to_out
+\end{PipsMake}
+
+All initial points-to are combined to define the program points-to which is an
+abstraction of the program initial state.
+
+\begin{PipsMake}
+program_points_to     > PROGRAM.program_points_to
+        < PROGRAM.entities
+        < ALL.initial_points_to
+\end{PipsMake}
+
+The program points-to can only be used for the initial state of the
+main procedure. Although it appears below for all interprocedural analyses
+and it always is computed, it only is used when a main procedure is
+available.
+
 \subsection{Pointer Values Analyses}
 \label{subsection-pointer-values}
 \index{Pointer Values Analyses}

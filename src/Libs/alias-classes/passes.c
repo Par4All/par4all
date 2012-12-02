@@ -455,3 +455,85 @@ bool fast_interprocedural_points_to_analysis(char * module_name)
   interprocedural_points_to_p = false;
   return generic_points_to_analysis(module_name);
 }
+
+/* Retrieve points-to that are statically initialized, especially in compilation units */
+bool initial_points_to(char * name)
+{
+  entity module = module_name_to_entity(name);
+  points_to_list ptl_init = points_to_list_undefined;
+
+  debug_on("POINTS_TO_DEBUG_LEVEL");
+
+  /* At least, useful for debugging */
+  set_current_module_entity(module);
+  //set_current_module_statement( (statement)
+  //	db_get_memory_resource(DBR_CODE, name, true));
+
+  if(compilation_unit_p(name)) {
+    points_to_list ptl_out = 
+      (points_to_list) db_get_memory_resource(DBR_POINTS_TO_OUT, name, true);
+    ptl_init = copy_points_to_list(ptl_out);
+  }
+  else {
+    /* Could we retrieve initializations of static variables? */
+    ptl_init = make_points_to_list(true, NIL);
+  }
+
+  DB_PUT_MEMORY_RESOURCE(DBR_INITIAL_POINTS_TO, strdup(name), (char*) ptl_init);
+
+  reset_current_module_entity();
+  //reset_current_module_statement();
+
+  debug_off();
+  return true;
+}
+
+bool program_points_to(char * name)
+{
+  //transformer t = transformer_identity();
+  entity the_main = get_main_entity();
+  int i, nmodules;
+  gen_array_t modules;
+  // list e_inter = NIL;
+  list pptl = NIL; // Program points-to list
+
+  pips_assert("main was found", the_main!=entity_undefined);
+
+  debug_on("POINTS_TO_DEBUG_LEVEL");
+  pips_debug(1, "considering program \"%s\" with main \"%s\"\n", name,
+	     module_local_name(the_main));
+
+  set_current_module_entity(the_main);
+  set_current_module_statement( (statement)
+				db_get_memory_resource(DBR_CODE,
+						       module_local_name(the_main),
+						       true));
+  modules = db_get_module_list();
+  nmodules = gen_array_nitems(modules);
+  pips_assert("some modules in the program", nmodules>0);
+
+  for(i=0; i<nmodules; i++) {
+    string mname = gen_array_item(modules, i);
+    pips_debug(1, "considering module %s\n", mname);
+
+    // Module initial points-to list
+    points_to_list mptl =
+      copy_points_to_list((points_to_list)
+			  db_get_memory_resource(DBR_INITIAL_POINTS_TO, mname, true));
+    if(!points_to_list_bottom(mptl)) {
+      // FI: a bit simplistic if C standard allows double definitions...
+      pptl = gen_nconc(pptl, points_to_list_list(mptl));
+    }
+  }
+
+  points_to_list program_ptl = make_points_to_list(false, pptl);
+  DB_PUT_MEMORY_RESOURCE(DBR_PROGRAM_POINTS_TO, "", (void *) program_ptl);
+
+  reset_current_module_entity();
+  reset_current_module_statement();
+
+  gen_array_full_free(modules);
+
+  debug_off();
+  return true;
+}

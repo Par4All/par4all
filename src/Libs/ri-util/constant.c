@@ -348,7 +348,9 @@ entity MakeConstant(string name, tag bt)
 bool constant_string_entity_p(entity e)
 {
   const char * eun = entity_user_name(e);
-  return ( eun[0]=='"' && eun[strlen(eun)-1] == '"' ) ;
+  bool first_quote = eun[0]=='"';
+  bool last_quote = eun[strlen(eun)-1] == '"';
+  return first_quote && last_quote;
 }
 
 /* make a complex constant from two calls to real or integer constants

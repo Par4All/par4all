@@ -352,7 +352,8 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
 	      if(!null_cell_p(ac) && !nowhere_cell_p(ac)) {
 		type fc_t = points_to_cell_to_concrete_type(fc);
 		type ac_t = points_to_cell_to_concrete_type(ac);
-		if(!type_equal_p(fc_t, ac_t)) {
+		// FI: why not use array_pointer_string_type_equal_p()?
+		if(!type_equal_p(fc_t, ac_t) && !overloaded_type_p(ac_t)) {
 		  points_to_cell_add_zero_subscript(ac);
 		  type ac_nt = points_to_cell_to_concrete_type(ac);
 		  if(!type_equal_p(fc_t, ac_nt))

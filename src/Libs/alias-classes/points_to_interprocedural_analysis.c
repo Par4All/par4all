@@ -84,7 +84,7 @@ set compute_points_to_binded_set(entity called_func, list real_args, set pt_call
 	  entity cv = reference_variable(cr);
 	  if(cv==v) {
 	    points_to npt = copy_points_to(pt);
-	    cell nc =points_to_source(npt);
+	    cell nc = points_to_source(npt);
 	    reference ncr = cell_any_reference(nc);
 	    reference_variable(ncr) = fp;
 	    nptl = CONS(POINTS_TO, npt, nptl);
@@ -94,13 +94,18 @@ set compute_points_to_binded_set(entity called_func, list real_args, set pt_call
 	  add_arc_to_simple_pt_map(npt, s);
 	gen_free_list(nptl);
       }
+      else if(expression_call_p(rhs) && expression_string_constant_p(rhs)) {
+	/* This may happen with a constant string as actual parameter
+	   and an array, bounded or not, as formal parameter. */
+	; // Nothing to do: the constant string does not point to anything
+      }
       else
 	pips_internal_error("Not implemented yet.\n");
     }
     else {
       /* It would be nice to build an assignment of rhs to fp and to
 	 let it deal with the many possible kinds of assignments. But
-	 if it is a pure poiints-to function, the symbolic subscripts
+	 if it is a pure points-to function, the symbolic subscripts
 	 are going to be lost. This is fine for points-to translation,
 	 but not OK for effects translation. */
 
