@@ -181,10 +181,8 @@ int main()
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
 // s1.ip1 -> i21 , EXACT
-// s1.ip2 -> i21 , MAY
-// s1.ip2 -> i22 , MAY
-// s2.ip1 -> i21 , MAY
-// s2.ip1 -> i22 , MAY
+// s1.ip2 -> i22 , EXACT
+// s2.ip1 -> i22 , EXACT
 // s2.ip2 -> i22 , EXACT
 
 
@@ -459,10 +457,8 @@ int main()
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
 // s1.ip1 -> i21 , EXACT
-// s1.ip2 -> i21 , MAY
-// s1.ip2 -> i22 , MAY
-// s2.ip1 -> i21 , MAY
-// s2.ip1 -> i22 , MAY
+// s1.ip2 -> i22 , EXACT
+// s2.ip1 -> i22 , EXACT
 // s2.ip2 -> i22 , EXACT
 
 
