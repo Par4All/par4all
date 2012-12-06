@@ -3,9 +3,6 @@ PROPER EFFECTS
 
 int global03()
 {
-   // To avoid a problem with the semantics of the empty points-to set
-   // The solution might be to add always an arc ANYWHERE->ANYWHERE
-   // when entering a module statement
 //             <    is written>: p
    int *p = i;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
@@ -28,9 +25,6 @@ PROPER POINTER EFFECTS
 
 int global03()
 {
-   // To avoid a problem with the semantics of the empty points-to set
-   // The solution might be to add always an arc ANYWHERE->ANYWHERE
-   // when entering a module statement
 //             <    is written>: p
    int *p = i;
 //             <    is read   >: pi
@@ -65,9 +59,6 @@ POINTS TO
 
 int global03()
 {
-   // To avoid a problem with the semantics of the empty points-to set
-   // The solution might be to add always an arc ANYWHERE->ANYWHERE
-   // when entering a module statement
 
 // Points To: none
 

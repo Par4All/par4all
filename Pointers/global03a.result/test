@@ -15,9 +15,6 @@ Points-to for "global03"
 
 int global03a()
 {
-   // To avoid a problem with the semantics of the empty points-to set
-   // The solution might be to add always an arc ANYWHERE->ANYWHERE
-   // when entering a module statement
 
 // Points To: none
 
@@ -69,7 +66,11 @@ Points-to for "global03!"
 // pi -> i[0] , EXACT
 // q -> s , EXACT
 
-/* #include<stdio.h> */
+/* Same as global03.c, but different tpips script 
+ *
+ * Check points-to analysis for computation unit, initial points-to
+ * and program points-to.
+ */
 
 // Points To: none
 
