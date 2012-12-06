@@ -1756,6 +1756,10 @@ generic_proper_effects_of_expression(expression e)
 	  }
 	else {
 	  if(!get_bool_property("MEMORY_EFFECTS_ONLY")) {
+	    // FI->BC: this piece of code generates an effect on type
+	    // "size_t" when a FILE * variable is declared...
+	    // See libio.h and Rice/fgetc01
+	    // This might be useful to control loop distribution.
 	    type sot = sizeofexpression_type(se);
 
 	    if(typedef_type_p(sot)) {
