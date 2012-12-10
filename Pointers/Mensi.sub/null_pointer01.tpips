@@ -1,0 +1,65 @@
+setenv WSPACE=null_pointer01
+delete $WSPACE
+setenv FILE=$WSPACE.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WSPACE $FILE
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+# This property is set to analyze C99 boolean variables
+setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty CONSTANT_PATH_EFFECTS TRUE
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+echo 
+echo PROPER  EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+echo 
+echo CUMULATED  EFFECTS WITH POINTS TO
+echo
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+echo
+echo Transformers for "main"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+echo
+echo Preconditions for "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+#apply CONTROL_SIMPLIFICATION[main]
+#apply SIMPLIFY_CONTROL[main]
+apply SIMPLIFY_CONTROL[main]
+
+echo
+echo Code after control simplification
+echo
+
+activate PRINT_CODE
+display PRINTED_FILE[main]
+
+close
+delete $WSPACE
+quit
