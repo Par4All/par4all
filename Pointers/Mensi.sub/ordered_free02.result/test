@@ -1,0 +1,71 @@
+
+POINTS TO for ordered_free02
+
+
+// Points To IN:
+// fp -> _fp_1 , EXACT
+
+
+// Points To OUT:
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+void ordered_free02(int *fp)
+{
+
+// Points To:
+// fp -> _fp_1 , EXACT
+
+   int *fq = fp;
+
+// Points To:
+// fp -> _fp_1 , EXACT
+// fq -> _fp_1 , EXACT
+
+   fp = (int *) malloc(sizeof(int));
+
+// Points To:
+// fp -> *HEAP*_l_6 , MAY
+// fq -> _fp_1 , EXACT
+
+   free(fp);
+
+// Points To:
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fq -> _fp_1 , EXACT
+
+   return;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void ordered_free02(int *fp)
+{
+//             <    is read   >: fp
+//             <    is written>: fq
+   int *fq = fp;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: fp _MALLOC_EFFECTS:_MALLOC_
+   fp = (int *) malloc(sizeof(int));
+//             <    is read   >: fp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(fp);
+   return;
+}
+
+CUMULATED  EFFECTS WITH POINTS TO
+
+//             <    is read   >: fp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+void ordered_free02(int *fp)
+{
+//             <    is read   >: fp
+//             <    is written>: fq
+   int *fq = fp;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: fp _MALLOC_EFFECTS:_MALLOC_
+   fp = (int *) malloc(sizeof(int));
+//             <    is read   >: fp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(fp);
+   return;
+}

@@ -1,0 +1,72 @@
+
+POINTS TO for ordered_free01
+
+
+// Points To IN:
+// fp -> _fp_1 , EXACT
+
+
+// Points To OUT: none
+
+void ordered_free01(int *fp)
+{
+
+// Points To:
+// fp -> _fp_1 , EXACT
+
+   int *fq = fp;
+
+// Points To:
+// fp -> _fp_1 , EXACT
+// fq -> _fp_1 , EXACT
+
+   free(fp);
+
+// Points To:
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fq -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   fp = (int *) malloc(sizeof(int));
+
+// Points To:
+// fp -> *HEAP*_l_7 , MAY
+// fq -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   return;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void ordered_free01(int *fp)
+{
+//             <    is read   >: fp
+//             <    is written>: fq
+   int *fq = fp;
+//             <    is read   >: fp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(fp);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: fp _MALLOC_EFFECTS:_MALLOC_
+   fp = (int *) malloc(sizeof(int));
+   return;
+}
+
+CUMULATED  EFFECTS WITH POINTS TO
+
+//             <    is read   >: fp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+void ordered_free01(int *fp)
+{
+//             <    is read   >: fp
+//             <    is written>: fq
+   int *fq = fp;
+//             <    is read   >: fp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(fp);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: fp _MALLOC_EFFECTS:_MALLOC_
+   fp = (int *) malloc(sizeof(int));
+   return;
+}
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[ordered_free01] (freed_pointer_to_points_to) Dangling pointer "ordered_free01:0`fq".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[ordered_free01] (points_to_function_projection) Memory cell *HEAP*_l_7 leaked.

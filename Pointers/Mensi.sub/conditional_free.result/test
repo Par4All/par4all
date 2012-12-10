@@ -1,0 +1,105 @@
+
+POINTS TO for conditional_free
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
+{
+
+// Points To: none
+
+   if (c1)
+
+// Points To: none
+
+      p = (int *) malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_5 , MAY
+
+   if (c2)
+
+// Points To:
+// p -> *HEAP*_l_5 , MAY
+
+      free(p);
+
+// Points To:
+// p -> *HEAP*_l_5 , MAY
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+   if (c3)
+
+// Points To:
+// p -> *HEAP*_l_5 , MAY
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+      p = (int *) malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_5 , MAY
+// p -> *HEAP*_l_7 , MAY
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+   return;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
+{
+//             <    is read   >: c1
+   if (c1)
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+      p = (int *) malloc(sizeof(int));
+//             <    is read   >: c2
+   if (c2)
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+      free(p);
+//             <    is read   >: c3
+   if (c3)
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+      p = (int *) malloc(sizeof(int));
+   return;
+}
+
+CUMULATED  EFFECTS WITH POINTS TO
+
+//             <may be read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: c1 c2 c3
+void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
+{
+//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: c1
+   if (c1)
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+      p = (int *) malloc(sizeof(int));
+//             <may be read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: c2
+   if (c2)
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+      free(p);
+//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: c3
+   if (c3)
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+      p = (int *) malloc(sizeof(int));
+   return;
+}
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free] (points_to_function_projection) Memory cell *HEAP*_l_5 leaked.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free] (points_to_function_projection) Memory cell *HEAP*_l_7 leaked.
