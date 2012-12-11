@@ -492,6 +492,12 @@ pt_map test_to_points_to(test t, pt_map pt_in)
 
   pips_assert("pt_t is consistent", points_to_graph_consistent_p(pt_t));
   pips_assert("pt_f is consistent", points_to_graph_consistent_p(pt_f));
+
+  /* We must use a common definition domain for both relations in
+     order to obatin a really consistent points-to relation after the
+     merge. This is similar to what is done in semantics for scalar
+     preconditions. */
+  equalize_points_to_domains(pt_t, pt_f);
   
   pt_out = merge_points_to_graphs(pt_t, pt_f);
 

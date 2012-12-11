@@ -1155,7 +1155,7 @@ void check_rhs_value_types(expression lhs,
  * New points-to information must be added when a formal parameter
  * is dereferenced.
  */
-pt_map pointer_assignment_to_points_to(expression lhs,
+pt_map internal_pointer_assignment_to_points_to(expression lhs,
 				       expression rhs,
 				       pt_map pt_in)
 {
@@ -1255,6 +1255,24 @@ pt_map pointer_assignment_to_points_to(expression lhs,
 
   pips_assert("pt_out is consistent", consistent_points_to_graph_p(pt_out));
 
+  return pt_out;
+}
+
+pt_map pointer_assignment_to_points_to(expression lhs,
+				       expression rhs,
+				       pt_map pt_in)
+{
+  /* FI: this is a crazy idea to avoid problems in balancing test
+   * branches. It should only be useful when the formal context has to
+   * be expanded by this assignment. lhs = lhs;
+   *
+   * Of course, it is a catastrophy when expression lhs has side effects...
+   *
+   * And it does not work because the current "in" of the test is
+   * modified by side-effect no seen when the false branch is analyzed.
+   */
+  // pt_map pt_out = internal_pointer_assignment_to_points_to(lhs, lhs, pt_in);
+  pt_map pt_out = internal_pointer_assignment_to_points_to(lhs, rhs, pt_in);
   return pt_out;
 }
 

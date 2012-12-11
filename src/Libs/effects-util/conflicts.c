@@ -1114,5 +1114,4 @@ list concrete_effects_entities_which_may_conflict_with_scalar_entity(list fx, en
   return generic_effects_entities_which_may_conflict_with_scalar_entity(fx, e, true);
 }
 
-
 /** @} */

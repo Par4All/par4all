@@ -853,3 +853,61 @@ bool exact_points_to_subscript_list_p(list sl)
   }
   return exact_p;
 }
+
+/* Two subscript are compatible if they are equal or if one of them is
+   unbounded. */
+bool compatible_points_to_subscripts_p(expression s1, expression s2)
+{
+  bool compatible_p = true;
+  bool u1 = unbounded_expression_p(s1);
+  if(!u1) {
+    bool u2 = unbounded_expression_p(s2);
+    if(!u2) {
+      /* In the ponts-to context s1 and s2 should be either integer
+	 constants or field references. */
+      compatible_p = expression_equal_p(s1, s2);
+    }
+  }
+  return compatible_p;
+}
+
+
+/* expand the domain of pt_f according to the domain of pt_t */
+static void expand_points_to_domain(points_to_graph pt_t, points_to_graph pt_f)
+{
+  set s_t = points_to_graph_set(pt_t);
+  set s_f = points_to_graph_set(pt_f);
+  SET_FOREACH(points_to, a_t, s_t) {
+    cell c_t = points_to_source(a_t);
+    bool found_p = false;
+    SET_FOREACH(points_to, a_f, s_f) {
+      cell c_f = points_to_source(a_f);
+      if(points_to_cell_equal_p(c_t, c_f)) {
+	found_p = true;
+	break;
+      }
+    }
+    if(!found_p) {
+      reference r_t = cell_any_reference(c_t);
+      entity v_t = reference_variable(r_t);
+      if(formal_parameter_p(v_t) || entity_stub_sink_p(v_t)) {
+	expression e_t = reference_to_expression(r_t);
+	pt_f = pointer_assignment_to_points_to(e_t, e_t, pt_f);
+	if(points_to_graph_bottom(pt_f))
+	  pips_internal_error("Unexpected information loss.");
+      }
+    }
+  }
+}
+
+/* Make sure that pt_t and pt_f have the same definition domain except
+   if one of them is bottom */
+void  equalize_points_to_domains(points_to_graph pt_t, points_to_graph pt_f)
+{
+  if(!points_to_graph_bottom(pt_t)) {
+    if(!points_to_graph_bottom(pt_f)) {
+      expand_points_to_domain(pt_t, pt_f);
+      expand_points_to_domain(pt_f, pt_t);
+    }
+  }
+}

@@ -988,9 +988,18 @@ bool aliased_translation_p(list fpcl, set translation)
 	entity fp1 = reference_variable(cell_any_reference(c));
 	entity fp2 = reference_variable(cell_any_reference(p_c));
 	
-	pips_user_warning("aliasing detected between formal parameters "
-			  "\"%s\" and \"%s\".\n", entity_user_name(fp1),
-			  entity_user_name(fp2));
+	if(statement_points_to_context_defined_p())
+	  pips_user_warning("aliasing detected between formal parameters "
+			    "\"%s\" and \"%s\" at line %d.\n",
+			    entity_user_name(fp1),
+			    entity_user_name(fp2),
+			    points_to_context_statement_line_number());
+	else {
+	  // In case this function is used in an effect context
+	  pips_user_warning("aliasing detected between formal parameters "
+			    "\"%s\" and \"%s\".\n", entity_user_name(fp1),
+			    entity_user_name(fp2));
+	}
 	break;
       }
       gen_free_list(c_succ_l);
@@ -1013,7 +1022,35 @@ bool aliased_translation_p(list fpcl, set translation)
   hash_table_free(closure);
   return alias_p;
 }
-
+
+/* It is partly a kill and partly a gen operation. 
+ *
+ * FI: the very same function must exist for pointer assignments I guess
+ */
+static set lower_points_to_approximations_according_to_write_effects(set pt_end, list wpl)
+{
+  list optl = NIL, nptl = NIL;
+  SET_FOREACH(points_to, pt, pt_end) {
+    cell source = points_to_source(pt);
+    // FI->FI: en fait, il faudrait prendre en compte le treillis et
+    // tester les conflits,
+    // written_effects_conflict_with_points_to_cell()
+    if(points_to_cell_in_list_p(source, wpl)) {
+      optl = CONS(POINTS_TO, pt, optl);
+      cell sink = points_to_sink(pt);
+      points_to npt = make_points_to(copy_cell(source),
+				     copy_cell(sink),
+				     make_approximation_may(),
+				     make_descriptor_none());
+      nptl = CONS(POINTS_TO, npt, nptl);
+    }
+  }
+  FOREACH(POINTS_TO, opt, optl)
+    remove_arc_from_simple_pt_map(opt, pt_end);
+  FOREACH(POINTS_TO, npt, nptl)
+    add_arc_to_simple_pt_map(npt, pt_end);
+  return pt_end;
+}
 
 /* Compute the points-to relations in a complete interprocedural way:
  * be as accurately as possible.
@@ -1052,8 +1089,8 @@ pt_map user_call_to_points_to_interprocedural(call c,
      bottom (see below) */
   if(!(ENDP(l_pt_to_out) && ENDP(l_pt_to_in))) {
     // FI: this function should be moved from semantics into effects-util
-    extern list load_summary_effects(entity e);
-    list el = load_summary_effects(f);
+    extern list load_body_effects(entity e);
+    list el = load_body_effects(f);
     list wpl = written_pointers_set(el);
     set pt_in_s = points_to_graph_set(pt_in);
 
@@ -1135,17 +1172,19 @@ pt_map user_call_to_points_to_interprocedural(call c,
       ifdebug(8) print_points_to_set("pt_kill", pts_kill);
 
       set pt_end = new_simple_pt_map();
+      // FI: c_pr_in_s is probably pt_{caller} in the dissertation
       pt_end = set_difference(pt_end, c_pt_in_s, pts_kill);
 
       set pts_gen = compute_points_to_gen_set(fpcl,
 					      pt_out_callee_filtered,
+					      wpl,
 					      pt_in_callee_filtered,
 					      pts_binded,
 					      translation, f);
 
       pips_assert("pts_gen is consistent", consistent_points_to_set(pts_gen));
 
-      // FI: Not satisfying; kludge to solve issue with Pointers/inter04
+      // FI->FI: Not satisfying; kludge to solve issue with Pointers/inter04
       pt_map pts_gen_g = make_points_to_graph(false, pts_gen);
       upgrade_approximations_in_points_to_set(pts_gen_g);
 
@@ -1157,6 +1196,20 @@ pt_map user_call_to_points_to_interprocedural(call c,
       if(!ENDP(stubs)) {
 	pips_internal_error("Translation failure in pts_gen.\n");
       }
+
+      /* Use written/wpl to reduce the precision of exact arcs in pt_end
+       *
+       * FI: I do not understand why the precision of the write is not
+       * exploited.
+       *
+       * FI: the wpl list must be implictly translated somewhere...
+       */
+      list twpl = points_to_cells_translation(wpl, translation, f);
+      pt_end =
+	lower_points_to_approximations_according_to_write_effects(pt_end, twpl);
+      // FI: I keep it temporarily for debugging purposes
+      // gen_free_list(twpl);
+
       // FI: set_union is unsafe; the union of two consistent
       // points-to graph is not a consistent points-to graph
       pt_end = set_union(pt_end, pt_end, pts_gen);
@@ -1226,4 +1279,610 @@ pt_map user_call_to_points_to_intraprocedural(call c,
     }
   }
   return pt_out;
+}
+
+/* Translate the "out" set into the scope of the caller
+ *
+ * Shouldn't it be the "written" list that needs to be translated?
+ */ 
+set compute_points_to_kill_set(list written,
+			       set pt_caller,
+			       list args __attribute__ ((unused)),
+			       set pt_in __attribute__ ((unused)),
+			       set pt_binded __attribute__ ((unused)),
+			       set translation)
+{
+  set kill = new_simple_pt_map(); 	
+  list written_cs = NIL;
+  set bm = translation;
+
+  // FI->AM: do you recompute "bm" several times?
+  // bm = points_to_binding(args, pt_in, pt_binded); 
+
+  FOREACH(CELL, c, written) {
+    cell new_sr = cell_undefined; 
+    reference r_1 = cell_any_reference(c);
+    entity v_1 = reference_variable(r_1);
+    if(!formal_parameter_p(v_1)) {
+      list ind1 = reference_indices(r_1);
+      SET_FOREACH(points_to, pp, bm) {
+	cell sr2 = points_to_source(pp); 
+	cell sk2 = points_to_sink(pp); 
+	reference r22 = copy_reference(cell_to_reference(sk2));
+	/* FI->AM: this test is loop invariant... and performed within the loop */
+	if(!source_in_set_p(c, bm)) {
+	  reference r_12 = cell_any_reference(sr2);
+	  entity v_12 = reference_variable( r_12 );
+	  if(same_string_p(entity_local_name(v_1),entity_local_name(v_12))) { 
+	    reference_indices(r22) = gen_nconc(reference_indices(r22),
+					       gen_full_copy_list(ind1));
+	    new_sr = make_cell_reference(r22);
+	    // FI->AM: I guess this statement was forgotten
+	    written_cs = CONS(CELL, new_sr, written_cs);
+	    break;
+	  }
+	  else if (heap_cell_p(c)) {
+	    written_cs = CONS(CELL, c, written_cs);
+	  }
+	}
+	else if(points_to_compare_cell(c,sr2)) {
+	  written_cs = CONS(CELL, points_to_sink(pp), written_cs);
+	  // break; // FI: why not look for other possible translations?
+	}
+      }
+    }
+  }
+  
+  /* Remove all points-to arc from pt_caller whose origin has been
+     fully written */
+  FOREACH(CELL, c, written_cs) {
+    SET_FOREACH(points_to, pt, pt_caller) {
+      if(points_to_cell_equal_p(c, points_to_source(pt))
+	 && atomic_points_to_cell_p(c))
+	set_add_element(kill, kill, (void*)pt);
+    }
+  }
+
+  return kill;
+}
+
+/* Compute the list of cells that correspond to cell "sr1" according
+ * to the translation mapping "bm" when function "f" is called.
+ *
+ * The check with rv may be useless, for instance when a sink cell is
+ * checked, as it is impossible (in C at least) to points toward the
+ * return value.
+ */
+list points_to_cell_translation(cell sr1, set bm, entity f)
+{
+  list new_sr_l = NIL;
+  entity rv = any_function_to_return_value(f);
+
+  /* Translate sr1 if needed */
+  reference r_1 = cell_any_reference(sr1);
+  entity v_1 = reference_variable(r_1);
+  list ind1 = reference_indices(r_1);
+  if(entity_anywhere_locations_p(v_1)
+     || entity_typed_anywhere_locations_p(v_1)
+     || heap_cell_p(sr1)
+     || v_1==rv
+     || entity_to_module_entity(v_1)!=f) {
+    /* No translation is needed. */
+    cell new_sr = copy_cell(sr1);
+    new_sr_l = CONS(CELL, new_sr, new_sr_l);
+  }
+  else {
+    SET_FOREACH(points_to, pp, bm) {
+      cell sr2 = points_to_source(pp); 
+      cell sk2 = points_to_sink(pp); 
+      reference r22 = copy_reference(cell_to_reference(sk2));
+      // FI: this test should be factored out
+      if(!source_in_set_p(sr1, bm)) {
+	// sr1 cannot be translated directly, let's try to remove
+	// (some) subscripts
+	reference r_12 = cell_any_reference(sr2);
+	entity v_12 = reference_variable( r_12 );
+	if(same_string_p(entity_local_name(v_1),entity_local_name(v_12))) {
+	  /* We assume here that the subscript list of sr1, the
+	     reference to translate, is longer than the subscript
+	     list of sr2, the source of its translation. */
+	  list ind2 = reference_indices(r_12);
+	  pips_assert("The effective subscript list is longer than "
+		      "the translated subscript list",
+		      gen_length(ind1)>=gen_length(ind2));
+	  // Either we check the subscript compatibility or we trust it
+	  // Let's trust it: no!
+	  list cind1 = ind1, cind2 = ind2;
+	  bool compatible_p = true;
+	  while(!ENDP(cind2)) {
+	    expression s1 = EXPRESSION(CAR(cind1));
+	    expression s2 = EXPRESSION(CAR(cind2));
+	    if(!compatible_points_to_subscripts_p(s1, s2)) {
+	      compatible_p = false;
+	      break;
+	    }
+	    POP(cind1), POP(cind2);
+	  }
+	  if(compatible_p) {
+	    // Propagate the remaining subscripts on the translation target
+	    reference_indices(r22) = gen_nconc(reference_indices(r22),cind1);
+	    cell new_sr = make_cell_reference(r22);
+	    new_sr_l = CONS(CELL, new_sr, new_sr_l);
+	  }
+	}
+      }
+      else if(points_to_compare_cell(sr1,sr2)) {
+	// sr1 can be translated directly as sk2
+	cell new_sr = copy_cell(points_to_sink(pp));
+	new_sr_l = CONS(CELL, new_sr, new_sr_l);
+      }
+    }
+  }
+  return new_sr_l;
+}
+
+/* Allocate a new list with the translations of the cells in cl. */
+list points_to_cells_translation(list cl, set bm, entity f)
+{
+  list tcl = NIL;
+  FOREACH(CELL, c, cl) {
+    list ptcl = points_to_cell_translation(c, bm, f);
+    tcl = gen_nconc(tcl, ptcl);
+  }
+  return tcl;
+}
+
+/* Translate the out set in the scope of the caller using the binding
+   information */
+set compute_points_to_gen_set(list args __attribute__ ((unused)),
+			      set pt_out,
+			      list Written,
+			      set pt_in __attribute__ ((unused)),
+			      set pt_binded __attribute__ ((unused)),
+			      set translation,
+			      entity f)
+{
+  set gen = new_simple_pt_map(); 		
+  // set bm = new_simple_pt_map();
+  //bm = points_to_binding(args, pt_in, pt_binded);
+  set bm = translation;
+  // entity rv = any_function_to_return_value(f);
+
+  /* Consider all points-to arcs "(sr1, sk1)" in "pt_out" */
+  SET_FOREACH(points_to, p, pt_out) {
+    cell sr1 = points_to_source(p); 
+    reference r_1 = cell_any_reference(sr1);
+    entity v_1 = reference_variable(r_1);
+    type t_1 = entity_basic_concrete_type(v_1);
+    if(array_type_p(t_1)
+       || !formal_parameter_p(v_1)
+       || !points_to_cell_in_list_p(sr1, Written)) {
+      //list ind1 = reference_indices(r_1);
+      // cell new_sr = cell_undefined; 
+      list new_sr_l = NIL;
+      cell new_sk = cell_undefined;
+      list new_sk_l = NIL;
+      approximation a = copy_approximation(points_to_approximation(p));
+      cell sk1 = points_to_sink(p); 
+
+
+      /* Translate sr1 */
+      new_sr_l = points_to_cell_translation(sr1, bm, f);
+
+      /* Translate sk1 if needed */
+      reference r_2 = cell_any_reference(sk1);
+      entity v_2 = reference_variable(r_2);
+      if (null_cell_p(sk1) || nowhere_cell_p(sk1) || heap_cell_p(sk1)
+	  || anywhere_cell_p(sk1) || cell_typed_anywhere_locations_p(sk1)
+	  || entity_to_module_entity(v_2)!=f) {
+	new_sk = copy_cell(sk1);
+	new_sk_l = CONS(CELL, new_sk, new_sk_l);
+      }
+      else
+	new_sk_l = points_to_cell_translation(sk1, bm, f);
+#if 0
+      reference r_2 = cell_any_reference(sk1);
+      entity v_2 = reference_variable(r_2);
+      if (null_cell_p(sk1) || nowhere_cell_p(sk1) || heap_cell_p(sk1)
+	  || anywhere_cell_p(sk1) || cell_typed_anywhere_locations_p(sk1)
+	  || entity_to_module_entity(v_2)!=f) {
+	new_sk = copy_cell(sk1);
+	new_sk_l = CONS(CELL, new_sk, new_sk_l);
+      }
+      else {
+	SET_FOREACH(points_to, pp1, bm) {
+	  cell sr2 = points_to_source(pp1); 
+	  cell sk2 = points_to_sink(pp1); 
+	  reference r22 = copy_reference(cell_to_reference(sk2));
+	  if(!source_in_set_p(sk1, bm)) {
+	    reference r_12 = cell_any_reference(sr2);
+	    entity v_12 = reference_variable( r_12 );
+	    if(same_string_p(entity_local_name(v_2),entity_local_name(v_12))) { 
+	      reference_indices_(r22) = gen_nconc(reference_indices(r22),ind1);
+	      new_sk = make_cell_reference(r22);
+	      new_sk_l = CONS(CELL, new_sk, new_sk_l);
+	    }
+	  }
+	  else if(points_to_compare_cell(sk1,sr2)) {
+	    new_sk = copy_cell(points_to_sink(pp1));
+	    new_sk_l = CONS(CELL, new_sk, new_sk_l);
+	  }
+	}
+      }
+#endif
+
+      if(!ENDP(new_sr_l) && !ENDP(new_sk_l)) {
+	int new_sk_n = (int) gen_length(new_sk_l);
+	FOREACH(CELL, new_sr, new_sr_l) {
+	  approximation na = approximation_undefined;
+	  if(!atomic_points_to_cell_p(new_sr) || new_sk_n>1) {
+	    na = make_approximation_may();
+	  }
+	  else
+	    na = copy_approximation(a);
+	  FOREACH(CELL, new_sk, new_sk_l) {
+	    points_to new_pt = make_points_to(copy_cell(new_sr),
+					      copy_cell(new_sk),
+					      na,
+					      make_descriptor_none());
+	    set_add_element(gen, gen, (void*)new_pt);
+	  }
+	}
+	// gen_full_free_list(new_sr_l);
+	// gen_full_free_list(new_sk_l);
+	free_approximation(a);
+      }
+    }
+  }
+
+  ifdebug(1) print_points_to_set("gen", gen);
+
+  return gen;  
+}
+
+
+/* Recursively find all the arcs, "ai", starting from the argument
+ * "c1" using "in", find all the arcs, "aj", starting from the
+ * parameter "c2" using "pt_binded", map each node "ai" to its
+ * corresponding "aj" and store the "ai->aj" arc in a new set, "bm".
+ *
+ * "pt_binded" contains the correspondance between formal and actual
+ * parameters, e.g. "fp->ap", with some information about the possible
+ * approximations because one formal parameter can points toward
+ * several actual memory locations of the caller.
+ *
+ * "in" contains the formal context of the callee, as it stands at its
+ * entry point (DBR_POINTS_TO_IN).
+ *
+ * "bm" is the binding relationship between references of the formal
+ * context of the callees towards addresses of the caller. For
+ * instance, when function "void foo(int ** fp)" is called as "ap=&q;
+ * foo(ap);", bm = {(_ap_1, q)}.
+ *
+ * See Amira Mensi's PhD dissertation, chapter about interprocedural analysis
+ */
+set points_to_binding_arguments(cell c1, cell c2 , set in, set pt_binded)
+{
+  set bm = new_simple_pt_map();
+
+  if(source_in_set_p(c1, in) || source_subset_in_set_p(c1, in)) {
+    // FI: impedance problem... and memory leak
+    points_to_graph in_g = make_points_to_graph(false, in);
+    points_to_graph pt_binded_g = make_points_to_graph(false, pt_binded);
+    // FI: allocate a new copy for sink1 and sink2
+    //list c1_children = cell_to_pointer_cells(c1);
+    //list c2_children = cell_to_pointer_cells(c2);
+    list c1_children = recursive_cell_to_pointer_cells(c1);
+    list c2_children = recursive_cell_to_pointer_cells(c2);
+    FOREACH(CELL,c1c, c1_children) {
+      FOREACH(CELL,c2c, c2_children) {
+	list sinks1 = points_to_source_to_some_sinks(c1c, in_g, true);
+	list sinks2 = points_to_source_to_some_sinks(c2c, pt_binded_g, true);
+	pips_assert("sinks1 is not empty", !ENDP(sinks1));
+	pips_assert("sinks2 is not empty", !ENDP(sinks2));
+	// FI Allocate more copies
+	list tmp1 = gen_full_copy_list(sinks1);
+	list tmp2 = gen_full_copy_list(sinks2);
+
+	FOREACH(CELL, s1, sinks1) { // Formal cell: fp->_fp_1 or fp->NULL
+	  // FI: no need to translate constants NULL and UNDEFINED
+	  if(!null_cell_p(s1) && !nowhere_cell_p(s1)) {
+	    FOREACH(CELL, s2, sinks2) { // Actual cell: ap-> i... NOWHERE... NULL...
+	      // FI: _fp_1 may or not exist since it is neither null nor undefined
+	      if(!null_cell_p(s2) && !nowhere_cell_p(s2)) {
+		approximation a = approximation_undefined;
+		if((size_t)gen_length(sinks2)>1) // FI->FI: atomicity should be tested too
+		  a = make_approximation_may();
+		else
+		  a = make_approximation_exact();
+		cell sink1 = copy_cell(s1);
+		cell sink2 = copy_cell(s2);
+		// Build arc _fp_1->... NOWHERE ... NULL ...
+		points_to pt = make_points_to(sink1, sink2, a, make_descriptor_none());
+		add_arc_to_simple_pt_map(pt, bm);
+	      }
+	      //gen_remove(&sinks2, (void*)s2);
+	    }
+	  }
+	  //gen_remove(&sinks1, (void*)s1);
+	}
+
+	/* Recursive call down the different points_to paths*/
+	FOREACH(CELL, sr1, tmp1) {
+	  if(!null_cell_p(sr1) && !nowhere_cell_p(sr1)) {
+	    FOREACH(CELL, sr2, tmp2) {
+	      if(!null_cell_p(sr2) && !nowhere_cell_p(sr2)) {
+		set sr1sr2 = points_to_binding_arguments(sr1, sr2, in, pt_binded);
+		bm = set_union(bm, sr1sr2, bm);
+		set_clear(sr1sr2), set_free(sr1sr2);
+	      }
+	    }
+	  }
+	}
+      }
+    }
+  }
+  else if(source_subset_in_set_p(c1, in)) { // Not reachable
+    /* Here we have, for instance, "q[*]" in "c1" for "q[4]" in "in". */
+    /* FI: I do not see how to handle incompatibility between assumptions... */
+    pips_internal_error("Do not know how to handle subsets...\n");
+  }
+  else /* (!source_in_set_p(c1, in) && !source_subset_in_set_p(c1, in)) */ {
+    // FI: this has already been performed
+    /* c1 is not a pointer: it is simply mapped to c2 */
+    // points_to pt = make_points_to(c1, c2, make_approximation_exact(), make_descriptor_none());
+    // add_arc_to_simple_pt_map(pt, bm);
+    ;
+  }
+  return bm;
+}
+
+/* Filter out written effects on pointers */
+list written_pointers_set(list eff) {
+  list written_l = NIL;
+  debug_on("EFFECTS_DEBUG_LEVEL");
+  list wr_eff = effects_write_effects(eff);
+  FOREACH(effect, ef, wr_eff) {
+    if(effect_pointer_type_p(ef)){
+      cell c = effect_cell(ef);
+      written_l = gen_nconc(CONS(CELL, c, NIL), written_l);
+    }
+  }
+  debug_off();
+  return written_l; 
+
+}
+
+
+/* For each actual argument "r" and its corresponding formal one "f",
+ * create the assignment "f = r;" and then compute the points-to set
+ * "s" generated by the assignment. The result is the union of
+ * "pt_caller" and "s".
+ */
+set compute_points_to_binded_set(entity called_func, list real_args, set pt_caller)
+{ 
+  set s = set_generic_make(set_private, points_to_equal_p,
+			   points_to_rank);
+  set pt_binded = set_generic_make(set_private, points_to_equal_p,
+				   points_to_rank);
+
+  /* Be careful with vararags
+   *
+   * This is not sufficient to handle varargs. Much more thinking
+   * needed. And corect examples.
+   */
+  type ft = entity_basic_concrete_type(called_func); // function type
+  functional fft = type_functional(ft);
+  list ptl = functional_parameters(fft); // parameter type list
+  int mnp = (int) gen_length(ptl); // maximum number of formal parameters
+  if(!ENDP(ptl)) {
+    // last parameter type
+    type lpt = parameter_type(PARAMETER(CAR(gen_last(ptl))));
+    if(type_varargs_p(lpt))
+      mnp--;
+  }
+
+  cons *pc;
+  int ipc;
+  s = set_assign(s, pt_caller);
+  for (ipc = 1, pc = real_args; pc != NIL; pc = CDR(pc), ipc++) {
+    expression rhs = EXPRESSION(CAR(pc));
+    int tr = ipc>mnp? mnp : ipc;
+    entity fp = find_ith_parameter(called_func, tr);
+    type fpt = entity_basic_concrete_type(fp);
+    if(array_type_p(fpt)) {
+      /* C does not support array assignments... */
+      if(expression_reference_p(rhs)) {
+	reference r = expression_reference(rhs);
+	entity v = reference_variable(r);
+	list nptl = NIL; // New points-to list
+	SET_FOREACH(points_to, pt, pt_caller) {
+	  cell c = points_to_source(pt);
+	  reference cr = cell_any_reference(c);
+	  entity cv = reference_variable(cr);
+	  if(cv==v) {
+	    points_to npt = copy_points_to(pt);
+	    cell nc = points_to_source(npt);
+	    reference ncr = cell_any_reference(nc);
+	    reference_variable(ncr) = fp;
+	    nptl = CONS(POINTS_TO, npt, nptl);
+	  }
+	}
+	FOREACH(POINTS_TO, npt, nptl)
+	  add_arc_to_simple_pt_map(npt, s);
+	gen_free_list(nptl);
+      }
+      else if(expression_call_p(rhs) && expression_string_constant_p(rhs)) {
+	/* This may happen with a constant string as actual parameter
+	   and an array, bounded or not, as formal parameter. */
+	; // Nothing to do: the constant string does not point to anything
+      }
+      else
+	pips_internal_error("Not implemented yet.\n");
+    }
+    else {
+      /* It would be nice to build an assignment of rhs to fp and to
+	 let it deal with the many possible kinds of assignments. But
+	 if it is a pure points-to function, the symbolic subscripts
+	 are going to be lost. This is fine for points-to translation,
+	 but not OK for effects translation. */
+
+      if(pointer_type_p(fpt)) {
+	points_to_graph s_g = make_points_to_graph(false, s);
+	list sinks = expression_to_points_to_cells(rhs, s_g, true, false);
+	int nsinks = (int) gen_length(sinks);
+	FOREACH(CELL, sink, sinks) {
+	  cell o = make_cell_reference(make_reference(fp, NIL));
+	  cell d = copy_cell(sink);
+	  approximation a = nsinks==1? make_approximation_exact() :
+	    make_approximation_may();
+	  descriptor desc = make_descriptor_none();
+	  points_to pt = make_points_to(o, d, a, desc);
+	  add_arc_to_simple_pt_map(pt, s);
+	}
+      }
+      else if(struct_type_p(fpt)) {
+	/* In the short term, build the assignment... */
+	expression lhs = entity_to_expression(fp);
+	points_to_graph s_g = make_points_to_graph(false, s);
+	points_to_graph a_g = assignment_to_points_to(lhs, rhs, s_g);
+	s = set_assign(s, points_to_graph_set(a_g));
+      }
+      else {
+	; // do nothing for other types
+      }
+    }
+  }
+
+  SET_FOREACH(points_to, pt, s) {
+    reference r = cell_any_reference(points_to_sink(pt));
+    entity e = reference_variable(r);
+    if(stub_entity_of_module_p(e, called_func))
+      s = set_del_element(s,s,(void*)pt);
+  }
+  pt_binded = set_union(pt_binded, s, pt_caller);
+  return pt_binded;
+}
+
+
+/* Apply points_to_binding_arguments() to each pair (, complete the
+ * process of binding each element of "in" to its corresponding memory
+ * address at the call site. Necessary to translate the fields of structures.
+ *
+ * "args": list of formal parameters of some callee
+ *
+ * "in": points-to in of the callee
+ *
+ * "pt_binded": points-to from formal to actual parameters for a specific call site
+ *
+ * A new set is allocated.
+ */
+set points_to_binding(list args, set in, set pt_binded)
+{
+
+  set bm = new_simple_pt_map();
+  //set bm1 = new_simple_pt_map();
+ 
+  /* Process each formal parameter and look for its actual values in
+     "pt_binded" */
+  SET_FOREACH(points_to, pt, pt_binded) {
+    FOREACH(CELL, c1, args) {
+      cell source = points_to_source(pt);
+      if(cell_equal_p(c1, source)) {
+	cell c2 = points_to_source_alias(pt, pt_binded);
+	// FI: We end up with c1=c2=one formal parameter...
+	// No need to add "p->p" in "bm"...
+	//approximation a = make_approximation_exact();
+	//points_to new_pt = make_points_to(c1, c2, a, make_descriptor_none());
+	//add_arc_to_simple_pt_map(new_pt, bm);
+	set c1c2 = points_to_binding_arguments(c1, c2,  in, pt_binded);
+	bm = set_union(bm, bm, c1c2);
+	set_clear(c1c2), set_free(c1c2);
+      }
+      else if(cell_entity_equal_p(c1, source)) {
+	pips_assert("c1 is a reference with no indices",
+		    ENDP(reference_indices(cell_any_reference(c1))));
+	cell c2 = copy_cell(source);
+	// FI: We end up with c1=c2=one formal parameter...
+	// No need to add "p->p" in "bm"...
+	//approximation a = make_approximation_exact();
+	//points_to new_pt = make_points_to(c1, c2, a, make_descriptor_none());
+	//add_arc_to_simple_pt_map(new_pt, bm);
+	set c1c2 = points_to_binding_arguments(source, c2,  in, pt_binded);
+	bm = set_union(bm, bm, c1c2);
+	set_clear(c1c2), set_free(c1c2);
+      }
+    }
+  }
+
+  return bm;
+}
+
+/* Add cells referencing a points-to stub found in parameter "s" are
+ * copied and added to list "osl".
+ *
+ * The stubs are returned as cells not as entities.
+ *
+ * New cells are allocated. No sharing is created between parameter
+ * "s" and result "sl".
+ */
+list generic_points_to_set_to_stub_cell_list(entity f, set s, list osl)
+{
+  list sl = osl;
+  SET_FOREACH(points_to, pt, s) {
+    cell sink = points_to_sink(pt);
+    reference r1 = cell_any_reference(sink);
+    entity e1 = reference_variable(r1);
+    if( ( (entity_undefined_p(f) && entity_stub_sink_p(e1))
+	  || stub_entity_of_module_p(e1, f) )
+	&& !points_to_cell_in_list_p(sink, sl) )
+      sl = CONS(CELL, copy_cell(sink), sl);
+      
+    cell source = points_to_source(pt);
+    reference r2 = cell_any_reference(source);
+    entity e2 = reference_variable(r2);
+    if( ( (entity_undefined_p(f) && entity_stub_sink_p(e2))
+	  || stub_entity_of_module_p(e2, f) )
+	&& !points_to_cell_in_list_p(source, sl) )
+      sl = CONS(CELL, copy_cell(source), sl);
+  }
+  
+  gen_sort_list(sl, (gen_cmp_func_t) points_to_compare_ptr_cell );
+  ifdebug(1) print_points_to_cells(sl);
+  return sl;
+}
+
+list points_to_set_to_stub_cell_list(set s, list osl)
+{
+  return generic_points_to_set_to_stub_cell_list(entity_undefined, s, osl);
+}
+
+list points_to_set_to_module_stub_cell_list(entity m, set s, list osl)
+{
+  return generic_points_to_set_to_stub_cell_list(m, s, osl);
+}
+
+/* Let "pt_binded" be the results of assignments of actual arguments
+ * to formal arguments (see compute_points_to_binded_set()).
+ *
+ * Let "pt" be a points-to arc in "pt_binded".
+ *
+ * Find for the source of p its corresponding alias, which means
+ * finding another source that points to the same location.
+ */
+cell points_to_source_alias(points_to pt, set pt_binded)
+{
+  cell source = cell_undefined;
+  cell sink1 = points_to_sink(pt);
+  SET_FOREACH(points_to, p, pt_binded) {
+    cell sink2 =  points_to_sink(p);
+    if(cell_equal_p(sink1, sink2)) {
+      source = points_to_source(p);
+      break;
+      }
+  }
+  if(cell_undefined_p(source))
+    pips_internal_error("At least one alias should be found.\n");
+
+  return source;
 }

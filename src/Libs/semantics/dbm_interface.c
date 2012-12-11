@@ -1329,7 +1329,8 @@ transformer load_summary_total_postcondition(entity e)
     return t_post;
 }
 
-
+/* FI->FI, FI->BC: these two functions should be moved into
+   effects-util or effects-simple */
 list load_summary_effects(entity e)
 {
     /* memorization could be used to improve efficiency */
@@ -1341,9 +1342,26 @@ list load_summary_effects(entity e)
 	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_local_name(e),
 			       true));
 
-    pips_assert("load_summary_effects", t != list_undefined);
+    pips_assert("t is defined", t != list_undefined);
 
     return t;
+}
+
+list load_body_effects(entity e)
+{
+    string module_name = module_local_name(e);
+
+    pips_assert("load_summary_effects", entity_module_p(e));
+
+    statement b = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
+    statement_effects se = (statement_effects)
+      db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true);
+    effects be = (effects) (intptr_t)HASH_GET(p, p, statement_effects_hash_table(se), (void *) b);
+    list bel = effects_effects(be);
+
+    pips_assert("bel is defined", bel != list_undefined);
+
+    return bel;
 }
 
 
