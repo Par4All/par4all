@@ -1,5 +1,5 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-delete scalarization06
+delete scalarization07
 
 setproperty PRETTYPRINT_BLOCKS TRUE
 setproperty CONSTANT_PATH_EFFECTS TRUE

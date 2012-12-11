@@ -10,15 +10,23 @@
 #include <stdio.h>
 #include <malloc.h>
 
-int main(int *x, int *y, int*t)
+int main(int argc, char **argv)
 {
   int i, n=100;
+  int *x, *y, *t;
 
-    
+  x = (int *)malloc(sizeof(int));
+  y = (int *)malloc(sizeof(int));
+  t = (int *)malloc(sizeof(int));
+
   for (i=0 ; i<n ; i++) {
-    t[i] = x[i];
-    x[i] = y[i];
-    y[i] = t[i];
+    scanf("%d %d", &x[i], &y[i]);
   }
-  
+
+  for (i=0 ; i<n ; i++) {
+    t[1] = x[i];
+    x[i] = y[i];
+    y[i] = t[1];
+  }
+  printf("%d %d", x[n-1], y[n-1]);
 }
