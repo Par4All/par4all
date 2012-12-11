@@ -1,5 +1,5 @@
 
-Points-to for "ordered_free01"
+POINTS TO for ordered_free01am
 
 
 // Points To IN:
@@ -8,7 +8,7 @@ Points-to for "ordered_free01"
 
 // Points To OUT: none
 
-int ordered_free01(int *fp)
+void ordered_free01(int *fp)
 {
 
 // Points To:
@@ -29,15 +29,15 @@ int ordered_free01(int *fp)
    fp = (int *) malloc(sizeof(int));
 
 // Points To:
-// fp -> *HEAP*_l_8 , MAY
+// fp -> *HEAP*_l_7 , MAY
 // fq -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
-   return 0;
+   return;
 }
 
-Proper effects with points-to for "ordered_free01"
+PROPER  EFFECTS WITH POINTS TO
 
-int ordered_free01(int *fp)
+void ordered_free01(int *fp)
 {
 //             <    is read   >: fp
 //             <    is written>: fq
@@ -48,14 +48,14 @@ int ordered_free01(int *fp)
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: fp _MALLOC_EFFECTS:_MALLOC_
    fp = (int *) malloc(sizeof(int));
-   return 0;
+   return;
 }
 
-Cumulated effects with points-to for "ordered_free01"
+CUMULATED  EFFECTS WITH POINTS TO
 
 //             <    is read   >: fp _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-int ordered_free01(int *fp)
+void ordered_free01(int *fp)
 {
 //             <    is read   >: fp
 //             <    is written>: fq
@@ -66,36 +66,7 @@ int ordered_free01(int *fp)
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: fp _MALLOC_EFFECTS:_MALLOC_
    fp = (int *) malloc(sizeof(int));
-   return 0;
-}
-
-Points-to for "main"
-
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   int *p = (int *) malloc(sizeof(int));
-
-// Points To:
-// p -> *HEAP*_l_14 , MAY
-
-   ordered_free01(p);
-
-// Points To:
-// p -> *HEAP*_l_14 , MAY
-
-   // Here we may not know that p has been freed but we should know
-   // that p may have been freed
-   return 0;
+   return;
 }
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[ordered_free01] (freed_pointer_to_points_to) Dangling pointer "ordered_free01:0`fq".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[ordered_free01] (points_to_function_projection) Memory cell *HEAP*_l_8 leaked.
-unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[ordered_free01] (points_to_function_projection) Memory cell *HEAP*_l_7 leaked.

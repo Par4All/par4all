@@ -1,4 +1,4 @@
-setenv WS=ordered_free01
+setenv WS=conditional_free03
 delete $WS
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
@@ -8,27 +8,27 @@ create $WS $WS.c
 
 
 echo
-echo Points-to for "ordered_free01"
+echo Points-to for "conditional_free03"
 echo
 
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[ordered_free01]
+display PRINTED_FILE[conditional_free03]
 
 echo 
-echo Proper effects with points-to for "ordered_free01"
+echo Proper effects with points-to for "conditional_free03"
 echo
 
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[ordered_free01]
+display PRINTED_FILE[conditional_free03]
 
 
 echo 
-echo Cumulated effects with points-to for "ordered_free01"
+echo Cumulated effects with points-to for "conditional_free03"
 echo
 activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[ordered_free01]
+display PRINTED_FILE[conditional_free03]
 
 echo
 echo Points-to for "main"

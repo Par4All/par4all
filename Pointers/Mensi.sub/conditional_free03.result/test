@@ -1,0 +1,111 @@
+
+Points-to for "conditional_free03"
+
+
+// Points To IN:
+// p -> _p_1 , EXACT
+
+
+// Points To OUT:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+void conditional_free03(int *p, _Bool c1)
+{
+
+// Points To:
+// p -> _p_1 , EXACT
+
+   int *q = p;
+
+// Points To:
+// p -> _p_1 , EXACT
+// q -> _p_1 , EXACT
+
+
+   if (c1)
+
+// Points To:
+// p -> _p_1 , EXACT
+// q -> _p_1 , EXACT
+
+      free(p);
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> _p_1 , MAY
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// q -> _p_1 , MAY
+
+
+   return *q;
+}
+
+Proper effects with points-to for "conditional_free03"
+
+void conditional_free03(int *p, _Bool c1)
+{
+//             <    is read   >: p
+//             <    is written>: q
+   int *q = p;
+//             <    is read   >: c1
+
+   if (c1)
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+      free(p);
+//             <    is read   >: _p_1 q
+
+   return *q;
+}
+
+Cumulated effects with points-to for "conditional_free03"
+
+//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: _p_1 c1 p
+void conditional_free03(int *p, _Bool c1)
+{
+//             <    is read   >: p
+//             <    is written>: q
+   int *q = p;
+//             <may be read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: c1
+
+   if (c1)
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+      free(p);
+//             <    is read   >: _p_1 q
+
+   return *q;
+}
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p = (int *) malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_16 , MAY
+
+   conditional_free03(p, 0);
+
+// Points To:
+// p -> *HEAP*_l_16 , MAY
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+   return 0;
+}
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free03] (freed_pointer_to_points_to) Dangling pointer "conditional_free03:0`q".
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

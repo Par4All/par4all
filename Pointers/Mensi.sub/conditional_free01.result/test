@@ -1,5 +1,5 @@
 
-POINTS TO for conditional_free
+Points-to for "conditional_free01"
 
 
 // Points To IN:
@@ -9,7 +9,7 @@ POINTS TO for conditional_free
 // Points To OUT:
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
-void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
+void conditional_free01(int *p, _Bool c1, _Bool c2, _Bool c3)
 {
 
 // Points To:
@@ -22,43 +22,43 @@ void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
       p = (int *) malloc(sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_5 , MAY
+// p -> *HEAP*_l_7 , MAY
 // p -> _p_1 , MAY
 
    if (c2)
 
 // Points To:
-// p -> *HEAP*_l_5 , MAY
+// p -> *HEAP*_l_7 , MAY
 // p -> _p_1 , MAY
 
       free(p);
 
 // Points To:
-// p -> *HEAP*_l_5 , MAY
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p -> _p_1 , MAY
-
-   if (c3)
-
-// Points To:
-// p -> *HEAP*_l_5 , MAY
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p -> _p_1 , MAY
-
-      p = (int *) malloc(sizeof(int));
-
-// Points To:
-// p -> *HEAP*_l_5 , MAY
 // p -> *HEAP*_l_7 , MAY
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 // p -> _p_1 , MAY
 
+   if (c3)
+
+// Points To:
+// p -> *HEAP*_l_7 , MAY
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> _p_1 , MAY
+
+      p = (int *) malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_7 , MAY
+// p -> *HEAP*_l_9 , MAY
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> _p_1 , MAY
+
    return;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+Proper effects with points-to for "conditional_free01"
 
-void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
+void conditional_free01(int *p, _Bool c1, _Bool c2, _Bool c3)
 {
 //             <    is read   >: c1
    if (c1)
@@ -78,12 +78,12 @@ void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
    return;
 }
 
-CUMULATED  EFFECTS WITH POINTS TO
+Cumulated effects with points-to for "conditional_free01"
 
 //             <may be read   >: p _MALLOC_EFFECTS:_MALLOC_
 //             <may be written>: _MALLOC_EFFECTS:_MALLOC_
 //             <    is read   >: c1 c2 c3
-void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
+void conditional_free01(int *p, _Bool c1, _Bool c2, _Bool c3)
 {
 //             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <may be written>: p _MALLOC_EFFECTS:_MALLOC_
@@ -108,5 +108,32 @@ void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
       p = (int *) malloc(sizeof(int));
    return;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free] (points_to_function_projection) Memory cell *HEAP*_l_5 leaked.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free] (points_to_function_projection) Memory cell *HEAP*_l_7 leaked.
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p = (int *) malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_15 , MAY
+
+   conditional_free01(p, 0, 1, 0);
+
+// Points To:
+// p -> *HEAP*_l_15 , MAY
+
+   return 0;
+}
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free01] (points_to_function_projection) Memory cell *HEAP*_l_9 leaked.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free01] (points_to_function_projection) Memory cell *HEAP*_l_7 leaked.
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

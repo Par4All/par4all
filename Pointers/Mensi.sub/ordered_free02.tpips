@@ -4,35 +4,38 @@ setproperty ABORT_ON_USER_ERROR TRUE
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
-
 create $WS $WS.c
 
 
-
-
 echo
-echo POINTS TO for "$WS"
+echo Points-to for "ordered_free02"
 echo
-#activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
+
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[ordered_free02]
 
 echo 
-echo PROPER  EFFECTS WITH POINTS TO
+echo Proper effects with points-to for "ordered_free02"
 echo
+
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[ordered_free02]
 
 
 echo 
-echo CUMULATED  EFFECTS WITH POINTS TO
+echo Cumulated effects with points-to for "ordered_free02"
 echo
 activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[ordered_free02]
 
-
+echo
+echo Points-to for "main"
+echo
+activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
 
 close
 shell cat $WS.database/Warnings
