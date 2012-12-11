@@ -519,6 +519,7 @@ Points-to for "init4"
 
 // Points To OUT:
 // *HEAP*_l_77.tab2 -> *HEAP*_l_78[0] , MAY
+// p[*] -> *HEAP*_l_77 , MAY
 
 void init4(mys *p[5])
 {
@@ -826,9 +827,12 @@ int main()
    init4(s);
 
 // Points To:
+// init3:*HEAP*_l_53[*] -> init3:*HEAP*_l_56 , MAY
+// init4:*HEAP*_l_77.tab2 -> init4:*HEAP*_l_78[0] , MAY
 // p -> s1 , EXACT
 // q -> s3 , EXACT
 // r -> q , EXACT
+// s[*] -> init4:*HEAP*_l_77 , MAY
 // s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
 // s[*] -> s4[*] , MAY
 // s1[0].tab2 -> init:*HEAP*_l_21[0] , MAY

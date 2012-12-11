@@ -23,19 +23,19 @@ Proper effects with points-to for call25
 
 void call25(int *q)
 {
-//             <may be written>: _q_1[0]
 //             <    is read   >: q
+//             <    is written>: _q_1[0]
    *q = 3;
 }
 
 Cumulated effects with points-to for call25
 
-//             <may be written>: _q_1[0]
 //             <    is read   >: q
+//             <    is written>: _q_1[0]
 void call25(int *q)
 {
-//             <may be written>: _q_1[0]
 //             <    is read   >: q
+//             <    is written>: _q_1[0]
    *q = 3;
 }
 

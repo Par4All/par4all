@@ -1,4 +1,5 @@
 
+
 Points-to for "init3" 
 
 
@@ -248,6 +249,7 @@ int main()
    init3(r);
 
 // Points To:
+// init3:*HEAP*_l_19[*] -> init3:*HEAP*_l_22 , MAY
 // q -> s3 , EXACT
 // r -> q , EXACT
 // s2.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
