@@ -33,4 +33,4 @@ int main()
 Warnings
 
 C_PARSER[main] (simplify_C_expression) Variable "i" is probably used before it is defined
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Assignment of an undefined value at line 13.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value at line 13.

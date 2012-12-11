@@ -1,5 +1,5 @@
 
-POINTS TO for "main"
+Points-to for "foo"
 
 
 // Points To IN:
@@ -61,6 +61,52 @@ void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
 
    printf("adress of (*pa2)->q = %p", (*pa2)->q);
 }
+
+Proper effects for "foo"
+
+void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
+{
+//             <    is read   >: a1 pa2
+//             <    is written>: _pa2_2[0]
+
+   *pa2 = a1;
+//             <may be written>: _a1_1[0].q _a1_1[0].q
+//             <    is read   >: _pa2_2[0] b2 pa2
+   (*pa2)->q = b2;
+//             <may be read   >: _a1_1[0].q _a1_1[0].q stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: _pa2_2[0] pa2 stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("adress of (*pa2)->q = %p", (*pa2)->q);
+}
+
+Cumulated effects for "foo"
+
+//             <may be read   >: _a1_1[0].q stdout[0]
+//             <may be written>: _a1_1[0].q stdout[0]
+//             <    is read   >: _pa2_2[0] a1 b2 pa2 stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: _pa2_2[0] __IO_EFFECTS:LUNS[1]
+void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
+{
+//             <    is read   >: a1 pa2
+//             <    is written>: _pa2_2[0]
+
+   *pa2 = a1;
+//             <may be written>: _a1_1[0].q
+//             <    is read   >: _pa2_2[0] b2 pa2
+   (*pa2)->q = b2;
+//             <may be read   >: _a1_1[0].q stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: _pa2_2[0] pa2 stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("adress of (*pa2)->q = %p", (*pa2)->q);
+}
+
+POINTS TO for "main"
+
 
 // Points To IN: none
 
@@ -144,6 +190,8 @@ int main()
 
 // Points To:
 // *HEAP*_l_29.q -> *HEAP*_l_23 , MAY
+// *HEAP*_l_29.q -> *HEAP*_l_24 , MAY
+// *HEAP*_l_29.q -> *NULL_POINTER* , MAY
 // p1 -> *HEAP*_l_29 , MAY
 // p2 -> *HEAP*_l_29 , MAY
 // q1 -> *HEAP*_l_23 , MAY
@@ -154,6 +202,8 @@ int main()
 
 // Points To:
 // *HEAP*_l_29.q -> *HEAP*_l_23 , MAY
+// *HEAP*_l_29.q -> *HEAP*_l_24 , MAY
+// *HEAP*_l_29.q -> *NULL_POINTER* , MAY
 // p1 -> *HEAP*_l_29 , MAY
 // p2 -> *HEAP*_l_29 , MAY
 // q1 -> *HEAP*_l_23 , MAY

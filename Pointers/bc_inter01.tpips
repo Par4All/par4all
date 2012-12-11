@@ -9,12 +9,34 @@ setproperty ABSTRACT_HEAP_LOCATIONS "flow-sensitive"
 setproperty ALIASING_ACROSS_TYPES TRUE
 
 echo
+echo Points-to for "foo"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[foo]
+
+echo
+echo Proper effects for "foo"
+echo
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[foo]
+
+echo
+echo Cumulated effects for "foo"
+echo
+
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[foo]
+
+echo
 echo POINTS TO for "main"
 echo
 
 activate PRINT_CODE_POINTS_TO_LIST
-
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[main]
 
 close
 delete bc_inter01

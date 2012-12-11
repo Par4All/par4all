@@ -1,4 +1,5 @@
-POINTS TO for "foo"
+
+Points-to for "foo"
 
 
 // Points To IN:
@@ -36,7 +37,7 @@ void foo(int ***p1, int ***p2, int **q3, int *r4)
 // Points To:
 // _p2_2[0] -> *NULL_POINTER* , MAY
 // _p2_2[0] -> _p2_2_2[0][0] , MAY
-// l -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> *ANY_MODULE*:*NOWHERE* , EXACT
 // p2 -> *NULL_POINTER* , MAY
 // p2 -> _p2_2[0] , MAY
 
@@ -73,6 +74,41 @@ void foo(int ***p1, int ***p2, int **q3, int *r4)
 
    *l = r4;
 }
+
+Proper effects for "foo"
+
+void foo(int ***p1, int ***p2, int **q3, int *r4)
+{
+   int **l;
+//             <    is read   >: _p2_2[0] p2
+//             <    is written>: l
+   l = *p2;
+//             <    is read   >: p1 q3
+//             <    is written>: _p1_1[0]
+   *p1 = q3;
+//             <    is read   >: l r4
+//             <    is written>: _p2_2_2[0][0]
+   *l = r4;
+}
+
+Cumulated effects for "foo"
+
+//             <    is read   >: _p2_2[0] p1 p2 q3 r4
+//             <    is written>: _p1_1[0] _p2_2_2[0][0]
+void foo(int ***p1, int ***p2, int **q3, int *r4)
+{
+   int **l;
+//             <    is read   >: _p2_2[0] p2
+//             <    is written>: l
+   l = *p2;
+//             <    is read   >: p1 q3
+//             <    is written>: _p1_1[0]
+   *p1 = q3;
+//             <    is read   >: l r4
+//             <    is written>: _p2_2_2[0][0]
+   *l = r4;
+}
+
 POINTS TO for "main"
 
 
@@ -89,168 +125,158 @@ int main()
    int ***a1;
 
 // Points To:
-// a1 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// a1 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    int ***a2;
 
 
 // Points To:
-// a1 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// a2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// a1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    int **b3;
 
 // Points To:
-// a1 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// a2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    int *c4;
 
 // Points To:
-// a1 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// a2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// a1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
 
    a1 = (int ***) malloc(sizeof(int * *));
 
 // Points To:
-// a1 -> *HEAP*_l_22 , MAY
-// a2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// a1 -> *HEAP*_l_24 , MAY
+// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    *a1 = (int **) malloc(sizeof(int *));
 
 // Points To:
-// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
-// a1 -> *HEAP*_l_22 , MAY
-// a2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
+// a1 -> *HEAP*_l_24 , MAY
+// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    **a1 = (int *) malloc(sizeof(int));
 
 // Points To:
-// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
-// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
-// a1 -> *HEAP*_l_22 , MAY
-// a2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_25 -> *HEAP*_l_26 , MAY
+// a1 -> *HEAP*_l_24 , MAY
+// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
 
    ***a1 = 1;
 
 // Points To:
-// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
-// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
-// a1 -> *HEAP*_l_22 , MAY
-// a2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_25 -> *HEAP*_l_26 , MAY
+// a1 -> *HEAP*_l_24 , MAY
+// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
 
    a2 = (int ***) malloc(sizeof(int * *));
 
 // Points To:
-// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
-// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
-// a1 -> *HEAP*_l_22 , MAY
-// a2 -> *HEAP*_l_28 , MAY
-// b3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_25 -> *HEAP*_l_26 , MAY
+// a1 -> *HEAP*_l_24 , MAY
+// a2 -> *HEAP*_l_30 , MAY
+// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    *a2 = *a1;
 
 // Points To:
-// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
-// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
-// *HEAP*_l_28 -> *HEAP*_l_23 , MAY
-// a1 -> *HEAP*_l_22 , MAY
-// a2 -> *HEAP*_l_28 , MAY
-// b3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_25 -> *HEAP*_l_26 , MAY
+// *HEAP*_l_30 -> *HEAP*_l_25 , MAY
+// a1 -> *HEAP*_l_24 , MAY
+// a2 -> *HEAP*_l_30 , MAY
+// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
 
    b3 = (int **) malloc(sizeof(int *));
 
 // Points To:
-// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
-// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
-// *HEAP*_l_28 -> *HEAP*_l_23 , MAY
-// a1 -> *HEAP*_l_22 , MAY
-// a2 -> *HEAP*_l_28 , MAY
-// b3 -> *HEAP*_l_31 , MAY
-// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_25 -> *HEAP*_l_26 , MAY
+// *HEAP*_l_30 -> *HEAP*_l_25 , MAY
+// a1 -> *HEAP*_l_24 , MAY
+// a2 -> *HEAP*_l_30 , MAY
+// b3 -> *HEAP*_l_33 , MAY
+// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    *b3 = (int *) malloc(sizeof(int));
 
 // Points To:
-// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
-// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
-// *HEAP*_l_28 -> *HEAP*_l_23 , MAY
-// *HEAP*_l_31 -> *HEAP*_l_32 , MAY
-// a1 -> *HEAP*_l_22 , MAY
-// a2 -> *HEAP*_l_28 , MAY
-// b3 -> *HEAP*_l_31 , MAY
-// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_25 -> *HEAP*_l_26 , MAY
+// *HEAP*_l_30 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_33 -> *HEAP*_l_34 , MAY
+// a1 -> *HEAP*_l_24 , MAY
+// a2 -> *HEAP*_l_30 , MAY
+// b3 -> *HEAP*_l_33 , MAY
+// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
    **b3 = 3;
 
 // Points To:
-// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
-// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
-// *HEAP*_l_28 -> *HEAP*_l_23 , MAY
-// *HEAP*_l_31 -> *HEAP*_l_32 , MAY
-// a1 -> *HEAP*_l_22 , MAY
-// a2 -> *HEAP*_l_28 , MAY
-// b3 -> *HEAP*_l_31 , MAY
-// c4 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_25 -> *HEAP*_l_26 , MAY
+// *HEAP*_l_30 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_33 -> *HEAP*_l_34 , MAY
+// a1 -> *HEAP*_l_24 , MAY
+// a2 -> *HEAP*_l_30 , MAY
+// b3 -> *HEAP*_l_33 , MAY
+// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
 
 
    c4 = (int *) malloc(sizeof(int));
 
 // Points To:
-// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
-// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
-// *HEAP*_l_28 -> *HEAP*_l_23 , MAY
-// *HEAP*_l_31 -> *HEAP*_l_32 , MAY
-// a1 -> *HEAP*_l_22 , MAY
-// a2 -> *HEAP*_l_28 , MAY
-// b3 -> *HEAP*_l_31 , MAY
-// c4 -> *HEAP*_l_35 , MAY
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_25 -> *HEAP*_l_26 , MAY
+// *HEAP*_l_30 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_33 -> *HEAP*_l_34 , MAY
+// a1 -> *HEAP*_l_24 , MAY
+// a2 -> *HEAP*_l_30 , MAY
+// b3 -> *HEAP*_l_33 , MAY
+// c4 -> *HEAP*_l_37 , MAY
 
    *c4 = 4;
 
 // Points To:
-// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
-// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
-// *HEAP*_l_28 -> *HEAP*_l_23 , MAY
-// *HEAP*_l_31 -> *HEAP*_l_32 , MAY
-// a1 -> *HEAP*_l_22 , MAY
-// a2 -> *HEAP*_l_28 , MAY
-// b3 -> *HEAP*_l_31 , MAY
-// c4 -> *HEAP*_l_35 , MAY
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_25 -> *HEAP*_l_26 , MAY
+// *HEAP*_l_30 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_33 -> *HEAP*_l_34 , MAY
+// a1 -> *HEAP*_l_24 , MAY
+// a2 -> *HEAP*_l_30 , MAY
+// b3 -> *HEAP*_l_33 , MAY
+// c4 -> *HEAP*_l_37 , MAY
 
 
    foo(a1, a2, b3, c4);
 
 // Points To:
-// *HEAP*_l_22 -> *HEAP*_l_23 , MAY
-// *HEAP*_l_22 -> *HEAP*_l_31 , MAY
-// *HEAP*_l_22 -> *NULL_POINTER* , MAY
-// *HEAP*_l_23 -> *HEAP*_l_24 , MAY
-// *HEAP*_l_23 -> *HEAP*_l_35 , MAY
-// *HEAP*_l_23 -> *NULL_POINTER* , MAY
-// *HEAP*_l_28 -> *HEAP*_l_23 , MAY
-// *HEAP*_l_31 -> *HEAP*_l_32 , MAY
-// a1 -> *HEAP*_l_22 , MAY
-// a2 -> *HEAP*_l_28 , MAY
-// b3 -> *HEAP*_l_31 , MAY
-// c4 -> *HEAP*_l_35 , MAY
+// *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// c4 -> *HEAP*_l_37 , MAY
 
 
    printf("%d\n", ***a1);
@@ -258,7 +284,7 @@ int main()
 // Points To:
 // *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
 // a1 -> *ANY_MODULE*:*ANYWHERE* , MAY
-// c4 -> *HEAP*_l_35 , MAY
+// c4 -> *HEAP*_l_37 , MAY
 
    printf("%d\n", ***a2);
 
@@ -266,9 +292,16 @@ int main()
 // *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
 // a1 -> *ANY_MODULE*:*ANYWHERE* , MAY
 // a2 -> *ANY_MODULE*:*ANYWHERE* , MAY
-// c4 -> *HEAP*_l_35 , MAY
+// c4 -> *HEAP*_l_37 , MAY
 
 
    return 0;
 }
+
+Warnings and errors
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (aliased_translation_p) aliasing detected between formal parameters "p1" and "p2" at line 40.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Aliasing between arguments at line 40.
+We would have to create a new formal context and to restart the points-to analysis and to modify the IN and OUT data structures...
+Or use a simpler analysis, here an intraprocedural one.
 

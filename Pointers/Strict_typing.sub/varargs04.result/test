@@ -10,6 +10,8 @@ Points-to for "f2"
 
 
 // Points To OUT:
+// array[*] -> *NULL_POINTER* , MAY
+// array[*] -> _array_2[*] , MAY
 // stderr -> *NULL_POINTER* , MAY
 // stderr -> _stderr_ , MAY
 
@@ -52,6 +54,8 @@ Points-to for "f4"
 
 
 // Points To OUT:
+// array[*] -> *NULL_POINTER* , MAY
+// array[*] -> _array_2[*] , MAY
 // stdout -> *NULL_POINTER* , MAY
 // stdout -> _stdout_ , MAY
 

@@ -29,6 +29,8 @@ list list_next(list nl)
    list n;
 
 // Points To:
+// _nl_1.next -> *NULL_POINTER* , MAY
+// _nl_1.next -> _nl_1_2__1 , MAY
 // n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // nil -> *NULL_POINTER* , EXACT
 // nl -> *NULL_POINTER* , MAY
