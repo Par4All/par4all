@@ -27,7 +27,7 @@ void init2(mys *n)
 // Points To:
 // _n_1[0].tab2 -> *NULL_POINTER* , MAY
 // _n_1[0].tab2 -> _n_1_3__1[0][0] , MAY
-// m.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// m.tab2 -> undefined , EXACT
 // n -> *NULL_POINTER* , MAY
 // n -> _n_1[0] , MAY
 
@@ -181,13 +181,13 @@ int main()
    mys *q;
 
 // Points To:
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q -> undefined , EXACT
 
 
    init2(q);
 
 // Points To:
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q -> undefined , EXACT
 
 
    return 1;

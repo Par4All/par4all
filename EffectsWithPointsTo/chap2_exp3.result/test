@@ -46,12 +46,12 @@ FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, in
    FLGR_Data2D *dat;
 
 // Points To:
-// dat -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// dat -> undefined , EXACT
 
    int i, k, nbrow, startin;
 
 // Points To:
-// dat -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// dat -> undefined , EXACT
 
    /* dat = (FLGR_Data2D*) flgr_malloc(sizeof(FLGR_Data2D)); */
    dat = (FLGR_Data2D *) malloc(sizeof(FLGR_Data2D));

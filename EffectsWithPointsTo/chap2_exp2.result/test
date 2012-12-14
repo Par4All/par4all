@@ -72,12 +72,12 @@ void jas_image_clearfmts(int jas_image_numfmts)
    jas_image_fmtinfo_t *fmtinfo;
 
 // Points To:
-// fmtinfo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fmtinfo -> undefined , EXACT
 
    for(i = 0; i <= jas_image_numfmts-1; i += 1) {
 
 // Points To:
-// fmtinfo -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// fmtinfo -> undefined , MAY
 // fmtinfo -> jas_image_fmtinfos[*] , MAY
 // jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
 // jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
@@ -162,7 +162,7 @@ void jas_image_clearfmts(int jas_image_numfmts)
    }
 
 // Points To:
-// fmtinfo -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// fmtinfo -> undefined , MAY
 // fmtinfo -> jas_image_fmtinfos[*] , MAY
 // jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
 // jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY

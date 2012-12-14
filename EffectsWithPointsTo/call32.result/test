@@ -8,7 +8,7 @@ Points-to for call32
 
 
 // Points To OUT:
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
 void call32(int i, int *q)
 {
@@ -20,7 +20,7 @@ void call32(int i, int *q)
    free(q);
 
 // Points To:
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
    return;
 }
@@ -34,7 +34,7 @@ Points-to for "call32_caller"
 
 
 // Points To OUT:
-// s.array -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s.array -> undefined , EXACT
 
 int call32_caller(struct ad s)
 {
@@ -50,7 +50,7 @@ int call32_caller(struct ad s)
    call32(ii, s.array);
 
 // Points To:
-// s.array -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s.array -> undefined , EXACT
 
    return ii++;
 }

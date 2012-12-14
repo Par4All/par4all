@@ -20,7 +20,7 @@ int main()
    int (*r)[100][10][3];
 
 // Points To:
-// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> undefined , EXACT
 
 
    r = &t;

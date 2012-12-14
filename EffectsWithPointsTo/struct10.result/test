@@ -15,49 +15,49 @@ int main()
    s_with_pointer a, b;
 
 // Points To:
-// a.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a.p -> undefined , EXACT
+// b.p -> undefined , EXACT
 
    s_with_array c, d;
 
 // Points To:
-// a.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a.p -> undefined , EXACT
+// b.p -> undefined , EXACT
 
    s_with_array_of_struct_with_pointer e, f;
 
 // Points To:
-// a.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a.p -> undefined , EXACT
+// b.p -> undefined , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
    s_with_array_of_struct_with_array g, h;
 
 
 // Points To:
-// a.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a.p -> undefined , EXACT
+// b.p -> undefined , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
    int i, j;
 
 // Points To:
-// a.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a.p -> undefined , EXACT
+// b.p -> undefined , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
    
    // just to create a block for prettyprinting
    if (1) {
 
 // Points To:
-// a.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a.p -> undefined , EXACT
+// b.p -> undefined , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
       
       // definition of a
@@ -65,33 +65,33 @@ int main()
 
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
-// b.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b.p -> undefined , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
       a.n = 2;
 
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
-// b.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b.p -> undefined , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
       for(i = 0; i <= 9; i += 1)
 
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
-// b.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b.p -> undefined , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
          (a.p)[i] = i;
 
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
-// b.p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b.p -> undefined , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
       
       // definition of b, also modifies the elments of a.p
@@ -100,32 +100,32 @@ int main()
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
       printf("\nstruct with pointer copy : \n");
 
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
       for(i = 0; i <= 9; i += 1) {
 
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
          (b.p)[i] = i*10;
 
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
          printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
       }
@@ -133,8 +133,8 @@ int main()
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
       
       // definition of c
@@ -143,24 +143,24 @@ int main()
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
       for(i = 0; i <= 9; i += 1)
 
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
          (c.array)[i] = i;
 
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
       
       // definition of d, does not modify c
@@ -169,32 +169,32 @@ int main()
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
       printf("\nstruct with array copy : \n");
 
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
       for(i = 0; i <= 9; i += 1) {
 
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
          (d.array)[i] = i*10;
 
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
 
          printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
@@ -203,8 +203,8 @@ int main()
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
       
       // definition of e
@@ -213,8 +213,8 @@ int main()
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , EXACT
+// f.champ[*].p -> undefined , EXACT
 
       for(i = 0; i <= 4; i += 1) {
 
@@ -222,8 +222,8 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , MAY
+// f.champ[*].p -> undefined , EXACT
 
          (e.champ)[i].p = malloc(10*sizeof(int));
 
@@ -231,8 +231,8 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , MAY
+// f.champ[*].p -> undefined , EXACT
 
          for(j = 0; j <= 9; j += 1)
 
@@ -240,8 +240,8 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , MAY
+// f.champ[*].p -> undefined , EXACT
 
             ((e.champ)[i].p)[j] = i+j;
       }
@@ -250,8 +250,8 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// e.champ[*].p -> undefined , MAY
+// f.champ[*].p -> undefined , EXACT
 
       
       // definition of f, also modifies e.champ[*].p[*]
@@ -261,9 +261,9 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// e.champ[*].p -> undefined , MAY
 // f.champ[*].p -> *HEAP*_l_73[0] , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> undefined , MAY
 
       printf("\nstruct with array of structs with pointer copy : \n");
 
@@ -271,9 +271,9 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// e.champ[*].p -> undefined , MAY
 // f.champ[*].p -> *HEAP*_l_73[0] , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> undefined , MAY
 
       for(i = 0; i <= 4; i += 1)
 
@@ -281,9 +281,9 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// e.champ[*].p -> undefined , MAY
 // f.champ[*].p -> *HEAP*_l_73[0] , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> undefined , MAY
 
          for(j = 0; j <= 9; j += 1) {
 
@@ -291,9 +291,9 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// e.champ[*].p -> undefined , MAY
 // f.champ[*].p -> *HEAP*_l_73[0] , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> undefined , MAY
 
             ((f.champ)[i].p)[j] = i*j;
 
@@ -301,9 +301,9 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// e.champ[*].p -> undefined , MAY
 // f.champ[*].p -> *HEAP*_l_73[0] , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> undefined , MAY
 
             
             
@@ -314,9 +314,9 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// e.champ[*].p -> undefined , MAY
 // f.champ[*].p -> *HEAP*_l_73[0] , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> undefined , MAY
 
       
       // definition of g
@@ -326,9 +326,9 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// e.champ[*].p -> undefined , MAY
 // f.champ[*].p -> *HEAP*_l_73[0] , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> undefined , MAY
 
       for(i = 0; i <= 4; i += 1)
 
@@ -336,9 +336,9 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// e.champ[*].p -> undefined , MAY
 // f.champ[*].p -> *HEAP*_l_73[0] , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> undefined , MAY
 
          for(j = 0; j <= 9; j += 1)
 
@@ -346,9 +346,9 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// e.champ[*].p -> undefined , MAY
 // f.champ[*].p -> *HEAP*_l_73[0] , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> undefined , MAY
 
             ((g.champ)[i].array)[j] = i+j;
 
@@ -356,9 +356,9 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// e.champ[*].p -> undefined , MAY
 // f.champ[*].p -> *HEAP*_l_73[0] , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> undefined , MAY
 
       
       // definition of h, does not modify g
@@ -368,9 +368,9 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// e.champ[*].p -> undefined , MAY
 // f.champ[*].p -> *HEAP*_l_73[0] , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> undefined , MAY
 
       printf("\nstruct with array of structs with array copy : \n");
 
@@ -378,9 +378,9 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// e.champ[*].p -> undefined , MAY
 // f.champ[*].p -> *HEAP*_l_73[0] , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> undefined , MAY
 
       for(i = 0; i <= 4; i += 1)
 
@@ -388,9 +388,9 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// e.champ[*].p -> undefined , MAY
 // f.champ[*].p -> *HEAP*_l_73[0] , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> undefined , MAY
 
          for(j = 0; j <= 9; j += 1) {
 
@@ -398,9 +398,9 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// e.champ[*].p -> undefined , MAY
 // f.champ[*].p -> *HEAP*_l_73[0] , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> undefined , MAY
 
             ((h.champ)[i].array)[j] = i*j;
 
@@ -408,9 +408,9 @@ int main()
 // a.p -> *HEAP*_l_40[0] , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// e.champ[*].p -> undefined , MAY
 // f.champ[*].p -> *HEAP*_l_73[0] , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> undefined , MAY
 
             
             
@@ -420,13 +420,13 @@ int main()
 
 // Points To:
 // a.p -> *HEAP*_l_40[0] , MAY
-// a.p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a.p -> undefined , MAY
 // b.p -> *HEAP*_l_40[0] , MAY
-// b.p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// b.p -> undefined , MAY
 // e.champ[*].p -> *HEAP*_l_73[0] , MAY
-// e.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// e.champ[*].p -> undefined , MAY
 // f.champ[*].p -> *HEAP*_l_73[0] , MAY
-// f.champ[*].p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// f.champ[*].p -> undefined , MAY
 
    return 0;
 }

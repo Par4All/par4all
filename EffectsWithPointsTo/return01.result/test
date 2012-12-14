@@ -62,35 +62,35 @@ int * foo()
    //PIPS generated variable
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
    int *foo;
 
 // Points To:
-// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// foo -> undefined , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
 
    p = &i;
 
 // Points To:
-// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// foo -> undefined , EXACT
 // p -> i , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
    q = &j;
 
 // Points To:
-// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// foo -> undefined , EXACT
 // p -> i , EXACT
 // q -> j , EXACT
 
 //:   BEGIN UNSTRUCTURED
 
 // Points To:
-// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// foo -> undefined , EXACT
 // p -> i , EXACT
 // q -> j , EXACT
 
@@ -98,7 +98,7 @@ int * foo()
    if (cond) goto l99999;
 
 // Points To:
-// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// foo -> undefined , EXACT
 // p -> i , EXACT
 // q -> j , EXACT
 
@@ -107,14 +107,14 @@ int * foo()
 l99999:   ;
 
 // Points To:
-// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// foo -> undefined , EXACT
 // p -> i , EXACT
 // q -> j , EXACT
 
    foo = p;
 
 // Points To:
-// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// foo -> undefined , EXACT
 // p -> i , EXACT
 // q -> j , EXACT
 
@@ -135,7 +135,7 @@ int main()
    int *r;
 
 // Points To:
-// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> undefined , EXACT
 
    r = foo();
 

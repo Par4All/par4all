@@ -15,59 +15,59 @@ int main()
    int **c, **a, **b, *y;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// a -> undefined , EXACT
+// b -> undefined , EXACT
+// c -> undefined , EXACT
+// y -> undefined , EXACT
 
    int x = 1, z = 2, p = 1;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// a -> undefined , EXACT
+// b -> undefined , EXACT
+// c -> undefined , EXACT
+// y -> undefined , EXACT
 
    
    //a = &x;
    b = &y;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a -> undefined , EXACT
 // b -> y , EXACT
-// c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// c -> undefined , EXACT
+// y -> undefined , EXACT
 
    if (p)
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a -> undefined , EXACT
 // b -> y , EXACT
-// c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// c -> undefined , EXACT
+// y -> undefined , EXACT
 
       y = &z;
    else
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a -> undefined , EXACT
 // b -> y , EXACT
-// c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// c -> undefined , EXACT
+// y -> undefined , EXACT
 
       y = &x;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a -> undefined , EXACT
 // b -> y , EXACT
-// c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// c -> undefined , EXACT
 // y -> x , MAY
 // y -> z , MAY
 
    c = &y;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a -> undefined , EXACT
 // b -> y , EXACT
 // c -> y , EXACT
 // y -> x , MAY
