@@ -204,34 +204,34 @@ int main()
    mys s4[5];
 
 // Points To:
-// s4[*].tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s4[*].tab2 -> undefined , EXACT
 
    mys *s[5];
 
 // Points To:
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s4[*].tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s[*] -> undefined , EXACT
+// s4[*].tab2 -> undefined , EXACT
 
    int i;
 
 // Points To:
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s4[*].tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s[*] -> undefined , EXACT
+// s4[*].tab2 -> undefined , EXACT
 
 
    for(i = 0; i <= 4; i += 1)
 
 // Points To:
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// s[*] -> undefined , MAY
 // s[*] -> s4[*] , MAY
-// s4[*].tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s4[*].tab2 -> undefined , EXACT
 
       s[i] = &s4[i];
 
 // Points To:
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// s[*] -> undefined , MAY
 // s[*] -> s4[*] , MAY
-// s4[*].tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s4[*].tab2 -> undefined , EXACT
 
 
    init4(s);
@@ -239,9 +239,9 @@ int main()
 // Points To:
 // init4:*HEAP*_l_20.tab2 -> init4:*HEAP*_l_21[0] , MAY
 // s[*] -> init4:*HEAP*_l_20 , MAY
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// s[*] -> undefined , MAY
 // s[*] -> s4[*] , MAY
-// s4[*].tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s4[*].tab2 -> undefined , EXACT
 
 
    return 1;

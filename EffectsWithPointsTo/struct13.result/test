@@ -148,13 +148,13 @@ int main()
    mys s1;
 
 // Points To:
-// s1.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.tab2 -> undefined , EXACT
 
    mys *p = &s1;
 
 // Points To:
 // p -> s1 , EXACT
-// s1.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.tab2 -> undefined , EXACT
 
 
    init(p);
@@ -162,7 +162,7 @@ int main()
 // Points To:
 // p -> s1 , EXACT
 // s1.tab2 -> init:*HEAP*_l_20[0] , MAY
-// s1.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// s1.tab2 -> undefined , MAY
 
 
    return 1;
