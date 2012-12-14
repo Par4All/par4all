@@ -41,39 +41,39 @@ int main(int argc, char *argv[])
    int *pi;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pi -> undefined , EXACT
 
    int *qi;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pi -> undefined , EXACT
+// qi -> undefined , EXACT
 
    int i;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pi -> undefined , EXACT
+// qi -> undefined , EXACT
 
 
    pi = (int *) malloc(sizeof(int));
 
 // Points To:
 // pi -> *HEAP*_l_11 , MAY
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// qi -> undefined , EXACT
 
    if (i>0)
 
 // Points To:
 // pi -> *HEAP*_l_11 , MAY
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// qi -> undefined , EXACT
 
       qi = pi;
    else
 
 // Points To:
 // pi -> *HEAP*_l_11 , MAY
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// qi -> undefined , EXACT
 
       qi = &i;
 
@@ -85,8 +85,8 @@ int main(int argc, char *argv[])
    free(pi);
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pi -> undefined , EXACT
+// qi -> undefined , MAY
 // qi -> i , MAY
 
 

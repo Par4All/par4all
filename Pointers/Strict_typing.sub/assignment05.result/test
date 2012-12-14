@@ -40,7 +40,7 @@ void assignment05(int *p)
 // Points To:
 // p -> *NULL_POINTER* , MAY
 // p -> _p_1 , MAY
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
 
    q = p;

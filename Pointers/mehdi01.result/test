@@ -27,64 +27,64 @@ int main()
    struct p_s *p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 
    struct q_s *b;
 
 // Points To:
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b -> undefined , EXACT
+// p -> undefined , EXACT
 
    struct q_s *u;
 
 // Points To:
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// u -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b -> undefined , EXACT
+// p -> undefined , EXACT
+// u -> undefined , EXACT
 
    struct q_s *x;
 
 // Points To:
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// u -> *ANY_MODULE*:*NOWHERE* , EXACT
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b -> undefined , EXACT
+// p -> undefined , EXACT
+// u -> undefined , EXACT
+// x -> undefined , EXACT
 
    struct q_s **z;
 
 // Points To:
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// u -> *ANY_MODULE*:*NOWHERE* , EXACT
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
-// z -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b -> undefined , EXACT
+// p -> undefined , EXACT
+// u -> undefined , EXACT
+// x -> undefined , EXACT
+// z -> undefined , EXACT
 
    int a = 0;
 
 // Points To:
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// u -> *ANY_MODULE*:*NOWHERE* , EXACT
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
-// z -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b -> undefined , EXACT
+// p -> undefined , EXACT
+// u -> undefined , EXACT
+// x -> undefined , EXACT
+// z -> undefined , EXACT
 
    u = (struct q_s *) malloc(sizeof(struct q_s ));
 
 // Points To:
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b -> undefined , EXACT
+// p -> undefined , EXACT
 // u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
-// z -> *ANY_MODULE*:*NOWHERE* , EXACT
+// x -> undefined , EXACT
+// z -> undefined , EXACT
 
    b = (struct q_s *) malloc(sizeof(struct q_s ));
 
 // Points To:
 // b -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 // u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
-// z -> *ANY_MODULE*:*NOWHERE* , EXACT
+// x -> undefined , EXACT
+// z -> undefined , EXACT
 
    p = (struct p_s *) malloc(sizeof(struct p_s ));
 
@@ -92,8 +92,8 @@ int main()
 // b -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
-// z -> *ANY_MODULE*:*NOWHERE* , EXACT
+// x -> undefined , EXACT
+// z -> undefined , EXACT
 
    x = b;
 
@@ -102,7 +102,7 @@ int main()
 // p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // x -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// z -> *ANY_MODULE*:*NOWHERE* , EXACT
+// z -> undefined , EXACT
 
    p->q = x;
 
@@ -113,7 +113,7 @@ int main()
 // p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // u -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // x -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// z -> *ANY_MODULE*:*NOWHERE* , EXACT
+// z -> undefined , EXACT
 
    z = &p->q;
 

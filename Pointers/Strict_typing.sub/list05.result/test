@@ -27,7 +27,7 @@ list list_next(list nl)
 // Points To:
 // _nl_1.next -> *NULL_POINTER* , MAY
 // _nl_1.next -> _nl_1_2__1 , MAY
-// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// n -> undefined , EXACT
 // nil -> *NULL_POINTER* , EXACT
 // nl -> *NULL_POINTER* , MAY
 // nl -> _nl_1 , MAY
@@ -35,7 +35,7 @@ list list_next(list nl)
    if (nl==nil)
 
 // Points To:
-// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// n -> undefined , EXACT
 // nil -> *NULL_POINTER* , EXACT
 // nl -> *NULL_POINTER* , EXACT
 
@@ -45,7 +45,7 @@ list list_next(list nl)
 // Points To:
 // _nl_1.next -> *NULL_POINTER* , MAY
 // _nl_1.next -> _nl_1_2__1 , MAY
-// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// n -> undefined , EXACT
 // nil -> *NULL_POINTER* , EXACT
 // nl -> _nl_1 , EXACT
 

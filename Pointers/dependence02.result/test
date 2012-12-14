@@ -31,7 +31,7 @@ void dependence02(int *b)
    int *a;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a -> undefined , EXACT
 // b -> *NULL_POINTER* , MAY
 // b -> _b_1[0] , MAY
 

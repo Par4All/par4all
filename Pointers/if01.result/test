@@ -38,29 +38,29 @@ int main()
    int *x, x1, x2, y;
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
 
    x1 = 1;
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
 
    x2 = 2;
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
 
 
    if (0==0)
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
 
       x = &x1;
    else
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
 
       x = &x2;
 

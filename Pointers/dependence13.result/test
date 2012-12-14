@@ -28,21 +28,21 @@ struct my_struct  dependence13()
    int *b, *a;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a -> undefined , EXACT
+// b -> undefined , EXACT
 
    int i;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a -> undefined , EXACT
+// b -> undefined , EXACT
 
    struct my_struct s;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s.p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a -> undefined , EXACT
+// b -> undefined , EXACT
+// s.p -> undefined , EXACT
 
 
    return s;

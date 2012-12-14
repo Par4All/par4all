@@ -23,22 +23,22 @@ int main(int argc, char **argv)
    int *x, *y, *t;
 
 // Points To:
-// t -> *ANY_MODULE*:*NOWHERE* , EXACT
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
-// y -> *ANY_MODULE*:*NOWHERE* , EXACT
+// t -> undefined , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
 
 
    x = (int *) malloc(sizeof(int));
 
 // Points To:
-// t -> *ANY_MODULE*:*NOWHERE* , EXACT
+// t -> undefined , EXACT
 // x -> *HEAP*_l_18 , MAY
-// y -> *ANY_MODULE*:*NOWHERE* , EXACT
+// y -> undefined , EXACT
 
    y = (int *) malloc(sizeof(int));
 
 // Points To:
-// t -> *ANY_MODULE*:*NOWHERE* , EXACT
+// t -> undefined , EXACT
 // x -> *HEAP*_l_18 , MAY
 // y -> *HEAP*_l_19 , MAY
 

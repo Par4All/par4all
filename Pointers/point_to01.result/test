@@ -53,7 +53,7 @@ void point_to01()
    } c, *p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
 
    p = &c;

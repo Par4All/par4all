@@ -29,17 +29,17 @@ void dereferencing03()
    double *p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    int i;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    *(p+1) = 0.;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    *(p+i) = 0.;
 }

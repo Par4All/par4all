@@ -96,49 +96,49 @@ int main()
    int (*p)[3];
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    int *pu;
 
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pu -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// p -> undefined , EXACT
+// pu -> undefined , EXACT
 
    int (*q)[10][3];
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pu -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// p -> undefined , EXACT
+// pu -> undefined , EXACT
+// q -> undefined , EXACT
 
    int (*qu)[3];
 
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pu -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
+// pu -> undefined , EXACT
+// q -> undefined , EXACT
+// qu -> undefined , EXACT
 
    int (*r)[100][10][3];
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pu -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
+// p -> undefined , EXACT
+// pu -> undefined , EXACT
+// q -> undefined , EXACT
+// qu -> undefined , EXACT
+// r -> undefined , EXACT
 
    int (*ru)[10][3];
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pu -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
-// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// p -> undefined , EXACT
+// pu -> undefined , EXACT
+// q -> undefined , EXACT
+// qu -> undefined , EXACT
+// r -> undefined , EXACT
+// ru -> undefined , EXACT
 
    
    
@@ -146,31 +146,31 @@ int main()
 
 // Points To:
 // p -> t[1][2] , EXACT
-// pu -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
-// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// pu -> undefined , EXACT
+// q -> undefined , EXACT
+// qu -> undefined , EXACT
+// r -> undefined , EXACT
+// ru -> undefined , EXACT
 
    (*p)[1] = 0;
 
 // Points To:
 // p -> t[1][2] , EXACT
-// pu -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
-// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// pu -> undefined , EXACT
+// q -> undefined , EXACT
+// qu -> undefined , EXACT
+// r -> undefined , EXACT
+// ru -> undefined , EXACT
 
    p[1][1] = 0;
 
 // Points To:
 // p -> t[1][2] , EXACT
-// pu -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
-// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// pu -> undefined , EXACT
+// q -> undefined , EXACT
+// qu -> undefined , EXACT
+// r -> undefined , EXACT
+// ru -> undefined , EXACT
 
 
    pu = &t[1][2][0];
@@ -178,30 +178,30 @@ int main()
 // Points To:
 // p -> t[1][2] , EXACT
 // pu -> t[1][2][0] , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
-// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// q -> undefined , EXACT
+// qu -> undefined , EXACT
+// r -> undefined , EXACT
+// ru -> undefined , EXACT
 
    *pu = 0;
 
 // Points To:
 // p -> t[1][2] , EXACT
 // pu -> t[1][2][0] , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
-// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// q -> undefined , EXACT
+// qu -> undefined , EXACT
+// r -> undefined , EXACT
+// ru -> undefined , EXACT
 
    pu[2] = 0;
 
 // Points To:
 // p -> t[1][2] , EXACT
 // pu -> t[1][2][0] , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
-// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// q -> undefined , EXACT
+// qu -> undefined , EXACT
+// r -> undefined , EXACT
+// ru -> undefined , EXACT
 
 
    q = &t[1];
@@ -210,9 +210,9 @@ int main()
 // p -> t[1][2] , EXACT
 // pu -> t[1][2][0] , EXACT
 // q -> t[1] , EXACT
-// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
-// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// qu -> undefined , EXACT
+// r -> undefined , EXACT
+// ru -> undefined , EXACT
 
    ((*q)[2])[3] = 0;
 
@@ -220,9 +220,9 @@ int main()
 // p -> t[1][2] , EXACT
 // pu -> t[1][2][0] , EXACT
 // q -> t[1] , EXACT
-// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
-// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// qu -> undefined , EXACT
+// r -> undefined , EXACT
+// ru -> undefined , EXACT
 
    q[1][2][3] = 0;
 
@@ -230,9 +230,9 @@ int main()
 // p -> t[1][2] , EXACT
 // pu -> t[1][2][0] , EXACT
 // q -> t[1] , EXACT
-// qu -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
-// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// qu -> undefined , EXACT
+// r -> undefined , EXACT
+// ru -> undefined , EXACT
 
 
    qu = &t[1][0];
@@ -242,8 +242,8 @@ int main()
 // pu -> t[1][2][0] , EXACT
 // q -> t[1] , EXACT
 // qu -> t[1][0] , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
-// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// r -> undefined , EXACT
+// ru -> undefined , EXACT
 
    (*qu)[1] = 0;
 
@@ -252,8 +252,8 @@ int main()
 // pu -> t[1][2][0] , EXACT
 // q -> t[1] , EXACT
 // qu -> t[1][0] , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
-// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// r -> undefined , EXACT
+// ru -> undefined , EXACT
 
    qu[1][1] = 0;
 
@@ -262,8 +262,8 @@ int main()
 // pu -> t[1][2][0] , EXACT
 // q -> t[1] , EXACT
 // qu -> t[1][0] , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b3 , EXACT
-// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// r -> undefined , EXACT
+// ru -> undefined , EXACT
 
 
    r = &t;
@@ -274,7 +274,7 @@ int main()
 // q -> t[1] , EXACT
 // qu -> t[1][0] , EXACT
 // r -> t , EXACT
-// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// ru -> undefined , EXACT
 
    (((*r)[0])[0])[0] = 0;
 
@@ -284,7 +284,7 @@ int main()
 // q -> t[1] , EXACT
 // qu -> t[1][0] , EXACT
 // r -> t , EXACT
-// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// ru -> undefined , EXACT
 
    (((*r)[1])[2])[3] = 0;
 
@@ -294,7 +294,7 @@ int main()
 // q -> t[1] , EXACT
 // qu -> t[1][0] , EXACT
 // r -> t , EXACT
-// ru -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// ru -> undefined , EXACT
 
 
    ru = &t[0];

@@ -107,95 +107,95 @@ void f3(int n_ptrs, int f4_after, ...)
    char *array[31];
 
 // Points To:
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// array[*] -> undefined , EXACT
 
    int ptr_no = 0;
 
 // Points To:
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// array[*] -> undefined , EXACT
 
    if (n_ptrs>31)
 
 // Points To:
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// array[*] -> undefined , EXACT
 
       n_ptrs = 31;
 
 // Points To:
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// array[*] -> undefined , EXACT
 
    va_start(ap, f4_after);
 
 // Points To:
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// array[*] -> undefined , EXACT
 
    for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1) {
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
 
       array[ptr_no] = va_arg(ap, char *);
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
 
       if (ptr_no==f4_after)
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
 
          va_copy(ap_save, ap);
    }
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
 
    va_end(ap);
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
 
    f2(n_ptrs, array);
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
 
    // Now process the saved copy.
    n_ptrs -= f4_after;
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
 
    for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
 
       array[ptr_no] = va_arg(ap_save, char *);
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
 
    va_end(ap_save);
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
 
    f4(n_ptrs, array);
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
 
    return;
 }

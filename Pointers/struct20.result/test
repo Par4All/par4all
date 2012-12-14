@@ -23,13 +23,13 @@ towns read_towns(const  char fname[])
 
 // Points To:
 // fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// the_towns.data -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// the_towns.data -> undefined , EXACT
 
    the_towns.nb = 1;
 
 // Points To:
 // fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// the_towns.data -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// the_towns.data -> undefined , EXACT
 
    the_towns.data = (town *) malloc(sizeof(town));
 

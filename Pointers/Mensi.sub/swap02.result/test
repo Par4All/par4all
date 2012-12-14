@@ -44,8 +44,8 @@ int main()
       int **P_0, **P_1;
 
 // Points To:
-// P_0 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// P_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// P_0 -> undefined , EXACT
+// P_1 -> undefined , EXACT
 // pi -> i , EXACT
 // pj -> j , EXACT
 
@@ -53,7 +53,7 @@ int main()
 
 // Points To:
 // P_0 -> pi , EXACT
-// P_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// P_1 -> undefined , EXACT
 // pi -> i , EXACT
 // pj -> j , EXACT
 
@@ -73,7 +73,7 @@ int main()
 // P_1 -> pj , EXACT
 // pi -> i , EXACT
 // pj -> j , EXACT
-// pt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pt -> undefined , EXACT
 
          pt = *P_0;
 
@@ -126,7 +126,7 @@ void swap(int **p, int **q)
 // Points To:
 // _p_1 -> _p_1_1 , EXACT
 // p -> _p_1 , EXACT
-// pt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pt -> undefined , EXACT
 
    pt = *p;
 

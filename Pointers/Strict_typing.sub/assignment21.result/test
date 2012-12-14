@@ -15,19 +15,19 @@ int main()
    int *a[2], i, j;
 
 // Points To:
-// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a[*] -> undefined , EXACT
 
    a[0] = &i;
 
 // Points To:
-// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> undefined , MAY
 // a[*] -> i , MAY
 // a[0] -> i , EXACT
 
    a[j] = &j;
 
 // Points To:
-// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> undefined , MAY
 // a[*] -> i , MAY
 // a[0] -> i , MAY
 // a[*] -> j , MAY

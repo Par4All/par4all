@@ -19,24 +19,24 @@ int main(void)
    int **pp;
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
    srand(time((void *) 0));
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
 
    if (alea()) {
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
       int *pi = &i;
 
 // Points To:
 // pi -> i , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
       pp = &pi;
 
@@ -49,14 +49,14 @@ int main(void)
    }
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
    
    // pp points to a dead value in the stack
    printf("%p\n", pp);
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
    
    // possible segfault.

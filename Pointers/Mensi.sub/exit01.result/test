@@ -38,8 +38,8 @@ int main()
    int *q, *r;
 
 // Points To:
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
-// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
 
    q = exit01(r);
 
@@ -131,8 +131,8 @@ int main()
    int *q, *r;
 
 // Points To:
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
-// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
 
    q = exit01(r);
 

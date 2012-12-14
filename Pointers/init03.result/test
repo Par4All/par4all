@@ -23,8 +23,8 @@ void init03x()
    struct cons_t a;
 
 // Points To:
-// a.foo.data[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// a.next[*] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// a.foo.data[*] -> undefined , EXACT
+// a.next[*] -> undefined , EXACT
 
    return;
 }

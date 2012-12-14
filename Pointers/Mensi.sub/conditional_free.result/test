@@ -7,7 +7,7 @@ POINTS TO for conditional_free
 
 
 // Points To OUT:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> undefined , MAY
 
 void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
 {
@@ -35,14 +35,14 @@ void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
 
 // Points To:
 // p -> *HEAP*_l_5 , MAY
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> undefined , MAY
 // p -> _p_1 , MAY
 
    if (c3)
 
 // Points To:
 // p -> *HEAP*_l_5 , MAY
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> undefined , MAY
 // p -> _p_1 , MAY
 
       p = (int *) malloc(sizeof(int));
@@ -50,7 +50,7 @@ void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
 // Points To:
 // p -> *HEAP*_l_5 , MAY
 // p -> *HEAP*_l_7 , MAY
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> undefined , MAY
 // p -> _p_1 , MAY
 
    return;

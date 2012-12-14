@@ -16,12 +16,12 @@ pointer alloc_pointer(int v)
    pointer p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 
    if (p!=(void *) 0)
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 
       p = malloc(sizeof(int));
    else
@@ -103,8 +103,8 @@ int main(void)
    pointer p1, p2;
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
 
    
    // could differentiate allocs based on call path?
@@ -112,7 +112,7 @@ int main(void)
 
 // Points To:
 // p1 -> alloc_pointer:*HEAP*_l_10 , MAY
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p2 -> undefined , EXACT
 
    p2 = p1;
 

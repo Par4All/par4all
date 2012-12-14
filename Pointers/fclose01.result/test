@@ -48,7 +48,7 @@ void fclose01()
    FILE *f;
 
 // Points To:
-// f -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f -> undefined , EXACT
 
    f = fopen("toto", "r");
 
@@ -58,7 +58,7 @@ void fclose01()
    fclose(f);
 
 // Points To:
-// f -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// f -> undefined , EXACT
 
    return;
 }

@@ -35,20 +35,20 @@ int main(int argc, char *argv[])
    int *pi;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pi -> undefined , EXACT
 
    int *qi;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pi -> undefined , EXACT
+// qi -> undefined , EXACT
 
 
    pi = (int *) malloc(sizeof(int));
 
 // Points To:
 // pi -> *HEAP*_l_10 , MAY
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// qi -> undefined , EXACT
 
    qi = pi;
 
@@ -59,8 +59,8 @@ int main(int argc, char *argv[])
    free(pi);
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pi -> undefined , EXACT
+// qi -> undefined , MAY
 
 
    return 0;

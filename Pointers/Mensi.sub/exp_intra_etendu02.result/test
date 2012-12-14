@@ -33,7 +33,7 @@ int main()
    MyStruct *root;
 
 // Points To:
-// root -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// root -> undefined , EXACT
 
    root = malloc(sizeof(MyStruct));
 
@@ -49,7 +49,7 @@ int main()
    free(root);
 
 // Points To:
-// root -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// root -> undefined , EXACT
 
    return 0;
 }

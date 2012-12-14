@@ -15,7 +15,7 @@ int main()
    int **a, b;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a -> undefined , EXACT
 
    a[0] = &b;
 

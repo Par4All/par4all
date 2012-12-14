@@ -41,45 +41,45 @@ void pointer14()
    double *(*t[3][4])[5][6][7];
 
 // Points To:
-// t[*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// t[*][*] -> undefined , EXACT
 
    double *a[5][6][7];
 
 // Points To:
-// a[*][*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
-// t[*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a[*][*][*] -> undefined , EXACT
+// t[*][*] -> undefined , EXACT
 
    double z;
 
 // Points To:
-// a[*][*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
-// t[*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a[*][*][*] -> undefined , EXACT
+// t[*][*] -> undefined , EXACT
 
    t[1][2] = &a;
 
 // Points To:
-// a[*][*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
-// t[*][*] -> *ANY_MODULE*:*NOWHERE* , MAY
+// a[*][*][*] -> undefined , EXACT
+// t[*][*] -> undefined , MAY
 // t[*][*] -> a , MAY
 // t[1][2] -> a , EXACT
 
    a[1][2][3] = &z;
 
 // Points To:
-// a[*][*][*] -> *ANY_MODULE*:*NOWHERE* , MAY
+// a[*][*][*] -> undefined , MAY
 // a[*][*][*] -> z , MAY
 // a[1][2][3] -> z , EXACT
-// t[*][*] -> *ANY_MODULE*:*NOWHERE* , MAY
+// t[*][*] -> undefined , MAY
 // t[*][*] -> a , MAY
 // t[1][2] -> a , EXACT
 
    foo(t);
 
 // Points To:
-// a[*][*][*] -> *ANY_MODULE*:*NOWHERE* , MAY
+// a[*][*][*] -> undefined , MAY
 // a[*][*][*] -> z , MAY
 // a[1][2][3] -> z , EXACT
-// t[*][*] -> *ANY_MODULE*:*NOWHERE* , MAY
+// t[*][*] -> undefined , MAY
 // t[2][3] -> a[0][0][0] , EXACT
 // t[*][*] -> a , MAY
 // t[1][2] -> a , EXACT

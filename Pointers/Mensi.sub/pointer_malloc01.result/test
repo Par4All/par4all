@@ -37,7 +37,7 @@ pointer alloc_pointer(int v)
    pointer p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 
    p = malloc(sizeof(int));
 
@@ -66,43 +66,43 @@ int main(void)
    //PIPS generated variable
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p1 -> undefined , EXACT
 
    pointer _return0;
    {
       //PIPS generated variable
 
 // Points To:
-// _return0 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// _return0 -> undefined , EXACT
+// p1 -> undefined , EXACT
 
       int v0 = 13;
       {
 
 // Points To:
-// _return0 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// _return0 -> undefined , EXACT
+// p1 -> undefined , EXACT
 
          pointer p;
 
 // Points To:
-// _return0 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// _return0 -> undefined , EXACT
+// p -> undefined , EXACT
+// p1 -> undefined , EXACT
 
          p = malloc(sizeof(int));
 
 // Points To:
-// _return0 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// _return0 -> undefined , EXACT
 // p -> *HEAP*_l_11 , MAY
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p1 -> undefined , EXACT
 
          *p = v0;
 
 // Points To:
-// _return0 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// _return0 -> undefined , EXACT
 // p -> *HEAP*_l_11 , MAY
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p1 -> undefined , EXACT
 
          _return0 = p;
       }
@@ -110,7 +110,7 @@ int main(void)
 
 // Points To:
 // _return0 -> *HEAP*_l_11 , MAY
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p1 -> undefined , EXACT
 
    p1 = _return0;
 

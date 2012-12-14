@@ -27,20 +27,20 @@ void dereferencing04()
    double *p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    double *q;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
    double *r;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
 
    *(p+(q-r)) = 0.;
 }

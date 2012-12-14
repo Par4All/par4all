@@ -17,15 +17,15 @@ int main(int argc, char *argv[])
    int *pi;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pi -> undefined , EXACT
 
    float *px;
 
 // Points To:
 // argv[0] -> *NULL_POINTER* , MAY
 // argv[0] -> _argv_2[0][0] , MAY
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pi -> undefined , EXACT
+// px -> undefined , EXACT
 
    char *pc = argv[0];
 
@@ -34,8 +34,8 @@ int main(int argc, char *argv[])
 // argv[0] -> _argv_2[0][0] , MAY
 // pc -> *NULL_POINTER* , MAY
 // pc -> _argv_2[0][0] , MAY
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pi -> undefined , EXACT
+// px -> undefined , EXACT
 
 
    pi = (int *) malloc(sizeof(int));
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 // pc -> *NULL_POINTER* , MAY
 // pc -> _argv_2[0][0] , MAY
 // pi -> *HEAP*_l_11 , MAY
-// px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// px -> undefined , EXACT
 
    px = (float *) malloc(sizeof(float));
 

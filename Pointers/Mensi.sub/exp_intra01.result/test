@@ -29,14 +29,14 @@ int main()
    int i = 0, *p, *q;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
    p = &i;
 
 // Points To:
 // p -> i , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> undefined , EXACT
 
    q = p;
 

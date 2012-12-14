@@ -19,20 +19,20 @@ int if15(int *p)
 // Points To:
 // p -> *NULL_POINTER* , MAY
 // p -> _p_1[0] , MAY
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> undefined , EXACT
 
    if (p==(void *) 0)
 
 // Points To:
 // p -> *NULL_POINTER* , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> undefined , EXACT
 
       q = &i;
    else
 
 // Points To:
 // p -> _p_1[0] , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> undefined , EXACT
 
       q = p;
 

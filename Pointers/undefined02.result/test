@@ -16,7 +16,7 @@ int main()
 
 // Points To:
 // p -> i , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
    
    // An error should be detected according to Pierre Jouvelot, because

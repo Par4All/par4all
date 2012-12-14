@@ -15,50 +15,50 @@ int main()
    int **x, **y, *z, *t;
 
 // Points To:
-// t -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// z -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// t -> undefined , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
+// z -> undefined , EXACT
 
    int i, j;
 
 // Points To:
-// t -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// z -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// t -> undefined , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
+// z -> undefined , EXACT
 
    i = 1;
 
 // Points To:
-// t -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// z -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// t -> undefined , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
+// z -> undefined , EXACT
 
    j = 2;
 
 // Points To:
-// t -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// z -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// t -> undefined , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
+// z -> undefined , EXACT
 
 
    z = &i;
 
 // Points To:
-// t -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// t -> undefined , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
 // z -> i , EXACT
 
    t = &j;
 
 // Points To:
 // t -> j , EXACT
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
 // z -> i , EXACT
 
 
@@ -66,8 +66,8 @@ int main()
 
 // Points To:
 // t -> j , EXACT
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
 // z -> j , EXACT
 
    *x = z;
@@ -75,8 +75,8 @@ int main()
 // Points To:
 // *ANY_MODULE*:*ANYWHERE*_b0 -> j , MAY
 // t -> j , EXACT
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
 // z -> j , EXACT
 
    printf(" x = %p\n", x);
@@ -84,8 +84,8 @@ int main()
 // Points To:
 // *ANY_MODULE*:*ANYWHERE*_b0 -> j , MAY
 // t -> j , EXACT
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
 // z -> j , EXACT
 
    return 0;

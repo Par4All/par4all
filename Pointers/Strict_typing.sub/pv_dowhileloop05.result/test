@@ -19,15 +19,15 @@ int main()
    int *p, *q;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
 
    p = (int *) malloc(10*sizeof(int));
 
 // Points To:
 // p -> *HEAP*_l_8[0] , MAY
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
    q = p;
 
@@ -111,7 +111,7 @@ int main()
    free(p);
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 // q -> *HEAP*_l_8[*] , MAY
 // q -> *HEAP*_l_8[1] , MAY
 // q -> *HEAP*_l_8[2] , MAY

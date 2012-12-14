@@ -17,14 +17,14 @@ int inc01(int *pi)
    int *q;
 
 // Points To:
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> undefined , EXACT
 
    int i = 0;
 
 // Points To:
 // pi -> *NULL_POINTER* , MAY
 // pi -> _pi_1[0] , MAY
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> undefined , EXACT
 
    q = pi;
 

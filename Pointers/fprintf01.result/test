@@ -15,17 +15,17 @@ int main()
    FILE *pFile;
 
 // Points To:
-// pFile -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pFile -> undefined , EXACT
 
    int n;
 
 // Points To:
-// pFile -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pFile -> undefined , EXACT
 
    char name[100];
 
 // Points To:
-// pFile -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pFile -> undefined , EXACT
 
 
    pFile = fopen("myfile.txt", "w");
@@ -57,7 +57,7 @@ int main()
    fclose(pFile);
 
 // Points To:
-// pFile -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pFile -> undefined , EXACT
 
    return 0;
 }

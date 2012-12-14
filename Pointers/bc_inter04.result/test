@@ -37,7 +37,7 @@ void foo(int ***p1, int ***p2, int **q3, int *r4)
 // Points To:
 // _p2_2[0] -> *NULL_POINTER* , MAY
 // _p2_2[0] -> _p2_2_2[0][0] , MAY
-// l -> *ANY_MODULE*:*NOWHERE* , EXACT
+// l -> undefined , EXACT
 // p2 -> *NULL_POINTER* , MAY
 // p2 -> _p2_2[0] , MAY
 
@@ -125,47 +125,47 @@ int main()
    int ***a1;
 
 // Points To:
-// a1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a1 -> undefined , EXACT
 
    int ***a2;
 
 
 // Points To:
-// a1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a1 -> undefined , EXACT
+// a2 -> undefined , EXACT
 
    int **b3;
 
 // Points To:
-// a1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a1 -> undefined , EXACT
+// a2 -> undefined , EXACT
+// b3 -> undefined , EXACT
 
    int *c4;
 
 // Points To:
-// a1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a1 -> undefined , EXACT
+// a2 -> undefined , EXACT
+// b3 -> undefined , EXACT
+// c4 -> undefined , EXACT
 
 
    a1 = (int ***) malloc(sizeof(int * *));
 
 // Points To:
 // a1 -> *HEAP*_l_24 , MAY
-// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a2 -> undefined , EXACT
+// b3 -> undefined , EXACT
+// c4 -> undefined , EXACT
 
    *a1 = (int **) malloc(sizeof(int *));
 
 // Points To:
 // *HEAP*_l_24 -> *HEAP*_l_25 , MAY
 // a1 -> *HEAP*_l_24 , MAY
-// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a2 -> undefined , EXACT
+// b3 -> undefined , EXACT
+// c4 -> undefined , EXACT
 
    **a1 = (int *) malloc(sizeof(int));
 
@@ -173,9 +173,9 @@ int main()
 // *HEAP*_l_24 -> *HEAP*_l_25 , MAY
 // *HEAP*_l_25 -> *HEAP*_l_26 , MAY
 // a1 -> *HEAP*_l_24 , MAY
-// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a2 -> undefined , EXACT
+// b3 -> undefined , EXACT
+// c4 -> undefined , EXACT
 
 
    ***a1 = 1;
@@ -184,9 +184,9 @@ int main()
 // *HEAP*_l_24 -> *HEAP*_l_25 , MAY
 // *HEAP*_l_25 -> *HEAP*_l_26 , MAY
 // a1 -> *HEAP*_l_24 , MAY
-// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a2 -> undefined , EXACT
+// b3 -> undefined , EXACT
+// c4 -> undefined , EXACT
 
 
    a2 = (int ***) malloc(sizeof(int * *));
@@ -196,8 +196,8 @@ int main()
 // *HEAP*_l_25 -> *HEAP*_l_26 , MAY
 // a1 -> *HEAP*_l_24 , MAY
 // a2 -> *HEAP*_l_30 , MAY
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b3 -> undefined , EXACT
+// c4 -> undefined , EXACT
 
    *a2 = *a1;
 
@@ -207,8 +207,8 @@ int main()
 // *HEAP*_l_30 -> *HEAP*_l_25 , MAY
 // a1 -> *HEAP*_l_24 , MAY
 // a2 -> *HEAP*_l_30 , MAY
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b3 -> undefined , EXACT
+// c4 -> undefined , EXACT
 
 
    b3 = (int **) malloc(sizeof(int *));
@@ -220,7 +220,7 @@ int main()
 // a1 -> *HEAP*_l_24 , MAY
 // a2 -> *HEAP*_l_30 , MAY
 // b3 -> *HEAP*_l_33 , MAY
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// c4 -> undefined , EXACT
 
    *b3 = (int *) malloc(sizeof(int));
 
@@ -232,7 +232,7 @@ int main()
 // a1 -> *HEAP*_l_24 , MAY
 // a2 -> *HEAP*_l_30 , MAY
 // b3 -> *HEAP*_l_33 , MAY
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// c4 -> undefined , EXACT
 
    **b3 = 3;
 
@@ -244,7 +244,7 @@ int main()
 // a1 -> *HEAP*_l_24 , MAY
 // a2 -> *HEAP*_l_30 , MAY
 // b3 -> *HEAP*_l_33 , MAY
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// c4 -> undefined , EXACT
 
 
    c4 = (int *) malloc(sizeof(int));

@@ -19,29 +19,29 @@ void array16()
    int *p[10];
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , EXACT
 
    int x[10];
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , EXACT
 
    int ii;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , EXACT
 
    p[0] = &a;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a , MAY
 // p[0] -> a , EXACT
 
    p[1] = &b;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a , MAY
 // p[0] -> a , EXACT
 // p[*] -> b , MAY
@@ -50,7 +50,7 @@ void array16()
    p[2] = &c;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a , MAY
 // p[0] -> a , EXACT
 // p[*] -> b , MAY
@@ -61,7 +61,7 @@ void array16()
    p[3] = &d;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a , MAY
 // p[0] -> a , EXACT
 // p[*] -> b , MAY
@@ -74,7 +74,7 @@ void array16()
    p[4] = &e;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a , MAY
 // p[0] -> a , EXACT
 // p[*] -> b , MAY
@@ -89,7 +89,7 @@ void array16()
    p[5] = &f;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a , MAY
 // p[0] -> a , EXACT
 // p[*] -> b , MAY
@@ -106,7 +106,7 @@ void array16()
    p[6] = &g;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a , MAY
 // p[0] -> a , EXACT
 // p[*] -> b , MAY
@@ -125,7 +125,7 @@ void array16()
    p[7] = &h;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a , MAY
 // p[0] -> a , EXACT
 // p[*] -> b , MAY
@@ -146,7 +146,7 @@ void array16()
    p[8] = &i;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a , MAY
 // p[0] -> a , EXACT
 // p[*] -> b , MAY
@@ -169,7 +169,7 @@ void array16()
    p[9] = &j;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a , MAY
 // p[0] -> a , EXACT
 // p[*] -> b , MAY
@@ -205,7 +205,7 @@ void array16()
 // p[7] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // p[8] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // p[9] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a , MAY
 // p[0] -> a , MAY
 // p[*] -> b , MAY
@@ -242,7 +242,7 @@ void array16()
 // p[7] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // p[8] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // p[9] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a , MAY
 // p[0] -> a , MAY
 // p[*] -> b , MAY

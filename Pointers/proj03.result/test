@@ -113,7 +113,7 @@ int main(void)
 
 // Points To:
 // pi -> i , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> undefined , MAY
 // pp -> pi , MAY
 
    
@@ -122,7 +122,7 @@ int main(void)
 
 // Points To:
 // pi -> i , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> undefined , MAY
 // pp -> pi , MAY
 
    

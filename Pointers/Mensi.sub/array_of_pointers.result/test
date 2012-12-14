@@ -40,24 +40,24 @@ int main()
    int *a[10];
 
 // Points To:
-// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a[*] -> undefined , EXACT
 
    int i = 0;
 
 // Points To:
-// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a[*] -> undefined , EXACT
 
    a[0] = &i;
 
 // Points To:
-// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> undefined , MAY
 // a[*] -> i , MAY
 // a[0] -> i , EXACT
 
    a[1] = &i;
 
 // Points To:
-// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> undefined , MAY
 // a[*] -> i , MAY
 // a[0] -> i , EXACT
 // a[1] -> i , EXACT
@@ -65,7 +65,7 @@ int main()
    a[2] = &i;
 
 // Points To:
-// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> undefined , MAY
 // a[*] -> i , MAY
 // a[0] -> i , EXACT
 // a[1] -> i , EXACT
@@ -74,7 +74,7 @@ int main()
    a[3] = &i;
 
 // Points To:
-// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> undefined , MAY
 // a[*] -> i , MAY
 // a[0] -> i , EXACT
 // a[1] -> i , EXACT
@@ -84,7 +84,7 @@ int main()
    a[4] = &i;
 
 // Points To:
-// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> undefined , MAY
 // a[*] -> i , MAY
 // a[0] -> i , EXACT
 // a[1] -> i , EXACT
@@ -95,7 +95,7 @@ int main()
    a[5] = &i;
 
 // Points To:
-// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> undefined , MAY
 // a[*] -> i , MAY
 // a[0] -> i , EXACT
 // a[1] -> i , EXACT
@@ -107,7 +107,7 @@ int main()
    a[6] = &i;
 
 // Points To:
-// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a[*] -> undefined , MAY
 // a[*] -> i , MAY
 // a[0] -> i , EXACT
 // a[1] -> i , EXACT

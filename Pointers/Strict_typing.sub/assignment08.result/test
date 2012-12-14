@@ -39,35 +39,35 @@ int assignment08(int a[10])
    } x, y;
 
 // Points To:
-// x.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// x.b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y.b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x.a -> undefined , EXACT
+// x.b -> undefined , EXACT
+// y.a -> undefined , EXACT
+// y.b -> undefined , EXACT
 
    int i, j;
 
 // Points To:
-// x.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// x.b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y.b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x.a -> undefined , EXACT
+// x.b -> undefined , EXACT
+// y.a -> undefined , EXACT
+// y.b -> undefined , EXACT
 
 
    x.a = &i;
 
 // Points To:
-// x.b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x.b -> undefined , EXACT
 // x.a -> i , EXACT
-// y.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y.b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y.a -> undefined , EXACT
+// y.b -> undefined , EXACT
 
    x.b = &j;
 
 // Points To:
 // x.a -> i , EXACT
 // x.b -> j , EXACT
-// y.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y.b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y.a -> undefined , EXACT
+// y.b -> undefined , EXACT
 
    y = x;
 

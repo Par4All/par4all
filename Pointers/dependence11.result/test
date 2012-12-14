@@ -48,14 +48,14 @@ void dependence11(struct my_struct *s)
    int *b, *a;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a -> undefined , EXACT
+// b -> undefined , EXACT
 
    int i;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a -> undefined , EXACT
+// b -> undefined , EXACT
 // s -> *NULL_POINTER* , MAY
 // s -> _s_1[0] , MAY
 
@@ -65,7 +65,7 @@ void dependence11(struct my_struct *s)
 // _s_1[0].b -> *NULL_POINTER* , MAY
 // _s_1[0].b -> _s_1_2__1[0][0] , MAY
 // a -> _s_1[0].a[0] , EXACT
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b -> undefined , EXACT
 // s -> _s_1[0] , EXACT
 
    // a points_to s[0][a], _s_1[0][a] or _s_1.a

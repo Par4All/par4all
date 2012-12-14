@@ -60,14 +60,14 @@ list * initialize()
    int *pi, i;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pi -> undefined , EXACT
 
    list *l = (void *) 0, *nl;
 
 // Points To:
 // l -> *NULL_POINTER* , EXACT
-// nl -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nl -> undefined , EXACT
+// pi -> undefined , EXACT
 
    while (!feof(stdin)) {
 
@@ -78,9 +78,9 @@ list * initialize()
 // l -> *HEAP*_l_17 , MAY
 // l -> *NULL_POINTER* , MAY
 // nl -> *HEAP*_l_17 , MAY
-// nl -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pi -> undefined , MAY
 
       scanf("%d", &i);
 
@@ -91,9 +91,9 @@ list * initialize()
 // l -> *HEAP*_l_17 , MAY
 // l -> *NULL_POINTER* , MAY
 // nl -> *HEAP*_l_17 , MAY
-// nl -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pi -> undefined , MAY
 
       pi = malloc(sizeof(int));
 
@@ -104,7 +104,7 @@ list * initialize()
 // l -> *HEAP*_l_17 , MAY
 // l -> *NULL_POINTER* , MAY
 // nl -> *HEAP*_l_17 , MAY
-// nl -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
 
       *pi = i;
@@ -116,7 +116,7 @@ list * initialize()
 // l -> *HEAP*_l_17 , MAY
 // l -> *NULL_POINTER* , MAY
 // nl -> *HEAP*_l_17 , MAY
-// nl -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
 
       nl = malloc(sizeof(list));
@@ -162,9 +162,9 @@ list * initialize()
 // l -> *HEAP*_l_17 , MAY
 // l -> *NULL_POINTER* , MAY
 // nl -> *HEAP*_l_17 , MAY
-// nl -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pi -> undefined , MAY
 
    return l;
 }

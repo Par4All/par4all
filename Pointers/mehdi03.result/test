@@ -27,20 +27,20 @@ int main()
    struct p_s *p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 
    struct q_s *x;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
+// x -> undefined , EXACT
 
 
    p = (struct p_s *) malloc(sizeof(struct p_s ));
 
 // Points To:
 // p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// x -> undefined , EXACT
 
    p->q = x;
 

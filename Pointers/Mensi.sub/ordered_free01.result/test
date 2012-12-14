@@ -23,14 +23,14 @@ int ordered_free01(int *fp)
    free(fp);
 
 // Points To:
-// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// fq -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fp -> undefined , EXACT
+// fq -> undefined , EXACT
 
    fp = (int *) malloc(sizeof(int));
 
 // Points To:
 // fp -> *HEAP*_l_8 , MAY
-// fq -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fq -> undefined , EXACT
 
    return 0;
 }

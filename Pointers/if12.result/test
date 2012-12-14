@@ -15,7 +15,7 @@ void if12(char *filename)
    FILE *file;
 
 // Points To:
-// file -> *ANY_MODULE*:*NOWHERE* , EXACT
+// file -> undefined , EXACT
 
 
    file = fopen(filename, "rb");

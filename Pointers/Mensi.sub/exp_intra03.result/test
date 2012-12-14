@@ -33,19 +33,19 @@ int main()
    int *p, i = 1, j = 2;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 
 
    if (i>j)
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 
       p = &i;
    else
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 
       p = &j;
 

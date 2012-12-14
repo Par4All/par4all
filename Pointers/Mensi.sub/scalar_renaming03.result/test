@@ -45,7 +45,7 @@ int scalar_renaming03()
    int *p, i, T, A[100], B[100], C[100], D[100];                        /*0004*/
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    p = &T;                                                              /*0005*/
 

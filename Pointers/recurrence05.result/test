@@ -6,7 +6,7 @@ POINTS TO for "recurrence05"
 
 
 // Points To OUT:
-// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> undefined , MAY
 // *ANY_MODULE*:*HEAP**ANYWHERE* -> *NULL_POINTER* , MAY
 // recurrence05 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 

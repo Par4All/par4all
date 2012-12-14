@@ -15,31 +15,31 @@ int main()
    struct2 *p1, *p2;
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
 
    struct1 *q1, *q2;
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q1 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
+// q1 -> undefined , EXACT
+// q2 -> undefined , EXACT
 
 
    q1 = (struct1 *) malloc(sizeof(struct1));
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
 // q1 -> *HEAP*_l_21 , MAY
-// q2 -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q2 -> undefined , EXACT
 
    q2 = (struct1 *) malloc(sizeof(struct1));
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
 // q1 -> *HEAP*_l_21 , MAY
 // q2 -> *HEAP*_l_22 , MAY
 
@@ -47,16 +47,16 @@ int main()
    q1->r = 10;
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
 // q1 -> *HEAP*_l_21 , MAY
 // q2 -> *HEAP*_l_22 , MAY
 
    q2->r = 20;
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
 // q1 -> *HEAP*_l_21 , MAY
 // q2 -> *HEAP*_l_22 , MAY
 
@@ -65,7 +65,7 @@ int main()
 
 // Points To:
 // p1 -> *HEAP*_l_27 , MAY
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> undefined , EXACT
 // q1 -> *HEAP*_l_21 , MAY
 // q2 -> *HEAP*_l_22 , MAY
 
@@ -75,7 +75,7 @@ int main()
 // Points To:
 // *HEAP*_l_27.q -> *HEAP*_l_21 , MAY
 // p1 -> *HEAP*_l_27 , MAY
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> undefined , EXACT
 // q1 -> *HEAP*_l_21 , MAY
 // q2 -> *HEAP*_l_22 , MAY
 

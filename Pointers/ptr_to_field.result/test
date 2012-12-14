@@ -40,10 +40,10 @@ POINTS-TO
 
 
 // Points To OUT:
-// *HEAP*_l_13.p -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
-// *HEAP*_l_13.q -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
-// *HEAP*_l_14.p -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
-// *HEAP*_l_14.q -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// *HEAP*_l_13.p -> undefined , MAY
+// *HEAP*_l_13.q -> undefined , MAY
+// *HEAP*_l_14.p -> undefined , MAY
+// *HEAP*_l_14.q -> undefined , MAY
 
 int ptr_to_field()
 {
@@ -61,20 +61,20 @@ int ptr_to_field()
    my_str *m, *n;
 
 // Points To:
-// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// m -> undefined , EXACT
+// n -> undefined , EXACT
 
    int i = 0, j = 1;
 
 // Points To:
-// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// m -> undefined , EXACT
+// n -> undefined , EXACT
 
    m = (my_str *) malloc(sizeof(my_str));
 
 // Points To:
 // m -> *HEAP*_l_13 , MAY
-// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// n -> undefined , EXACT
 
    n = (my_str *) malloc(sizeof(my_str));
 

@@ -8,7 +8,7 @@ Points-to for "pointer_free"
 
 
 // Points To OUT:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
 void pointer_free(pointer p)
 {
@@ -20,7 +20,7 @@ void pointer_free(pointer p)
    free(p);
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    return;
 }
@@ -61,7 +61,7 @@ Points-to for "pointer_free"
 
 
 // Points To OUT:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
 void pointer_free(pointer p)
 {
@@ -73,7 +73,7 @@ void pointer_free(pointer p)
    free(p);
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    return;
 }
@@ -94,8 +94,8 @@ int main(void)
    pointer p1, p2;
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
 
    
    // could differentiate allocs based on call path?
@@ -103,7 +103,7 @@ int main(void)
 
 // Points To:
 // p1 -> alloc_pointer:*HEAP*_l_8 , MAY
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> undefined , EXACT
 
    p2 = p1;
 
@@ -114,7 +114,7 @@ int main(void)
    pointer_free(p1);
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p1 -> undefined , EXACT
 // p2 -> alloc_pointer:*HEAP*_l_8 , MAY
 
 

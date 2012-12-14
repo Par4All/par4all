@@ -80,7 +80,7 @@ void list_free(list l)
 //    _l_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1[0][0][0][0][0][0][0][0]
 //     , MAY
 // l -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// l -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// l -> undefined , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1[0] , MAY
 // n -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
@@ -132,7 +132,7 @@ void list_free(list l)
 //    _l_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1[0][0][0][0][0][0][0][0]
 //     , MAY
 // l -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// l -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// l -> undefined , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1[0] , MAY
 // n -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
@@ -185,7 +185,7 @@ void list_free(list l)
 //    _l_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1[0][0][0][0][0][0][0][0]
 //     , MAY
 // l -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// l -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// l -> undefined , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1[0] , MAY
 // n -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
@@ -199,7 +199,7 @@ void list_free(list l)
 // n -> _l_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1[0][0][0][0][0][0][0][0
 //    ] , MAY
 // nil -> *NULL_POINTER* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
       p = n;
    }

@@ -8,8 +8,8 @@ POINTS TO for pointer15
 
 
 // Points To OUT:
-// _t_1[*][*][*][*][*][*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// _t_1[1][2][0][3][4][5] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// _t_1[*][*][*][*][*][*] -> undefined , MAY
+// _t_1[1][2][0][3][4][5] -> undefined , EXACT
 // t[1][2] -> _t_1[1][2][0][0][0][0] , EXACT
 
 void pointer15(double *(*t[3][4])[5][6][7])

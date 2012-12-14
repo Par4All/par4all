@@ -34,24 +34,24 @@ int main()
    s_t s;
 
 // Points To:
-// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s.tab -> undefined , EXACT
 
    int j;
 
 // Points To:
-// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s.tab -> undefined , EXACT
 
 
    init_s(s, 10);
 
 // Points To:
-// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s.tab -> undefined , EXACT
 
 
    compute_s(s, 10);
 
 // Points To:
-// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s.tab -> undefined , EXACT
 
    
    

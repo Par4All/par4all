@@ -15,21 +15,18 @@ POINTS TO for "recurrence01"
 
 
 // Points To OUT:
-// _l_1[*].content -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// _l_1[0].content -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// _l_1[*].content -> undefined , MAY
+// _l_1[0].content -> undefined , EXACT
 // _l_1[0].next -> _l_1_2__1[0][0] , MAY
-// _l_1_2__1[*][*].content -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// _l_1_2__1[0][0].content -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// _l_1_2__1[*][*].content -> undefined , MAY
+// _l_1_2__1[0][0].content -> undefined , EXACT
 // _l_1_2__1[0][0].next -> _l_1_2__1_2__1[0][0][0] , MAY
-// _l_1_2__1_2__1[*][*][*].content -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// _l_1_2__1_2__1[0][0][0].content -> *ANY_MODULE*:*NOWHERE*_b0
-//     , EXACT
+// _l_1_2__1_2__1[*][*][*].content -> undefined , MAY
+// _l_1_2__1_2__1[0][0][0].content -> undefined , EXACT
 // _l_1_2__1_2__1[0][0][0].next -> _l_1_2__1_2__1_2__1[0][0][0][0]
 //     , MAY
-// _l_1_2__1_2__1_2__1[*][*][*][*].content -> 
-//    *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// _l_1_2__1_2__1_2__1[0][0][0][0].content -> 
-//    *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// _l_1_2__1_2__1_2__1[*][*][*][*].content -> undefined , MAY
+// _l_1_2__1_2__1_2__1[0][0][0][0].content -> undefined , EXACT
 
 void recurrence01(list l)
 {

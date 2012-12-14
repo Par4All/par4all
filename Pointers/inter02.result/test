@@ -15,67 +15,67 @@ int main()
    int *x;
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// x -> undefined , EXACT
 
    int tab[10];
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// x -> undefined , EXACT
 
    int *tab2[10];
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// tab2[*] -> undefined , EXACT
+// x -> undefined , EXACT
 
    int tab3[10][10];
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// tab2[*] -> undefined , EXACT
+// x -> undefined , EXACT
 
    int **tab4;
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
-// tab4 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// tab2[*] -> undefined , EXACT
+// tab4 -> undefined , EXACT
+// x -> undefined , EXACT
 
    int y;
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
-// tab4 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// tab2[*] -> undefined , EXACT
+// tab4 -> undefined , EXACT
+// x -> undefined , EXACT
 
 
    foo(x);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
-// tab4 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// tab2[*] -> undefined , EXACT
+// tab4 -> undefined , EXACT
+// x -> undefined , EXACT
 
    foo(tab);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
-// tab4 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// tab2[*] -> undefined , EXACT
+// tab4 -> undefined , EXACT
+// x -> undefined , EXACT
 
    foo(tab2[4]);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
-// tab4 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// tab2[*] -> undefined , EXACT
+// tab4 -> undefined , EXACT
+// x -> undefined , EXACT
 
    foo(tab3[5]);
 
 // Points To:
-// tab2[*] -> *ANY_MODULE*:*NOWHERE* , EXACT
-// tab4 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// x -> *ANY_MODULE*:*NOWHERE* , EXACT
+// tab2[*] -> undefined , EXACT
+// tab4 -> undefined , EXACT
+// x -> undefined , EXACT
 
    foo(tab4[6]);
 

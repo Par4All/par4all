@@ -28,12 +28,12 @@ int main()
    int *p[5];
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , EXACT
 
    int q[10][5];
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , EXACT
 
    p[3] = q[0][0];
 

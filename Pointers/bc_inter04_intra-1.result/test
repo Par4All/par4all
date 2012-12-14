@@ -14,48 +14,48 @@ int main()
    int ***a1;
 
 // Points To:
-// a1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a1 -> undefined , EXACT
 
    int ***a2;
 
 
 // Points To:
-// a1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a1 -> undefined , EXACT
+// a2 -> undefined , EXACT
 
    int **b3;
 
 // Points To:
-// a1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a1 -> undefined , EXACT
+// a2 -> undefined , EXACT
+// b3 -> undefined , EXACT
 
    int *c4;
 
 // Points To:
-// a1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a1 -> undefined , EXACT
+// a2 -> undefined , EXACT
+// b3 -> undefined , EXACT
+// c4 -> undefined , EXACT
 
    int **l;
 
 // Points To:
-// a1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// l -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a1 -> undefined , EXACT
+// a2 -> undefined , EXACT
+// b3 -> undefined , EXACT
+// c4 -> undefined , EXACT
+// l -> undefined , EXACT
 
 
    a1 = (int ***) malloc(sizeof(int * *));
 
 // Points To:
 // a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// l -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a2 -> undefined , EXACT
+// b3 -> undefined , EXACT
+// c4 -> undefined , EXACT
+// l -> undefined , EXACT
 
    *a1 = (int **) malloc(sizeof(int *));
 
@@ -63,10 +63,10 @@ int main()
 // *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
 //     , MAY
 // a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// l -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a2 -> undefined , EXACT
+// b3 -> undefined , EXACT
+// c4 -> undefined , EXACT
+// l -> undefined , EXACT
 
    **a1 = (int *) malloc(sizeof(int));
 
@@ -74,10 +74,10 @@ int main()
 // *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
 //     , MAY
 // a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// l -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a2 -> undefined , EXACT
+// b3 -> undefined , EXACT
+// c4 -> undefined , EXACT
+// l -> undefined , EXACT
 
 
    ***a1 = 1;
@@ -86,10 +86,10 @@ int main()
 // *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*HEAP**ANYWHERE*
 //     , MAY
 // a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// a2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// l -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a2 -> undefined , EXACT
+// b3 -> undefined , EXACT
+// c4 -> undefined , EXACT
+// l -> undefined , EXACT
 
 
    a2 = (int ***) malloc(sizeof(int * *));
@@ -99,9 +99,9 @@ int main()
 //     , MAY
 // a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// l -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b3 -> undefined , EXACT
+// c4 -> undefined , EXACT
+// l -> undefined , EXACT
 
    *a2 = *a1;
 
@@ -110,9 +110,9 @@ int main()
 //     , MAY
 // a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// b3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// l -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b3 -> undefined , EXACT
+// c4 -> undefined , EXACT
+// l -> undefined , EXACT
 
 
    b3 = (int **) malloc(sizeof(int *));
@@ -123,8 +123,8 @@ int main()
 // a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // b3 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// l -> *ANY_MODULE*:*NOWHERE* , EXACT
+// c4 -> undefined , EXACT
+// l -> undefined , EXACT
 
    *b3 = (int *) malloc(sizeof(int));
 
@@ -134,8 +134,8 @@ int main()
 // a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // b3 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// l -> *ANY_MODULE*:*NOWHERE* , EXACT
+// c4 -> undefined , EXACT
+// l -> undefined , EXACT
 
    **b3 = 3;
 
@@ -145,8 +145,8 @@ int main()
 // a1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // b3 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// c4 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// l -> *ANY_MODULE*:*NOWHERE* , EXACT
+// c4 -> undefined , EXACT
+// l -> undefined , EXACT
 
 
    c4 = (int *) malloc(sizeof(int));
@@ -158,7 +158,7 @@ int main()
 // a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // b3 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // c4 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// l -> *ANY_MODULE*:*NOWHERE* , EXACT
+// l -> undefined , EXACT
 
    *c4 = 4;
 
@@ -169,7 +169,7 @@ int main()
 // a2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // b3 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // c4 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// l -> *ANY_MODULE*:*NOWHERE* , EXACT
+// l -> undefined , EXACT
 
 
    l = *a2;

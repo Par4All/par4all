@@ -7,7 +7,7 @@ Points-to for "conditional_free02"
 
 
 // Points To OUT:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> undefined , MAY
 
 void conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 {
@@ -45,7 +45,7 @@ void conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 
 // Points To:
 // p -> *HEAP*_l_8 , MAY
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> undefined , MAY
 // p -> _p_1 , MAY
 // q -> _p_1 , EXACT
 
@@ -53,7 +53,7 @@ void conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 
 // Points To:
 // p -> *HEAP*_l_8 , MAY
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> undefined , MAY
 // p -> _p_1 , MAY
 // q -> _p_1 , EXACT
 
@@ -62,7 +62,7 @@ void conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 // Points To:
 // p -> *HEAP*_l_10 , MAY
 // p -> *HEAP*_l_8 , MAY
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> undefined , MAY
 // p -> _p_1 , MAY
 // q -> _p_1 , EXACT
 

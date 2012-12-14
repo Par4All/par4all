@@ -45,27 +45,27 @@ struct my_struct  dependence09()
    int *b, *a;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a -> undefined , EXACT
+// b -> undefined , EXACT
 
    int i;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a -> undefined , EXACT
+// b -> undefined , EXACT
 
    struct my_struct s;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE* , EXACT
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a -> undefined , EXACT
+// b -> undefined , EXACT
 
 
    a = s.a;
 
 // Points To:
 // a -> s.a[0] , EXACT
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b -> undefined , EXACT
 
    // a points_to s[1]
    b = s.b;

@@ -91,7 +91,7 @@ int main(void)
    }
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> undefined , MAY
 // pp -> *NULL_POINTER* , MAY
 
    
@@ -99,7 +99,7 @@ int main(void)
    printf("%p\n", pp);
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> undefined , MAY
 // pp -> *NULL_POINTER* , MAY
 
    
@@ -108,7 +108,7 @@ int main(void)
    if (pp)
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> undefined , MAY
 
       **pp = 0;
 

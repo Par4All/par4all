@@ -36,9 +36,9 @@ POINTS-TO
 
 
 // Points To OUT:
-// _p_1.val -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// _p_1.val -> undefined , MAY
 // _p_1.next -> _p_1_2__1 , MAY
-// _p_1_2__1.val -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// _p_1_2__1.val -> undefined , MAY
 // _p_1_2__1.next -> _p_1_2__1 , MAY
 
 int count(liste *p)

@@ -132,24 +132,24 @@ int main(void)
    pointer p1, p2, p3;
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
+// p3 -> undefined , EXACT
 
 
    p1 = &i1;
 
 // Points To:
 // p1 -> i1 , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> undefined , EXACT
+// p3 -> undefined , EXACT
 
    p2 = &i2;
 
 // Points To:
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
-// p3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p3 -> undefined , EXACT
 
    p3 = &i3;
 
@@ -255,7 +255,7 @@ void pointer_add(pointer q1, const pointer q2, const pointer q3)
 
 
 // Points To OUT:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
 void pointer_free(pointer p)
 {
@@ -267,7 +267,7 @@ void pointer_free(pointer p)
    free(p);
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    return;
 }

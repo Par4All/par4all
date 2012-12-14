@@ -44,7 +44,7 @@ POINTS TO
 
 
 // Points To OUT:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b2 , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> undefined , MAY
 
 void assign07()
 {
@@ -54,34 +54,34 @@ void assign07()
    int ***p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    int **q;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
    int *r;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
 
    int i;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
 
 
    r = &i;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 // r -> i , EXACT
 
    //q = &r;
@@ -89,7 +89,7 @@ void assign07()
 
 // Points To:
 // p -> q , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q -> undefined , EXACT
 // r -> i , EXACT
 
    **p = r;
@@ -97,7 +97,7 @@ void assign07()
 // Points To:
 // *ANY_MODULE*:*ANYWHERE*_b0 -> i , MAY
 // p -> q , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q -> undefined , EXACT
 // r -> i , EXACT
 
    ***p = 0;
@@ -105,7 +105,7 @@ void assign07()
 // Points To:
 // *ANY_MODULE*:*ANYWHERE*_b0 -> i , MAY
 // p -> q , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q -> undefined , EXACT
 // r -> i , EXACT
 
    return;
@@ -115,7 +115,7 @@ void assign07()
 
 
 // Points To OUT:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b2 , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> undefined , MAY
 
 void foo()
 {
@@ -125,7 +125,7 @@ void foo()
    assign07();
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b2 , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> undefined , MAY
 
    return;
 }

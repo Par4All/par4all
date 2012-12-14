@@ -15,51 +15,51 @@ int main(int argc, char *argv[])
    int *pi;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pi -> undefined , EXACT
 
    float *px;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pi -> undefined , EXACT
+// px -> undefined , EXACT
 
    float *pz;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// pz -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pi -> undefined , EXACT
+// px -> undefined , EXACT
+// pz -> undefined , EXACT
 
    int (*pt)[30];
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pt -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// pz -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pi -> undefined , EXACT
+// pt -> undefined , EXACT
+// px -> undefined , EXACT
+// pz -> undefined , EXACT
 
 
    pi = (int *) malloc(sizeof(int));
 
 // Points To:
 // pi -> *HEAP*_l_12 , MAY
-// pt -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// pz -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pt -> undefined , EXACT
+// px -> undefined , EXACT
+// pz -> undefined , EXACT
 
    px = (float *) malloc(sizeof(float));
 
 // Points To:
 // pi -> *HEAP*_l_12 , MAY
-// pt -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// pt -> undefined , EXACT
 // px -> *HEAP*_l_13 , MAY
-// pz -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pz -> undefined , EXACT
 
    pz = (float *) malloc(sizeof(float));
 
 // Points To:
 // pi -> *HEAP*_l_12 , MAY
-// pt -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// pt -> undefined , EXACT
 // px -> *HEAP*_l_13 , MAY
 // pz -> *HEAP*_l_14 , MAY
 

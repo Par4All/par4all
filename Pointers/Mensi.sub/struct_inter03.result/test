@@ -42,93 +42,93 @@ int main()
    struct foo s1;
 
 // Points To:
-// s1.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip1 -> undefined , EXACT
+// s1.ip2 -> undefined , EXACT
 
    struct foo s2;
 
 // Points To:
-// s1.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip1 -> undefined , EXACT
+// s1.ip2 -> undefined , EXACT
+// s2.ip1 -> undefined , EXACT
+// s2.ip2 -> undefined , EXACT
 
    struct foo **ppt, **pps;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
-// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s1.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
+// ppt -> undefined , EXACT
+// s1.ip1 -> undefined , EXACT
+// s1.ip2 -> undefined , EXACT
+// s2.ip1 -> undefined , EXACT
+// s2.ip2 -> undefined , EXACT
 
    struct foo *pt = &s1, *ps = &s2;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
-// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
+// ppt -> undefined , EXACT
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
-// s1.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip1 -> undefined , EXACT
+// s1.ip2 -> undefined , EXACT
+// s2.ip1 -> undefined , EXACT
+// s2.ip2 -> undefined , EXACT
 
    int i11 = 1, i12 = 2, i21 = 3, i22 = 4;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
-// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
+// ppt -> undefined , EXACT
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
-// s1.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip1 -> undefined , EXACT
+// s1.ip2 -> undefined , EXACT
+// s2.ip1 -> undefined , EXACT
+// s2.ip2 -> undefined , EXACT
 
 
    s1.ip1 = &i11;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
-// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
+// ppt -> undefined , EXACT
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
-// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip2 -> undefined , EXACT
 // s1.ip1 -> i11 , EXACT
-// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip1 -> undefined , EXACT
+// s2.ip2 -> undefined , EXACT
 
    s1.ip2 = &i12;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
-// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
+// ppt -> undefined , EXACT
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
 // s1.ip1 -> i11 , EXACT
 // s1.ip2 -> i12 , EXACT
-// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip1 -> undefined , EXACT
+// s2.ip2 -> undefined , EXACT
 
    s2.ip1 = &i21;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
-// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
+// ppt -> undefined , EXACT
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
 // s1.ip1 -> i11 , EXACT
 // s1.ip2 -> i12 , EXACT
-// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip2 -> undefined , EXACT
 // s2.ip1 -> i21 , EXACT
 
    s2.ip2 = &i22;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
-// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
+// ppt -> undefined , EXACT
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
 // s1.ip1 -> i11 , EXACT
@@ -140,8 +140,8 @@ int main()
    *pt = s2;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
-// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
+// ppt -> undefined , EXACT
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
 // s1.ip1 -> i21 , EXACT
@@ -152,7 +152,7 @@ int main()
    ppt = &pt;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
 // ppt -> pt , EXACT
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
@@ -318,93 +318,93 @@ int main()
    struct foo s1;
 
 // Points To:
-// s1.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip1 -> undefined , EXACT
+// s1.ip2 -> undefined , EXACT
 
    struct foo s2;
 
 // Points To:
-// s1.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip1 -> undefined , EXACT
+// s1.ip2 -> undefined , EXACT
+// s2.ip1 -> undefined , EXACT
+// s2.ip2 -> undefined , EXACT
 
    struct foo **ppt, **pps;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
-// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s1.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
+// ppt -> undefined , EXACT
+// s1.ip1 -> undefined , EXACT
+// s1.ip2 -> undefined , EXACT
+// s2.ip1 -> undefined , EXACT
+// s2.ip2 -> undefined , EXACT
 
    struct foo *pt = &s1, *ps = &s2;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
-// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
+// ppt -> undefined , EXACT
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
-// s1.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip1 -> undefined , EXACT
+// s1.ip2 -> undefined , EXACT
+// s2.ip1 -> undefined , EXACT
+// s2.ip2 -> undefined , EXACT
 
    int i11 = 1, i12 = 2, i21 = 3, i22 = 4;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
-// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
+// ppt -> undefined , EXACT
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
-// s1.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip1 -> undefined , EXACT
+// s1.ip2 -> undefined , EXACT
+// s2.ip1 -> undefined , EXACT
+// s2.ip2 -> undefined , EXACT
 
 
    s1.ip1 = &i11;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
-// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
+// ppt -> undefined , EXACT
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
-// s1.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s1.ip2 -> undefined , EXACT
 // s1.ip1 -> i11 , EXACT
-// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip1 -> undefined , EXACT
+// s2.ip2 -> undefined , EXACT
 
    s1.ip2 = &i12;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
-// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
+// ppt -> undefined , EXACT
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
 // s1.ip1 -> i11 , EXACT
 // s1.ip2 -> i12 , EXACT
-// s2.ip1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip1 -> undefined , EXACT
+// s2.ip2 -> undefined , EXACT
 
    s2.ip1 = &i21;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
-// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
+// ppt -> undefined , EXACT
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
 // s1.ip1 -> i11 , EXACT
 // s1.ip2 -> i12 , EXACT
-// s2.ip2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// s2.ip2 -> undefined , EXACT
 // s2.ip1 -> i21 , EXACT
 
    s2.ip2 = &i22;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
-// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
+// ppt -> undefined , EXACT
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
 // s1.ip1 -> i11 , EXACT
@@ -416,8 +416,8 @@ int main()
    *pt = s2;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
-// ppt -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
+// ppt -> undefined , EXACT
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT
 // s1.ip1 -> i21 , EXACT
@@ -428,7 +428,7 @@ int main()
    ppt = &pt;
 
 // Points To:
-// pps -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pps -> undefined , EXACT
 // ppt -> pt , EXACT
 // ps -> s2 , EXACT
 // pt -> s1 , EXACT

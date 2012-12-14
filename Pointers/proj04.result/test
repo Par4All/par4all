@@ -144,13 +144,13 @@ int main(void)
    }
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
 
    printf("pp=%p\n", pp);
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
    
    // possible segfault.

@@ -23,7 +23,7 @@ void assignment17(int **qq)
 // Points To:
 // _qq_1[0] -> *NULL_POINTER* , MAY
 // _qq_1[0] -> _qq_1_1[0][0] , MAY
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 // qq -> *NULL_POINTER* , MAY
 // qq -> _qq_1[0] , MAY
 

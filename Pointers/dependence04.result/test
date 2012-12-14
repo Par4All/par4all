@@ -29,7 +29,7 @@ void dependence04()
    int *b;
 
 // Points To:
-// b -> *ANY_MODULE*:*NOWHERE* , EXACT
+// b -> undefined , EXACT
 
    b = &global_a;
 

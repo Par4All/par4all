@@ -7,7 +7,7 @@ Points-to for "conditional_free03"
 
 
 // Points To OUT:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> undefined , MAY
 
 void conditional_free03(int *p, _Bool c1)
 {
@@ -31,9 +31,9 @@ void conditional_free03(int *p, _Bool c1)
       free(p);
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> undefined , MAY
 // p -> _p_1 , MAY
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// q -> undefined , MAY
 // q -> _p_1 , MAY
 
 
@@ -103,7 +103,7 @@ int main()
 
 // Points To:
 // p -> *HEAP*_l_16 , MAY
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> undefined , MAY
 
    return 0;
 }

@@ -44,28 +44,28 @@ int main()
    int *p, *q, i, j;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
 
    i = 1;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
    j = 0;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
    /* Initialisation des pointeurs*/
    p = &i;
 
 // Points To:
 // p -> i , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
    q = &j;
 

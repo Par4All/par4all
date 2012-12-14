@@ -44,7 +44,7 @@ l:   ap = first;
 // Points To:
 // _first_8[0].next -> *NULL_POINTER* , MAY
 // _first_8[0].next -> _first_8_3__8[0][0] , MAY
-// ap -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap -> undefined , MAY
 // ap -> *NULL_POINTER* , MAY
 // ap -> _first_8[0] , MAY
 // first -> *NULL_POINTER* , MAY
