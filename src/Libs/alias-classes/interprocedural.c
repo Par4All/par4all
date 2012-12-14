@@ -83,6 +83,26 @@ list points_to_cells_parameters(list dl)
   return fpcl;
 }
 
+
+/* Transform a list of arguments of type "expression" to a list of cells
+ *
+ * The list is not sorted. It is probably a reversed list.
+ */
+list points_to_cells_pointer_arguments(list al)
+{
+  list apcl = NIL;
+  FOREACH(EXPRESSION, ap, al) {
+    if(expression_pointer_p(ap) && expression_reference_p(ap)) {
+      reference r = expression_reference(ap);
+      cell c = make_cell_reference(r);
+      apcl = gen_nconc(CONS(CELL, c, NULL), apcl);
+    }
+  }
+  return apcl;
+}
+
+
+
 /* FI: limited to the interprocedural option */
 points_to_graph user_call_to_points_to(call c,
 				       points_to_graph pt_in,
@@ -228,10 +248,48 @@ pt_map user_call_to_points_to_fast_interprocedural(call c,
 {
   set pt_in_s = points_to_graph_set(pt_in);
   pt_map pt_out = pt_in;
+  set kill_1 =  set_generic_make(set_private, points_to_equal_p, points_to_rank);
+  set gen_1 =  set_generic_make(set_private, points_to_equal_p, points_to_rank);
+  set gen_2 =  set_generic_make(set_private, points_to_equal_p, points_to_rank);
   entity f = call_function(c);
   list al = call_arguments(c);
   list dl = code_declarations(value_code(entity_initial(f)));
   list fpcl = points_to_cells_parameters(dl);   
+  /* Compute kill_1 = effective parameters of pointer type should point to
+     nowhere in case the function call the free routine.
+  */
+  list apcl = points_to_cells_pointer_arguments(al);
+  FOREACH(CELL, ac, apcl) {
+    SET_FOREACH(points_to, pt, pt_in_s) {
+      if(points_to_cell_equal_p(ac, points_to_source(pt)) ) {
+	points_to npt = copy_points_to(pt);
+	(void) add_arc_to_simple_pt_map(npt, kill_1);
+      }
+    }
+  }
+  ifdebug(8) print_points_to_set("kill_1",kill_1);
+  
+  SET_FOREACH(points_to, pt_to, kill_1) {
+    approximation a = make_approximation_may();
+    cell sr = copy_cell(points_to_source(pt_to));
+    cell sk = copy_cell(points_to_sink(pt_to));
+    points_to npt = make_points_to(sr, sk, a, make_descriptor_none());
+    (void) add_arc_to_simple_pt_map(npt, gen_1);
+  }
+  ifdebug(8) print_points_to_set("gen_1",gen_1);
+
+  
+  SET_FOREACH(points_to, pt_to1, gen_1) {
+    cell source = copy_cell(points_to_source(pt_to1));
+    cell nc = cell_to_nowhere_sink(source);
+    approximation a = make_approximation_may();
+    points_to npt = make_points_to(source, nc, a, make_descriptor_none());
+    (void) add_arc_to_simple_pt_map(npt, gen_2);
+  }
+  ifdebug(8) print_points_to_set("gen_1",gen_2);
+
+
+
   extern list load_summary_effects(entity e);
   list el = load_summary_effects(f);
   list wpl = written_pointers_set(el);
@@ -257,7 +315,10 @@ pt_map user_call_to_points_to_fast_interprocedural(call c,
     (void) add_arc_to_simple_pt_map(npt, pts_gen);
   }
   set pt_end = new_simple_pt_map();
+  pts_kill = set_union(pts_kill, pts_kill, kill_1);
   pt_end = set_difference(pt_end, pt_in_s, pts_kill);
+  pts_gen = set_union(pts_gen, pts_gen, gen_1);
+  pts_gen = set_union(pts_gen, pts_gen, gen_2);
   pt_end = set_union(pt_end, pt_end, pts_gen);
   ifdebug(8) print_points_to_set("pt_end =", pt_end);
   points_to_graph_set(pt_out) = pt_end;
