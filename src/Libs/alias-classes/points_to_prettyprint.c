@@ -242,7 +242,14 @@ list words_points_to(points_to pt)
 
   w = gen_nconc(w, effect_words_reference(source_ref));
   w = CHAIN_SWORD(w," -> ");
-  w = gen_nconc(w, effect_words_reference(sink_ref));
+  if(!nowhere_cell_p) {
+    w = gen_nconc(w, effect_words_reference(sink_ref));
+  }
+  else {
+    string undef = "undefined" ;
+    w = gen_nconc(w, CONS(STRING,undef,NIL));
+  }
+    
   w = CHAIN_SWORD(w, approximation_may_p(ap) ? " (may)" : " (exact)" );
   return (w);
 }
@@ -312,7 +319,16 @@ text text_points_to_relation(points_to pt_to)
 
   append(" -> ");
 
-  ls = effect_words_reference(sink_r);
+  /* Change nowhere cells into undefined to comply with the C standard */
+  entity e = reference_variable(sink_r);
+  if(! entity_typed_nowhere_locations_p(e)) {
+    ls = effect_words_reference(sink_r);
+  }
+  else {
+    string undef = "undefined" ;
+    ls =  CONS(STRING,strdup(undef),NIL);
+  }
+  //  ls = effect_words_reference(sink_r);
   /* if (points_to_second_address_of_p(pt_to)) */
   /*   append("&"); */
 
