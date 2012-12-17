@@ -1,5 +1,9 @@
 /* Example for Section 1.2.5, liberation d'une zone memoire, chapitre
  * interprocedural. 
+ *
+ * Modified version: the formal parameter p is written by pointer_free
+ * after free is called. Function pointer_free does free the bucket
+ * pointed by p and generates a memory leak.
  */
 
 #include<stdlib.h>
@@ -9,6 +13,7 @@ typedef int * pointer;
 void pointer_free(pointer p)
 {
   free(p);
+  p = malloc(sizeof(int));
   return;
 }
 

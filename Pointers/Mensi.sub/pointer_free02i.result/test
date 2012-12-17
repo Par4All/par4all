@@ -1,0 +1,61 @@
+
+INLINING "pointer_free"
+
+int main(void)
+{
+   pointer p1, p2;
+   p1 = malloc(sizeof(int));
+   p2 = p1;
+   p1 = malloc(sizeof(int));
+   free(p1);
+
+   return;
+}
+
+POINTS-TO for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   pointer p1, p2;
+
+// Points To:
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
+
+   p1 = malloc(sizeof(int));
+
+// Points To:
+// p1 -> *HEAP*_l_4 , MAY
+// p2 -> undefined , EXACT
+
+   p2 = p1;
+
+// Points To:
+// p1 -> *HEAP*_l_4 , MAY
+// p2 -> *HEAP*_l_4 , MAY
+
+   p1 = malloc(sizeof(int));
+
+// Points To:
+// p1 -> *HEAP*_l_6 , MAY
+// p2 -> *HEAP*_l_4 , MAY
+
+   free(p1);
+
+// Points To:
+// p1 -> undefined , EXACT
+// p2 -> *HEAP*_l_4 , MAY
+
+
+   return;
+}
+unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
