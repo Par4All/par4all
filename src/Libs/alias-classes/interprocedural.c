@@ -131,7 +131,7 @@ points_to_graph user_call_to_points_to(call c,
     /* Using memory effects does not simplify the points-to analysis,
        which is a preliminary analusis wrt memory effects */
     if(interprocedural_points_to_analysis_p()) {
-      pt_out = user_call_to_points_to_interprocedural(c, pt_in, el);
+      pt_out = user_call_to_points_to_interprocedural(c, pt_in);
     }
     else if(fast_interprocedural_points_to_analysis_p()) {
       pt_out = user_call_to_points_to_fast_interprocedural(c, pt_in, el);
@@ -303,8 +303,7 @@ pt_map user_call_to_points_to_fast_interprocedural(call c,
   set pts_binded = compute_points_to_binded_set(f, al, pt_in_s);
   ifdebug(8) print_points_to_set("pt_binded", pts_binded);
   set bm = points_to_binding(fpcl, pt_in_callee, pts_binded);
-  set pts_kill = compute_points_to_kill_set(wpl, pt_in_s, fpcl,
-					    pt_in_callee, pts_binded, bm);
+  set pts_kill = compute_points_to_kill_set(wpl, pt_in_s, bm);
   ifdebug(8) print_points_to_set("pts_kill", pts_kill);
   set pts_gen = new_simple_pt_map();
   SET_FOREACH(points_to, pt, pts_kill) {
@@ -1159,8 +1158,8 @@ static set lower_points_to_approximations_according_to_write_effects(set pt_end,
  *
  */
 pt_map user_call_to_points_to_interprocedural(call c,
-					      pt_map pt_in,
-					      list el __attribute__ ((unused)))
+					      pt_map pt_in)
+					      
 {
   pt_map pt_out = pt_in;
   pips_assert("pt_in is valid", !points_to_graph_bottom(pt_in));
@@ -1262,10 +1261,7 @@ pt_map user_call_to_points_to_interprocedural(call c,
       set c_pt_in_s = points_to_graph_set(points_to_context_statement_in());
       c_pt_in_s = set_union(c_pt_in_s, c_pt_in_s, pt_in_s);
 
-      set pts_kill = compute_points_to_kill_set(wpl, c_pt_in_s, fpcl,
-						pt_in_callee_filtered,
-						pts_binded,
-						translation);
+      set pts_kill = compute_points_to_kill_set(wpl, c_pt_in_s, translation);
       /* Implicitly written pointers imply some arc removals: free(),
 	 tests and exits. */
       add_implicitly_killed_arcs_to_kill_set(pts_kill, wpl, c_pt_in_s,
@@ -1277,11 +1273,8 @@ pt_map user_call_to_points_to_interprocedural(call c,
       // FI: c_pr_in_s is probably pt_{caller} in the dissertation
       pt_end = set_difference(pt_end, c_pt_in_s, pts_kill);
 
-      set pts_gen = compute_points_to_gen_set(fpcl,
-					      pt_out_callee_filtered,
+      set pts_gen = compute_points_to_gen_set(pt_out_callee_filtered,
 					      wpl,
-					      pt_in_callee_filtered,
-					      pts_binded,
 					      translation, f);
 
       pips_assert("pts_gen is consistent", consistent_points_to_set(pts_gen));
@@ -1389,9 +1382,6 @@ pt_map user_call_to_points_to_intraprocedural(call c,
  */ 
 set compute_points_to_kill_set(list written,
 			       set pt_caller,
-			       list args __attribute__ ((unused)),
-			       set pt_in __attribute__ ((unused)),
-			       set pt_binded __attribute__ ((unused)),
 			       set translation)
 {
   set kill = new_simple_pt_map(); 	
@@ -1553,11 +1543,8 @@ list points_to_cells_translation(list cl, set bm, entity f)
 
 /* Translate the out set in the scope of the caller using the binding
    information */
-set compute_points_to_gen_set(list args __attribute__ ((unused)),
-			      set pt_out,
+set compute_points_to_gen_set(set pt_out,
 			      list Written,
-			      set pt_in __attribute__ ((unused)),
-			      set pt_binded __attribute__ ((unused)),
 			      set translation,
 			      entity f)
 {
