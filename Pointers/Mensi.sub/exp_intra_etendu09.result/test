@@ -37,7 +37,7 @@ POINTS-TO
 
 
 // Points To OUT:
-// _p_1.next -> _p_1_2__1 , MAY
+// _p_1.next -> _p_1_2__1 , EXACT
 // _p_1_2__1.next -> _p_1_2__1 , MAY
 
 int count(list *p)
@@ -48,6 +48,8 @@ int count(list *p)
    int i = 0;
 
 // Points To:
+// _p_1.next -> _p_1_2__1 , EXACT
+// _p_1_2__1.next -> _p_1_2__1 , MAY
 // p -> _p_1 , EXACT
 
    if (p!=(void *) 0) {
@@ -65,6 +67,7 @@ int count(list *p)
 
 // Points To:
 // _p_1.next -> _p_1_2__1 , EXACT
+// _p_1_2__1.next -> _p_1_2__1 , MAY
 // p -> _p_1_2__1 , EXACT
 
       if (p!=(void *) 0) {
@@ -85,7 +88,7 @@ int count(list *p)
    }
 
 // Points To:
-// _p_1.next -> _p_1_2__1 , MAY
+// _p_1.next -> _p_1_2__1 , EXACT
 // _p_1_2__1.next -> _p_1_2__1 , MAY
 // p -> *NULL_POINTER* , MAY
 // p -> _p_1_2__1 , MAY
@@ -93,7 +96,7 @@ int count(list *p)
    return i;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 int count(list *p)
 {
@@ -121,7 +124,7 @@ int count(list *p)
    return i;
 }
 
-CUMULATED  EFFECTS WITH POINTS TO
+CUMULATED EFFECTS WITH POINTS TO
 
 //             <may be read   >: _p_1.next _p_1_2__1.next
 //             <    is read   >: p

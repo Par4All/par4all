@@ -94,7 +94,7 @@ int foo(int **p, int *q)
    return j;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 int foo(int **p, int *q)
 {

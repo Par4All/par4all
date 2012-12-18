@@ -54,7 +54,7 @@ int main()
    return 0;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 int main()
 {

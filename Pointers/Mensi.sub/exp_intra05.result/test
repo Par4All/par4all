@@ -48,7 +48,7 @@ int main()
    return 0;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 int main()
 {
@@ -63,7 +63,7 @@ int main()
    return 0;
 }
 
-CUMULATED  EFFECTS WITH POINTS TO
+CUMULATED EFFECTS WITH POINTS TO
 
 int main()
 {

@@ -97,7 +97,7 @@ int cse_wpt01()
    // END BLOCK
 }
 
-PROPER  EFFECTS WITH POINTS TO
+proper effects with points-to
 
 int cse_wpt01()
 {

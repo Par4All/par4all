@@ -13,30 +13,30 @@ echo
 echo PROPER  EFFECTS 
 echo
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[foo]
 
 
 echo 
 echo POINTS-TO
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[foo]
 
 
 echo 
-echo PROPER  EFFECTS WITH POINTS TO
+echo proper effects with points-to
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[foo]
 
 
 echo 
-echo CUMULATED  EFFECTS WITH POINTS TO
+echo cumulated effects with points-to
 echo
 activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[foo]
 
 
 

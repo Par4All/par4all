@@ -18,7 +18,7 @@ activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[conditional_free]
 
 echo 
-echo PROPER  EFFECTS WITH POINTS TO
+echo proper effects with points-to
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
@@ -26,7 +26,7 @@ display PRINTED_FILE[conditional_free]
 
 
 echo 
-echo CUMULATED  EFFECTS WITH POINTS TO
+echo cumulated  effects with points-to
 echo
 activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_CUMULATED_EFFECTS

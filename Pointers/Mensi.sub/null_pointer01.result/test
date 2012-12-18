@@ -58,7 +58,7 @@ int main(void)
    return i+j+k;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 int main(void)
 {
@@ -89,7 +89,7 @@ int main(void)
    return i+j+k;
 }
 
-CUMULATED  EFFECTS WITH POINTS TO
+CUMULATED EFFECTS WITH POINTS TO
 
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]

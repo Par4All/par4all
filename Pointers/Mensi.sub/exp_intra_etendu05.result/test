@@ -169,7 +169,7 @@ list * initialize()
    return l;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 list * initialize()
 {

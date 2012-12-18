@@ -56,7 +56,7 @@ void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
    return;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+proper effects with points-to
 
 void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
 {
@@ -78,7 +78,7 @@ void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
    return;
 }
 
-CUMULATED  EFFECTS WITH POINTS TO
+cumulated  effects with points-to
 
 //             <may be read   >: p _MALLOC_EFFECTS:_MALLOC_
 //             <may be written>: _MALLOC_EFFECTS:_MALLOC_

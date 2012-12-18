@@ -2,38 +2,6 @@
 POINTS TO for swap01
 
 
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   int i = 1, j = 2, z = 3, *pi = &i, *pj = &j, *pz = &z, **ppi = &pi, **ppj = &pj;
-
-// Points To:
-// pi -> i , EXACT
-// pj -> j , EXACT
-// ppi -> pi , EXACT
-// ppj -> pj , EXACT
-// pz -> z , EXACT
-
-   swap01(ppi, ppj);
-
-// Points To:
-// pi -> j , EXACT
-// pj -> i , EXACT
-// ppi -> pi , EXACT
-// ppj -> pj , EXACT
-// pz -> z , EXACT
-
-
-   return 0;
-}
-
 // Points To IN:
 // _p_1 -> _p_1_1 , EXACT
 // _q_2 -> _q_2_2 , EXACT
@@ -82,18 +50,8 @@ void swap01(int **p, int **q)
    return;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
-int main()
-{
-//             <    is written>: i j pi pj ppi ppj pz z
-   int i = 1, j = 2, z = 3, *pi = &i, *pj = &j, *pz = &z, **ppi = &pi, **ppj = &pj;
-//             <    is read   >: pj ppi ppj
-//             <    is written>: pi pj
-   swap01(ppi, ppj);
-
-   return 0;
-}
 void swap01(int **p, int **q)
 {
 //             <    is read   >: _p_1 p
@@ -107,22 +65,9 @@ void swap01(int **p, int **q)
    *q = pt;
    return;
 }
-void swap01(int **p, int **q);
 
-int main();
+CUMULATED EFFECTS WITH POINTS TO
 
-CUMULATED  EFFECTS WITH POINTS TO
-
-int main()
-{
-//             <    is written>: i j pi pj ppi ppj pz z
-   int i = 1, j = 2, z = 3, *pi = &i, *pj = &j, *pz = &z, **ppi = &pi, **ppj = &pj;
-//             <    is read   >: pj ppi ppj
-//             <    is written>: pi pj
-   swap01(ppi, ppj);
-
-   return 0;
-}
 //             <    is read   >: _q_2 p q
 //             <    is written>: _p_1 _q_2
 void swap01(int **p, int **q)
@@ -138,44 +83,9 @@ void swap01(int **p, int **q)
    *q = pt;
    return;
 }
-void swap01(int **p, int **q);
-
-int main();
 
 POINTS TO for swap01
 
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   int i = 1, j = 2, z = 3, *pi = &i, *pj = &j, *pz = &z, **ppi = &pi, **ppj = &pj;
-
-// Points To:
-// pi -> i , EXACT
-// pj -> j , EXACT
-// ppi -> pi , EXACT
-// ppj -> pj , EXACT
-// pz -> z , EXACT
-
-   swap01(ppi, ppj);
-
-// Points To:
-// pi -> j , EXACT
-// pj -> i , EXACT
-// ppi -> pi , EXACT
-// ppj -> pj , EXACT
-// pz -> z , EXACT
-
-
-   return 0;
-}
 
 // Points To IN:
 // _p_1 -> _p_1_1 , EXACT
@@ -224,7 +134,44 @@ void swap01(int **p, int **q)
 
    return;
 }
+
+POINTS TO for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i = 1, j = 2, z = 3, *pi = &i, *pj = &j, *pz = &z, **ppi = &pi, **ppj = &pj;
+
+// Points To:
+// pi -> i , EXACT
+// pj -> j , EXACT
+// ppi -> pi , EXACT
+// ppj -> pj , EXACT
+// pz -> z , EXACT
+
+   swap01(ppi, ppj);
+
+// Points To:
+// pi -> j , EXACT
+// pj -> i , EXACT
+// ppi -> pi , EXACT
+// ppj -> pj , EXACT
+// pz -> z , EXACT
+
+
+   return 0;
+}
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active
 C_PARSER[main] (simplify_C_expression) Variable "i" is probably used before it is defined
 C_PARSER[main] (simplify_C_expression) Variable "j" is probably used before it is defined
 C_PARSER[main] (simplify_C_expression) Variable "z" is probably used before it is defined
-unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

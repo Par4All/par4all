@@ -1,5 +1,5 @@
 
-POINTS TO for tableau_dynamique
+POINTS TO for "allocate_array"
 
 
 // Points To IN:
@@ -23,6 +23,9 @@ void allocate_array(parray_t pa)
 
    return;
 }
+
+POINTS TO for "init_array"
+
 
 // Points To IN:
 // pa -> _pa_1 , EXACT
@@ -52,6 +55,9 @@ void init_array(parray_t pa)
 
    return;
 }
+
+POINTS TO for "main"
+
 
 // Points To IN: none
 
@@ -84,26 +90,8 @@ int main()
    return 0;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
-void allocate_array(parray_t pa)
-{
-//             <    is read   >: _pa_1.dim pa _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _pa_1.data _MALLOC_EFFECTS:_MALLOC_
-   pa->data = (float *) malloc(pa->dim*sizeof(float));
-   return;
-}
-void init_array(parray_t pa)
-{
-   int i;
-//             <    is read   >: pa
-//             <    is written>: i
-   for(i = 0; i <= pa->dim-1; i += 1)
-//             <    is read   >: _pa_1.data _pa_1.dim i pa
-      (pa->data)[i] = (float) i;
-
-   return;
-}
 int main()
 {
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
@@ -121,31 +109,8 @@ int main()
    return 0;
 }
 
-CUMULATED  EFFECTS WITH POINTS TO
+CUMULATED EFFECTS WITH POINTS TO
 
-//             <    is read   >: _pa_1.dim pa _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _pa_1.data _MALLOC_EFFECTS:_MALLOC_
-void allocate_array(parray_t pa)
-{
-//             <    is read   >: _pa_1.dim pa _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _pa_1.data _MALLOC_EFFECTS:_MALLOC_
-   pa->data = (float *) malloc(pa->dim*sizeof(float));
-   return;
-}
-//             <may be read   >: _pa_1.data _pa_1.dim
-//             <    is read   >: pa
-void init_array(parray_t pa)
-{
-   int i;
-//             <may be read   >: _pa_1.data _pa_1.dim i
-//             <    is read   >: pa
-//             <    is written>: i
-   for(i = 0; i <= pa->dim-1; i += 1)
-//             <    is read   >: _pa_1.data _pa_1.dim i pa
-      (pa->data)[i] = (float) i;
-
-   return;
-}
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 int main()
@@ -164,88 +129,5 @@ int main()
 
    return 0;
 }
-
-POINTS TO for tableau_dynamique
-
-
-// Points To IN:
-// pa -> _pa_1 , EXACT
-
-
-// Points To OUT:
-// _pa_1.data -> *HEAP*_l_7[0] , MAY
-
-void allocate_array(parray_t pa)
-{
-
-// Points To:
-// pa -> _pa_1 , EXACT
-
-   pa->data = (float *) malloc(pa->dim*sizeof(float));
-
-// Points To:
-// _pa_1.data -> *HEAP*_l_7[0] , MAY
-// pa -> _pa_1 , EXACT
-
-   return;
-}
-
-// Points To IN:
-// pa -> _pa_1 , EXACT
-
-
-// Points To OUT: none
-
-void init_array(parray_t pa)
-{
-
-// Points To: none
-
-   int i;
-
-// Points To: none
-
-   for(i = 0; i <= pa->dim-1; i += 1)
-
-// Points To:
-// pa -> _pa_1 , EXACT
-
-      (pa->data)[i] = (float) i;
-
-// Points To:
-// pa -> _pa_1 , EXACT
-
-
-   return;
-}
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   parray_t ma = (parray_t) malloc(sizeof(darray_t));
-
-// Points To:
-// ma -> *HEAP*_l_20 , MAY
-
-   allocate_array(ma);
-
-// Points To:
-// *HEAP*_l_20.data -> allocate_array:*HEAP*_l_7[0] , MAY
-// ma -> *HEAP*_l_20 , MAY
-
-   init_array(ma);
-
-// Points To:
-// *HEAP*_l_20.data -> allocate_array:*HEAP*_l_7[0] , MAY
-// ma -> *HEAP*_l_20 , MAY
-
-
-   return 0;
-}
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active

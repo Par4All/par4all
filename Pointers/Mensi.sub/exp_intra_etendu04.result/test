@@ -101,7 +101,7 @@ int count(liste *p)
    return i;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 int count(liste *p)
 {

@@ -49,7 +49,7 @@ int exemple01()
    return a;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+proper effects with points-to
 
 int exemple01()
 {

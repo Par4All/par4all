@@ -42,7 +42,7 @@ void pointer01(int n, float *p, float *q)
       p[i] = q[i];                                                      /*0010*/
 }
 
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 void pointer01(int n, float *p, float *q)
 {

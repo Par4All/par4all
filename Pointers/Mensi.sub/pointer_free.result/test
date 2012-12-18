@@ -1,5 +1,5 @@
 
-POINTS TO for pointer_free
+POINTS TO for "alloc_pointer"
 
 
 // Points To IN: none
@@ -26,45 +26,8 @@ pointer alloc_pointer(int v)
    return p;
 }
 
-// Points To IN: none
+POINTS TO for "pointer_free"
 
-
-// Points To OUT: none
-
-int main(void)
-{
-
-// Points To: none
-
-   pointer p1, p2;
-
-// Points To:
-// p1 -> undefined , EXACT
-// p2 -> undefined , EXACT
-
-   
-   // could differentiate allocs based on call path?
-   p1 = alloc_pointer(13);
-
-// Points To:
-// p1 -> alloc_pointer:*HEAP*_l_7 , MAY
-// p2 -> undefined , EXACT
-
-   p2 = p1;
-
-// Points To:
-// p1 -> alloc_pointer:*HEAP*_l_7 , MAY
-// p2 -> alloc_pointer:*HEAP*_l_7 , MAY
-
-   pointer_free(p1);
-
-// Points To:
-// p1 -> undefined , EXACT
-// p2 -> alloc_pointer:*HEAP*_l_7 , MAY
-
-
-   return;
-}
 
 // Points To IN:
 // p -> _p_1 , EXACT
@@ -87,199 +50,8 @@ void pointer_free(pointer p)
    return;
 }
 
-// Points To IN: none
+POINTS TO for "main"
 
-
-// Points To OUT: none
-
-//#include<stdlib.h>
-
-// Points To: none
-
-typedef int *pointer;
-
-// should catch that returned value is malloc'ed there
-
-// Points To: none
-
-pointer alloc_pointer(int v);
-
-
-// Points To: none
-
-void pointer_free(pointer p);
-
-
-// Points To: none
-
-int main(void);
-
-PROPER  EFFECTS WITH POINTS TO
-
-pointer alloc_pointer(int v)
-{
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-   pointer p = malloc(sizeof(int));
-//             <may be written>: *HEAP*_l_7
-//             <    is read   >: p v
-   *p = v;
-//             <    is read   >: p
-   return p;
-}
-int main(void)
-{
-   pointer p1, p2;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
-   
-   // could differentiate allocs based on call path?
-   p1 = alloc_pointer(13);
-//             <    is read   >: p1
-//             <    is written>: p2
-   p2 = p1;
-//             <    is read   >: p1 _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   pointer_free(p1);
-
-   return;
-}
-void pointer_free(pointer p)
-{
-//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   free(p);
-   return;
-}
-//#include<stdlib.h>
-typedef int *pointer;
-
-// should catch that returned value is malloc'ed there
-pointer alloc_pointer(int v);
-
-void pointer_free(pointer p);
-
-int main(void);
-
-CUMULATED  EFFECTS WITH POINTS TO
-
-//             <    is read   >: v _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-pointer alloc_pointer(int v)
-{
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-   pointer p = malloc(sizeof(int));
-//             <may be written>: *HEAP*_l_7
-//             <    is read   >: p v
-   *p = v;
-//             <    is read   >: p
-   return p;
-}
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-int main(void)
-{
-   pointer p1, p2;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
-   
-   // could differentiate allocs based on call path?
-   p1 = alloc_pointer(13);
-//             <    is read   >: p1
-//             <    is written>: p2
-   p2 = p1;
-//             <    is read   >: p1 _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   pointer_free(p1);
-
-   return;
-}
-//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-void pointer_free(pointer p)
-{
-//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   free(p);
-   return;
-}
-//#include<stdlib.h>
-typedef int *pointer;
-
-// should catch that returned value is malloc'ed there
-pointer alloc_pointer(int v);
-
-void pointer_free(pointer p);
-
-int main(void);
-
-POINTS TO for pointer_free
-
-
-// Points To IN: none
-
-
-// Points To OUT:
-// alloc_pointer -> *HEAP*_l_7 , MAY
-
-pointer alloc_pointer(int v)
-{
-
-// Points To: none
-
-   pointer p = malloc(sizeof(int));
-
-// Points To:
-// p -> *HEAP*_l_7 , MAY
-
-   *p = v;
-
-// Points To:
-// p -> *HEAP*_l_7 , MAY
-
-   return p;
-}
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main(void)
-{
-
-// Points To: none
-
-   pointer p1, p2;
-
-// Points To:
-// p1 -> undefined , EXACT
-// p2 -> undefined , EXACT
-
-   
-   // could differentiate allocs based on call path?
-   p1 = alloc_pointer(13);
-
-// Points To:
-// p1 -> alloc_pointer:*HEAP*_l_7 , MAY
-// p2 -> undefined , EXACT
-
-   p2 = p1;
-
-// Points To:
-// p1 -> alloc_pointer:*HEAP*_l_7 , MAY
-// p2 -> alloc_pointer:*HEAP*_l_7 , MAY
-
-   pointer_free(p1);
-
-// Points To:
-// p1 -> undefined , EXACT
-// p2 -> alloc_pointer:*HEAP*_l_7 , MAY
-
-
-   return;
-}
 
 // Points To IN:
 // p -> _p_1 , EXACT
@@ -302,29 +74,46 @@ void pointer_free(pointer p)
    return;
 }
 
-// Points To IN: none
+PROPER EFFECTS WITH POINTS TO
 
+int main(void)
+{
+   pointer p1, p2;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
+   
+   // could differentiate allocs based on call path?
+   p1 = alloc_pointer(13);
+//             <    is read   >: p1
+//             <    is written>: p2
+   p2 = p1;
+//             <    is read   >: p1 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   pointer_free(p1);
 
-// Points To OUT: none
+   return;
+}
 
-//#include<stdlib.h>
+CUMULATED EFFECTS WITH POINTS TO
 
-// Points To: none
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+int main(void)
+{
+   pointer p1, p2;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
+   
+   // could differentiate allocs based on call path?
+   p1 = alloc_pointer(13);
+//             <    is read   >: p1
+//             <    is written>: p2
+   p2 = p1;
+//             <    is read   >: p1 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   pointer_free(p1);
 
-typedef int *pointer;
-
-// should catch that returned value is malloc'ed there
-
-// Points To: none
-
-pointer alloc_pointer(int v);
-
-
-// Points To: none
-
-void pointer_free(pointer p);
-
-
-// Points To: none
-
-int main(void);
+   return;
+}
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active

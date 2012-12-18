@@ -22,7 +22,7 @@ void msg_error(char *msg)
    exit(1);
 }
 
-Proper effects with points-to for ""
+Proper effects with points-to for "msg_error"
 
 void msg_error(char *msg)
 {
@@ -34,7 +34,7 @@ void msg_error(char *msg)
    exit(1);
 }
 
-Cumulated effects with points-to for ""
+Cumulated effects with points-to for "msg_error"
 
 //             <may be read   >: _msg_1[*] stdout[0]
 //             <may be written>: stdout[0]
@@ -50,7 +50,7 @@ void msg_error(char *msg)
    exit(1);
 }
 
-Points-to for ""
+Points-to for "main"
 
 
 // Points To IN: none
@@ -82,7 +82,7 @@ int main()
    return 0;
 }
 
-Proper effects with points-to for ""
+Proper effects with points-to for "main"
 
 int main()
 {
@@ -100,7 +100,7 @@ int main()
    return 0;
 }
 
-Cumulated effects with points-to for ""
+Cumulated effects with points-to for "main"
 
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]

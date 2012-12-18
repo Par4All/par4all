@@ -68,7 +68,7 @@ int count(list *p)
    return i;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 int count(list *p)
 {

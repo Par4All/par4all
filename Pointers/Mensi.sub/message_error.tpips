@@ -19,35 +19,35 @@ activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[msg_error]
 
 echo 
-echo Proper effects with points-to for ""
+echo Proper effects with points-to for "msg_error"
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[msg_error]
 
 echo 
-echo Cumulated effects with points-to for ""
+echo Cumulated effects with points-to for "msg_error"
 echo
 activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[msg_error]
 
 echo
-echo Points-to for ""
+echo Points-to for "main"
 echo
 #activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[main]
 
 echo 
-echo Proper effects with points-to for ""
+echo Proper effects with points-to for "main"
 echo
 #activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[main]
 
 echo 
-echo Cumulated effects with points-to for ""
+echo Cumulated effects with points-to for "main"
 echo
 #activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_CUMULATED_EFFECTS

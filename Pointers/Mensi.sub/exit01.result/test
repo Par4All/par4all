@@ -25,30 +25,7 @@ int * exit01(int *p)
    return p;
 }
 
-// Points To IN: none
-
-
-// Points To OUT: unreachable
-
-int main()
-{
-
-// Points To: none
-
-   int *q, *r;
-
-// Points To:
-// q -> undefined , EXACT
-// r -> undefined , EXACT
-
-   q = exit01(r);
-
-// Points To: unreachable
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
+proper effects with points-to
 
 int * exit01(int *p)
 {
@@ -59,16 +36,8 @@ int * exit01(int *p)
    exit(0);
    return p;
 }
-int main()
-{
-   int *q, *r;
-//             <    is read   >: r _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: q _MALLOC_EFFECTS:_MALLOC_
-   q = exit01(r);
-   return 0;
-}
 
-CUMULATED  EFFECTS WITH POINTS TO
+cumulated effects with points-to
 
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
@@ -80,16 +49,6 @@ int * exit01(int *p)
    p = (int *) malloc(4*sizeof(int));
    exit(0);
    return p;
-}
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-int main()
-{
-   int *q, *r;
-//             <    is read   >: r _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: q _MALLOC_EFFECTS:_MALLOC_
-   q = exit01(r);
-   return 0;
 }
 
 POINTS TO for exit01
@@ -118,6 +77,9 @@ int * exit01(int *p)
    return p;
 }
 
+POINTS TO for exit01
+
+
 // Points To IN: none
 
 
@@ -140,7 +102,7 @@ int main()
 
    return 0;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function "exit01" has no side effect on its formal context via pointer variables.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function "exit01" has no side effect on its formal context via pointer variables.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function "exit01" has no side effect on its formal context via pointer variables.
 unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function "exit01" has no side effect on its formal context via pointer variables.

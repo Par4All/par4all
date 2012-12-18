@@ -28,57 +28,7 @@ void chain(ilp_t c1, ilp_t c2)
    return;
 }
 
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   ilp_t x1 = (ilp_t) malloc(sizeof(il_t));
-
-// Points To:
-// x1 -> *HEAP*_l_17 , MAY
-
-   ilp_t x2 = (ilp_t) malloc(sizeof(il_t));
-
-// Points To:
-// x1 -> *HEAP*_l_17 , MAY
-// x2 -> *HEAP*_l_18 , MAY
-
-   x1->next = (void *) 0;
-
-// Points To:
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
-// x1 -> *HEAP*_l_17 , MAY
-// x2 -> *HEAP*_l_18 , MAY
-
-   x2->next = (void *) 0;
-
-// Points To:
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
-// *HEAP*_l_18.next -> *NULL_POINTER* , MAY
-// x1 -> *HEAP*_l_17 , MAY
-// x2 -> *HEAP*_l_18 , MAY
-
-
-   chain(x1, x2);
-
-// Points To:
-// *HEAP*_l_17.next -> *HEAP*_l_18 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
-// *HEAP*_l_18.next -> *NULL_POINTER* , MAY
-// x1 -> *HEAP*_l_17 , MAY
-// x2 -> *HEAP*_l_18 , MAY
-
-
-   return 0;
-}
-
-PROPER  EFFECTS WITH POINTS TO
+proper effects with points-to
 
 void chain(ilp_t c1, ilp_t c2)
 {
@@ -88,29 +38,8 @@ void chain(ilp_t c1, ilp_t c2)
 
    return;
 }
-int main()
-{
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: x1 _MALLOC_EFFECTS:_MALLOC_
-   ilp_t x1 = (ilp_t) malloc(sizeof(il_t));
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: x2 _MALLOC_EFFECTS:_MALLOC_
-   ilp_t x2 = (ilp_t) malloc(sizeof(il_t));
-//             <may be written>: *HEAP*_l_17.next
-//             <    is read   >: x1
-   x1->next = (void *) 0;
-//             <may be written>: *HEAP*_l_18.next
-//             <    is read   >: x2
-   x2->next = (void *) 0;
-//             <    is read   >: x1 x2
-//             <    is written>: *HEAP*_l_17.next
 
-   chain(x1, x2);
-
-   return 0;
-}
-
-CUMULATED  EFFECTS WITH POINTS TO
+cumulated effects with points-to
 
 //             <    is read   >: c1 c2
 //             <    is written>: _c1_1.next
@@ -122,31 +51,8 @@ void chain(ilp_t c1, ilp_t c2)
 
    return;
 }
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-int main()
-{
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: x1 _MALLOC_EFFECTS:_MALLOC_
-   ilp_t x1 = (ilp_t) malloc(sizeof(il_t));
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: x2 _MALLOC_EFFECTS:_MALLOC_
-   ilp_t x2 = (ilp_t) malloc(sizeof(il_t));
-//             <may be written>: *HEAP*_l_17.next
-//             <    is read   >: x1
-   x1->next = (void *) 0;
-//             <may be written>: *HEAP*_l_18.next
-//             <    is read   >: x2
-   x2->next = (void *) 0;
-//             <    is read   >: x1 x2
-//             <    is written>: *HEAP*_l_17.next
 
-   chain(x1, x2);
-
-   return 0;
-}
-
-POINTS TO for chain
+POINTS-TO for "chain"
 
 
 // Points To IN:
@@ -175,6 +81,9 @@ void chain(ilp_t c1, ilp_t c2)
    return;
 }
 
+POINTS-TO for "main"
+
+
 // Points To IN: none
 
 
@@ -224,3 +133,4 @@ int main()
 
    return 0;
 }
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active

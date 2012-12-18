@@ -14,6 +14,30 @@ int main(void)
 POINTS TO for pointer_free01
 
 
+// Points To IN:
+// p -> _p_1 , EXACT
+
+
+// Points To OUT:
+// p -> undefined , EXACT
+
+void pointer_free(pointer p)
+{
+
+// Points To:
+// p -> _p_1 , EXACT
+
+   free(p);
+
+// Points To:
+// p -> undefined , EXACT
+
+   return;
+}
+
+POINTS TO for "main"
+
+
 // Points To IN: none
 
 
@@ -52,28 +76,7 @@ int main(void)
    return;
 }
 
-// Points To IN:
-// p -> _p_1 , EXACT
-
-
-// Points To OUT:
-// p -> undefined , EXACT
-
-void pointer_free(pointer p)
-{
-
-// Points To:
-// p -> _p_1 , EXACT
-
-   free(p);
-
-// Points To:
-// p -> undefined , EXACT
-
-   return;
-}
-
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 int main(void)
 {
@@ -91,7 +94,7 @@ int main(void)
    return;
 }
 
-CUMULATED  EFFECTS WITH POINTS TO
+CUMULATED EFFECTS WITH POINTS TO
 
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
@@ -111,4 +114,5 @@ int main(void)
    return;
 }
 unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Dangling pointer "main:0`p2".

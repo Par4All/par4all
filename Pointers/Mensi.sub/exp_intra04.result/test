@@ -80,7 +80,7 @@ void foo(struct s *ps)
    return;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+proper effects with points-to
 
 void foo(struct s *ps)
 {
@@ -102,7 +102,7 @@ void foo(struct s *ps)
    return;
 }
 
-CUMULATED  EFFECTS WITH POINTS TO
+cumulated effects with points-to
 
 //             <    is read   >: _ps_1.pp1 _ps_1.pp2 ps
 //             <    is written>: _ps_1.pp1 _ps_1_1__1 _ps_1_2__1

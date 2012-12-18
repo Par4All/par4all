@@ -20,22 +20,22 @@ display PRINTED_FILE[cse_wpt01]
 echo 
 echo PROPER  EFFECTS 
 echo
-activate PROPER_EFFECTS<
+activate PROPER_EFFECTS
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[cse_wpt01]
 
 echo 
 echo POINTS-TO
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[cse_wpt01]
 
 echo 
-echo PROPER  EFFECTS WITH POINTS TO
+echo proper effects with points-to
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[cse_wpt01]
 
 echo
 echo Code after CSE

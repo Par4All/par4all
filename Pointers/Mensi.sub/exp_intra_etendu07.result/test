@@ -107,7 +107,7 @@ int main()
    *p = s;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 int main()
 {
@@ -132,7 +132,7 @@ int main()
    *p = s;
 }
 
-CUMULATED  EFFECTS WITH POINTS TO
+CUMULATED EFFECTS WITH POINTS TO
 
 int main()
 {
