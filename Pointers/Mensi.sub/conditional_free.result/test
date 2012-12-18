@@ -108,5 +108,5 @@ void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
       p = (int *) malloc(sizeof(int));
    return;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free] (points_to_function_projection) Memory cell *HEAP*_l_5 leaked.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free] (points_to_function_projection) Memory cell *HEAP*_l_7 leaked.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free] (potential_to_effective_memory_leaks) Memory cell *HEAP*_l_5 leaked.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free] (potential_to_effective_memory_leaks) Memory cell *HEAP*_l_7 leaked.

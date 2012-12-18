@@ -110,9 +110,6 @@ pointer alloc_pointer(int v);
 void pointer_free(pointer p);
 
 
-
-
-
 // Points To: none
 
 int main(void);
@@ -161,9 +158,6 @@ typedef int *pointer;
 pointer alloc_pointer(int v);
 
 void pointer_free(pointer p);
-
-
-
 
 int main(void);
 
@@ -217,9 +211,6 @@ typedef int *pointer;
 pointer alloc_pointer(int v);
 
 void pointer_free(pointer p);
-
-
-
 
 int main(void);
 
@@ -332,9 +323,6 @@ pointer alloc_pointer(int v);
 // Points To: none
 
 void pointer_free(pointer p);
-
-
-
 
 
 // Points To: none

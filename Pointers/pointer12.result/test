@@ -41,4 +41,4 @@ void pointer12(array_2D a)
 
          (a.array)[a.d2*i+j] = 0.;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer12] (points_to_function_projection) Memory cell *HEAP**ANYWHERE* leaked.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer12] (potential_to_effective_memory_leaks) Memory cell *HEAP**ANYWHERE* leaked.

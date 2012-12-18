@@ -134,6 +134,6 @@ int main()
 
    return 0;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free01] (points_to_function_projection) Memory cell *HEAP*_l_9 leaked.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free01] (points_to_function_projection) Memory cell *HEAP*_l_7 leaked.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free01] (potential_to_effective_memory_leaks) Memory cell *HEAP*_l_9 leaked.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free01] (potential_to_effective_memory_leaks) Memory cell *HEAP*_l_7 leaked.
 unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
