@@ -973,9 +973,39 @@ void points_to_translation_of_formal_parameters(list fpcl,
 	      points_to_translation_mapping_is_typed_p(translation));
 }
 
-/* add arcs of set "pt_in_s" to set "pts_kill" if their origin cell is
- * not in the list of written pointers "wpl" but is the origin of some
- * arc in "pt_out_callee_filtered".
+/* Initial comments: add arcs of set "pt_in_s" to set "pts_kill" if
+ * their origin cells are not in the list of written pointers "wpl"
+ * but is the origin of some exact arc in "pt_out_callee_filtered".
+ *
+ * Equations retrieved from the C code
+ *
+ * K = { c | \exits pt c=source(pt) !\in Written ^ |translation(source(pt))==1
+ *                  ^ atomic(translation(source(pt)) }
+ * 
+ * kill = {pt in pt_in_s | \exits c \in K translation(c)==source(pt)}
+ *
+ * K is defined in the frame of the callee and kill in the frame of the caller
+ *
+ * Examples:
+ *
+ * Indirect free of a pointed cell
+ *
+ * "main() {p = malloc(); * my_free(p);}" with "my_free(int * p) {free(p);}".
+ *
+ * p->heap in pt_caller must be removed from pt_end, hence p->heap
+ * bealongs to pt_kill
+ *
+ * Other possibilities must be linked to tests and executions errors.
+ *
+ * void foo(int * ap) {bar(ap);} 
+ *
+ * void bar(int * fp) { *p = 1;}
+ *
+ * As a result ap->_ap_1, EXACT because ap->NULL has been killed
+ *
+ * void bar(int * fp) {if(fp==NULL) exit(1); return;}
+ *
+ * The result should be the same as above.
  */
 void add_implicitly_killed_arcs_to_kill_set(set pts_kill, list wpl, set pt_in_s,
 					    set pt_out_callee_filtered,
@@ -1493,12 +1523,29 @@ list points_to_cell_translation(cell sr1, set bm, entity f)
   return new_sr_l;
 }
 
-/* Allocate a new list with the translations of the cells in cl. */
+/* Allocate a new list with the translations of the cells in cl, when
+ * their translation make sense. Effects on copied parameters are
+ * discarded.
+ */
 list points_to_cells_translation(list cl, set bm, entity f)
 {
   list tcl = NIL;
   FOREACH(CELL, c, cl) {
+    reference r = cell_any_reference(c);
+    entity v = reference_variable(r);
+    list ptcl = NIL;
+    if(formal_parameter_p(v)) {
+      type t = entity_basic_concrete_type(v);
+      if(array_type_p(t)) {
+	// Passing by reference
     list ptcl = points_to_cell_translation(c, bm, f);
+      }
+      else
+	// Passing by value
+	;
+    }
+    else
+      ptcl = points_to_cell_translation(c, bm, f);
     tcl = gen_nconc(tcl, ptcl);
   }
   return tcl;

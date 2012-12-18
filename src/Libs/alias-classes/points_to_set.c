@@ -324,7 +324,124 @@ points_to_graph points_to_cell_source_projection(points_to_graph ptg, cell c)
   return ptg;
 }
 
-/* FI: side-effects to be used explicitly in this function */
+/* All arcs in relation "g" must be removed or updated if they use the
+ * node "c".
+ *
+ * If "c" is the source of an arc, the arc must be removed and the
+ * sink is a new potential leak.
+ *
+ * If "c" is the sink of an arc, *NOWHERE*, i.e. *UNDEFINED* is the
+ * new sink. The approximation is unchanged.
+ *
+ * Since the heap model does not support a precise analysis, this is
+ * not sure. For the time being, all buckets allocated by the same
+ * statement have a unique name. So arcs pointing to one cannot be
+ * removed when another one is freed. However, since we check that no
+ * arc points to an abstract bucket before we declare a sure memory
+ * leak, this should be OK in the context of memory leaks...
+ */
+set remove_points_to_cell(cell c, set g)
+{
+  // FI: do we have to check the atomicity of the source? If it is
+  // removed, it is removed, isn'it? So it's up to the caller?
+
+  list pmll = NIL; // potential memory leak list
+  list ral = NIL; // removed arc list
+  list nal = NIL; // new arc list
+  SET_FOREACH(points_to, a, g) {
+    cell source = points_to_source(a);
+    cell sink = points_to_sink(a);
+    if(points_to_cell_equal_p(c, source)) {
+      ral = CONS(POINTS_TO, a, ral);
+      if(heap_cell_p(sink) /* && atomic_points_to_cell_p(c)*/ ) {
+	pmll = CONS(CELL, sink, pmll);
+      }
+    }
+    else if(points_to_cell_equal_p(c, sink)) {
+      type sink_t = points_to_cell_to_concrete_type(sink);
+      cell nsink =
+	get_bool_property("ALIASING_ACROSS_TYPES")?
+	make_nowhere_cell()
+	: make_typed_nowhere_cell(sink_t);
+      approximation nap = copy_approximation(points_to_approximation(a));
+      points_to na = make_points_to(copy_cell(source),
+				    nsink,
+				    nap,
+				    make_descriptor_none());
+      ral = CONS(POINTS_TO, a, ral);
+      nal = CONS(POINTS_TO, na, nal);
+    }
+  }
+
+  /* Apply the arc removals */
+  FOREACH(POINTS_TO, ra, ral)
+    remove_arc_from_simple_pt_map(ra, g);
+
+  /* Apply the arc additions */
+  FOREACH(POINTS_TO, na, nal)
+    add_arc_to_simple_pt_map(na, g);
+
+  /* Look for effective memory leaks induced by the removal */
+  list emll = potential_to_effective_memory_leaks(pmll, g);
+  if(!ENDP(emll)) {
+    /* Go down recursively... */
+    remove_points_to_cells(emll, g);
+  }
+
+  return g;
+}
+
+/* All nodes, i.e. cells, in "cl" must be removed from graph "g".
+ *
+ * graph "g" is updated by side-effects and returned.
+ */
+set remove_points_to_cells(list cl, set g)
+{
+  FOREACH(CELL, c, cl)
+    (void) remove_points_to_cell(c, g);
+  return g;
+}
+
+/* A new list, "emll", is allocated. It contains the cells in the
+ *   potential memory leak list that are unreachable in set/relation
+ * "res". Relation "res" is unchanged. List "pmll" is unchanged.
+ *
+ * FI: This is not a sufficient implementation. It fails with strongly
+ * connected components (SCC) in "res". The fixed point algorithms are
+ * likely to generate SCCs. 
+ */
+list potential_to_effective_memory_leaks(list pmll, set res)
+{
+  list emll = NIL; // Effective memory leak list
+  FOREACH(CELL, h, pmll) {
+    bool found_p = false;
+    SET_FOREACH(points_to, pt, res) {
+      cell sink = points_to_sink(pt);
+      if(points_to_cell_equal_p(h, sink)) {
+	found_p = true;
+	break;
+      }
+    }
+    if(!found_p) {
+      // FI: because of the current heap model, all arcs to a memory
+      // bucket are may arcs. We probably cannot get more than
+      // "possible" memory leak. More thinking needed.
+      // FI: Especially for sources that are not atomic...
+      pips_user_warning("Memory cell %s leaked.\n", 
+			reference_to_string(cell_any_reference(h)));
+      emll = CONS(CELL, h, emll);
+    }
+  }
+  return emll;
+}
+
+/* "pts" is the points-to relation existing at the return point of a
+ * function. Meaningless arcs in an interprocedural context must be
+ * eliminated.
+ *
+ * FI: side-effects to be used explicitly in this function
+ * For the time being a new set is allocated
+ */
 set points_to_function_projection(set pts)
 {
   set res = set_generic_make(set_private, points_to_equal_p,
@@ -360,8 +477,12 @@ set points_to_function_projection(set pts)
 	 */
 	cell sink = points_to_sink(pt);
 	if(!nowhere_cell_p(sink)) {
+	  // FI: written by Amira
 	  set_del_element(res, res, (void*)pt);
-	  if(heap_cell_p(sink) || all_heap_locations_cell_p(sink))
+	  if((heap_cell_p(sink) || all_heap_locations_cell_p(sink))
+	     // FI: we are protected by the test on v_t
+	     // The atomicity should not be an issue here
+	     && atomic_points_to_cell_p(source))
 	    pmll = CONS(CELL, sink, pmll);
 	}
       }
@@ -369,21 +490,13 @@ set points_to_function_projection(set pts)
   }
 
   /* Detect memory leaks */
-  FOREACH(CELL, h, pmll) {
-    bool found_p = false;
-    SET_FOREACH(points_to, pt, res) {
-      cell sink = points_to_sink(pt);
-      if(points_to_cell_equal_p(h, sink)) {
-	found_p = true;
-	break;
-      }
-    }
-    if(!found_p) {
-      pips_user_warning("Memory cell %s leaked.\n", 
-			reference_to_string(cell_any_reference(h)));
-    }
-  }
+  list emll = potential_to_effective_memory_leaks(pmll, res);
   gen_free_list(pmll);
+
+  /* Look recursively for more memory leaks: cells in "emll" are no
+     longer reachable */
+  res = remove_points_to_cells(emll, res);
+  gen_free_list(emll);
 
   return res;
 }
