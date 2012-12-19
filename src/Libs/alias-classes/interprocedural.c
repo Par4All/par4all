@@ -1158,11 +1158,11 @@ static set lower_points_to_approximations_according_to_write_effects(set pt_end,
  *
  */
 pt_map user_call_to_points_to_interprocedural(call c,
-					      pt_map pt_in)
+					      pt_map pt_caller)
 					      
 {
-  pt_map pt_out = pt_in;
-  pips_assert("pt_in is valid", !points_to_graph_bottom(pt_in));
+  pt_map pt_out_f = pt_caller;
+  pips_assert("pt_in is valid", !points_to_graph_bottom(pt_caller));
   entity f = call_function(c);
   list al = call_arguments(c);
   list dl = code_declarations(value_code(entity_initial(f)));
@@ -1193,26 +1193,26 @@ pt_map user_call_to_points_to_interprocedural(call c,
     extern list load_body_effects(entity e);
     list el = load_body_effects(f);
     list wpl = written_pointers_set(el);
-    set pt_in_s = points_to_graph_set(pt_in);
+    set pt_caller_s = points_to_graph_set(pt_caller);
 
     //points_to_list pts_to_in = (points_to_list)
     //db_get_memory_resource(DBR_POINTS_TO_IN, module_local_name(f), true);
    
     //list l_pt_to_in = gen_full_copy_list(points_to_list_list(pts_to_in));
-    set pt_in_callee = new_simple_pt_map();
-    pt_in_callee = set_assign_list(pt_in_callee, l_pt_to_in);
-    set pt_out_callee = new_simple_pt_map();
-    pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out);
+    set pt_in = new_simple_pt_map();
+    pt_in= set_assign_list(pt_in, l_pt_to_in);
+    set pt_out = new_simple_pt_map();
+    pt_out = set_assign_list(pt_out, l_pt_to_out);
 
     // FI: function name... set or list?
-    set pts_binded = compute_points_to_binded_set(f, al, pt_in_s);
+    set pts_binded = compute_points_to_binded_set(f, al, pt_caller_s);
     ifdebug(8) print_points_to_set("pt_binded", pts_binded);
 
     set translation = new_simple_pt_map();
     /* This is only useful when a free occurs with the callee, since
        information about formal parameters is normally projected
        out. */
-    points_to_translation_of_formal_parameters(fpcl, al, pt_in, translation);
+    points_to_translation_of_formal_parameters(fpcl, al, pt_caller, translation);
 
     /* Filter pt_in_callee according to pts_binded. For instance, a
        formal parameter can point to NULL in pt_in_callee only if it
@@ -1223,9 +1223,9 @@ pt_map user_call_to_points_to_interprocedural(call c,
        it would be useless (not clear if we can remove such an arc
        when it is a may arc...). Finally, each formal parameter must
        still point to something. */
-    set pt_in_callee_filtered =
+    set pt_in_filtered =
       filter_formal_context_according_to_actual_context(fpcl,
-							pt_in_callee,
+							pt_in,
 							pts_binded,
 							translation);
 
@@ -1244,36 +1244,36 @@ pt_map user_call_to_points_to_interprocedural(call c,
 
     if(compatible_p) {
 
-      set pt_out_callee_filtered =
+      set pt_out_filtered =
 	filter_formal_out_context_according_to_formal_in_context
-	(pt_out_callee, pt_in_callee_filtered, wpl, f);
+	(pt_out, pt_in_filtered, wpl, f);
 
       /* Explicitly written pointers imply some arc removals; pointer
 	 assignments directly or indirectly in the callee. */
-      // pt_end = set_difference(pt_end, pt_in_s, pts_kill);
+      // pt_end = set_difference(pt_end, pt_caller_s, pts_kill);
 
-      /* FI: pt_in_s may have been modified implictly because the
+      /* FI: pt_caller_s may have been modified implictly because the
        * formal context has been increased according to the needs of
-       * the callee. But pt_in_s may also have been updated by what
+       * the callee. But pt_caller_s may also have been updated by what
        * has happened prevously when analyzing the current
        * statement. See for instance Pointers/sort01.c.
        */
-      set c_pt_in_s = points_to_graph_set(points_to_context_statement_in());
-      c_pt_in_s = set_union(c_pt_in_s, c_pt_in_s, pt_in_s);
+      set c_pt_caller_s = points_to_graph_set(points_to_context_statement_in());
+      c_pt_caller_s = set_union(c_pt_caller_s, c_pt_caller_s, pt_caller_s);
 
-      set pts_kill = compute_points_to_kill_set(wpl, c_pt_in_s, translation);
+      set pts_kill = compute_points_to_kill_set(wpl, c_pt_caller_s, translation);
       /* Implicitly written pointers imply some arc removals: free(),
 	 tests and exits. */
-      add_implicitly_killed_arcs_to_kill_set(pts_kill, wpl, c_pt_in_s,
-					     pt_out_callee_filtered,
+      add_implicitly_killed_arcs_to_kill_set(pts_kill, wpl, c_pt_caller_s,
+					     pt_out_filtered,
 					     translation);
       ifdebug(8) print_points_to_set("pt_kill", pts_kill);
 
       set pt_end = new_simple_pt_map();
       // FI: c_pr_in_s is probably pt_{caller} in the dissertation
-      pt_end = set_difference(pt_end, c_pt_in_s, pts_kill);
+      pt_end = set_difference(pt_end, c_pt_caller_s, pts_kill);
 
-      set pts_gen = compute_points_to_gen_set(pt_out_callee_filtered,
+      set pts_gen = compute_points_to_gen_set(pt_out_filtered,
 					      wpl,
 					      translation, f);
 
@@ -1315,7 +1315,7 @@ pt_map user_call_to_points_to_interprocedural(call c,
       if(!ENDP(stubs)) {
 	pips_internal_error("Translation failure in pt_end.\n");
       }
-      points_to_graph_set(pt_out) = pt_end;
+      points_to_graph_set(pt_out_f) = pt_end;
     }
     else {
       pips_user_warning("Aliasing between arguments at line %d.\n"
@@ -1331,7 +1331,7 @@ pt_map user_call_to_points_to_interprocedural(call c,
 
       // pt_out = user_call_to_points_to_fast_interprocedural(c, pt_in, el);
 
-      pt_out = user_call_to_points_to_intraprocedural(c, pt_in, el);
+      pt_out_f = user_call_to_points_to_intraprocedural(c, pt_caller, el);
     }
   }
   else {
@@ -1345,11 +1345,11 @@ pt_map user_call_to_points_to_interprocedural(call c,
      the formal context of the callee, or the effect computation is
      going to fail. */
   if(out_bottom_p) {
-    clear_pt_map(pt_out);
-    points_to_graph_bottom(pt_out) = true;
+    clear_pt_map(pt_out_f);
+    points_to_graph_bottom(pt_out_f) = true;
   }
 
-  return pt_out;
+  return pt_out_f;
 }
 
 pt_map user_call_to_points_to_intraprocedural(call c,
