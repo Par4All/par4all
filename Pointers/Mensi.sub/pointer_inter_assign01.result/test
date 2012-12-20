@@ -1,0 +1,124 @@
+
+INLINING "pointer_assign01"
+
+int main(void)
+{
+   int i = 1;
+   pointer p1 = &i, p2;
+   //PIPS generated variable
+   pointer _return0;
+   _return0 = p1;
+   p2 = _return0;
+
+   return;
+}
+
+POINTS TO for pointer_inter_assign01
+
+
+// Points To IN:
+// fp -> _fp_1 , EXACT
+
+
+// Points To OUT:
+// pointer_assign01 -> _fp_1 , EXACT
+
+pointer pointer_assign01(pointer fp)
+{
+
+// Points To:
+// fp -> _fp_1 , EXACT
+
+   return fp;
+}
+
+POINTS TO for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   int i = 1;
+
+// Points To: none
+
+   pointer p1 = &i, p2;
+   //PIPS generated variable
+
+// Points To:
+// p1 -> i , EXACT
+// p2 -> undefined , EXACT
+
+   pointer _return0;
+
+// Points To:
+// _return0 -> undefined , EXACT
+// p1 -> i , EXACT
+// p2 -> undefined , EXACT
+
+   _return0 = p1;
+
+// Points To:
+// _return0 -> i , EXACT
+// p1 -> i , EXACT
+// p2 -> undefined , EXACT
+
+   p2 = _return0;
+
+// Points To:
+// _return0 -> i , EXACT
+// p1 -> i , EXACT
+// p2 -> i , EXACT
+
+
+   return;
+}
+
+PROPER EFFECTS WITH POINTS TO
+
+int main(void)
+{
+//             <    is written>: i
+   int i = 1;
+//             <    is written>: p1
+   pointer p1 = &i, p2;
+   //PIPS generated variable
+   pointer _return0;
+//             <    is read   >: p1
+//             <    is written>: _return0
+   _return0 = p1;
+//             <    is read   >: _return0
+//             <    is written>: p2
+   p2 = _return0;
+
+   return;
+}
+
+CUMULATED EFFECTS WITH POINTS TO
+
+int main(void)
+{
+//             <    is written>: i
+   int i = 1;
+//             <    is written>: p1
+   pointer p1 = &i, p2;
+   //PIPS generated variable
+   pointer _return0;
+//             <    is read   >: p1
+//             <    is written>: _return0
+   _return0 = p1;
+//             <    is read   >: _return0
+//             <    is written>: p2
+   p2 = _return0;
+
+   return;
+}
+unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active
