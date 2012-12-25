@@ -106,17 +106,18 @@ int main()
    s_t s;
 
 // Points To:
-// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s.tab -> undefined , EXACT
 
    int j;
 
 // Points To:
-// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s.tab -> undefined , EXACT
 
 
    init_s(s, 10);
 
 // Points To:
+// s.tab -> undefined , EXACT
 // stderr -> *NULL_POINTER* , MAY
 // stderr -> _stderr_[0] , MAY
 
@@ -154,6 +155,7 @@ int main()
 //             <    is read   >: s.tab stderr __IO_EFFECTS:LUNS[2]
 //             <    is written>: __IO_EFFECTS:LUNS[2]
    fprintf(stderr, "In main, s.tab=%p\n", s.tab);
+//             <    is read   >: s.max s.tab
 
    compute_s(s, 10);
    
@@ -177,13 +179,10 @@ Warnings (A memory leak should be detected when exiting init_s)
 
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[init_s] (CSafeSizeOfArray) Varying size for array "pointer_modif04!:_IO_FILE^_unused2"
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[init_s] (CSafeSizeOfArray) Not yet supported properly by PIPS
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[init_s] (points_to_function_projection) Memory cell *HEAP*_l_14[0] leaked.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[init_s] (potential_to_effective_memory_leaks) Memory cell *HEAP*_l_14[0] leaked.
 unknown[unknown] (activate_phase) Rule `PROPER_EFFECTS_WITH_POINTS_TO' already active
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Assignment of an undefined value at line 34.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) 
-Uninitialized or null pointer dereferenced: Sink missing for a source based on "s".
-Update points-to property POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING and/or POINTS_TO_UNINITIALIZED_NULL_DEREFERENCING according to needs.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (binary_intrinsic_call_to_points_to_sinks) Some kind of execution error has been encountered.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value at line 34.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function "compute_s" has no side effect on its formal context via pointer variables.
 unknown[unknown] (activate_phase) Rule `PROPER_EFFECTS_WITH_POINTS_TO' already active
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Assignment of an undefined value at line 34.
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) 

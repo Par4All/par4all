@@ -7,7 +7,8 @@ Points-to for call22
 // q[4] -> _q_1[4][0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// q[4] -> _q_1[4][0] , EXACT
 
 void call22(int *q[10])
 {
@@ -59,32 +60,33 @@ int main()
    int *ap[10];
 
 // Points To:
-// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ap[*] -> undefined , EXACT
 
    int i;
 
 // Points To:
-// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ap[*] -> undefined , EXACT
 
 
    for(i = 0; i <= 9; i += 1)
 
 // Points To:
-// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap[*] -> undefined , MAY
 // ap[*] -> a[*] , MAY
 
       ap[i] = &a[i];
 
 // Points To:
-// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap[*] -> undefined , MAY
 // ap[*] -> a[*] , MAY
 
 
    call22(ap);
 
 // Points To:
-// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// ap[*] -> undefined , MAY
 // ap[*] -> a[*] , MAY
+// ap[4] -> a[*] , EXACT
 
    return 0;
 }

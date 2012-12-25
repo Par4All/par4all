@@ -33,7 +33,7 @@ echo
 echo Proper effects with points-to for "compute_s"
 echo
 
-activate PROPER_EFFECTS_WITH_POINTS_TO
+#activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE [compute_s]
 
@@ -48,19 +48,22 @@ echo
 echo Proper effects with points-to for "main"
 echo
 
-activate PROPER_EFFECTS_WITH_POINTS_TO
+#activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE [main]
-
 
 activate PRINT_CHAINS_GRAPH
 display DG_FILE[main]
 
-
 close
 
 echo
-echo Warnings (A memory leak should be detected when exiting init_s)
+echo Warnings:
+echo
+echo  1. A memory leak should be detected when exiting init_s.
+echo
+echo  2. Because struct s is passed by copy, it is left uninitialized
+echo     and the program core dumps
 echo
 shell cat $WSPACE.database/Warnings
 

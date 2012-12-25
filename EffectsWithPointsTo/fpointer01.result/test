@@ -14,7 +14,9 @@ Points-to for fpointer01
 void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_stream), int *col, int indent, int *nbout)
 {
 
-// Points To: none
+// Points To:
+// nbout -> *NULL_POINTER* , MAY
+// nbout -> _nbout_6[0] , MAY
 
    if (c=='\n'||c=='\r')
 
@@ -64,7 +66,8 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 
 // Points To:
 // col -> _col_4[0] , EXACT
-// nbout -> _nbout_6[0] , EXACT
+// nbout -> *NULL_POINTER* , MAY
+// nbout -> _nbout_6[0] , MAY
 
    
    /* dans tous les cas il faut afficher le caractere passe */
@@ -73,7 +76,8 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 
 // Points To:
 // col -> _col_4[0] , EXACT
-// nbout -> _nbout_6[0] , EXACT
+// nbout -> *NULL_POINTER* , MAY
+// nbout -> _nbout_6[0] , MAY
 
    (*nbout)++;
 }
