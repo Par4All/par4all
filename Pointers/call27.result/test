@@ -63,7 +63,7 @@ int main()
 
 // Points To:
 // p -> i , EXACT
-// pp -> undefined , EXACT
+// pp -> *NULL_POINTER* , EXACT
 // ppp -> pp , EXACT
 
    return 0;

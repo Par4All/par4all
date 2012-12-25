@@ -28,7 +28,7 @@ int formal_parameter01(int **pi)
 // pi -> *NULL_POINTER* , MAY
 // pi -> _pi_1[0] , MAY
 
-   /* FI: I need the summary for the sequence */
+   /* FI: I need the summary for the sequence, hence if(1) */
    if (1) {
 
 // Points To: none
@@ -76,6 +76,7 @@ int formal_parameter01(int **pi)
 // pi -> _pi_1[0] , MAY
 // q -> _pi_1[1] , EXACT
 
+      // Incompatible with call site since pi points toward a scalar
       pi = &i;
 
 // Points To:
@@ -116,7 +117,7 @@ int formal_parameter01(int **pi)
 {
 //             <may be read   >: pi
 //             <may be written>: _pi_1[1] pi
-   /* FI: I need the summary for the sequence */
+   /* FI: I need the summary for the sequence, hence if(1) */
    if (1) {
       int **q;
       int *i;
@@ -131,6 +132,7 @@ int formal_parameter01(int **pi)
 //             <    is written>: q
       q++;
 //             <    is written>: pi
+      // Incompatible with call site since pi points toward a scalar
       pi = &i;
 //             <    is read   >: pi
 //             <    is written>: i
@@ -144,3 +146,45 @@ int formal_parameter01(int **pi)
 
 Points-to for "main"
 
+
+// Points To IN: none
+
+
+// Points To OUT: unreachable
+
+int main()
+{
+
+// Points To: none
+
+   int i, *ip, **aipp;
+
+// Points To:
+// aipp -> undefined , EXACT
+// ip -> undefined , EXACT
+
+   ip = &i;
+
+// Points To:
+// aipp -> undefined , EXACT
+// ip -> i , EXACT
+
+   aipp = &ip;
+
+// Points To:
+// aipp -> ip , EXACT
+// ip -> i , EXACT
+
+   i = formal_parameter01(aipp);
+
+// Points To: unreachable
+
+   return 0;
+}
+
+Warnings and errors
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[formal_parameter01] (points_to_set_block_projection) Dangling pointer "pi" towards "i".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[formal_parameter01] (points_to_set_block_projection) Dangling pointer "_pi_1" towards "j".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (compute_points_to_gen_set) Cell sr1="_pi_1[1]" could not be translated.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Incompatibility between call site and callee's output.

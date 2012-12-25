@@ -8,7 +8,7 @@ int main(void)
    p2 = p1;
    free(p1);
 
-   return;
+   return 0;
 }
 
 POINTS TO for pointer_free01
@@ -73,7 +73,7 @@ int main(void)
 // p2 -> undefined , MAY
 
 
-   return;
+   return 0;
 }
 
 PROPER EFFECTS WITH POINTS TO
@@ -91,7 +91,7 @@ int main(void)
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    free(p1);
 
-   return;
+   return 0;
 }
 
 CUMULATED EFFECTS WITH POINTS TO
@@ -111,7 +111,7 @@ int main(void)
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    free(p1);
 
-   return;
+   return 0;
 }
 unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active

@@ -2,7 +2,7 @@
 
 int formal_parameter01(int **pi)
 {
-  /* FI: I need the summary for the sequence */
+  /* FI: I need the summary for the sequence, hence if(1) */
   if(1) {
     int ** q;
     int *i;
@@ -10,10 +10,10 @@ int formal_parameter01(int **pi)
 
     i = 0;
     q = pi;
-    q++;
+    q++; // Incompatible with call site since pi points toward a scalar
     pi = &i;
     *pi = &j;
-    *q = &j;
+    *q = &j; // Incompatible with call site, see previous comment
   }
   return 0;
 }

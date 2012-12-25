@@ -21,7 +21,7 @@ echo
 echo Points-to for "main"
 echo
 
-activate FAST_INTERPROCEDURAL_POINTS_TO_ANALYSIS
+#activate FAST_INTERPROCEDURAL_POINTS_TO_ANALYSIS
 
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[main]

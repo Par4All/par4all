@@ -19,5 +19,5 @@ int main(void)
   p2 = p1;
   pointer_free(p1);
 
-  return;
+  return 0;
 }
