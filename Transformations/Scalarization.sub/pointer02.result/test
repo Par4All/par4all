@@ -19,17 +19,17 @@ int main()
    int *p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 
    int a[1000];
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 
    int i = 0;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 
 
    p = &a[i];
@@ -89,7 +89,7 @@ int main()
 
    a[i] = 1;
 
-//  <a[PHI1]-W-EXACT-{i==0}>
+//  <a[PHI1]-W-MAY-{i==0}>
 //  <p-R-EXACT-{}>
 
    *p = 0;
@@ -121,14 +121,7 @@ int main()
    int i = 0;
 
    p = &a[i];
-   {
-      // BEGIN BLOCK
-      //PIPS generated variable
-      register int a_0;
-
-      a_0 = 1;
-      // END BLOCK
-   }
+   a[i] = 1;
    *p = 0;
    a[i]++;
 
