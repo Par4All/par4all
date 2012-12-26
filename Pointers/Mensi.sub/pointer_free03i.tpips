@@ -1,7 +1,7 @@
 # Use inlining before points-to information is computed
 #
 
-setenv WS=pointer_free03
+setenv WS=pointer_free03i
 delete $WS
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
