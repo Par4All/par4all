@@ -24,13 +24,13 @@ int main(int argc, char **argv)
    void *toto;
 
 // Points To:
-// toto -> *ANY_MODULE*:*NOWHERE* , EXACT
+// toto -> undefined , EXACT
 
 
    a_d1 = a_d2 = 5;
 
 // Points To:
-// toto -> *ANY_MODULE*:*NOWHERE* , EXACT
+// toto -> undefined , EXACT
 
    // a_d1*a_d2 must be parenthesized because of the limited number of
    // patterns checked by the abstract heap stub generator
@@ -59,14 +59,14 @@ int main(int argc, char **argv)
    free(toto);
 
 // Points To:
-// toto -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// toto -> undefined , EXACT
 
    
    
    a_d1 = a_d2 = 10;
 
 // Points To:
-// toto -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// toto -> undefined , EXACT
 
    toto = malloc(sizeof(double)*a_d1*a_d2);
 
@@ -93,7 +93,7 @@ int main(int argc, char **argv)
    free(toto);
 
 // Points To:
-// toto -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// toto -> undefined , EXACT
 
    
    
@@ -395,13 +395,13 @@ int main(int argc, char **argv)
    void *toto;
 
 // Points To:
-// toto -> *ANY_MODULE*:*NOWHERE* , EXACT
+// toto -> undefined , EXACT
 
 
    a_d1 = a_d2 = 5;
 
 // Points To:
-// toto -> *ANY_MODULE*:*NOWHERE* , EXACT
+// toto -> undefined , EXACT
 
    // a_d1*a_d2 must be parenthesized because of the limited number of
    // patterns checked by the abstract heap stub generator
@@ -430,14 +430,14 @@ int main(int argc, char **argv)
    free(toto);
 
 // Points To:
-// toto -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// toto -> undefined , EXACT
 
    
    
    a_d1 = a_d2 = 10;
 
 // Points To:
-// toto -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// toto -> undefined , EXACT
 
    toto = malloc(100*sizeof(double));
 
@@ -464,7 +464,7 @@ int main(int argc, char **argv)
    free(toto);
 
 // Points To:
-// toto -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// toto -> undefined , EXACT
 
    
    
