@@ -1395,9 +1395,6 @@ set compute_points_to_kill_set(list written,
   list written_cs = NIL;
   set bm = binding;
 
-  // FI->AM: do you recompute "bm" several times?
-  // bm = points_to_binding(args, pt_in, pt_binded); 
-
   FOREACH(CELL, c, written) {
     cell new_sr = cell_undefined; 
     reference r_1 = cell_any_reference(c);
@@ -1550,7 +1547,14 @@ list points_to_cells_translation(list cl, set binding, entity f)
 }
 
 /* Translate the out set in the scope of the caller using the binding
- * information. This is pt_gen_1 in Amira Mensi's dissertation
+ * information, but eliminate irrelevant arcs using Written and the
+ * type of the source.
+ *
+ * This is pt_gen_1 in Amira Mensi's dissertation.
+ *
+ * Also, pay attention to translation errors because they are related
+ * to programming bugs, such as pointer arithmetic applied to pointers
+ * to scalar.
  */
 set compute_points_to_gen_set(set pt_out,
 			      list Written,
@@ -1558,10 +1562,6 @@ set compute_points_to_gen_set(set pt_out,
 			      entity f)
 {
   set gen = new_simple_pt_map(); 		
-  // set bm = new_simple_pt_map();
-  //bm = points_to_binding(args, pt_in, pt_binded);
-  //set bm = translation;
-  // entity rv = any_function_to_return_value(f);
 
   /* Consider all points-to arcs "(sr1, sk1)" in "pt_out" */
   SET_FOREACH(points_to, p, pt_out) {
@@ -1569,6 +1569,17 @@ set compute_points_to_gen_set(set pt_out,
     reference r_1 = cell_any_reference(sr1);
     entity v_1 = reference_variable(r_1);
     type t_1 = entity_basic_concrete_type(v_1);
+    /* Keep arcs whose source is:
+     *
+     *  - an array, because it has certainly not been passed by copy;
+     *
+     *  - not a formal parameter: again, no copy passing;
+     *
+     *  - not written by the procedure, because, even if it passed by
+     *    copy, the actual parameter is aliased.
+     *
+     * In other word, get rid of scalar formal parameter that are written.
+     */
     if(array_type_p(t_1)
        || !formal_parameter_p(v_1)
        || !points_to_cell_in_list_p(sr1, Written)) {
@@ -1615,7 +1626,11 @@ set compute_points_to_gen_set(set pt_out,
 	}
 	else {
 	  /* The translation of pt's sink failed. */
-	  ;
+	  pips_user_warning("Cell sk1=\"%s\" could not be translated.\n",
+			  points_to_cell_name(sk1));
+	  set_free(gen);
+	  gen = set_undefined;
+	  break;
 	}
       }
       else {
