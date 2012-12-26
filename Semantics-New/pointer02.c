@@ -17,7 +17,7 @@ void foo(double *p)
 int main()
 {
   x= 1, y=2, z=3;
-  double *p = (int *)malloc(sizeof(double));
+  double *p = (double *)malloc(sizeof(double));
   foo(p);
   return x+y+z; // information about x, y and z should be preserved
 }
