@@ -1,11 +1,342 @@
 
-POINTS-TO
+Points-to for "init"
+
+
+// Points To IN:
+// m -> *NULL_POINTER* , MAY
+// m -> _m_1 , MAY
+
+
+// Points To OUT:
+// _m_1.tab2 -> *HEAP*_l_16[0] , MAY
+
+void init(mys *m)
+{
+
+// Points To: none
+
+   int i;
+
+// Points To:
+// m -> *NULL_POINTER* , MAY
+// m -> _m_1 , MAY
+
+   m->num = 5;
+
+// Points To:
+// m -> _m_1 , EXACT
+
+   m->tab2 = malloc(5*sizeof(int));
+
+// Points To:
+// _m_1.tab2 -> *HEAP*_l_16[0] , MAY
+// m -> _m_1 , EXACT
+
+   (m->tab1)[0] = 10;
+
+// Points To:
+// _m_1.tab2 -> *HEAP*_l_16[0] , MAY
+// m -> _m_1 , EXACT
+
+   (m->tab2)[0] = 20;
+
+// Points To:
+// _m_1.tab2 -> *HEAP*_l_16[0] , MAY
+// m -> _m_1 , EXACT
+
+   for(i = 0; i <= 4; i += 1) {
+
+// Points To:
+// _m_1.tab2 -> *HEAP*_l_16[0] , MAY
+// m -> _m_1 , EXACT
+
+      (m->tab1)[i] = 1;
+
+// Points To:
+// _m_1.tab2 -> *HEAP*_l_16[0] , MAY
+// m -> _m_1 , EXACT
+
+      (m->tab2)[i] = (m->tab1)[i];
+   }
+}
+
+Points-to for "init2"
+
+
+// Points To IN:
+// _n_1.tab2 -> *NULL_POINTER* , MAY
+// _n_1.tab2 -> _n_1_3__1 , MAY
+// n -> *NULL_POINTER* , MAY
+// n -> _n_1 , MAY
+
+
+// Points To OUT:
+// _n_1.tab2 -> *NULL_POINTER* , MAY
+// _n_1.tab2 -> _n_1_3__1 , MAY
+
+void init2(mys *n)
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   mys m;
+
+// Points To:
+// _n_1.tab2 -> *NULL_POINTER* , MAY
+// _n_1.tab2 -> _n_1_3__1 , MAY
+// m.tab2 -> undefined , EXACT
+// n -> *NULL_POINTER* , MAY
+// n -> _n_1 , MAY
+
+
+   m = *n;
+
+// Points To:
+// _n_1.tab2 -> *NULL_POINTER* , MAY
+// _n_1.tab2 -> _n_1_3__1 , MAY
+// m.tab2 -> *NULL_POINTER* , MAY
+// m.tab2 -> _n_1_3__1 , MAY
+// n -> _n_1 , EXACT
+
+   m.num = 5;
+
+// Points To:
+// _n_1.tab2 -> *NULL_POINTER* , MAY
+// _n_1.tab2 -> _n_1_3__1 , MAY
+// m.tab2 -> *NULL_POINTER* , MAY
+// m.tab2 -> _n_1_3__1 , MAY
+// n -> _n_1 , EXACT
+
+   m.tab2 = malloc(5*sizeof(int));
+
+// Points To:
+// _n_1.tab2 -> *NULL_POINTER* , MAY
+// _n_1.tab2 -> _n_1_3__1 , MAY
+// m.tab2 -> *HEAP*_l_34[0] , MAY
+// n -> _n_1 , EXACT
+
+   (m.tab1)[0] = 10;
+
+// Points To:
+// _n_1.tab2 -> *NULL_POINTER* , MAY
+// _n_1.tab2 -> _n_1_3__1 , MAY
+// m.tab2 -> *HEAP*_l_34[0] , MAY
+// n -> _n_1 , EXACT
+
+   (m.tab2)[0] = 20;
+
+// Points To:
+// _n_1.tab2 -> *NULL_POINTER* , MAY
+// _n_1.tab2 -> _n_1_3__1 , MAY
+// m.tab2 -> *HEAP*_l_34[0] , MAY
+// n -> _n_1 , EXACT
+
+   for(i = 0; i <= 4; i += 1) {
+
+// Points To:
+// _n_1.tab2 -> *NULL_POINTER* , MAY
+// _n_1.tab2 -> _n_1_3__1 , MAY
+// m.tab2 -> *HEAP*_l_34[0] , MAY
+// n -> _n_1 , EXACT
+
+      (m.tab1)[i] = 1;
+
+// Points To:
+// _n_1.tab2 -> *NULL_POINTER* , MAY
+// _n_1.tab2 -> _n_1_3__1 , MAY
+// m.tab2 -> *HEAP*_l_34[0] , MAY
+// n -> _n_1 , EXACT
+
+      (m.tab2)[i] = (m.tab1)[i];
+   }
+}
+
+Points-to for "init3"
 
 
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
+// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
+
+void init3(mys **p)
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   p = malloc(5*sizeof(mys *));
+
+// Points To:
+// p -> *HEAP*_l_48[0] , MAY
+
+   for(i = 0; i <= 4; i += 1) {
+
+// Points To:
+// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
+// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
+// p -> *HEAP*_l_48[0] , MAY
+
+      p[i] = malloc(sizeof(mys));
+
+// Points To:
+// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
+// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
+// p -> *HEAP*_l_48[0] , MAY
+
+      p[i]->tab2 = malloc(5*sizeof(int));
+   }
+
+// Points To:
+// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
+// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
+// p -> *HEAP*_l_48[0] , MAY
+
+
+   p[0]->num = 11;
+
+// Points To:
+// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
+// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
+// p -> *HEAP*_l_48[0] , MAY
+
+   (p[0]->tab1)[0] = 20;
+
+// Points To:
+// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
+// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
+// p -> *HEAP*_l_48[0] , MAY
+
+   (p[0]->tab2)[0] = 30;
+
+// Points To:
+// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
+// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
+// p -> *HEAP*_l_48[0] , MAY
+
+
+   for(i = 1; i <= 4; i += 1) {
+
+// Points To:
+// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
+// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
+// p -> *HEAP*_l_48[0] , MAY
+
+      p[i]->num = 10;
+
+// Points To:
+// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
+// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
+// p -> *HEAP*_l_48[0] , MAY
+
+      (p[i]->tab1)[0] = 21;
+
+// Points To:
+// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
+// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
+// p -> *HEAP*_l_48[0] , MAY
+
+      (p[i]->tab2)[0] = (p[i]->tab1)[0];
+   }
+}
+
+Points-to for "init4"
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
+// p[*] -> *HEAP*_l_72 , MAY
+
+void init4(mys *p[5])
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   for(i = 0; i <= 4; i += 1) {
+
+// Points To:
+// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
+// p[*] -> *HEAP*_l_72 , MAY
+
+      p[i] = malloc(sizeof(mys));
+
+// Points To:
+// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
+// p[*] -> *HEAP*_l_72 , MAY
+
+      p[i]->tab2 = malloc(5*sizeof(int));
+   }
+
+// Points To:
+// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
+// p[*] -> *HEAP*_l_72 , MAY
+
+
+   p[0]->num = 11;
+
+// Points To:
+// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
+// p[*] -> *HEAP*_l_72 , MAY
+
+   (p[0]->tab1)[0] = 20;
+
+// Points To:
+// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
+// p[*] -> *HEAP*_l_72 , MAY
+
+   (p[0]->tab2)[0] = 30;
+
+// Points To:
+// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
+// p[*] -> *HEAP*_l_72 , MAY
+
+   
+   
+   for(i = 1; i <= 4; i += 1) {
+
+// Points To:
+// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
+// p[*] -> *HEAP*_l_72 , MAY
+
+      p[i]->num = 10;
+
+// Points To:
+// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
+// p[*] -> *HEAP*_l_72 , MAY
+
+      (p[i]->tab1)[0] = 21;
+
+// Points To:
+// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
+// p[*] -> *HEAP*_l_72 , MAY
+
+      (p[i]->tab2)[0] = (p[i]->tab1)[0];
+   }
+}
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: unreachable
 
 int main()
 {
@@ -15,44 +346,36 @@ int main()
    mys *p, *q, **r, *s[5];
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
+// s[*] -> undefined , EXACT
 
 
    init(p);
 
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// Points To: unreachable
 
    init2(q);
 
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// Points To: unreachable
 
    init3(r);
 
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// Points To: unreachable
 
    init4(s);
 
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// Points To: unreachable
 
 
    return 1;
 }
+
+Warnings and errors
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[init2] (points_to_set_block_projection) Memory leak for bucket "init2:*HEAP*_l_34".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[init3] (potential_to_effective_memory_leaks) Memory cell *HEAP*_l_48[0] leaked.
+PROPER_EFFECTS_WITH_POINTS_TO[init4] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (compute_points_to_gen_set) Cell sr1="_m_1[tab2]" could not be translated.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Incompatibility between call site and callee's output.

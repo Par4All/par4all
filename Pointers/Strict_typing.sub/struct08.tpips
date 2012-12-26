@@ -13,12 +13,47 @@ setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 #module main
 
 echo 
-echo POINTS-TO
+echo Points-to for "init"
 echo
 
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE
+display PRINTED_FILE[init]
+
+echo 
+echo Points-to for "init2"
+echo
+
+#activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[init2]
+
+echo 
+echo Points-to for "init3"
+echo
+
+#activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[init3]
+
+echo 
+echo Points-to for "init4"
+echo
+
+#activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[init4]
+
+echo 
+echo Points-to for "main"
+echo
+
+#activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
 
 close
+
+echo
+echo Warnings and errors
+echo
+
+shell cat $WSPACE.database/Warnings
+
 delete $WSPACE
 quit
