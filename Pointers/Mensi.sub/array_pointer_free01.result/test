@@ -1,0 +1,47 @@
+
+POINTS-TO for "pointer_free"
+
+
+// Points To IN:
+// fp[*] -> _fp_2[*] , MAY
+
+
+// Points To OUT: unreachable
+
+void pointer_free(int i, pointer fp[])
+{
+
+// Points To:
+// fp[*] -> _fp_2[*] , MAY
+
+   free(fp[i]);
+
+// Points To: unreachable
+
+   return;
+}
+
+POINTS-TO for "pointer_malloc"
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// fp[*] -> *HEAP*_l_17 , MAY
+
+void pointer_malloc(int i, pointer fp[])
+{
+
+// Points To: none
+
+   fp[i] = (pointer) malloc(sizeof(int));
+
+// Points To:
+// fp[*] -> *HEAP*_l_17 , MAY
+
+   return;
+}
+
+POINTS TO for "main"
+
