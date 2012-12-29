@@ -298,7 +298,9 @@ pt_map user_call_to_points_to_fast_interprocedural(call c,
   pt_in_callee = set_assign_list(pt_in_callee, l_pt_to_in);
   // list l_pt_to_out = gen_full_copy_list(points_to_list_list(pts_to_out));
   // pt_map pt_out_callee = set_assign_list(pt_out_callee, l_pt_to_out);
-  set pts_binded = compute_points_to_binded_set(f, al, pt_in_s);
+  bool success_p = false;
+  set pts_binded = compute_points_to_binded_set(f, al, pt_in_s, & success_p);
+  // FI->AM: for the time being, ignore success_p...
   ifdebug(8) print_points_to_set("pt_binded", pts_binded);
   set bm = points_to_binding(fpcl, pt_in_callee, pts_binded);
   set pts_kill = compute_points_to_kill_set(wpl, pt_in_s, bm);
@@ -584,11 +586,16 @@ set filter_formal_context_according_to_actual_context(list fpcl,
     list al = points_to_source_to_any_sinks(c, pts_binded_g, false); // actual list
     int nfl = (int) gen_length(fl);
     int nal = (int) gen_length(al);
-    approximation a = approximation_undefined;
+    approximation approx = approximation_undefined;
+
+    // FI: que fait-on avec nfl==0, comme dans
+    // Pointers/StrictTyping.sub/struct08.c ou nfl vaut 0 parce que le
+    // parametre effectif est undefined?
+
     if(nfl==1 && nal==1)
-      a = make_approximation_exact();
+      approx = make_approximation_exact();
     else
-      a = make_approximation_may();
+      approx = make_approximation_may();
     FOREACH(CELL, fc, fl) {
       if(!null_cell_p(fc)) {
 	FOREACH(CELL, ac, al) {
@@ -635,7 +642,9 @@ set filter_formal_context_according_to_actual_context(list fpcl,
 		}
 	      }
 	    }
-	    points_to tr = make_points_to(copy_cell(fc), copy_cell(ac), a,
+	    points_to tr = make_points_to(copy_cell(fc), 
+					  copy_cell(ac), 
+					  copy_approximation(approx),
 					  make_descriptor_none());
 	    add_arc_to_simple_pt_map(tr, translation);
 	  }
@@ -643,6 +652,7 @@ set filter_formal_context_according_to_actual_context(list fpcl,
 	fcl = CONS(CELL, fc, fcl);
       }
     }
+    free_approximation(approx);
   }
 
   ifdebug(8) {
@@ -741,7 +751,14 @@ set filter_formal_out_context_according_to_formal_in_context
 
   /* Second, filter set "in" with respect to new set "filtered_out". */
   list to_be_removed = NIL;
+  list to_be_added = NIL; // FI: why do you want to add stuff?
   SET_FOREACH(points_to, ipt, in) {
+  /*
+  hash_table _hash_ = set_private_get_hash_table(in);
+  void * _point_ = NULL;
+  for (points_to ipt;
+       (_point_ =  hash_table_scan(_hash_, _point_, (void **) &ipt, NULL));) {
+  */
     cell source = points_to_source(ipt);
     if(points_to_cell_in_list_p(source, wpl))
       ; // do nothing
@@ -760,7 +777,8 @@ set filter_formal_out_context_according_to_formal_in_context
 	  approximation na = copy_approximation(a);
 	  points_to npt = make_points_to(nsource, nsink, na,
 					 make_descriptor_none());
-	  add_arc_to_simple_pt_map(npt, in);
+	  //add_arc_to_simple_pt_map(npt, in);
+	  to_be_added = CONS(POINTS_TO, npt, to_be_added);
 	  to_be_removed = CONS(POINTS_TO, ipt, to_be_removed);
 	}
 	else {
@@ -775,6 +793,9 @@ set filter_formal_out_context_according_to_formal_in_context
 
   FOREACH(POINTS_TO, pt, to_be_removed)
     remove_arc_from_simple_pt_map(pt, in);
+
+  FOREACH(POINTS_TO, pt, to_be_added)
+    add_arc_to_simple_pt_map(pt, in);
 
   return out_filtered;
 }
@@ -993,7 +1014,7 @@ void points_to_translation_of_formal_parameters(list fpcl,
  *
  * Equations retrieved from the C code
  *
- * K = { c | \exits pt c=source(pt) !\in Written ^ |translation(source(pt))==1
+ * K = { c | \exits pt c=source(pt) !\in Written ^ |translation(source(pt))|==1
  *                  ^ atomic(translation(source(pt)) }
  * 
  * kill = {pt in pt_in_s | \exits c \in K translation(c)==source(pt)}
@@ -1007,7 +1028,7 @@ void points_to_translation_of_formal_parameters(list fpcl,
  * "main() {p = malloc(); * my_free(p);}" with "my_free(int * p) {free(p);}".
  *
  * p->heap in pt_caller must be removed from pt_end, hence p->heap
- * bealongs to pt_kill
+ * belongs to pt_kill
  *
  * Other possibilities must be linked to tests and executions errors.
  *
@@ -1023,7 +1044,7 @@ void points_to_translation_of_formal_parameters(list fpcl,
  */
 void add_implicitly_killed_arcs_to_kill_set(set pts_kill, list wpl, set pt_in_s,
 					    set pt_out_callee_filtered,
-					    set translation)
+					    set binding)
 {
   SET_FOREACH(points_to, out_pt, pt_out_callee_filtered) {
     cell source = points_to_source(out_pt);
@@ -1033,9 +1054,9 @@ void add_implicitly_killed_arcs_to_kill_set(set pts_kill, list wpl, set pt_in_s,
       // FI: let's assume that approximation subsumes atomicity
       if(approximation_exact_p(a)) {
 	// source is defined in the formal context
-	points_to_graph translation_g =
-	  make_points_to_graph(false, translation);
-	list tl = points_to_source_to_sinks(source, translation_g, false);
+	points_to_graph binding_g =
+	  make_points_to_graph(false, binding);
+	list tl = points_to_source_to_sinks(source, binding_g, false);
 	int  ntl = (int) gen_length(tl);
 	cell t_source = cell_undefined;
 	if(ntl==1 && (atomic_points_to_cell_p(t_source=CELL(CAR(tl))))) {
@@ -1061,8 +1082,16 @@ list translation_transitive_closure(cell c, set translation)
   while(!finished_p) {
     points_to_graph translation_g = make_points_to_graph(false, translation);
     // Do not worry about sharing due to NULL or UNDEFINED/NOWHERE
-    n_succ = points_to_sources_to_effective_sinks(n_succ, translation_g, false);
-    gen_list_and_not(&n_succ, succ);
+    // Potentially new successors
+    list pn_succ = points_to_sources_to_effective_sinks(n_succ, translation_g, false);
+    list n_succ = NIL; // Reealy new successors
+    // FI: does not work in general because the content is not used, shallow
+    // gen_list_and_not(&n_succ, succ);
+    FOREACH(CELL, c, pn_succ) {
+      if(!points_to_cell_in_list_p(c, succ))
+	n_succ = CONS(CELL, c, n_succ);
+    }
+    gen_free_list(pn_succ);
     if(ENDP(n_succ)) {
       /* We are done */
       finished_p = true;
@@ -1096,24 +1125,28 @@ bool aliased_translation_p(list fpcl, set translation)
       // FI: this is not sufficient, conflicts between cells should be
       // checked to take into account abstract locations.
       // gen_list_and(&c_succ_l, p_succ_l);
-      bool conflict_p = points_to_cell_lists_may_conflict_p(c_succ_l, p_succ_l);
+      bool may_conflict_p = points_to_cell_lists_may_conflict_p(c_succ_l, p_succ_l);
+      bool must_conflict_p = points_to_cell_lists_must_conflict_p(c_succ_l, p_succ_l);
       //if(!ENDP(c_succ_l)) {
-      if(conflict_p) {
+      if(may_conflict_p /*|| must_conflict_p*/ ) { // must implies may I guess
 	alias_p = true;
 	gen_free_list(c_succ_l);
 	entity fp1 = reference_variable(cell_any_reference(c));
 	entity fp2 = reference_variable(cell_any_reference(p_c));
 	
 	if(statement_points_to_context_defined_p())
-	  pips_user_warning("aliasing detected between formal parameters "
+	  pips_user_warning("%saliasing detected between formal parameters "
 			    "\"%s\" and \"%s\" at line %d.\n",
+			    must_conflict_p? "" : "possible ",
 			    entity_user_name(fp1),
 			    entity_user_name(fp2),
 			    points_to_context_statement_line_number());
 	else {
 	  // In case this function is used in an effect context
-	  pips_user_warning("aliasing detected between formal parameters "
-			    "\"%s\" and \"%s\".\n", entity_user_name(fp1),
+	  pips_user_warning("%saliasing detected between formal parameters "
+			    "\"%s\" and \"%s\".\n",
+			    must_conflict_p? "" : "possible ",
+			    entity_user_name(fp1),
 			    entity_user_name(fp2));
 	}
 	break;
@@ -1197,6 +1230,7 @@ pt_map user_call_to_points_to_interprocedural(call c,
     extern list load_body_effects(entity e);
     list el = load_body_effects(f);
     list wpl = written_pointers_set(el);
+    list cwpl = certainly_written_pointers_set(el);
     set pt_caller_s = points_to_graph_set(pt_caller);
 
     //points_to_list pts_to_in = (points_to_list)
@@ -1204,142 +1238,153 @@ pt_map user_call_to_points_to_interprocedural(call c,
    
     //list l_pt_to_in = gen_full_copy_list(points_to_list_list(pts_to_in));
     set pt_in = new_simple_pt_map();
-    pt_in= set_assign_list(pt_in, l_pt_to_in);
+    pt_in = set_assign_list(pt_in, l_pt_to_in);
     set pt_out = new_simple_pt_map();
     pt_out = set_assign_list(pt_out, l_pt_to_out);
 
     // FI: function name... set or list?
-    set pts_binded = compute_points_to_binded_set(f, al, pt_caller_s);
-    ifdebug(8) print_points_to_set("pt_binded", pts_binded);
+    bool success_p = false;
+    set pt_binded = compute_points_to_binded_set(f, al, pt_caller_s, &success_p);
+    ifdebug(8) print_points_to_set("pt_binded", pt_binded);
 
-    set binding = new_simple_pt_map();
-    /* This is only useful when a free occurs with the callee, since
-       information about formal parameters is normally projected
-       out. */
-    points_to_translation_of_formal_parameters(fpcl, al, pt_caller, binding);
+    if(success_p) {
+      set binding = new_simple_pt_map();
+      /* This is only useful when a free occurs with the callee, since
+	 information about formal parameters is normally projected
+	 out. */
+      points_to_translation_of_formal_parameters(fpcl, al, pt_caller, binding);
 
-    /* Filter pt_in_callee according to pts_binded. For instance, a
-       formal parameter can point to NULL in pt_in_callee only if it
-       also points to NULL in pts_binded. In the same way, a formal
-       parameter can point to a points-to stub in pt_in_callee only if
-       it points to a non-NULL target in pts_binded. Also, a formal
-       parameter cannot points exactly to UNDEFINED in pts_binded as
-       it would be useless (not clear if we can remove such an arc
-       when it is a may arc...). Finally, each formal parameter must
-       still point to something. */
-    set pt_in_filtered =
-      filter_formal_context_according_to_actual_context(fpcl,
-							pt_in,
-							pts_binded,
-							binding);
+      /* Filter pt_in_callee according to pt_binded. For instance, a
+	 formal parameter can point to NULL in pt_in_callee only if it
+	 also points to NULL in pt_binded. In the same way, a formal
+	 parameter can point to a points-to stub in pt_in_callee only if
+	 it points to a non-NULL target in pt_binded. Also, a formal
+	 parameter cannot points exactly to UNDEFINED in pt_binded as
+	 it would be useless (not clear if we can remove such an arc
+	 when it is a may arc...). Finally, each formal parameter must
+	 still point to something. */
+      set pt_in_filtered =
+	filter_formal_context_according_to_actual_context(fpcl,
+							  pt_in,
+							  pt_binded,
+							  binding);
 
-    /* We have to test if pts_binded is compatible with pt_in_callee */
-    /* We have to start by computing all the elements of E (stubs) */
-    //list stubs = stubs_list(pt_in_callee, pt_out_callee);
-    // bool compatible_p = true;
-    // FI: I do not understand Amira's test
-    // = sets_binded_and_in_compatible_p(stubs, fpcl, pts_binded,
-    //					pt_in_callee_filtered, pt_out_callee,
-    //					binding);
-    /* See if two formal parameters can reach the same memory cell,
-     * i.e. transitive closure of binding map. We should take care
-     * of global variables too... */
-    // compatible_p = compatible_p && !aliased_translation_p(fpcl, pts_binded);
+      /* We have to test if pt_binded is compatible with pt_in_callee */
+      /* We have to start by computing all the elements of E (stubs) */
+      //list stubs = stubs_list(pt_in_callee, pt_out_callee);
+      // bool compatible_p = true;
+      // FI: I do not understand Amira's test
+      // = sets_binded_and_in_compatible_p(stubs, fpcl, pt_binded,
+      //					pt_in_callee_filtered, pt_out_callee,
+      //					binding);
+      /* See if two formal parameters can reach the same memory cell,
+       * i.e. transitive closure of binding map. We should take care
+       * of global variables too... */
+      // compatible_p = compatible_p && !aliased_translation_p(fpcl, pt_binded);
 
-    if(!aliased_translation_p(fpcl, pts_binded)) {
+      if(!aliased_translation_p(fpcl, pt_binded)) {
 
-      set pt_out_filtered =
-	filter_formal_out_context_according_to_formal_in_context
-	(pt_out, pt_in_filtered, wpl, f);
+	set pt_out_filtered =
+	  filter_formal_out_context_according_to_formal_in_context
+	  (pt_out, pt_in_filtered, wpl, f);
 
-      /* Explicitly written pointers imply some arc removals; pointer
-	 assignments directly or indirectly in the callee. */
-      // pt_end = set_difference(pt_end, pt_caller_s, pts_kill);
+	/* Explicitly written pointers imply some arc removals; pointer
+	   assignments directly or indirectly in the callee. */
+	// pt_end = set_difference(pt_end, pt_caller_s, pts_kill);
 
-      /* FI: pt_caller_s may have been modified implictly because the
-       * formal context has been increased according to the needs of
-       * the callee. But pt_caller_s may also have been updated by what
-       * has happened prevously when analyzing the current
-       * statement. See for instance Pointers/sort01.c.
-       */
-      set c_pt_caller_s = points_to_graph_set(points_to_context_statement_in());
-      c_pt_caller_s = set_union(c_pt_caller_s, c_pt_caller_s, pt_caller_s);
+	/* FI: pt_caller_s may have been modified implictly because the
+	 * formal context has been increased according to the needs of
+	 * the callee. But pt_caller_s may also have been updated by what
+	 * has happened prevously when analyzing the current
+	 * statement. See for instance Pointers/sort01.c.
+	 */
+	set c_pt_caller_s = points_to_graph_set(points_to_context_statement_in());
+	c_pt_caller_s = set_union(c_pt_caller_s, c_pt_caller_s, pt_caller_s);
 
-      set pt_kill = compute_points_to_kill_set(wpl, c_pt_caller_s, binding);
-      /* Implicitly written pointers imply some arc removals: free(),
-	 tests and exits. */
-      add_implicitly_killed_arcs_to_kill_set(pt_kill, wpl, c_pt_caller_s,
-					     pt_out_filtered,
-					     binding);
-      ifdebug(8) print_points_to_set("pt_kill", pt_kill);
+	list tcwpl = points_to_cells_exact_translation(cwpl, binding, f);
+	/* Compute pt_kill_2 */
+	set pt_kill = compute_points_to_kill_set(tcwpl, c_pt_caller_s, binding);
+	/* Implicitly written pointers imply some arc removals:
+	 * free(), tests and exits. These are the elements of
+	 * pt_kill_1, although the equations do not seem to fit at
+	 * all since pt_in_filtered is not an argument...
+	 */
+	add_implicitly_killed_arcs_to_kill_set(pt_kill, wpl, c_pt_caller_s,
+					       pt_out_filtered,
+					       binding);
+	ifdebug(8) print_points_to_set("pt_kill", pt_kill);
 
-      set pt_end = new_simple_pt_map();
-      // FI: c_pr_in_s is probably pt_{caller} in the dissertation
-      pt_end = set_difference(pt_end, c_pt_caller_s, pt_kill);
+	set pt_end = new_simple_pt_map();
+	// FI: c_pr_in_s is probably pt_{caller} in the dissertation
+	pt_end = set_difference(pt_end, c_pt_caller_s, pt_kill);
 
-      set pt_gen_1 = compute_points_to_gen_set(pt_out_filtered,
-					      wpl,
-					      binding, f);
+	set pt_gen_1 = compute_points_to_gen_set(pt_out_filtered,
+						 wpl,
+						 binding, f);
 
-      if(set_undefined_p(pt_gen_1)) {
-	/* Translation failure, incompatibility between the call site
-	   and the callee. */
-	pips_user_warning("Incompatibility between call site and "
-			  "callee's output.\n");
-	out_bottom_p = true;
+	if(set_undefined_p(pt_gen_1)) {
+	  /* Translation failure, incompatibility between the call site
+	     and the callee. */
+	  pips_user_warning("Incompatibility between call site and "
+			    "callee's output.\n");
+	  out_bottom_p = true;
+	}
+	else {
+	  pips_assert("pt_gen_1 is consistent", consistent_points_to_set(pt_gen_1));
+
+	  // FI->FI: Not satisfying; kludge to solve issue with Pointers/inter04
+	  pt_map pt_gen_1_g = make_points_to_graph(false, pt_gen_1);
+	  upgrade_approximations_in_points_to_set(pt_gen_1_g);
+
+	  pips_assert("pt_gen_1 is consistent after upgrade",
+		      consistent_points_to_set(pt_gen_1));
+
+	  /* Some check */
+	  list stubs = points_to_set_to_module_stub_cell_list(f, pt_gen_1, NIL);
+	  if(!ENDP(stubs)) {
+	    pips_internal_error("Translation failure in pt_gen_1.\n");
+	  }
+
+	  /* Use written/wpl to reduce the precision of exact arcs in
+	   * pt_end. This is equivalent to pt_kill_3 and pt_gen_3.
+	   *
+	   *
+	   * FI: I do not understand why the precision of the write is not
+	   * exploited. We may need to use mwpl instead of wpl
+	   *
+	   */
+	  list twpl = points_to_cells_translation(wpl, binding, f);
+	  pt_end =
+	    lower_points_to_approximations_according_to_write_effects(pt_end, twpl);
+	  // FI: I keep it temporarily for debugging purposes
+	  // gen_free_list(twpl);
+
+	  // FI: set_union is unsafe; the union of two consistent
+	  // points-to graph is not a consistent points-to graph
+	  pt_end = set_union(pt_end, pt_end, pt_gen_1);
+	  pips_assert("pt_end is consistent", consistent_points_to_set(pt_end));
+	  ifdebug(8) print_points_to_set("pt_end =",pt_end);
+	  /* Some check */
+	  stubs = points_to_set_to_module_stub_cell_list(f, pt_end, NIL);
+	  if(!ENDP(stubs)) {
+	    pips_internal_error("Translation failure in pt_end.\n");
+	  }
+	  points_to_graph_set(pt_end_f) = pt_end;
+	}
       }
       else {
-	pips_assert("pt_gen_1 is consistent", consistent_points_to_set(pt_gen_1));
+	pips_user_warning("Aliasing between arguments at line %d.\n"
+			  "We would have to create a new formal context "
+			  "and to restart the points-to analysis "
+			  "and to modify the IN and OUT data structures...\n"
+			  "Or use a simpler analysis, here an intraprocedural one.\n",
+			  points_to_context_statement_line_number());
 
-	// FI->FI: Not satisfying; kludge to solve issue with Pointers/inter04
-	pt_map pt_gen_1_g = make_points_to_graph(false, pt_gen_1);
-	upgrade_approximations_in_points_to_set(pt_gen_1_g);
-
-	pips_assert("pt_gen_1 is consistent after upgrade",
-		    consistent_points_to_set(pt_gen_1));
-
-	/* Some check */
-	list stubs = points_to_set_to_module_stub_cell_list(f, pt_gen_1, NIL);
-	if(!ENDP(stubs)) {
-	  pips_internal_error("Translation failure in pt_gen_1.\n");
-	}
-
-	/* Use written/wpl to reduce the precision of exact arcs in pt_end
-	 *
-	 * FI: I do not understand why the precision of the write is not
-	 * exploited.
-	 *
-	 * FI: the wpl list must be implictly translated somewhere...
-	 */
-	list twpl = points_to_cells_translation(wpl, binding, f);
-	pt_end =
-	  lower_points_to_approximations_according_to_write_effects(pt_end, twpl);
-	// FI: I keep it temporarily for debugging purposes
-	// gen_free_list(twpl);
-
-	// FI: set_union is unsafe; the union of two consistent
-	// points-to graph is not a consistent points-to graph
-	pt_end = set_union(pt_end, pt_end, pt_gen_1);
-	pips_assert("pt_end is consistent", consistent_points_to_set(pt_end));
-	ifdebug(8) print_points_to_set("pt_end =",pt_end);
-	/* Some check */
-	stubs = points_to_set_to_module_stub_cell_list(f, pt_end, NIL);
-	if(!ENDP(stubs)) {
-	  pips_internal_error("Translation failure in pt_end.\n");
-	}
-	points_to_graph_set(pt_end_f) = pt_end;
+	pt_end_f = user_call_to_points_to_intraprocedural(c, pt_caller, el);
       }
     }
-    else {
-      pips_user_warning("Aliasing between arguments at line %d.\n"
-			"We would have to create a new formal context "
-			"and to restart the points-to analysis "
-			"and to modify the IN and OUT data structures...\n"
-			"Or use a simpler analysis, here an intraprocedural one.\n",
-			points_to_context_statement_line_number());
-
-      pt_end_f = user_call_to_points_to_intraprocedural(c, pt_caller, el);
-    }
+    else
+      out_bottom_p = true;
   }
   else {
     // FI: I do not think we want this warning in general!
@@ -1386,12 +1431,15 @@ pt_map user_call_to_points_to_intraprocedural(call c,
 /* Translate the "out" set into the scope of the caller
  *
  * Shouldn't it be the "written" list that needs to be translated?
+ *
  */ 
-set compute_points_to_kill_set(list written,
+set compute_points_to_kill_set(list written_must_translated,
 			       set pt_caller,
-			       set binding)
+			       set binding __attribute__ ((unused)))
 {
   set kill = new_simple_pt_map(); 	
+  list written_cs = written_must_translated;
+#if 0
   list written_cs = NIL;
   set bm = binding;
 
@@ -1428,6 +1476,7 @@ set compute_points_to_kill_set(list written,
       }
     }
   }
+#endif
   
   /* Remove all points-to arc from pt_caller whose origin has been
      fully written */
@@ -1461,7 +1510,7 @@ list points_to_cell_translation(cell sr1, set binding, entity f)
   if(entity_anywhere_locations_p(v_1)
      || entity_typed_anywhere_locations_p(v_1)
      || heap_cell_p(sr1)
-     || v_1==rv
+     || v_1 == rv
      || entity_to_module_entity(v_1)!=f) {
     /* No translation is needed. */
     cell new_sr = copy_cell(sr1);
@@ -1520,8 +1569,11 @@ list points_to_cell_translation(cell sr1, set binding, entity f)
 /* Allocate a new list with the translations of the cells in cl, when
  * their translation make sense. Effects on copied parameters are
  * discarded.
+ *
+ * If exact_p is required, translate only cells that can be translated
+ * exactly.
  */
-list points_to_cells_translation(list cl, set binding, entity f)
+list generic_points_to_cells_translation(list cl, set binding, entity f, bool exact_p)
 {
   list tcl = NIL;
   FOREACH(CELL, c, cl) {
@@ -1541,9 +1593,30 @@ list points_to_cells_translation(list cl, set binding, entity f)
     }
     else
       ptcl = points_to_cell_translation(c, binding, f);
-    tcl = gen_nconc(tcl, ptcl);
+    if(exact_p && gen_length(ptcl)>1)
+      gen_free_list(ptcl);
+    else
+      tcl = gen_nconc(tcl, ptcl);
   }
   return tcl;
+}
+
+/* Allocate a new list with the translations of the cells in cl, when
+ * their translation make sense. Effects on copied parameters are
+ * discarded.
+ */
+list points_to_cells_translation(list cl, set binding, entity f)
+{
+  return generic_points_to_cells_translation(cl, binding, f, false);
+}
+
+/* Allocate a new list with the translations of the cells in cl, when
+ * their translation make sense and is unique (one-to-one
+ * mapping). Effects on copied parameters are discarded.
+ */
+list points_to_cells_exact_translation(list cl, set binding, entity f)
+{
+  return generic_points_to_cells_translation(cl, binding, f, true);
 }
 
 /* Translate the out set in the scope of the caller using the binding
@@ -1607,7 +1680,10 @@ set compute_points_to_gen_set(set pt_out,
 	  int new_sk_n = (int) gen_length(new_sk_l);
 	  FOREACH(CELL, new_sr, new_sr_l) {
 	    approximation na = approximation_undefined;
-	    if(!atomic_points_to_cell_p(new_sr) || new_sk_n>1) {
+	    if(!atomic_points_to_cell_p(new_sr)
+	       || new_sk_n>1
+	       || (new_sk_n==1
+		   && !atomic_points_to_cell_p(CELL(CAR(new_sk_l))))) {
 	      na = make_approximation_may();
 	    }
 	    else
@@ -1639,12 +1715,22 @@ set compute_points_to_gen_set(set pt_out,
 	 * array, whereas the call site associates it to a scalar.
 	 *
 	 * See for instance Pointers/formal_parameter01.c
+	 *
+	 * But this may also occur because the formal parameter cannot
+	 * be translated because the effective argument is an
+	 * address_of expression. See for instance
+	 * EffectsWithPointsTO/call01.c.
+	 *
+	 * We have no way to guess here the reason for the translation
+	 * failure...
 	 */
 	pips_user_warning("Cell sr1=\"%s\" could not be translated.\n",
 			  points_to_cell_name(sr1));
+	/*
 	set_free(gen);
 	gen = set_undefined;
 	break;
+	*/
       }
     }
   }
@@ -1757,33 +1843,50 @@ set points_to_binding_arguments(cell c1, cell c2 , set in, set pt_binded)
 }
 
 /* Filter out written effects on pointers */
-list written_pointers_set(list eff) {
+static list generic_written_pointers_set(list eff, bool exact_p)
+{
   list written_l = NIL;
   debug_on("EFFECTS_DEBUG_LEVEL");
   list wr_eff = effects_write_effects(eff);
   FOREACH(effect, ef, wr_eff) {
-    if(effect_pointer_type_p(ef)){
-      cell c = effect_cell(ef);
-      written_l = gen_nconc(CONS(CELL, c, NIL), written_l);
+    approximation a = effect_approximation(ef);
+    if(!exact_p || approximation_must_p(a) || approximation_exact_p(a)) {
+      if(effect_pointer_type_p(ef)){
+	cell c = effect_cell(ef);
+	written_l = gen_nconc(CONS(CELL, c, NIL), written_l);
+      }
     }
   }
   debug_off();
   return written_l; 
-
 }
 
+/* Filter out written effects on pointers */
+list written_pointers_set(list eff) {
+  return generic_written_pointers_set(eff, false);
+}
+
+/* Filter out certainly written effects on pointers */
+list certainly_written_pointers_set(list eff) {
+  return generic_written_pointers_set(eff, true);
+}
 
 /* For each actual argument "r" and its corresponding formal one "f",
  * create the assignment "f = r;" and then compute the points-to set
  * "s" generated by the assignment. The result is the union of
  * "pt_caller" and "s".
  */
-set compute_points_to_binded_set(entity called_func, list real_args, set pt_caller)
+set compute_points_to_binded_set(entity called_func,
+				 list real_args,
+				 set pt_caller,
+				 bool * success_p)
 { 
   set s = set_generic_make(set_private, points_to_equal_p,
 			   points_to_rank);
   set pt_binded = set_generic_make(set_private, points_to_equal_p,
 				   points_to_rank);
+
+  *success_p = true; // default value
 
   /* Be careful with vararags
    *
@@ -1875,7 +1978,14 @@ set compute_points_to_binded_set(entity called_func, list real_args, set pt_call
 	expression lhs = entity_to_expression(fp);
 	points_to_graph s_g = make_points_to_graph(false, s);
 	points_to_graph a_g = assignment_to_points_to(lhs, rhs, s_g);
-	s = set_assign(s, points_to_graph_set(a_g));
+	if(points_to_graph_bottom(a_g)) {
+	  /* The assignment failed because the call site is not
+	     compatible with the caller. */
+	  *success_p = false;
+	}
+	else {
+	  s = set_assign(s, points_to_graph_set(a_g));
+	}
       }
       else {
 	; // do nothing for other types

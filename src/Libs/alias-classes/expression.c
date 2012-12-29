@@ -177,6 +177,8 @@ pt_map expression_to_points_to(expression e, pt_map pt_in, bool side_effect_p)
  * evaluation of a possibly empty list of expression. A new data
  * structure is allocated.
  *
+ * Ignore side-effects unless side_effect_p is set to true.
+ *
  * The result is correct only if you are sure that all expressions in
  * "el" are always evaluated.
  */
@@ -471,6 +473,15 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in, bool side_effect_p)
       if(pointer_type_p(at)) {
 	// For the side-effects on pt_out
 	list sinks = expression_to_points_to_sinks(a, pt_out);
+	if(gen_length(sinks)==1 && nowhere_cell_p(CELL(CAR(sinks)))) {
+	  /* attempt at using an undefined value */
+	  pips_user_warning("Undefined value \"%s\" is used at line %d.\n",
+			    expression_to_string(a),
+			    points_to_context_statement_line_number());
+
+	  clear_pt_map(pt_out);
+	  points_to_graph_bottom(pt_out) = true;
+	}
 	gen_free_list(sinks);
       }
     }
@@ -1156,8 +1167,8 @@ void check_rhs_value_types(expression lhs,
  * is dereferenced.
  */
 pt_map internal_pointer_assignment_to_points_to(expression lhs,
-				       expression rhs,
-				       pt_map pt_in)
+						expression rhs,
+						pt_map pt_in)
 {
   pt_map pt_out = pt_in;
 
@@ -1225,14 +1236,22 @@ pt_map internal_pointer_assignment_to_points_to(expression lhs,
 
     /* We must be in a dead-code portion. If not pleased, adjust properties... */
     if(ENDP(L)) {
-      pips_user_warning("Expression \"%s\" could not be dereferenced at line %d.\n",
-			expression_to_string(lhs),
-			points_to_context_statement_line_number());
+      if(statement_points_to_context_defined_p())
+	pips_user_warning("Expression \"%s\" could not be dereferenced at line %d.\n",
+			  expression_to_string(lhs),
+			  points_to_context_statement_line_number());
+      else
+	pips_user_warning("Expression \"%s\" could not be dereferenced.\n",
+			  expression_to_string(lhs));
     }
     if(ENDP(R)) {
-      pips_user_warning("Expression \"%s\" could not be dereferenced at line %d.\n",
-			expression_to_string(rhs),
-			points_to_context_statement_line_number());
+      if(statement_points_to_context_defined_p())
+	pips_user_warning("Expression \"%s\" could not be dereferenced at line %d.\n",
+			  expression_to_string(rhs),
+			  points_to_context_statement_line_number());
+      else
+	pips_user_warning("Expression \"%s\" could not be dereferenced.\n",
+			  expression_to_string(rhs));
     }
     clear_pt_map(pt_out);
     points_to_graph_bottom(pt_out) = true;
@@ -1242,10 +1261,21 @@ pt_map internal_pointer_assignment_to_points_to(expression lhs,
     // We are not sure what to do if null in L or if nowhere in R
     int nR = (int) gen_length(R);
     if(nR==1 && nowhere_cell_p(CELL(CAR(R)))) {
-      pips_user_warning("Assignment of an undefined value at line %d.\n",
-			points_to_context_statement_line_number());
-      clear_pt_map(pt_out);
-      points_to_graph_bottom(pt_out) = true;
+      if(statement_points_to_context_defined_p())
+	pips_user_warning("Assignment of an undefined value to \"%s\" at line %d.\n",
+			  expression_to_string(lhs),
+			  points_to_context_statement_line_number());
+      else
+	pips_user_warning("Assignment of an undefined value to \"%s\".\n",
+			  expression_to_string(lhs));
+      /* The C99 standard does not preclude the propagation of
+	 indeterminate values. It is often used in our test cases when
+	 structs are assigned.
+
+	 clear_pt_map(pt_out);
+	 points_to_graph_bottom(pt_out) = true;
+      */
+      pt_out = list_assignment_to_points_to(L, R, pt_out);
     }
     else
       pt_out = list_assignment_to_points_to(L, R, pt_out);

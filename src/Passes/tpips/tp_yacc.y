@@ -880,7 +880,7 @@ i_activate: TK_ACTIVATE rulename TK_ENDOFLINE
 				pips_user_error("Open or create a workspace first!\n");
 
 		user_log("Selecting rule: %s\n", $2);
-		activate ($2);
+		activate($2);
 		$$ = true;
 		}
 		free($2);

@@ -106,13 +106,46 @@ pt_map dereferencing_to_points_to(expression p, pt_map in)
       break;
     }
     case is_syntax_call: {
+      call c = syntax_call(s);
+      list al = call_arguments(c);
+      
       // FI: you do not want to apply side-effects twice...
       // But you then miss the detection of pointers that are not NULL
       // because they are dereferenced
-      //call c = syntax_call(s);
-      //list al = call_arguments(c);
       //in = expressions_to_points_to(al, in);
       //in = call_to_points_to(c, in);
+      
+      /* You must take care of s.tab, which is encoded by a call */
+      entity f = call_function(c);
+      if(ENTITY_FIELD_P(f)) {
+	expression ae = EXPRESSION(CAR(al));
+	expression fe = EXPRESSION(CAR(CDR(al)));
+	/* EffectsWithPointsTo/struct08.c: ae = (e.champ)[i], fe = p*/
+	//pips_assert("ae and fe are references",
+	//	    expression_reference_p(ae) && expression_reference_p(fe));
+	pips_assert("fe is a reference", expression_reference_p(fe));
+	reference fr = expression_reference(fe);
+	entity fv = reference_variable(fr);
+	type ft = entity_basic_concrete_type(fv);
+	if(pointer_type_p(ft) || struct_type_p(ft)
+	   || array_of_pointers_type_p(ft) 
+	   || array_of_struct_type_p(ft)) {
+#if 0
+	  reference r = copy_reference(ar);
+	  expression s = entity_to_expression(fv);
+	  reference_indices(r) = gen_nconc(reference_indices(r),
+					   CONS(EXPRESSION, s, NIL));
+	  /*out = */reference_dereferencing_to_points_to(r, in,
+							 nowhere_dereferencing_p,
+							 null_dereferencing_p);
+	  free_reference(r);
+#endif
+	  in = dereferencing_to_points_to(ae, in);
+	  /* For side effects on "in" */
+	  list sink_l = expression_to_points_to_sinks(p, in);
+	  gen_free_list(sink_l);
+	}
+      }
       break;
     }
     case is_syntax_cast: {
@@ -135,14 +168,14 @@ pt_map dereferencing_to_points_to(expression p, pt_map in)
       break;
     }
     case is_syntax_subscript: {
-      //subscript sub = syntax_subscript(s);
-      //expression a = subscript_array(sub);
-      //list sel = subscript_indices(sub);
+      subscript sub = syntax_subscript(s);
+      expression a = subscript_array(sub);
+      list sel = subscript_indices(sub);
       /* a cannot evaluate to null or undefined */
       /* FI: we may need a special case for stubs... */
-      //out = dereferencing_to_points_to(a, in);
-      //out = expression_to_points_to(a, out);
-      //out = expressions_to_points_to(sel, out);
+      in = dereferencing_to_points_to(a, in);
+      in = expression_to_points_to(a, in, false);
+      in = expressions_to_points_to(sel, in, false);
       break;
     }
     case is_syntax_application: {
@@ -199,6 +232,7 @@ pt_map reference_dereferencing_to_points_to(reference r,
   list sl = reference_indices(r);
 
   /* Does the reference implies some dereferencing itself? */
+  // FI: I do not remember what this means; examples are nice
   if(pointer_points_to_reference_p(r)) {
     pointer_reference_dereferencing_to_points_to(r, in);
   }
@@ -215,36 +249,40 @@ pt_map reference_dereferencing_to_points_to(reference r,
     ;
   }
   else {
-    reference nr = copy_reference(r);
-    cell source = make_cell_reference(nr);
-    /* Remove store-dependent indices */
-    reference_indices(nr) =
-      subscript_expressions_to_constant_subscript_expressions(reference_indices(nr));
-    list sinks = source_to_sinks(source, in, false);
-    int n = (int) gen_length(sinks);
-    FOREACH(CELL, sink, sinks) {
-      if(!nowhere_dereferencing_p && nowhere_cell_p(sink)) {
-	remove_points_to_arcs(source, sink, in);
-	n--;
+    // FI: I am confused here
+    // FI: we might have to do more when a struct or an array is referenced
+    if(pointer_type_p(t) || array_of_pointers_type_p(t)) { // FI: implies ENDP(sl)
+      reference nr = copy_reference(r);
+      cell source = make_cell_reference(nr);
+      /* Remove store-dependent indices */
+      reference_indices(nr) =
+	subscript_expressions_to_constant_subscript_expressions(reference_indices(nr));
+      list sinks = source_to_sinks(source, in, false);
+      int n = (int) gen_length(sinks);
+      FOREACH(CELL, sink, sinks) {
+	if(!nowhere_dereferencing_p && nowhere_cell_p(sink)) {
+	  remove_points_to_arcs(source, sink, in);
+	  n--;
+	}
+	if(!null_dereferencing_p && null_cell_p(sink)) {
+	  remove_points_to_arcs(source, sink, in);
+	  n--;
+	}
       }
-      if(!null_dereferencing_p && null_cell_p(sink)) {
-	remove_points_to_arcs(source, sink, in);
-	n--;
+      if(n==0) {
+	clear_pt_map(in);
+	points_to_graph_bottom(in) = true;
+	if(statement_points_to_context_defined_p())
+	  pips_user_warning("Null or undefined pointer may be dereferenced because of \"%s\" at line %d.\n",
+			    effect_reference_to_string(r),
+			    points_to_context_statement_line_number());
+	else
+	  pips_user_warning("Null or undefined pointer may be dereferenced because of \"%s\".\n",
+			    effect_reference_to_string(r));
       }
-    }
-    if(n==0) {
-      clear_pt_map(in);
-      points_to_graph_bottom(in) = true;
-      if(statement_points_to_context_defined_p())
-	pips_user_warning("Null or undefined pointer may be dereferenced because of \"%s\" at line %d.\n",
-			  effect_reference_to_string(r),
-			  points_to_context_statement_line_number());
-      else
-	pips_user_warning("Null or undefined pointer may be dereferenced because of \"%s\".\n",
-			  effect_reference_to_string(r));
-    }
 
-    gen_free_list(sinks);
+      gen_free_list(sinks);
+    }
   }
   return in;
 }

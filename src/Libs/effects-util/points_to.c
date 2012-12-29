@@ -170,8 +170,9 @@ void print_points_to_cells(list cl)
     FOREACH(CELL, c, cl) {
       reference r = cell_any_reference(c);
       entity v = reference_variable(r);
+      /* *ANY_MODULE* is unfortunately not an entity... */
       entity mv =  module_name_to_entity(entity_module_name(v));
-      if(m!=mv)
+      if(!entity_undefined_p(mv) && m!=mv)
 	fprintf(stderr,"%s" MODULE_SEP_STRING, entity_local_name(mv));
       print_points_to_cell(c);
       if(!ENDP(CDR(cl)))
@@ -374,11 +375,47 @@ list points_to_reference_to_typed_index(reference r, type t)
   return psl;
 }
 
-/* Is it a unique concrete memory location? */
+/* Is it a unique concrete memory location?
+ *
+ * Plus NULL? No doubt about the value of the pointer...
+ *
+ * Plus undefined? No doubt about the indeterminate value of the
+ * pointer according to C standard...
+ */
 bool atomic_points_to_cell_p(cell c)
 {
   reference r = cell_any_reference(c);
-  bool atomic_p = null_cell_p(c) || atomic_points_to_reference_p(r);
+  bool atomic_p = null_cell_p(c)
+    || nowhere_cell_p(c) // FI: added for EffectsWithPointsTo/call30.c
+    || atomic_points_to_reference_p(r);
+
+  // FI: atomic_p should be false for all abstract locations
+  // This is dealt with by atomic_points_to_reference_p()
+  /*
+  if(atomic_p && (heap_cell_p(c) || all_heap_locations_cell_p(c)))
+    atomic_p = false;
+
+  if(atomic_p) {
+    atomic_p = !cell_abstract_location_p(c);
+  }
+  */
+
+  return atomic_p;
+}
+
+/* Is it a unique concrete memory location?
+ *
+ * If strict_p, stubs are not considered atomic, as is the case in an
+ * interprocedural setting since they can be associated to several
+ * cells in the caller frame.
+ *
+ * Else, stubs are not considered non atomic per se.
+ */
+bool generic_atomic_points_to_cell_p(cell c, bool strict_p)
+{
+  reference r = cell_any_reference(c);
+  bool atomic_p = null_cell_p(c)
+    || generic_atomic_points_to_reference_p(r, strict_p);
 
   return atomic_p;
 }

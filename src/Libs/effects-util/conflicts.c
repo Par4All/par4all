@@ -688,6 +688,24 @@ bool cells_must_conflict_p( cell c1, cell c2 ) {
   return conflict_p;
 }
 
+/* Same as above, but for lists. Lists conflict if there exist at
+least one element in l1 and one element in l2 that must conflict. */
+bool points_to_cell_lists_must_conflict_p(list l1, list l2)
+{
+  bool conflict_p = false;
+  FOREACH(CELL, c1, l1) {
+    FOREACH(CELL, c2, l2) {
+      if(cells_must_conflict_p(c1, c2)) {
+	conflict_p = true;
+	break;
+      }
+    }
+    if(conflict_p)
+      break;
+  }
+  return conflict_p;
+}
+
 /**
  * @brief Check if two entities may or must conflict
  *
