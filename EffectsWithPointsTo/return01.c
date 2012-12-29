@@ -20,5 +20,8 @@ int main()
   int *r;
   r = foo();
 
-  return 0;
+  /* r's value is indeterminate and the dereferencement is forbidden
+   * by the standard.
+   */
+  return *r;
 }

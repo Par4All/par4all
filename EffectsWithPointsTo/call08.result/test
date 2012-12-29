@@ -7,7 +7,8 @@ POINTS-TO
 // x -> _x_3[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// x -> _x_3[0] , EXACT
 
 void call08(int r, int m, int *x)
 {

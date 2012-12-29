@@ -7,7 +7,8 @@ POINTS-TO
 // p -> _p_1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_1[0] , EXACT
 
 void foo(int *p)
 {
@@ -80,18 +81,21 @@ int main()
    foo(tab);
 
 // Points To:
+// tab -> tab[0] , EXACT
 // tab2[*] -> undefined , EXACT
 // tab4 -> undefined , EXACT
 
    printf("%s\n", "tab");
 
 // Points To:
+// tab -> tab[0] , EXACT
 // tab2[*] -> undefined , EXACT
 // tab4 -> undefined , EXACT
 
    myprint(tab);
 
 // Points To:
+// tab -> tab[0] , EXACT
 // tab2[*] -> undefined , EXACT
 // tab4 -> undefined , EXACT
 
@@ -121,7 +125,8 @@ int main()
 // p -> _p_1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_1[0] , EXACT
 
 void myprint(int *p)
 {

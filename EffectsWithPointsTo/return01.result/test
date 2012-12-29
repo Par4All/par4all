@@ -34,8 +34,12 @@ int main()
    int *r;
 //             <    is written>: r
    r = foo();
-
-   return 0;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   
+   /* r's value is indeterminate and the dereferencement is forbidden
+      * by the standard.
+      */
+   return *r;
 }
 int *foo();
 
@@ -47,7 +51,8 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: unreachable
+// Points To OUT:
+// foo -> undefined , EXACT
 
 int * foo()
 {
@@ -139,10 +144,14 @@ int main()
 
    r = foo();
 
-// Points To: unreachable
+// Points To:
+// r -> undefined , EXACT
 
-
-   return 0;
+   
+   /* r's value is indeterminate and the dereferencement is forbidden
+      * by the standard.
+      */
+   return *r;
 }
 
 // Points To IN: none
@@ -195,8 +204,12 @@ int main()
    int *r;
 //             <    is written>: r
    r = foo();
-
-   return 0;
+//             <    is read   >: r
+   
+   /* r's value is indeterminate and the dereferencement is forbidden
+      * by the standard.
+      */
+   return *r;
 }
 int *foo();
 
@@ -204,5 +217,7 @@ int main();
 
  *********************** Use-Def Chains *********************
 
+	21 --> -1 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
 
 ****************** End of Dependence Graph ******************

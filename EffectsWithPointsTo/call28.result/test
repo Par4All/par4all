@@ -7,7 +7,8 @@ Points-to for call28
 // qq -> _qq_1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// qq -> _qq_1[0] , EXACT
 
 void call28(int *qq)
 {
@@ -54,7 +55,8 @@ Points-to for "call28_caller"
 // q -> _q_1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// q -> _q_1[0] , EXACT
 
 int call28_caller(int *q)
 {
@@ -66,8 +68,7 @@ int call28_caller(int *q)
    call28(q);
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// q -> _q_1[0] , EXACT
 
    return 0;
 }

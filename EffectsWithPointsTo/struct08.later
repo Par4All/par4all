@@ -1,0 +1,5 @@
+The error detection has already beeen programmed, but I do not have the information to decide if it is really an error as in this case or if it is normal as in many other cases.
+
+In this case, an undefined is passed. This should always be forbidden.
+
+In other cases, the effective arguments is a constant such as &i and no equivalent is found for the corresponding formal parameter. There is nothing wrong.

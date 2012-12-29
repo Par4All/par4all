@@ -7,6 +7,9 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 #setenv POINTER_VALUES_DEBUG_LEVEL 2
 
+activate PROPER_EFFECTS_WITH_POINTS_TO
+#activate CUMULATED_EFFECTS_WITH_POINTS_TO
+
 echo
 echo Points-to for "init_s"
 echo
@@ -18,7 +21,6 @@ echo
 echo Proper effects with points-to for "init_s"
 echo
 
-activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE [init_s]
 

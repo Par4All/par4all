@@ -39,7 +39,8 @@ Points-to for "call32_caller"
 int call32_caller(struct ad s)
 {
 
-// Points To: none
+// Points To:
+// s.array -> _s_1__1[0] , MAY
 
    int ii = *s.array;
 
@@ -59,7 +60,7 @@ Proper effects with points-to for "call32_caller"
 
 int call32_caller(struct ad s)
 {
-//             <    is read   >: s.array
+//             <    is read   >: _s_1__1[0] s.array
 //             <    is written>: ii
    int ii = *s.array;
 //             <    is read   >: ii s.array _MALLOC_EFFECTS:_MALLOC_
@@ -74,7 +75,7 @@ Cumulated effects with points-to for "call32_caller"
 
 int call32_caller(struct ad s)
 {
-//             <    is read   >: s.array
+//             <    is read   >: _s_1__1[0] s.array
 //             <    is written>: ii
    int ii = *s.array;
 //             <    is read   >: ii s.array _MALLOC_EFFECTS:_MALLOC_

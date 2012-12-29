@@ -33,6 +33,8 @@ POINTS-TO
 // _data1_1.array -> _data1_1_1__1 , MAY
 // _data2_2.array -> *NULL_POINTER* , MAY
 // _data2_2.array -> _data2_2_1__2 , MAY
+// data1 -> _data1_1 , EXACT
+// data2 -> _data2_2 , EXACT
 
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *data1, FLGR_Data1D *data2)
 {

@@ -10,6 +10,7 @@ Points-to for "init"
 // Points To OUT:
 // _m_1[*].tab2 -> *HEAP*_l_20[0] , MAY
 // _m_1[0].tab2 -> *HEAP*_l_20[0] , MAY
+// m -> _m_1[0] , EXACT
 
 void init(mys *m)
 {
@@ -64,6 +65,13 @@ void init(mys *m)
 
       (m->tab2)[i] = (m->tab1)[i];
    }
+
+// Points To:
+// _m_1[*].tab2 -> *HEAP*_l_20[0] , MAY
+// _m_1[0].tab2 -> *HEAP*_l_20[0] , MAY
+// m -> _m_1[0] , EXACT
+
+   return;
 }
 
 Proper effects with points-to for "init"
@@ -92,6 +100,7 @@ void init(mys *m)
 //             <    is read   >: _m_1[0].tab1[i] _m_1[0].tab2 i m
       (m->tab2)[i] = (m->tab1)[i];
    }
+   return;
 }
 
 Cumulated effects with points-to for "init"
@@ -130,6 +139,7 @@ void init(mys *m)
 //             <    is read   >: _m_1[0].tab2 i m
       (m->tab2)[i] = (m->tab1)[i];
    }
+   return;
 }
 
 Points-to for "main"
@@ -162,7 +172,6 @@ int main()
 // Points To:
 // p -> s1 , EXACT
 // s1.tab2 -> init:*HEAP*_l_20[0] , MAY
-// s1.tab2 -> undefined , MAY
 
 
    return 1;

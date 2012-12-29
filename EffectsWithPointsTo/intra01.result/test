@@ -78,6 +78,8 @@ POINTS-TO
 // _fpp_1 -> _fqq_2_2 , MAY
 // _fqq_2 -> *NULL_POINTER* , MAY
 // _fqq_2 -> _fqq_2_2 , MAY
+// fpp -> _fpp_1 , EXACT
+// fqq -> _fqq_2 , EXACT
 
 void bar(int **fpp, int **fqq)
 {

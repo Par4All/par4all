@@ -7,7 +7,8 @@ Points-to for call24
 // q -> _q_1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// q -> _q_1[0] , EXACT
 
 void call24(int *q)
 {

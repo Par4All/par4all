@@ -8,7 +8,8 @@ int main()
 //             <    is written>: buf2 _MALLOC_EFFECTS:_MALLOC_
    char *buf2 = malloc(200*sizeof(char));
    char *fmt;
-   char *i_name;
+//             <    is written>: i_name
+   char *i_name = "i=";
    int i, r, c, max;
    fpos_t *fp_pos, pos;
    long int fp_pos_indic;
@@ -43,7 +44,7 @@ int main()
 //                               __IO_EFFECTS:LUNS[*]
    (void) fprintf(fp, "%s%d", i_name, i);
 //             <may be read   >: stdin[0]
-//             <may be written>: i stdin[0]
+//             <may be written>: stdin[0] *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: i_name stdin __IO_EFFECTS:LUNS[0]
 //             <    is written>: __IO_EFFECTS:LUNS[0]
    

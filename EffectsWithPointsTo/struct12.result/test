@@ -10,6 +10,7 @@ Points-to for "init"
 // Points To OUT:
 // _m_1[*].tab2 -> *HEAP*_l_21[0] , MAY
 // _m_1[0].tab2 -> *HEAP*_l_21[0] , MAY
+// m -> _m_1[0] , EXACT
 
 void init(mys *m)
 {
@@ -145,6 +146,7 @@ Points-to for "init2"
 // Points To OUT:
 // _n_1[0].tab2 -> *NULL_POINTER* , MAY
 // _n_1[0].tab2 -> _n_1_3__1[0][0] , MAY
+// n -> _n_1[0] , EXACT
 
 void init2(mys *n)
 {
@@ -160,7 +162,7 @@ void init2(mys *n)
 // Points To:
 // _n_1[0].tab2 -> *NULL_POINTER* , MAY
 // _n_1[0].tab2 -> _n_1_3__1[0][0] , MAY
-// m.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// m.tab2 -> undefined , EXACT
 // n -> *NULL_POINTER* , MAY
 // n -> _n_1[0] , MAY
 
@@ -310,6 +312,7 @@ Points-to for "init3"
 // Points To OUT:
 // *HEAP*_l_53[*] -> *HEAP*_l_56 , MAY
 // *HEAP*_l_56.tab2 -> *HEAP*_l_57[0] , MAY
+// p -> *HEAP*_l_53[0] , MAY
 
 void init3(mys **p)
 {
@@ -711,10 +714,10 @@ int main()
    mys s1, s2, s3, s4[5];
 
 // Points To:
-// s1.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4[*].tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.tab2 -> undefined , EXACT
+// s2.tab2 -> undefined , EXACT
+// s3.tab2 -> undefined , EXACT
+// s4[*].tab2 -> undefined , EXACT
 
    mys *p = &s1, *q = &s2, **r = &q, *s[5];
 
@@ -722,11 +725,11 @@ int main()
 // p -> s1 , EXACT
 // q -> s2 , EXACT
 // r -> q , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s1.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4[*].tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s[*] -> undefined , EXACT
+// s1.tab2 -> undefined , EXACT
+// s2.tab2 -> undefined , EXACT
+// s3.tab2 -> undefined , EXACT
+// s4[*].tab2 -> undefined , EXACT
 
    int i;
 
@@ -734,11 +737,11 @@ int main()
 // p -> s1 , EXACT
 // q -> s2 , EXACT
 // r -> q , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s1.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4[*].tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s[*] -> undefined , EXACT
+// s1.tab2 -> undefined , EXACT
+// s2.tab2 -> undefined , EXACT
+// s3.tab2 -> undefined , EXACT
+// s4[*].tab2 -> undefined , EXACT
 
 
    for(i = 0; i <= 4; i += 1)
@@ -747,12 +750,12 @@ int main()
 // p -> s1 , EXACT
 // q -> s2 , EXACT
 // r -> q , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// s[*] -> undefined , MAY
 // s[*] -> s4[*] , MAY
-// s1.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4[*].tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.tab2 -> undefined , EXACT
+// s2.tab2 -> undefined , EXACT
+// s3.tab2 -> undefined , EXACT
+// s4[*].tab2 -> undefined , EXACT
 
       s[i] = &s4[i];
 
@@ -760,12 +763,12 @@ int main()
 // p -> s1 , EXACT
 // q -> s2 , EXACT
 // r -> q , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// s[*] -> undefined , MAY
 // s[*] -> s4[*] , MAY
-// s1.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4[*].tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.tab2 -> undefined , EXACT
+// s2.tab2 -> undefined , EXACT
+// s3.tab2 -> undefined , EXACT
+// s4[*].tab2 -> undefined , EXACT
 
 
    init(p);
@@ -774,13 +777,12 @@ int main()
 // p -> s1 , EXACT
 // q -> s2 , EXACT
 // r -> q , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// s[*] -> undefined , MAY
 // s[*] -> s4[*] , MAY
-// s1[0].tab2 -> init:*HEAP*_l_21[0] , MAY
-// s1.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4[*].tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.tab2 -> init:*HEAP*_l_21[0] , MAY
+// s2.tab2 -> undefined , EXACT
+// s3.tab2 -> undefined , EXACT
+// s4[*].tab2 -> undefined , EXACT
 
    init2(q);
 
@@ -788,13 +790,12 @@ int main()
 // p -> s1 , EXACT
 // q -> s2 , EXACT
 // r -> q , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// s[*] -> undefined , MAY
 // s[*] -> s4[*] , MAY
-// s1[0].tab2 -> init:*HEAP*_l_21[0] , MAY
-// s1.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4[*].tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.tab2 -> init:*HEAP*_l_21[0] , MAY
+// s2.tab2 -> undefined , EXACT
+// s3.tab2 -> undefined , EXACT
+// s4[*].tab2 -> undefined , EXACT
 
    q = &s3;
 
@@ -802,27 +803,26 @@ int main()
 // p -> s1 , EXACT
 // q -> s3 , EXACT
 // r -> q , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// s[*] -> undefined , MAY
 // s[*] -> s4[*] , MAY
-// s1[0].tab2 -> init:*HEAP*_l_21[0] , MAY
-// s1.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4[*].tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.tab2 -> init:*HEAP*_l_21[0] , MAY
+// s2.tab2 -> undefined , EXACT
+// s3.tab2 -> undefined , EXACT
+// s4[*].tab2 -> undefined , EXACT
 
    init3(r);
 
 // Points To:
+// init3:*HEAP*_l_53[*] -> init3:*HEAP*_l_56 , MAY
 // p -> s1 , EXACT
 // q -> s3 , EXACT
 // r -> q , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// s[*] -> undefined , MAY
 // s[*] -> s4[*] , MAY
-// s1[0].tab2 -> init:*HEAP*_l_21[0] , MAY
-// s1.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4[*].tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.tab2 -> init:*HEAP*_l_21[0] , MAY
+// s2.tab2 -> undefined , EXACT
+// s3.tab2 -> undefined , EXACT
+// s4[*].tab2 -> undefined , EXACT
 
    init4(s);
 
@@ -833,13 +833,12 @@ int main()
 // q -> s3 , EXACT
 // r -> q , EXACT
 // s[*] -> init4:*HEAP*_l_77 , MAY
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// s[*] -> undefined , MAY
 // s[*] -> s4[*] , MAY
-// s1[0].tab2 -> init:*HEAP*_l_21[0] , MAY
-// s1.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4[*].tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.tab2 -> init:*HEAP*_l_21[0] , MAY
+// s2.tab2 -> undefined , EXACT
+// s3.tab2 -> undefined , EXACT
+// s4[*].tab2 -> undefined , EXACT
 
 
    return 1;

@@ -16,6 +16,8 @@ POINTS-TO
 // _bpp_1 -> _bqq_2_2 , MAY
 // _bqq_2 -> *NULL_POINTER* , MAY
 // _bqq_2 -> _bqq_2_2 , MAY
+// bpp -> _bpp_1 , EXACT
+// bqq -> _bqq_2 , EXACT
 
 void bar(int **bpp, int **bqq)
 {

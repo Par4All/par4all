@@ -86,7 +86,7 @@ int main()
 // Points To:
 // ap[*] -> undefined , MAY
 // ap[*] -> a[*] , MAY
-// ap[4] -> a[*] , EXACT
+// ap[4] -> a[*] , MAY
 
    return 0;
 }

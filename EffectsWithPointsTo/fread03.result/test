@@ -283,7 +283,8 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // line -> _line_3[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// line -> _line_3[0] , EXACT
 
 void ReadPGMrow(FILE *file, int width, byte *line)
 {
@@ -315,3 +316,84 @@ void nrerror(char *f1)
 
 PROPER  EFFECTS WITH POINTS TO
 
+byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
+{
+//             <    is written>: height width
+   int height = 64, width = 128;
+   byte **m;
+   FILE *file;
+   char *buffer;
+   int i;
+//             <    is written>: buffer
+
+   buffer = (char *) calloc(80, sizeof(char));
+//             <may be read   >: __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <    is read   >: filename
+//             <    is written>: file
+   file = fopen(filename, "rb");
+   void nrerror(char *f1);
+//             <    is read   >: file
+   if (file==(void *) 0)
+      nrerror("ouverture du fichier impossible\n");
+//             <    is read   >: buffer
+   
+   // The code synthesis fails because of type_supporting_entities() which explodes the stack
+   //readitem(file, buffer);
+   if (strcmp(buffer, "P5")!=0)
+      nrerror("entete du fichier %s invalide\n");
+//             <    is read   >: nrl
+//             <    is written>: _nrl_2[0]
+   
+   //width  = atoi(readitem(file, buffer));
+   //height = atoi(readitem(file, buffer));
+   //gris   = atoi(readitem(file, buffer));
+   
+   *nrl = 0;
+//             <    is read   >: height nrh
+//             <    is written>: _nrh_3[0]
+   *nrh = height-1;
+//             <    is read   >: ncl
+//             <    is written>: _ncl_4[0]
+   *ncl = 0;
+//             <    is read   >: nch width
+//             <    is written>: _nch_5[0]
+   *nch = width-1;
+   byte **bmatrix(int f1, int f2, int f3, int f4);
+//             <    is read   >: _nch_5[0] _ncl_4[0] _nrh_3[0] 
+//                               _nrl_2[0] nch ncl nrh nrl
+//             <    is written>: m
+   m = bmatrix(*nrl, *nrh, *ncl, *nch);
+
+   for(i = 0; i <= height-1; i += 1)
+//             <may be read   >: __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+      ReadPGMrow(file, width, m[i]);
+//             <may be read   >: __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+
+   fclose(file);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(buffer);
+
+   return m;
+}
+void ReadPGMrow(FILE *file, int width, byte *line)
+{
+//             <may be read   >: __IO_EFFECTS:LUNS[*]
+//             <may be written>: _line_3[*] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: file width
+   fread(&line[0], sizeof(byte), width, file);
+}
+byte * * bmatrix(int f1, int f2, int f3, int f4)
+{
+}
+void nrerror(char *f1)
+{
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

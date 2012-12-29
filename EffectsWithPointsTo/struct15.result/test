@@ -1,5 +1,4 @@
 
-
 Points-to for "init3" 
 
 
@@ -7,8 +6,9 @@ Points-to for "init3"
 
 
 // Points To OUT:
-// *HEAP*_l_19[*] -> *HEAP*_l_22 , MAY
-// *HEAP*_l_22.tab2 -> *HEAP*_l_23[0] , MAY
+// *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
+// p -> *HEAP*_l_26[0] , MAY
 
 void init3(mys **p)
 {
@@ -22,73 +22,73 @@ void init3(mys **p)
    p = malloc(5*sizeof(mys *));
 
 // Points To:
-// p -> *HEAP*_l_19[0] , MAY
+// p -> *HEAP*_l_26[0] , MAY
 
    for(i = 0; i <= 4; i += 1) {
 
 // Points To:
-// *HEAP*_l_19[*] -> *HEAP*_l_22 , MAY
-// *HEAP*_l_22.tab2 -> *HEAP*_l_23[0] , MAY
-// p -> *HEAP*_l_19[0] , MAY
+// *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
+// p -> *HEAP*_l_26[0] , MAY
 
       p[i] = malloc(sizeof(mys));
 
 // Points To:
-// *HEAP*_l_19[*] -> *HEAP*_l_22 , MAY
-// *HEAP*_l_22.tab2 -> *HEAP*_l_23[0] , MAY
-// p -> *HEAP*_l_19[0] , MAY
+// *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
+// p -> *HEAP*_l_26[0] , MAY
 
       p[i]->tab2 = malloc(5*sizeof(int));
    }
 
 // Points To:
-// *HEAP*_l_19[*] -> *HEAP*_l_22 , MAY
-// *HEAP*_l_22.tab2 -> *HEAP*_l_23[0] , MAY
-// p -> *HEAP*_l_19[0] , MAY
+// *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
+// p -> *HEAP*_l_26[0] , MAY
 
 
    p[0]->num = 11;
 
 // Points To:
-// *HEAP*_l_19[*] -> *HEAP*_l_22 , MAY
-// *HEAP*_l_22.tab2 -> *HEAP*_l_23[0] , MAY
-// p -> *HEAP*_l_19[0] , MAY
+// *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
+// p -> *HEAP*_l_26[0] , MAY
 
    (p[0]->tab1)[0] = 20;
 
 // Points To:
-// *HEAP*_l_19[*] -> *HEAP*_l_22 , MAY
-// *HEAP*_l_22.tab2 -> *HEAP*_l_23[0] , MAY
-// p -> *HEAP*_l_19[0] , MAY
+// *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
+// p -> *HEAP*_l_26[0] , MAY
 
    (p[0]->tab2)[0] = 30;
 
 // Points To:
-// *HEAP*_l_19[*] -> *HEAP*_l_22 , MAY
-// *HEAP*_l_22.tab2 -> *HEAP*_l_23[0] , MAY
-// p -> *HEAP*_l_19[0] , MAY
+// *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
+// p -> *HEAP*_l_26[0] , MAY
 
 
    for(i = 1; i <= 4; i += 1) {
 
 // Points To:
-// *HEAP*_l_19[*] -> *HEAP*_l_22 , MAY
-// *HEAP*_l_22.tab2 -> *HEAP*_l_23[0] , MAY
-// p -> *HEAP*_l_19[0] , MAY
+// *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
+// p -> *HEAP*_l_26[0] , MAY
 
       p[i]->num = 10;
 
 // Points To:
-// *HEAP*_l_19[*] -> *HEAP*_l_22 , MAY
-// *HEAP*_l_22.tab2 -> *HEAP*_l_23[0] , MAY
-// p -> *HEAP*_l_19[0] , MAY
+// *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
+// p -> *HEAP*_l_26[0] , MAY
 
       (p[i]->tab1)[0] = 21;
 
 // Points To:
-// *HEAP*_l_19[*] -> *HEAP*_l_22 , MAY
-// *HEAP*_l_22.tab2 -> *HEAP*_l_23[0] , MAY
-// p -> *HEAP*_l_19[0] , MAY
+// *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
+// p -> *HEAP*_l_26[0] , MAY
 
       (p[i]->tab2)[0] = (p[i]->tab1)[0];
    }
@@ -104,44 +104,44 @@ void init3(mys **p)
    p = malloc(5*sizeof(mys *));
 //             <    is written>: i
    for(i = 0; i <= 4; i += 1) {
-//             <may be written>: *HEAP*_l_19[i]
+//             <may be written>: *HEAP*_l_26[i]
 //             <    is read   >: i p _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
       p[i] = malloc(sizeof(mys));
-//             <may be read   >: *HEAP*_l_19[i]
-//             <may be written>: *HEAP*_l_19[i][0].tab2
+//             <may be read   >: *HEAP*_l_26[i]
+//             <may be written>: *HEAP*_l_26[i][0].tab2
 //             <    is read   >: i p _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
       p[i]->tab2 = malloc(5*sizeof(int));
    }
-//             <may be read   >: *HEAP*_l_19[0]
-//             <may be written>: *HEAP*_l_19[0][0].num
+//             <may be read   >: *HEAP*_l_26[0]
+//             <may be written>: *HEAP*_l_26[0][0].num
 //             <    is read   >: p
 
    p[0]->num = 11;
-//             <may be read   >: *HEAP*_l_19[0]
-//             <may be written>: *HEAP*_l_19[0][0].tab1[0]
+//             <may be read   >: *HEAP*_l_26[0]
+//             <may be written>: *HEAP*_l_26[0][0].tab1[0]
 //             <    is read   >: p
    (p[0]->tab1)[0] = 20;
-//             <may be read   >: *HEAP*_l_19[0] *HEAP*_l_19[0][0].tab2
-//             <may be written>: *HEAP*_l_19[0][0].tab2[0]
+//             <may be read   >: *HEAP*_l_26[0] *HEAP*_l_26[0][0].tab2
+//             <may be written>: *HEAP*_l_26[0][0].tab2[0]
 //             <    is read   >: p
    (p[0]->tab2)[0] = 30;
 //             <    is written>: i
 
    for(i = 1; i <= 4; i += 1) {
-//             <may be read   >: *HEAP*_l_19[i]
-//             <may be written>: *HEAP*_l_19[i][0].num
+//             <may be read   >: *HEAP*_l_26[i]
+//             <may be written>: *HEAP*_l_26[i][0].num
 //             <    is read   >: i p
       p[i]->num = 10;
-//             <may be read   >: *HEAP*_l_19[i]
-//             <may be written>: *HEAP*_l_19[i][0].tab1[0]
+//             <may be read   >: *HEAP*_l_26[i]
+//             <may be written>: *HEAP*_l_26[i][0].tab1[0]
 //             <    is read   >: i p
       (p[i]->tab1)[0] = 21;
-//             <may be read   >: *HEAP*_l_19[i] *HEAP*_l_19[i] 
-//                               *HEAP*_l_19[i][0].tab1[0] 
-//                               *HEAP*_l_19[i][0].tab2
-//             <may be written>: *HEAP*_l_19[i][0].tab2[0]
+//             <may be read   >: *HEAP*_l_26[i] *HEAP*_l_26[i] 
+//                               *HEAP*_l_26[i][0].tab1[0] 
+//                               *HEAP*_l_26[i][0].tab2
+//             <may be written>: *HEAP*_l_26[i][0].tab2[0]
 //             <    is read   >: i p
       (p[i]->tab2)[0] = (p[i]->tab1)[0];
    }
@@ -157,54 +157,54 @@ void init3(mys **p)
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
    p = malloc(5*sizeof(mys *));
-//             <may be read   >: *HEAP*_l_19[*]
-//             <may be written>: *HEAP*_l_19 *HEAP*_l_19[*]
+//             <may be read   >: *HEAP*_l_26[*]
+//             <may be written>: *HEAP*_l_26 *HEAP*_l_26[*]
 //             <    is read   >: i p _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: i _MALLOC_EFFECTS:_MALLOC_
    for(i = 0; i <= 4; i += 1) {
-//             <may be written>: *HEAP*_l_19[*]
+//             <may be written>: *HEAP*_l_26[*]
 //             <    is read   >: i p _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
       p[i] = malloc(sizeof(mys));
-//             <may be read   >: *HEAP*_l_19[*]
-//             <may be written>: *HEAP*_l_19[*][0].tab2
+//             <may be read   >: *HEAP*_l_26[*]
+//             <may be written>: *HEAP*_l_26[*][0].tab2
 //             <    is read   >: i p _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
       p[i]->tab2 = malloc(5*sizeof(int));
    }
-//             <may be read   >: *HEAP*_l_19[0]
-//             <may be written>: *HEAP*_l_19[0][0].num
+//             <may be read   >: *HEAP*_l_26[0]
+//             <may be written>: *HEAP*_l_26[0][0].num
 //             <    is read   >: p
 
    p[0]->num = 11;
-//             <may be read   >: *HEAP*_l_19[0]
-//             <may be written>: *HEAP*_l_19[0][0].tab1[0]
+//             <may be read   >: *HEAP*_l_26[0]
+//             <may be written>: *HEAP*_l_26[0][0].tab1[0]
 //             <    is read   >: p
    (p[0]->tab1)[0] = 20;
-//             <may be read   >: *HEAP*_l_19[0] *HEAP*_l_19[0][0].tab2
-//             <may be written>: *HEAP*_l_19[0][0].tab2[0]
+//             <may be read   >: *HEAP*_l_26[0] *HEAP*_l_26[0][0].tab2
+//             <may be written>: *HEAP*_l_26[0][0].tab2[0]
 //             <    is read   >: p
    (p[0]->tab2)[0] = 30;
-//             <may be read   >: *HEAP*_l_19 *HEAP*_l_19 
-//                               *HEAP*_l_19[*]
-//             <may be written>: *HEAP*_l_19 *HEAP*_l_19 
-//                               *HEAP*_l_19[*][0].num
+//             <may be read   >: *HEAP*_l_26 *HEAP*_l_26 
+//                               *HEAP*_l_26[*]
+//             <may be written>: *HEAP*_l_26 *HEAP*_l_26 
+//                               *HEAP*_l_26[*][0].num
 //             <    is read   >: i p
 //             <    is written>: i
 
    for(i = 1; i <= 4; i += 1) {
-//             <may be read   >: *HEAP*_l_19[*]
-//             <may be written>: *HEAP*_l_19[*][0].num
+//             <may be read   >: *HEAP*_l_26[*]
+//             <may be written>: *HEAP*_l_26[*][0].num
 //             <    is read   >: i p
       p[i]->num = 10;
-//             <may be read   >: *HEAP*_l_19[*]
-//             <may be written>: *HEAP*_l_19[*][0].tab1[0]
+//             <may be read   >: *HEAP*_l_26[*]
+//             <may be written>: *HEAP*_l_26[*][0].tab1[0]
 //             <    is read   >: i p
       (p[i]->tab1)[0] = 21;
-//             <may be read   >: *HEAP*_l_19[*] 
-//                               *HEAP*_l_19[*][0].tab1[0] 
-//                               *HEAP*_l_19[*][0].tab2
-//             <may be written>: *HEAP*_l_19[*][0].tab2[0]
+//             <may be read   >: *HEAP*_l_26[*] 
+//                               *HEAP*_l_26[*][0].tab1[0] 
+//                               *HEAP*_l_26[*][0].tab2
+//             <may be written>: *HEAP*_l_26[*][0].tab2[0]
 //             <    is read   >: i p
       (p[i]->tab2)[0] = (p[i]->tab1)[0];
    }
@@ -226,16 +226,16 @@ int main()
    mys s2, s3;
 
 // Points To:
-// s2.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s2.tab2 -> undefined , EXACT
+// s3.tab2 -> undefined , EXACT
 
    mys *q = &s2, **r = &q;
 
 // Points To:
 // q -> s2 , EXACT
 // r -> q , EXACT
-// s2.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s2.tab2 -> undefined , EXACT
+// s3.tab2 -> undefined , EXACT
 
 
    q = &s3;
@@ -243,17 +243,17 @@ int main()
 // Points To:
 // q -> s3 , EXACT
 // r -> q , EXACT
-// s2.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s2.tab2 -> undefined , EXACT
+// s3.tab2 -> undefined , EXACT
 
    init3(r);
 
 // Points To:
-// init3:*HEAP*_l_19[*] -> init3:*HEAP*_l_22 , MAY
+// init3:*HEAP*_l_26[*] -> init3:*HEAP*_l_29 , MAY
 // q -> s3 , EXACT
 // r -> q , EXACT
-// s2.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s2.tab2 -> undefined , EXACT
+// s3.tab2 -> undefined , EXACT
 
 
    return 1;
@@ -275,3 +275,7 @@ int main()
 
    return 1;
 }
+
+Warnings and errors (two memory leaks should be detected)
+
+PROPER_EFFECTS_WITH_POINTS_TO[init3] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.

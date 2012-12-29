@@ -25,7 +25,7 @@ void init(mys *m)
       m->tab1[i] = 1;
       m->tab2[i] = m->tab1[i];
     }
-  
+  return;
 }
 
 int main() 

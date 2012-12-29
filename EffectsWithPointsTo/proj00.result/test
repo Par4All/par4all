@@ -31,7 +31,6 @@ int main(void)
    
    // pp points to a dead value in the stack
    printf("%p\n", pp);
-//             <    is read   >: pp
    
    // possible segfault.
    // should generate an error while analyzing?
@@ -63,8 +62,6 @@ static int alea(void)
 	21 --> 23 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
 	21 --> 27 with conflicts
-		from <pp-W-EXACT> to <pp-R-EXACT>
-	21 --> 31 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
 
 ****************** End of Dependence Graph ******************

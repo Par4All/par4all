@@ -7,7 +7,8 @@ Points-to for "foo"
 // b -> _b_1[0][0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// b -> _b_1[0][0] , EXACT
 
 int foo(float (*b)[3])
 {
@@ -225,12 +226,12 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	63 --> 64 with conflicts
+	61 --> 62 with conflicts
 		from <ret-W-EXACT> to <ret-W-EXACT>
 		from <a[*][3]-W-MAY> to <a[*][3]-W-MAY>
 		from <a[*][3]-W-MAY> to <a[*][3]-R-MAY>
 		from <a[*][3]-R-MAY> to <a[*][3]-W-MAY>
-	64 --> 65 with conflicts
+	62 --> 63 with conflicts
 		from <ret-W-EXACT> to <ret-W-EXACT>
 
 ****************** End of Dependence Graph ******************

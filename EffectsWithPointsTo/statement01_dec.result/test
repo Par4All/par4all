@@ -65,4 +65,4 @@ Warnings
 
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (source_to_sinks) Typing error in a pointer assignment or a dereferencing with "tab" at line 5.
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_to_points_to_sinks) Some kind of execution error has been encountered at line 5.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Expression "tab[1]" could not be dereferenced at line 5.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Expression "tab[1]" could not be dereferenced at line 5.

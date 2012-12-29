@@ -10,6 +10,7 @@ Points-to for "init"
 // Points To OUT:
 // _m_1[*].tab2 -> *HEAP*_l_23[0] , MAY
 // _m_1[0].tab2 -> *HEAP*_l_23[0] , MAY
+// m -> _m_1[0] , EXACT
 
 void init(mys *m)
 {
@@ -145,6 +146,7 @@ Points-to for "init2"
 // Points To OUT:
 // _n_1[0].tab2 -> *NULL_POINTER* , MAY
 // _n_1[0].tab2 -> _n_1_3__1[0][0] , MAY
+// n -> _n_1[0] , EXACT
 
 void init2(mys *n)
 {
@@ -160,7 +162,7 @@ void init2(mys *n)
 // Points To:
 // _n_1[0].tab2 -> *NULL_POINTER* , MAY
 // _n_1[0].tab2 -> _n_1_3__1[0][0] , MAY
-// m.tab2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// m.tab2 -> undefined , EXACT
 // n -> *NULL_POINTER* , MAY
 // n -> _n_1[0] , MAY
 
@@ -310,6 +312,7 @@ Points-to for "init3"
 // Points To OUT:
 // *HEAP*_l_55[*] -> *HEAP*_l_58 , MAY
 // *HEAP*_l_58.tab2 -> *HEAP*_l_59[0] , MAY
+// p -> *HEAP*_l_55[0] , MAY
 
 void init3(mys **p)
 {
@@ -519,6 +522,7 @@ Points-to for "init4"
 
 // Points To OUT:
 // *HEAP*_l_79.tab2 -> *HEAP*_l_80[0] , MAY
+// p[*] -> *HEAP*_l_79 , MAY
 
 void init4(mys *p[5])
 {
@@ -710,43 +714,27 @@ int main()
    mys *p, *q, **r, *s[5];
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
+// s[*] -> undefined , EXACT
 
 
    init(p);
 
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// Points To: unreachable
 
    init2(q);
 
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// Points To: unreachable
 
    init3(r);
 
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// Points To: unreachable
 
    init4(s);
 
-// Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// s[*] -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// Points To: unreachable
 
 
    return 1;

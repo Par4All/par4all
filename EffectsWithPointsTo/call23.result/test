@@ -7,7 +7,8 @@ Points-to for call23
 // q -> _q_1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// q -> _q_1[0] , EXACT
 
 void call23(int *q)
 {
@@ -73,8 +74,7 @@ int main()
    call23(ip);
 
 // Points To:
-// ip -> undefined , MAY
-// ip -> i , MAY
+// ip -> i , EXACT
 
    return 0;
 }

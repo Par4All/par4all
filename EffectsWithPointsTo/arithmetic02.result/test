@@ -118,14 +118,14 @@ int main()
    }
 
 // Points To:
-// p -> t[*] , EXACT
+// p -> t[*] , MAY
 // pdeb -> t[0] , EXACT
 // pfin -> t[9] , EXACT
 
    printf("\n");
 
 // Points To:
-// p -> t[*] , EXACT
+// p -> t[*] , MAY
 // pdeb -> t[0] , EXACT
 // pfin -> t[9] , EXACT
 

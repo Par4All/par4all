@@ -10,7 +10,8 @@ Points-to for call02
 
 
 // Points To OUT:
-// q[*] -> _q_4[*][0] , EXACT
+// p -> _p_5[0] , EXACT
+// q[*] -> _q_4[*][0] , MAY
 
 void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
@@ -43,6 +44,12 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 // q[*] -> _q_4[*][0] , MAY
 
    *q[i] = 3;
+
+// Points To:
+// p -> _p_5[0] , EXACT
+// q[*] -> _q_4[*][0] , MAY
+
+   return;
 }
 
 Proper effects with points-to for call02
@@ -67,6 +74,7 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 //             <may be written>: _q_4[*][0]
 //             <    is read   >: i q[i]
    *q[i] = 3;
+   return;
 }
 
 Cumulated effects with points-to for call02
@@ -96,7 +104,102 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 //             <may be written>: _q_4[*][0]
 //             <    is read   >: i
    *q[i] = 3;
+   return;
 }
 
 Points-to for "main"
 
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int a = 1;
+
+// Points To: none
+
+   int b = 2;
+
+// Points To: none
+
+   int x[10], aa[10], i;
+
+// Points To: none
+
+   int *ap[10];
+
+// Points To:
+// ap[*] -> undefined , EXACT
+
+   tf_t s;
+
+// Points To:
+// ap[*] -> undefined , EXACT
+
+   tf_t *sp = &s;
+
+// Points To:
+// ap[*] -> undefined , EXACT
+// sp -> s , EXACT
+
+   
+   /* Initialization added to avoid a segfault in the callee */
+   for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// ap[*] -> undefined , MAY
+// ap[*] -> aa[*] , MAY
+// sp -> s , EXACT
+
+      ap[i] = &aa[i];
+
+// Points To:
+// ap[*] -> undefined , MAY
+// ap[*] -> aa[*] , MAY
+// sp -> s , EXACT
+
+
+   call02(a, b, x, ap, sp);
+
+// Points To:
+// ap[*] -> undefined , MAY
+// ap[*] -> aa[*] , MAY
+// sp -> s , EXACT
+
+   return 0;
+}
+
+Proper effects with points-to for "main"
+
+int main()
+{
+//             <    is written>: a
+   int a = 1;
+//             <    is written>: b
+   int b = 2;
+   int x[10], aa[10], i;
+   int *ap[10];
+   tf_t s;
+//             <    is written>: sp
+   tf_t *sp = &s;
+//             <    is written>: i
+   
+   /* Initialization added to avoid a segfault in the callee */
+   for(i = 0; i <= 9; i += 1)
+//             <    is read   >: i
+//             <    is written>: ap[i]
+      ap[i] = &aa[i];
+//             <may be read   >: ap[*]
+//             <may be written>: aa[*] s.two[*] x[*]
+//             <    is read   >: a b sp
+//             <    is written>: s.one
+
+   call02(a, b, x, ap, sp);
+   return 0;
+}

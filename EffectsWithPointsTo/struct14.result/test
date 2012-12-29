@@ -12,6 +12,7 @@ Points-to for "init2"
 // Points To OUT:
 // _n_1[0].tab2 -> *NULL_POINTER* , MAY
 // _n_1[0].tab2 -> _n_1_3__1[0][0] , MAY
+// n -> _n_1[0] , EXACT
 
 void init2(mys *n)
 {
