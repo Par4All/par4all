@@ -35,22 +35,22 @@ int main()
    p = &a[i];
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[*] , MAY
 
    a[i] = 1;
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[*] , MAY
 
    *p = 0;
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[*] , MAY
 
    a[i]++;
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[*] , MAY
 
 
    printf("a[0]=%d\n", a[0]);
