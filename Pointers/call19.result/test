@@ -58,7 +58,8 @@ POINTS-TO
 // p -> _p_1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_1[0] , EXACT
 
 int bla(int *p)
 {
@@ -80,7 +81,8 @@ int bla(int *p)
 // q -> _q_1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// q -> _q_1[0] , EXACT
 
 int call19(int *q)
 {
@@ -101,8 +103,7 @@ int call19(int *q)
    i = bla(q);
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// q -> _q_1[0] , EXACT
 
    i += *q;
 

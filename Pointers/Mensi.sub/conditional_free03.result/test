@@ -8,8 +8,9 @@ Points-to for "conditional_free03"
 
 // Points To OUT:
 // p -> undefined , MAY
+// p -> _p_1 , MAY
 
-void conditional_free03(int *p, _Bool c1)
+int conditional_free03(int *p, _Bool c1)
 {
 
 // Points To:
@@ -42,7 +43,7 @@ void conditional_free03(int *p, _Bool c1)
 
 Proper effects with points-to for "conditional_free03"
 
-void conditional_free03(int *p, _Bool c1)
+int conditional_free03(int *p, _Bool c1)
 {
 //             <    is read   >: p
 //             <    is written>: q
@@ -63,7 +64,7 @@ Cumulated effects with points-to for "conditional_free03"
 //             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <may be written>: _MALLOC_EFFECTS:_MALLOC_
 //             <    is read   >: _p_1 c1 p
-void conditional_free03(int *p, _Bool c1)
+int conditional_free03(int *p, _Bool c1)
 {
 //             <    is read   >: p
 //             <    is written>: q
@@ -97,15 +98,23 @@ int main()
    int *p = (int *) malloc(sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_16 , MAY
+// p -> *HEAP*_l_17 , MAY
 
-   conditional_free03(p, 0);
+   (void) conditional_free03(p, 0);
 
 // Points To:
-// p -> *HEAP*_l_16 , MAY
+// p -> *HEAP*_l_17 , MAY
 // p -> undefined , MAY
 
    return 0;
 }
+
+Warnigns and errors:
+
+1. Two memory leaks should be indicated;
+
+2. But the current implementation of points_to_function_projection
+does not allow it.
+
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free03] (freed_pointer_to_points_to) Dangling pointer "conditional_free03:0`q".
 unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

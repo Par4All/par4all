@@ -15,6 +15,10 @@ POINTS TO
 
 // Points To OUT:
 // LoadPGM_bmatrix -> *ANY_MODULE*:*HEAP*_b0[0] , MAY
+// nch -> _nch_5[0] , EXACT
+// ncl -> _ncl_4[0] , EXACT
+// nrh -> _nrh_3[0] , EXACT
+// nrl -> _nrl_2[0] , EXACT
 
 byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
@@ -214,7 +218,8 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // line -> _line_3[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// line -> _line_3[0] , EXACT
 
 void ReadPGMrow(FILE *file, int width, byte *line)
 {

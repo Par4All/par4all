@@ -6,7 +6,8 @@ Points-to for "init"
 // p -> _p_1 , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_1 , EXACT
 
 void init(int *p)
 {
@@ -62,7 +63,6 @@ int main()
 
 // Points To:
 // q -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// q -> *NULL_POINTER* , MAY
 
    return *q;
 }
@@ -103,7 +103,8 @@ Points-to for "main"
 // p -> _p_1 , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_1 , EXACT
 
 void init(int *p)
 {
@@ -159,7 +160,6 @@ int main()
 
 // Points To:
 // q -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// q -> *NULL_POINTER* , MAY
 
    return *q;
 }

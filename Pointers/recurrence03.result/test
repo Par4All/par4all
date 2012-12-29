@@ -16,6 +16,7 @@ POINTS TO for "recurrence03"
 // _l_1_2__1[0][0].next -> _l_1_2__1_2__1[0][0][0] , MAY
 // _l_1_2__1_2__1[*][*][*].next -> _l_1_2__1[0][0] , MAY
 // _l_1_2__1_2__1[0][0][0].next -> _l_1_2__1[0][0] , EXACT
+// l -> _l_1[0] , EXACT
 
 void recurrence03(list l)
 {

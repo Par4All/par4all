@@ -24,6 +24,8 @@ POINTS TO for inter05
 // _qqq_2[0] -> _qqq_2_2[0][0] , MAY
 // _qqq_2_2[0][0] -> *NULL_POINTER* , MAY
 // _qqq_2_2[0][0] -> _qqq_2_2_2[0][0][0] , MAY
+// ppp -> _ppp_1[0] , EXACT
+// qqq -> _qqq_2[0] , EXACT
 
 void bar(int ***ppp, int ***qqq)
 {

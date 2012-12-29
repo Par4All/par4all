@@ -12,6 +12,7 @@ POINTS-TO
 // Points To OUT:
 // _argv_2[0][1] -> *NULL_POINTER* , MAY
 // _argv_2[0][1] -> _argv_2_2[0][1][0] , MAY
+// argv -> _argv_2[0][0] , EXACT
 
 int argv03(int argc, char *(*argv)[argc])
 {

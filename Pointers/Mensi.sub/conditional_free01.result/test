@@ -7,7 +7,10 @@ Points-to for "conditional_free01"
 
 
 // Points To OUT:
+// p -> *HEAP*_l_7 , MAY
+// p -> *HEAP*_l_9 , MAY
 // p -> undefined , MAY
+// p -> _p_1 , MAY
 
 void conditional_free01(int *p, _Bool c1, _Bool c2, _Bool c3)
 {
@@ -134,6 +137,12 @@ int main()
 
    return 0;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free01] (potential_to_effective_memory_leaks) Memory cell *HEAP*_l_9 leaked.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free01] (potential_to_effective_memory_leaks) Memory cell *HEAP*_l_7 leaked.
+
+Warnigns and errors:
+
+1. Two memory leaks should be indicated;
+
+2. But the current implementation of points_to_function_projection
+does not allow it.
+
 unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

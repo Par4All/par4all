@@ -21,6 +21,8 @@ POINTS TO
 // _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
 // _vct_4[0].array -> _vct_4_3__4[0][0] , MAY
+// dat -> _dat_1[0] , EXACT
+// vct -> _vct_4[0] , EXACT
 
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
 {
@@ -203,7 +205,7 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 // _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
 // _vct_4[0].array -> _vct_4_3__4[0][0] , MAY
-// array_d -> _dat_1_1__1_1[0][*][0] , EXACT
+// array_d -> _dat_1_1__1_1[0][*][0] , MAY
 // array_s -> _vct_4_3__4[0][0] , EXACT
 // dat -> _dat_1[0] , EXACT
 // vct -> _vct_4[0] , EXACT

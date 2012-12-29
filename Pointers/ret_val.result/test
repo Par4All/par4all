@@ -32,8 +32,7 @@ int main(int argc, char **argv)
    long long int size = get_result(argc, argv);
 
 // Points To:
-// argv -> *NULL_POINTER* , MAY
-// argv -> _argv_2[0] , MAY
+// argv -> _argv_2[0] , EXACT
 
    return size;
 }

@@ -38,6 +38,8 @@ POINTS-TO
 // _t2_2[0] -> _t2_2_2[0][0] , MAY
 // _t2_2_2[0][0].ip2 -> *NULL_POINTER* , MAY
 // _t2_2_2[0][0].ip2 -> _t2_2_2_2__2[0][0][0] , MAY
+// t1 -> _t1_1[0] , EXACT
+// t2 -> _t2_2[0] , EXACT
 
 void assignment(struct foo **t1, struct foo **t2)
 {

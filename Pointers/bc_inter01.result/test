@@ -19,6 +19,11 @@ Points-to for "foo"
 // _pa2_2[*] -> *NULL_POINTER* , MAY
 // _pa2_2[*] -> _a1_1[0] , MAY
 // _pa2_2[0] -> _a1_1[0] , MAY
+// a1 -> *NULL_POINTER* , MAY
+// a1 -> _a1_1[0] , MAY
+// b2 -> *NULL_POINTER* , MAY
+// b2 -> _b2_3[0] , MAY
+// pa2 -> _pa2_2[0] , EXACT
 
 void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
 {

@@ -40,6 +40,7 @@ POINTS-TO
 // _p_1.next -> _p_1_2__1 , MAY
 // _p_1_2__1.val -> undefined , MAY
 // _p_1_2__1.next -> _p_1_2__1 , MAY
+// p -> *NULL_POINTER* , EXACT
 
 int count(liste *p)
 {

@@ -36,6 +36,9 @@ POINTS-TO
 // Points To OUT:
 // *HEAP*_l_30.n -> *HEAP*_l_30 , MAY
 // *HEAP*_l_30.n -> *NULL_POINTER* , MAY
+// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 // reverse_copy -> *HEAP*_l_30 , MAY
 // reverse_copy -> *NULL_POINTER* , MAY
 

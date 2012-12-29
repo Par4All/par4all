@@ -38,6 +38,16 @@ activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[main]
 
 close
+
+echo
+echo Warnigns and errors:
+echo
+echo  1. Two memory leaks should be indicated;
+echo
+echo  2. But the current implementation of points_to_function_projection
+echo     does not allow it.
+echo
+
 shell cat $WS.database/Warnings
 delete $WS
 quit

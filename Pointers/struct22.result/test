@@ -18,6 +18,7 @@ POINTS-TO
 // _ps_1_1__1[0][0] -> undefined , EXACT
 // _ps_1_2__1[*][*] -> undefined , MAY
 // _ps_1_2__1[0][0] -> undefined , EXACT
+// ps -> _ps_1[0] , EXACT
 
 void foo(struct s *ps)
 {

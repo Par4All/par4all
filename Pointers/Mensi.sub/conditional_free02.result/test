@@ -7,9 +7,12 @@ Points-to for "conditional_free02"
 
 
 // Points To OUT:
+// p -> *HEAP*_l_10 , MAY
+// p -> *HEAP*_l_8 , MAY
 // p -> undefined , MAY
+// p -> _p_1 , MAY
 
-void conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
+int conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 {
 
 // Points To:
@@ -71,7 +74,7 @@ void conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 
 Proper effects with points-to for "conditional_free02"
 
-void conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
+int conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 {
 //             <    is read   >: p
 //             <    is written>: q
@@ -100,7 +103,7 @@ Cumulated effects with points-to for "conditional_free02"
 //             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <may be written>: _MALLOC_EFFECTS:_MALLOC_
 //             <    is read   >: _p_1 c1 c2 c3 p
-void conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
+int conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 {
 //             <    is read   >: p
 //             <    is written>: q
@@ -148,12 +151,18 @@ int main()
 // Points To:
 // p -> *HEAP*_l_16 , MAY
 
-   conditional_free02(p, 0, 1, 0);
+   (void) conditional_free02(p, 0, 1, 0);
 
 // Points To:
 // p -> *HEAP*_l_16 , MAY
 
    return 0;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free02] (potential_to_effective_memory_leaks) Memory cell *HEAP*_l_10 leaked.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free02] (potential_to_effective_memory_leaks) Memory cell *HEAP*_l_8 leaked.
+
+Warnigns and errors:
+
+1. Two memory leaks should be indicated;
+
+2. But the current implementation of points_to_function_projection
+does not allow it.
+

@@ -7,7 +7,10 @@ POINTS TO for conditional_free
 
 
 // Points To OUT:
+// p -> *HEAP*_l_10 , MAY
+// p -> *HEAP*_l_8 , MAY
 // p -> undefined , MAY
+// p -> _p_1 , MAY
 
 void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
 {
@@ -22,34 +25,34 @@ void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
       p = (int *) malloc(sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_5 , MAY
+// p -> *HEAP*_l_8 , MAY
 // p -> _p_1 , MAY
 
    if (c2)
 
 // Points To:
-// p -> *HEAP*_l_5 , MAY
+// p -> *HEAP*_l_8 , MAY
 // p -> _p_1 , MAY
 
       free(p);
 
 // Points To:
-// p -> *HEAP*_l_5 , MAY
+// p -> *HEAP*_l_8 , MAY
 // p -> undefined , MAY
 // p -> _p_1 , MAY
 
    if (c3)
 
 // Points To:
-// p -> *HEAP*_l_5 , MAY
+// p -> *HEAP*_l_8 , MAY
 // p -> undefined , MAY
 // p -> _p_1 , MAY
 
       p = (int *) malloc(sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_5 , MAY
-// p -> *HEAP*_l_7 , MAY
+// p -> *HEAP*_l_10 , MAY
+// p -> *HEAP*_l_8 , MAY
 // p -> undefined , MAY
 // p -> _p_1 , MAY
 
@@ -108,5 +111,11 @@ void conditional_free(int *p, _Bool c1, _Bool c2, _Bool c3)
       p = (int *) malloc(sizeof(int));
    return;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free] (potential_to_effective_memory_leaks) Memory cell *HEAP*_l_5 leaked.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free] (potential_to_effective_memory_leaks) Memory cell *HEAP*_l_7 leaked.
+
+Warnigns and errors:
+
+1. Two memory leaks should be indicated;
+
+2. But the current implementation of points_to_function_projection
+does not allow it.
+

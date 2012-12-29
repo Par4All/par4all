@@ -21,7 +21,9 @@ POINTS TO for "dependence02"
 // b -> _b_1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// b -> *NULL_POINTER* , MAY
+// b -> _b_1[0] , MAY
 
 void dependence02(int *b)
 {

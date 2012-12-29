@@ -8,6 +8,7 @@ Points-to for "call28"
 
 // Points To OUT:
 // _ppp_1 -> *NULL_POINTER* , EXACT
+// ppp -> _ppp_1 , EXACT
 
 void call28(int ***ppp)
 {

@@ -16,6 +16,7 @@ POINTS TO for pointer18
 // _p_1_1[1][2] -> _p_1_1_1[1][2][0] , MAY
 // _p_1_1_1[*][*][*] -> undefined , MAY
 // _p_1_1_1[1][2][3] -> undefined , EXACT
+// p -> _p_1[0] , EXACT
 
 void pointer18(float ****p)
 {

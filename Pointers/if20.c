@@ -20,8 +20,9 @@ int main() {
   if(i>0) q = &i;
 
   if(p!=q) {
-    // This assignment cannot be executed according to C standard
-    // because the value of q is unknown
+    // This assignment can be executed according to C standard
+    // although the value of q is undefined/indeterminate; however,
+    // the behavior of the assignment is defined.
     r = q;
     i++; // to get points-to information for the true branch
   }

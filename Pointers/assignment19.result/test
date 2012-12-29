@@ -7,7 +7,7 @@ POINTS TO for assignment19
 
 // Points To OUT: unreachable
 
-void assignment19()
+int assignment19()
 {
 
 // Points To: none
@@ -18,11 +18,16 @@ void assignment19()
 // p -> undefined , EXACT
 // q -> undefined , EXACT
 
+   // the value of q is unknown, the assignment is meaningless, and gcc
+   // issues a warning, but this is OK with the C standard
    p = q;
 
-// Points To: unreachable
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
-   // the value of q is unknown, the assignment is meaningless
-   return;
+   // But this dereferencing is not
+   return *p;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[assignment19] (internal_pointer_assignment_to_points_to) Assignment of an undefined value at line 8.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[assignment19] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "p" at line 12.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[assignment19] (reference_dereferencing_to_points_to) Null or undefined pointer may be dereferenced because of "p" at line 14.

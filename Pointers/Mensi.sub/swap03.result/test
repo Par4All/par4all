@@ -1,5 +1,5 @@
 
-POINTS TO for swap03
+Points-to for "swap03"
 
 
 // Points To IN:
@@ -12,8 +12,10 @@ POINTS TO for swap03
 // Points To OUT:
 // _p_1 -> _q_2_2 , EXACT
 // _q_2 -> _p_1_1 , EXACT
+// p -> _p_1 , EXACT
+// q -> _q_2 , EXACT
 
-void swap01(int **p, int **q)
+void swap03(int **p, int **q)
 {
 
 // Points To:
@@ -50,9 +52,9 @@ void swap01(int **p, int **q)
    return;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+Proper effects with points-to for "swap03"
 
-void swap01(int **p, int **q)
+void swap03(int **p, int **q)
 {
 //             <    is read   >: _p_1 p
 //             <    is written>: pt
@@ -66,21 +68,11 @@ void swap01(int **p, int **q)
    return;
 }
 
-CUMULATED  EFFECTS WITH POINTS TO
+CUMULATED  EFFECTS WITH POINTS TO for "swap03"
 
-int main()
-{
-//             <    is written>: i j pi pj ppi ppj pz z
-   int i = 1, j = 2, z = 3, *pi = &i, *pj = &j, *pz = &z, **ppi = &pi, **ppj = &pj;
-//             <    is read   >: pj ppi ppj
-//             <    is written>: pi pj
-   swap01(ppi, ppj);
-
-   return 0;
-}
 //             <    is read   >: _q_2 p q
 //             <    is written>: _p_1 _q_2
-void swap01(int **p, int **q)
+void swap03(int **p, int **q)
 {
 //             <    is read   >: _p_1 p
 //             <    is written>: pt
@@ -91,60 +83,6 @@ void swap01(int **p, int **q)
 //             <    is read   >: pt q
 //             <    is written>: _q_2
    *q = pt;
-   return;
-}
-void swap01(int **p, int **q);
-
-int main();
-
-POINTS TO for swap03
-
-
-// Points To IN:
-// _p_1 -> _p_1_1 , EXACT
-// _q_2 -> _q_2_2 , EXACT
-// p -> _p_1 , EXACT
-// q -> _q_2 , EXACT
-
-
-// Points To OUT:
-// _p_1 -> _q_2_2 , EXACT
-// _q_2 -> _p_1_1 , EXACT
-
-void swap01(int **p, int **q)
-{
-
-// Points To:
-// _p_1 -> _p_1_1 , EXACT
-// p -> _p_1 , EXACT
-
-   int *pt = *p;
-
-// Points To:
-// _p_1 -> _p_1_1 , EXACT
-// _q_2 -> _q_2_2 , EXACT
-// p -> _p_1 , EXACT
-// pt -> _p_1_1 , EXACT
-// q -> _q_2 , EXACT
-
-   *p = *q;
-
-// Points To:
-// _p_1 -> _q_2_2 , EXACT
-// _q_2 -> _q_2_2 , EXACT
-// p -> _p_1 , EXACT
-// pt -> _p_1_1 , EXACT
-// q -> _q_2 , EXACT
-
-   *q = pt;
-
-// Points To:
-// _p_1 -> _q_2_2 , EXACT
-// _q_2 -> _p_1_1 , EXACT
-// p -> _p_1 , EXACT
-// pt -> _p_1_1 , EXACT
-// q -> _q_2 , EXACT
-
    return;
 }
 
@@ -159,6 +97,7 @@ POINTS TO for "main"
 int main()
 {
 
+
 // Points To: none
 
    int i = 1, j = 2, z = 3, *pi = &i, *pj = &j, *pz = &z, **ppi = &pi, **ppj = &pj;
@@ -170,11 +109,11 @@ int main()
 // ppj -> pj , EXACT
 // pz -> z , EXACT
 
-   swap01(ppi, ppj);
+   swap03(ppi, ppj);
 
 // Points To:
-// pi -> undefined , EXACT
-// pj -> undefined , EXACT
+// pi -> i , EXACT
+// pj -> j , EXACT
 // ppi -> undefined , MAY
 // ppi -> pi , MAY
 // ppj -> undefined , MAY
@@ -187,4 +126,3 @@ int main()
 C_PARSER[main] (simplify_C_expression) Variable "i" is probably used before it is defined
 C_PARSER[main] (simplify_C_expression) Variable "j" is probably used before it is defined
 C_PARSER[main] (simplify_C_expression) Variable "z" is probably used before it is defined
-unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active

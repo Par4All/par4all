@@ -39,6 +39,7 @@ POINTS TO for "dependence11"
 // Points To OUT:
 // _s_1[0].b -> *NULL_POINTER* , MAY
 // _s_1[0].b -> _s_1_2__1[0][0] , MAY
+// s -> _s_1[0] , EXACT
 
 void dependence11(struct my_struct *s)
 {

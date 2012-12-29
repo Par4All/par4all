@@ -7,7 +7,8 @@ POINTS-TO
 // p -> _p_1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_1[0] , EXACT
 
 void fprintf02(int *p)
 {

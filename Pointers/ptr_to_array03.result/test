@@ -6,7 +6,8 @@ POINTS-TO
 // p -> _p_1[0][0] , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_1[0][0] , EXACT
 
 int ptr_to_array03(int (*p)[10])
 {

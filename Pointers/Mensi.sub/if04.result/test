@@ -21,7 +21,8 @@ POINTS TO for if04
 // p -> _p_1 , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_1 , EXACT
 
 void init(int *p)
 {

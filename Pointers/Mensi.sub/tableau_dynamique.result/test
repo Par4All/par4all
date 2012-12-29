@@ -8,6 +8,7 @@ POINTS TO for "allocate_array"
 
 // Points To OUT:
 // _pa_1.data -> *HEAP*_l_7[0] , MAY
+// pa -> _pa_1 , EXACT
 
 void allocate_array(parray_t pa)
 {
@@ -31,7 +32,8 @@ POINTS TO for "init_array"
 // pa -> _pa_1 , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// pa -> _pa_1 , EXACT
 
 void init_array(parray_t pa)
 {

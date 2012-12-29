@@ -57,7 +57,7 @@ int main()
       p = &a[i];
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[*] , MAY
 
       i++;
    }

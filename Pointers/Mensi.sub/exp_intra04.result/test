@@ -35,6 +35,7 @@ POINTS-TO
 // _ps_1.pp2 -> _ps_1_2__1 , EXACT
 // _ps_1_1__1 -> undefined , EXACT
 // _ps_1_2__1 -> undefined , EXACT
+// ps -> _ps_1 , EXACT
 
 void foo(struct s *ps)
 {

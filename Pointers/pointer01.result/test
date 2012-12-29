@@ -9,7 +9,11 @@ POINTS-TO
 // q -> _q_3[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_2[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _q_3[0] , MAY
 
 void pointer01(int n, float *p, float *q)
 {

@@ -12,6 +12,7 @@ POINTS TO for assignment17
 // Points To OUT:
 // _qq_1[0] -> *NULL_POINTER* , MAY
 // _qq_1[0] -> _qq_1_1[0][0] , MAY
+// qq -> _qq_1[0] , EXACT
 
 void assignment17(int **qq)
 {

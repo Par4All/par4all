@@ -10,6 +10,7 @@ Points-to for properties04
 // Points To OUT:
 // _q_1[*] -> undefined , MAY
 // _q_1[0] -> undefined , EXACT
+// q -> _q_1[0] , EXACT
 
 int properties04(int **q)
 {

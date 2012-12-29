@@ -149,8 +149,7 @@ int main(void)
 
    printf("pp=%p\n", pp);
 
-// Points To:
-// pp -> undefined , EXACT
+// Points To: unreachable
 
    
    // possible segfault.

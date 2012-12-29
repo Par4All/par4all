@@ -18,7 +18,8 @@ POINTS TO for "dependence13"
 // Points To IN: none
 
 
-// Points To OUT: unreachable
+// Points To OUT:
+// dependence13.p -> undefined , EXACT
 
 struct my_struct  dependence13()
 {

@@ -21,7 +21,9 @@ POINTS-TO
 // q -> _q_3[0] , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_2[0] , EXACT
+// q -> _q_3[0] , EXACT
 
 void pointer01(int n, float *p, float *q)
 {

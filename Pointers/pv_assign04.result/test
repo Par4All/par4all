@@ -29,7 +29,7 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: unreachable
+// Points To OUT: none
 
 int main()
 {
@@ -61,20 +61,66 @@ int main()
 
    tab_s[0] = s1;
 
-// Points To: unreachable
+// Points To:
+// s1.b[*] -> undefined , EXACT
+// s1.a -> undefined , EXACT
+// s1.c -> undefined , EXACT
+// s2.b[*] -> undefined , EXACT
+// s2.a -> undefined , EXACT
+// s2.c -> undefined , EXACT
+// tab_s[*].b[*] -> undefined , MAY
+// tab_s[0].b[*] -> undefined , MAY
+// tab_s[*].a -> undefined , MAY
+// tab_s[0].a -> undefined , EXACT
+// tab_s[*].c -> undefined , MAY
+// tab_s[0].c -> undefined , EXACT
 
    tab_s[1] = s1;
 
-// Points To: unreachable
+// Points To:
+// s1.b[*] -> undefined , EXACT
+// s1.a -> undefined , EXACT
+// s1.c -> undefined , EXACT
+// s2.b[*] -> undefined , EXACT
+// s2.a -> undefined , EXACT
+// s2.c -> undefined , EXACT
+// tab_s[*].b[*] -> undefined , MAY
+// tab_s[0].b[*] -> undefined , MAY
+// tab_s[1].b[*] -> undefined , MAY
+// tab_s[*].a -> undefined , MAY
+// tab_s[0].a -> undefined , EXACT
+// tab_s[1].a -> undefined , EXACT
+// tab_s[*].c -> undefined , MAY
+// tab_s[0].c -> undefined , EXACT
+// tab_s[1].c -> undefined , EXACT
 
    tab_s[1] = s2;
 
-// Points To: unreachable
+// Points To:
+// s1.b[*] -> undefined , EXACT
+// s1.a -> undefined , EXACT
+// s1.c -> undefined , EXACT
+// s2.b[*] -> undefined , EXACT
+// s2.a -> undefined , EXACT
+// s2.c -> undefined , EXACT
+// tab_s[*].b[*] -> undefined , MAY
+// tab_s[0].b[*] -> undefined , MAY
+// tab_s[1].b[*] -> undefined , MAY
+// tab_s[*].a -> undefined , MAY
+// tab_s[0].a -> undefined , EXACT
+// tab_s[1].a -> undefined , EXACT
+// tab_s[*].c -> undefined , MAY
+// tab_s[0].c -> undefined , EXACT
+// tab_s[1].c -> undefined , EXACT
 
    return 0;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value at line 11.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_to_points_to_sinks) Some kind of execution error has been encountered at line 11.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Expression "s1[b][*]" could not be dereferenced at line 11.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_to_points_to_sinks) Some kind of execution error has been encountered at line 11.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Expression "s1[c]" could not be dereferenced at line 11.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "tab_s[0][a]" at line 11.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "tab_s[0][b][*]" at line 11.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "tab_s[0][c]" at line 11.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "tab_s[1][a]" at line 12.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "tab_s[1][b][*]" at line 12.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "tab_s[1][c]" at line 12.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "tab_s[1][a]" at line 13.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "tab_s[1][b][*]" at line 13.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "tab_s[1][c]" at line 13.

@@ -66,13 +66,13 @@ int main()
 
 // Points To:
 // p -> undefined , EXACT
-// q -> a[*] , EXACT
+// q -> a[*] , MAY
 
       p = q;
 
 // Points To:
-// p -> a[*] , EXACT
-// q -> a[*] , EXACT
+// p -> a[*] , MAY
+// q -> a[*] , MAY
 
       i = 0;
    }

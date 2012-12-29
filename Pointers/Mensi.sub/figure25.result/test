@@ -12,6 +12,8 @@ Points-to for "foo"
 // Points To OUT:
 // _pi_1 -> _pi_1_1 , EXACT
 // _pj_2 -> _pj_2_2 , EXACT
+// pi -> _pi_1 , EXACT
+// pj -> _pj_2 , EXACT
 
 void foo(int **pi, int **pj)
 {

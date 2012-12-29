@@ -6,7 +6,8 @@ POINTS TO for "init"
 // p -> _p_1 , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_1 , EXACT
 
 void init(int *p)
 {
@@ -93,8 +94,7 @@ int main()
    init(q);
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> init_p , MAY
+// q -> init_p , EXACT
 
    return 0;
 }

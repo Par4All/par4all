@@ -59,6 +59,7 @@ int main()
    foo(tab);
 
 // Points To:
+// tab -> tab[0] , EXACT
 // tab2[*] -> undefined , EXACT
 // tab4 -> undefined , EXACT
 // x -> undefined , EXACT
@@ -66,6 +67,7 @@ int main()
    foo(tab2[4]);
 
 // Points To:
+// tab -> tab[0] , EXACT
 // tab2[*] -> undefined , EXACT
 // tab4 -> undefined , EXACT
 // x -> undefined , EXACT
@@ -73,7 +75,9 @@ int main()
    foo(tab3[5]);
 
 // Points To:
+// tab -> tab[0] , EXACT
 // tab2[*] -> undefined , EXACT
+// tab3[5] -> tab3[5][0] , EXACT
 // tab4 -> undefined , EXACT
 // x -> undefined , EXACT
 

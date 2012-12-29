@@ -10,6 +10,7 @@ POINTS TO for pt_kill_3_02
 // Points To OUT:
 // _fpp_2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 // _fpp_2 -> _fpp_2_2 , MAY
+// fpp -> _fpp_2 , EXACT
 
 void my_malloc(int c, int **fpp)
 {

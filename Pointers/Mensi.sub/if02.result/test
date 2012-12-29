@@ -6,7 +6,8 @@ POINTS TO for if02
 // p -> _p_1 , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_1 , EXACT
 
 void init(int *p)
 {
@@ -64,7 +65,8 @@ POINTS TO for "init"
 // p -> _p_1 , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_1 , EXACT
 
 void init(int *p)
 {
@@ -123,7 +125,6 @@ int main()
 
 // Points To:
 // q -> *HEAP*_l_20[0] , MAY
-// q -> *NULL_POINTER* , MAY
 
    return 0;
 }

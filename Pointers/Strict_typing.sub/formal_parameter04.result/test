@@ -64,6 +64,7 @@ POINTS TO
 // _p_1_2__1.two -> _p_1_2__1_2__1 , MAY
 // _p_1_2__1_2__1.two -> _p_1_2__1_2__1_2__1 , MAY
 // _p_1_2__1_2__1_2__1.two -> *NULL_POINTER* , EXACT
+// p -> _p_1 , EXACT
 
 int formal_parameter04(my_struct *p)
 {

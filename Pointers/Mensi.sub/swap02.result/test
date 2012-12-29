@@ -33,6 +33,8 @@ POINTS TO for swap02
 // Points To OUT:
 // _p_1 -> _q_2_2 , EXACT
 // _q_2 -> _p_1_1 , EXACT
+// p -> _p_1 , EXACT
+// q -> _q_2 , EXACT
 
 void swap(int **p, int **q)
 {

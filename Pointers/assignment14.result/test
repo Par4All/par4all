@@ -24,6 +24,8 @@ POINTS TO for assignment14
 // _ty_2[0] -> _ty_2_2[0][0] , MAY
 // _ty_2_2[0][0].ip2 -> *NULL_POINTER* , MAY
 // _ty_2_2[0][0].ip2 -> _ty_2_2_5__2[0][0][0] , MAY
+// tx -> _tx_1[0] , EXACT
+// ty -> _ty_2[0] , EXACT
 
 void assignment14(struct foo **tx, struct foo **ty)
 {

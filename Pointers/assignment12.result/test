@@ -18,6 +18,8 @@ POINTS TO for assignment12
 // _pp_1[0] -> _qq_2_2[0][0] , MAY
 // _qq_2[0] -> *NULL_POINTER* , MAY
 // _qq_2[0] -> _qq_2_2[0][0] , MAY
+// pp -> _pp_1[0] , EXACT
+// qq -> _qq_2[0] , EXACT
 
 void assignment12(int **pp, int **qq)
 {

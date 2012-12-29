@@ -1,4 +1,4 @@
-/* To illustrate the interprocedural issues with free() */
+/* To illustrate the interprocedural issues with free() and flow senstivity */
 
 #include <stdlib.h>
 #include <stdbool.h>

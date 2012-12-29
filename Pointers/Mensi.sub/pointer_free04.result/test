@@ -21,7 +21,9 @@ POINTS TO for pointer_free04
 // fp -> _fp_1 , EXACT
 
 
-// Points To OUT: unreachable
+// Points To OUT:
+// fp -> undefined , EXACT
+// pointer_free -> undefined , EXACT
 
 pointer pointer_free(pointer fp)
 {
@@ -43,7 +45,7 @@ POINTS TO for "main"
 // Points To IN: none
 
 
-// Points To OUT: unreachable
+// Points To OUT: none
 
 int main(void)
 {
@@ -80,11 +82,17 @@ int main(void)
 
    _return0 = p1;
 
-// Points To: unreachable
+// Points To:
+// _return0 -> undefined , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
 
    p2 = _return0;
 
-// Points To: unreachable
+// Points To:
+// _return0 -> undefined , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
 
 
    return;
@@ -106,6 +114,8 @@ int main(void)
 //             <    is read   >: p1
 //             <    is written>: _return0
    _return0 = p1;
+//             <    is read   >: _return0
+//             <    is written>: p2
    p2 = _return0;
 
    return;
@@ -129,11 +139,14 @@ int main(void)
 //             <    is read   >: p1
 //             <    is written>: _return0
    _return0 = p1;
+//             <    is read   >: _return0
+//             <    is written>: p2
    p2 = _return0;
 
    return;
 }
 unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer_free] (internal_pointer_assignment_to_points_to) Assignment of an undefined value at line 12.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer_free] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "pointer_free" at line 12.
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value at line 8.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "_return0" at line 8.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "p2" at line 11.

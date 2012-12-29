@@ -7,7 +7,8 @@ Points-to properties02
 // p -> _p_2 , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_2 , EXACT
 
 void properties02(int n, int *p)
 {

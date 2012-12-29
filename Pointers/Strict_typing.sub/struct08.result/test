@@ -9,6 +9,7 @@ Points-to for "init"
 
 // Points To OUT:
 // _m_1.tab2 -> *HEAP*_l_16[0] , MAY
+// m -> _m_1 , EXACT
 
 void init(mys *m)
 {
@@ -73,6 +74,7 @@ Points-to for "init2"
 // Points To OUT:
 // _n_1.tab2 -> *NULL_POINTER* , MAY
 // _n_1.tab2 -> _n_1_3__1 , MAY
+// n -> _n_1 , EXACT
 
 void init2(mys *n)
 {
@@ -164,6 +166,7 @@ Points-to for "init3"
 // Points To OUT:
 // *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
 // *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
+// p -> *HEAP*_l_48[0] , MAY
 
 void init3(mys **p)
 {

@@ -32,6 +32,8 @@ POINTS-TO
 
 
 // Points To OUT:
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
 // nil -> *NULL_POINTER* , EXACT
 
 void list_free(list l)

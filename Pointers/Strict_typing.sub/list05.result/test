@@ -16,6 +16,8 @@ Points-to for "list_next"
 // list_next -> *NULL_POINTER* , MAY
 // list_next -> _nl_1_2__1 , MAY
 // nil -> *NULL_POINTER* , EXACT
+// nl -> *NULL_POINTER* , MAY
+// nl -> _nl_1 , MAY
 
 list list_next(list nl)
 {
@@ -77,6 +79,8 @@ Points-to for "list_len"
 // Points To OUT:
 // _ll_1.next -> *NULL_POINTER* , MAY
 // _ll_1.next -> _ll_1_2__1 , MAY
+// ll -> *NULL_POINTER* , MAY
+// ll -> _ll_1 , MAY
 // nil -> *NULL_POINTER* , EXACT
 
 int list_len(list ll)

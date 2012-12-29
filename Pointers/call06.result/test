@@ -7,7 +7,8 @@ POINTS TO for call06
 // x -> _x_3[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// x -> _x_3[0] , EXACT
 
 void call06(int r, int m, int *x)
 {

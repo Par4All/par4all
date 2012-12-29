@@ -6,7 +6,8 @@ POINTS TO for ordered_free01am
 // fp -> _fp_1 , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// fp -> *HEAP*_l_7 , MAY
 
 void ordered_free01(int *fp)
 {
@@ -69,4 +70,3 @@ void ordered_free01(int *fp)
    return;
 }
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[ordered_free01] (freed_pointer_to_points_to) Dangling pointer "ordered_free01:0`fq".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[ordered_free01] (potential_to_effective_memory_leaks) Memory cell *HEAP*_l_7 leaked.

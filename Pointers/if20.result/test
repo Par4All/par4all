@@ -51,11 +51,15 @@ int main()
 // q -> undefined , MAY
 // r -> undefined , EXACT
 
-      // This assignment cannot be executed according to C standard
-      // because the value of q is unknown
+      // This assignment can be executed according to C standard
+      // although the value of q is undefined/indeterminate; however,
+      // the behavior of the assignment is defined.
       r = q;
 
-// Points To: unreachable
+// Points To:
+// p -> i , EXACT
+// q -> undefined , MAY
+// r -> undefined , EXACT
 
       i++;
    }
@@ -78,10 +82,12 @@ int main()
 
 // Points To:
 // p -> i , EXACT
-// q -> i , EXACT
-// r -> i , EXACT
+// q -> undefined , MAY
+// q -> i , MAY
+// r -> undefined , MAY
+// r -> i , MAY
 
 
    return 0;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value at line 25.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "r" at line 26.

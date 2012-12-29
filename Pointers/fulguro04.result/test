@@ -15,6 +15,7 @@ POINTS TO
 // _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
 // _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
+// dat -> _dat_1[0] , EXACT
 
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row)
 {

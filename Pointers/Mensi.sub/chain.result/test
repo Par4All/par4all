@@ -9,6 +9,8 @@ POINTS TO for chain
 
 // Points To OUT:
 // _c1_1.next -> _c2_2 , EXACT
+// c1 -> _c1_1 , EXACT
+// c2 -> _c2_2 , EXACT
 
 void chain(ilp_t c1, ilp_t c2)
 {
@@ -62,6 +64,8 @@ POINTS-TO for "chain"
 
 // Points To OUT:
 // _c1_1.next -> _c2_2 , EXACT
+// c1 -> _c1_1 , EXACT
+// c2 -> _c2_2 , EXACT
 
 void chain(ilp_t c1, ilp_t c2)
 {
@@ -133,4 +137,6 @@ int main()
 
    return 0;
 }
-unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active
+
+Warnings and errors: none expected
+

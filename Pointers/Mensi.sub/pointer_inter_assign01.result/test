@@ -21,6 +21,7 @@ POINTS TO for pointer_inter_assign01
 
 
 // Points To OUT:
+// fp -> _fp_1 , EXACT
 // pointer_assign01 -> _fp_1 , EXACT
 
 pointer pointer_assign01(pointer fp)

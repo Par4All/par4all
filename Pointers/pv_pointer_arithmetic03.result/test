@@ -72,22 +72,22 @@ int main()
    p = p+i;
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[*] , MAY
 
    p = p+j;
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[*] , MAY
 
    p = p-i;
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[*] , MAY
 
    p = p-j;
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[*] , MAY
 
    return 0;
 }

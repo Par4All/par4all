@@ -47,7 +47,8 @@ POINTS TO for "count"
 // p -> _p_1 , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> *NULL_POINTER* , EXACT
 
 int count(list *p)
 {

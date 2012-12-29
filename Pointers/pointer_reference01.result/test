@@ -15,6 +15,7 @@ POINTS-TO
 // _p_1[3] -> _p_1_1[3][0] , MAY
 // _p_1_1[3][0] -> *NULL_POINTER* , MAY
 // _p_1_1[3][0] -> _p_1_1_1[3][0][0] , MAY
+// p -> _p_1[0] , EXACT
 
 int pointer_reference01(char ***p)
 {

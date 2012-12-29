@@ -6,7 +6,8 @@ POINTS-TO for "pointer_free"
 // p -> _p_1 , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> *HEAP*_l_16 , MAY
 
 void pointer_free(pointer p)
 {
@@ -95,4 +96,3 @@ int main(void)
 
    return;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer_free] (potential_to_effective_memory_leaks) Memory cell *HEAP*_l_16 leaked.
