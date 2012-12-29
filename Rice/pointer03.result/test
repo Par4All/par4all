@@ -7,7 +7,8 @@ POINTS TO
 // p -> _p_2[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_2[0] , EXACT
 
 void pointer03(int n, float *p)
 {

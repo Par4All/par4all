@@ -11,7 +11,10 @@ POINTS TO
 // c -> _c_3[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
 
 void pointer07(double *a, double *b, double *c, int cnt)
 {
