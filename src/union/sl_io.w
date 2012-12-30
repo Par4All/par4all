@@ -107,7 +107,7 @@ celle effectuée pour les Psystemes :
 %%
 
 int yywrap() { return(-1); }
-int sl_init_lex() { BEGIN TEXT; }
+void sl_init_lex() { BEGIN TEXT; }
 @}
 
 \subsection{Analyse grammaticale}
@@ -598,7 +598,7 @@ char        *(*in_fu)() ;
 
 extern  Psyslist  sl_yacc;  /* Psysteme construit par sl_gram.y */
 extern  FILE*     slx_in;   /* fichier lu par sl_lex.l          */
-extern  int sl_init_lex();
+extern  void sl_init_lex();
 
 /* void sl_read(FILE*) reads a Psyslist */
 Psyslist  sl_read( nomfic )
