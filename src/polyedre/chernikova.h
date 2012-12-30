@@ -1,5 +1,4 @@
 /*
-
   $Id$
 
   Copyright 1989-2012 MINES ParisTech
@@ -11,15 +10,14 @@
   the Free Software Foundation, either version 3 of the License, or
   any later version.
 
-  Linear/C3 Library is distributed in the hope that it will be useful, but WITHOUT ANY
-  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  Linear/C3 Library is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.
 
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public License
   along with Linear/C3 Library.  If not, see <http://www.gnu.org/licenses/>.
-
 */
 
 #ifndef LINEAR_CHERNIKOVA_H
@@ -214,7 +212,7 @@ static void zvec_neg(zval_t* zvec1, zval_t* zvec2, unsigned nbvals) {
 	}
 }
 
-static int zvec_index_first_notzero(zval_t* zvec, unsigned nbvals) { 
+static int zvec_index_first_notzero(zval_t* zvec, unsigned nbvals) {
 	zval_t *cv;
 	cv = zvec;
 	int i;
@@ -248,7 +246,7 @@ static void zvec_min_notzero(zval_t* zvec, unsigned nbvals,
 		if (zval_cmp(aux, *pmin) < 0) {
 			zval_set(*pmin, aux);
 			*pindex = i;
-		}  
+		}
 	}
 	zval_clear(aux);
 }
@@ -413,7 +411,7 @@ static void NOWUNUSED zmat_fprint(FILE* stream, zmat_p zmat) {
 
 #define WSIZE (8 * sizeof(int))
 
-#define MSB ((unsigned) (((unsigned) 1) << (WSIZE - 1))) 
+#define MSB ((unsigned) (((unsigned) 1) << (WSIZE - 1)))
 
 #define NEXT(j ,b) { \
 	if (!((b) >>= 1)) { \
@@ -1486,7 +1484,7 @@ static inline Psysteme sc_union(Psysteme sc1, Psysteme sc2) {
 		if (sc != NULL) {
 			sc_rm(sc);
 		}
-		// clear the alarm if necessary		
+		// clear the alarm if necessary
 		if (get_linear_convex_hull_timeout()) {
 			alarm(0);
 		}
@@ -1566,5 +1564,5 @@ static inline Psysteme sc_union(Psysteme sc1, Psysteme sc2) {
 	return sc;
 }
 
-#endif
+#endif // LINEAR_CHERNIKOVA_H
 
