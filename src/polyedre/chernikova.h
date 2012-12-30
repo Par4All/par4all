@@ -617,10 +617,14 @@ static void sort_rays(zmat_p rays, bmat_p sat, int nbbrays, int nbrays,
 	}
 }
 
-static int chernikova(zmat_p constrs, zmat_p rays, bmat_p sat, unsigned nbbrays,
-			unsigned nbmaxrays, bool dual) {
+static int chernikova(
+  zmat_p constrs, zmat_p rays, bmat_p sat,
+  volatile unsigned nbbrays,
+  volatile unsigned nbmaxrays,
+  bool dual)
+{
 	unsigned nbconstrs = constrs->nbrows;
-	unsigned nbrays = rays->nbrows;
+	volatile unsigned nbrays = rays->nbrows;
 	unsigned nbdims = constrs->nbcols - 1;
 	unsigned sat_nbcols = sat->nbcols;
 	unsigned nbcols1 = nbdims + 1;
@@ -845,7 +849,8 @@ static int gauss(zmat_p zmat, int nbeqs, int nbdims) {
 	return rank;
 }
 
-static void remove_redundants(zmat_p* pconstrs, zmat_p* prays, bmat_p sat) {
+static void remove_redundants(zmat_p* pconstrs, zmat_p* prays, bmat_p sat)
+{
 	zmat_p constrs = *pconstrs, rays = *prays;
 	zmat_p constrs2 = NULL, rays2 = NULL;
 	unsigned nbbrays, nburays, nbeqs, nbineqs;
@@ -853,7 +858,7 @@ static void remove_redundants(zmat_p* pconstrs, zmat_p* prays, bmat_p sat) {
 	unsigned nbdims = constrs->nbcols - 1;
 	unsigned nbrays = rays->nbrows;
 	unsigned sat_nbcols = sat->nbcols;
-	unsigned nbconstrs = constrs->nbrows;
+	volatile unsigned nbconstrs = constrs->nbrows;
 	unsigned nbcols2 = sat_nbcols * sizeof(int);
 	int i, j, k;
 	int aux;

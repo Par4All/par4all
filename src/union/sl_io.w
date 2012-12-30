@@ -583,7 +583,7 @@ int         in_tab;
     for (peq = ps->egalites;peq!=NULL;
 	 fprintf(in_fi,"%s", tabs),
          egalite_fprint(in_fi,peq,in_fu),peq=peq->succ);
-    
+
     fprintf(in_fi,"%s } \n", tabs);
   }
   free( tabs );
@@ -596,10 +596,9 @@ char        *(*in_fu)() ;
 { sl_fprint_tab( in_fi, in_sl, in_fu, 0 );  }
 
 
- 
 extern  Psyslist  sl_yacc;  /* Psysteme construit par sl_gram.y */
 extern  FILE*     slx_in;   /* fichier lu par sl_lex.l          */
-void sl_init_lex();
+extern  int sl_init_lex();
 
 /* void sl_read(FILE*) reads a Psyslist */
 Psyslist  sl_read( nomfic )
