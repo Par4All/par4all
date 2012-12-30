@@ -317,11 +317,11 @@ char *directory_name;
       (void) fprintf(f,"INEGALITES (%d)  ",sc_nbre_inegalites(sc));
       (void) fprintf(f,"EGALITES (%d)  ",sc_nbre_egalites(sc));
       (void) fprintf(f,"\nVAR ");
-	
+
       base_fprint(f,sc->base, default_variable_to_string);
       (void) fprintf(f,"  {\n ");
       inegalites_fprint(f,sc->inegalites, default_variable_to_string);
-      egalites_fprint(f,sc->egalites, default_variable_to_string);      
+      egalites_fprint(f,sc->egalites, default_variable_to_string);
       (void) fprintf(f,"  }\n");
     }
     else {
@@ -330,6 +330,7 @@ char *directory_name;
     fclose(f);
   } else {
     fprintf(stderr,"Ouverture du fichier %s impossible\n",fn);
-  }    
-  chdir("..");    
+  }
+  if (chdir("..")) // just to avoid a gcc warning
+    fprintf(stderr, "chdir(\"..\") failed\n");
 }
