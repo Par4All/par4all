@@ -31,7 +31,7 @@
   *  - suppression de l'ancienne version de vect_print() qui faisait
   *    l'hypothese que le type Variable etait egal au type int; remplacement
   *    par un appel a vect_fprint(); (FI, 27/11/89)
-  *  - ajout de vect_dump() qui utilise implicitement la fonction 
+  *  - ajout de vect_dump() qui utilise implicitement la fonction
   *    variable_dump_name()
   */
 
@@ -62,41 +62,39 @@
  *
  * Ce format est malheureusement incompatible avec celui de vect_fprint()
  */
-Pvecteur vect_read(b)
-Pbase * b;
+Pvecteur vect_read(Pbase * b)
 {
-    Pvecteur v1;
-    Pvecteur v = VECTEUR_NUL;
-    /* Let's assume that no variable name will be longer than 9 characters */
-    static char buffer[10];
-    /* flag de continuation */
-    int c;
+  Pvecteur v1, v = VECTEUR_NUL;
+  // Let's assume that no variable name will be longer than 9 characters
+  char buffer[10];
+  int c; // flag de continuation
 
-    c = 1;
-    while (c == 1)  {
-	Variable var;
-	Value val;
-
-	/* vect_chain() n'est pas utilise pour conserver l'ordre des couples */
-	(void) printf ("valeur de variable :");
-	(void) scanf("%9s",buffer);
-	(void) printf ("valeur du coefficient de la variable :");
-	(void) scan_Value(&val);
-	if(!base_contains_variable_p(*b, (Variable) buffer)) {
+  c = 1;
+  while (c == 1)  {
+    Variable var;
+    Value val;
+    // vect_chain() n'est pas utilise pour conserver l'ordre des couples
+    (void) printf ("valeur de variable :");
+    int n = scanf("%9s",buffer);
+    assert(n==1);
+    (void) printf ("valeur du coefficient de la variable :");
+    (void) scan_Value(&val);
+    if(!base_contains_variable_p(*b, (Variable) buffer)) {
 	    var = variable_make(buffer);
 	    *b = vect_add_variable(*b,var);
-	}
-	else {
-	    var = base_find_variable(*b, (Variable) buffer);
-	}
-	v1 = vect_new(var, val);
-	v1->succ = v;
-	v = v1;
-	(void) printf ("'1' -->rentrer d'autres valeurs,(0-2..9)"
-		       "sinon. votre choix:");
-	(void) scanf("%d",&c);
     }
-    return(v);
+    else {
+	    var = base_find_variable(*b, (Variable) buffer);
+    }
+    v1 = vect_new(var, val);
+    v1->succ = v;
+    v = v1;
+    (void) printf ("'1' -->rentrer d'autres valeurs,(0-2..9)"
+                   "sinon. votre choix:");
+    n = scanf("%d", &c);
+    assert(n==1);
+  }
+  return v;
 }
 
 /* void vect_fprint(FILE * f, Pvecteur v, char * (*variable_name)()):
