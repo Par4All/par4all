@@ -351,7 +351,7 @@ sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 	Pcontrainte eq = CONTRAINTE_UNDEFINED;
 	Pcontrainte ineq = CONTRAINTE_UNDEFINED;
 	Pcontrainte next_eq = CONTRAINTE_UNDEFINED;
-	int nvar;
+	volatile int nvar;
 	int neq = sc_nbre_egalites(ps);
 
 	if_debug_sc_minmax_of_variable2 {
@@ -362,7 +362,7 @@ sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 	    sc_dump(ps);
 	}
 
-	/* 
+	/*
 	 * Solve the equalities (if any)
 	 *
 	 * Start with equalities with the smallest number of variables
