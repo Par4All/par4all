@@ -5826,8 +5826,12 @@ towards the \verb/NULL/ location. Thus it prevents from dereferencing
 a null pointer when dereferencing a points-to stub and it allows the
 comparison of two points-to stubs when a condition such as \verb/p!=q/
 is interpreted or the comparison of one points-to stub to NULL as in
-\verb/p!=NULL/. Temporarily, to perform an interprocedural analysis,
-it must be turned to {\tt FALSE}.
+\verb/p!=NULL/. This property must be set to TRUE for the points-to
+analysis to return valid results since the constant path lattice used
+implies that NULL is not included in points-to stubes. Also, setting
+it to FALSE make any formal recursive data structures infinite since
+NULL is never found by the analyzer. Basically, this property should
+be removed.
 \begin{PipsProp}{POINTS_TO_NULL_POINTER_INITIALIZATION}
 POINTS_TO_NULL_POINTER_INITIALIZATION TRUE
 \end{PipsProp}
