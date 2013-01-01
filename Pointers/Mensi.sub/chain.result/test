@@ -1,50 +1,45 @@
 
-POINTS TO for chain
+Points-to for "chain"
 
 
 // Points To IN:
-// c1 -> _c1_1 , EXACT
-// c2 -> _c2_2 , EXACT
+// c1 -> *NULL_POINTER* , MAY
+// c1 -> _c1_1 , MAY
+// c2 -> *NULL_POINTER* , MAY
+// c2 -> _c2_2 , MAY
 
 
 // Points To OUT:
-// _c1_1.next -> _c2_2 , EXACT
+// _c1_1.next -> *NULL_POINTER* , MAY
+// _c1_1.next -> _c2_2 , MAY
 // c1 -> _c1_1 , EXACT
-// c2 -> _c2_2 , EXACT
+// c2 -> *NULL_POINTER* , MAY
+// c2 -> _c2_2 , MAY
 
 void chain(ilp_t c1, ilp_t c2)
 {
 
 // Points To:
-// c1 -> _c1_1 , EXACT
-// c2 -> _c2_2 , EXACT
+// c1 -> *NULL_POINTER* , MAY
+// c1 -> _c1_1 , MAY
+// c2 -> *NULL_POINTER* , MAY
+// c2 -> _c2_2 , MAY
 
    c1->next = c2;
 
 // Points To:
-// _c1_1.next -> _c2_2 , EXACT
+// _c1_1.next -> *NULL_POINTER* , MAY
+// _c1_1.next -> _c2_2 , MAY
 // c1 -> _c1_1 , EXACT
-// c2 -> _c2_2 , EXACT
+// c2 -> *NULL_POINTER* , MAY
+// c2 -> _c2_2 , MAY
 
 
    return;
 }
 
-proper effects with points-to
+Proper effects with points-to for "chain"
 
-void chain(ilp_t c1, ilp_t c2)
-{
-//             <    is read   >: c1 c2
-//             <    is written>: _c1_1.next
-   c1->next = c2;
-
-   return;
-}
-
-cumulated effects with points-to
-
-//             <    is read   >: c1 c2
-//             <    is written>: _c1_1.next
 void chain(ilp_t c1, ilp_t c2)
 {
 //             <    is read   >: c1 c2
@@ -54,38 +49,20 @@ void chain(ilp_t c1, ilp_t c2)
    return;
 }
 
-POINTS-TO for "chain"
+Cumulated effects with points-to for "chain"
 
-
-// Points To IN:
-// c1 -> _c1_1 , EXACT
-// c2 -> _c2_2 , EXACT
-
-
-// Points To OUT:
-// _c1_1.next -> _c2_2 , EXACT
-// c1 -> _c1_1 , EXACT
-// c2 -> _c2_2 , EXACT
-
+//             <    is read   >: c1 c2
+//             <    is written>: _c1_1.next
 void chain(ilp_t c1, ilp_t c2)
 {
-
-// Points To:
-// c1 -> _c1_1 , EXACT
-// c2 -> _c2_2 , EXACT
-
+//             <    is read   >: c1 c2
+//             <    is written>: _c1_1.next
    c1->next = c2;
-
-// Points To:
-// _c1_1.next -> _c2_2 , EXACT
-// c1 -> _c1_1 , EXACT
-// c2 -> _c2_2 , EXACT
-
 
    return;
 }
 
-POINTS-TO for "main"
+Points-to for "main"
 
 
 // Points To IN: none
