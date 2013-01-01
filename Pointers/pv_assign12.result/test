@@ -3,7 +3,7 @@ PROPER  EFFECTS
 
 int main()
 {
-   int *a[2];
+   int *a[2], *q;
    int b[2];
 //             <    is written>: c
    int c = 0;
@@ -17,6 +17,9 @@ int main()
 //             <    is written>: a[1]
 
    a[1] = &c;
+//             <    is read   >: a[0]
+//             <    is written>: q
+   q = a[0];
    return 0;
 }
 
@@ -33,53 +36,66 @@ int main()
 
 // Points To: none
 
-   int *a[2];
+   int *a[2], *q;
 
 // Points To:
 // a[*] -> undefined , EXACT
+// q -> undefined , EXACT
 
    int b[2];
 
 // Points To:
 // a[*] -> undefined , EXACT
+// q -> undefined , EXACT
 
    int c = 0;
 
 // Points To:
 // a[*] -> undefined , EXACT
+// q -> undefined , EXACT
 
 
    if (1)
 
 // Points To:
 // a[*] -> undefined , EXACT
+// q -> undefined , EXACT
 
       a[0] = &b[0];
    else
 
 // Points To:
 // a[*] -> undefined , EXACT
+// q -> undefined , EXACT
 
       a[0] = &b[1];
 
 // Points To:
 // a[*] -> undefined , MAY
-// a[*] -> b[0] , MAY
-// a[*] -> b[1] , MAY
 // a[0] -> b[0] , MAY
 // a[0] -> b[1] , MAY
+// q -> undefined , EXACT
 
 
    a[1] = &c;
 
 // Points To:
 // a[*] -> undefined , MAY
-// a[*] -> b[0] , MAY
-// a[*] -> b[1] , MAY
 // a[0] -> b[0] , MAY
 // a[0] -> b[1] , MAY
-// a[*] -> c , MAY
 // a[1] -> c , EXACT
+// q -> undefined , EXACT
+
+   q = a[0];
+
+// Points To:
+// a[*] -> undefined , MAY
+// a[0] -> b[0] , MAY
+// a[0] -> b[1] , MAY
+// a[1] -> c , EXACT
+// q -> undefined , MAY
+// q -> b[0] , MAY
+// q -> b[1] , MAY
 
    return 0;
 }

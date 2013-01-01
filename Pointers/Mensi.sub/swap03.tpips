@@ -2,7 +2,10 @@ setenv WS=swap03
 delete $WS
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
+# Not compatible with the current points-to implementation and CP lattice
+# setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
 create $WS $WS.c
 
 activate FAST_INTERPROCEDURAL_POINTS_TO_ANALYSIS

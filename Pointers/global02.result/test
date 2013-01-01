@@ -35,7 +35,6 @@ int main()
    *q = &i;
 
 // Points To:
-// _p_0[*] -> i , MAY
 // _p_0[0] -> i , EXACT
 // p -> *NULL_POINTER* , MAY
 // p -> _p_0[0] , MAY
@@ -45,7 +44,6 @@ int main()
    r = &**q;
 
 // Points To:
-// _p_0[*] -> i , MAY
 // _p_0[0] -> i , EXACT
 // p -> *NULL_POINTER* , MAY
 // p -> _p_0[0] , MAY

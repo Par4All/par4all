@@ -1,0 +1,169 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   int *a[10], *q;
+//             <    is written>: i j
+   int i = 0, j = 2;
+//             <    is written>: a[0]
+   a[0] = &i;
+//             <    is read   >: a[j] j
+//             <    is written>: q
+   q = a[j];
+//             <    is written>: a[1]
+   a[1] = &i;
+//             <    is written>: a[2]
+   a[2] = &i;
+//             <    is written>: a[3]
+   a[3] = &i;
+//             <    is written>: a[4]
+   a[4] = &i;
+//             <    is written>: a[5]
+   a[5] = &i;
+//             <    is written>: a[6]
+   a[6] = &i;
+
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *a[10], *q;
+
+// Points To:
+// a[*] -> undefined , EXACT
+// q -> undefined , EXACT
+
+   int i = 0, j = 2;
+
+// Points To:
+// a[*] -> undefined , EXACT
+// q -> undefined , EXACT
+
+   a[0] = &i;
+
+// Points To:
+// a[*] -> undefined , MAY
+// a[0] -> i , EXACT
+// q -> undefined , EXACT
+
+   q = a[j];
+
+// Points To:
+// a[*] -> undefined , MAY
+// a[0] -> i , EXACT
+// q -> undefined , MAY
+// q -> i , MAY
+
+   a[1] = &i;
+
+// Points To:
+// a[*] -> undefined , MAY
+// a[0] -> i , EXACT
+// a[1] -> i , EXACT
+// q -> undefined , MAY
+// q -> i , MAY
+
+   a[2] = &i;
+
+// Points To:
+// a[*] -> undefined , MAY
+// a[0] -> i , EXACT
+// a[1] -> i , EXACT
+// a[2] -> i , EXACT
+// q -> undefined , MAY
+// q -> i , MAY
+
+   a[3] = &i;
+
+// Points To:
+// a[*] -> undefined , MAY
+// a[0] -> i , EXACT
+// a[1] -> i , EXACT
+// a[2] -> i , EXACT
+// a[3] -> i , EXACT
+// q -> undefined , MAY
+// q -> i , MAY
+
+   a[4] = &i;
+
+// Points To:
+// a[*] -> undefined , MAY
+// a[0] -> i , EXACT
+// a[1] -> i , EXACT
+// a[2] -> i , EXACT
+// a[3] -> i , EXACT
+// a[4] -> i , EXACT
+// q -> undefined , MAY
+// q -> i , MAY
+
+   a[5] = &i;
+
+// Points To:
+// a[*] -> undefined , MAY
+// a[0] -> i , EXACT
+// a[1] -> i , EXACT
+// a[2] -> i , EXACT
+// a[3] -> i , EXACT
+// a[4] -> i , EXACT
+// a[5] -> i , EXACT
+// q -> undefined , MAY
+// q -> i , MAY
+
+   a[6] = &i;
+
+// Points To:
+// a[*] -> undefined , MAY
+// a[0] -> i , EXACT
+// a[1] -> i , EXACT
+// a[2] -> i , EXACT
+// a[3] -> i , EXACT
+// a[4] -> i , EXACT
+// a[5] -> i , EXACT
+// a[6] -> i , EXACT
+// q -> undefined , MAY
+// q -> i , MAY
+
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int *a[10], *q;
+//             <    is written>: i j
+   int i = 0, j = 2;
+//             <    is written>: a[0]
+   a[0] = &i;
+//             <    is read   >: a[j] j
+//             <    is written>: q
+   q = a[j];
+//             <    is written>: a[1]
+   a[1] = &i;
+//             <    is written>: a[2]
+   a[2] = &i;
+//             <    is written>: a[3]
+   a[3] = &i;
+//             <    is written>: a[4]
+   a[4] = &i;
+//             <    is written>: a[5]
+   a[5] = &i;
+//             <    is written>: a[6]
+   a[6] = &i;
+
+   return 0;
+}

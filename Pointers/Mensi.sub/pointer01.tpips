@@ -9,7 +9,10 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 setproperty PRINT_DOTDG_NODE_FONT_SIZE "10"
-setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
+# Not compatible with the current points-to implementation and CP lattice
+# setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
 #setproperty PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT TRUE
 #setenv POINTER_VALUES_DEBUG_LEVEL 2
 

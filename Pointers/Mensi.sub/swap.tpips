@@ -2,21 +2,26 @@ setenv WS=swap
 delete $WS
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
+# Not compatible with the current points-to implementation and CP lattice
+# setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
 create $WS $WS.c
 
+activate PROPER_EFFECTS_WITH_POINTS_TO
+#activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
 
 echo
 echo POINTS TO for "$WS"
 echo
-#activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
+
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[swap]
 
 echo 
 echo PROPER EFFECTS WITH POINTS TO
 echo
-activate PROPER_EFFECTS_WITH_POINTS_TO
+
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[swap]
 
@@ -24,21 +29,14 @@ display PRINTED_FILE[swap]
 echo 
 echo CUMULATED EFFECTS WITH POINTS TO
 echo
+
 activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[swap]
 
 echo
-echo POINTS TO for "$WS"
-echo
-activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
-activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[swap]
-
-echo
 echo POINTS TO for "main"
 echo
-activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[main]
 

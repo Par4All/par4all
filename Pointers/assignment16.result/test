@@ -3,6 +3,8 @@ POINTS TO for assignment16
 
 
 // Points To IN:
+// _pp_1[1] -> *NULL_POINTER* , MAY
+// _pp_1[1] -> _pp_1_1[1][0] , MAY
 // _qq_2[0] -> *NULL_POINTER* , MAY
 // _qq_2[0] -> _qq_2_2[0][0] , MAY
 // pp -> *NULL_POINTER* , MAY
@@ -12,11 +14,9 @@ POINTS TO for assignment16
 
 
 // Points To OUT:
-// _pp_1[*] -> *NULL_POINTER* , MAY
 // _pp_1[0] -> *NULL_POINTER* , MAY
-// _pp_1[*] -> _qq_2_2[0][0] , MAY
+// _pp_1[1] -> _pp_1_1[1][1] , EXACT
 // _pp_1[0] -> _qq_2_2[0][0] , MAY
-// _pp_1[1] -> _qq_2_2[1][1] , MAY
 // _qq_2[0] -> *NULL_POINTER* , MAY
 // _qq_2[0] -> _qq_2_2[0][0] , MAY
 // pp -> _pp_1[1] , EXACT
@@ -36,9 +36,7 @@ void assignment16(int **pp, int **qq)
    *pp = *qq;
 
 // Points To:
-// _pp_1[*] -> *NULL_POINTER* , MAY
 // _pp_1[0] -> *NULL_POINTER* , MAY
-// _pp_1[*] -> _qq_2_2[0][0] , MAY
 // _pp_1[0] -> _qq_2_2[0][0] , MAY
 // _qq_2[0] -> *NULL_POINTER* , MAY
 // _qq_2[0] -> _qq_2_2[0][0] , MAY
@@ -48,9 +46,7 @@ void assignment16(int **pp, int **qq)
    pp++;
 
 // Points To:
-// _pp_1[*] -> *NULL_POINTER* , MAY
 // _pp_1[0] -> *NULL_POINTER* , MAY
-// _pp_1[*] -> _qq_2_2[0][0] , MAY
 // _pp_1[0] -> _qq_2_2[0][0] , MAY
 // _qq_2[0] -> *NULL_POINTER* , MAY
 // _qq_2[0] -> _qq_2_2[0][0] , MAY
@@ -60,9 +56,9 @@ void assignment16(int **pp, int **qq)
    qq++;
 
 // Points To:
-// _pp_1[*] -> *NULL_POINTER* , MAY
 // _pp_1[0] -> *NULL_POINTER* , MAY
-// _pp_1[*] -> _qq_2_2[0][0] , MAY
+// _pp_1[1] -> *NULL_POINTER* , MAY
+// _pp_1[1] -> _pp_1_1[1][0] , MAY
 // _pp_1[0] -> _qq_2_2[0][0] , MAY
 // _qq_2[0] -> *NULL_POINTER* , MAY
 // _qq_2[0] -> _qq_2_2[0][0] , MAY
@@ -72,11 +68,9 @@ void assignment16(int **pp, int **qq)
    (*pp)++;
 
 // Points To:
-// _pp_1[*] -> *NULL_POINTER* , MAY
 // _pp_1[0] -> *NULL_POINTER* , MAY
-// _pp_1[*] -> _qq_2_2[0][0] , MAY
+// _pp_1[1] -> _pp_1_1[1][1] , EXACT
 // _pp_1[0] -> _qq_2_2[0][0] , MAY
-// _pp_1[1] -> _qq_2_2[1][1] , MAY
 // _qq_2[0] -> *NULL_POINTER* , MAY
 // _qq_2[0] -> _qq_2_2[0][0] , MAY
 // pp -> _pp_1[1] , EXACT

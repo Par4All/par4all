@@ -17,8 +17,10 @@ POINTS-TO
 
 
 // Points To IN:
-// p -> _p_2[0] , EXACT
-// q -> _q_3[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_2[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _q_3[0] , MAY
 
 
 // Points To OUT:
@@ -38,8 +40,10 @@ void pointer01(int n, float *p, float *q)
    for(i = 0; i <= n-1; i += 1)                                         /*0009*/
 
 // Points To:
-// p -> _p_2[0] , EXACT
-// q -> _q_3[0] , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_2[0] , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _q_3[0] , MAY
 
       p[i] = q[i];                                                      /*0010*/
 }

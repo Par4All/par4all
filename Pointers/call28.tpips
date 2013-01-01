@@ -8,7 +8,7 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 
 # For provisional interprocedural analysis, two properties
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+# setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
 
 echo 
 echo Points-to for "call28"

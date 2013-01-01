@@ -10,9 +10,7 @@ POINTS TO for "recurrence04"
 
 
 // Points To OUT:
-// _l_1[*].next -> *NULL_POINTER* , MAY
 // _l_1[0].next -> *NULL_POINTER* , MAY
-// _l_1[*].next -> _m_2[0] , MAY
 // _l_1[0].next -> _m_2[0] , MAY
 // l -> _l_1[0] , EXACT
 // m -> *NULL_POINTER* , MAY
@@ -30,9 +28,7 @@ void recurrence04(list l, list m)
    l->next = m;
 
 // Points To:
-// _l_1[*].next -> *NULL_POINTER* , MAY
 // _l_1[0].next -> *NULL_POINTER* , MAY
-// _l_1[*].next -> _m_2[0] , MAY
 // _l_1[0].next -> _m_2[0] , MAY
 // l -> _l_1[0] , EXACT
 // m -> *NULL_POINTER* , MAY

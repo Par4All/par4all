@@ -8,7 +8,6 @@ Points-to for "call26"
 
 
 // Points To OUT:
-// _ppp_1[*] -> *NULL_POINTER* , MAY
 // _ppp_1[0] -> *NULL_POINTER* , EXACT
 // ppp -> _ppp_1[0] , EXACT
 
@@ -22,7 +21,6 @@ void call26(int ***ppp)
    *ppp = (void *) 0;
 
 // Points To:
-// _ppp_1[*] -> *NULL_POINTER* , MAY
 // _ppp_1[0] -> *NULL_POINTER* , EXACT
 // ppp -> _ppp_1[0] , EXACT
 

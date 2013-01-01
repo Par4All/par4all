@@ -3,15 +3,21 @@ Points-to for "foo"
 
 
 // Points To IN:
-// _pi_1 -> _pi_1_1 , EXACT
-// _pj_2 -> _pj_2_2 , EXACT
-// pi -> _pi_1 , EXACT
-// pj -> _pj_2 , EXACT
+// _pi_1 -> *NULL_POINTER* , MAY
+// _pi_1 -> _pi_1_1 , MAY
+// _pj_2 -> *NULL_POINTER* , MAY
+// _pj_2 -> _pj_2_2 , MAY
+// pi -> *NULL_POINTER* , MAY
+// pi -> _pi_1 , MAY
+// pj -> *NULL_POINTER* , MAY
+// pj -> _pj_2 , MAY
 
 
 // Points To OUT:
-// _pi_1 -> _pi_1_1 , EXACT
-// _pj_2 -> _pj_2_2 , EXACT
+// _pi_1 -> *NULL_POINTER* , MAY
+// _pi_1 -> _pi_1_1 , MAY
+// _pj_2 -> *NULL_POINTER* , MAY
+// _pj_2 -> _pj_2_2 , MAY
 // pi -> _pi_1 , EXACT
 // pj -> _pj_2 , EXACT
 
@@ -23,40 +29,54 @@ void foo(int **pi, int **pj)
    int *r, *s;
 
 // Points To:
-// _pi_1 -> _pi_1_1 , EXACT
-// pi -> _pi_1 , EXACT
+// _pi_1 -> *NULL_POINTER* , MAY
+// _pi_1 -> _pi_1_1 , MAY
+// pi -> *NULL_POINTER* , MAY
+// pi -> _pi_1 , MAY
 // r -> undefined , EXACT
 // s -> undefined , EXACT
 
    r = *pi;
 
 // Points To:
-// _pi_1 -> _pi_1_1 , EXACT
-// _pj_2 -> _pj_2_2 , EXACT
+// _pi_1 -> *NULL_POINTER* , MAY
+// _pi_1 -> _pi_1_1 , MAY
+// _pj_2 -> *NULL_POINTER* , MAY
+// _pj_2 -> _pj_2_2 , MAY
 // pi -> _pi_1 , EXACT
-// pj -> _pj_2 , EXACT
-// r -> _pi_1_1 , EXACT
+// pj -> *NULL_POINTER* , MAY
+// pj -> _pj_2 , MAY
+// r -> *NULL_POINTER* , MAY
+// r -> _pi_1_1 , MAY
 // s -> undefined , EXACT
 
    s = *pj;
 
 // Points To:
-// _pi_1 -> _pi_1_1 , EXACT
-// _pj_2 -> _pj_2_2 , EXACT
+// _pi_1 -> *NULL_POINTER* , MAY
+// _pi_1 -> _pi_1_1 , MAY
+// _pj_2 -> *NULL_POINTER* , MAY
+// _pj_2 -> _pj_2_2 , MAY
 // pi -> _pi_1 , EXACT
 // pj -> _pj_2 , EXACT
-// r -> _pi_1_1 , EXACT
-// s -> _pj_2_2 , EXACT
+// r -> *NULL_POINTER* , MAY
+// r -> _pi_1_1 , MAY
+// s -> *NULL_POINTER* , MAY
+// s -> _pj_2_2 , MAY
 
    **pi = 1, **pj = 2;
 
 // Points To:
-// _pi_1 -> _pi_1_1 , EXACT
-// _pj_2 -> _pj_2_2 , EXACT
+// _pi_1 -> *NULL_POINTER* , MAY
+// _pi_1 -> _pi_1_1 , MAY
+// _pj_2 -> *NULL_POINTER* , MAY
+// _pj_2 -> _pj_2_2 , MAY
 // pi -> _pi_1 , EXACT
 // pj -> _pj_2 , EXACT
-// r -> _pi_1_1 , EXACT
-// s -> _pj_2_2 , EXACT
+// r -> *NULL_POINTER* , MAY
+// r -> _pi_1_1 , MAY
+// s -> *NULL_POINTER* , MAY
+// s -> _pj_2_2 , MAY
 
 
    return;

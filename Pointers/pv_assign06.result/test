@@ -87,7 +87,6 @@ int main()
 // Points To:
 // s1.b[*] -> undefined , MAY
 // s1.c -> undefined , EXACT
-// s1.b[*] -> i , MAY
 // s1.b[0] -> i , EXACT
 // s1.a -> j , EXACT
 // s2 -> s1 , EXACT

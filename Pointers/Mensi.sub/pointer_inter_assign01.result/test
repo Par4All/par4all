@@ -1,5 +1,5 @@
 
-INLINING "pointer_assign01"
+Inlining of "pointer_assign01" into "main"
 
 int main(void)
 {
@@ -13,27 +13,31 @@ int main(void)
    return;
 }
 
-POINTS TO for pointer_inter_assign01
+Points-to for "pointer_assign01"
 
 
 // Points To IN:
-// fp -> _fp_1 , EXACT
+// fp -> *NULL_POINTER* , MAY
+// fp -> _fp_1 , MAY
 
 
 // Points To OUT:
-// fp -> _fp_1 , EXACT
-// pointer_assign01 -> _fp_1 , EXACT
+// fp -> *NULL_POINTER* , MAY
+// fp -> _fp_1 , MAY
+// pointer_assign01 -> *NULL_POINTER* , MAY
+// pointer_assign01 -> _fp_1 , MAY
 
 pointer pointer_assign01(pointer fp)
 {
 
 // Points To:
-// fp -> _fp_1 , EXACT
+// fp -> *NULL_POINTER* , MAY
+// fp -> _fp_1 , MAY
 
    return fp;
 }
 
-POINTS TO for "main"
+Points-to for "main"
 
 
 // Points To IN: none
@@ -82,7 +86,7 @@ int main(void)
    return;
 }
 
-PROPER EFFECTS WITH POINTS TO
+Proper effects with points-to for "main"
 
 int main(void)
 {
@@ -102,7 +106,7 @@ int main(void)
    return;
 }
 
-CUMULATED EFFECTS WITH POINTS TO
+Cumulated effects with points-to for "main"
 
 int main(void)
 {
@@ -121,5 +125,3 @@ int main(void)
 
    return;
 }
-unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
-unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active

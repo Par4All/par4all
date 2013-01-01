@@ -4,7 +4,10 @@ delete scalarization06
 setproperty PRETTYPRINT_BLOCKS TRUE
 setproperty CONSTANT_PATH_EFFECTS TRUE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
-setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
+# Not compatible with the current points-to implementation and CP lattice
+# setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
 ##TODO: explain

@@ -51,14 +51,12 @@ int main()
 
 // Points To:
 // a[*] -> undefined , MAY
-// a[*] -> i , MAY
 // a[0] -> i , EXACT
 
    a[1] = &i;
 
 // Points To:
 // a[*] -> undefined , MAY
-// a[*] -> i , MAY
 // a[0] -> i , EXACT
 // a[1] -> i , EXACT
 
@@ -66,7 +64,6 @@ int main()
 
 // Points To:
 // a[*] -> undefined , MAY
-// a[*] -> i , MAY
 // a[0] -> i , EXACT
 // a[1] -> i , EXACT
 // a[2] -> i , EXACT
@@ -75,7 +72,6 @@ int main()
 
 // Points To:
 // a[*] -> undefined , MAY
-// a[*] -> i , MAY
 // a[0] -> i , EXACT
 // a[1] -> i , EXACT
 // a[2] -> i , EXACT
@@ -85,7 +81,6 @@ int main()
 
 // Points To:
 // a[*] -> undefined , MAY
-// a[*] -> i , MAY
 // a[0] -> i , EXACT
 // a[1] -> i , EXACT
 // a[2] -> i , EXACT
@@ -96,7 +91,6 @@ int main()
 
 // Points To:
 // a[*] -> undefined , MAY
-// a[*] -> i , MAY
 // a[0] -> i , EXACT
 // a[1] -> i , EXACT
 // a[2] -> i , EXACT
@@ -108,7 +102,6 @@ int main()
 
 // Points To:
 // a[*] -> undefined , MAY
-// a[*] -> i , MAY
 // a[0] -> i , EXACT
 // a[1] -> i , EXACT
 // a[2] -> i , EXACT

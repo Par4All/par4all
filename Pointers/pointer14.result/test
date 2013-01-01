@@ -60,28 +60,23 @@ void pointer14()
 // Points To:
 // a[*][*][*] -> undefined , EXACT
 // t[*][*] -> undefined , MAY
-// t[*][*] -> a , MAY
 // t[1][2] -> a , EXACT
 
    a[1][2][3] = &z;
 
 // Points To:
 // a[*][*][*] -> undefined , MAY
-// a[*][*][*] -> z , MAY
 // a[1][2][3] -> z , EXACT
 // t[*][*] -> undefined , MAY
-// t[*][*] -> a , MAY
 // t[1][2] -> a , EXACT
 
    foo(t);
 
 // Points To:
 // a[*][*][*] -> undefined , MAY
-// a[*][*][*] -> z , MAY
 // a[1][2][3] -> z , EXACT
 // t[*][*] -> undefined , MAY
 // t[2][3] -> a[0][0][0] , EXACT
-// t[*][*] -> a , MAY
 // t[1][2] -> a , EXACT
 
    return;

@@ -16,16 +16,18 @@ Points-to for "foo"
 
 
 // Points To OUT:
-// _p1_1[*] -> *NULL_POINTER* , MAY
 // _p1_1[0] -> *NULL_POINTER* , MAY
-// _p1_1[*] -> _q3_3[0] , MAY
 // _p1_1[0] -> _q3_3[0] , MAY
 // _p2_2[0] -> *NULL_POINTER* , MAY
 // _p2_2[0] -> _p2_2_2[0][0] , MAY
-// _p2_2_2[*][*] -> *NULL_POINTER* , MAY
 // _p2_2_2[0][0] -> *NULL_POINTER* , MAY
-// _p2_2_2[*][*] -> _r4_4[0] , MAY
 // _p2_2_2[0][0] -> _r4_4[0] , MAY
+// p1 -> _p1_1[0] , EXACT
+// p2 -> _p2_2[0] , EXACT
+// q3 -> *NULL_POINTER* , MAY
+// q3 -> _q3_3[0] , MAY
+// r4 -> *NULL_POINTER* , MAY
+// r4 -> _r4_4[0] , MAY
 
 void foo(int ***p1, int ***p2, int **q3, int *r4)
 {
@@ -57,9 +59,7 @@ void foo(int ***p1, int ***p2, int **q3, int *r4)
    *p1 = q3;
 
 // Points To:
-// _p1_1[*] -> *NULL_POINTER* , MAY
 // _p1_1[0] -> *NULL_POINTER* , MAY
-// _p1_1[*] -> _q3_3[0] , MAY
 // _p1_1[0] -> _q3_3[0] , MAY
 // _p2_2[0] -> *NULL_POINTER* , MAY
 // _p2_2[0] -> _p2_2_2[0][0] , MAY
@@ -275,23 +275,50 @@ int main()
    foo(a1, a2, b3, c4);
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_24 -> *HEAP*_l_33 , MAY
+// *HEAP*_l_24 -> *NULL_POINTER* , MAY
+// *HEAP*_l_25 -> *HEAP*_l_26 , MAY
+// *HEAP*_l_25 -> *HEAP*_l_37 , MAY
+// *HEAP*_l_25 -> *NULL_POINTER* , MAY
+// *HEAP*_l_30 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_33 -> *HEAP*_l_34 , MAY
+// a1 -> *HEAP*_l_24 , MAY
+// a2 -> *HEAP*_l_30 , MAY
+// b3 -> *HEAP*_l_33 , MAY
 // c4 -> *HEAP*_l_37 , MAY
 
 
    printf("%d\n", ***a1);
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
-// a1 -> *ANY_MODULE*:*ANYWHERE* , MAY
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_24 -> *HEAP*_l_33 , MAY
+// *HEAP*_l_24 -> *NULL_POINTER* , MAY
+// *HEAP*_l_25 -> *HEAP*_l_26 , MAY
+// *HEAP*_l_25 -> *HEAP*_l_37 , MAY
+// *HEAP*_l_25 -> *NULL_POINTER* , MAY
+// *HEAP*_l_30 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_33 -> *HEAP*_l_34 , MAY
+// a1 -> *HEAP*_l_24 , MAY
+// a2 -> *HEAP*_l_30 , MAY
+// b3 -> *HEAP*_l_33 , MAY
 // c4 -> *HEAP*_l_37 , MAY
 
    printf("%d\n", ***a2);
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE* -> *ANY_MODULE*:*ANYWHERE* , EXACT
-// a1 -> *ANY_MODULE*:*ANYWHERE* , MAY
-// a2 -> *ANY_MODULE*:*ANYWHERE* , MAY
+// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_24 -> *HEAP*_l_33 , MAY
+// *HEAP*_l_24 -> *NULL_POINTER* , MAY
+// *HEAP*_l_25 -> *HEAP*_l_26 , MAY
+// *HEAP*_l_25 -> *HEAP*_l_37 , MAY
+// *HEAP*_l_25 -> *NULL_POINTER* , MAY
+// *HEAP*_l_30 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_33 -> *HEAP*_l_34 , MAY
+// a1 -> *HEAP*_l_24 , MAY
+// a2 -> *HEAP*_l_30 , MAY
+// b3 -> *HEAP*_l_33 , MAY
 // c4 -> *HEAP*_l_37 , MAY
 
 
@@ -300,8 +327,4 @@ int main()
 
 Warnings and errors
 
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (aliased_translation_p) aliasing detected between formal parameters "p1" and "p2" at line 40.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Aliasing between arguments at line 40.
-We would have to create a new formal context and to restart the points-to analysis and to modify the IN and OUT data structures...
-Or use a simpler analysis, here an intraprocedural one.
 

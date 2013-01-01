@@ -28,7 +28,6 @@ int main()
 // Points To:
 // a[*] -> undefined , MAY
 // a[*] -> i , MAY
-// a[*] -> j , MAY
 // a[0] -> j , EXACT
 
    return 0;

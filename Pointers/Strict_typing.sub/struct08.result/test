@@ -118,7 +118,7 @@ void init2(mys *n)
 // Points To:
 // _n_1.tab2 -> *NULL_POINTER* , MAY
 // _n_1.tab2 -> _n_1_3__1 , MAY
-// m.tab2 -> *HEAP*_l_34[0] , MAY
+// m.tab2 -> *HEAP*_l_35[0] , MAY
 // n -> _n_1 , EXACT
 
    (m.tab1)[0] = 10;
@@ -126,7 +126,7 @@ void init2(mys *n)
 // Points To:
 // _n_1.tab2 -> *NULL_POINTER* , MAY
 // _n_1.tab2 -> _n_1_3__1 , MAY
-// m.tab2 -> *HEAP*_l_34[0] , MAY
+// m.tab2 -> *HEAP*_l_35[0] , MAY
 // n -> _n_1 , EXACT
 
    (m.tab2)[0] = 20;
@@ -134,7 +134,7 @@ void init2(mys *n)
 // Points To:
 // _n_1.tab2 -> *NULL_POINTER* , MAY
 // _n_1.tab2 -> _n_1_3__1 , MAY
-// m.tab2 -> *HEAP*_l_34[0] , MAY
+// m.tab2 -> *HEAP*_l_35[0] , MAY
 // n -> _n_1 , EXACT
 
    for(i = 0; i <= 4; i += 1) {
@@ -142,7 +142,7 @@ void init2(mys *n)
 // Points To:
 // _n_1.tab2 -> *NULL_POINTER* , MAY
 // _n_1.tab2 -> _n_1_3__1 , MAY
-// m.tab2 -> *HEAP*_l_34[0] , MAY
+// m.tab2 -> *HEAP*_l_35[0] , MAY
 // n -> _n_1 , EXACT
 
       (m.tab1)[i] = 1;
@@ -150,7 +150,7 @@ void init2(mys *n)
 // Points To:
 // _n_1.tab2 -> *NULL_POINTER* , MAY
 // _n_1.tab2 -> _n_1_3__1 , MAY
-// m.tab2 -> *HEAP*_l_34[0] , MAY
+// m.tab2 -> *HEAP*_l_35[0] , MAY
 // n -> _n_1 , EXACT
 
       (m.tab2)[i] = (m.tab1)[i];
@@ -164,9 +164,9 @@ Points-to for "init3"
 
 
 // Points To OUT:
-// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
-// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
-// p -> *HEAP*_l_48[0] , MAY
+// *HEAP*_l_49[*] -> *HEAP*_l_52 , MAY
+// *HEAP*_l_52.tab2 -> *HEAP*_l_53[0] , MAY
+// p -> *HEAP*_l_49[0] , MAY
 
 void init3(mys **p)
 {
@@ -180,73 +180,73 @@ void init3(mys **p)
    p = malloc(5*sizeof(mys *));
 
 // Points To:
-// p -> *HEAP*_l_48[0] , MAY
+// p -> *HEAP*_l_49[0] , MAY
 
    for(i = 0; i <= 4; i += 1) {
 
 // Points To:
-// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
-// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
-// p -> *HEAP*_l_48[0] , MAY
+// *HEAP*_l_49[*] -> *HEAP*_l_52 , MAY
+// *HEAP*_l_52.tab2 -> *HEAP*_l_53[0] , MAY
+// p -> *HEAP*_l_49[0] , MAY
 
       p[i] = malloc(sizeof(mys));
 
 // Points To:
-// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
-// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
-// p -> *HEAP*_l_48[0] , MAY
+// *HEAP*_l_49[*] -> *HEAP*_l_52 , MAY
+// *HEAP*_l_52.tab2 -> *HEAP*_l_53[0] , MAY
+// p -> *HEAP*_l_49[0] , MAY
 
       p[i]->tab2 = malloc(5*sizeof(int));
    }
 
 // Points To:
-// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
-// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
-// p -> *HEAP*_l_48[0] , MAY
+// *HEAP*_l_49[*] -> *HEAP*_l_52 , MAY
+// *HEAP*_l_52.tab2 -> *HEAP*_l_53[0] , MAY
+// p -> *HEAP*_l_49[0] , MAY
 
 
    p[0]->num = 11;
 
 // Points To:
-// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
-// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
-// p -> *HEAP*_l_48[0] , MAY
+// *HEAP*_l_49[*] -> *HEAP*_l_52 , MAY
+// *HEAP*_l_52.tab2 -> *HEAP*_l_53[0] , MAY
+// p -> *HEAP*_l_49[0] , MAY
 
    (p[0]->tab1)[0] = 20;
 
 // Points To:
-// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
-// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
-// p -> *HEAP*_l_48[0] , MAY
+// *HEAP*_l_49[*] -> *HEAP*_l_52 , MAY
+// *HEAP*_l_52.tab2 -> *HEAP*_l_53[0] , MAY
+// p -> *HEAP*_l_49[0] , MAY
 
    (p[0]->tab2)[0] = 30;
 
 // Points To:
-// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
-// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
-// p -> *HEAP*_l_48[0] , MAY
+// *HEAP*_l_49[*] -> *HEAP*_l_52 , MAY
+// *HEAP*_l_52.tab2 -> *HEAP*_l_53[0] , MAY
+// p -> *HEAP*_l_49[0] , MAY
 
 
    for(i = 1; i <= 4; i += 1) {
 
 // Points To:
-// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
-// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
-// p -> *HEAP*_l_48[0] , MAY
+// *HEAP*_l_49[*] -> *HEAP*_l_52 , MAY
+// *HEAP*_l_52.tab2 -> *HEAP*_l_53[0] , MAY
+// p -> *HEAP*_l_49[0] , MAY
 
       p[i]->num = 10;
 
 // Points To:
-// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
-// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
-// p -> *HEAP*_l_48[0] , MAY
+// *HEAP*_l_49[*] -> *HEAP*_l_52 , MAY
+// *HEAP*_l_52.tab2 -> *HEAP*_l_53[0] , MAY
+// p -> *HEAP*_l_49[0] , MAY
 
       (p[i]->tab1)[0] = 21;
 
 // Points To:
-// *HEAP*_l_48[*] -> *HEAP*_l_51 , MAY
-// *HEAP*_l_51.tab2 -> *HEAP*_l_52[0] , MAY
-// p -> *HEAP*_l_48[0] , MAY
+// *HEAP*_l_49[*] -> *HEAP*_l_52 , MAY
+// *HEAP*_l_52.tab2 -> *HEAP*_l_53[0] , MAY
+// p -> *HEAP*_l_49[0] , MAY
 
       (p[i]->tab2)[0] = (p[i]->tab1)[0];
    }
@@ -259,8 +259,8 @@ Points-to for "init4"
 
 
 // Points To OUT:
-// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
-// p[*] -> *HEAP*_l_72 , MAY
+// *HEAP*_l_73.tab2 -> *HEAP*_l_74[0] , MAY
+// p[*] -> *HEAP*_l_73 , MAY
 
 void init4(mys *p[5])
 {
@@ -274,60 +274,60 @@ void init4(mys *p[5])
    for(i = 0; i <= 4; i += 1) {
 
 // Points To:
-// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
-// p[*] -> *HEAP*_l_72 , MAY
+// *HEAP*_l_73.tab2 -> *HEAP*_l_74[0] , MAY
+// p[*] -> *HEAP*_l_73 , MAY
 
       p[i] = malloc(sizeof(mys));
 
 // Points To:
-// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
-// p[*] -> *HEAP*_l_72 , MAY
+// *HEAP*_l_73.tab2 -> *HEAP*_l_74[0] , MAY
+// p[*] -> *HEAP*_l_73 , MAY
 
       p[i]->tab2 = malloc(5*sizeof(int));
    }
 
 // Points To:
-// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
-// p[*] -> *HEAP*_l_72 , MAY
+// *HEAP*_l_73.tab2 -> *HEAP*_l_74[0] , MAY
+// p[*] -> *HEAP*_l_73 , MAY
 
 
    p[0]->num = 11;
 
 // Points To:
-// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
-// p[*] -> *HEAP*_l_72 , MAY
+// *HEAP*_l_73.tab2 -> *HEAP*_l_74[0] , MAY
+// p[*] -> *HEAP*_l_73 , MAY
 
    (p[0]->tab1)[0] = 20;
 
 // Points To:
-// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
-// p[*] -> *HEAP*_l_72 , MAY
+// *HEAP*_l_73.tab2 -> *HEAP*_l_74[0] , MAY
+// p[*] -> *HEAP*_l_73 , MAY
 
    (p[0]->tab2)[0] = 30;
 
 // Points To:
-// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
-// p[*] -> *HEAP*_l_72 , MAY
+// *HEAP*_l_73.tab2 -> *HEAP*_l_74[0] , MAY
+// p[*] -> *HEAP*_l_73 , MAY
 
    
    
    for(i = 1; i <= 4; i += 1) {
 
 // Points To:
-// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
-// p[*] -> *HEAP*_l_72 , MAY
+// *HEAP*_l_73.tab2 -> *HEAP*_l_74[0] , MAY
+// p[*] -> *HEAP*_l_73 , MAY
 
       p[i]->num = 10;
 
 // Points To:
-// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
-// p[*] -> *HEAP*_l_72 , MAY
+// *HEAP*_l_73.tab2 -> *HEAP*_l_74[0] , MAY
+// p[*] -> *HEAP*_l_73 , MAY
 
       (p[i]->tab1)[0] = 21;
 
 // Points To:
-// *HEAP*_l_72.tab2 -> *HEAP*_l_73[0] , MAY
-// p[*] -> *HEAP*_l_72 , MAY
+// *HEAP*_l_73.tab2 -> *HEAP*_l_74[0] , MAY
+// p[*] -> *HEAP*_l_73 , MAY
 
       (p[i]->tab2)[0] = (p[i]->tab1)[0];
    }
@@ -377,8 +377,7 @@ int main()
 
 Warnings and errors
 
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[init2] (points_to_set_block_projection) Memory leak for bucket "init2:*HEAP*_l_34".
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[init3] (potential_to_effective_memory_leaks) Memory cell *HEAP*_l_48[0] leaked.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[init2] (points_to_set_block_projection) Memory leak for bucket "init2:*HEAP*_l_35".
 PROPER_EFFECTS_WITH_POINTS_TO[init4] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (compute_points_to_gen_set) Cell sr1="_m_1[tab2]" could not be translated.
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Incompatibility between call site and callee's output.

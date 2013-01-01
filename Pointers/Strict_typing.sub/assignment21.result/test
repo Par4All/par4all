@@ -21,14 +21,12 @@ int main()
 
 // Points To:
 // a[*] -> undefined , MAY
-// a[*] -> i , MAY
 // a[0] -> i , EXACT
 
    a[j] = &j;
 
 // Points To:
 // a[*] -> undefined , MAY
-// a[*] -> i , MAY
 // a[0] -> i , MAY
 // a[*] -> j , MAY
 

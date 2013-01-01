@@ -32,7 +32,7 @@ POINTS TO
 
 
 // Points To OUT:
-// _ppp_1[0] -> _ppp_1_1[0][0] , MAY
+// _ppp_1[0] -> _ppp_1_1[0][0] , EXACT
 // _ppp_1_1[0][0] -> *NULL_POINTER* , MAY
 // _ppp_1_1[0][0] -> _ppp_1_1_1[0][0][0] , MAY
 // ppp -> _ppp_1[0] , EXACT
@@ -51,7 +51,7 @@ int formal_parameter02(int ***ppp)
    int *q = **ppp;
 
 // Points To:
-// _ppp_1[0] -> _ppp_1_1[0][0] , MAY
+// _ppp_1[0] -> _ppp_1_1[0][0] , EXACT
 // _ppp_1_1[0][0] -> *NULL_POINTER* , MAY
 // _ppp_1_1[0][0] -> _ppp_1_1_1[0][0][0] , MAY
 // ppp -> _ppp_1[0] , EXACT

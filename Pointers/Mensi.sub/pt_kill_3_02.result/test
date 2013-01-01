@@ -3,33 +3,42 @@ POINTS TO for pt_kill_3_02
 
 
 // Points To IN:
-// _fpp_2 -> _fpp_2_2 , EXACT
-// fpp -> _fpp_2 , EXACT
+// _fpp_2 -> *NULL_POINTER* , MAY
+// _fpp_2 -> _fpp_2_2 , MAY
+// fpp -> *NULL_POINTER* , MAY
+// fpp -> _fpp_2 , MAY
 
 
 // Points To OUT:
 // _fpp_2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// _fpp_2 -> *NULL_POINTER* , MAY
 // _fpp_2 -> _fpp_2_2 , MAY
-// fpp -> _fpp_2 , EXACT
+// fpp -> *NULL_POINTER* , MAY
+// fpp -> _fpp_2 , MAY
 
 void my_malloc(int c, int **fpp)
 {
 
 // Points To:
-// _fpp_2 -> _fpp_2_2 , EXACT
-// fpp -> _fpp_2 , EXACT
+// _fpp_2 -> *NULL_POINTER* , MAY
+// _fpp_2 -> _fpp_2_2 , MAY
+// fpp -> *NULL_POINTER* , MAY
+// fpp -> _fpp_2 , MAY
 
    if (c)
 
 // Points To:
-// fpp -> _fpp_2 , EXACT
+// fpp -> *NULL_POINTER* , MAY
+// fpp -> _fpp_2 , MAY
 
       *fpp = (int *) malloc(sizeof(int));
 
 // Points To:
 // _fpp_2 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// _fpp_2 -> *NULL_POINTER* , MAY
 // _fpp_2 -> _fpp_2_2 , MAY
-// fpp -> _fpp_2 , EXACT
+// fpp -> *NULL_POINTER* , MAY
+// fpp -> _fpp_2 , MAY
 
    return;
 }
@@ -58,6 +67,7 @@ int main()
 
 // Points To:
 // pi -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// pi -> *NULL_POINTER* , MAY
 // pi -> i , MAY
 // pp -> pi , EXACT
 

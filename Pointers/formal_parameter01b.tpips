@@ -1,0 +1,44 @@
+setenv WS=formal_parameter01b
+delete $WS
+create $WS $WS.c
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+
+echo
+echo Points-to for \"$WS\"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[$WS]
+
+echo
+echo Cumulated effects for \"$WS\"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[$WS]
+
+echo
+echo Points-to for "main"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+
+close
+
+echo
+echo Warnings and errors
+echo
+
+shell cat $WS.database/Warnings
+
+delete $WS
+quit

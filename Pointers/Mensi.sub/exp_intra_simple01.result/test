@@ -28,13 +28,17 @@ POINTS-TO
 
 
 // Points To IN:
-// _p_1 -> _p_1_1 , EXACT
-// p -> _p_1 , EXACT
-// q -> _q_2 , EXACT
+// _p_1 -> *NULL_POINTER* , MAY
+// _p_1 -> _p_1_1 , MAY
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1 , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _q_2 , MAY
 
 
 // Points To OUT:
-// _p_1 -> _p_1_1 , EXACT
+// _p_1 -> *NULL_POINTER* , MAY
+// _p_1 -> _p_1_1 , MAY
 // p -> undefined , EXACT
 // q -> undefined , EXACT
 
@@ -46,38 +50,48 @@ int foo(int **p, int *q)
    int *i, j = 0;
 
 // Points To:
-// _p_1 -> _p_1_1 , EXACT
+// _p_1 -> *NULL_POINTER* , MAY
+// _p_1 -> _p_1_1 , MAY
 // i -> undefined , EXACT
-// p -> _p_1 , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1 , MAY
 
 
    i = *p;
 
 // Points To:
-// _p_1 -> _p_1_1 , EXACT
-// i -> _p_1_1 , EXACT
+// _p_1 -> *NULL_POINTER* , MAY
+// _p_1 -> _p_1_1 , MAY
+// i -> *NULL_POINTER* , MAY
+// i -> _p_1_1 , MAY
 // p -> _p_1 , EXACT
 
    p = &i;
 
 // Points To:
-// _p_1 -> _p_1_1 , EXACT
-// i -> _p_1_1 , EXACT
+// _p_1 -> *NULL_POINTER* , MAY
+// _p_1 -> _p_1_1 , MAY
+// i -> *NULL_POINTER* , MAY
+// i -> _p_1_1 , MAY
 // p -> i , EXACT
-// q -> _q_2 , EXACT
+// q -> *NULL_POINTER* , MAY
+// q -> _q_2 , MAY
 
    j = *q;
 
 // Points To:
-// _p_1 -> _p_1_1 , EXACT
-// i -> _p_1_1 , EXACT
+// _p_1 -> *NULL_POINTER* , MAY
+// _p_1 -> _p_1_1 , MAY
+// i -> *NULL_POINTER* , MAY
+// i -> _p_1_1 , MAY
 // p -> i , EXACT
 // q -> _q_2 , EXACT
 
    i = &j;
 
 // Points To:
-// _p_1 -> _p_1_1 , EXACT
+// _p_1 -> *NULL_POINTER* , MAY
+// _p_1 -> _p_1_1 , MAY
 // i -> j , EXACT
 // p -> i , EXACT
 // q -> _q_2 , EXACT
@@ -85,7 +99,8 @@ int foo(int **p, int *q)
    q = *p;
 
 // Points To:
-// _p_1 -> _p_1_1 , EXACT
+// _p_1 -> *NULL_POINTER* , MAY
+// _p_1 -> _p_1_1 , MAY
 // i -> j , EXACT
 // p -> i , EXACT
 // q -> j , EXACT

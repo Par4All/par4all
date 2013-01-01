@@ -12,11 +12,9 @@ POINTS-TO
 
 
 // Points To OUT:
-// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , MAY
-// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , MAY
-// _ps_1_1__1[*][*] -> undefined , MAY
+// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , EXACT
+// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , EXACT
 // _ps_1_1__1[0][0] -> undefined , EXACT
-// _ps_1_2__1[*][*] -> undefined , MAY
 // _ps_1_2__1[0][0] -> undefined , EXACT
 // ps -> _ps_1[0] , EXACT
 
@@ -37,53 +35,44 @@ void foo(struct s *ps)
 
 // Points To:
 // _ps_1[0].pp2 -> *NULL_POINTER* , MAY
-// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , MAY
+// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , EXACT
 // _ps_1[0].pp2 -> _ps_1_2__1[0][0] , MAY
-// _ps_1_1__1[*][*] -> i , MAY
 // _ps_1_1__1[0][0] -> i , EXACT
 // ps -> _ps_1[0] , EXACT
 
    *(*ps).pp2 = &j;
 
 // Points To:
-// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , MAY
-// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , MAY
-// _ps_1_1__1[*][*] -> i , MAY
+// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , EXACT
+// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , EXACT
 // _ps_1_1__1[0][0] -> i , EXACT
-// _ps_1_2__1[*][*] -> j , MAY
 // _ps_1_2__1[0][0] -> j , EXACT
 // ps -> _ps_1[0] , EXACT
 
    **(*ps).pp1 = 1;
 
 // Points To:
-// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , MAY
-// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , MAY
-// _ps_1_1__1[*][*] -> i , MAY
+// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , EXACT
+// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , EXACT
 // _ps_1_1__1[0][0] -> i , EXACT
-// _ps_1_2__1[*][*] -> j , MAY
 // _ps_1_2__1[0][0] -> j , EXACT
 // ps -> _ps_1[0] , EXACT
 
    **(*ps).pp2 = 2;
 
 // Points To:
-// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , MAY
-// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , MAY
-// _ps_1_1__1[*][*] -> i , MAY
+// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , EXACT
+// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , EXACT
 // _ps_1_1__1[0][0] -> i , EXACT
-// _ps_1_2__1[*][*] -> j , MAY
 // _ps_1_2__1[0][0] -> j , EXACT
 // ps -> _ps_1[0] , EXACT
 
    **(*ps).pp1 = 3;
 
 // Points To:
-// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , MAY
-// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , MAY
-// _ps_1_1__1[*][*] -> i , MAY
+// _ps_1[0].pp1 -> _ps_1_1__1[0][0] , EXACT
+// _ps_1[0].pp2 -> _ps_1_2__1[0][0] , EXACT
 // _ps_1_1__1[0][0] -> i , EXACT
-// _ps_1_2__1[*][*] -> j , MAY
 // _ps_1_2__1[0][0] -> j , EXACT
 // ps -> _ps_1[0] , EXACT
 

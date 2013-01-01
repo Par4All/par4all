@@ -15,7 +15,8 @@ POINTS TO for message_error01
 
 
 // Points To IN:
-// msg -> _msg_1 , EXACT
+// msg -> *NULL_POINTER* , MAY
+// msg -> _msg_1 , MAY
 
 
 // Points To OUT: unreachable
@@ -24,12 +25,14 @@ void msg_error(char *msg)
 {
 
 // Points To:
-// msg -> _msg_1 , EXACT
+// msg -> *NULL_POINTER* , MAY
+// msg -> _msg_1 , MAY
 
    printf("%s", msg);
 
 // Points To:
-// msg -> _msg_1 , EXACT
+// msg -> *NULL_POINTER* , MAY
+// msg -> _msg_1 , MAY
 
    exit(1);
 }

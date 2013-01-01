@@ -12,13 +12,9 @@ Points-to for "foo"
 
 
 // Points To OUT:
-// _a1_1[*].q -> *NULL_POINTER* , MAY
 // _a1_1[0].q -> *NULL_POINTER* , MAY
-// _a1_1[*].q -> _b2_3[0] , MAY
 // _a1_1[0].q -> _b2_3[0] , MAY
-// _pa2_2[*] -> *NULL_POINTER* , MAY
-// _pa2_2[*] -> _a1_1[0] , MAY
-// _pa2_2[0] -> _a1_1[0] , MAY
+// _pa2_2[0] -> _a1_1[0] , EXACT
 // a1 -> *NULL_POINTER* , MAY
 // a1 -> _a1_1[0] , MAY
 // b2 -> *NULL_POINTER* , MAY
@@ -38,9 +34,7 @@ void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
    *pa2 = a1;
 
 // Points To:
-// _pa2_2[*] -> *NULL_POINTER* , MAY
 // _pa2_2[0] -> *NULL_POINTER* , MAY
-// _pa2_2[*] -> _a1_1[0] , MAY
 // _pa2_2[0] -> _a1_1[0] , MAY
 // a1 -> *NULL_POINTER* , MAY
 // a1 -> _a1_1[0] , MAY
@@ -51,13 +45,9 @@ void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
    (*pa2)->q = b2;
 
 // Points To:
-// _a1_1[*].q -> *NULL_POINTER* , MAY
 // _a1_1[0].q -> *NULL_POINTER* , MAY
-// _a1_1[*].q -> _b2_3[0] , MAY
 // _a1_1[0].q -> _b2_3[0] , MAY
-// _pa2_2[*] -> *NULL_POINTER* , MAY
-// _pa2_2[*] -> _a1_1[0] , MAY
-// _pa2_2[0] -> _a1_1[0] , MAY
+// _pa2_2[0] -> _a1_1[0] , EXACT
 // a1 -> *NULL_POINTER* , MAY
 // a1 -> _a1_1[0] , MAY
 // b2 -> *NULL_POINTER* , MAY
@@ -75,12 +65,12 @@ void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
 //             <    is written>: _pa2_2[0]
 
    *pa2 = a1;
-//             <may be written>: _a1_1[0].q _a1_1[0].q
 //             <    is read   >: _pa2_2[0] b2 pa2
+//             <    is written>: _a1_1[0].q
    (*pa2)->q = b2;
-//             <may be read   >: _a1_1[0].q _a1_1[0].q stdout[0]
+//             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: _pa2_2[0] pa2 stdout 
+//             <    is read   >: _a1_1[0].q _pa2_2[0] pa2 stdout 
 //                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("adress of (*pa2)->q = %p", (*pa2)->q);
@@ -88,23 +78,24 @@ void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
 
 Cumulated effects for "foo"
 
-//             <may be read   >: _a1_1[0].q stdout[0]
-//             <may be written>: _a1_1[0].q stdout[0]
-//             <    is read   >: _pa2_2[0] a1 b2 pa2 stdout 
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: _a1_1[0].q _pa2_2[0] a1 b2 pa2 stdout
 //                               __IO_EFFECTS:LUNS[1]
-//             <    is written>: _pa2_2[0] __IO_EFFECTS:LUNS[1]
+//             <    is written>: _a1_1[0].q _pa2_2[0] 
+//                               __IO_EFFECTS:LUNS[1]
 void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
 {
 //             <    is read   >: a1 pa2
 //             <    is written>: _pa2_2[0]
 
    *pa2 = a1;
-//             <may be written>: _a1_1[0].q
 //             <    is read   >: _pa2_2[0] b2 pa2
+//             <    is written>: _a1_1[0].q
    (*pa2)->q = b2;
-//             <may be read   >: _a1_1[0].q stdout[0]
+//             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: _pa2_2[0] pa2 stdout 
+//             <    is read   >: _a1_1[0].q _pa2_2[0] pa2 stdout 
 //                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("adress of (*pa2)->q = %p", (*pa2)->q);

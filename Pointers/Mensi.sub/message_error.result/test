@@ -3,7 +3,8 @@ Points-to for ""
 
 
 // Points To IN:
-// msg -> _msg_1[0] , EXACT
+// msg -> *NULL_POINTER* , MAY
+// msg -> _msg_1[0] , MAY
 
 
 // Points To OUT: unreachable
@@ -12,12 +13,14 @@ void msg_error(char *msg)
 {
 
 // Points To:
-// msg -> _msg_1[0] , EXACT
+// msg -> *NULL_POINTER* , MAY
+// msg -> _msg_1[0] , MAY
 
    printf("%s", msg);
 
 // Points To:
-// msg -> _msg_1[0] , EXACT
+// msg -> *NULL_POINTER* , MAY
+// msg -> _msg_1[0] , MAY
 
    exit(1);
 }
