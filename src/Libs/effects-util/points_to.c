@@ -118,6 +118,25 @@ bool points_to_cell_in_list_p(cell c, list L)
   return found_p;
 }
 
+/* Add in "l1" elements of "l2" that are not yet in "l1". List "l2" is
+ * then destroyed.
+ *
+ * This is a set union.
+ */
+list merge_points_to_cell_lists(list l1, list l2)
+{
+  list lt = NIL;
+  FOREACH(CELL, c2, l2) {
+    if(!points_to_cell_in_list_p(c2, l1)) {
+      lt = CONS(CELL,c2, lt);
+    }
+  }
+  lt = gen_nreverse(lt);
+  l1 = gen_nconc(l1, lt);
+  gen_free_list(l2);
+  return l1;
+}
+
 /* Two cells are related if they are based on the same entity */
 bool related_points_to_cell_in_list_p(cell c, list L)
 {
