@@ -8,7 +8,6 @@ Points-to for "init"
 
 
 // Points To OUT:
-// _m_1[*].tab2 -> *HEAP*_l_20[0] , MAY
 // _m_1[0].tab2 -> *HEAP*_l_20[0] , MAY
 // m -> _m_1[0] , EXACT
 
@@ -31,35 +30,30 @@ void init(mys *m)
    m->tab2 = malloc(5*sizeof(int));
 
 // Points To:
-// _m_1[*].tab2 -> *HEAP*_l_20[0] , MAY
 // _m_1[0].tab2 -> *HEAP*_l_20[0] , MAY
 // m -> _m_1[0] , EXACT
 
    (m->tab1)[0] = 10;
 
 // Points To:
-// _m_1[*].tab2 -> *HEAP*_l_20[0] , MAY
 // _m_1[0].tab2 -> *HEAP*_l_20[0] , MAY
 // m -> _m_1[0] , EXACT
 
    (m->tab2)[0] = 20;
 
 // Points To:
-// _m_1[*].tab2 -> *HEAP*_l_20[0] , MAY
 // _m_1[0].tab2 -> *HEAP*_l_20[0] , MAY
 // m -> _m_1[0] , EXACT
 
    for(i = 0; i <= 4; i += 1) {
 
 // Points To:
-// _m_1[*].tab2 -> *HEAP*_l_20[0] , MAY
 // _m_1[0].tab2 -> *HEAP*_l_20[0] , MAY
 // m -> _m_1[0] , EXACT
 
       (m->tab1)[i] = 1;
 
 // Points To:
-// _m_1[*].tab2 -> *HEAP*_l_20[0] , MAY
 // _m_1[0].tab2 -> *HEAP*_l_20[0] , MAY
 // m -> _m_1[0] , EXACT
 
@@ -67,7 +61,6 @@ void init(mys *m)
    }
 
 // Points To:
-// _m_1[*].tab2 -> *HEAP*_l_20[0] , MAY
 // _m_1[0].tab2 -> *HEAP*_l_20[0] , MAY
 // m -> _m_1[0] , EXACT
 
@@ -88,7 +81,7 @@ void init(mys *m)
 //             <    is read   >: m
 //             <    is written>: _m_1[0].tab1[0]
    (m->tab1)[0] = 10;
-//             <may be written>: *HEAP*_l_20[0] *HEAP*_l_20[0]
+//             <may be written>: *HEAP*_l_20[0]
 //             <    is read   >: _m_1[0].tab2 m
    (m->tab2)[0] = 20;
 //             <    is written>: i
@@ -96,7 +89,7 @@ void init(mys *m)
 //             <    is read   >: i m
 //             <    is written>: _m_1[0].tab1[i]
       (m->tab1)[i] = 1;
-//             <may be written>: *HEAP*_l_20[i] *HEAP*_l_20[i]
+//             <may be written>: *HEAP*_l_20[i]
 //             <    is read   >: _m_1[0].tab1[i] _m_1[0].tab2 i m
       (m->tab2)[i] = (m->tab1)[i];
    }

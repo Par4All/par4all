@@ -44,7 +44,7 @@ int main()
   compute_s(s, 10);
 
   for (i=0; i<10; i++)
-  fprintf(stderr, "In main, s.tab[i]=%f\n", s.tab[i]);
+    fprintf(stderr, "In main, s.tab[i]=%f\n", s.tab[i]);
 
   return 0;
 }

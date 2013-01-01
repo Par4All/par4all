@@ -134,3 +134,6 @@ int main()
 //             <    is read   >: i[1]
    return i[1];
 }
+
+Warnings and errors:
+

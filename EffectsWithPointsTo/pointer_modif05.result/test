@@ -10,7 +10,6 @@ Points-to for "init_s"
 
 
 // Points To OUT:
-// _ps_1[*].tab -> *HEAP*_l_19[0] , MAY
 // _ps_1[0].tab -> *HEAP*_l_19[0] , MAY
 // ps -> _ps_1[0] , EXACT
 // stderr -> *NULL_POINTER* , MAY
@@ -27,14 +26,12 @@ void init_s(s_t *ps, int max)
    ps->tab = (float *) malloc(max*sizeof(float));
 
 // Points To:
-// _ps_1[*].tab -> *HEAP*_l_19[0] , MAY
 // _ps_1[0].tab -> *HEAP*_l_19[0] , MAY
 // ps -> _ps_1[0] , EXACT
 
    ps->max = max;
 
 // Points To:
-// _ps_1[*].tab -> *HEAP*_l_19[0] , MAY
 // _ps_1[0].tab -> *HEAP*_l_19[0] , MAY
 // ps -> _ps_1[0] , EXACT
 // stderr -> *NULL_POINTER* , MAY
@@ -43,7 +40,6 @@ void init_s(s_t *ps, int max)
    fprintf(stderr, "In init_s, s.tab=%p\n", ps->tab);
 
 // Points To:
-// _ps_1[*].tab -> *HEAP*_l_19[0] , MAY
 // _ps_1[0].tab -> *HEAP*_l_19[0] , MAY
 // ps -> _ps_1[0] , EXACT
 // stderr -> *NULL_POINTER* , MAY
@@ -274,5 +270,4 @@ Warnings and errors: nothing special expected
 
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[init_s] (CSafeSizeOfArray) Varying size for array "pointer_modif05!:_IO_FILE^_unused2"
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[init_s] (CSafeSizeOfArray) Not yet supported properly by PIPS
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (compute_points_to_gen_set) Cell sr1="ps" could not be translated.
 PROPER_EFFECTS_WITH_POINTS_TO[main] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
