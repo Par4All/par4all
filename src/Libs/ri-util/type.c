@@ -2824,7 +2824,8 @@ bool pointer_type_p(type t)
 	  && (variable_dimensions(type_variable(t)) == NIL));
 }
 
-/* Returns OK for "char[]" as well as for "char *".
+/* Returns OK for "char[]" as well as for "char *". And do not forget
+ * "string" for PIPS internal representation.
  * 
  * Does not take care of typedef. Use compute_basic_concrete_type()
  * first is necessary.
@@ -2837,6 +2838,7 @@ bool C_pointer_type_p(type t)
     list dl = variable_dimensions(v);
     basic b = variable_basic(v);
     pointer_p = (ENDP(dl) && basic_pointer_p(b))
+      ||  (ENDP(dl) && basic_string_p(b))
       || ((int)gen_length(dl)==1 && unbounded_dimension_p(DIMENSION(CAR(dl))));
   }
   return pointer_p;
