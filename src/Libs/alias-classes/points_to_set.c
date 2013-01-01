@@ -1744,13 +1744,22 @@ list points_to_source_to_translations(cell source, pt_map ptm, bool fresh_p)
  * to retrieve sinks... If source = a[34], clearly a[*] is an OK
  * equivalent source if a[34] is not a vertex of "ptm".
  *
- * If !strict_p, "a[34]" is considered a source for "a[*]".
+ * If !strict_p, "a[34]" is considered a source for "a[*]". This
+ * should always be the case. So strict_p should always be false.
  *
  * If all_p, look for all possible sinks. For instance, if a[34] and
  * a[*] have different sinks, return their union. If !all_p, stop the
- * search if a[34] has sinks.
+ * search if a[34] has sinks. This should now be obsolete thanks to
+ * exact_p. So all_p should always be true.
  *
- * effective_p: you only want sinks that are not NULL and not UNDEFINED/NOWHERE
+ * effective_p: you only want sinks that are not NULL and not
+ * UNDEFINED/NOWHERE. For instance, because you know you will
+ * dereference it.
+ *
+ * Note: we must also take into account the approximations of the arcs...
+ *
+ * This is a key point of Amira's dissertation, but it has not been
+ * handled properly yet...
  */
 list generic_points_to_source_to_sinks(cell source, pt_map ptm,
 				       bool fresh_p,
@@ -1762,19 +1771,27 @@ list generic_points_to_source_to_sinks(cell source, pt_map ptm,
   set pts = points_to_graph_set(ptm);
 
   /* 1. See if cell "source" is the starting vertex of a points-to arc. */
+  bool exact_p = false;
   SET_FOREACH( points_to, pt, pts) {
     if(cell_equal_p(source, points_to_source(pt))) {
       cell sink = points_to_sink(pt);
       if(!effective_p || (!nowhere_cell_p(sink) && !null_cell_p(sink))) {
+	approximation a = points_to_approximation(pt);
 	cell sc = fresh_p? copy_cell(sink) : sink;
 	sinks = CONS(CELL, sc, sinks);
+	if(approximation_exact_p(a) || approximation_must_p(a)) {
+	  if(exact_p)
+	    pips_internal_error("Two contradictory arcs in ptm\n");
+	  else
+	    exact_p = true;
+	}
       }
     }
   }
 
   /* 2. Much harder... See if source is contained in one of the many
      abstract sources. Step 1 is subsumed by Step 2... but is much faster.  */
-  if(ENDP(sinks) || all_p) {
+  if(ENDP(sinks) || (all_p && !exact_p)) {
     SET_FOREACH(points_to, pt, pts) {
       if(cell_included_p(source, points_to_source(pt))) {
 	cell sink = points_to_sink(pt);
@@ -1832,7 +1849,8 @@ list generic_points_to_source_to_sinks(cell source, pt_map ptm,
  */
 list points_to_source_to_sinks(cell source, pt_map ptm, bool fresh_p)
 {
-  return generic_points_to_source_to_sinks(source, ptm, fresh_p, true, false, false);
+  //return generic_points_to_source_to_sinks(source, ptm, fresh_p, true, false, false);
+  return generic_points_to_source_to_sinks(source, ptm, fresh_p, false, true, false);
 }
 
 list points_to_source_to_effective_sinks(cell source, pt_map ptm, bool fresh_p)
@@ -2016,6 +2034,71 @@ list points_to_source_to_arcs(cell source, pt_map ptm, bool fresh_p)
 
   return arcs;
 }
+
+int points_to_cell_to_number_of_unbounded_dimensions(cell c)
+{
+  reference r = cell_any_reference(c);
+  int n = points_to_reference_to_number_of_unbounded_dimensions(r);
+  return n;
+}
+
+int points_to_reference_to_number_of_unbounded_dimensions(reference r)
+{
+  list sl = reference_indices(r);
+  int n = points_to_subscripts_to_number_of_unbounded_dimensions(sl);
+  return n;
+}
+
+int points_to_subscripts_to_number_of_unbounded_dimensions(list sl)
+{
+  int count = 0;
+  FOREACH(EXPRESSION, s, sl) {
+    if(unbounded_expression_p(s))
+      count++;
+  }
+  return count;
+}
+
+/* Is there at least one cell "sink" in list "sinks" whose subscripts
+ * fully match the subscripts in cell "source"?
+ *
+ * It is easy in a one-D setting. If "p" is an array or a presumed
+ * array and if the source is "p[*]" then sinks "{a[1], a[2]}" are not
+ * sufficient. Something else is needed such as "a[*]" or "b[*]" or
+ * "undefined".
+ *
+ * FI: As a first cut, the numbers of unbounded subscripts in references
+ * are counted and compared.
+ */
+bool sinks_fully_matches_source_p(cell source, list sinks)
+{
+  bool match_p = false;
+  reference source_r = cell_any_reference(source);
+  list source_sl = reference_indices(source_r);
+
+  if(ENDP(sinks)) {
+    match_p = false;
+  }
+  else if(ENDP(source_sl)) {
+    match_p = true; // no issue
+  }
+  else {
+    int n_us_in_source =
+      points_to_subscripts_to_number_of_unbounded_dimensions(source_sl);
+    FOREACH(CELL, sink, sinks) {
+      reference sink_r = cell_any_reference(sink);
+      list sink_sl = reference_indices(sink_r);
+      int n_us_in_sink =
+	points_to_subscripts_to_number_of_unbounded_dimensions(sink_sl);
+      if(n_us_in_sink >= n_us_in_source) {
+	match_p = true;
+	break;
+      }
+    }
+  }
+
+  return match_p;
+}
 
 
 /* Return a list of cells, "sinks", that are sink for some arc whose
@@ -2054,13 +2137,14 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
 {
   list sinks = NIL;
   if(!points_to_graph_bottom(pts)) {
-    bool to_be_freed;
-    type source_t = points_to_cell_to_type(source, & to_be_freed);
-    type c_source_t = compute_basic_concrete_type(source_t);
-    bool ok_p = C_pointer_type_p(c_source_t)
-      || overloaded_type_p(c_source_t) // might be a pointer
+    //bool to_be_freed;
+    type source_t = points_to_cell_to_concrete_type(source);
+    //type source_t = points_to_cell_to_type(source, & to_be_freed);
+    //type c_source_t = compute_basic_concrete_type(source_t);
+    bool ok_p = C_pointer_type_p(source_t)
+      || overloaded_type_p(source_t) // might be a pointer
       || null_cell_p(source);
-    if(to_be_freed) free_type(source_t);
+    //if(to_be_freed) free_type(source_t);
 
     /* Can we expect a sink? */
     if(!ok_p) {
@@ -2084,10 +2168,11 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
       /* 0. Is the source a pointer? You would expect a yes, but C
 	 pointer arithmetics requires some strange typing. We assume it
 	 is an array of pointers. */
-      bool to_be_freed;
-      type ct = points_to_cell_to_type(source, &to_be_freed);
-      if(array_type_p(ct)) {
-	basic ctb = variable_basic(type_variable(ct));
+      //bool to_be_freed;
+      //type ct = points_to_cell_to_type(source, &to_be_freed);
+      //if(array_type_p(ct)) {
+      if(array_type_p(source_t)) {
+	basic ctb = variable_basic(type_variable(source_t));
 	// FI->AM: I am not happy at all with his
 	if(basic_pointer_p(ctb)) {
 	  ;
@@ -2097,30 +2182,38 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
 	  sinks = CONS(CELL, sc, sinks);
 	}
       }
-      if(to_be_freed) free_type(ct);
+      //if(to_be_freed) free_type(ct);
 
       /* 1. Try to find the source in the points-to information */
       if(ENDP(sinks))
 	sinks = points_to_source_to_sinks(source, pts, fresh_p);
 
       /* 2. If the previous step has failed, build a new sink if the
-	 source is a formal parameter, a global variable, a C file local
-	 global variable (static) or a stub. */
-      if(ENDP(sinks)) {
+       * source is a formal parameter, a global variable, a C file local
+       * global variable (static) or a stub.
+       *
+       * We may need a stub even if sinks is not empty when the source
+       * contains "*" subscript(s) and when none of the sinks contains
+       * such a subscript, or, more precisely when star subscripts do
+       * not match, matching being not yet clearly defined.
+       */
+      if(ENDP(sinks) || !sinks_fully_matches_source_p(source, sinks)) {
 	reference r = cell_any_reference(source);
 	entity v = reference_variable(r);
+	list n_sinks = NIL;
 	if(formal_parameter_p(v)) {
-	  sinks = formal_source_to_sinks(source, pts, fresh_p);
+	  n_sinks = formal_source_to_sinks(source, pts, fresh_p);
 	}
 	else if(top_level_entity_p(v) || static_global_variable_p(v)) {
-	  sinks = global_source_to_sinks(source, pts, fresh_p);
+	  n_sinks = global_source_to_sinks(source, pts, fresh_p);
 	}
 	else if(entity_stub_sink_p(v)) {
-	  sinks = stub_source_to_sinks(source, pts, fresh_p);
+	  n_sinks = stub_source_to_sinks(source, pts, fresh_p);
 	}
 	else if(entity_typed_anywhere_locations_p(v)) {
 	  pips_internal_error("This case should have been handled above.\n");
 	}
+	sinks = gen_nconc(sinks, n_sinks);
 
 	/* 3. Still no sinks? Check the lattice structure... */
 	if(ENDP(sinks)) {
@@ -2720,8 +2813,40 @@ bool points_to_set_sharing_p(set s)
   return sharing_p;
 }
 
-/* because of points-to set implementation, you cannot change
- * approximations by side effects.
+/* When arcs have been removed from a points-to relation, the
+ * approximations of remaining arcs may not correspond to the new
+ * points-to relation. A may approximation may have become an exact
+ * approximation.
+ *
+ * The semantics of the approximation and its many constraints must be
+ * taken into account. But they are not (yet) well formaly
+ * defined... The conditions here are:
+ *
+ * 1. One out-going arc
+ *
+ * 2. The source cannot be an abstract location because the concrete
+ *    is not well known. Same thing for the sink.
+ *
+ * 3. The source must be atomic, i.e. t[*] does not qualify because
+ *    many concrete locations exist. Same thing for the source.
+ *
+ * 4. What do we want to do with stubs? In an intraprocedural
+ *    analysis, the concrete location is well defined. In an
+ *    interprocedural analysis, depending on the call site, the stub
+ *    may exist or not, or the concrete locations can be many. Also,
+ *    the implementation is no symetrical: sinks are not
+ *    tested. However, at run-time, the atomic stubs correspond to one
+ *    concrete location, and if they are part of a exact/must arc, the
+ *    call site must provide a corresponding concrete location. The
+ *    arc will later be converted to a may arc if the translation is
+ *    not exact.
+ *
+ * Another question: is it OK to fix a lack of precision later or
+ * wouldn't it ne better to maintain the proper approximation on the
+ * fly, when more information is available?
+ *
+ * Note about the implementation: Because of points-to set
+ * implementation, you cannot change approximations by side effects.
  */
 void upgrade_approximations_in_points_to_set(pt_map ptm)
 {
@@ -2731,7 +2856,7 @@ void upgrade_approximations_in_points_to_set(pt_map ptm)
     if(!approximation_exact_p(a)) {
       cell source = points_to_source(pt);
       if(!cell_abstract_location_p(source) // Represents may locations
-	 && !stub_points_to_cell_p(source) // May not exist...
+	 /* && !stub_points_to_cell_p(source)*/ // May not exist... See above
 	 && generic_atomic_points_to_cell_p(source, false)) {
 	list sinks = points_to_source_to_any_sinks(source, ptm, false);
 	if(gen_length(sinks)==1) {

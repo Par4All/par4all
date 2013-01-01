@@ -382,7 +382,8 @@ list dereferencing_to_sinks(expression a, pt_map in, bool eval_p)
 	      }
 	      else {
 		list starpointed = extended_source_to_sinks(sc, in);
-		sinks = gen_nconc(sinks, starpointed);
+		// sinks = gen_nconc(sinks, starpointed);
+		sinks = merge_points_to_cell_lists(sinks, starpointed);
 	      }
 	      if(to_be_freed) free_type(t);
 	    }

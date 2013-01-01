@@ -1333,11 +1333,21 @@ pt_map user_call_to_points_to_interprocedural(call c,
 	  pips_assert("pt_gen_1 is consistent", consistent_points_to_set(pt_gen_1));
 
 	  // FI->FI: Not satisfying; kludge to solve issue with Pointers/inter04
+	  // FI->FI: this causes a core dump for Pointers/formal_parameter01.c
+	  // A lot should be said about this test case, which is revealing
+	  // because of the test it contains, and because of the
+	  // pointer arithmetic, and because the useless primature
+	  // expansion of_pi_1[1] in _pi_1[*] which is semantically
+	  // correct but fuzzy as it implies possible unexisting arcs
+	  // for _pi_1[0], _pi_1[2], etc...
+	  // FI->FI: the upgrade must be postponed
+	  /*
 	  pt_map pt_gen_1_g = make_points_to_graph(false, pt_gen_1);
 	  upgrade_approximations_in_points_to_set(pt_gen_1_g);
 
 	  pips_assert("pt_gen_1 is consistent after upgrade",
 		      consistent_points_to_set(pt_gen_1));
+	  */
 
 	  /* Some check */
 	  list stubs = points_to_set_to_module_stub_cell_list(f, pt_gen_1, NIL);
@@ -1635,6 +1645,8 @@ set compute_points_to_gen_set(set pt_out,
 			      entity f)
 {
   set gen = new_simple_pt_map(); 		
+  // To avoid redundant error messages
+  list translation_failures = NIL;
 
   /* Consider all points-to arcs "(sr1, sk1)" in "pt_out" */
   SET_FOREACH(points_to, p, pt_out) {
@@ -1646,7 +1658,7 @@ set compute_points_to_gen_set(set pt_out,
      *
      *  - an array, because it has certainly not been passed by copy;
      *
-     *  - not a formal parameter: again, no copy passing;
+     *  - not a scalar formal parameter: again, no copy passing;
      *
      *  - not written by the procedure, because, even if it passed by
      *    copy, the actual parameter is aliased.
@@ -1702,11 +1714,22 @@ set compute_points_to_gen_set(set pt_out,
 	}
 	else {
 	  /* The translation of pt's sink failed. */
-	  pips_user_warning("Cell sk1=\"%s\" could not be translated.\n",
-			  points_to_cell_name(sk1));
-	  set_free(gen);
-	  gen = set_undefined;
-	  break;
+	  /* Note: the piece of code below is replicated */
+	  approximation a = points_to_approximation(p);
+	  if(approximation_may_p(a)) {
+	    if(!points_to_cell_in_list_p(sk1, translation_failures)) {
+	      pips_user_warning("Points-to sink cell sk1=\"%s\" could not be translated.\n",
+				points_to_cell_name(sk1));
+	      translation_failures = CONS(CELL, sk1, translation_failures);
+	    }
+	  }
+	  else {
+	    pips_user_warning("Points-to sink cell sk1=\"%s\" could not be translated but has to be.\n",
+			    points_to_cell_name(sk1));
+	    set_free(gen);
+	    gen = set_undefined;
+	    break;
+	  }
 	}
       }
       else {
@@ -1724,16 +1747,34 @@ set compute_points_to_gen_set(set pt_out,
 	 * We have no way to guess here the reason for the translation
 	 * failure...
 	 */
-	pips_user_warning("Cell sr1=\"%s\" could not be translated.\n",
+	entity v = reference_variable(cell_any_reference(sr1));
+	// FI: we should check that it is a formal parameter of "f"...
+	if(!formal_parameter_p(v)) {
+	approximation a = points_to_approximation(p);
+	if(approximation_may_p(a)) {
+	  if(!points_to_cell_in_list_p(sr1, translation_failures)) {
+	    pips_user_warning("Points-to source cell sr1=\"%s\" could not be translated.\n",
+			      points_to_cell_name(sr1));
+	    translation_failures = CONS(CELL, sr1, translation_failures);
+	  }
+	}
+	else {
+	  /* Could be a user error, but you may prefer to go on with
+	   * the points-to analysis to perform some dead code
+	   * elimination later...
+	   */
+	  pips_user_warning("Points-to source cell sr1=\"%s\" could not be translated but has to be.\n",
 			  points_to_cell_name(sr1));
-	/*
-	set_free(gen);
-	gen = set_undefined;
+	  set_free(gen);
+	  gen = set_undefined;
 	break;
-	*/
+	}
+	}
       }
     }
   }
+
+  gen_free_list(translation_failures);
 
   ifdebug(1) {
     if(set_undefined_p(gen))
@@ -1947,7 +1988,8 @@ set compute_points_to_binded_set(entity called_func,
 	 */
 	call c = expression_call(rhs);
 	entity f = call_function(c);
-	pips_internal_error("Not implemented yet.\n");
+	pips_internal_error("Not implemented yet. Function \"%s\".\n",
+			    entity_user_name(f));
       }
       else
 	pips_internal_error("Not implemented yet.\n");

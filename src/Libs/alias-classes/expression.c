@@ -470,7 +470,7 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in, bool side_effect_p)
 	  || ENTITY_SCANF_P(f) || ENTITY_FSCANF_P(f) || ENTITY_SSCANF_P(f)) {
     FOREACH(EXPRESSION, a, al) {
       type at = points_to_expression_to_concrete_type(a);
-      if(pointer_type_p(at)) {
+      if(C_pointer_type_p(at)) {
 	// For the side-effects on pt_out
 	list sinks = expression_to_points_to_sinks(a, pt_out);
 	if(gen_length(sinks)==1 && nowhere_cell_p(CELL(CAR(sinks)))) {
@@ -1681,8 +1681,9 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
   list udl = NIL; // undefined dereferencing error list
   // FI->AM: you have no way to know if stubs are atomic or not...
   // I am not sure the atomic predicate takes this into account
+  // but it does not really matter intraprocedurally: stubs are atomic
   bool singleton_p = (gen_length(L)==1
-		      && atomic_points_to_cell_p(CELL(CAR(L))));
+		      && generic_atomic_points_to_cell_p(CELL(CAR(L)), false));
   FOREACH(CELL, c, L) {
     if(nowhere_cell_p(c)){
       udl = CONS(CELL, c, udl);

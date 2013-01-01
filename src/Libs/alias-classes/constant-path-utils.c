@@ -1150,8 +1150,8 @@ set kill_may_set(list L, set in_may)
   FOREACH(cell, l, L) {
     SET_FOREACH(points_to, pt, in_may) {
       cell pt_source = points_to_source(pt);
-      if (opkill_may_constant_path(points_to_source(pt),l)) {
-	points_to npt = make_points_to(points_to_source(pt),
+      if (opkill_may_constant_path(pt_source,l)) {
+	points_to npt = make_points_to(pt_source,
 				       points_to_sink(pt), 
 				       make_approximation_exact(),
 				       make_descriptor_none());
@@ -1366,6 +1366,10 @@ set gen_may_set(list L, list R, set in_may, bool *address_of_p)
     }
   }
 
+  // FI->FI: this is a really bad idea; it adds an upperapproximation
+  // that is not needed and that reduces accuracy.
+  // This shows on formal_parameter01
+#if 0
   FOREACH(cell, l, L) {
     // Hopefully, l' will be empty most of the time!
     list L_prime = points_to_cell_to_upper_bound_points_to_cells(l);
@@ -1376,6 +1380,7 @@ set gen_may_set(list L, list R, set in_may, bool *address_of_p)
       // free_set(gen_l);
     }
   }
+#endif
 
   set_union(gen_may2, gen_may2, gen_may1);
   set_union(gen_may2, gen_may2, gen_may3);
