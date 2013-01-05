@@ -6,7 +6,7 @@ Points-to "read_towns"
 
 
 // Points To OUT:
-// read_towns.data -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
+// read_towns.data -> *HEAP*_l_21[0] , MAY
 
 towns read_towns(const  char fname[])
 {
@@ -22,7 +22,7 @@ towns read_towns(const  char fname[])
 
 // Points To:
 // fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// the_towns.data -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// the_towns.data -> *HEAP*_l_21[0] , MAY
 
    return the_towns;
 }

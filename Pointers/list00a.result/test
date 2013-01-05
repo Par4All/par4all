@@ -1,0 +1,231 @@
+
+Points-to for "list_next"
+
+
+// Points To IN:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
+// nil -> *NULL_POINTER* , EXACT
+
+
+// Points To OUT:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
+// list_next -> *NULL_POINTER* , MAY
+// list_next -> _l_1_2__1[0][0] , MAY
+// nil -> *NULL_POINTER* , EXACT
+
+list list_next(list l)
+{
+
+// Points To: none
+
+   list n;
+
+// Points To:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
+// n -> undefined , EXACT
+// nil -> *NULL_POINTER* , EXACT
+
+   if (l==nil)
+
+// Points To:
+// l -> *NULL_POINTER* , EXACT
+// n -> undefined , EXACT
+// nil -> *NULL_POINTER* , EXACT
+
+      n = nil;
+   else
+
+// Points To:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
+// l -> _l_1[0] , EXACT
+// n -> undefined , EXACT
+// nil -> *NULL_POINTER* , EXACT
+
+      n = l->next;
+
+// Points To:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
+// n -> *NULL_POINTER* , MAY
+// n -> _l_1_2__1[0][0] , MAY
+// nil -> *NULL_POINTER* , EXACT
+
+   return n;
+}
+
+Proper effects for "list_next"
+
+list list_next(list l)
+{
+   list n;
+//             <    is read   >: l nil
+   if (l==nil)
+//             <    is read   >: nil
+//             <    is written>: n
+      n = nil;
+   else
+//             <    is read   >: _l_1[0].next l
+//             <    is written>: n
+      n = l->next;
+//             <    is read   >: n
+   return n;
+}
+
+Cumulated effects for "list_next"
+
+//             <may be read   >: _l_1[0].next
+//             <    is read   >: l nil
+list list_next(list l)
+{
+   list n;
+//             <may be read   >: _l_1[0].next
+//             <    is read   >: l nil
+//             <    is written>: n
+   if (l==nil)
+//             <    is read   >: nil
+//             <    is written>: n
+      n = nil;
+   else
+//             <    is read   >: _l_1[0].next l
+//             <    is written>: n
+      n = l->next;
+//             <    is read   >: n
+   return n;
+}
+
+Points-to for "list_len"
+
+
+// Points To IN:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
+// nil -> *NULL_POINTER* , EXACT
+
+
+// Points To OUT:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
+// nil -> *NULL_POINTER* , EXACT
+
+int list_len(list l)
+{
+
+// Points To: none
+
+   int n = 0;
+
+// Points To:
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
+
+   list c = l;
+
+// Points To:
+// c -> *NULL_POINTER* , MAY
+// c -> _l_1[0] , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
+// nil -> *NULL_POINTER* , EXACT
+
+   while (c!=nil) {
+
+// Points To:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
+// c -> _l_1[0] , EXACT
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
+// nil -> *NULL_POINTER* , EXACT
+
+      // we know that c!=nil...
+      c = list_next(c);
+
+// Points To:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
+// c -> *NULL_POINTER* , EXACT
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
+// nil -> *NULL_POINTER* , EXACT
+
+      n++;
+   }
+
+// Points To:
+// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> _l_1_2__1[0][0] , MAY
+// c -> *NULL_POINTER* , EXACT
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1[0] , MAY
+// nil -> *NULL_POINTER* , EXACT
+
+   return n;
+}
+
+Proper effects for "list_len"
+
+int list_len(list l)
+{
+//             <    is written>: n
+   int n = 0;
+//             <    is read   >: l
+//             <    is written>: c
+   list c = l;
+//             <    is read   >: c nil
+   while (c!=nil) {
+//             <may be read   >: _l_1[0].next
+//             <    is read   >: c nil
+//             <    is written>: c
+      // we know that c!=nil...
+      c = list_next(c);
+//             <    is read   >: n
+//             <    is written>: n
+      n++;
+   }
+//             <    is read   >: n
+   return n;
+}
+
+Cumulated effects for "list_len"
+
+//             <may be read   >: _l_1[0].next
+//             <    is read   >: l nil
+int list_len(list l)
+{
+//             <    is written>: n
+   int n = 0;
+//             <    is read   >: l
+//             <    is written>: c
+   list c = l;
+//             <may be read   >: _l_1[0].next n
+//             <may be written>: c n
+//             <    is read   >: c nil
+   while (c!=nil) {
+//             <may be read   >: _l_1[0].next
+//             <    is read   >: c nil
+//             <    is written>: c
+      // we know that c!=nil...
+      c = list_next(c);
+//             <    is read   >: n
+//             <    is written>: n
+      n++;
+   }
+//             <    is read   >: n
+   return n;
+}

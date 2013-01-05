@@ -12,8 +12,7 @@ Points-to for "f2"
 // Points To OUT:
 // array[*] -> *NULL_POINTER* , MAY
 // array[*] -> _array_2[*] , MAY
-// stderr -> *NULL_POINTER* , MAY
-// stderr -> _stderr_ , MAY
+// stderr -> _stderr_ , EXACT
 
 void f2(int n_ptrs, char *array[31])
 {
@@ -37,8 +36,7 @@ void f2(int n_ptrs, char *array[31])
 // Points To:
 // array[*] -> *NULL_POINTER* , MAY
 // array[*] -> _array_2[*] , MAY
-// stderr -> *NULL_POINTER* , MAY
-// stderr -> _stderr_ , MAY
+// stderr -> _stderr_ , EXACT
 
    return;
 }
@@ -56,8 +54,7 @@ Points-to for "f4"
 // Points To OUT:
 // array[*] -> *NULL_POINTER* , MAY
 // array[*] -> _array_2[*] , MAY
-// stdout -> *NULL_POINTER* , MAY
-// stdout -> _stdout_ , MAY
+// stdout -> _stdout_ , EXACT
 
 void f4(int n_ptrs, char *array[31])
 {
@@ -81,8 +78,7 @@ void f4(int n_ptrs, char *array[31])
 // Points To:
 // array[*] -> *NULL_POINTER* , MAY
 // array[*] -> _array_2[*] , MAY
-// stdout -> *NULL_POINTER* , MAY
-// stdout -> _stdout_ , MAY
+// stdout -> _stdout_ , EXACT
 
    return;
 }

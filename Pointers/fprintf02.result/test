@@ -45,8 +45,7 @@ int main(int argc, char **argv)
 
 // Points To:
 // p -> argc , EXACT
-// stderr -> *NULL_POINTER* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> _stderr_[0] , EXACT
 
    
    // Here, p must points toward argc

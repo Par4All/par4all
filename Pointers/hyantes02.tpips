@@ -1,4 +1,4 @@
-setenv WSPACE=hyantes
+setenv WSPACE=hyantes02
 delete $WSPACE
 create $WSPACE $WSPACE.c
 
@@ -20,8 +20,36 @@ echo
 echo Points-to for "run"
 echo
 
-activate PRINT_CODE_POINTS_TO_LIST
+#activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[run]
+
+echo 
+echo Points-to for "display"
+echo
+
+#activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[display]
+
+echo 
+echo Proper effects for "read_towns"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[read_towns]
+
+echo 
+echo Proper effects for "run"
+echo
+
+#activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[run]
+
+echo 
+echo Proper effects for "display"
+echo
+
+#activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[display]
 
 echo 
 echo Cumulated effects for "read_towns"
@@ -34,8 +62,15 @@ echo
 echo Cumulated effects for "run"
 echo
 
-activate PRINT_CODE_CUMULATED_EFFECTS
+#activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[run]
+
+echo 
+echo Cumulated effects for "display"
+echo
+
+#activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[display]
 
 echo 
 echo Points-to for "main"
@@ -45,5 +80,12 @@ activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[main]
 
 close
+
+echo
+echo Warnings and errors:
+echo
+
+shell cat $WSPACE.database/Warnings
+
 delete $WSPACE
 quit

@@ -177,8 +177,7 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
-// stdout -> *NULL_POINTER* , MAY
-// stdout -> _stdout_[0] , MAY
+// stdout -> _stdout_[0] , EXACT
 
    
    // no pointer assigned! can keep all points-to
@@ -188,8 +187,7 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
-// stdout -> *NULL_POINTER* , MAY
-// stdout -> _stdout_[0] , MAY
+// stdout -> _stdout_[0] , EXACT
 
    
    // no pointer assigned! can keep all points-to
@@ -199,8 +197,7 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
-// stdout -> *NULL_POINTER* , MAY
-// stdout -> _stdout_[0] , MAY
+// stdout -> _stdout_[0] , EXACT
 
    
    // 36 17 53
@@ -211,8 +208,7 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
-// stdout -> *NULL_POINTER* , MAY
-// stdout -> _stdout_[0] , MAY
+// stdout -> _stdout_[0] , EXACT
 
    return 0;
 }

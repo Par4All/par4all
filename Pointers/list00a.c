@@ -2,7 +2,11 @@
  * maintenance. Also, I do not need spurious functions that are of no
  * use for the final results about "main". Hence the inlining.
  *
- * Same as list07.c, but with call to list_free() not commented out.
+ * Same as list00.c, but limited to list_len() whose proper effects
+ * computation core dumps.
+ *
+ * Will be useful to debug the intraprocedural analysis: just update
+ * the corresponding tpips script.
  */
 
 // #include "list.src/list.c"
@@ -15,26 +19,6 @@ struct cons_t {
   double value;
   list next;
 };
-
-list list_cons(double v, list l)
-{
-  list n = (list) malloc(sizeof(struct cons_t));
-  n->value = v;
-  n->next = l;
-  return n;
-}
-
-void list_free(list l)
-{
-  list n = l, p = l;
-  while (n!=nil)
-  {
-    n = n->next;
-    free(p);
-    p = n;
-  }
-  return;
-}
 
 list list_next(list l)
 {
@@ -57,16 +41,4 @@ int list_len(list l)
     n++;
   }
   return n;
-}
-
-int main(void)
-{
-  list l;
-  l = nil;
-  l = list_cons(1.0, nil);
-  l = list_cons(2.0, l);
-  l = list_cons(3.0, l);
-  int n = list_len(l);
-  list_free(l);
-  return n; // to avoid a gcc warning
 }

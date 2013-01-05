@@ -17,269 +17,182 @@ int main()
 // Points To: none
 
    float x, y;
+   //syst * my_syst;
+   //part * curr_part1, *curr_part2;
+   
+   // initializations
 
 // Points To: none
 
-   syst *my_syst;
+   syst *my_syst = (syst *) malloc(sizeof(syst));
 
 // Points To:
-// my_syst -> *ANY_MODULE*:*NOWHERE* , EXACT
-
-   part *curr_part1, *curr_part2;
-
-// Points To:
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// my_syst -> *ANY_MODULE*:*NOWHERE* , EXACT
-
-   
-   // initializations
-   my_syst = (syst *) malloc(sizeof(syst));
-
-// Points To:
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// my_syst -> *HEAP*_l_44 , MAY
 
    for(i = 0; i <= 9; i += 1) {
 
 // Points To:
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
       (my_syst->tab_dom)[i] = (dom *) malloc(sizeof(dom));
 
 // Points To:
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
       for(j = 0; j <= 99; j += 1)
 
 // Points To:
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , EXACT
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
          ((my_syst->tab_dom)[i]->tab_part)[j] = (part *) malloc(sizeof(part));
    }
 
 // Points To:
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
    x = 0;
 
 // Points To:
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
    y = 0;
 
 // Points To:
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
    
    // computations
    for(i = 0; i <= 9; i += 1) {
 
 // Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
-      dom *curr_dom;
+      dom *curr_dom = (my_syst->tab_dom)[i];
 
 // Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
-
-      curr_dom = (my_syst->tab_dom)[i];
-
-// Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// curr_dom -> *HEAP*_l_46 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
 
       for(j = 0; j <= 99; j += 1) {
 
 // Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`2`3`curr_part1 -> *ANY_MODULE*:*ANYWHERE* , MAY
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// curr_dom -> *HEAP*_l_46 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
          part *curr_part1;
 
 // Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`2`3`curr_part1 -> *ANY_MODULE*:*ANYWHERE* , MAY
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// curr_dom -> *HEAP*_l_46 , MAY
+// 0`2`3`curr_part1 -> undefined , EXACT
+// my_syst -> *HEAP*_l_44 , MAY
 
          curr_part1 = (curr_dom->tab_part)[j];
 
 // Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`2`3`curr_part1 -> *ANY_MODULE*:*ANYWHERE* , MAY
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// curr_dom -> *HEAP*_l_46 , MAY
+// 0`2`3`curr_part1 -> *HEAP*_l_48 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
 
          curr_part1->x = x+0.01*(float) j;
 
 // Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`2`3`curr_part1 -> *ANY_MODULE*:*ANYWHERE* , MAY
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// curr_dom -> *HEAP*_l_46 , MAY
+// 0`2`3`curr_part1 -> *HEAP*_l_48 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
          curr_part1->y = y+0.01*(float) j;
       }
 
 // Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// curr_dom -> *HEAP*_l_46 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
 
       for(j = 0; j <= 99; j += 1) {
 
 // Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`2`4`curr_part1 -> *ANY_MODULE*:*ANYWHERE* , MAY
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// curr_dom -> *HEAP*_l_46 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
-         part *curr_part1;
+         part *curr_part1 = (curr_dom->tab_part)[j];
 
 // Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`2`4`curr_part1 -> *ANY_MODULE*:*ANYWHERE* , MAY
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
-
-         curr_part1 = (curr_dom->tab_part)[j];
-
-// Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`2`4`curr_part1 -> *ANY_MODULE*:*ANYWHERE* , MAY
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// curr_dom -> *HEAP*_l_46 , MAY
+// 0`2`4`curr_part1 -> *HEAP*_l_48 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
 
          for(k = j+1; k <= 99; k += 1) {
 
 // Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`2`4`curr_part1 -> *ANY_MODULE*:*ANYWHERE* , EXACT
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`2`4`5`curr_part2 -> *ANY_MODULE*:*ANYWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// curr_dom -> *HEAP*_l_46 , MAY
+// 0`2`4`curr_part1 -> *HEAP*_l_48 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
-            part *curr_part2;
+            part *curr_part2 = (curr_dom->tab_part)[k];
 
 // Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`2`4`curr_part1 -> *ANY_MODULE*:*ANYWHERE* , EXACT
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`2`4`5`curr_part2 -> *ANY_MODULE*:*ANYWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
-
-            curr_part2 = (curr_dom->tab_part)[k];
-
-// Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`2`4`curr_part1 -> *ANY_MODULE*:*ANYWHERE* , EXACT
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`2`4`5`curr_part2 -> *ANY_MODULE*:*ANYWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// curr_dom -> *HEAP*_l_46 , MAY
+// 0`2`4`curr_part1 -> *HEAP*_l_48 , MAY
+// curr_part2 -> *HEAP*_l_48 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
 
             if (dist(curr_part1, curr_part2)<0.1) {
 
 // Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`2`4`curr_part1 -> *ANY_MODULE*:*ANYWHERE* , EXACT
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`2`4`5`curr_part2 -> *ANY_MODULE*:*ANYWHERE* , EXACT
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// curr_dom -> *HEAP*_l_46 , MAY
+// 0`2`4`curr_part1 -> *HEAP*_l_48 , MAY
+// curr_part2 -> *HEAP*_l_48 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
                curr_part1->x_new = curr_part1->x-0.1;
 
 // Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`2`4`curr_part1 -> *ANY_MODULE*:*ANYWHERE* , EXACT
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`2`4`5`curr_part2 -> *ANY_MODULE*:*ANYWHERE* , EXACT
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// curr_dom -> *HEAP*_l_46 , MAY
+// 0`2`4`curr_part1 -> *HEAP*_l_48 , MAY
+// curr_part2 -> *HEAP*_l_48 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
                curr_part1->y_new = curr_part1->y-0.1;
             }
@@ -288,15 +201,13 @@ int main()
    }
 
 // Points To:
-// curr_dom -> *ANY_MODULE*:*HEAP* , MAY
-// 0`curr_part1 -> *ANY_MODULE*:*NOWHERE* , MAY
-// 0`curr_part2 -> *ANY_MODULE*:*NOWHERE* , MAY
-// my_syst[0].tab_dom[*][0].tab_part[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst[0].tab_dom[*] -> *ANY_MODULE*:*HEAP* , MAY
-// my_syst -> *ANY_MODULE*:*HEAP* , EXACT
+// *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// my_syst -> *HEAP*_l_44 , MAY
 
    
    // final IOs (& free()...)
    
    return 0;
 }
+

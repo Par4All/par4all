@@ -52,9 +52,7 @@ int test02()
 
    if (p==q)
 
-// Points To:
-// p -> i , EXACT
-// q -> j , EXACT
+// Points To: unreachable
 
       i = 1;
    else

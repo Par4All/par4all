@@ -2,38 +2,12 @@
 POINTS-TO
 
 
-// Points To IN: none
+Warnings and errors:
 
-
-// Points To OUT:
-// *HEAP*_l_8 -> *HEAP*_l_9 , EXACT
-
-int main()
-{
-
-// Points To: none
-
-   list *root;
-
-// Points To:
-// root -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   root = malloc(sizeof(list *));
-
-// Points To:
-// root -> *HEAP*_l_8 , EXACT
-
-   root->next = malloc(sizeof(list *));
-
-// Points To:
-// *HEAP*_l_8 -> *HEAP*_l_9 , EXACT
-// root -> *HEAP*_l_8 , EXACT
-
-   free(root);
-
-// Points To:
-// *HEAP*_l_8 -> *HEAP*_l_9 , EXACT
-// root -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   return 0;
-}
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (check_type_of_points_to_cells) Maybe an issue with a dynamic memory allocation.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (check_type_of_points_to_cells) user error
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (check_type_of_points_to_cells) At line 15, the type returned for the cell"*HEAP*_l_15", "struct {struct list *next;} *", is not the expected type, "struct {struct list *next;}".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module main.
+unknown[unknown] (display_a_resource) user error
+unknown[unknown] (display_a_resource) Cannot build view file PRINTED_FILE

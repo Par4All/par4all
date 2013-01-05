@@ -50,7 +50,8 @@ void init_array(parray_t pa)
    for(i = 0; i <= pa->dim-1; i += 1)
 
 // Points To:
-// pa -> _pa_1 , EXACT
+// pa -> *NULL_POINTER* , MAY
+// pa -> _pa_1 , MAY
 
       (pa->data)[i] = (float) i;
 

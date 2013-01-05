@@ -1,3 +1,8 @@
+/* FI : case for shape analysis and descriptors and Feautrier's algorithm
+ *
+ * FI: I chagen the code to reduce its size.
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -32,11 +37,11 @@ int main()
 {
   int i, j, k;
   float x, y;
-  syst * my_syst;
-  part * curr_part1, *curr_part2;
+  //syst * my_syst;
+  //part * curr_part1, *curr_part2;
 
   // initializations
-  my_syst = (syst *) malloc( sizeof(syst) );
+  syst * my_syst = (syst *) malloc( sizeof(syst) );
   for ( i = 0; i < MAX_DOM; i++ ) {
     my_syst->tab_dom[i] = (dom *) malloc( sizeof(dom) );
     for ( j = 0; j < MAX_PART; j++ )
@@ -46,8 +51,7 @@ int main()
 
   // computations
   for ( i = 0; i < MAX_DOM; i++ ) {
-    dom * curr_dom;
-    curr_dom = my_syst->tab_dom[i];
+    dom * curr_dom = my_syst->tab_dom[i];
 
     for ( j = 0; j < MAX_PART; j++ ) {
       part * curr_part1;
@@ -58,12 +62,10 @@ int main()
     }
 
     for ( j = 0; j < MAX_PART; j++ ) {
-      part * curr_part1;
-      curr_part1 = curr_dom->tab_part[j];
+      part * curr_part1 = curr_dom->tab_part[j];
 
       for ( k = j + 1; k < MAX_PART; k++ ) {
-	part * curr_part2;
-	curr_part2 = curr_dom->tab_part[k];
+	part * curr_part2 = curr_dom->tab_part[k];
 
 	if ( dist( curr_part1, curr_part2 ) < MIN_DIST ) {
 	  curr_part1->x_new = curr_part1->x - MIN_DIST;

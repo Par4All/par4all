@@ -47,6 +47,7 @@ POINTS-TO
 // _p_1_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> 
 //    _p_1_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // nil -> *NULL_POINTER* , EXACT
+// p -> _p_1 , EXACT
 
 void list_clean(list *p)
 {
@@ -135,6 +136,8 @@ void list_clean(list *p)
 // Points To OUT:
 // *HEAP*_l_15.next -> *NULL_POINTER* , MAY
 // *HEAP*_l_15.next -> _lc_2 , MAY
+// lc -> *NULL_POINTER* , MAY
+// lc -> _lc_2 , MAY
 // list_cons -> *HEAP*_l_15 , MAY
 
 list list_cons(double v, list lc)
@@ -190,6 +193,8 @@ list list_cons(double v, list lc)
 
 
 // Points To OUT:
+// fl -> *NULL_POINTER* , MAY
+// fl -> _fl_1 , MAY
 // nil -> *NULL_POINTER* , EXACT
 
 void list_free(list fl)
@@ -232,7 +237,7 @@ void list_free(list fl)
 // _fl_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> 
 //    _fl_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // fl -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// fl -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// fl -> undefined , MAY
 // fl -> *NULL_POINTER* , MAY
 // fl -> _fl_1 , MAY
 // n -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
@@ -278,7 +283,7 @@ void list_free(list fl)
 // _fl_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> 
 //    _fl_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // fl -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// fl -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// fl -> undefined , MAY
 // fl -> *NULL_POINTER* , MAY
 // fl -> _fl_1 , MAY
 // n -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
@@ -324,7 +329,7 @@ void list_free(list fl)
 // _fl_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> 
 //    _fl_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // fl -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// fl -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// fl -> undefined , MAY
 // fl -> *NULL_POINTER* , MAY
 // fl -> _fl_1 , MAY
 // n -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
@@ -337,7 +342,7 @@ void list_free(list fl)
 // n -> _fl_1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // n -> _fl_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // nil -> *NULL_POINTER* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
       p = n;
    }
@@ -384,6 +389,8 @@ void list_free(list fl)
 // _ll_1.next -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // _ll_1.next -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
 // _ll_1.next -> *NULL_POINTER* , MAY
+// ll -> *NULL_POINTER* , MAY
+// ll -> _ll_1 , MAY
 // nil -> *NULL_POINTER* , EXACT
 
 int list_len(list ll)
@@ -669,6 +676,8 @@ int list_len(list ll)
 // list_next -> *NULL_POINTER* , MAY
 // list_next -> _nl_1_2__1 , MAY
 // nil -> *NULL_POINTER* , EXACT
+// nl -> *NULL_POINTER* , MAY
+// nl -> _nl_1 , MAY
 
 list list_next(list nl)
 {
@@ -682,7 +691,9 @@ list list_next(list nl)
    list n;
 
 // Points To:
-// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// _nl_1.next -> *NULL_POINTER* , MAY
+// _nl_1.next -> _nl_1_2__1 , MAY
+// n -> undefined , EXACT
 // nil -> *NULL_POINTER* , EXACT
 // nl -> *NULL_POINTER* , MAY
 // nl -> _nl_1 , MAY
@@ -690,7 +701,7 @@ list list_next(list nl)
    if (nl==nil)
 
 // Points To:
-// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// n -> undefined , EXACT
 // nil -> *NULL_POINTER* , EXACT
 // nl -> *NULL_POINTER* , EXACT
 
@@ -700,7 +711,7 @@ list list_next(list nl)
 // Points To:
 // _nl_1.next -> *NULL_POINTER* , MAY
 // _nl_1.next -> _nl_1_2__1 , MAY
-// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// n -> undefined , EXACT
 // nil -> *NULL_POINTER* , EXACT
 // nl -> _nl_1 , EXACT
 
@@ -719,6 +730,8 @@ list list_next(list nl)
 }
 
 // Points To IN:
+// _l_1.next -> *NULL_POINTER* , MAY
+// _l_1.next -> _l_1_2__1 , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1 , MAY
 // n -> *NULL_POINTER* , MAY
@@ -728,16 +741,24 @@ list list_next(list nl)
 
 // Points To OUT:
 // _l_1.next -> *NULL_POINTER* , MAY
+// _l_1.next -> _l_1_2__1 , MAY
 // _l_1.next -> _n_2 , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1 , MAY
+// l -> _n_2 , MAY
 // list_set_next -> *NULL_POINTER* , MAY
 // list_set_next -> _l_1 , MAY
 // list_set_next -> _n_2 , MAY
+// n -> *NULL_POINTER* , MAY
+// n -> _n_2 , MAY
 // nil -> *NULL_POINTER* , EXACT
 
 list list_set_next(list l, list n)
 {
 
 // Points To:
+// _l_1.next -> *NULL_POINTER* , MAY
+// _l_1.next -> _l_1_2__1 , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1 , MAY
 // nil -> *NULL_POINTER* , EXACT
@@ -763,6 +784,7 @@ list list_set_next(list l, list n)
 
 // Points To:
 // _l_1.next -> *NULL_POINTER* , MAY
+// _l_1.next -> _l_1_2__1 , MAY
 // _l_1.next -> _n_2 , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1 , MAY
@@ -780,6 +802,7 @@ list list_set_next(list l, list n)
 
 
 // Points To OUT:
+// l -> _l_1 , EXACT
 // list_set_value -> _l_1 , EXACT
 
 list list_set_value(list l, double v)
@@ -805,6 +828,8 @@ list list_set_value(list l, double v)
 
 
 // Points To OUT:
+// lv -> *NULL_POINTER* , MAY
+// lv -> _lv_1 , MAY
 // nil -> *NULL_POINTER* , EXACT
 
 double list_value(list lv)
@@ -881,6 +906,8 @@ int main(void)
    while (n--)
 
 // Points To:
+// list_cons:*HEAP*_l_15.next -> list_cons:*HEAP*_l_15 , MAY
+// list_cons:*HEAP*_l_15.next -> *NULL_POINTER* , MAY
 // l -> list_cons:*HEAP*_l_15 , MAY
 // l -> *NULL_POINTER* , MAY
 // nil -> *NULL_POINTER* , EXACT
@@ -888,6 +915,8 @@ int main(void)
       l = list_cons((double) n, l);
 
 // Points To:
+// list_cons:*HEAP*_l_15.next -> list_cons:*HEAP*_l_15 , MAY
+// list_cons:*HEAP*_l_15.next -> *NULL_POINTER* , MAY
 // l -> list_cons:*HEAP*_l_15 , MAY
 // l -> *NULL_POINTER* , MAY
 // nil -> *NULL_POINTER* , EXACT
@@ -895,6 +924,8 @@ int main(void)
    n = list_len(l);
 
 // Points To:
+// list_cons:*HEAP*_l_15.next -> list_cons:*HEAP*_l_15 , MAY
+// list_cons:*HEAP*_l_15.next -> *NULL_POINTER* , MAY
 // l -> list_cons:*HEAP*_l_15 , MAY
 // l -> *NULL_POINTER* , MAY
 // nil -> *NULL_POINTER* , EXACT
@@ -904,19 +935,21 @@ int main(void)
    fprintf(stdout, "n=%d", n);
 
 // Points To:
+// list_cons:*HEAP*_l_15.next -> list_cons:*HEAP*_l_15 , MAY
+// list_cons:*HEAP*_l_15.next -> *NULL_POINTER* , MAY
 // l -> list_cons:*HEAP*_l_15 , MAY
 // l -> *NULL_POINTER* , MAY
 // nil -> *NULL_POINTER* , EXACT
-// stdout -> *NULL_POINTER* , MAY
-// stdout -> _stdout_ , MAY
+// stdout -> _stdout_ , EXACT
 
    list_clean(&l);
 
 // Points To:
+// list_cons:*HEAP*_l_15.next -> list_cons:*HEAP*_l_15 , MAY
+// list_cons:*HEAP*_l_15.next -> *NULL_POINTER* , MAY
 // l -> *NULL_POINTER* , EXACT
 // nil -> *NULL_POINTER* , EXACT
-// stdout -> *NULL_POINTER* , MAY
-// stdout -> _stdout_ , MAY
+// stdout -> _stdout_ , EXACT
 
    return 0;
 }

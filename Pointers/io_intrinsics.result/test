@@ -932,8 +932,7 @@ int main(char *fmt1, ...)
 // fp -> undefined , EXACT
 // fp_pos -> undefined , EXACT
 // i_name -> "i=" , EXACT
-// stderr -> *NULL_POINTER* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> _stderr_[0] , EXACT
 
    return 0;
 }

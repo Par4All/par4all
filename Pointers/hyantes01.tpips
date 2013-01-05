@@ -1,4 +1,4 @@
-setenv WSPACE=hyantes
+setenv WSPACE=hyantes01
 delete $WSPACE
 create $WSPACE $WSPACE.c
 
@@ -17,32 +17,11 @@ activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[read_towns]
 
 echo 
-echo Points-to for "run"
-echo
-
-activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[run]
-
-echo 
 echo Cumulated effects for "read_towns"
 echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[read_towns]
-
-echo 
-echo Cumulated effects for "run"
-echo
-
-activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[run]
-
-echo 
-echo Points-to for "main"
-echo
-
-activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[main]
 
 close
 delete $WSPACE
