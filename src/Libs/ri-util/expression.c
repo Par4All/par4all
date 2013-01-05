@@ -4278,3 +4278,17 @@ bool C_initialization_expression_p(expression e)
   }
   return initialization_p;
 }
+
+/* Returns a list of expressions hidden by the brace function.
+ *
+ * First cut: FI not too sure about recursive calls to the brace function.
+ */
+list struct_initialization_expression_to_expressions(expression e)
+{
+  pips_assert("rhs is a C initialization expression",
+	      C_initialization_expression_p(e));
+  syntax s = expression_syntax(e);
+  call c = syntax_call(s);
+  list el = call_arguments(c);
+  return el;
+}

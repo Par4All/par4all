@@ -1393,6 +1393,19 @@ bool static_global_variable_p(entity v)
   return static_global_variable_p;
 }
 
+/* Is v a global variable such as "int i;"
+ *
+ * This is OK for C, but Fortran deals with commons.
+ */
+bool global_variable_p(entity v)
+{
+  // static global variables are decared in a compilation unit
+  bool global_variable_p =
+    (strcmp(entity_module_name(v), TOP_LEVEL_MODULE_NAME)==0);
+
+  return global_variable_p;
+}
+
 
 /* True if a variable is the pseudo-variable used to store value
    returned by a function: */
@@ -1870,4 +1883,15 @@ bool same_scalar_location_p(entity e1, entity e2)
   }
 
   return same;
+}
+
+/* Assume that v is declared as a struct. Return the list of its fields.
+ *
+ * Apart from a possible assert, the same function should wor for a union.
+*/
+list struct_variable_to_fields(entity v)
+{
+  type c_t = entity_basic_concrete_type(v);
+  list fl = derived_type_to_fields(c_t);
+  return fl;
 }

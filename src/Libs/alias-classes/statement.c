@@ -120,6 +120,7 @@ void add_arc_to_statement_points_to_context(points_to pt)
 {
   pt_map in = stack_head(statement_points_to_context);
   add_arc_to_pt_map(pt, in);
+  pips_assert("in is consistent", consistent_pt_map_p(in));
 }
 
 int points_to_context_statement_line_number()

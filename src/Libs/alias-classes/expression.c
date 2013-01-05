@@ -485,6 +485,18 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in, bool side_effect_p)
 	gen_free_list(sinks);
       }
     }
+    if(!points_to_graph_bottom(pt_out)
+       && (ENTITY_FPRINTF_P(f) || ENTITY_FSCANF_P(f))) {
+      /* stdin, stdout, stderr, fd... must be defined and not NULL */
+      expression a1 = EXPRESSION(CAR(al));
+      if(expression_reference_p(a1)) {
+	expression d =
+	  unary_intrinsic_expression(DEREFERENCING_OPERATOR_NAME,
+					      copy_expression(a1));
+	pt_out = expression_to_points_to(d, pt_out, false);
+	free_expression(d);
+      }
+    }
   }
   else if(ENTITY_C_RETURN_P(f)) {
     /* it is assumed that only one return is present in any module
@@ -1858,28 +1870,44 @@ pt_map struct_initialization_to_points_to(expression lhs,
   // Implementation 0:
   // pips_internal_error("Not implemented yet.\n");
   // pips_assert("to please gcc, waiting for implementation", lhs==rhs && in==in);
-
-  /* Temporary implementation: use anywhere as default initialization */
   list L = expression_to_points_to_sources(lhs, in);
-  // ignore rhs
-  pips_assert("to please gcc, waiting for implementation", rhs==rhs);
+
   // L must contain a unique cell, containing a non-index reference
-  pips_assert("One struct to initializze", (int) gen_length(L)==1);
+  pips_assert("One struct to initialize", (int) gen_length(L)==1);
   cell c = CELL(CAR(L));
   reference r = cell_any_reference(c);
   entity e = reference_variable(r);
   pips_assert("c is not indexed", ENDP(reference_indices(r)));
-  list l = variable_to_pointer_locations(e);
-  FOREACH(CELL, source, l) {
-    bool to_be_freed;
-    type t = points_to_cell_to_type(source, &to_be_freed);
-    type c_t = type_to_pointed_type(compute_basic_concrete_type(t));
-    cell sink = make_anywhere_cell(c_t);
-    if(to_be_freed) free_type(t);
-    points_to pt = make_points_to(source, sink,
-				  make_approximation_exact(),
-				  make_descriptor_none());
-    add_arc_to_pt_map(pt, out);
+  if(0) {
+    /* Temporary implementation: use anywhere as default initialization */
+    // ignore rhs
+    list l = variable_to_pointer_locations(e);
+    FOREACH(CELL, source, l) {
+      bool to_be_freed;
+      type t = points_to_cell_to_type(source, &to_be_freed);
+      type c_t = type_to_pointed_type(compute_basic_concrete_type(t));
+      cell sink = make_anywhere_cell(c_t);
+      if(to_be_freed) free_type(t);
+      points_to pt = make_points_to(source, sink,
+				    make_approximation_exact(),
+				    make_descriptor_none());
+      add_arc_to_pt_map(pt, out);
+    }
+  }
+  else {
+    /* We must assign to each relevant field its initial value */
+    list fl = struct_variable_to_fields(e); // list of entities
+    list vl = struct_initialization_expression_to_expressions(rhs);
+    pips_assert("The field and initial value lists have the same length",
+		gen_length(fl)==gen_length(vl));
+    list cvl = vl;
+    FOREACH(ENTITY, f, fl) {
+      reference nr =
+	make_reference(e, CONS(EXPRESSION, entity_to_expression(f), NIL));
+      expression nlhs = reference_to_expression(nr);
+      out = assignment_to_points_to(nlhs, EXPRESSION(CAR(cvl)), out);
+      POP(cvl);
+    }
   }
 
   return out;

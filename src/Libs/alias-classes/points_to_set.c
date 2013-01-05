@@ -571,7 +571,8 @@ void print_or_dump_points_to(const points_to pt, bool print_p)
       fprintf(stderr,"%s" MODULE_SEP_STRING, entity_local_name(m1));
     print_reference(r1);
     fprintf(stderr,"->");
-    if(m!=m2 && !null_cell_p(sink) && !nowhere_cell_p(sink))
+    if(m!=m2 && !null_cell_p(sink) && !nowhere_cell_p(sink)
+       && !anywhere_cell_p(sink) && !cell_typed_anywhere_locations_p(sink))
       fprintf(stderr,"%s" MODULE_SEP_STRING, entity_local_name(m2));
     print_reference(r2);
     fprintf(stderr," (%s)", approximation_to_string(app));

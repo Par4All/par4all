@@ -519,42 +519,46 @@ static type constant_string_type_to_string_type(type t)
 }
 
 /* Filter pt_in_callee according to pts_binded. For instance, a
-   formal parameter can point to NULL in pt_in_callee only if it
-   also points to NULL in pts_binded. In the same way, a formal
-   parameter can point to a points-to stub in pt_in_callee only if
-   it points to a non-NULL target in pts_binded. Also, a formal
-   parameter cannot points exactly to UNDEFINED in pts_binded as
-   it would be useless (not clear if we can remove such an arc
-   when it is a may arc...). Finally, each formal parameter must
-   still point to something.
-
-   The context of the caller may be insufficiently developped because
-   its does not use explictly a pointer that is a formal parameter for
-   it. For instance:
-
-   foo(int ***p) {bar(int ***p);}
-
-   The formal context of "foo()" must be developped when the formal
-   context of "bar()" is imported. For instance, *p, **p and ***p may
-   be accessed in "bar()", generating points-to stub in "bar". Similar
-   stubs must be generated here for "foo()" before the translation can
-   be performed.
+ * formal parameter can point to NULL in pt_in_callee only if it
+ * also points to NULL in pts_binded. In the same way, a formal
+ * parameter can point to a points-to stub in pt_in_callee only if
+ * it points to a non-NULL target in pts_binded. Also, a formal
+ * parameter cannot points exactly to UNDEFINED in pts_binded as
+ * it would be useless (not clear if we can remove such an arc
+ * when it is a may arc...). Finally, each formal parameter must
+ * still point to something.
+ *
+ * The context of the caller may be insufficiently developped because
+ * its does not use explictly a pointer that is a formal parameter for
+ * it. For instance:
+ *
+ * foo(int ***p) {bar(int ***p);}
+ *
+ * The formal context of "foo()" must be developped when the formal
+ * context of "bar()" is imported. For instance, *p, **p and ***p may
+ * be accessed in "bar()", generating points-to stub in "bar". Similar
+ * stubs must be generated here for "foo()" before the translation can
+ * be performed.
+ *
+ * This is also true for global variables. pt_in may contain arcs that
+ * should exist in pt_binded, and hence pt_caller. It may also contain
+ * arcs that deny the existence of some arcs in pt_caller.
  */
 set filter_formal_context_according_to_actual_context(list fpcl,
-						      set pt_in_callee,
-						      set pts_binded,
+						      set pt_in,
+						      set pt_binded,
 						      set translation)
 {
   set filtered = new_simple_pt_map();
 
-  /* Copy only possible arcs "pt" from "pt_in_callee" into the "filtered" set */
-  SET_FOREACH(points_to, pt, pt_in_callee) {
+  /* Copy only possible arcs "pt" from "pt_in" into the "filtered" set */
+  SET_FOREACH(points_to, pt, pt_in) {
     cell source = points_to_source(pt);
     if(related_points_to_cell_in_list_p(source, fpcl)) {
       cell sink = points_to_sink(pt);
       if(null_cell_p(sink)) {
-	/* Do we have the same arc in pts_binded? */
-	if(arc_in_points_to_set_p(pt, pts_binded)) {
+	/* Do we have the same arc in pt_binded? */
+	if(arc_in_points_to_set_p(pt, pt_binded)) {
 	  points_to npt = copy_points_to(pt);
 	  add_arc_to_simple_pt_map(npt, filtered);
 	}
@@ -563,7 +567,7 @@ set filter_formal_context_according_to_actual_context(list fpcl,
 	}
       }
       else {
-	if(cell_points_to_non_null_sink_in_set_p(source, pts_binded)) {
+	if(cell_points_to_non_null_sink_in_set_p(source, pt_binded)) {
 	  points_to npt = copy_points_to(pt);
 	  add_arc_to_simple_pt_map(npt, filtered);
 	}
@@ -573,17 +577,39 @@ set filter_formal_context_according_to_actual_context(list fpcl,
       }
     }
     else {
-      /* We have to deal recursively with stubs of the formal context */
+      /* We have to deal recursively with stubs of the formal context
+	 and first with the global variables...although they, or there
+	 stubs, do not require any translation? Too bad I did not
+	 record why I had to add this... */
+      reference r = cell_any_reference(source);
+      entity v = reference_variable(r);
+      if(false && (static_global_variable_p(v) || global_variable_p(v))) {
+	points_to npt = copy_points_to(pt);
+	add_arc_to_simple_pt_map(npt, filtered);
+	/* FI: I do not understand why I have to do this for
+	   EffectsWithPointsTo/pointer_modif04.c */
+	if(statement_points_to_context_defined_p()) {
+	  /* Useless when called from effects... */
+	  add_arc_to_points_to_context(npt);
+	  add_arc_to_statement_points_to_context(npt);
+	}
+      }
+      else {
+	/* FI: we do not know what we really do here... An arc is not
+	   taken into account, but it might be taben into account
+	   recursively below. */
+	;
+      }
     }
   }
 
   /* Compute the translation relation for sinks of the formal arguments */
   list fcl = NIL;
   points_to_graph filtered_g = make_points_to_graph(false, filtered);
-  points_to_graph pts_binded_g = make_points_to_graph(false, pts_binded);
+  points_to_graph pt_binded_g = make_points_to_graph(false, pt_binded);
   FOREACH(CELL, c, fpcl) {
     list fl = points_to_source_to_any_sinks(c, filtered_g, false); // formal list
-    list al = points_to_source_to_any_sinks(c, pts_binded_g, false); // actual list
+    list al = points_to_source_to_any_sinks(c, pt_binded_g, false); // actual list
     int nfl = (int) gen_length(fl);
     int nal = (int) gen_length(al);
     approximation approx = approximation_undefined;
@@ -669,7 +695,7 @@ set filter_formal_context_according_to_actual_context(list fpcl,
      list of formal sinks */
   if(!ENDP(fcl)) {
     recursive_filter_formal_context_according_to_actual_context
-      (fcl, pt_in_callee, pts_binded, translation, filtered);
+      (fcl, pt_in, pt_binded, translation, filtered);
     gen_free_list(fcl);
   }
 
@@ -1008,18 +1034,20 @@ void points_to_translation_of_formal_parameters(list fpcl,
 	      points_to_translation_mapping_is_typed_p(translation));
 }
 
-/* Initial comments: add arcs of set "pt_in_s" to set "pts_kill" if
+/* Initial comments: add arcs of set "pt_caller" to set "pt_kill" if
  * their origin cells are not in the list of written pointers "wpl"
  * but is the origin of some exact arc in "pt_out_callee_filtered".
  *
  * Equations retrieved from the C code
  *
- * K = { c | \exits pt c=source(pt) !\in Written ^ |translation(source(pt))|==1
- *                  ^ atomic(translation(source(pt)) }
+ * K = { c | \exits pt c=source(pt) !\in Written
+ *                  ^ |translation(source(pt), binding, f)|==1
+ *                  ^ atomic(translation(source(pt), binding, f) }
  * 
- * kill = {pt in pt_in_s | \exits c \in K translation(c)==source(pt)}
+ * pt_kill = {pt in pt_caller | \exits c \in K binding(c)==source(pt)}
  *
- * K is defined in the frame of the callee and kill in the frame of the caller
+ * K is a set of cells defined in the frame of the callee and pt_kill
+ * a set of points-to defined in the frame of the caller.
  *
  * Examples:
  *
@@ -1042,9 +1070,12 @@ void points_to_translation_of_formal_parameters(list fpcl,
  *
  * The result should be the same as above.
  */
-void add_implicitly_killed_arcs_to_kill_set(set pts_kill, list wpl, set pt_in_s,
+void add_implicitly_killed_arcs_to_kill_set(set pt_kill,
+					    list wpl,
+					    set pt_caller,
 					    set pt_out_callee_filtered,
-					    set binding)
+					    set binding,
+					    entity f)
 {
   SET_FOREACH(points_to, out_pt, pt_out_callee_filtered) {
     cell source = points_to_source(out_pt);
@@ -1054,17 +1085,18 @@ void add_implicitly_killed_arcs_to_kill_set(set pts_kill, list wpl, set pt_in_s,
       // FI: let's assume that approximation subsumes atomicity
       if(approximation_exact_p(a)) {
 	// source is defined in the formal context
-	points_to_graph binding_g =
-	  make_points_to_graph(false, binding);
-	list tl = points_to_source_to_sinks(source, binding_g, false);
+	//points_to_graph binding_g =
+	//   make_points_to_graph(false, binding);
+	// list tl = points_to_source_to_sinks(source, binding_g, false);
+	list tl = points_to_cell_translation(source, binding, f);
 	int  ntl = (int) gen_length(tl);
 	cell t_source = cell_undefined;
 	if(ntl==1 && (atomic_points_to_cell_p(t_source=CELL(CAR(tl))))) {
-	  SET_FOREACH(points_to, pt, pt_in_s) {
+	  SET_FOREACH(points_to, pt, pt_caller) {
 	    cell pt_source = points_to_source(pt);
 	    if(points_to_cell_equal_p(t_source, pt_source)) {
 	      // FI: do not worry about sharing of arcs
-	      add_arc_to_simple_pt_map(pt, pts_kill);
+	      add_arc_to_simple_pt_map(pt, pt_kill);
 	    }
 	  }
 	}
@@ -1209,7 +1241,8 @@ pt_map user_call_to_points_to_interprocedural(call c,
 					      pt_map pt_caller)
 {
   pt_map pt_end_f = pt_caller;
-  pips_assert("pt_in is valid", !points_to_graph_bottom(pt_caller));
+  pips_assert("pt_caller is valid", !points_to_graph_bottom(pt_caller));
+  pips_assert("pt_caller is consistent", consistent_pt_map_p(pt_caller));
   entity f = call_function(c);
   list al = call_arguments(c);
   list dl = code_declarations(value_code(entity_initial(f)));
@@ -1249,10 +1282,15 @@ pt_map user_call_to_points_to_interprocedural(call c,
 
     if(success_p) {
       set binding = new_simple_pt_map();
-      /* This is only useful when a free occurs with the callee, since
-	 information about formal parameters is normally projected
-	 out. */
+      /* This used to be only useful when a free occurs with the
+	 callee, since information about formal parameters used to be
+	 normally projected out. */
       points_to_translation_of_formal_parameters(fpcl, al, pt_caller, binding);
+
+      /* Global variables do not require any translation in C, but it
+	 might more convenient to apply translation uniformly, without
+	 checking for global variables... Or the other way round? */
+      //points_to_translation_of_global_variables(pt_out, pt_caller, binding);
 
       /* Filter pt_in_callee according to pt_binded. For instance, a
 	 formal parameter can point to NULL in pt_in_callee only if it
@@ -1282,7 +1320,8 @@ pt_map user_call_to_points_to_interprocedural(call c,
        * of global variables too... */
       // compatible_p = compatible_p && !aliased_translation_p(fpcl, pt_binded);
 
-      if(!aliased_translation_p(fpcl, pt_binded)) {
+      /* If no pointer is written, aliasing is not an issue */
+      if(ENDP(wpl) || !aliased_translation_p(fpcl, pt_binded)) {
 
 	set pt_out_filtered =
 	  filter_formal_out_context_according_to_formal_in_context
@@ -1309,9 +1348,12 @@ pt_map user_call_to_points_to_interprocedural(call c,
 	 * pt_kill_1, although the equations do not seem to fit at
 	 * all since pt_in_filtered is not an argument...
 	 */
-	add_implicitly_killed_arcs_to_kill_set(pt_kill, wpl, c_pt_caller_s,
+	add_implicitly_killed_arcs_to_kill_set(pt_kill, 
+					       wpl,
+					       c_pt_caller_s,
 					       pt_out_filtered,
-					       binding);
+					       binding,
+					       f);
 	ifdebug(8) print_points_to_set("pt_kill", pt_kill);
 
 	set pt_end = new_simple_pt_map();
