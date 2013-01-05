@@ -1,0 +1,82 @@
+
+Points-to for "union01"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int union01()
+{
+
+// Points To: none
+
+   union one {
+      int first;
+      int second;
+   } x;
+
+// Points To: none
+
+   int y[10];
+
+// Points To: none
+
+
+   x.first = 1;
+
+// Points To: none
+
+   x.second = 2;
+
+// Points To: none
+
+
+   y[0] = 1;
+}
+
+Proper effects for "union01"
+
+int union01()
+{
+   union one {
+      int first;
+      int second;
+   } x;
+   int y[10];
+//             <    is written>: x.first
+
+   x.first = 1;
+//             <    is written>: x.second
+   x.second = 2;
+//             <    is written>: y[0]
+
+   y[0] = 1;
+}
+
+Cumulated effects for "union01"
+
+int union01()
+{
+   union one {
+      int first;
+      int second;
+   } x;
+   int y[10];
+//             <    is written>: x.first
+
+   x.first = 1;
+//             <    is written>: x.second
+   x.second = 2;
+//             <    is written>: y[0]
+
+   y[0] = 1;
+}
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 12 with conflicts
+		from <x.first-W-EXACT> to <x.second-W-EXACT>
+
+****************** End of Dependence Graph ******************

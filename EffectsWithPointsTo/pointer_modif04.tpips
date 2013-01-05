@@ -8,7 +8,12 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 #setenv POINTER_VALUES_DEBUG_LEVEL 2
 
 activate PROPER_EFFECTS_WITH_POINTS_TO
-#activate CUMULATED_EFFECTS_WITH_POINTS_TO
+
+# The line below can be commented out to understand the strange
+# behavior of pipsmake: all points-to information is recomputed when
+# effects for main are requested.
+
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
 
 echo
 echo Points-to for "init_s"
@@ -25,6 +30,13 @@ activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE [init_s]
 
 echo
+echo Cumulated effects with points-to for "init_s"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE [init_s]
+
+echo
 echo Points-to for "compute_s"
 echo
 
@@ -35,8 +47,14 @@ echo
 echo Proper effects with points-to for "compute_s"
 echo
 
-#activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE [compute_s]
+
+echo
+echo Cumulated effects with points-to for "compute_s"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE [compute_s]
 
 echo

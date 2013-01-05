@@ -12,8 +12,7 @@ Points-to for "init_s"
 // Points To OUT:
 // _ps_1[0].tab -> *HEAP*_l_19[0] , MAY
 // ps -> _ps_1[0] , EXACT
-// stderr -> *NULL_POINTER* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> _stderr_[0] , EXACT
 
 void init_s(s_t *ps, int max)
 {
@@ -42,8 +41,7 @@ void init_s(s_t *ps, int max)
 // Points To:
 // _ps_1[0].tab -> *HEAP*_l_19[0] , MAY
 // ps -> _ps_1[0] , EXACT
-// stderr -> *NULL_POINTER* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> _stderr_[0] , EXACT
 
    return;
 }
@@ -159,8 +157,7 @@ int main()
 
 // Points To:
 // s.tab -> init_s:*HEAP*_l_19[0] , MAY
-// stderr -> *NULL_POINTER* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> _stderr_[0] , EXACT
 
    
    // FI: it would be nicer to use &s, but this should work...
@@ -168,23 +165,20 @@ int main()
 
 // Points To:
 // s.tab -> init_s:*HEAP*_l_19[0] , MAY
-// stderr -> *NULL_POINTER* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> _stderr_[0] , EXACT
 
 
    for(i = 0; i <= 9; i += 1)
 
 // Points To:
 // s.tab -> init_s:*HEAP*_l_19[0] , MAY
-// stderr -> *NULL_POINTER* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> _stderr_[0] , EXACT
 
       fprintf(stderr, "In main, s.tab[i]=%f\n", (s.tab)[i]);
 
 // Points To:
 // s.tab -> init_s:*HEAP*_l_19[0] , MAY
-// stderr -> *NULL_POINTER* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> _stderr_[0] , EXACT
 
 
    return 0;
