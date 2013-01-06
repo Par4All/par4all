@@ -550,8 +550,10 @@ set filter_formal_context_according_to_actual_context(list fpcl,
 						      set translation)
 {
   set filtered = new_simple_pt_map();
+  // list gvcl = NIL; // global variable cell list
 
-  /* Copy only possible arcs "pt" from "pt_in" into the "filtered" set */
+  /* Copy arcs "pt" from "pt_in" into the "filtered" set if they are
+     compatible with "pt_binded". The set "pt_in" is reduced. */
   SET_FOREACH(points_to, pt, pt_in) {
     cell source = points_to_source(pt);
     if(related_points_to_cell_in_list_p(source, fpcl)) {
@@ -579,35 +581,53 @@ set filter_formal_context_according_to_actual_context(list fpcl,
     else {
       /* We have to deal recursively with stubs of the formal context
 	 and first with the global variables...although they, or there
-	 stubs, do not require any translation? Too bad I did not
-	 record why I had to add this... */
+	 stubs, do not require any translation? Why is the points-to
+	 information about q lost in the translation of the call site
+	 to call03 in main (PointersWithEffects/call03.c) */
       reference r = cell_any_reference(source);
       entity v = reference_variable(r);
-      if(false && (static_global_variable_p(v) || global_variable_p(v))) {
-	points_to npt = copy_points_to(pt);
-	add_arc_to_simple_pt_map(npt, filtered);
-	/* FI: I do not understand why I have to do this for
-	   EffectsWithPointsTo/pointer_modif04.c */
-	if(statement_points_to_context_defined_p()) {
-	  /* Useless when called from effects... */
-	  add_arc_to_points_to_context(npt);
-	  add_arc_to_statement_points_to_context(npt);
+      if(!arc_in_points_to_set_p(pt, pt_binded)) {
+	// FI: necessary for Pointers/global10
+	if(static_global_variable_p(v) || global_variable_p(v)) {
+	  //gvcl = CONS(CELL, source, gvcl);
+	  points_to npt = copy_points_to(pt);
+	  add_arc_to_simple_pt_map(npt, filtered);
+	  /* FI: I do not understand why I have to do this for
+	     EffectsWithPointsTo/pointer_modif04.c. Because the arc "pt"
+	     in "pt_in" is more precise than the information available
+	     in "pt_caller". For instance, "pt_in" may contain
+	     "stderr->_stderr_0[0], Exact", while "pt_caller" may
+	     contain "stderr->_stderr_0[0], May", "stderr->NULL,
+	     May". Basically, we have not thougt about the kill set
+	     generated for the global variables. */
+	  if(statement_points_to_context_defined_p()) {
+	    /* Useless when called from effects... In fact, it should
+	       never be called from effects... */
+	    //add_arc_to_points_to_context(npt);
+	    update_points_to_context_with_arc(npt);
+	  }
+	  else
+	    pips_internal_error("This function should not reach this point"
+				" when called from effects, simple or generic.");
 	}
-      }
-      else {
-	/* FI: we do not know what we really do here... An arc is not
-	   taken into account, but it might be taben into account
-	   recursively below. */
-	;
+	else {
+	  /* FI: we do not know what we really do here... An arc is not
+	     taken into account, but it might be taben into account
+	     recursively below. */
+	  ;
+	}
       }
     }
   }
 
-  /* Compute the translation relation for sinks of the formal arguments */
+  /* Compute the translation relation for sinks of the formal
+     arguments and global variables */
+  //list fpgvcl = gen_nconc(fpcl, gvcl);
   list fcl = NIL;
   points_to_graph filtered_g = make_points_to_graph(false, filtered);
   points_to_graph pt_binded_g = make_points_to_graph(false, pt_binded);
   FOREACH(CELL, c, fpcl) {
+  //FOREACH(CELL, c, fpgvcl) {
     list fl = points_to_source_to_any_sinks(c, filtered_g, false); // formal list
     list al = points_to_source_to_any_sinks(c, pt_binded_g, false); // actual list
     int nfl = (int) gen_length(fl);

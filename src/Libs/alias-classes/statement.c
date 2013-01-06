@@ -120,6 +120,15 @@ void add_arc_to_statement_points_to_context(points_to pt)
 {
   pt_map in = stack_head(statement_points_to_context);
   add_arc_to_pt_map(pt, in);
+  //update_points_to_graph_with_arc(pt, in);
+  pips_assert("in is consistent", consistent_pt_map_p(in));
+}
+
+void update_statement_points_to_context_with_arc(points_to pt)
+{
+  pt_map in = stack_head(statement_points_to_context);
+  //add_arc_to_pt_map(pt, in);
+  update_points_to_graph_with_arc(pt, in);
   pips_assert("in is consistent", consistent_pt_map_p(in));
 }
 
