@@ -182,14 +182,15 @@ int main()
 
 // Points To:
 // s.tab -> undefined , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
 
 
    init_s(s, 10);
 
 // Points To:
 // s.tab -> undefined , EXACT
-// stderr -> *NULL_POINTER* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> _stderr_[0] , EXACT
 
    fprintf(stderr, "In main, s.tab=%p\n", s.tab);
 
