@@ -45,7 +45,9 @@ void flatten_code12(void)
 Points-to for \"main\"
 
 
-// Points To IN: none
+// Points To IN:
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_[0] , MAY
 
 
 // Points To OUT: none
@@ -53,13 +55,14 @@ Points-to for \"main\"
 int main()
 {
 
-// Points To: none
+// Points To:
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_[0] , MAY
 
    flatten_code12();
 
 // Points To:
-// stdout -> *NULL_POINTER* , MAY
-// stdout -> _stdout_[0] , MAY
+// stdout -> _stdout_[0] , EXACT
 
 
    return 0;

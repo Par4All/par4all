@@ -72,6 +72,7 @@ void list_clean(list *p)
 // _p_1_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
 // _p_1_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> 
 //    _p_1_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
+// nil -> *NULL_POINTER* , EXACT
 // p -> *NULL_POINTER* , MAY
 // p -> _p_1 , MAY
 

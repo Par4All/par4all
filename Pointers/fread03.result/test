@@ -11,6 +11,8 @@ POINTS TO
 // nrh -> _nrh_3[0] , MAY
 // nrl -> *NULL_POINTER* , MAY
 // nrl -> _nrl_2[0] , MAY
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
 
 
 // Points To OUT:
@@ -76,6 +78,8 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // buffer -> *ANY_MODULE*:*HEAP*_b1[0] , MAY
 // file -> *NULL_POINTER* , EXACT
 // m -> undefined , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
 
       nrerror("ouverture du fichier impossible\n");
 
@@ -93,6 +97,8 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // buffer -> *ANY_MODULE*:*HEAP*_b1[0] , MAY
 // file -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
 // m -> undefined , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
 
       nrerror("entete du fichier %s invalide\n");
 

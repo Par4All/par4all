@@ -86,10 +86,16 @@ void f4(int n_ptrs, char *array[31])
 Points-to for "f3"
 
 
-// Points To IN: none
+// Points To IN:
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_ , MAY
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_ , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// stderr -> _stderr_ , EXACT
+// stdout -> _stdout_ , EXACT
 
 void f3(int n_ptrs, int f4_after, ...)
 {
@@ -155,12 +161,15 @@ void f3(int n_ptrs, int f4_after, ...)
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // array[*] -> undefined , MAY
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_ , MAY
 
    f2(n_ptrs, array);
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // array[*] -> undefined , MAY
+// stderr -> _stderr_ , EXACT
 
    // Now process the saved copy.
    n_ptrs -= f4_after;
@@ -168,30 +177,38 @@ void f3(int n_ptrs, int f4_after, ...)
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // array[*] -> undefined , MAY
+// stderr -> _stderr_ , EXACT
 
    for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // array[*] -> undefined , MAY
+// stderr -> _stderr_ , EXACT
 
       array[ptr_no] = va_arg(ap_save, char *);
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // array[*] -> undefined , MAY
+// stderr -> _stderr_ , EXACT
 
    va_end(ap_save);
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // array[*] -> undefined , MAY
+// stderr -> _stderr_ , EXACT
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_ , MAY
 
    f4(n_ptrs, array);
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // array[*] -> undefined , MAY
+// stderr -> _stderr_ , EXACT
+// stdout -> _stdout_ , EXACT
 
    return;
 }
@@ -199,7 +216,11 @@ void f3(int n_ptrs, int f4_after, ...)
 Points-to for "main"
 
 
-// Points To IN: none
+// Points To IN:
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_ , MAY
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_ , MAY
 
 
 // Points To OUT: none
@@ -207,11 +228,17 @@ Points-to for "main"
 int main()
 {
 
-// Points To: none
+// Points To:
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_ , MAY
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_ , MAY
 
    f3(6, 4, "ch1", "ch2", "ch3", "ch4", "ch5", "ch6");
 
-// Points To: none
+// Points To:
+// stderr -> _stderr_ , EXACT
+// stdout -> _stdout_ , EXACT
 
    return 0;
 }
