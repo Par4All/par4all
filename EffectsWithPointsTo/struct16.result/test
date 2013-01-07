@@ -9,6 +9,7 @@ Points-to for "init4"
 
 // Points To OUT:
 // *HEAP*_l_20.tab2 -> *HEAP*_l_21[0] , MAY
+// *HEAP*_l_20.tab2 -> undefined , MAY
 // _p_1[*][0].tab2 -> *HEAP*_l_21[0] , MAY
 // p[*] -> *HEAP*_l_20 , MAY
 // p[*] -> _p_1[*][0] , MAY
@@ -26,6 +27,7 @@ void init4(mys *p[5])
 
 // Points To:
 // *HEAP*_l_20.tab2 -> *HEAP*_l_21[0] , MAY
+// *HEAP*_l_20.tab2 -> undefined , MAY
 // _p_1[*][0].tab2 -> *HEAP*_l_21[0] , MAY
 // p[*] -> *HEAP*_l_20 , MAY
 // p[*] -> _p_1[*][0] , MAY
@@ -34,6 +36,7 @@ void init4(mys *p[5])
 
 // Points To:
 // *HEAP*_l_20.tab2 -> *HEAP*_l_21[0] , MAY
+// *HEAP*_l_20.tab2 -> undefined , MAY
 // _p_1[*][0].tab2 -> *HEAP*_l_21[0] , MAY
 // p[*] -> *HEAP*_l_20 , MAY
 // p[*] -> *NULL_POINTER* , MAY
@@ -44,6 +47,7 @@ void init4(mys *p[5])
 
 // Points To:
 // *HEAP*_l_20.tab2 -> *HEAP*_l_21[0] , MAY
+// *HEAP*_l_20.tab2 -> undefined , MAY
 // _p_1[*][0].tab2 -> *HEAP*_l_21[0] , MAY
 // p[*] -> *HEAP*_l_20 , MAY
 // p[*] -> _p_1[*][0] , MAY
@@ -53,6 +57,7 @@ void init4(mys *p[5])
 
 // Points To:
 // *HEAP*_l_20.tab2 -> *HEAP*_l_21[0] , MAY
+// *HEAP*_l_20.tab2 -> undefined , MAY
 // _p_1[*][0].tab2 -> *HEAP*_l_21[0] , MAY
 // p[*] -> *HEAP*_l_20 , MAY
 // p[*] -> _p_1[*][0] , MAY
@@ -61,6 +66,7 @@ void init4(mys *p[5])
 
 // Points To:
 // *HEAP*_l_20.tab2 -> *HEAP*_l_21[0] , MAY
+// *HEAP*_l_20.tab2 -> undefined , MAY
 // _p_1[*][0].tab2 -> *HEAP*_l_21[0] , MAY
 // p[*] -> *HEAP*_l_20 , MAY
 // p[*] -> _p_1[*][0] , MAY
@@ -69,6 +75,7 @@ void init4(mys *p[5])
 
 // Points To:
 // *HEAP*_l_20.tab2 -> *HEAP*_l_21[0] , MAY
+// *HEAP*_l_20.tab2 -> undefined , MAY
 // _p_1[*][0].tab2 -> *HEAP*_l_21[0] , MAY
 // p[*] -> *HEAP*_l_20 , MAY
 // p[*] -> _p_1[*][0] , MAY
@@ -78,6 +85,7 @@ void init4(mys *p[5])
 
 // Points To:
 // *HEAP*_l_20.tab2 -> *HEAP*_l_21[0] , MAY
+// *HEAP*_l_20.tab2 -> undefined , MAY
 // _p_1[*][0].tab2 -> *HEAP*_l_21[0] , MAY
 // p[*] -> *HEAP*_l_20 , MAY
 // p[*] -> _p_1[*][0] , MAY
@@ -86,6 +94,7 @@ void init4(mys *p[5])
 
 // Points To:
 // *HEAP*_l_20.tab2 -> *HEAP*_l_21[0] , MAY
+// *HEAP*_l_20.tab2 -> undefined , MAY
 // _p_1[*][0].tab2 -> *HEAP*_l_21[0] , MAY
 // p[*] -> *HEAP*_l_20 , MAY
 // p[*] -> _p_1[*][0] , MAY
@@ -94,6 +103,7 @@ void init4(mys *p[5])
 
 // Points To:
 // *HEAP*_l_20.tab2 -> *HEAP*_l_21[0] , MAY
+// *HEAP*_l_20.tab2 -> undefined , MAY
 // _p_1[*][0].tab2 -> *HEAP*_l_21[0] , MAY
 // p[*] -> *HEAP*_l_20 , MAY
 // p[*] -> _p_1[*][0] , MAY
@@ -103,6 +113,7 @@ void init4(mys *p[5])
 
 // Points To:
 // *HEAP*_l_20.tab2 -> *HEAP*_l_21[0] , MAY
+// *HEAP*_l_20.tab2 -> undefined , MAY
 // _p_1[*][0].tab2 -> *HEAP*_l_21[0] , MAY
 // p[*] -> *HEAP*_l_20 , MAY
 // p[*] -> _p_1[*][0] , MAY
@@ -273,6 +284,7 @@ int main()
 
 // Points To:
 // init4:*HEAP*_l_20.tab2 -> init4:*HEAP*_l_21[0] , MAY
+// init4:*HEAP*_l_20.tab2 -> undefined , MAY
 // s[*] -> init4:*HEAP*_l_20 , MAY
 // s[*] -> undefined , MAY
 // s[*] -> s4[*] , MAY

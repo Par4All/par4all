@@ -36,7 +36,9 @@ POINTS-TO
 // datain -> _datain_1 , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// *HEAP*_l_33.row -> undefined , EXACT
+// *HEAP*_l_33.array -> undefined , EXACT
 
 FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, int partIndex, int overlapSize)
 {
@@ -57,17 +59,23 @@ FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, in
    dat = (FLGR_Data2D *) malloc(sizeof(FLGR_Data2D));
 
 // Points To:
+// *HEAP*_l_33.row -> undefined , EXACT
+// *HEAP*_l_33.array -> undefined , EXACT
 // dat -> *HEAP*_l_33 , MAY
 
    dat->link_overlap = overlapSize;
 
 // Points To:
+// *HEAP*_l_33.row -> undefined , EXACT
+// *HEAP*_l_33.array -> undefined , EXACT
 // dat -> *HEAP*_l_33 , MAY
 
 
    for(i = 0; i <= nbrow-overlapSize-1; i += 1) {
 
 // Points To:
+// *HEAP*_l_33.row -> undefined , EXACT
+// *HEAP*_l_33.array -> undefined , EXACT
 // dat -> *HEAP*_l_33 , MAY
 // datain -> *NULL_POINTER* , MAY
 // datain -> _datain_1 , MAY

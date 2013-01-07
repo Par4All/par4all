@@ -7,6 +7,7 @@ Points-to for "init3"
 
 // Points To OUT:
 // *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_26[*] -> undefined , MAY
 // *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
 // p -> *HEAP*_l_26[0] , MAY
 
@@ -22,12 +23,14 @@ void init3(mys **p)
    p = malloc(5*sizeof(mys *));
 
 // Points To:
+// *HEAP*_l_26[*] -> undefined , EXACT
 // p -> *HEAP*_l_26[0] , MAY
 
    for(i = 0; i <= 4; i += 1) {
 
 // Points To:
 // *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_26[*] -> undefined , MAY
 // *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
 // p -> *HEAP*_l_26[0] , MAY
 
@@ -35,7 +38,9 @@ void init3(mys **p)
 
 // Points To:
 // *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_26[*] -> undefined , MAY
 // *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
+// *HEAP*_l_29.tab2 -> undefined , MAY
 // p -> *HEAP*_l_26[0] , MAY
 
       p[i]->tab2 = malloc(5*sizeof(int));
@@ -43,6 +48,7 @@ void init3(mys **p)
 
 // Points To:
 // *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_26[*] -> undefined , MAY
 // *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
 // p -> *HEAP*_l_26[0] , MAY
 
@@ -51,6 +57,7 @@ void init3(mys **p)
 
 // Points To:
 // *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_26[*] -> undefined , MAY
 // *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
 // p -> *HEAP*_l_26[0] , MAY
 
@@ -58,6 +65,7 @@ void init3(mys **p)
 
 // Points To:
 // *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_26[*] -> undefined , MAY
 // *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
 // p -> *HEAP*_l_26[0] , MAY
 
@@ -65,6 +73,7 @@ void init3(mys **p)
 
 // Points To:
 // *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_26[*] -> undefined , MAY
 // *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
 // p -> *HEAP*_l_26[0] , MAY
 
@@ -73,6 +82,7 @@ void init3(mys **p)
 
 // Points To:
 // *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_26[*] -> undefined , MAY
 // *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
 // p -> *HEAP*_l_26[0] , MAY
 
@@ -80,6 +90,7 @@ void init3(mys **p)
 
 // Points To:
 // *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_26[*] -> undefined , MAY
 // *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
 // p -> *HEAP*_l_26[0] , MAY
 
@@ -87,6 +98,7 @@ void init3(mys **p)
 
 // Points To:
 // *HEAP*_l_26[*] -> *HEAP*_l_29 , MAY
+// *HEAP*_l_26[*] -> undefined , MAY
 // *HEAP*_l_29.tab2 -> *HEAP*_l_30[0] , MAY
 // p -> *HEAP*_l_26[0] , MAY
 
@@ -250,6 +262,7 @@ int main()
 
 // Points To:
 // init3:*HEAP*_l_26[*] -> init3:*HEAP*_l_29 , MAY
+// init3:*HEAP*_l_26[*] -> undefined , MAY
 // q -> s3 , EXACT
 // r -> q , EXACT
 // s2.tab2 -> undefined , EXACT
