@@ -56,7 +56,8 @@ int main(int argc, char *argv[])
    towns t = read_towns(argv[1]);
 
 // Points To:
-// t.data -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
+// read_towns:read_towns.data -> read_towns:*HEAP*_l_30 , MAY
+// t.data -> read_towns:*HEAP*_l_30 , MAY
 
    return (int) t.nb;
 }

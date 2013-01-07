@@ -119,13 +119,16 @@ int main(int argc, char * argv[])
     towns t;
     t = read_towns(argv[1]);
     data_t xmin = atof(argv[2])*M_PI/180.,
-      ymin =atof(argv[3])*M_PI/180.,
-      xmax=atof(argv[4])*M_PI/180.,
-      ymax=atof(argv[5])*M_PI/180.,
-      step=atof(argv[6])*M_PI/180.,
-      range=atof(argv[7]);
+      ymin = atof(argv[3])*M_PI/180.,
+      xmax = atof(argv[4])*M_PI/180.,
+      ymax = atof(argv[5])*M_PI/180.,
+      step = atof(argv[6])*M_PI/180.,
+      range= atof(argv[7]);
     towns out = run(t,xmin,ymin,xmax,ymax,step,range);
     display(out,xmin,ymin,xmax,ymax,step);
+    /* A memory leak is detected here because the analyzer does not
+       know that the block exit is about equivalent to a main function
+       exit. */
   }
 
   return code;

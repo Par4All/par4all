@@ -871,26 +871,32 @@ int main(int argc, char *argv[])
       
 
 // Points To:
+// read_towns:read_towns.data -> read_towns:*HEAP*_l_54[0] , MAY
 // stderr -> _stderr_[0] , EXACT
-// t.data -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
+// t.data -> read_towns:*HEAP*_l_54[0] , MAY
 
       data_t xmin = atof(argv[2])*3.14159265358979323846/180., ymin = atof(argv[3])*3.14159265358979323846/180., xmax = atof(argv[4])*3.14159265358979323846/180., ymax = atof(argv[5])*3.14159265358979323846/180., step = atof(argv[6])*3.14159265358979323846/180., range = atof(argv[7]);
 
 // Points To:
+// read_towns:read_towns.data -> read_towns:*HEAP*_l_54[0] , MAY
 // stderr -> _stderr_[0] , EXACT
-// t.data -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
+// t.data -> read_towns:*HEAP*_l_54[0] , MAY
 
       towns out = run(t, xmin, ymin, xmax, ymax, step, range);
 
 // Points To:
-// out.data -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
+// out.data -> run:*HEAP*_l_72[0] , MAY
+// read_towns:read_towns.data -> read_towns:*HEAP*_l_54[0] , MAY
+// run:run.data -> run:*HEAP*_l_72[0] , MAY
 // stderr -> _stderr_[0] , EXACT
-// t.data -> *ANY_MODULE*:*ANYWHERE*_b1[0] , MAY
+// t.data -> read_towns:*HEAP*_l_54[0][0] , MAY
 
       display(out, xmin, ymin, xmax, ymax, step);
    }
 
 // Points To:
+// read_towns:read_towns.data -> read_towns:*HEAP*_l_54[0] , MAY
+// run:run.data -> run:*HEAP*_l_72[0] , MAY
 // stderr -> _stderr_[0] , EXACT
 
 
@@ -903,3 +909,5 @@ INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (binary_intrinsic_call_to_points_
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (CSafeSizeOfArray) Varying size for array "hyantes02!:_IO_FILE^_unused2"
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (CSafeSizeOfArray) Not yet supported properly by PIPS
 PROPER_EFFECTS_WITH_POINTS_TO[read_towns] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_set_block_projection) Memory leak for bucket "run:*HEAP*_l_72".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_set_block_projection) Memory leak for bucket "read_towns:*HEAP*_l_54".

@@ -3,17 +3,20 @@ Points-to for "call27"
 
 
 // Points To IN:
-// ppp -> _ppp_1 , EXACT
+// ppp -> *NULL_POINTER* , MAY
+// ppp -> _ppp_1 , MAY
 
 
 // Points To OUT:
 // _ppp_1 -> *NULL_POINTER* , EXACT
+// ppp -> _ppp_1 , EXACT
 
 void call27(int ***ppp)
 {
 
 // Points To:
-// ppp -> _ppp_1 , EXACT
+// ppp -> *NULL_POINTER* , MAY
+// ppp -> _ppp_1 , MAY
 
    *ppp = (void *) 0;
 

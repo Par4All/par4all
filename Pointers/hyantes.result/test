@@ -539,3 +539,65 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 
 Points-to for "main"
 
+
+// Points To IN:
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+
+// Points To OUT: none
+
+int main(int argc, char *argv[])
+{
+
+// Points To: none
+
+   if (argc!=8)
+
+// Points To: none
+
+      return 1;
+   {
+
+// Points To:
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      towns t = read_towns(argv[1]);
+      
+      
+      
+      
+      
+
+// Points To:
+// read_towns:read_towns.data -> read_towns:*HEAP*_l_52[0] , MAY
+// stderr -> _stderr_[0] , EXACT
+// t.data -> read_towns:*HEAP*_l_52[0] , MAY
+
+      data_t xmin = atof(argv[2])*3.14159265358979323846/180., ymin = atof(argv[3])*3.14159265358979323846/180., xmax = atof(argv[4])*3.14159265358979323846/180., ymax = atof(argv[5])*3.14159265358979323846/180., step = atof(argv[6])*3.14159265358979323846/180., range = atof(argv[7]);
+
+// Points To:
+// read_towns:read_towns.data -> read_towns:*HEAP*_l_52[0] , MAY
+// stderr -> _stderr_[0] , EXACT
+// t.data -> read_towns:*HEAP*_l_52[0] , MAY
+
+      towns out = run(t, xmin, ymin, xmax, ymax, step, range);
+
+// Points To:
+// out.data -> run:*HEAP*_l_70[0] , MAY
+// read_towns:read_towns.data -> read_towns:*HEAP*_l_52[0] , MAY
+// run:run.data -> run:*HEAP*_l_70[0] , MAY
+// stderr -> _stderr_[0] , EXACT
+// t.data -> read_towns:*HEAP*_l_52[0][0] , MAY
+
+      display(out, xmin, ymin, xmax, ymax, step);
+   }
+
+// Points To:
+// read_towns:read_towns.data -> read_towns:*HEAP*_l_52[0] , MAY
+// run:run.data -> run:*HEAP*_l_70[0] , MAY
+// stderr -> _stderr_[0] , EXACT
+
+   return 0;
+}

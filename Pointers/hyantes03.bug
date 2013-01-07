@@ -1,8 +1,0 @@
-Contradictory points-to arcs: incompatible approximation
-0x3292600 t[data]->*NOWHERE*_b1 (exact)
-0x32afa40 t[data]->*ANYWHERE*_b1 (may)
-pips error in statement_to_points_to: (/home/francois/MYPIPS/prod/pips/src/Libs/alias-classes/statement.c:193) assertion failed
-
- 'pt_out is consistent' not verified
-
-Aborted
