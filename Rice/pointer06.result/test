@@ -8,6 +8,10 @@ POINTS TO
 // Points To OUT:
 // *HEAP*_l_10.left -> *HEAP*_l_11 , MAY
 // *HEAP*_l_10.right -> *HEAP*_l_12 , MAY
+// *HEAP*_l_11.left -> undefined , EXACT
+// *HEAP*_l_11.right -> undefined , EXACT
+// *HEAP*_l_12.left -> undefined , EXACT
+// *HEAP*_l_12.right -> undefined , EXACT
 
 void pointer06()
 {
@@ -29,12 +33,17 @@ void pointer06()
    struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
 
 // Points To:
+// *HEAP*_l_10.left -> undefined , EXACT
+// *HEAP*_l_10.right -> undefined , EXACT
 // t -> *HEAP*_l_10 , MAY
 
    t->left = (struct tree *) malloc(sizeof(struct tree ));
 
 // Points To:
 // *HEAP*_l_10.left -> *HEAP*_l_11 , MAY
+// *HEAP*_l_10.right -> undefined , EXACT
+// *HEAP*_l_11.left -> undefined , EXACT
+// *HEAP*_l_11.right -> undefined , EXACT
 // t -> *HEAP*_l_10 , MAY
 
    t->right = (struct tree *) malloc(sizeof(struct tree ));
@@ -42,6 +51,10 @@ void pointer06()
 // Points To:
 // *HEAP*_l_10.left -> *HEAP*_l_11 , MAY
 // *HEAP*_l_10.right -> *HEAP*_l_12 , MAY
+// *HEAP*_l_11.left -> undefined , EXACT
+// *HEAP*_l_11.right -> undefined , EXACT
+// *HEAP*_l_12.left -> undefined , EXACT
+// *HEAP*_l_12.right -> undefined , EXACT
 // t -> *HEAP*_l_10 , MAY
 
    struct tree *tl = t->left;
@@ -49,6 +62,10 @@ void pointer06()
 // Points To:
 // *HEAP*_l_10.left -> *HEAP*_l_11 , MAY
 // *HEAP*_l_10.right -> *HEAP*_l_12 , MAY
+// *HEAP*_l_11.left -> undefined , EXACT
+// *HEAP*_l_11.right -> undefined , EXACT
+// *HEAP*_l_12.left -> undefined , EXACT
+// *HEAP*_l_12.right -> undefined , EXACT
 // t -> *HEAP*_l_10 , MAY
 // tl -> *HEAP*_l_11 , MAY
 
@@ -57,6 +74,10 @@ void pointer06()
 // Points To:
 // *HEAP*_l_10.left -> *HEAP*_l_11 , MAY
 // *HEAP*_l_10.right -> *HEAP*_l_12 , MAY
+// *HEAP*_l_11.left -> undefined , EXACT
+// *HEAP*_l_11.right -> undefined , EXACT
+// *HEAP*_l_12.left -> undefined , EXACT
+// *HEAP*_l_12.right -> undefined , EXACT
 // t -> *HEAP*_l_10 , MAY
 // tl -> *HEAP*_l_11 , MAY
 // tr -> *HEAP*_l_12 , MAY
@@ -66,6 +87,10 @@ void pointer06()
 // Points To:
 // *HEAP*_l_10.left -> *HEAP*_l_11 , MAY
 // *HEAP*_l_10.right -> *HEAP*_l_12 , MAY
+// *HEAP*_l_11.left -> undefined , EXACT
+// *HEAP*_l_11.right -> undefined , EXACT
+// *HEAP*_l_12.left -> undefined , EXACT
+// *HEAP*_l_12.right -> undefined , EXACT
 // t -> *HEAP*_l_10 , MAY
 // tl -> *HEAP*_l_11 , MAY
 // tr -> *HEAP*_l_12 , MAY
