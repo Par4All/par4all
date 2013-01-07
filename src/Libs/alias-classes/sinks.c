@@ -1498,10 +1498,11 @@ list expression_to_points_to_cells(expression e,
   /* reference + range + call + cast + sizeofexpression + subscript +
      application*/
   list sinks = NIL;
-  bool to_be_freed;
-  type et = points_to_expression_to_type(e, &to_be_freed);
-  type cet = compute_basic_concrete_type(et);
-  if(to_be_freed) free_type(et);
+  //bool to_be_freed;
+  //type et = points_to_expression_to_type(e, &to_be_freed);
+  //type cet = compute_basic_concrete_type(et);
+  //if(to_be_freed) free_type(et);
+  type cet = points_to_expression_to_concrete_type(e);
   tag tt ;
   syntax s = expression_syntax(e);
 

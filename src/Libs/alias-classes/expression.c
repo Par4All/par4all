@@ -1976,6 +1976,29 @@ pt_map struct_assignment_to_points_to(expression lhs,
 		  // pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
 		  points_to pt = make_points_to(lc, rc, make_approximation_may(), make_descriptor_none());
 		  // FI: pt is allocated but not used...
+		  // FI: see update_points_to_graph_with_arc()?
+		  /* Current arc list (cal): the new arc may be
+		     conflicting with an existing must arc */
+		  list cal = points_to_source_to_arcs(lc, pt_out, false);
+		  list oal = NIL;
+		  list nal = NIL;
+		  FOREACH(POINTS_TO, a, cal) {
+		    approximation ap = points_to_approximation(a);
+		    if(approximation_exact_p(ap)) {
+		      oal = CONS(POINTS_TO, a, oal);
+		      points_to na =
+			make_points_to(copy_cell(points_to_source(a)),
+				       copy_cell(points_to_sink(a)),
+				       make_approximation_may(),
+				       make_descriptor_none());
+		      nal = CONS(POINTS_TO, na, nal);
+		    }
+		  }
+		  FOREACH(POINTS_TO, oa, oal)
+		    remove_arc_from_pt_map(oa, pt_out);
+		  FOREACH(POINTS_TO, na, nal)
+		    add_arc_to_pt_map(na, pt_out);
+		  gen_free_list(oal), gen_free_list(nal);
 		  add_arc_to_pt_map(pt, pt_out); // FI: I guess...
 		  // FI->FC: it would be nice to have a Newgen free_xxxxs() to
 		  // free a list of objects of type xxx with one call

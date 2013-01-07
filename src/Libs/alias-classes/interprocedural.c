@@ -144,7 +144,10 @@ points_to_graph user_call_to_points_to(call c,
   return pt_out;
 }
 
-// FI: I assume we do not need the eval_p parameter here
+/* FI: I assume we do not need the eval_p parameter here. No, we
+ * return either the return value, or the cells pointed by the return
+ * value.
+ */
 list user_call_to_points_to_sinks(call c,
 				  type et __attribute__ ((unused)),
 				  pt_map in __attribute__ ((unused)),
@@ -177,15 +180,25 @@ list user_call_to_points_to_sinks(call c,
       entity se = reference_variable(sr);
       const char* sn = entity_local_name(se);
       if( strcmp(mn, sn)==0) {
-	cell sc = copy_cell(points_to_sink(pt));
-	sinks = gen_nconc(CONS(CELL, sc, NULL), sinks);
-	rvptl = CONS(POINTS_TO, pt, rvptl);
+	if(eval_p) {
+	  cell sc = copy_cell(points_to_sink(pt));
+	  sinks = gen_nconc(CONS(CELL, sc, NULL), sinks);
+	  rvptl = CONS(POINTS_TO, pt, rvptl);
+	}
+	else {
+	  /* This is a very convoluted way to return the return value... */
+	  cell sc = copy_cell(points_to_source(pt));
+	  reference scr = cell_any_reference(sc);
+	  free_expressions(reference_indices(scr));
+	  reference_indices(scr) = NIL;
+	  sinks = gen_nconc(CONS(CELL, sc, NULL), sinks);
+	}
       }
     }
-    /* Remove all arcs related to the return value of the callee */
+    /* Remove all arcs related to the return value of the callee. This
+       never happens when eval_p is false because rvptl is NIL*/
     FOREACH(POINTS_TO, rvpt, rvptl) {
       remove_arc_from_simple_pt_map(rvpt, in_s);
-      ;
     }
     gen_free_list(rvptl);
   /* FI: definitely the intraprocedural version */
