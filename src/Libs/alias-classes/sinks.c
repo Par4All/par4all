@@ -1093,7 +1093,7 @@ int get_heap_counter()
  * previous property is not specified...
  */
 list malloc_to_points_to_sinks(expression e,
-			       pt_map in __attribute__ ((unused)))
+			       pt_map in)
 {
   list sinks = NIL;
   const char * opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
@@ -1116,6 +1116,31 @@ list malloc_to_points_to_sinks(expression e,
     pips_user_error("Unexpected value \"%s\" for Property ABSTRACT_HEAP_LOCATION."
 		    "Possible values are \"unique\", \"insensitive\","
 		    "\"flow-sensitive\", \"context-sensitive\".\n", opt);
+  }
+
+  /* The C standard specifies that all pointers that are allocated in
+     the heap have the value "indeterminate". */
+  FOREACH(CELL, c, sinks) {
+    reference r = cell_any_reference(c);
+    entity v = reference_variable(r);
+    list l = variable_to_pointer_locations(v);
+    FOREACH(CELL, source, l) {
+      list psl = points_to_source_to_sinks(source, in, false);
+      cell sink = cell_to_nowhere_sink(source);
+      points_to pt = points_to_undefined;
+      if(ENDP(psl)) {
+	pt = make_points_to(source, sink,
+			    make_approximation_exact(),
+			    make_descriptor_none());
+      }
+      else {
+	pt = make_points_to(source, sink,
+			    make_approximation_may(),
+			    make_descriptor_none());
+	gen_free_list(psl);
+      }
+      add_arc_to_pt_map(pt, in);
+    }
   }
 
   return sinks;
