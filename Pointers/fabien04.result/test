@@ -112,6 +112,7 @@ rec reverse_copy(rec p)
 // Points To:
 // *ANY_MODULE*:*ANYWHERE*_b1 -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
 // *HEAP*_l_30.n -> *HEAP*_l_30 , MAY
+// *HEAP*_l_30.n -> undefined , MAY
 // *HEAP*_l_30.n -> *NULL_POINTER* , MAY
 // _p_1[0].n -> *NULL_POINTER* , MAY
 // _p_1[0].n -> _p_1_2__1[0][0] , MAY
@@ -157,6 +158,7 @@ rec reverse_copy(rec p)
 // Points To:
 // *ANY_MODULE*:*ANYWHERE*_b1 -> *ANY_MODULE*:*ANYWHERE*_b2 , MAY
 // *HEAP*_l_30.n -> *HEAP*_l_30 , MAY
+// *HEAP*_l_30.n -> undefined , MAY
 // *HEAP*_l_30.n -> *NULL_POINTER* , MAY
 // _p_1[0].n -> *NULL_POINTER* , MAY
 // _p_1[0].n -> _p_1_2__1[0][0] , MAY

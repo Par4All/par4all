@@ -78,18 +78,21 @@ int main()
    parray_t ma = (parray_t) malloc(sizeof(darray_t));
 
 // Points To:
+// *HEAP*_l_20.data -> undefined , EXACT
 // ma -> *HEAP*_l_20 , MAY
 
    allocate_array(ma);
 
 // Points To:
 // *HEAP*_l_20.data -> allocate_array:*HEAP*_l_7[0] , MAY
+// *HEAP*_l_20.data -> undefined , MAY
 // ma -> *HEAP*_l_20 , MAY
 
    init_array(ma);
 
 // Points To:
 // *HEAP*_l_20.data -> allocate_array:*HEAP*_l_7[0] , MAY
+// *HEAP*_l_20.data -> undefined , MAY
 // ma -> *HEAP*_l_20 , MAY
 
 

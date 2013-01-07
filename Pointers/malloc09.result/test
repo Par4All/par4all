@@ -21,12 +21,14 @@ int main(int argc, char *argv[])
    ppp = (int ***) malloc(sizeof(int * *));
 
 // Points To:
+// *HEAP*_l_23 -> undefined , EXACT
 // ppp -> *HEAP*_l_23 , MAY
 
    *ppp = (int **) malloc(sizeof(int *));
 
 // Points To:
 // *HEAP*_l_23 -> *HEAP*_l_24 , MAY
+// *HEAP*_l_24 -> undefined , EXACT
 // ppp -> *HEAP*_l_23 , MAY
 
    **ppp = (int *) malloc(sizeof(int));

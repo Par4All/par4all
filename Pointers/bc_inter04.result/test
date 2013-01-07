@@ -153,6 +153,7 @@ int main()
    a1 = (int ***) malloc(sizeof(int * *));
 
 // Points To:
+// *HEAP*_l_24 -> undefined , EXACT
 // a1 -> *HEAP*_l_24 , MAY
 // a2 -> undefined , EXACT
 // b3 -> undefined , EXACT
@@ -162,6 +163,7 @@ int main()
 
 // Points To:
 // *HEAP*_l_24 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_25 -> undefined , EXACT
 // a1 -> *HEAP*_l_24 , MAY
 // a2 -> undefined , EXACT
 // b3 -> undefined , EXACT
@@ -194,6 +196,7 @@ int main()
 // Points To:
 // *HEAP*_l_24 -> *HEAP*_l_25 , MAY
 // *HEAP*_l_25 -> *HEAP*_l_26 , MAY
+// *HEAP*_l_30 -> undefined , EXACT
 // a1 -> *HEAP*_l_24 , MAY
 // a2 -> *HEAP*_l_30 , MAY
 // b3 -> undefined , EXACT
@@ -217,6 +220,7 @@ int main()
 // *HEAP*_l_24 -> *HEAP*_l_25 , MAY
 // *HEAP*_l_25 -> *HEAP*_l_26 , MAY
 // *HEAP*_l_30 -> *HEAP*_l_25 , MAY
+// *HEAP*_l_33 -> undefined , EXACT
 // a1 -> *HEAP*_l_24 , MAY
 // a2 -> *HEAP*_l_30 , MAY
 // b3 -> *HEAP*_l_33 , MAY

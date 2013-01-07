@@ -59,6 +59,7 @@ rec reverse_copy(rec p)
       rec t = (rec) malloc(sizeof(struct rec_st ));
 
 // Points To:
+// *HEAP*_l_30.n -> undefined , MAY
 // *HEAP*_l_30.n -> *NULL_POINTER* , MAY
 // _p_1.n -> *NULL_POINTER* , MAY
 // _p_1.n -> _p_1_2__1 , MAY
@@ -74,6 +75,7 @@ rec reverse_copy(rec p)
       t->i = q->i;
 
 // Points To:
+// *HEAP*_l_30.n -> undefined , MAY
 // *HEAP*_l_30.n -> *NULL_POINTER* , MAY
 // _p_1.n -> *NULL_POINTER* , MAY
 // _p_1.n -> _p_1_2__1 , MAY

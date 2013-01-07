@@ -27,27 +27,34 @@ int main()
    syst *my_syst = (syst *) malloc(sizeof(syst));
 
 // Points To:
+// *HEAP*_l_44.tab_dom[*] -> undefined , EXACT
 // my_syst -> *HEAP*_l_44 , MAY
 
    for(i = 0; i <= 9; i += 1) {
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // my_syst -> *HEAP*_l_44 , MAY
 
       (my_syst->tab_dom)[i] = (dom *) malloc(sizeof(dom));
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // my_syst -> *HEAP*_l_44 , MAY
 
       for(j = 0; j <= 99; j += 1)
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // my_syst -> *HEAP*_l_44 , MAY
 
          ((my_syst->tab_dom)[i]->tab_part)[j] = (part *) malloc(sizeof(part));
@@ -55,21 +62,27 @@ int main()
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // my_syst -> *HEAP*_l_44 , MAY
 
    x = 0;
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // my_syst -> *HEAP*_l_44 , MAY
 
    y = 0;
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // my_syst -> *HEAP*_l_44 , MAY
 
    
@@ -78,15 +91,20 @@ int main()
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // my_syst -> *HEAP*_l_44 , MAY
 
       dom *curr_dom = (my_syst->tab_dom)[i];
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // curr_dom -> *HEAP*_l_46 , MAY
+// curr_dom -> undefined , MAY
 // my_syst -> *HEAP*_l_44 , MAY
 
 
@@ -94,16 +112,22 @@ int main()
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // curr_dom -> *HEAP*_l_46 , MAY
+// curr_dom -> undefined , MAY
 // my_syst -> *HEAP*_l_44 , MAY
 
          part *curr_part1;
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // curr_dom -> *HEAP*_l_46 , MAY
+// curr_dom -> undefined , MAY
 // 0`2`3`curr_part1 -> undefined , EXACT
 // my_syst -> *HEAP*_l_44 , MAY
 
@@ -111,9 +135,12 @@ int main()
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // curr_dom -> *HEAP*_l_46 , MAY
 // 0`2`3`curr_part1 -> *HEAP*_l_48 , MAY
+// 0`2`3`curr_part1 -> undefined , MAY
 // my_syst -> *HEAP*_l_44 , MAY
 
 
@@ -121,7 +148,9 @@ int main()
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // curr_dom -> *HEAP*_l_46 , MAY
 // 0`2`3`curr_part1 -> *HEAP*_l_48 , MAY
 // my_syst -> *HEAP*_l_44 , MAY
@@ -131,8 +160,11 @@ int main()
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // curr_dom -> *HEAP*_l_46 , MAY
+// curr_dom -> undefined , MAY
 // my_syst -> *HEAP*_l_44 , MAY
 
 
@@ -140,17 +172,23 @@ int main()
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // curr_dom -> *HEAP*_l_46 , MAY
+// curr_dom -> undefined , MAY
 // my_syst -> *HEAP*_l_44 , MAY
 
          part *curr_part1 = (curr_dom->tab_part)[j];
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // curr_dom -> *HEAP*_l_46 , MAY
 // 0`2`4`curr_part1 -> *HEAP*_l_48 , MAY
+// 0`2`4`curr_part1 -> undefined , MAY
 // my_syst -> *HEAP*_l_44 , MAY
 
 
@@ -158,19 +196,26 @@ int main()
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // curr_dom -> *HEAP*_l_46 , MAY
 // 0`2`4`curr_part1 -> *HEAP*_l_48 , MAY
+// 0`2`4`curr_part1 -> undefined , MAY
 // my_syst -> *HEAP*_l_44 , MAY
 
             part *curr_part2 = (curr_dom->tab_part)[k];
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // curr_dom -> *HEAP*_l_46 , MAY
 // 0`2`4`curr_part1 -> *HEAP*_l_48 , MAY
+// 0`2`4`curr_part1 -> undefined , MAY
 // curr_part2 -> *HEAP*_l_48 , MAY
+// curr_part2 -> undefined , MAY
 // my_syst -> *HEAP*_l_44 , MAY
 
 
@@ -178,7 +223,9 @@ int main()
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // curr_dom -> *HEAP*_l_46 , MAY
 // 0`2`4`curr_part1 -> *HEAP*_l_48 , MAY
 // curr_part2 -> *HEAP*_l_48 , MAY
@@ -188,7 +235,9 @@ int main()
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // curr_dom -> *HEAP*_l_46 , MAY
 // 0`2`4`curr_part1 -> *HEAP*_l_48 , MAY
 // curr_part2 -> *HEAP*_l_48 , MAY
@@ -202,7 +251,9 @@ int main()
 
 // Points To:
 // *HEAP*_l_44.tab_dom[*] -> *HEAP*_l_46 , MAY
+// *HEAP*_l_44.tab_dom[*] -> undefined , MAY
 // *HEAP*_l_46.tab_part[*] -> *HEAP*_l_48 , MAY
+// *HEAP*_l_46.tab_part[*] -> undefined , MAY
 // my_syst -> *HEAP*_l_44 , MAY
 
    

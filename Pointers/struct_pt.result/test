@@ -68,12 +68,14 @@ int main()
    m = (my_str *) malloc(sizeof(my_str));
 
 // Points To:
+// *HEAP*_l_11.p -> undefined , EXACT
 // m -> *HEAP*_l_11 , MAY
 // n -> undefined , EXACT
 
    m->i = 1;
 
 // Points To:
+// *HEAP*_l_11.p -> undefined , EXACT
 // m -> *HEAP*_l_11 , MAY
 // n -> undefined , EXACT
 

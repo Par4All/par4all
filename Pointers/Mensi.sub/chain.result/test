@@ -78,25 +78,36 @@ int main()
    ilp_t x1 = (ilp_t) malloc(sizeof(il_t));
 
 // Points To:
+// *HEAP*_l_17.ip -> undefined , EXACT
+// *HEAP*_l_17.next -> undefined , EXACT
 // x1 -> *HEAP*_l_17 , MAY
 
    ilp_t x2 = (ilp_t) malloc(sizeof(il_t));
 
 // Points To:
+// *HEAP*_l_17.ip -> undefined , EXACT
+// *HEAP*_l_17.next -> undefined , EXACT
+// *HEAP*_l_18.ip -> undefined , EXACT
+// *HEAP*_l_18.next -> undefined , EXACT
 // x1 -> *HEAP*_l_17 , MAY
 // x2 -> *HEAP*_l_18 , MAY
 
    x1->next = (void *) 0;
 
 // Points To:
+// *HEAP*_l_17.ip -> undefined , EXACT
 // *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_18.ip -> undefined , EXACT
+// *HEAP*_l_18.next -> undefined , EXACT
 // x1 -> *HEAP*_l_17 , MAY
 // x2 -> *HEAP*_l_18 , MAY
 
    x2->next = (void *) 0;
 
 // Points To:
+// *HEAP*_l_17.ip -> undefined , EXACT
 // *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_18.ip -> undefined , EXACT
 // *HEAP*_l_18.next -> *NULL_POINTER* , MAY
 // x1 -> *HEAP*_l_17 , MAY
 // x2 -> *HEAP*_l_18 , MAY
@@ -106,7 +117,9 @@ int main()
 
 // Points To:
 // *HEAP*_l_17.next -> *HEAP*_l_18 , MAY
+// *HEAP*_l_17.ip -> undefined , EXACT
 // *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_18.ip -> undefined , EXACT
 // *HEAP*_l_18.next -> *NULL_POINTER* , MAY
 // x1 -> *HEAP*_l_17 , MAY
 // x2 -> *HEAP*_l_18 , MAY

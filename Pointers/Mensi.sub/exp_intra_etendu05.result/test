@@ -124,6 +124,8 @@ list * initialize()
 // Points To:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
+// *HEAP*_l_17.val -> undefined , MAY
+// *HEAP*_l_17.next -> undefined , MAY
 // *HEAP*_l_17.next -> *NULL_POINTER* , MAY
 // l -> *HEAP*_l_17 , MAY
 // l -> *NULL_POINTER* , MAY
@@ -135,6 +137,7 @@ list * initialize()
 // Points To:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
+// *HEAP*_l_17.next -> undefined , MAY
 // *HEAP*_l_17.next -> *NULL_POINTER* , MAY
 // l -> *HEAP*_l_17 , MAY
 // l -> *NULL_POINTER* , MAY

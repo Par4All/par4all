@@ -32,6 +32,7 @@ int main()
    q = (int **) malloc(sizeof(int *));
 
 // Points To:
+// *HEAP*_l_9 -> undefined , EXACT
 // p -> undefined , EXACT
 // q -> *HEAP*_l_9 , MAY
 
@@ -45,6 +46,7 @@ int main()
    p = (int ***) malloc(sizeof(int * *));
 
 // Points To:
+// *HEAP*_l_11 -> undefined , EXACT
 // *HEAP*_l_9 -> a , MAY
 // p -> *HEAP*_l_11 , MAY
 // q -> *HEAP*_l_9 , MAY

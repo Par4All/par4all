@@ -73,19 +73,28 @@ int ptr_to_field()
    m = (my_str *) malloc(sizeof(my_str));
 
 // Points To:
+// *HEAP*_l_13.p -> undefined , EXACT
+// *HEAP*_l_13.q -> undefined , EXACT
 // m -> *HEAP*_l_13 , MAY
 // n -> undefined , EXACT
 
    n = (my_str *) malloc(sizeof(my_str));
 
 // Points To:
+// *HEAP*_l_13.p -> undefined , EXACT
+// *HEAP*_l_13.q -> undefined , EXACT
+// *HEAP*_l_14.p -> undefined , EXACT
+// *HEAP*_l_14.q -> undefined , EXACT
 // m -> *HEAP*_l_13 , MAY
 // n -> *HEAP*_l_14 , MAY
 
    m->q = &i;
 
 // Points To:
+// *HEAP*_l_13.p -> undefined , EXACT
 // *HEAP*_l_13.q -> i , MAY
+// *HEAP*_l_14.p -> undefined , EXACT
+// *HEAP*_l_14.q -> undefined , EXACT
 // m -> *HEAP*_l_13 , MAY
 // n -> *HEAP*_l_14 , MAY
 
@@ -94,6 +103,8 @@ int ptr_to_field()
 // Points To:
 // *HEAP*_l_13.q -> i , MAY
 // *HEAP*_l_13.p -> j , MAY
+// *HEAP*_l_14.p -> undefined , EXACT
+// *HEAP*_l_14.q -> undefined , EXACT
 // m -> *HEAP*_l_13 , MAY
 // n -> *HEAP*_l_14 , MAY
 
@@ -102,6 +113,7 @@ int ptr_to_field()
 // Points To:
 // *HEAP*_l_13.q -> i , MAY
 // *HEAP*_l_13.p -> j , MAY
+// *HEAP*_l_14.p -> undefined , EXACT
 // *HEAP*_l_14.q -> j , MAY
 // m -> *HEAP*_l_13 , MAY
 // n -> *HEAP*_l_14 , MAY

@@ -166,6 +166,7 @@ int main()
    p1 = (struct2 *) malloc(sizeof(struct2));
 
 // Points To:
+// *HEAP*_l_29.q -> undefined , EXACT
 // p1 -> *HEAP*_l_29 , MAY
 // p2 -> undefined , EXACT
 // q1 -> *HEAP*_l_23 , MAY

@@ -149,11 +149,13 @@ list list_cons(double v, list lc)
    list n = (list) malloc(sizeof(struct cons_t ));
 
 // Points To:
+// *HEAP*_l_15.next -> undefined , EXACT
 // n -> *HEAP*_l_15 , MAY
 
    n->value = v;
 
 // Points To:
+// *HEAP*_l_15.next -> undefined , EXACT
 // lc -> *NULL_POINTER* , MAY
 // lc -> _lc_2 , MAY
 // n -> *HEAP*_l_15 , MAY
