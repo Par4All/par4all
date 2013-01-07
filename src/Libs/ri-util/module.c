@@ -575,6 +575,21 @@ entity any_function_to_return_value(entity m)
   return generic_function_to_return_value(m, false);
 }
 
+/* Is entity v the return value of some function? */
+bool return_value_p(entity v)
+{
+  bool return_p = strcmp(entity_module_name(v), entity_user_name(v))==0;
+  return return_p;
+}
+
+/* Is entity v the return value of function f? */
+bool function_return_value_p(entity v, entity f)
+{
+  bool return_p = strcmp(entity_module_name(v), entity_user_name(v))==0
+    &&  strcmp(entity_module_name(v), entity_user_name(f))==0;
+  return return_p;
+}
+
 /* Check if m is a C void function or a Fortran subroutine. No
    information about m is available when false is returned. */
 bool void_function_p(entity m)

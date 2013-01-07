@@ -4292,3 +4292,10 @@ list struct_initialization_expression_to_expressions(expression e)
   list el = call_arguments(c);
   return el;
 }
+
+/* Free a list of expressions. */
+void free_expressions(list el)
+{
+  FOREACH(EXPRESSION,e, el)
+    free_expression(e);
+}
