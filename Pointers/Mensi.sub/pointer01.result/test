@@ -11,6 +11,8 @@ void pointer01(int n, float *p, float *q)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
       p[i] = q[i];                                                      /*0010*/
+
+   return;                                                              /*0012*/
 }
 
 POINTS-TO
@@ -46,6 +48,13 @@ void pointer01(int n, float *p, float *q)
 // q -> _q_3[0] , MAY
 
       p[i] = q[i];                                                      /*0010*/
+
+// Points To:
+// p -> _p_2[0] , EXACT
+// q -> _q_3[0] , EXACT
+
+
+   return;                                                              /*0012*/
 }
 
 PROPER EFFECTS WITH POINTS TO
@@ -60,6 +69,8 @@ void pointer01(int n, float *p, float *q)
 //             <    is read   >: _q_3[i] i n p q
 //             <    is written>: _p_2[i]
       p[i] = q[i];                                                      /*0010*/
+
+   return;                                                              /*0012*/
 }
 //             <may be read   >: _q_3[*] p q
 //             <may be written>: _p_2[*]
@@ -77,6 +88,8 @@ void pointer01(int n, float *p, float *q)
 //             <may be written>: _p_2[*]
 //             <    is read   >: i n p q
       p[i] = q[i];                                                      /*0010*/
+
+   return;                                                              /*0012*/
 }
 
 Parallel code
@@ -88,4 +101,6 @@ void pointer01(int n, float *p, float *q)
 #pragma omp parallel for 
    for(i = 0; i <= n-1; i += 1)                                         /*0009*/
       p[i] = q[i];                                                      /*0010*/
+
+   return;                                                              /*0012*/
 }
