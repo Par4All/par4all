@@ -1,18 +1,4 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-//             <    is written>: i p
-   int i = 1, *p = &i;
-//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-
-   free(p);
-
-   return 0;
-}
-
 POINTS-TO
 
 
@@ -39,6 +25,8 @@ int main()
 
    return 0;
 }
+
+Warnings and errors: Check that the illegal free is detected
+
 C_PARSER[main] (simplify_C_expression) Variable "i" is probably used before it is defined
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Free of a non-heap allocated address.
-Or bug in the points-to analysis...
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Expression "p" at line 10 cannot be freed.

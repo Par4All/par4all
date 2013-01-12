@@ -125,6 +125,7 @@ int * dependence05()
    free(c);
 
 // Points To:
+// a -> *HEAP*_l_11[0] , MAY
 // a -> undefined , MAY
 // b -> *HEAP*_l_10[0] , MAY
 // c -> undefined , EXACT

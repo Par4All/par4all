@@ -1,31 +1,5 @@
 
-PROPER  EFFECTS
-
-int main(int argc, char *argv[])
-{
-   int *pi;
-   int *qi;
-   int i;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: pi _MALLOC_EFFECTS:_MALLOC_
-
-   pi = (int *) malloc(sizeof(int));
-//             <    is read   >: i
-   if (i>0)
-//             <    is read   >: pi
-//             <    is written>: qi
-      qi = pi;
-   else
-//             <    is written>: qi
-      qi = &i;
-//             <    is read   >: pi _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   free(pi);
-
-   return 0;
-}
-
-POINTS-TO
+Points-to for "main"
 
 
 // Points To IN: none
@@ -86,10 +60,14 @@ int main(int argc, char *argv[])
 
 // Points To:
 // pi -> undefined , EXACT
+// qi -> *HEAP*_l_11 , MAY
 // qi -> undefined , MAY
 // qi -> i , MAY
 
 
    return 0;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Dangling pointer "main:0`qi".
+
+Warnings and errors: Check that the potential dangling pointer is detected?
+It cannot be detected with our current heap model and without alias analysis.
+

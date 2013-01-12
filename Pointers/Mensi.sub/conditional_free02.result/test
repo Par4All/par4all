@@ -8,7 +8,7 @@ Points-to for "conditional_free02"
 
 
 // Points To OUT:
-// p -> *HEAP*_l_10 , MAY
+// p -> *HEAP*_l_13 , MAY
 // p -> *HEAP*_l_8 , MAY
 // p -> undefined , MAY
 // p -> *NULL_POINTER* , MAY
@@ -21,7 +21,7 @@ int conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 // p -> *NULL_POINTER* , MAY
 // p -> _p_1 , MAY
 
-   int *q = p;
+   int *q = p, i = 0;
 
 // Points To:
 // p -> *NULL_POINTER* , MAY
@@ -46,7 +46,7 @@ int conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 // q -> *NULL_POINTER* , MAY
 // q -> _p_1 , MAY
 
-   if (c2)
+   if (c2) {
 
 // Points To:
 // p -> *HEAP*_l_8 , MAY
@@ -58,10 +58,20 @@ int conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
       free(p);
 
 // Points To:
+// p -> undefined , EXACT
+// q -> undefined , MAY
+// q -> *NULL_POINTER* , MAY
+// q -> _p_1 , MAY
+
+      i++;
+   }
+
+// Points To:
 // p -> *HEAP*_l_8 , MAY
 // p -> undefined , MAY
 // p -> *NULL_POINTER* , MAY
 // p -> _p_1 , MAY
+// q -> undefined , MAY
 // q -> *NULL_POINTER* , MAY
 // q -> _p_1 , MAY
 
@@ -72,17 +82,19 @@ int conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 // p -> undefined , MAY
 // p -> *NULL_POINTER* , MAY
 // p -> _p_1 , MAY
+// q -> undefined , MAY
 // q -> *NULL_POINTER* , MAY
 // q -> _p_1 , MAY
 
       p = (int *) malloc(sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_10 , MAY
+// p -> *HEAP*_l_13 , MAY
 // p -> *HEAP*_l_8 , MAY
 // p -> undefined , MAY
 // p -> *NULL_POINTER* , MAY
 // p -> _p_1 , MAY
+// q -> undefined , MAY
 // q -> *NULL_POINTER* , MAY
 // q -> _p_1 , MAY
 
@@ -94,18 +106,22 @@ Proper effects with points-to for "conditional_free02"
 int conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 {
 //             <    is read   >: p
-//             <    is written>: q
-   int *q = p;
+//             <    is written>: i q
+   int *q = p, i = 0;
 //             <    is read   >: c1
    if (c1)
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
       p = (int *) malloc(sizeof(int));
 //             <    is read   >: c2
-   if (c2)
+   if (c2) {
 //             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
       free(p);
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+   }
 //             <    is read   >: c3
    if (c3)
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
@@ -123,8 +139,8 @@ Cumulated effects with points-to for "conditional_free02"
 int conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 {
 //             <    is read   >: p
-//             <    is written>: q
-   int *q = p;
+//             <    is written>: i q
+   int *q = p, i = 0;
 //             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <may be written>: p _MALLOC_EFFECTS:_MALLOC_
 //             <    is read   >: c1
@@ -132,13 +148,17 @@ int conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
       p = (int *) malloc(sizeof(int));
-//             <may be read   >: p _MALLOC_EFFECTS:_MALLOC_
-//             <may be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <may be read   >: i p _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: i _MALLOC_EFFECTS:_MALLOC_
 //             <    is read   >: c2
-   if (c2)
+   if (c2) {
 //             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
       free(p);
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+   }
 //             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <may be written>: p _MALLOC_EFFECTS:_MALLOC_
 //             <    is read   >: c3
@@ -166,12 +186,12 @@ int main()
    int *p = (int *) malloc(sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_16 , MAY
+// p -> *HEAP*_l_19 , MAY
 
    (void) conditional_free02(p, 0, 1, 0);
 
 // Points To:
-// p -> *HEAP*_l_16 , MAY
+// p -> *HEAP*_l_19 , MAY
 
    return 0;
 }
@@ -183,3 +203,4 @@ Warnigns and errors:
 2. But the current implementation of points_to_function_projection
 does not allow it.
 
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free02] (freed_list_to_points_to) Dangling pointer "q" has been detected at line 10.

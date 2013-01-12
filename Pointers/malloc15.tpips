@@ -1,4 +1,4 @@
-setenv WSPACE=pv_heap04
+setenv WSPACE=malloc15
 delete $WSPACE
 create $WSPACE $WSPACE.c
 
@@ -15,8 +15,9 @@ display PRINTED_FILE
 close
 
 echo
-echo Warnings and errors: memory leak to be detected
+echo Warnings and errors: Check that the illegal free is detected
 echo
 
+shell cat $WSPACE.database/Warnings
 delete $WSPACE
 quit

@@ -97,6 +97,7 @@ int main()
 // Points To:
 // p -> undefined , EXACT
 // q -> *HEAP*_l_8[*] , MAY
+// q -> *HEAP*_l_8[0] , MAY
 // q -> *HEAP*_l_8[1] , MAY
 // q -> *HEAP*_l_8[2] , MAY
 // q -> *HEAP*_l_8[3] , MAY

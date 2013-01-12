@@ -63,3 +63,6 @@ int main()
 
    return 0;
 }
+
+Warnings and errors: memory leak to be detected
+

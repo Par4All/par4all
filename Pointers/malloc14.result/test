@@ -5,7 +5,7 @@ Points-to for "main"
 // Points To IN: none
 
 
-// Points To OUT: unreachable
+// Points To OUT: none
 
 int main()
 {
@@ -20,7 +20,8 @@ int main()
 
    free(p);
 
-// Points To: unreachable
+// Points To:
+// p -> *NULL_POINTER* , EXACT
 
 
    return 0;
@@ -28,5 +29,3 @@ int main()
 
 Warnings and errors: None
 
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Free of a non-heap allocated address pointed by "p" at line 9.
-Or bug in the points-to analysis...

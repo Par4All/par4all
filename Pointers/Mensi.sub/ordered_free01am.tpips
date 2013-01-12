@@ -38,6 +38,10 @@ display PRINTED_FILE[ordered_free01]
 
 
 close
+
+echo
+echo Warnings and errors:
+echo
 shell cat $WS.database/Warnings
 delete $WS
 quit

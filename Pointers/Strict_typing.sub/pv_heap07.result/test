@@ -27,30 +27,31 @@ int main()
    p = (int *) malloc(2*sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_8[0] , MAY
+// p -> *HEAP*_l_13[0] , MAY
 // q -> undefined , EXACT
 
    p[0] = 0;
 
 // Points To:
-// p -> *HEAP*_l_8[0] , MAY
+// p -> *HEAP*_l_13[0] , MAY
 // q -> undefined , EXACT
 
    p[1] = 1;
 
 // Points To:
-// p -> *HEAP*_l_8[0] , MAY
+// p -> *HEAP*_l_13[0] , MAY
 // q -> undefined , EXACT
 
    q = p;
 
 // Points To:
-// p -> *HEAP*_l_8[0] , MAY
-// q -> *HEAP*_l_8[0] , MAY
+// p -> *HEAP*_l_13[0] , MAY
+// q -> *HEAP*_l_13[0] , MAY
 
    free(q);
 
 // Points To:
+// p -> *HEAP*_l_13[0] , MAY
 // p -> undefined , MAY
 // q -> undefined , EXACT
 
