@@ -451,7 +451,9 @@ bool generic_atomic_points_to_cell_p(cell c, bool strict_p)
  * know if they represent one address or a set of addresses. Unless
  * the intraprocedural points-to analysis is performed for each
  * combination of atomic/non-atomic stub, safety implies that
- * stub-based references are not atomic.
+ * stub-based references are not atomic (strict_p=true). In some other
+ * cases, you know that a stub does represent a unique location
+ * (strict_p=false).
  *
  * Note: it is assumed that the reference is a points-to
  * reference. All subscripts are constants, field references or

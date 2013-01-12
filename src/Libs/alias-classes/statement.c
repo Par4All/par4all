@@ -706,7 +706,7 @@ pt_map any_loop_to_points_to(statement b,
       pt_out = merge_points_to_graphs(prev, pt_out);
 
       pt_out = normalize_points_to_graph(pt_out);
-      pt_out = remove_unreachable_vertices_in_points_to_graph(pt_out);
+      pt_out = remove_unreachable_stub_vertices_in_points_to_graph(pt_out);
 
       // pips_assert("", consistent_points_to_graph_p(pt_out));
 

@@ -3131,10 +3131,32 @@ pt_map normalize_points_to_graph(pt_map ptg)
   return ptg;
 }
 
+string points_to_cell_to_string(cell c)
+{
+  return effect_reference_to_string(cell_any_reference(c));
+}
+
+/* Can cell c be accessed via another cell? */
+bool unreachable_points_to_cell_p(cell c, pt_map ptg)
+{
+  set ptg_s = points_to_graph_set(ptg);
+  bool unreachable_p = true;
+
+  SET_FOREACH(points_to, pt, ptg_s) {
+    cell sink = points_to_sink(pt);
+    if(points_to_cell_equal_p(c,sink)) {
+      unreachable_p = false;
+      break;
+    }
+  }
+
+  return unreachable_p;
+}
+
 /* Remove arcs in points-to graph "ptg" when they start from a stub
  * cell that is not reachable.
  *
- * Points-to graph "ptg" i modified by side-effects and returned.
+ * Points-to graph "ptg" is modified by side-effects and returned.
  *
  * This clean-up should be performed each time a projection is
  * performed, and even potentially, each time an arc is removed.
@@ -3144,7 +3166,7 @@ pt_map normalize_points_to_graph(pt_map ptg)
  * *not* recursive. This function should be called repeatedly till the
  * results converge to a fix point...
  */
-pt_map remove_unreachable_vertices_in_points_to_graph(pt_map ptg)
+pt_map generic_remove_unreachable_vertices_in_points_to_graph(pt_map ptg, int code, bool verbose_p)
 {
   set ptg_s = points_to_graph_set(ptg);
   list ual = NIL; // unreachable arc list
@@ -3157,11 +3179,17 @@ pt_map remove_unreachable_vertices_in_points_to_graph(pt_map ptg)
     cell source = points_to_source(pt);
     reference r = cell_any_reference(source);
     entity e = reference_variable(r);
-    if(entity_stub_sink_p(e)) {
+    if(code == 3
+       || ((code & 1) == 1 && entity_stub_sink_p(e))
+       || ((code & 2) == 2 && entity_heap_location_p(e))) {
       // list S = points_to_source_to_sinks(source, ptg);
       list S = points_to_sink_to_sources(source, ptg, false);
-      if(ENDP(S))
+      if(ENDP(S)) {
+	if(verbose_p)
+	  pips_user_warning("Unreachable cell \"%s\" removed.\n",
+			    points_to_cell_to_string(source));
 	ual = CONS(POINTS_TO, pt, ual);
+      }
       gen_free_list(S);
     }
   }
@@ -3179,6 +3207,26 @@ pt_map remove_unreachable_vertices_in_points_to_graph(pt_map ptg)
   return ptg;
 }
 
+pt_map remove_unreachable_stub_vertices_in_points_to_graph(pt_map in)
+{
+  pt_map out = generic_remove_unreachable_vertices_in_points_to_graph(in, 1, false);
+  return out;
+}
+
+pt_map remove_unreachable_heap_vertices_in_points_to_graph(pt_map in, bool verbose_p)
+{
+  pt_map out = generic_remove_unreachable_vertices_in_points_to_graph(in, 2, verbose_p);
+  return out;
+}
+
+/* This function looks pretty dangerous as variables can be reached by
+   their names. */
+pt_map remove_unreachable_vertices_in_points_to_graph(pt_map in)
+{
+  pt_map out = generic_remove_unreachable_vertices_in_points_to_graph(in, 3, false);
+  return out;
+}
+
 bool consistent_points_to_graph_p(points_to_graph ptg)
 {
   bool consistent_p;
