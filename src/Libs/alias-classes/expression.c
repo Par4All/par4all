@@ -1685,24 +1685,28 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 			  effect_reference_to_string(cell_any_reference(c)),
 			  points_to_context_statement_line_number());
       else
-	pips_user_warning("Dereferencing of an undefined pointer.\n");
+	pips_user_warning("Possible dereferencing of an undefined pointer.\n");
     }
     else if(null_cell_p(c)) {
       ndl = CONS(CELL, c, ndl);
       if(singleton_p)
 	// Not necessarily a user error if the code is dead
 	// Should be controlled by an extra property...
-	pips_user_warning("Dereferencing of a null pointer.\n");
+	pips_user_warning("Dereferencing of a null pointer \"%s\" at line %d.\n",
+			  effect_reference_to_string(cell_any_reference(c)),
+			  points_to_context_statement_line_number());
       else
-	pips_user_warning("Dereferencing of a null pointer.\n");
+	pips_user_warning("Possible dereferencing of a null pointer \"%s\" at line %d.\n",
+			  effect_reference_to_string(cell_any_reference(c)),
+			  points_to_context_statement_line_number());
     }
     else {
       /* For arrays, an extra eval has been applied by adding 0 subscripts */
       cell nc = copy_cell(c); // FI: for debugging purpose
       c = reduce_cell_to_pointer_type(c);
-      bool to_be_freed;
-      type t = points_to_cell_to_type(c, &to_be_freed);
-      type ct = compute_basic_concrete_type(t);
+      //bool to_be_freed;
+      type ct = points_to_cell_to_concrete_type(c);
+      //type ct = compute_basic_concrete_type(t);
       if(!C_pointer_type_p(ct) && !overloaded_type_p(ct)) {
 	fprintf(stderr, "nc=");
 	print_points_to_cell(nc);
@@ -1710,7 +1714,7 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 	print_points_to_cell(c);
 	pips_internal_error("\nSource cell cannot really be a source cell\n");
       }
-      if(to_be_freed) free_type(t);
+      //if(to_be_freed) free_type(t);
       free_cell(nc);
     }
   }
@@ -1781,6 +1785,7 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
     // FI: easiest way to find the proper set "kill_may"
     kill_may = set_difference(kill_may, kill_may, kill_must);
     bool address_of_p = true;
+    // gen_may = gen_2 in the dissertation
     set gen_may = gen_may_set(L, R, pt_out_s, &address_of_p);
     // set gen_must = gen_must_set(L, R, in_must, &address_of_p);
     //set kill/* = new_pt_map()*/;
@@ -1814,7 +1819,9 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
     set_union(pt_out_s, pt_out_s, gen);
 
     // FI->AM: use kill_may to reduce the precision of these arcs
-    // Easier than to make sure than "gen_may1" is consistent with "kill_may"
+    // Easier than to make sure than "gen_may1", i.e. "gen_1" in the
+    // dissertation, is consistent with "kill_may", i.e. kill_2 in the
+    // dissertation
 
     SET_FOREACH(points_to, pt, kill_may) {
       approximation a = points_to_approximation(pt);
