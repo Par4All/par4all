@@ -603,6 +603,10 @@ static void copy_from_statement(statement st) {
         pips_user_warning("Unsupported stmt expression : ");
         print_expression(e);
         fprintf(stderr,"\n");
+        // Just propagate then...
+        set copy_from_in = COPY_FROM_IN( st );
+        set copy_from_out = COPY_FROM_OUT( st );
+        set_assign(copy_from_out, copy_from_in);
       }
       break;
     }
@@ -881,6 +885,11 @@ static void copy_to_statement(statement st) {
         pips_user_warning("Unsupported stmt expression : ");
         print_expression(e);
         fprintf(stderr,"\n");
+        // Just propagate then...
+        set copy_to_in = COPY_TO_IN( st );
+        set copy_to_out = COPY_TO_OUT( st );
+        /* The ins are initially the out minus CopyFrom*/
+        set_assign(copy_to_in, copy_to_out);
       }
       break;
     }
