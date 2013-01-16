@@ -1371,7 +1371,11 @@ pt_map freed_list_to_points_to(expression lhs, list L, list R, pt_map pt_in)
   /* Remove Kill_3 if it is not empty by definition: with the
      current heap model, it is always empty. Unreachable cells are
      dealt somewhere else. They can be tested with
-     points_to_sink_to_sources(). */
+     points_to_sink_to_sources().
+
+     FI: Must be placed after gen_1 in case the assignment makes the cell
+     reachable? Nonsense?
+ */
   if(gen_length(R)==1
      && (atomic_points_to_cell_p(CELL(CAR(R))) 
 	 || unreachable_points_to_cell_p(CELL(CAR(R)), pt_out))) {
@@ -1383,7 +1387,8 @@ pt_map freed_list_to_points_to(expression lhs, list L, list R, pt_map pt_in)
 	cell l = points_to_source(pts);
 	if(related_points_to_cell_in_list_p(l, R)) {
 	  // Potentially memory leaked cell:
-	  //cell r = points_to_sink(pts);
+	  cell r = points_to_sink(pts);
+	  pt_out = memory_leak_to_more_memory_leaks(r, pt_out);
 	  remove_arc_from_pt_map(pts, pt_out);
 	}
       }
@@ -1611,7 +1616,90 @@ list reduce_cells_to_pointer_type(list cl)
   }
   return cl;
 }
+
+list points_to_cell_to_pointer_cells(cell c)
+{
+  list pcl = NIL; // pointer cell list
+  type c_t = points_to_cell_to_concrete_type(c);
+  if(pointer_type_p(c_t)) {
+    cell nc = copy_cell(c);
+    pcl = CONS(CELL, nc, pcl);
+  }
+  else if(struct_type_p(c_t)) {
+    /* Look for pointer and struct and array of pointers or struct fields */
+    list fl = struct_type_to_fields(c_t);
+    FOREACH(ENTITY, f, fl) {
+      type f_t = entity_basic_concrete_type(f);
+      if(pointer_type_p(f_t) || struct_type_p(f_t)
+	 || array_of_pointers_type_p(f_t)
+	 || array_of_struct_type_p(f_t)) {
+	cell nc = copy_cell(c);
+	points_to_cell_add_field_dimension(nc, f);
+	list ppcl = points_to_cell_to_pointer_cells(nc);
+	pcl = gen_nconc(pcl, ppcl);
+      }
+    }
+  }
+  else if(array_of_pointers_type_p(c_t) || array_of_struct_type_p(c_t)) {
+    /* transformer */
+    cell nc = copy_cell(c);
+    points_to_cell_add_unbounded_subscripts(nc);
+    pcl = points_to_cell_to_pointer_cells(nc);
+  }
+  return pcl;
+}
 
+/* Cell "l" has been memory leaked for sure and is not referenced any
+   more in "in". Its successors may be leaked too. */
+pt_map memory_leak_to_more_memory_leaks(cell l, pt_map in)
+{
+  pt_map out = in;
+  // potential memory leaks
+  list pml = points_to_cell_to_pointer_cells(l);
+  FOREACH(CELL, c, pml) {
+    // This first test is probably useless because if has been
+    // partially or fully performed by the caller
+    if(heap_cell_p(c) && unreachable_points_to_cell_p(c, in)) {
+      /* Remove useless unreachable arcs */
+      list dl = NIL, npml = NIL;
+      set out_s = points_to_graph_set(out);
+      SET_FOREACH(points_to, pt, out_s) {
+	cell source = points_to_source(pt);
+	// FI: a weaker test based on the lattice is needed
+	if(points_to_cell_equal_p(source, c)) {
+	  dl = CONS(POINTS_TO, pt, dl);
+	  cell sink = points_to_sink(pt);
+	  npml = CONS(CELL, sink, npml);
+	  // FI: we need to remove pt before we can test for unreachability...
+	  /*
+	    if(heap_cell_p(sink) && unreachable_points_to_cell_p(sink, out)) {
+	    pips_user_warning("Heap bucket \"%s\" leaked at line %d.\n",
+	    points_to_cell_to_string(sink),
+	    points_to_context_statement_line_number());
+	  */
+	}
+      }
+      FOREACH(POINTS_TO, d, dl)
+	remove_arc_from_pt_map(d, out);
+      gen_free_list(dl);
+
+      FOREACH(CELL, sink, npml) {
+	if(heap_cell_p(sink) && unreachable_points_to_cell_p(sink, out)) {
+	  pips_user_warning("Heap bucket \"%s\" leaked at line %d.\n",
+			    points_to_cell_to_string(sink),
+			    points_to_context_statement_line_number());
+	  /* Look for a chain of memory leaks */
+	  //if(!points_to_cell_equal_p(c, l))
+	  out = memory_leak_to_more_memory_leaks(sink, out);
+	}
+      }
+      gen_free_list(npml);
+    }
+  }
+  return out;
+}
+
+
 /* Update "pt_out" when any element of L can be assigned any element of R
  *
  * FI->AM: Potential and sure memory leaks are not (yet) detected.
@@ -1704,9 +1792,7 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
       /* For arrays, an extra eval has been applied by adding 0 subscripts */
       cell nc = copy_cell(c); // FI: for debugging purpose
       c = reduce_cell_to_pointer_type(c);
-      //bool to_be_freed;
       type ct = points_to_cell_to_concrete_type(c);
-      //type ct = compute_basic_concrete_type(t);
       if(!C_pointer_type_p(ct) && !overloaded_type_p(ct)) {
 	fprintf(stderr, "nc=");
 	print_points_to_cell(nc);
@@ -1714,7 +1800,6 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 	print_points_to_cell(c);
 	pips_internal_error("\nSource cell cannot really be a source cell\n");
       }
-      //if(to_be_freed) free_type(t);
       free_cell(nc);
     }
   }
@@ -1837,6 +1922,31 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 
     pips_assert("After union and approximation updates pt_out is consistent",
 		consistent_points_to_graph_p(pt_out));
+
+    /* Check kill_must for potential memory leaks */
+    SET_FOREACH(points_to, kpt, kill_must) {
+      cell d = points_to_sink(kpt);
+      //approximation ap = points_to_approximation(kpt);
+      // approximation_exact_p(ap) && : this is incompatible with heap_cell_p
+      if(heap_cell_p(d)
+	 && unreachable_points_to_cell_p(d, pt_out)) {
+	/* FI: this error message may be wrong in case of a call to
+	 * realloc(); see Ponters/hyantes02.c, hyantes03.c
+	 *
+	 * FI: this error message may deal with a bucket that does not
+	 * really exist because its allocation was conditional.
+	 *
+	 * To make things worse, the warning is emitted in an
+	 * iterative loop analysis.
+	 */
+	pips_user_warning("Heap bucket \"%s\" %sleaked at line %d.\n",
+			  points_to_cell_to_string(d),
+			  set_size(kill_must)>1? "possibly " : "",
+			  points_to_context_statement_line_number());
+	/* Look for a chain of memory leaks */
+	pt_out = memory_leak_to_more_memory_leaks(d, pt_out);
+      }
+    }
 
     sets_free(in_may, in_must,
 	      kill_may, kill_must,

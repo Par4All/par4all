@@ -749,7 +749,7 @@ bool opkill_must_module(cell m1, cell m2)
 }
 
 
-/* Opertaor gen for modules:
+/* Operator gen for modules:
    m1 is the sink, m2 the source (m2 points to m1)
    opkill_gen_module : Module * Module -> Module
 
