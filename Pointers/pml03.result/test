@@ -33,7 +33,6 @@ int main()
    free(root);
 
 // Points To:
-// *HEAP*_l_21.next -> undefined , EXACT
 // root -> undefined , EXACT
 
    return 0;

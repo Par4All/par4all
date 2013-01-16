@@ -153,4 +153,5 @@ Warnigns and errors:
 2. But the current implementation of points_to_function_projection
 does not allow it.
 
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free01] (list_assignment_to_points_to) Heap bucket "*HEAP*_l_7" possibly leaked at line 9.
 unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

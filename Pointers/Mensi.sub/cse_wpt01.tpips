@@ -1,4 +1,4 @@
-delete cse01
+delete cse_wpt01
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE
@@ -7,10 +7,6 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
 create cse_wpt01 cse_wpt01.c
-
-activate C_PARSER
-setproperty PRETTYPRINT_LANGUAGE "C"
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo
 echo Initial code
@@ -25,6 +21,31 @@ activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[cse_wpt01]
 
 echo 
+echo Cumulated effects for "cse_wpt01" 
+echo
+activate CUMULATED_EFFECTS
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[cse_wpt01]
+
+echo 
+echo Data dependence graph for "cse_wpt01" 
+echo
+
+activate PRINT_CHAINS_GRAPH
+display DG_FILE[cse_wpt01]
+quit
+
+
+echo
+echo Code after CSE without points-to analysis
+echo
+setproperty MEMORY_EFFECTS_ONLY  TRUE
+apply COMMON_SUBEXPRESSION_ELIMINATION[cse_wpt01]
+apply RESTRUCTURE_CONTROL[cse_wpt01]
+activate PRINT_CODE
+display PRINTED_FILE[cse_wpt01]
+quit
+echo 
 echo POINTS-TO
 echo
 activate PRINT_CODE_POINTS_TO_LIST
@@ -38,7 +59,7 @@ activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[cse_wpt01]
 
 echo
-echo Code after CSE
+echo Code after CSE with points-to analysis
 echo
 setproperty MEMORY_EFFECTS_ONLY  TRUE
 apply COMMON_SUBEXPRESSION_ELIMINATION[cse_wpt01]

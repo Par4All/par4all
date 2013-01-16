@@ -913,6 +913,11 @@ Warnings and errors:
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (binary_intrinsic_call_to_points_to_sinks) Fopen() not precisely implemented.
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (CSafeSizeOfArray) Varying size for array "hyantes03!:_IO_FILE^_unused2"
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (CSafeSizeOfArray) Not yet supported properly by PIPS
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (list_assignment_to_points_to) Heap bucket "*HEAP*_l_31[0]" leaked at line 39.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (list_assignment_to_points_to) Heap bucket "*HEAP*_l_31[0]" possibly leaked at line 39.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (list_assignment_to_points_to) Heap bucket "*HEAP*_l_31[0]" possibly leaked at line 39.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (list_assignment_to_points_to) Heap bucket "*HEAP*_l_39[0]" possibly leaked at line 58.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (list_assignment_to_points_to) Heap bucket "*HEAP*_l_31[0]" possibly leaked at line 58.
 PROPER_EFFECTS_WITH_POINTS_TO[read_towns] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_set_block_projection) Memory leak for bucket "run:*HEAP*_l_76".
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_set_block_projection) Memory leak for bucket "read_towns:*HEAP*_l_58".
