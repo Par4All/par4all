@@ -30,5 +30,12 @@ display PRINTED_FILE[main]
 
 
 close
+
+echo
+echo Warnings and errors: two memory leaks
+echo
+
+shell cat $WSPACE.database/Warnings
+
 delete $WSPACE
 quit

@@ -51,7 +51,6 @@ int main()
    free(root);
 
 // Points To:
-// *HEAP*_l_12.next -> undefined , EXACT
 // root -> undefined , EXACT
 
    return 0;
@@ -74,3 +73,7 @@ int main()
    free(root);
    return 0;
 }
+
+Warnings and errors: two memory leaks
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_list_to_points_to) Memory leak for bucket "main:*HEAP*_l_12".
