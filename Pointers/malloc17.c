@@ -1,4 +1,6 @@
-/* Check that memory leaks created by an assignment are detected */
+/* Check that memory leaks and indirect created by an assignment are
+ * detected
+ */
 
 #include <stdlib.h>
 
