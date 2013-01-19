@@ -1163,8 +1163,8 @@ set kill_may_set(list L, set in_may)
 }
 
 
-/* Generate the set of exact arcs that must be removed from the
- * current points-to graph.
+/* Generate the subset of arcs that must be removed from the
+ * points-to graph "in".
  *
  * Set "in_must" is the subset of set "in" with exact points-to arcs only.
  *
@@ -1175,18 +1175,16 @@ set kill_may_set(list L, set in_may)
  * Here, correctly, the atomicity is not checked directly, but
  * properly, using an operator of the lattice.
  */
-set kill_must_set(list L, set in_must)
+set kill_must_set(list L, set in)
 {
-  set kill_must = set_generic_make(set_private, points_to_equal_p,
-			     points_to_rank);
+  set kill_must = new_simple_pt_map();
   int nL = (int) gen_length(L);
 
   if(nL==1) {
-    FOREACH(cell, l, L){
-      SET_FOREACH(points_to, s, in_must){
-	if(opkill_must_constant_path(points_to_source(s),l))
-	  set_add_element(kill_must, kill_must,(void*)s);
-      }
+    cell l = CELL(CAR(L));
+    SET_FOREACH(points_to, s, in) {
+      if(opkill_must_constant_path(points_to_source(s),l))
+	set_add_element(kill_must, kill_must,(void*)s);
     }
   }
   return kill_must;

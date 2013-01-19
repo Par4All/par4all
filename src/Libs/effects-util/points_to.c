@@ -154,6 +154,17 @@ bool related_points_to_cell_in_list_p(cell c, list L)
   return found_p;
 }
 
+bool related_points_to_cells_p(cell c1, cell c2)
+{
+  bool related_p = false;
+  reference rc1 = cell_any_reference(c1);
+  entity ec1 = reference_variable(rc1);
+  reference rc2 = cell_any_reference(c2);
+  entity ec2 = reference_variable(rc2);
+  related_p = (ec1==ec2);
+  return related_p;
+}
+
  /* Debug: print a cell list for points-to. Parameter f is not useful
     in a debugging context. */
 void fprint_points_to_cell(FILE * f __attribute__ ((unused)), cell c)

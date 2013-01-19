@@ -3144,7 +3144,19 @@ bool unreachable_points_to_cell_p(cell c, pt_map ptg)
 
   SET_FOREACH(points_to, pt, ptg_s) {
     cell sink = points_to_sink(pt);
-    if(points_to_cell_equal_p(c,sink)) {
+    /* FI: the CP lattice should be used instead
+     *
+     * If "c" is somehow included into "sink", "c" is reachable. For
+     * instance, if c[*] is reachable than c[1] is reachable too.
+     *
+     * But the opposite may be true: if c[1] is reachable, then c[*]
+     * is reachable.
+     *
+     * However, if "struct s" is reachable, then so "s[next]" . But if
+     * "s[next]" is reachable does not imply that "s" is reachable.
+     */
+    //if(points_to_cell_equal_p(c,sink)) {
+    if(related_points_to_cells_p(c,sink)) {
       unreachable_p = false;
       break;
     }

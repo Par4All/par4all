@@ -1257,12 +1257,15 @@ list freeable_points_to_cells(list R)
   return R;
 }
 
-/* Error detections on L and R have already been performed. R only
-   contains heap locations or stub locations, i.e. potential heap
-   locations. Neither L nor R are empty. */
+/* Error detections on "L" and "R" have already been performed. R only
+ * contains heap locations or stub locations, i.e. potential heap
+ * locations. Neither L nor R are empty. "lhs" is provided for other
+ * error messages.
+ */
 pt_map freed_list_to_points_to(expression lhs, list L, list R, pt_map pt_in)
 {
   pt_map pt_out = pt_in;
+  list ML = NIL; /* First level memory leaks */
 
   pips_assert("L is not empty", !ENDP(L));
   pips_assert("R is not empty", !ENDP(R));
@@ -1278,6 +1281,8 @@ pt_map freed_list_to_points_to(expression lhs, list L, list R, pt_map pt_in)
     set pt_out_s = points_to_graph_set(pt_out);
     SET_FOREACH(points_to, pts, pt_out_s) {
       cell l = points_to_source(pts);
+      // FI: use the CP lattice and its operators instead?
+      //if(related_points_to_cell_in_list_p(l, L)) {
       if(points_to_cell_in_list_p(l, L)) {
 	// FI: assuming you can perform the removal inside the loop...
 	remove_arc_from_pt_map(pts, pt_out);
@@ -1308,6 +1313,7 @@ pt_map freed_list_to_points_to(expression lhs, list L, list R, pt_map pt_in)
 	  entity b = reference_variable(cell_any_reference(m));
 	  pips_user_warning("Memory leak for bucket \"%s\".\n",
 			    entity_name(b));
+	  ML = CONS(CELL, m, ML);
 	}
       }
     }
@@ -1406,6 +1412,11 @@ pt_map freed_list_to_points_to(expression lhs, list L, list R, pt_map pt_in)
    * Other pointers may or must now be dangling because their target
    * has been freed. Already detected at the level of Gen_2.
    */
+
+  /* More memory leaks? */
+  FOREACH(CELL, m, ML)
+    pt_out = memory_leak_to_more_memory_leaks(m, pt_out);
+  gen_free_list(ML);
 
   /* Clean up the resulting graph */
   // pt_out = remove_unreachable_heap_vertices_in_points_to_graph(pt_out, true);
@@ -1931,7 +1942,7 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
       if(heap_cell_p(d)
 	 && unreachable_points_to_cell_p(d, pt_out)) {
 	/* FI: this error message may be wrong in case of a call to
-	 * realloc(); see Ponters/hyantes02.c, hyantes03.c
+	 * realloc(); see Pointers/hyantes02.c, hyantes03.c
 	 *
 	 * FI: this error message may deal with a bucket that does not
 	 * really exist because its allocation was conditional.
@@ -1943,8 +1954,30 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 			  points_to_cell_to_string(d),
 			  set_size(kill_must)>1? "possibly " : "",
 			  points_to_context_statement_line_number());
-	/* Look for a chain of memory leaks */
+
+	/* Look for a chain of memory leaks. Since they are also
+	   "related" to "d", this must be done before the next
+	   step. */
 	pt_out = memory_leak_to_more_memory_leaks(d, pt_out);
+
+	/* Look for related lost arcs. See Pointers/malloc18.c */
+	reference dr = cell_any_reference(d);
+	entity dv = reference_variable(dr);
+	// cell nd = make_cell_reference(make_reference(dv, NIL));
+	//points_to_cell_add_unbounded_subscripts(nd);
+	list dal = NIL; // Deleted arc list
+	SET_FOREACH(points_to, pt, pt_out_s) {
+	  cell s = points_to_source(pt);
+	  reference sr = cell_any_reference(s);
+	  entity sv = reference_variable(sr);
+	  if(dv==sv) {
+	    if(unreachable_points_to_cell_p(s, pt_out))
+	      dal = CONS(POINTS_TO, pt, dal);
+	  }
+	}
+	FOREACH(POINTS_TO, da, dal)
+	  remove_arc_from_pt_map(da, pt_out);
+	gen_free_list(dal);
       }
     }
 
@@ -2327,10 +2360,10 @@ pt_map intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
     // Evaluate side effects only once...
     out = intrinsic_call_to_points_to(c, in, true_p);
     expression lhs = EXPRESSION(CAR(call_arguments(c)));
-    bool to_be_freed;
-    type t = points_to_expression_to_type(lhs, &to_be_freed);
-    type lhs_t = compute_basic_concrete_type(t);
-    if(to_be_freed) free_type(t);
+    //bool to_be_freed;
+    type lhs_t = points_to_expression_to_concrete_type(lhs);
+    //type lhs_t = compute_basic_concrete_type(t);
+    //if(to_be_freed) free_type(t);
     if(pointer_type_p(lhs_t)) {
       expression rhs = EXPRESSION(CAR(CDR(call_arguments(c))));
       list R = expression_to_points_to_sinks(rhs, out);
@@ -2354,13 +2387,13 @@ pt_map intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
       expression p = EXPRESSION(CAR(call_arguments(c)));
       /* Make sure that all dereferencements are possible? Might be
 	 included in intrinsic_call_to_points_to()... */
-      bool to_be_freed;
-      type et = points_to_expression_to_type(p, &to_be_freed);
+      //bool to_be_freed;
+      type et = points_to_expression_to_concrete_type(p);
       if(pointer_type_p(et)) {
 	dereferencing_to_points_to(p, in);
 	out = condition_to_points_to(p, out, true_p);
       }
-      if(to_be_freed) free_type(et);
+      //if(to_be_freed) free_type(et);
     }
     // Take care of side effects as in "if(*p++)"
     // We must take care of side effects only once...
