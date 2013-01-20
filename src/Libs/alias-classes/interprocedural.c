@@ -344,19 +344,19 @@ pt_map user_call_to_points_to_fast_interprocedural(call c,
  */
 void
 recursive_filter_formal_context_according_to_actual_context(list fcl,
-							    set pt_in_callee,
+							    set pt_in,
 							    set pts_binded,
-							    set translation,
+							    set binding,
 							    set filtered)
 {
-  points_to_graph translation_g = make_points_to_graph(false, translation);
+  points_to_graph binding_g = make_points_to_graph(false, binding);
 
-  /* Copy only possible arcs "pt" from "pt_in_callee" into the "filtered" set */
-  SET_FOREACH(points_to, pt, pt_in_callee) {
+  /* Copy only possible arcs "pt" from "pt_in" into the "filtered" set */
+  SET_FOREACH(points_to, pt, pt_in) {
     cell source = points_to_source(pt);
     if(related_points_to_cell_in_list_p(source, fcl)) {
       cell sink = points_to_sink(pt);
-      list tsl = points_to_source_to_sinks(source, translation_g, false);
+      list tsl = points_to_source_to_sinks(source, binding_g, false);
       /* FI: this assert may be too strong FI: This assert is too
        * strong for Pointers/formal_parameter01 and its message is
        * misleading because "source" is not an element of
@@ -401,8 +401,14 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
 	      points_to npt = copy_points_to(pt);
 	      add_arc_to_simple_pt_map(npt, filtered);
 	      /* 
-		 We need to concatenate fields indices to the formal parameter. AM
+	       * We need to concatenate fields indices to the formal
+	       * parameter. AM
+	       *
+	       * FI: this seems awfully dangerous as you know nothing
+	       * about the origin of fcl and you modify it by
+	       * side-effect...
 	      */
+	      if(false) {
 	      FOREACH(CELL, c, fcl) {
 		if(cell_entity_equal_p(source,c)) {
 		  reference r = cell_any_reference(source);
@@ -410,6 +416,7 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
 		  reference rc = cell_to_reference(c);
 		  reference_indices(rc) = gen_nconc(reference_indices(rc), ind);
 		}
+	      }
 	      }
 	      break;
 	    }
@@ -426,7 +433,7 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
     }
   }
 
-  /* Compute the translation relation for sinks of the formal arguments */
+  /* Compute the binding relation for sinks of the formal context list "fcl" */
   list nfcl = NIL;
   FOREACH(CELL, c, fcl) {
     points_to_graph filtered_g = make_points_to_graph(false, filtered);
@@ -434,9 +441,9 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
     if(!ENDP(fl)) {
       // FI: I am in trouble with _nl_1 and _nl_1[next]; the first one
       // is not recognized in the second one.
-      //list tsl = points_to_source_to_sinks(c, translation_g, false);
-      list tsl = points_to_source_to_some_sinks(c, translation_g, false);
-      //list tsl = source_to_sinks(c, translation_g, false);
+      //list tsl = points_to_source_to_sinks(c, binding_g, false);
+      list tsl = points_to_source_to_some_sinks(c, binding_g, false);
+      //list tsl = source_to_sinks(c, binding_g, false);
       FOREACH(CELL, tc, tsl) {
 	points_to_graph pts_binded_g = make_points_to_graph(false, pts_binded);
 	list al = points_to_source_to_some_sinks(tc, pts_binded_g, false); // formal list
@@ -463,7 +470,7 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
 		points_to tr = make_points_to(copy_cell(fc), copy_cell(ac), 
 					      copy_approximation(a),
 					      make_descriptor_none());
-		add_arc_to_simple_pt_map(tr, translation);
+		add_arc_to_simple_pt_map(tr, binding);
 	      }
 	    }
 	    nfcl = CONS(CELL, fc, nfcl);
@@ -480,17 +487,17 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
   }
 
   pips_assert("The points-to translation mapping is well typed",
-	      points_to_translation_mapping_is_typed_p(translation));
+	      points_to_translation_mapping_is_typed_p(binding));
 
   /* Now, we have to call about the same function recursively on the
      list of formal sinks */
   if(!ENDP(nfcl)) {
     recursive_filter_formal_context_according_to_actual_context
-      (nfcl, pt_in_callee, pts_binded, translation, filtered);
+      (nfcl, pt_in, pts_binded, binding, filtered);
     gen_free_list(nfcl);
   }
 
-  // FI translation_g should be freed, but not the set in it...
+  // FI binding_g should be freed, but not the set in it...
 
   return;
 }
@@ -531,12 +538,12 @@ static type constant_string_type_to_string_type(type t)
   return nt;
 }
 
-/* Filter pt_in_callee according to pts_binded. For instance, a
- * formal parameter can point to NULL in pt_in_callee only if it
- * also points to NULL in pts_binded. In the same way, a formal
- * parameter can point to a points-to stub in pt_in_callee only if
- * it points to a non-NULL target in pts_binded. Also, a formal
- * parameter cannot points exactly to UNDEFINED in pts_binded as
+/* Filter "pt_in" according to "pt_binded". For instance, a
+ * formal parameter can point to NULL in "pt_in" only if it
+ * also points to NULL in "pt_binded". In the same way, a formal
+ * parameter can point to a points-to stub in "pt_in" only if
+ * it points to a non-NULL target in "pt_binded". Also, a formal
+ * parameter cannot points exactly to UNDEFINED in "pt_binded" as
  * it would be useless (not clear if we can remove such an arc
  * when it is a may arc...). Finally, each formal parameter must
  * still point to something.
@@ -560,7 +567,7 @@ static type constant_string_type_to_string_type(type t)
 set filter_formal_context_according_to_actual_context(list fpcl,
 						      set pt_in,
 						      set pt_binded,
-						      set translation)
+						      set binding)
 {
   set filtered = new_simple_pt_map();
   // list gvcl = NIL; // global variable cell list
@@ -633,7 +640,7 @@ set filter_formal_context_according_to_actual_context(list fpcl,
     }
   }
 
-  /* Compute the translation relation for sinks of the formal
+  /* Compute the binding relation for sinks of the formal
      arguments and global variables */
   //list fpgvcl = gen_nconc(fpcl, gvcl);
   list fcl = NIL;
@@ -678,7 +685,7 @@ set filter_formal_context_according_to_actual_context(list fpcl,
 		type ac_nt = points_to_cell_to_concrete_type(ac);
 		if(!type_equal_p(fc_t, ac_nt) && !overloaded_type_p(ac_nt)) {
 		  // Pointers/pointer14.c
-		  // FI: I am not sure it is the best translaration
+		  // FI: I am not sure it is the best translation
 		  // It might be better to remove some zero subscripts from fc
 		  points_to_cell_complete_with_zero_subscripts(ac);
 		  type ac_nnt = points_to_cell_to_concrete_type(ac);
@@ -705,7 +712,7 @@ set filter_formal_context_according_to_actual_context(list fpcl,
 					  copy_cell(ac), 
 					  copy_approximation(approx),
 					  make_descriptor_none());
-	    add_arc_to_simple_pt_map(tr, translation);
+	    add_arc_to_simple_pt_map(tr, binding);
 	  }
 	}
 	fcl = CONS(CELL, fc, fcl);
@@ -717,18 +724,18 @@ set filter_formal_context_according_to_actual_context(list fpcl,
   ifdebug(8) {
     pips_debug(8, "First filtered IN set for callee at call site:\n");
     print_points_to_set("", filtered);
-    pips_debug(8, "First translation set for call site:\n");
-    print_points_to_set("", translation);
+    pips_debug(8, "First translation mapping for call site:\n");
+    print_points_to_set("", binding);
   }
 
   pips_assert("The points-to translation mapping is well typed",
-	      points_to_translation_mapping_is_typed_p(translation));
+	      points_to_translation_mapping_is_typed_p(binding));
 
   /* Now, we have to call about the same function recursively on the
      list of formal sinks */
   if(!ENDP(fcl)) {
     recursive_filter_formal_context_according_to_actual_context
-      (fcl, pt_in, pt_binded, translation, filtered);
+      (fcl, pt_in, pt_binded, binding, filtered);
     gen_free_list(fcl);
   }
 
@@ -739,8 +746,8 @@ set filter_formal_context_according_to_actual_context(list fpcl,
   ifdebug(8) {
     pips_debug(8, "Final filtered IN set for callee at call site:\n");
     print_points_to_set("", filtered);
-    pips_debug(8, "Final translation set for call site:\n");
-    print_points_to_set("", translation);
+    pips_debug(8, "Final mapping for call site:\n");
+    print_points_to_set("", binding);
   }
     
   return filtered;
@@ -1298,15 +1305,8 @@ pt_map user_call_to_points_to_interprocedural(call c,
     list wpl = written_pointers_set(el);
     list cwpl = certainly_written_pointers_set(el);
     set pt_caller_s = points_to_graph_set(pt_caller);
-
-    //points_to_list pts_to_in = (points_to_list)
-    //db_get_memory_resource(DBR_POINTS_TO_IN, module_local_name(f), true);
-   
-    //list l_pt_to_in = gen_full_copy_list(points_to_list_list(pts_to_in));
-    set pt_in = new_simple_pt_map();
-    pt_in = set_assign_list(pt_in, l_pt_to_in);
-    set pt_out = new_simple_pt_map();
-    pt_out = set_assign_list(pt_out, l_pt_to_out);
+    set pt_in = set_assign_list(new_simple_pt_map(), l_pt_to_in);
+    set pt_out = set_assign_list(new_simple_pt_map(), l_pt_to_out);
 
     // FI: function name... set or list?
     bool success_p = false;
@@ -1325,15 +1325,18 @@ pt_map user_call_to_points_to_interprocedural(call c,
 	 checking for global variables... Or the other way round? */
       //points_to_translation_of_global_variables(pt_out, pt_caller, binding);
 
-      /* Filter pt_in_callee according to pt_binded. For instance, a
-	 formal parameter can point to NULL in pt_in_callee only if it
+      /* Filter "pt_in" according to "pt_binded". For instance, a
+	 formal parameter can point to NULL in "pt_in" only if it
 	 also points to NULL in pt_binded. In the same way, a formal
-	 parameter can point to a points-to stub in pt_in_callee only if
-	 it points to a non-NULL target in pt_binded. Also, a formal
-	 parameter cannot points exactly to UNDEFINED in pt_binded as
-	 it would be useless (not clear if we can remove such an arc
-	 when it is a may arc...). Finally, each formal parameter must
-	 still point to something. */
+	 parameter can point to a points-to stub in "pt_in" only
+	 if it points to a non-NULL target in pt_binded. Also, a
+	 formal parameter cannot points exactly to UNDEFINED in
+	 "pt_binded" as it would be useless (not clear if we can remove
+	 such an arc when it is a may arc...). Finally, each formal
+	 parameter must still point to something. The mapping
+	 "binding" is augmented as needed. as well as "pt_caller"
+	 because of the on-demand approach. But "pt_binded" is not
+	 updated accordingly (?). */
       set pt_in_filtered =
 	filter_formal_context_according_to_actual_context(fpcl,
 							  pt_in,
@@ -1793,6 +1796,9 @@ set compute_points_to_gen_set(set pt_out,
 	  approximation a = points_to_approximation(p);
 	  if(approximation_may_p(a)) {
 	    if(!points_to_cell_in_list_p(sk1, translation_failures)) {
+	      /* The caller does not have to have counterparts for all
+		 hypothetical stubs that *may* be developped in
+		 callee. */
 	      pips_user_warning("Points-to sink cell sk1=\"%s\" could not be translated.\n",
 				points_to_cell_name(sk1));
 	      translation_failures = CONS(CELL, sk1, translation_failures);

@@ -302,8 +302,35 @@ type MakeAnyScalarResult(tag t, _int size)
 }
 
 
+/* Type equality and equivalence
+ *
+ * Issues mostly due to C:
+ *
+ *  - typedefs: do you want a syntactic equality only?
+ *
+ *  - qualifiers: should they be taken into account or not?
+ *
+ *  - C defined type equivalence/compatibility: char * == char[],
+ *    char[N][M]==char (*)[M]
+ *
+ *  - functions and pointers to functions are equivalent
+ *
+ *  - dependent types: how do you compare the dimension expressions?
+ *
+ * Issues dur to PIPS internal representation:
+ *
+ *  - newgen basic "string" is sometimes used instead of unsigned char[]
+ *
+ * - constant string like all constants are functions; for instance, a
+ *   char * pointer can be assigned a functional void->string...
+ *
+ * These issues lead to the concepts of "ultimate" type and of "basic
+ * concrete" type, and to the development of many different type
+ * "equality" functions.
+ */
 
-/* similar as type_equals but by passes typedefs
+/* same_type_p(): similar to type_equals but bypasses typedefs
+ *
  * FI Warning: current version only compares ultimate_types
  * but check the various typedef that follows.
  *
@@ -466,13 +493,6 @@ bool array_pointer_type_equal_p(type t1, type t2)
 	equal_p = false;
       }
       else {
-#if 0
-	basic pb = variable_basic(type_variable(pt));
-	variable etv = type_variable(t2);
-	basic eb = variable_basic(etv);
-	int d = (int) gen_length(variable_dimensions(etv));
-	equal_p = (d==1 && basic_equal_p(pb, eb));
-#endif
 	// Generalization
 	type st = array_type_to_sub_array_type(t2);
 	equal_p = array_pointer_type_equal_p(pt, st);
@@ -487,13 +507,6 @@ bool array_pointer_type_equal_p(type t1, type t2)
 	equal_p = false;
       }
       else {
-#if 0
-	basic pb = variable_basic(type_variable(pt));
-	variable etv = type_variable(t1);
-	basic eb = variable_basic(etv);
-	int d = (int) gen_length(variable_dimensions(etv));
-	equal_p = (d==1 && basic_equal_p(pb, eb));
-#endif
 	// Generalization
 	type st = array_type_to_sub_array_type(t1);
 	equal_p = array_pointer_type_equal_p(pt, st);
@@ -514,7 +527,9 @@ bool array_pointer_type_equal_p(type t1, type t2)
 }
 
 /* Assume that a pointer to type x is equal to a 1-D array of x. And
-   do not forget the PIPS "string" exception. Constants strings are given type string instead of char[n] or char *. */
+ * do not forget the PIPS "string" exception. Constants strings are
+ * given type void->string instead of char[n] or char *.
+ */
 bool array_pointer_string_type_equal_p(type t1, type t2)
 {
   bool equal_p = true;
@@ -562,9 +577,12 @@ bool concrete_array_pointer_type_equal_p(type t1, type t2)
   type ct1 = compute_basic_concrete_type(t1);
   type ct2 = compute_basic_concrete_type(t2);
   bool equal_p = array_pointer_type_equal_p(ct1, ct2);
-  free_type(ct1), free_type(ct2);
+  // Basic concrete types are memoized in a hash-table.
+  // They should not be freed (see corresponding functions)
+  // free_type(ct1), free_type(ct2);
   return equal_p;
 }
+
 
 type make_scalar_integer_type(_int n)
 {
@@ -982,7 +1000,7 @@ dimension FindIthDimension(entity e, int i)
 
     return(DIMENSION(CAR(pc)));
 }
-
+
 /*
  * returns a string defining a type.
  */
@@ -1049,7 +1067,7 @@ string string_of_type(const type t)
   gen_free_list(wl);
   return s;
 }
-
+
 /* BEGIN_EOLE */ /* - please do not remove this line */
 /* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
    in the EOLE project (JZ - 11/98) */
@@ -2647,12 +2665,15 @@ bool signed_type_p(type t)
     }
   return false;
 }
+
 bool unsigned_basic_p(basic b) {
     if (basic_int_p(b))
         if (basic_int(b)/10 == DEFAULT_UNSIGNED_TYPE_SIZE)
             return true;
     return false;
 }
+
+/* Predicates on types */
 
 bool unsigned_type_p(type t)
 {
@@ -2663,7 +2684,6 @@ bool unsigned_type_p(type t)
     }
   return false;
 }
-
 
 bool long_type_p(type t)
 {
@@ -2849,7 +2869,7 @@ bool array_of_pointers_type_p(type t)
   return (type_variable_p(t) && basic_pointer_p(variable_basic(type_variable(t)))
 	  && (variable_dimensions(type_variable(t)) != NIL));
 }
-
+
 
 /**
    returns the type pointed by the input type if it is a pointer or an array of pointers
@@ -3539,7 +3559,7 @@ bool basic_concrete_type_leads_to_pointer_p(type bct)
 /* end of basic_concrete_types */
 /*                             */
 /*******************************/
-
+
 
 /* Is an object of type t compatible with a call? */
 bool call_compatible_type_p(type t)
@@ -3644,6 +3664,7 @@ type call_to_functional_type(call c, bool ultimate_p)
 
   return rt;
 }
+
 bool type_struct_variable_p(type t)
 {
     t = ultimate_type(t);
@@ -3657,7 +3678,7 @@ bool type_union_variable_p(type t)
     return basic_derived_p(variable_basic(type_variable(t))) &&
          entity_union_p(basic_derived(variable_basic(type_variable(t))));
 }
-
+
 /* Recursive number of fields in a data structure...
  *
  * union and probably enum are not taken into account.
