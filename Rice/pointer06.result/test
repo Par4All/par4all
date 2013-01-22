@@ -5,13 +5,7 @@ POINTS TO
 // Points To IN: none
 
 
-// Points To OUT:
-// *HEAP*_l_10.left -> *HEAP*_l_11 , MAY
-// *HEAP*_l_10.right -> *HEAP*_l_12 , MAY
-// *HEAP*_l_11.left -> undefined , EXACT
-// *HEAP*_l_11.right -> undefined , EXACT
-// *HEAP*_l_12.left -> undefined , EXACT
-// *HEAP*_l_12.right -> undefined , EXACT
+// Points To OUT: none
 
 void pointer06()
 {
@@ -165,3 +159,11 @@ void pointer06()
    forall(i = 0; i <= 9; i += 1)
       (t->val)[i] = (tl->val)[i]+(tr->val)[i];
 }
+
+Error and warnings:
+
+unknown[unknown] (activate_phase) Rule `PROPER_EFFECTS' already active
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer06] (points_to_set_block_projection) Memory leak for bucket "pointer06:*HEAP*_l_10".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer06] (memory_leak_to_more_memory_leaks) Heap bucket "*HEAP*_l_11" leaked at line -1.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer06] (memory_leak_to_more_memory_leaks) Heap bucket "*HEAP*_l_12" leaked at line -1.
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning pointer06 instead

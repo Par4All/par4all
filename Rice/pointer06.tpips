@@ -33,5 +33,12 @@ echo
 display PARALLELPRINTED_FILE
 
 close
+
+echo
+echo Error and warnings:
+echo
+
+shell cat pointer06.database/Warnings
+
 delete pointer06
 quit
