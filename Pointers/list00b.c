@@ -40,6 +40,9 @@ int list_len(list ll)
   c = list_next(c);
   c = list_next(c);
   c = list_next(c);
+  c = list_next(c);
+  c = list_next(c);
+  c = list_next(c);
 
   return n;
 }

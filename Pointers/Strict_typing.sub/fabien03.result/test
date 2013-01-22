@@ -12,7 +12,6 @@ POINTS-TO
 
 
 // Points To OUT:
-// *HEAP*_l_30.n -> *NULL_POINTER* , MAY
 // _p_1.n -> *NULL_POINTER* , MAY
 // _p_1.n -> _p_1_2__1 , MAY
 // _p_1_2__1.n -> *NULL_POINTER* , MAY
@@ -45,7 +44,6 @@ rec reverse_copy(rec p)
    while (q!=(void *) 0) {
 
 // Points To:
-// *HEAP*_l_30.n -> *NULL_POINTER* , MAY
 // _p_1.n -> *NULL_POINTER* , MAY
 // _p_1.n -> _p_1_2__1 , MAY
 // _p_1_2__1.n -> *NULL_POINTER* , MAY
@@ -59,8 +57,7 @@ rec reverse_copy(rec p)
       rec t = (rec) malloc(sizeof(struct rec_st ));
 
 // Points To:
-// *HEAP*_l_30.n -> undefined , MAY
-// *HEAP*_l_30.n -> *NULL_POINTER* , MAY
+// *HEAP*_l_30.n -> undefined , EXACT
 // _p_1.n -> *NULL_POINTER* , MAY
 // _p_1.n -> _p_1_2__1 , MAY
 // _p_1_2__1.n -> *NULL_POINTER* , MAY
@@ -75,8 +72,7 @@ rec reverse_copy(rec p)
       t->i = q->i;
 
 // Points To:
-// *HEAP*_l_30.n -> undefined , MAY
-// *HEAP*_l_30.n -> *NULL_POINTER* , MAY
+// *HEAP*_l_30.n -> undefined , EXACT
 // _p_1.n -> *NULL_POINTER* , MAY
 // _p_1.n -> _p_1_2__1 , MAY
 // _p_1_2__1.n -> *NULL_POINTER* , MAY
@@ -107,7 +103,6 @@ rec reverse_copy(rec p)
    }
 
 // Points To:
-// *HEAP*_l_30.n -> *NULL_POINTER* , MAY
 // _p_1.n -> *NULL_POINTER* , MAY
 // _p_1.n -> _p_1_2__1 , MAY
 // _p_1_2__1.n -> *NULL_POINTER* , MAY

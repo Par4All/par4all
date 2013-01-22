@@ -1,49 +1,11 @@
 
-PROPER  EFFECTS
-
-int ptr_to_field()
-{
-   typedef struct {
-      int *q;
-      int *p;
-   } my_str;
-
-   my_str *m, *n;
-//             <    is written>: i j
-   int i = 0, j = 1;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: m _MALLOC_EFFECTS:_MALLOC_
-   m = (my_str *) malloc(sizeof(my_str));
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: n _MALLOC_EFFECTS:_MALLOC_
-   n = (my_str *) malloc(sizeof(my_str));
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: m
-   m->q = &i;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: m
-   m->p = &j;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   n->q = m->p;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   n->p = m->q;
-
-   return 0;
-}
-
 POINTS-TO
 
 
 // Points To IN: none
 
 
-// Points To OUT:
-// *HEAP*_l_13.p -> undefined , MAY
-// *HEAP*_l_13.q -> undefined , MAY
-// *HEAP*_l_14.p -> undefined , MAY
-// *HEAP*_l_14.q -> undefined , MAY
+// Points To OUT: none
 
 int ptr_to_field()
 {
@@ -131,3 +93,8 @@ int ptr_to_field()
 
    return 0;
 }
+
+Warnings and errors: two memory leaks
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[ptr_to_field] (points_to_set_block_projection) Memory leak for bucket "ptr_to_field:*HEAP*_l_14".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[ptr_to_field] (points_to_set_block_projection) Memory leak for bucket "ptr_to_field:*HEAP*_l_13".
