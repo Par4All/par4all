@@ -682,7 +682,7 @@ pt_map any_loop_to_points_to(statement b,
     // FI: it should be a while loop to reach convergence
     // FI: I keep it a for loop for safety
     bool fix_point_p = false;
-    for(i = 0; i<k+2 ; i++){
+    for(i = 0; i<k+2 ; i++) {
       /* prev receives the current points-to information, pt_out */
       clear_pt_map(prev);
       prev = assign_pt_map(prev, pt_out);
@@ -698,8 +698,10 @@ pt_map any_loop_to_points_to(statement b,
       // FI: should be condition_to_points_to() for conditions such as
       // while(p!=q);
       // The condition is not always defined (do loops)
-      if(!expression_undefined_p(c))
+      if(!expression_undefined_p(c)) {
 	pt_out = condition_to_points_to(c, pt_out, true);
+	upgrade_approximations_in_points_to_set(pt_out);
+      }
 
       /* Merge the previous resut and the current result. */
       // FI: move to pt_map
@@ -740,8 +742,9 @@ pt_map any_loop_to_points_to(statement b,
     }
 
     if(!fix_point_p) {
-      print_points_to_set("Loop points-to set:\n", points_to_graph_set(pt_out));
-      pips_internal_error("Loop convergence not reached.\n");
+      print_points_to_set("Loop points-to set prev:\n", points_to_graph_set(prev));
+      print_points_to_set("Loop points-to set pt_out:\n", points_to_graph_set(pt_out));
+      pips_internal_error("Loop convergence not reached in %d iterations.\n", i);
     }
 
     /* FI: I suppose that p[i] is replaced by p[*] and that MAY/MUST
