@@ -270,6 +270,10 @@ set points_to_set_block_projection(set pts, list  l, bool main_p, bool body_p)
 	entity b = reference_variable(r);
 	pips_user_warning("Memory leak for bucket \"%s\".\n",
 			  entity_name(b));
+	points_to_graph ptg = make_points_to_graph(false, pts);
+	ptg = memory_leak_to_more_memory_leaks(c, ptg);
+	points_to_graph_set(ptg) = set_undefined;
+	free_points_to_graph(ptg);
       }
     }
   }
@@ -1105,21 +1109,22 @@ list sink_to_sources(cell sink, set pts, bool fresh_p)
 
   /* Get rid of the constant subscripts since they are not direclty
      part of the points-to scheme on the sink side */
-  entity v = reference_variable(cell_any_reference(sink));
-  reference nr = make_reference(v, NIL);
-  cell nsink = make_cell_reference(nr);
+  //entity v = reference_variable(cell_any_reference(sink));
+  //reference nr = make_reference(v, NIL);
+  //cell nsink = make_cell_reference(nr);
 
   /* 1. Try to find the source in the points-to information */
   SET_FOREACH(points_to, pt, pts) {
     // FI: a more flexible test is needed as the sink cell may be
     // either a, or a[0] or a[*] or a[*][*] or...
-    if(cell_equal_p(nsink, points_to_sink(pt))) {
+    //if(cell_equal_p(nsink, points_to_sink(pt))) {
+    if(related_points_to_cells_p(sink, points_to_sink(pt))) {
       cell sc = fresh_p? copy_cell(points_to_source(pt))
 	: points_to_source(pt);
       sources = CONS(CELL, sc, sources);
     }
   }
-  free_cell(nsink);
+  //free_cell(nsink);
   return sources;
 }
 
