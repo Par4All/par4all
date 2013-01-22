@@ -1696,9 +1696,13 @@ pt_map memory_leak_to_more_memory_leaks(cell l, pt_map in)
 
       FOREACH(CELL, sink, npml) {
 	if(heap_cell_p(sink) && unreachable_points_to_cell_p(sink, out)) {
-	  pips_user_warning("Heap bucket \"%s\" leaked at line %d.\n",
-			    points_to_cell_to_string(sink),
-			    points_to_context_statement_line_number());
+	  if(false)
+	    pips_user_warning("Heap bucket \"%s\" leaked.\n",
+			      points_to_cell_to_string(sink));
+	    else
+	      pips_user_warning("Heap bucket \"%s\" leaked at line %d.\n",
+				points_to_cell_to_string(sink),
+				points_to_context_statement_line_number());
 	  /* Look for a chain of memory leaks */
 	  //if(!points_to_cell_equal_p(c, l))
 	  out = memory_leak_to_more_memory_leaks(sink, out);

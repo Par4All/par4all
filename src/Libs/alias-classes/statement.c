@@ -233,8 +233,13 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
     bool main_p = ms==s && entity_main_module_p(m);
     bool body_p = ms==s;
     list dl = statement_declarations(s);
+    /* The statement context is know unknown: it has been popped
+       above. No precise error message in
+       points_to_set_block_projection() */
+    push_statement_points_to_context(s, pt_in);
     points_to_graph_set(pt_out) =
       points_to_set_block_projection(points_to_graph_set(pt_out), dl, main_p, body_p);
+    pt_in = pop_statement_points_to_context();
   }
 
   /* Because arc removals do not update the approximations of the
