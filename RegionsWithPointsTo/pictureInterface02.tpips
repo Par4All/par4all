@@ -1,0 +1,44 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete pictureInterface02
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty CONSTANT_PATH_EFFECTS TRUE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+set PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+##TODO: explain
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+create pictureInterface02 pictureInterface02.c
+
+
+
+echo 
+echo PROPER EFFECTS
+echo
+activate PROPER_EFFECTS
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[buildRaster]
+
+
+echo 
+echo  CUMULATED EFFECTS
+echo
+activate CUMULATED_EFFECTS
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[buildRaster]
+
+
+
+echo
+echo RW regions
+echo
+activate MUST_REGIONS
+activate PRINT_CODE_PROPER_REGIONS
+display PRINTED_FILE[buildRaster]
+
+
+close
+delete pictureInterface02
+quit
