@@ -1,0 +1,610 @@
+
+Transformers for "smvp"
+
+
+//  T() {}
+
+void smvp(int nodes, double (*A)[3][3], int *Acol, int *Aindex, double (*v)[3], double (*w)[3])
+{
+
+//  T(i,j) {}
+
+   int i, j;
+
+//  T(Alast,Anext,col) {}
+
+   int Anext, Alast, col;
+
+//  T() {}
+
+   double sum0, sum1, sum2;
+
+//  T() {}
+
+   smallarray_t **w1 = (smallarray_t **) malloc(2*sizeof(smallarray_t *));
+
+//  T() {}
+
+   int **w2 = (int **) malloc(2*sizeof(int *));
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+   for(j = 0; j <= 1; j += 1)
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+      for(i = 0; i <= nodes-1; i += 1)
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+         w2[j][i] = 0;
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+
+   for(i = 0; i <= nodes-1; i += 1) {
+
+//  T(Anext) {}
+
+      Anext = Aindex[i];
+
+//  T(Alast) {}
+
+      Alast = Aindex[i+1];
+
+//  T() {}
+
+
+      sum0 = A[Anext][0][0]*v[i][0]+A[Anext][0][1]*v[i][1]+A[Anext][0][2]*v[i][2];
+
+//  T() {}
+
+      sum1 = A[Anext][1][0]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][1][2]*v[i][2];
+
+//  T() {}
+
+      sum2 = A[Anext][2][0]*v[i][0]+A[Anext][2][1]*v[i][1]+A[Anext][2][2]*v[i][2];
+
+//  T(Anext) {Anext==Anext#init+1}
+
+
+      Anext++;
+
+//  T(Alast,Anext,col,i,j,nodes) {Anext#init+1<=Alast#init}
+
+      while (Anext<Alast) {
+
+//  T(col) {}
+
+         col = Acol[Anext];
+
+//  T() {}
+
+
+         sum0 += A[Anext][0][0]*v[col][0]+A[Anext][0][1]*v[col][1]+A[Anext][0][2]*v[col][2];
+
+//  T() {}
+
+         sum1 += A[Anext][1][0]*v[col][0]+A[Anext][1][1]*v[col][1]+A[Anext][1][2]*v[col][2];
+
+//  T() {}
+
+         sum2 += A[Anext][2][0]*v[col][0]+A[Anext][2][1]*v[col][1]+A[Anext][2][2]*v[col][2];
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+
+         if (w2[0][col]==0) {
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+            w2[0][col] = 1;
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+            w1[0][col].first = 0.0;
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+            w1[0][col].second = 0.0;
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+            w1[0][col].third = 0.0;
+         }
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+
+         w1[0][col].first += A[Anext][0][0]*v[i][0]+A[Anext][1][0]*v[i][1]+A[Anext][2][0]*v[i][2];
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+         w1[0][col].second += A[Anext][0][1]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][2][1]*v[i][2];
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+         w1[0][col].third += A[Anext][0][2]*v[i][0]+A[Anext][1][2]*v[i][1]+A[Anext][2][2]*v[i][2];
+
+//  T(Anext) {Anext==Anext#init+1}
+
+         Anext++;
+      }
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+
+      if (w2[0][i]==0) {
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+         w2[0][i] = 1;
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+         w1[0][i].first = 0.0;
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+         w1[0][i].second = 0.0;
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+         w1[0][i].third = 0.0;
+      }
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+
+      w1[0][i].first += sum0;
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+      w1[0][i].second += sum1;
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+      w1[0][i].third += sum2;
+   }
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+   
+   
+   
+   for(i = 0; i <= nodes-1; i += 1)
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+      for(j = 0; j <= 1; j += 1)
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+         if (w2[j][i]) {
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+            w[i][0] += w1[j][i].first;
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+            w[i][1] += w1[j][i].second;
+
+//  T(Alast,Anext,col,i,j,nodes) {}
+
+            w[i][2] += w1[j][i].third;
+         }
+}
+
+Preconditions for "smvp"
+
+
+//  P() {}
+
+void smvp(int nodes, double (*A)[3][3], int *Acol, int *Aindex, double (*v)[3], double (*w)[3])
+{
+
+//  P() {}
+
+   int i, j;
+
+//  P(i,j) {}
+
+   int Anext, Alast, col;
+
+//  P(Alast,Anext,col,i,j) {}
+
+   double sum0, sum1, sum2;
+
+//  P(Alast,Anext,col,i,j) {}
+
+   smallarray_t **w1 = (smallarray_t **) malloc(2*sizeof(smallarray_t *));
+
+//  P(Alast,Anext,col,i,j) {}
+
+   int **w2 = (int **) malloc(2*sizeof(int *));
+
+//  P(Alast,Anext,col,i,j) {}
+
+   for(j = 0; j <= 1; j += 1)
+
+//  P(Alast,Anext,col,i,j,nodes) {0<=j, j<=1}
+
+      for(i = 0; i <= nodes-1; i += 1)
+
+//  P(Alast,Anext,col,i,j,nodes) {0<=i}
+
+         w2[j][i] = 0;
+
+//  P(Alast,Anext,col,i,j,nodes) {j==2}
+
+
+   for(i = 0; i <= nodes-1; i += 1) {
+
+//  P(Alast,Anext,col,i,j,nodes) {0<=i}
+
+      Anext = Aindex[i];
+
+//  P(Alast,Anext,col,i,j,nodes) {0<=i}
+
+      Alast = Aindex[i+1];
+
+//  P(Alast,Anext,col,i,j,nodes) {0<=i}
+
+
+      sum0 = A[Anext][0][0]*v[i][0]+A[Anext][0][1]*v[i][1]+A[Anext][0][2]*v[i][2];
+
+//  P(Alast,Anext,col,i,j,nodes) {0<=i}
+
+      sum1 = A[Anext][1][0]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][1][2]*v[i][2];
+
+//  P(Alast,Anext,col,i,j,nodes) {0<=i}
+
+      sum2 = A[Anext][2][0]*v[i][0]+A[Anext][2][1]*v[i][1]+A[Anext][2][2]*v[i][2];
+
+//  P(Alast,Anext,col,i,j,nodes) {0<=i}
+
+
+      Anext++;
+
+//  P(Alast,Anext,col,i,j,nodes) {0<=i}
+
+      while (Anext<Alast) {
+
+//  P(Alast,Anext,col,i,j,nodes) {Anext+1<=Alast}
+
+         col = Acol[Anext];
+
+//  P(Alast,Anext,col,i,j,nodes) {Anext+1<=Alast}
+
+
+         sum0 += A[Anext][0][0]*v[col][0]+A[Anext][0][1]*v[col][1]+A[Anext][0][2]*v[col][2];
+
+//  P(Alast,Anext,col,i,j,nodes) {Anext+1<=Alast}
+
+         sum1 += A[Anext][1][0]*v[col][0]+A[Anext][1][1]*v[col][1]+A[Anext][1][2]*v[col][2];
+
+//  P(Alast,Anext,col,i,j,nodes) {Anext+1<=Alast}
+
+         sum2 += A[Anext][2][0]*v[col][0]+A[Anext][2][1]*v[col][1]+A[Anext][2][2]*v[col][2];
+
+//  P(Alast,Anext,col,i,j,nodes) {Anext+1<=Alast}
+
+
+         if (w2[0][col]==0) {
+
+//  P(Alast,Anext,col,i,j,nodes) {Anext+1<=Alast}
+
+            w2[0][col] = 1;
+
+//  P(Alast,Anext,col,i,j,nodes) {}
+
+            w1[0][col].first = 0.0;
+
+//  P(Alast,Anext,col,i,j,nodes) {}
+
+            w1[0][col].second = 0.0;
+
+//  P(Alast,Anext,col,i,j,nodes) {}
+
+            w1[0][col].third = 0.0;
+         }
+
+//  P(Alast,Anext,col,i,j,nodes) {}
+
+
+         w1[0][col].first += A[Anext][0][0]*v[i][0]+A[Anext][1][0]*v[i][1]+A[Anext][2][0]*v[i][2];
+
+//  P(Alast,Anext,col,i,j,nodes) {}
+
+         w1[0][col].second += A[Anext][0][1]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][2][1]*v[i][2];
+
+//  P(Alast,Anext,col,i,j,nodes) {}
+
+         w1[0][col].third += A[Anext][0][2]*v[i][0]+A[Anext][1][2]*v[i][1]+A[Anext][2][2]*v[i][2];
+
+//  P(Alast,Anext,col,i,j,nodes) {}
+
+         Anext++;
+      }
+
+//  P(Alast,Anext,col,i,j,nodes) {Alast<=Anext}
+
+
+      if (w2[0][i]==0) {
+
+//  P(Alast,Anext,col,i,j,nodes) {Alast<=Anext}
+
+         w2[0][i] = 1;
+
+//  P(Alast,Anext,col,i,j,nodes) {}
+
+         w1[0][i].first = 0.0;
+
+//  P(Alast,Anext,col,i,j,nodes) {}
+
+         w1[0][i].second = 0.0;
+
+//  P(Alast,Anext,col,i,j,nodes) {}
+
+         w1[0][i].third = 0.0;
+      }
+
+//  P(Alast,Anext,col,i,j,nodes) {}
+
+
+      w1[0][i].first += sum0;
+
+//  P(Alast,Anext,col,i,j,nodes) {}
+
+      w1[0][i].second += sum1;
+
+//  P(Alast,Anext,col,i,j,nodes) {}
+
+      w1[0][i].third += sum2;
+   }
+
+//  P(Alast,Anext,col,i,j,nodes) {}
+
+   
+   
+   
+   for(i = 0; i <= nodes-1; i += 1)
+
+//  P(Alast,Anext,col,i,j,nodes) {0<=i}
+
+      for(j = 0; j <= 1; j += 1)
+
+//  P(Alast,Anext,col,i,j,nodes) {0<=j, j<=1}
+
+         if (w2[j][i]) {
+
+//  P(Alast,Anext,col,i,j,nodes) {0<=j, j<=1}
+
+            w[i][0] += w1[j][i].first;
+
+//  P(Alast,Anext,col,i,j,nodes) {}
+
+            w[i][1] += w1[j][i].second;
+
+//  P(Alast,Anext,col,i,j,nodes) {}
+
+            w[i][2] += w1[j][i].third;
+         }
+}
+
+Regions for "smvp"
+
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+void smvp(int nodes, double (*A)[3][3], int *Acol, int *Aindex, double (*v)[3], double (*w)[3])
+{
+   int i, j;
+   int Anext, Alast, col;
+   double sum0, sum1, sum2;
+
+//  <w1-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   smallarray_t **w1 = (smallarray_t **) malloc(2*sizeof(smallarray_t *));
+
+//  <w2-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   int **w2 = (int **) malloc(2*sizeof(int *));
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+   for(j = 0; j <= 1; j += 1)
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+      for(i = 0; i <= nodes-1; i += 1)
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+         w2[j][i] = 0;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+
+   for(i = 0; i <= nodes-1; i += 1) {
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+      Anext = Aindex[i];
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+      Alast = Aindex[i+1];
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+
+      sum0 = A[Anext][0][0]*v[i][0]+A[Anext][0][1]*v[i][1]+A[Anext][0][2]*v[i][2];
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+      sum1 = A[Anext][1][0]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][1][2]*v[i][2];
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+      sum2 = A[Anext][2][0]*v[i][0]+A[Anext][2][1]*v[i][1]+A[Anext][2][2]*v[i][2];
+
+      Anext++;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+      while (Anext<Alast) {
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+         col = Acol[Anext];
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+
+         sum0 += A[Anext][0][0]*v[col][0]+A[Anext][0][1]*v[col][1]+A[Anext][0][2]*v[col][2];
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+         sum1 += A[Anext][1][0]*v[col][0]+A[Anext][1][1]*v[col][1]+A[Anext][1][2]*v[col][2];
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+         sum2 += A[Anext][2][0]*v[col][0]+A[Anext][2][1]*v[col][1]+A[Anext][2][2]*v[col][2];
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+
+         if (w2[0][col]==0) {
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+            w2[0][col] = 1;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+            w1[0][col].first = 0.0;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+            w1[0][col].second = 0.0;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+            w1[0][col].third = 0.0;
+         }
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+
+         w1[0][col].first += A[Anext][0][0]*v[i][0]+A[Anext][1][0]*v[i][1]+A[Anext][2][0]*v[i][2];
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+         w1[0][col].second += A[Anext][0][1]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][2][1]*v[i][2];
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+         w1[0][col].third += A[Anext][0][2]*v[i][0]+A[Anext][1][2]*v[i][1]+A[Anext][2][2]*v[i][2];
+         Anext++;
+      }
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+
+      if (w2[0][i]==0) {
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+         w2[0][i] = 1;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+         w1[0][i].first = 0.0;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+         w1[0][i].second = 0.0;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+         w1[0][i].third = 0.0;
+      }
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+
+      w1[0][i].first += sum0;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+      w1[0][i].second += sum1;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+      w1[0][i].third += sum2;
+   }
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+   
+   
+   
+   for(i = 0; i <= nodes-1; i += 1)
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+      for(j = 0; j <= 1; j += 1)
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+         if (w2[j][i]) {
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+            w[i][0] += w1[j][i].first;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+            w[i][1] += w1[j][i].second;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+            w[i][2] += w1[j][i].third;
+         }
+}

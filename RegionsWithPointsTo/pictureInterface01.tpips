@@ -13,47 +13,16 @@ setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
 create pictureInterface01 pictureInterface01.c
 
 
-echo 
-echo POINTS-TO
-echo
-activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[buildRaster]
-
-echo 
-echo PROPER  EFFECTS WITH POINTS TO
-echo
-activate PROPER_EFFECTS_WITH_POINTS_TO
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[buildRaster]
-
-
-echo 
-echo  CUMULATED EFFECTS WITH POINTS TO
-echo
-activate CUMULATED_EFFECTS_WITH_POINTS_TO
-activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[buildRaster]
-
 
 
 echo
 echo RW regions
 echo
-activate MUST_REGIONS_WITH_POINTS_TO
+activate MUST_REGIONS
 activate PRINT_CODE_PROPER_REGIONS
 display PRINTED_FILE[buildRaster]
 
-#echo
-#echo IN regions
-#echo
-#activate PRINT_CODE_IN_REGIONS
-#display PRINTED_FILE[buildRaster]
 
-#echo
-#echo Privatized regions
-#echo
-#activate PRINT_CODE_PRIVATIZED_REGIONS
-#display PRINTED_FILE[buildRaster]
 
 
 close
