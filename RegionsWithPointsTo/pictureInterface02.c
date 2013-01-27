@@ -17,7 +17,7 @@
 #define	DISPFIELD_C(t, tag) { char  *v; if (TIFFGetField(t, tag, &v)) fprintf(stdout, #tag ": %s\n", v); }
 
 #define	SAT(c)			(c < 0 ? 0 : c > 255 ? 255 : c)
-typedef TIFF *PictureHandler;
+//typedef TIFF *PictureHandler;
 
 
 int buildRaster(const uint32 fact, PictureHandler tif, RasterType **raster)

@@ -1,4 +1,4 @@
-setenv WS  quake01
+setenv WS  kmeans_clustering01
 delete $WS
 
 setproperty ABORT_ON_USER_ERROR TRUE
@@ -12,25 +12,25 @@ setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 #setproperty CONSTANT_PATH_EFFECTS  FALSE
 
 echo
-echo Transformers for "smvp"
+echo Transformers for "kmeans_clustering"
 echo
 
 activate PRINT_CODE_TRANSFORMERS 
-display PRINTED_FILE[smvp]
+display PRINTED_FILE[kmeans_clustering]
 
 echo
-echo Preconditions for "smvp"
+echo Preconditions for "kmeans_clustering"
 echo
 
 activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[smvp]
+display PRINTED_FILE[kmeans_clustering]
 
 echo
-echo Regions for "smvp"
+echo Regions for "kmeans_clustering"
 echo
 
 activate PRINT_CODE_REGIONS 
-display PRINTED_FILE[smvp]
+display PRINTED_FILE[kmeans_clustering]
 
 close
 #delete $WS
