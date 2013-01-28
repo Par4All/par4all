@@ -242,7 +242,7 @@ list words_points_to(points_to pt)
 
   w = gen_nconc(w, effect_words_reference(source_ref));
   w = CHAIN_SWORD(w," -> ");
-  if(!nowhere_cell_p) {
+  if(!nowhere_cell_p(sink)) {
     w = gen_nconc(w, effect_words_reference(sink_ref));
   }
   else {

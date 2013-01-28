@@ -3326,8 +3326,8 @@ static void  xml_Transposition(call c,int d,string_buffer sb_result)
     if (array_argument_p(arg1) && array_argument_p(arg2)) {
       reference r1 = syntax_reference(expression_syntax(arg1));
       reference r2 = syntax_reference(expression_syntax(arg2));
-      int ArrayDim1 = variable_entity_dimension(reference_variable(r1));
-      int ArrayDim2 = variable_entity_dimension(reference_variable(r2));
+      //int ArrayDim1 = variable_entity_dimension(reference_variable(r1));
+      //int ArrayDim2 = variable_entity_dimension(reference_variable(r2));
       if (d==3) {
 	mat = matrix_new(3,3);
 	matrix_init(mat,mat->number_of_lines,mat->number_of_columns);

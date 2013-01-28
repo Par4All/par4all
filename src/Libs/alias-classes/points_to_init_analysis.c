@@ -1,8 +1,10 @@
+/* For strdup and asprintf: */
+// Already defined elsewhere
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #include <stdlib.h>
 #include <stdio.h>
-/* For strdup: */
-// Already defined elsewhere
-//#define _GNU_SOURCE
 #include <string.h>
 
 #include "genC.h"

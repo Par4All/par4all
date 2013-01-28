@@ -1349,7 +1349,7 @@ list load_summary_effects(entity e)
 
 list load_body_effects(entity e)
 {
-    string module_name = module_local_name(e);
+  string module_name = (string) module_local_name(e);
 
     pips_assert("load_summary_effects", entity_module_p(e));
 
