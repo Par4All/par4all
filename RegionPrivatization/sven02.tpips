@@ -1,0 +1,37 @@
+delete sven02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+##TODO: explain
+#setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+create sven02 sven02.c
+
+module sven02
+
+## Needed for substracting set approximations
+activate MUST_REGIONS
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+activate PRINT_CODE_REGIONS
+echo sven02 RW must regions
+display PRINTED_FILE
+
+activate PRINT_CODE_IN_REGIONS
+echo sven02 in regions
+display PRINTED_FILE
+
+activate PRINT_CODE_OUT_REGIONS
+echo sven02 out regions
+display PRINTED_FILE
+
+activate ARRAY_SECTION_PRIVATIZER
+activate PRINT_CODE_PRIVATIZED_REGIONS
+echo sven02 privatized regions
+display PRINTED_FILE
+
+close
+delete sven02
+quit
+
