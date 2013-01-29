@@ -589,8 +589,15 @@ static transformer ordinary_summary_precondition(const char* module_name,
       /* Try to eliminate (some) redundancy at a reasonnable cost. */
       /* What is a reasonnable cost? */
 
-      /* t = transformer_normalize(t, 2); */
-      t = transformer_normalize(t, 7);
+      t = transformer_normalize(t, 2);
+      /* Level 7 core dumps with
+       * Semantics-New/summary_precondition04.c unless formal
+       * parameter "_c" is renamed... external_value_name is called
+       * when the value mapping hash-tables are not
+       * available. Validations of Semantics and Semantics-new are not
+       * improved by level 7 wrt level 2.
+       */
+      /* t = transformer_normalize(t, 7); */
 
       /* Corinne's best one... for YPENT2 in ARC2D, but be ready to pay
 	 the price! And in case an overflow occurs, you may loose a lot of
