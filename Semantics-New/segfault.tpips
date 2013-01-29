@@ -1,9 +1,0 @@
-# Check that preconditions are properly ordered
-delete segfault
-create segfault segfault.c
-module userfunction
-activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE
-close
-delete segfault
-quit
