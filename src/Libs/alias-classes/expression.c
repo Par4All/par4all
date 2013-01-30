@@ -1628,6 +1628,10 @@ list reduce_cells_to_pointer_type(list cl)
   return cl;
 }
 
+/* Returns a list of cells of pointer type which are included in cell
+ * "c". Useful when "c" is a struct or an array of structs or
+ * pointers. Returns a list with cell "c" if it denotes a pointer.
+ */
 list points_to_cell_to_pointer_cells(cell c)
 {
   list pcl = NIL; // pointer cell list

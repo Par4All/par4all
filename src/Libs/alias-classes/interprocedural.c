@@ -337,7 +337,17 @@ pt_map user_call_to_points_to_fast_interprocedural(call c,
   return pt_out;
 }
 
-/* This function is very similar to
+/* This function looks for successors of elements of list "fcl" both
+ * in points-to relations "pt_in" and "pt_binded". Update the formal
+ * context defined by "pt_binded" on demand as necessary according to
+ * "pt_in", update the translation mapping "binding" according to the
+ * new pairs found, and go down recursively with a new list of
+ * constant paths, "nfcl", the possible successors in the formal
+ * context of the callee of elements in "fcl" when possible. In fact,
+ * the elements in "nfcl" must be pointers and are not necessarily the
+ * successors of elements of "fcl", but pointers contained in them.
+ *
+ *This function is very similar to
  * filter_formal_context_according_to_actual_context(), but a little
  * bit more tricky. Amira Mensi unified both in her own version, but
  * the unification makes the maintenance more difficult.
@@ -345,7 +355,7 @@ pt_map user_call_to_points_to_fast_interprocedural(call c,
 void
 recursive_filter_formal_context_according_to_actual_context(list fcl,
 							    set pt_in,
-							    set pts_binded,
+							    set pt_binded,
 							    set binding,
 							    set filtered)
 {
@@ -372,20 +382,20 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
 	pips_assert("Elements of \"fcl\" can be translated", !ENDP(tsl));
 
       if(!ENDP(tsl)) {
-	/* Make sure pts_binded is large enough: the pointer may be
+	/* Make sure pt_binded is large enough: the pointer may be
 	   initialized before the call to the caller and used only in
-	   the callee. Because of the on-demand approach, pts_binded
+	   the callee. Because of the on-demand approach, pt_binded
 	   does not contain enough elements. */
-	pt_map pts_binded_g = make_points_to_graph(false, pts_binded);
+	pt_map pt_binded_g = make_points_to_graph(false, pt_binded);
 	FOREACH(CELL, c, tsl) {
-	  list sinks = any_source_to_sinks(c, pts_binded_g, false);
+	  list sinks = any_source_to_sinks(c, pt_binded_g, false);
 	  gen_free_list(sinks);
 	}
 
 	if(null_cell_p(sink)) {
-	  /* Do we have a similar arc in pts_binded? */
+	  /* Do we have a similar arc in pt_binded? */
 	  FOREACH(CELL, tc, tsl) {
-	    if(cell_points_to_null_sink_in_set_p(tc, pts_binded)) {
+	    if(cell_points_to_null_sink_in_set_p(tc, pt_binded)) {
 	      points_to npt = copy_points_to(pt);
 	      add_arc_to_simple_pt_map(npt, filtered);
 	      break;
@@ -397,7 +407,7 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
 	}
 	else {
 	  FOREACH(CELL, tc, tsl) {
-	    if(cell_points_to_non_null_sink_in_set_p(tc, pts_binded)) {
+	    if(cell_points_to_non_null_sink_in_set_p(tc, pt_binded)) {
 	      points_to npt = copy_points_to(pt);
 	      add_arc_to_simple_pt_map(npt, filtered);
 	      /* 
@@ -445,8 +455,8 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
       list tsl = points_to_source_to_some_sinks(c, binding_g, false);
       //list tsl = source_to_sinks(c, binding_g, false);
       FOREACH(CELL, tc, tsl) {
-	points_to_graph pts_binded_g = make_points_to_graph(false, pts_binded);
-	list al = points_to_source_to_some_sinks(tc, pts_binded_g, false); // formal list
+	points_to_graph pt_binded_g = make_points_to_graph(false, pt_binded);
+	list al = points_to_source_to_some_sinks(tc, pt_binded_g, false); // formal list
 	int nfl = (int) gen_length(fl);
 	int nal = (int) gen_length(al);
 	approximation a = approximation_undefined;
@@ -473,7 +483,10 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
 		add_arc_to_simple_pt_map(tr, binding);
 	      }
 	    }
-	    nfcl = CONS(CELL, fc, nfcl);
+	    /* If "fc" is  not a pointer, look for pointers in "fc" */
+	    list pcl = points_to_cell_to_pointer_cells(fc);
+	    nfcl = gen_nconc(nfcl, pcl);
+	    //nfcl = CONS(CELL, fc, nfcl);
 	  }
 	}
 	free_approximation(a);
@@ -493,7 +506,7 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
      list of formal sinks */
   if(!ENDP(nfcl)) {
     recursive_filter_formal_context_according_to_actual_context
-      (nfcl, pt_in, pts_binded, binding, filtered);
+      (nfcl, pt_in, pt_binded, binding, filtered);
     gen_free_list(nfcl);
   }
 
@@ -715,7 +728,10 @@ set filter_formal_context_according_to_actual_context(list fpcl,
 	    add_arc_to_simple_pt_map(tr, binding);
 	  }
 	}
-	fcl = CONS(CELL, fc, fcl);
+	/* If "fc" is  not a pointer, look for pointers in "fc" */
+	list pcl = points_to_cell_to_pointer_cells(fc);
+	fcl = gen_nconc(fcl, pcl);
+	//fcl = CONS(CELL, fc, fcl);
       }
     }
     free_approximation(approx);
@@ -1076,7 +1092,17 @@ void points_to_translation_of_formal_parameters(list fpcl,
 
 /* Initial comments: add arcs of set "pt_caller" to set "pt_kill" if
  * their origin cells are not in the list of written pointers "wpl"
- * but is the origin of some exact arc in "pt_out_callee_filtered".
+ * but is the origin of some exact arc in
+ * "pt_out_callee_filtered". This is beneficial when "pt_out" is more
+ * precise than "pt_caller" because of a free or a test. This is
+ * detrimental when "pt_caller" is more precise than
+ * "pt_out_callee_filtered" because the intraprocedural analysis of
+ * the callee had to assume a possible NULL pointer that did not
+ * really exist (see Mensi.sub/struct_inter03.c). So it would be
+ * better to compute the intersection of "pt_caller" and
+ * "translation(pt_out, binding)" and to kill all arcs in "pt_caller"
+ * minus this intersection... if they are related in some way to the
+ * callee... Some more thinking needed.
  *
  * Equations retrieved from the C code
  *
@@ -1084,7 +1110,7 @@ void points_to_translation_of_formal_parameters(list fpcl,
  *                  ^ |translation(source(pt), binding, f)|==1
  *                  ^ atomic(translation(source(pt), binding, f) }
  * 
- * pt_kill = {pt in pt_caller | \exits c \in K binding(c)==source(pt)}
+ * pt_kill = {pt in pt_caller | \exists c \in K binding(c)==source(pt)}
  *
  * K is a set of cells defined in the frame of the callee and pt_kill
  * a set of points-to defined in the frame of the caller.

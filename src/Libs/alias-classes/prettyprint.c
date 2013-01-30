@@ -383,6 +383,9 @@ void dprint(expression x)
       fprintf(stderr, "%s\n", s);
       free(s);
     }
+    else if(ot==transformer_domain) {
+      print_transformer((transformer) x);
+    }
     else if(0<=ot && ot<1000)
       (void) fprintf(stderr, "Unprocessed Newgen Object with tag %d\n", ot);
     else if(ot>1000 || ot<=0) {
