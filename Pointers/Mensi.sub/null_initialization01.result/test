@@ -1,0 +1,132 @@
+
+POINTS TO for null_initialization01
+
+
+// Points To IN:
+// q -> _q_1 , EXACT
+
+
+// Points To OUT:
+// q -> _q_1 , EXACT
+
+int foo(int *q)
+{
+
+// Points To: none
+
+   int i = 0, *p;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> _q_1 , EXACT
+
+   p = q;
+
+// Points To:
+// p -> _q_1 , EXACT
+// q -> _q_1 , EXACT
+
+   if (p==(void *) 0)
+
+// Points To:
+// p -> *NULL_POINTER* , EXACT
+// q -> _q_1 , EXACT
+
+      printf("i = %d", i);
+
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _q_1 , MAY
+// q -> _q_1 , EXACT
+
+   return i;
+}
+
+PROPER EFFECTS WITH POINTS TO
+
+int foo(int *q)
+{
+//             <    is written>: i
+   int i = 0, *p;
+//             <    is read   >: q
+//             <    is written>: p
+   p = q;
+//             <    is read   >: p
+   if (p==(void *) 0)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("i = %d", i);
+//             <    is read   >: i
+   return i;
+}
+
+CUMULATED EFFECTS WITH POINTS TO
+
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: q
+int foo(int *q)
+{
+//             <    is written>: i
+   int i = 0, *p;
+//             <    is read   >: q
+//             <    is written>: p
+   p = q;
+//             <may be read   >: i stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: p
+   if (p==(void *) 0)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("i = %d", i);
+//             <    is read   >: i
+   return i;
+}
+
+POINTS TO for null_initialization01
+
+
+// Points To IN:
+// q -> _q_1 , EXACT
+
+
+// Points To OUT:
+// q -> _q_1 , EXACT
+
+int foo(int *q)
+{
+
+// Points To: none
+
+   int i = 0, *p;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> _q_1 , EXACT
+
+   p = q;
+
+// Points To:
+// p -> _q_1 , EXACT
+// q -> _q_1 , EXACT
+
+   if (p==(void *) 0)
+
+// Points To:
+// p -> *NULL_POINTER* , EXACT
+// q -> _q_1 , EXACT
+
+      printf("i = %d", i);
+
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _q_1 , MAY
+// q -> _q_1 , EXACT
+
+   return i;
+}
