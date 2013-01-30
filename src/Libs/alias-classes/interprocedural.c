@@ -410,24 +410,6 @@ recursive_filter_formal_context_according_to_actual_context(list fcl,
 	    if(cell_points_to_non_null_sink_in_set_p(tc, pt_binded)) {
 	      points_to npt = copy_points_to(pt);
 	      add_arc_to_simple_pt_map(npt, filtered);
-	      /* 
-	       * We need to concatenate fields indices to the formal
-	       * parameter. AM
-	       *
-	       * FI: this seems awfully dangerous as you know nothing
-	       * about the origin of fcl and you modify it by
-	       * side-effect...
-	      */
-	      if(false) {
-	      FOREACH(CELL, c, fcl) {
-		if(cell_entity_equal_p(source,c)) {
-		  reference r = cell_any_reference(source);
-		  list ind = reference_indices(r);
-		  reference rc = cell_to_reference(c);
-		  reference_indices(rc) = gen_nconc(reference_indices(rc), ind);
-		}
-	      }
-	      }
 	      break;
 	    }
 	    else {
