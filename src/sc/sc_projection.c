@@ -550,6 +550,12 @@ int ofl_ctrl;
 
     assert(!SC_UNDEFINED_P(sc));
 
+    /* FI/CA: in case the overflow must be handled by this function,
+       the function should catch it and remove the constraint that
+       generate the overflow. If this is ever implemented,
+       sc_normalize2() should be simplified by delegating overflow
+       control to this function. */
+
     for(eq = sc_egalites(sc); !CONTRAINTE_UNDEFINED_P(eq);
 	eq = contrainte_succ(eq)){
       if (eq!=def) /* skip if aliased! */

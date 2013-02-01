@@ -2286,6 +2286,8 @@ Psysteme ps;
     /* Eliminate variables linked by a two-term equation. Preserve integer
        information or choose variable with minimal rank in basis b if some
        ambiguity exists. */
+    Psysteme ps_backup = sc_copy(ps);
+    bool failure_p = false;
     for (eq = ps->egalites; (!SC_UNDEFINED_P(ps) && eq != NULL); eq=eq->succ) {
       Pvecteur veq = contrainte_vecteur(eq);
       if(((vect_size(veq)==2) && (vect_coeff(TCST,veq)==VALUE_ZERO))
@@ -2315,15 +2317,37 @@ Psysteme ps;
 	if(VARIABLE_DEFINED_P(v)) {
 	  /* An overflow is unlikely... but it should be handled here
 	     I guess rather than be subcontracted? */
+	  CATCH(overflow_error) 
+	  {
+	    /* The substitution of the variable defined by "eq" by its
+	       value leads to an overflow in one some unknown
+	       constraint of "ps". It might be better to trap the
+	       overflow at a lower level, when you know which
+	       constraint fails because the constraint could be
+	       removed altogether. */
+	    sc_rm(ps); /* */
+	    ps = ps_backup;
+	    failure_p = true;
+	    break;
+	  }
+	  TRY 
+	    {
 	  sc_simple_variable_substitution_with_eq_ofl_ctrl(ps, eq, v, OFL_CTRL);
+	    }
+	  UNCATCH(overflow_error);
 	}
       }
+    }
+    if(!failure_p) {
+      sc_rm(ps_backup);
     }
   }
 
   if (!SC_UNDEFINED_P(ps)) {
     /* Propagate constant definitions, only once although a triangular
        system might require n steps is the equations are in the worse order */
+    Psysteme ps_backup = sc_copy(ps);
+    bool failure_p = false;
     for (eq = ps->egalites; (!SC_UNDEFINED_P(ps) && eq != NULL); eq=eq->succ) {
       Pvecteur veq = contrainte_vecteur(eq);
       if(((vect_size(veq)==1) && (vect_coeff(TCST,veq)==VALUE_ZERO))
@@ -2335,13 +2359,33 @@ Psysteme ps;
 	   || value_mod(vect_coeff(TCST,veq), a)==VALUE_ZERO) {
 	  /* An overflow is unlikely... but it should be handled here
 	     I guess rather than be subcontracted. */
-	  sc_simple_variable_substitution_with_eq_ofl_ctrl(ps, eq, v, OFL_CTRL);
+	  CATCH(overflow_error) 
+	  {
+	    /* The substitution of the variable defined by "eq" by its
+	       value leads to an overflow in one some unknown
+	       constraint of "ps". It might be better to trap the
+	       overflow at a lower level, when you know which
+	       constraint fails because the constraint could be
+	       removed altogether. */
+	    sc_rm(ps); /* */
+	    ps = ps_backup;
+	    failure_p = true;
+	    break;
+	  }
+	  TRY 
+	    {
+	      sc_simple_variable_substitution_with_eq_ofl_ctrl(ps, eq, v, OFL_CTRL);
+	    }
+	  UNCATCH(overflow_error);
 	}
 	else {
 	  sc_rm(ps);
 	  ps = SC_UNDEFINED;
 	}
       }
+    }
+    if(!failure_p) {
+      sc_rm(ps_backup);
     }
 
     ps = sc_elim_double_constraints(ps);
