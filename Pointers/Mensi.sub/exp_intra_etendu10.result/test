@@ -1,0 +1,125 @@
+
+PROPER  EFFECTS 
+
+list * initialize()
+{
+//             <    is written>: i pi
+   int i = 0, *pi = &i;
+//             <    is written>: l
+   list *l = (void *) 0, *nl;
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+   while (!feof(stdin)) {
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: nl _MALLOC_EFFECTS:_MALLOC_
+      nl = malloc(sizeof(list));
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: nl pi
+      nl->val = pi;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: l nl
+      nl->next = l;
+   }
+//             <    is read   >: l
+   return l;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// initialize -> *NULL_POINTER* , EXACT
+
+list * initialize()
+{
+
+// Points To: none
+
+   int i = 0, *pi = &i;
+
+// Points To:
+// pi -> i , EXACT
+
+   list *l = (void *) 0, *nl;
+
+// Points To:
+// l -> *NULL_POINTER* , EXACT
+// nl -> undefined , EXACT
+// pi -> i , EXACT
+
+   while (!feof(stdin)) {
+
+// Points To:
+// *HEAP*_l_14.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_14.val -> i , MAY
+// l -> *NULL_POINTER* , EXACT
+// nl -> *HEAP*_l_14 , MAY
+// nl -> undefined , MAY
+// pi -> i , EXACT
+
+      nl = malloc(sizeof(list));
+
+// Points To:
+// *HEAP*_l_14.next -> undefined , MAY
+// *HEAP*_l_14.val -> undefined , MAY
+// *HEAP*_l_14.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_14.val -> i , MAY
+// l -> *NULL_POINTER* , EXACT
+// nl -> *HEAP*_l_14 , MAY
+// pi -> i , EXACT
+
+      nl->val = pi;
+
+// Points To:
+// *HEAP*_l_14.next -> undefined , MAY
+// *HEAP*_l_14.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_14.val -> i , MAY
+// l -> *NULL_POINTER* , EXACT
+// nl -> *HEAP*_l_14 , MAY
+// pi -> i , EXACT
+
+      nl->next = l;
+   }
+
+// Points To:
+// *HEAP*_l_14.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_14.val -> i , MAY
+// l -> *NULL_POINTER* , EXACT
+// nl -> *HEAP*_l_14 , MAY
+// nl -> undefined , MAY
+// pi -> i , EXACT
+
+   return l;
+}
+
+PROPER EFFECTS WITH POINTS TO
+
+list * initialize()
+{
+//             <    is written>: i pi
+   int i = 0, *pi = &i;
+//             <    is written>: l
+   list *l = (void *) 0, *nl;
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+   while (!feof(stdin)) {
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: nl _MALLOC_EFFECTS:_MALLOC_
+      nl = malloc(sizeof(list));
+//             <may be written>: *HEAP*_l_14.val
+//             <    is read   >: nl pi
+      nl->val = pi;
+//             <may be written>: *HEAP*_l_14.next
+//             <    is read   >: l nl
+      nl->next = l;
+   }
+//             <    is read   >: l
+   return l;
+}
