@@ -40,6 +40,8 @@
 #include "top-level.h"
 #include "preprocessor.h"
 
+// imports gtk
+#undef test_undefined // also defined in glib included from gtk
 #include <gtk/gtk.h>
 #include "gpips.h"
 

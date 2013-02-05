@@ -30,9 +30,6 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-// imports gtk
-#include <gtk/gtk.h>
-
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
@@ -46,6 +43,10 @@
 #include "pipsmake.h"
 
 #include "top-level.h"
+
+// imports gtk
+#undef test_undefined // also defined in glib included from gtk
+#include <gtk/gtk.h>
 
 #include "gpips.h"
 

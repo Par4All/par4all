@@ -31,11 +31,11 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-#include <gtk/gtk.h>
-
 #include "genC.h"
 #include "misc.h"
 
+#undef test_undefined // also defined in glib included from gtk
+#include <gtk/gtk.h>
 #include "gpips.h"
 
 static GtkWidget * query_entry, * query_entry_label;

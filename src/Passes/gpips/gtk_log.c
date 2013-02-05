@@ -54,6 +54,7 @@
 
 #include "properties.h"
 
+#undef test_undefined // also defined in glib included from gtk
 #include <gtk/gtk.h>
 
 #include "gpips.h"

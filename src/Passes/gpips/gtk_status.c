@@ -34,6 +34,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
+#undef test_undefined // also defined in glib included from gtk
 #include <gtk/gtk.h>
 
 #if (defined(TEXT))

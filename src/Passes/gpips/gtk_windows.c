@@ -32,6 +32,7 @@
 #include "genC.h"
 #include "misc.h"
 
+#undef test_undefined // also defined in glib included from gtk
 #include <gtk/gtk.h>
 #include "gtk_sizes.h"
 #include "gpips.h"
