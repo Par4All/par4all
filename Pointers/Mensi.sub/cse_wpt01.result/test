@@ -4,13 +4,11 @@ Initial code
 int cse_wpt01()
 {
    // BEGIN BLOCK
-   int i = 0;
-   int j = 1;
-   int k;
+   int i = 0, j = 1, k;
    int *p = &j;
    int *q = &k;
    i = 2*(j+2);
-   *p = *q;
+   *q = *p;
    k = 3*(j+2);
    // END BLOCK
 }
@@ -20,11 +18,8 @@ PROPER  EFFECTS
 int cse_wpt01()
 {
    // BEGIN BLOCK
-//             <    is written>: i
-   int i = 0;
-//             <    is written>: j
-   int j = 1;
-   int k;
+//             <    is written>: i j
+   int i = 0, j = 1, k;
 //             <    is written>: p
    int *p = &j;
 //             <    is written>: q
@@ -34,79 +29,24 @@ int cse_wpt01()
    i = 2*(j+2);
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   *p = *q;
+   *q = *p;
 //             <    is read   >: j
 //             <    is written>: k
    k = 3*(j+2);
    // END BLOCK
 }
 
-POINTS-TO
+Cumulated effects for "cse_wpt01" 
 
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 int cse_wpt01()
 {
-
-// Points To: none
-
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    // BEGIN BLOCK
-
-// Points To: none
-
-   int i = 0;
-
-// Points To: none
-
-   int j = 1;
-
-// Points To: none
-
-   int k;
-
-// Points To: none
-
-   int *p = &j;
-
-// Points To:
-// p -> j , EXACT
-
-   int *q = &k;
-
-// Points To:
-// p -> j , EXACT
-// q -> k , EXACT
-
-   i = 2*(j+2);
-
-// Points To:
-// p -> j , EXACT
-// q -> k , EXACT
-
-   *p = *q;
-
-// Points To:
-// p -> j , EXACT
-// q -> k , EXACT
-
-   k = 3*(j+2);
-   // END BLOCK
-}
-
-proper effects with points-to
-
-int cse_wpt01()
-{
-   // BEGIN BLOCK
-//             <    is written>: i
-   int i = 0;
-//             <    is written>: j
-   int j = 1;
-   int k;
+//             <    is written>: i j
+   int i = 0, j = 1, k;
 //             <    is written>: p
    int *p = &j;
 //             <    is written>: q
@@ -114,30 +54,41 @@ int cse_wpt01()
 //             <    is read   >: j
 //             <    is written>: i
    i = 2*(j+2);
-//             <    is read   >: k p q
-//             <    is written>: j
-   *p = *q;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   *q = *p;
 //             <    is read   >: j
 //             <    is written>: k
    k = 3*(j+2);
    // END BLOCK
 }
 
-Code after CSE
+Data dependence graph for "cse_wpt01" 
 
-int cse_wpt01()
-{
-   // BEGIN BLOCK
-   int i = 0;
-   int j = 1;
-   int k;
-   int *p = &j;
-   int *q = &k;
-   //PIPS generated variable
-   int I_0, I_1, I_2, I_3;
-   I_0 = j+2;
-   i = 2*I_0;
-   *p = *q;
-   k = 3*I_0;
-   // END BLOCK
-}
+
+ *********************** Use-Def Chains *********************
+
+	06 --> 09 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <j-W-EXACT> to <j-R-EXACT>
+	06 --> 10 with conflicts
+		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	06 --> 11 with conflicts
+		from <j-W-EXACT> to <j-R-EXACT>
+	07 --> 10 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	08 --> 10 with conflicts
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	09 --> 10 with conflicts
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <j-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	10 --> 11 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <k-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <k-W-EXACT>
+
+****************** End of Dependence Graph ******************

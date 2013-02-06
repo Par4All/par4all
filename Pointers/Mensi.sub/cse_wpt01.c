@@ -3,14 +3,10 @@
 
 int cse_wpt01()
 {
-  int i = 0;
-  int j = 1;
-  int k;
+  int i = 0, j = 1, k;
   int *p = &j;
   int *q = &k;
- 
-
   i = 2*(j+2);
-  *p = *q;
+  *q = *p;
   k = 3*(j+2);
 }
