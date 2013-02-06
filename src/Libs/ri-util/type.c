@@ -4201,7 +4201,11 @@ list constant_expression_supporting_references(list srl, expression e)
 	srl = constant_expression_supporting_references(srl, se);
       }, inds);
   }
-  else {
+  else if(syntax_cast_p(s)) {
+    /* Forward the inner expression */
+    expression e = cast_expression(syntax_cast(s));
+    srl = constant_expression_supporting_references(srl,e);
+  } else {
     /* do nothing for the time being... */
     ;
   }
