@@ -55,6 +55,15 @@
 #include "transformer.h"
 #include "accel-util.h"
 
+/**
+ *
+ */
+bool user_call_p(call c) {
+  entity f = call_function(c);
+  value v = entity_initial(f);
+  return value_code_p(v);
+}
+
 
 /** Make a sizeof expression
  *
@@ -535,11 +544,11 @@ static void copy_from_call(statement st, call c) {
 
 
     // We get the inter-procedural results for copy in
-    set at_call_site = set_make(set_pointer);
-    if(!call_intrinsic_p(c)) { // Ignoring intrinsics
-      set_free(at_call_site);
+    set at_call_site;
+    if(user_call_p(c)) { // Ignoring intrinsics
       at_call_site = interprocedural_mapping(DBR_KERNEL_COPY_IN,c);
-    }
+    } else
+      at_call_site = set_make(set_pointer);
 
     // We remove from "copy from" what is used by this statement but not what's
     // in copy-in
@@ -555,7 +564,7 @@ static void copy_from_call(statement st, call c) {
     set_free(at_call_site);
 
     // We add the inter-procedural results for copy out, but not for intrinsics
-    if(!call_intrinsic_p(c)) { // Ignoring intrinsics
+    if(user_call_p(c)) { // Ignoring intrinsics
       at_call_site = interprocedural_mapping(DBR_KERNEL_COPY_OUT,c);
       copy_from_out = set_union(copy_from_out, at_call_site, copy_from_out);
       ifdebug(6) {
@@ -831,7 +840,7 @@ static void copy_to_call(statement st, call c) {
 
 
     // We add the inter-procedural results for copy in, but not for intrinsics
-    if(!call_intrinsic_p(c)) { // Ignoring intrinsics
+    if(user_call_p(c)) { // Ignoring intrinsics
       set at_call_site = interprocedural_mapping(DBR_KERNEL_COPY_IN,c);
       copy_to_in = set_union(copy_to_in, at_call_site, copy_to_in);
       set_free(at_call_site);
