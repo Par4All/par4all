@@ -4,7 +4,10 @@ create exp_intra_etendu03 exp_intra_etendu03.c
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
-#setenv POINTER_VALUES_DEBUG_LEVEL 3
+
+# Show the iteration control property
+setproperty POINTS_TO_PATH_LIMIT 4
+
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
 # This property is an aberration wrt to the constant path lattice:

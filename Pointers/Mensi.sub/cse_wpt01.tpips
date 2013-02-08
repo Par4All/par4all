@@ -33,7 +33,7 @@ echo
 
 activate PRINT_CHAINS_GRAPH
 display DG_FILE[cse_wpt01]
-quit
+#quit
 
 
 echo

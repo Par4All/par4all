@@ -1,0 +1,21 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   error("ici");
+
+// Points To: none
+
+
+   return 0;
+}
