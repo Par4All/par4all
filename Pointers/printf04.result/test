@@ -19,3 +19,16 @@ int main(void)
 
    return 0;
 }
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main(void)
+{
+//             <may be read   >: "ici" stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   error("ici");
+
+   return 0;
+}
