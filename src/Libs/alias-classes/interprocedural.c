@@ -995,11 +995,18 @@ void points_to_translation_of_formal_parameters(list fpcl,
       if(pointer_type_p(source_t)) {
 	cell n_source = copy_cell(fc);
 	cell n_sink = copy_cell(ac);
-	type sink_t = points_to_cell_to_concrete_type(n_sink);
+	type e_sink_t = points_to_cell_to_concrete_type(n_sink);
+	type sink_t = e_sink_t;
+	/* Beware of constant character strings */
+	if(type_functional_p(e_sink_t)) {
+	  functional f = type_functional(sink_t);
+	  if(ENDP(functional_parameters(f)))
+	    sink_t = functional_result(f);
+	}
 	//reference n_sink_r = cell_any_reference(n_sink);
 	// points_to_indices_to_unbounded_indices(reference_indices(n_sink_r));
-	if(!type_equal_p(source_t, sink_t)) {
-	  if(array_pointer_type_equal_p(source_t, sink_t))
+	if(type_equal_p(source_t, sink_t)) {
+	  if(array_pointer_string_type_equal_p(source_t, sink_t))
 	    ; // do nothing: a 1D array is equivalent to a pointer
 	  else if(array_type_p(sink_t)) {
 	    // FI: I do not remember in which case I needed this

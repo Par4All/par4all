@@ -1543,7 +1543,7 @@ list reference_to_points_to_translations(entity v, list sl, pt_map ptm)
 	else if(compatible_p) {
 	  reference d_r = cell_any_reference(d);
 	  list d_sl = reference_indices(d_r);
-	  /* The subscripts left in csl must be happened to the new sink */
+	  /* The subscripts left in csl must be appended to the new sink */
 	  int nsl = (int) gen_length(sl);
 	  int no_sl = (int) gen_length(o_sl);
 	  int nd_sl = (int) gen_length(d_sl);
@@ -1591,7 +1591,7 @@ list reference_to_points_to_translations(entity v, list sl, pt_map ptm)
 		constant sl_c = value_constant(sl_v);
 		constant d_sl_c = value_constant(d_sl_v);
 		if(constant_int_p(sl_c) && constant_int_p(d_sl_c)) {
-		  // POssible overflow
+		  // Possible overflow
 		  int nic = constant_int(sl_c)+constant_int(d_sl_c);
 		  ne = int_to_expression(nic);
 		}
@@ -1617,7 +1617,15 @@ list reference_to_points_to_translations(entity v, list sl, pt_map ptm)
 	  int ntsl = (int) gen_length(tsl);
 	  pips_assert("The resulting", ntsl==np+nb+ns);
 	  entity d_v = reference_variable(d_r);
-	  reference tr = make_reference(d_v, tsl);
+	  type d_v_t = entity_basic_concrete_type(d_v);
+	  reference tr = reference_undefined;
+	  if(type_functional_p(d_v_t)) {
+	    /* Do no index constant character strings */
+	    tr = make_reference(d_v, NIL);
+	    gen_free_list(tsl);
+	  }
+	  else
+	    tr = make_reference(d_v, tsl);
 	  cell tc = make_cell_reference(tr);
 	  tl = CONS(CELL, tc, tl);
 	}
@@ -1730,7 +1738,9 @@ list points_to_source_to_translations(cell source, pt_map ptm, bool fresh_p)
 	bool c_to_be_freed;
 	type c_t = points_to_cell_to_type(c, &c_to_be_freed);
 	type c_et = compute_basic_concrete_type(c_t);
-	if(!overloaded_type_p(c_et) && !type_equal_p(source_et, c_et))
+	if(!overloaded_type_p(c_et) && !type_equal_p(source_et, c_et)
+	   /* Beware of constant strings... */
+	   && !type_functional_p(c_et))
 	  pips_internal_error("Type mismatch after translation.\n");
 	if(c_to_be_freed) free_type(c_t);
       }
