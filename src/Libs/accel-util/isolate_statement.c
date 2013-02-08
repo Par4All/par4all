@@ -112,37 +112,110 @@ static const char* get_dma_name(enum region_to_dma_switch m, size_t d) {
     return dmaname;
 }
 
-static bool region_to_dimensions(region reg, transformer tr, list *dimensions, list * offsets, expression* condition) {
-    if(region_to_minimal_dimensions(reg,tr,dimensions,offsets,true,condition)) {
-        return true;
+#if 0
+/*
+ * Build a fake region and try to build dimensions from it
+ */
+static bool declaration_region_to_dimensions(effect reg,
+                                      transformer tr,
+                                      list *dimensions,
+                                      list * offsets,
+                                      expression *condition) {
+  pips_assert("effects are regions\n", effect_region_p(reg));
+  bool success_p=true;
+
+  /* Apply partial eval on the declaration, better chance to get a
+   * "usable" region
+   */
+  effects dummy_effect = make_effects(NIL);
+  entity e = reference_variable(region_any_reference(reg));
+  set_live_loop_indices();
+  partial_eval_declaration(e,
+                           predicate_system(transformer_relation(tr)),
+                           dummy_effect);
+  reset_live_loop_indices();
+  free_effects(dummy_effect);
+
+  /* Create a new region corresponding to the declaration dimensions */
+  effect decl_region = region_dup(reg);
+  descriptor_convex(effect_descriptor(decl_region)) = entity_declaration_sc(e);
+
+  /* Try again to compute the dimensions, based on the array declaration
+   * Mehdi: I don't understand why we want to use a "region" to do that ?
+   */
+  if(!region_to_minimal_dimensions(reg,
+                                   tr,
+                                   dimensions,
+                                   offsets,
+                                   true,
+                                   condition)) {
+    success_p = false;
+    pips_user_warning("failed to compute DMA from the array declaration based region\n");
+    ifdebug(4) {
+      pips_user_warning("Original Region:");
+      print_region(decl_region);
+      pips_user_warning("Declaration based Region:");
+      print_region(decl_region);
+      pips_user_warning("Entity is :");
+      print_entity_variable(e);
     }
-    else
-    {
+  }
+  region_free(decl_region);
+  return success_p;
+}
+#endif
+
+
+// Build DMA dimensions directly from the entity declaration
+static bool declarations_to_dimensions(entity e, list *dimensions, list * offsets) {
+  if(!entity_array_p(e)) {
+    return false;
+  }
+
+  // Populate "dimensions" and "offsets" by looking to the declaration
+  list ldim = variable_dimensions(type_variable(ultimate_type(entity_type(e))));
+  FOREACH(dimension, d, ldim) {
+    // FIXME Unsure who cares about the free....
+    dimension d_dup = copy_dimension(d);
+    expression dl = dimension_lower(d);
+
+    // Check if we have an offset (impossible in C!)
+    intptr_t offset;
+    bool dl_is_int_p=expression_integer_value(dl,&offset);
+    pips_assert("lower bound is int",dl_is_int_p);
+    if(offset!=0) {
+      pips_internal_error("We shouldn't have an offset in the array declaration"
+          ", are you using Fortran?");
+    }
+
+    *dimensions = CONS(DIMENSION, d_dup, *dimensions );
+    *offsets = CONS(EXPRESSION, dl, *offsets);
+  }
+  return true;
+
+}
+
+
+void region_to_dimensions(effect reg, transformer tr, list *dimensions, list * offsets, expression *condition) {
+    pips_assert("effects are regions\n",effect_region_p(reg));
+    if( ! region_to_minimal_dimensions(reg,tr,dimensions,offsets,true,condition) ) {
         pips_user_warning("failed to convert regions to minimal array dimensions, using whole array instead\n");
-        return false;
+
+        bool success_p = false;
+        // Try using a region based on the declaration (Old way)
+        //success_p=declaration_region_to_dimensions(reg,tr,dimensions,offsets,condition);
+
+        // Use directly the dimensions from the declaration without building a region!
+        entity e = reference_variable(region_any_reference(reg));
+        success_p=declarations_to_dimensions(e, dimensions, offsets);
+ 
+        if(!success_p) {
+          // Don't know how to recover from that...
+          pips_internal_error("Abort");
+        }
     }
 }
 
-static void effect_to_dimensions(effect eff, transformer tr, list *dimensions, list * offsets, expression *condition) {
-    pips_assert("effects are regions\n",effect_region_p(eff));
-    if( ! region_to_dimensions(eff,tr,dimensions,offsets,condition) ) {
-        /* let's try with the definition region instead */
-        descriptor d = effect_descriptor(eff);
-        if(descriptor_convex_p(d)) {
-            sc_free(descriptor_convex(d));
-            /* create dummy empty effects */
-            effects dumbo = make_effects(NIL);
-            entity e = reference_variable(region_any_reference(eff));
-            set_live_loop_indices();
-            partial_eval_declaration(e,predicate_system(transformer_relation(tr)),dumbo);
-            reset_live_loop_indices();
-            free_effects(dumbo);
-            descriptor_convex(d)=entity_declaration_sc(reference_variable(region_any_reference(eff)));
-        }
-        if( ! region_to_dimensions(eff,tr,dimensions,offsets,condition) ) 
-            pips_internal_error("failed to compute dma from regions appropriately\n");
-    }
-}
 
 static expression region_to_address(region reg) {
     bool is_fortran = fortran_module_p(get_current_module_entity());
@@ -299,7 +372,6 @@ list variable_to_dimensions(region reg_from) {
  *
  * @return
  */
-static
 call dimensions_to_dma(effect reg_from,
         entity to,
         list/*of dimensions*/ ld,
@@ -705,7 +777,7 @@ statement effects_to_dma(statement stat,
               ) {
                 list /*of dimensions*/ the_dims = NIL,
                      /*of expressions*/the_offsets = NIL;
-                effect_to_dimensions(eff,tr,&the_dims,&the_offsets,condition);
+                region_to_dimensions(eff,tr,&the_dims,&the_offsets,condition);
 
                 entity eto;
                 if(val == HASH_UNDEFINED_VALUE) {
