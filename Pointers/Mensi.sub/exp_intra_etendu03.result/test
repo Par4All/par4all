@@ -25,7 +25,11 @@ POINTS-TO
 // _p_1.next -> *NULL_POINTER* , MAY
 // _p_1.next -> _p_1_2__1 , MAY
 // _p_1_2__1.next -> *NULL_POINTER* , MAY
-// _p_1_2__1.next -> _p_1_2__1 , MAY
+// _p_1_2__1.next -> _p_1_2__1_2__1 , MAY
+// _p_1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _p_1_2__1_2__1.next -> _p_1_2__1_2__1_2__1 , MAY
+// _p_1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _p_1_2__1_2__1_2__1.next -> _p_1_2__1_2__1_2__1 , MAY
 // p -> *NULL_POINTER* , MAY
 // p -> _p_1 , MAY
 
@@ -34,7 +38,11 @@ POINTS-TO
 // _p_1.next -> *NULL_POINTER* , MAY
 // _p_1.next -> _p_1_2__1 , MAY
 // _p_1_2__1.next -> *NULL_POINTER* , MAY
-// _p_1_2__1.next -> _p_1_2__1 , MAY
+// _p_1_2__1.next -> _p_1_2__1_2__1 , MAY
+// _p_1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _p_1_2__1_2__1.next -> _p_1_2__1_2__1_2__1 , MAY
+// _p_1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _p_1_2__1_2__1_2__1.next -> _p_1_2__1_2__1_2__1 , MAY
 // p -> *NULL_POINTER* , EXACT
 
 int count(list *p)
@@ -54,9 +62,15 @@ int count(list *p)
 // _p_1.next -> *NULL_POINTER* , MAY
 // _p_1.next -> _p_1_2__1 , MAY
 // _p_1_2__1.next -> *NULL_POINTER* , MAY
-// _p_1_2__1.next -> _p_1_2__1 , MAY
+// _p_1_2__1.next -> _p_1_2__1_2__1 , MAY
+// _p_1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _p_1_2__1_2__1.next -> _p_1_2__1_2__1_2__1 , MAY
+// _p_1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _p_1_2__1_2__1_2__1.next -> _p_1_2__1_2__1_2__1 , MAY
 // p -> _p_1 , MAY
 // p -> _p_1_2__1 , MAY
+// p -> _p_1_2__1_2__1 , MAY
+// p -> _p_1_2__1_2__1_2__1 , MAY
 
       i++;
 
@@ -64,9 +78,15 @@ int count(list *p)
 // _p_1.next -> *NULL_POINTER* , MAY
 // _p_1.next -> _p_1_2__1 , MAY
 // _p_1_2__1.next -> *NULL_POINTER* , MAY
-// _p_1_2__1.next -> _p_1_2__1 , MAY
+// _p_1_2__1.next -> _p_1_2__1_2__1 , MAY
+// _p_1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _p_1_2__1_2__1.next -> _p_1_2__1_2__1_2__1 , MAY
+// _p_1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _p_1_2__1_2__1_2__1.next -> _p_1_2__1_2__1_2__1 , MAY
 // p -> _p_1 , MAY
 // p -> _p_1_2__1 , MAY
+// p -> _p_1_2__1_2__1 , MAY
+// p -> _p_1_2__1_2__1_2__1 , MAY
 
       p = p->next;
    }
@@ -75,7 +95,11 @@ int count(list *p)
 // _p_1.next -> *NULL_POINTER* , MAY
 // _p_1.next -> _p_1_2__1 , MAY
 // _p_1_2__1.next -> *NULL_POINTER* , MAY
-// _p_1_2__1.next -> _p_1_2__1 , MAY
+// _p_1_2__1.next -> _p_1_2__1_2__1 , MAY
+// _p_1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _p_1_2__1_2__1.next -> _p_1_2__1_2__1_2__1 , MAY
+// _p_1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _p_1_2__1_2__1_2__1.next -> _p_1_2__1_2__1_2__1 , MAY
 // p -> *NULL_POINTER* , EXACT
 
    return i;
@@ -92,7 +116,9 @@ int count(list *p)
 //             <    is read   >: i
 //             <    is written>: i
       i++;
-//             <may be read   >: _p_1.next _p_1_2__1.next
+//             <may be read   >: _p_1.next _p_1_2__1.next 
+//                               _p_1_2__1_2__1.next 
+//                               _p_1_2__1_2__1_2__1.next
 //             <    is read   >: p
 //             <    is written>: p
       p = p->next;

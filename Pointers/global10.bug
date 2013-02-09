@@ -1,0 +1,4 @@
+user warning in check_type_of_points_to_cells: Maybe an issue with a dynamic memory allocation.
+user error in check_type_of_points_to_cells: At line 12, the type returned for the cell"_p_0", "int * *[]", is not the expected type, "int *".
+user warning in tpips_user_error: Abort on user error requested!
+Aborted (core dumped)
