@@ -2220,11 +2220,13 @@ list source_to_sinks(cell source, pt_map pts, bool fresh_p)
 	if(formal_parameter_p(v)) {
 	  n_sinks = formal_source_to_sinks(source, pts, fresh_p);
 	}
-	else if(top_level_entity_p(v) || static_global_variable_p(v)) {
-	  n_sinks = global_source_to_sinks(source, pts, fresh_p);
-	}
+	/* Must be checked before globals because stubs for global
+	   variables are themselves global. */
 	else if(entity_stub_sink_p(v)) {
 	  n_sinks = stub_source_to_sinks(source, pts, fresh_p);
+	}
+	else if(top_level_entity_p(v) || static_global_variable_p(v)) {
+	  n_sinks = global_source_to_sinks(source, pts, fresh_p);
 	}
 	else if(entity_typed_anywhere_locations_p(v)) {
 	  pips_internal_error("This case should have been handled above.\n");
