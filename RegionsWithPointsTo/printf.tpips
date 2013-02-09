@@ -5,8 +5,12 @@ delete printf
 setproperty CONSTANT_PATH_EFFECTS TRUE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
-setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-#set PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+
+# This property causes a user error because the actual argument is not
+# a character but a character string (a.k.a. array)
+# 
+# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
 create printf printf.c
 

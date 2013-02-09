@@ -1,0 +1,127 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   int n = 10;
+
+
+// Points To: none
+
+   int array_1D[n];
+
+// Points To: none
+
+   init_1D(n, array_1D);
+
+// Points To: none
+
+   display_1D(n, array_1D);
+
+// Points To: none
+
+   error("ici");
+
+// Points To: none
+
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main(void)
+{
+//             <    is written>: n
+   int n = 10;
+
+//             <    is read   >: n
+   int array_1D[n];
+//             <may be written>: array_1D[*]
+//             <    is read   >: n
+   init_1D(n, array_1D);
+//             <may be read   >: array_1D[*] stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: n stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   display_1D(n, array_1D);
+//             <may be read   >: "ici" stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   error("ici");
+
+   return 0;
+}
+
+CUMULATED EFFECTS WITH POINTS TO
+
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+int main(void)
+{
+//             <    is written>: n
+   int n = 10;
+
+//             <    is read   >: n
+   int array_1D[n];
+//             <may be written>: array_1D[*]
+//             <    is read   >: n
+   init_1D(n, array_1D);
+//             <may be read   >: array_1D[*] stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: n stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   display_1D(n, array_1D);
+//             <may be read   >: "ici" stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   error("ici");
+
+   return 0;
+}
+
+RW regions
+
+int main(void)
+{
+   int n = 10;
+
+   int array_1D[n];
+
+//  <array_1D[PHI1]-W-EXACT-{0<=PHI1, PHI1<=9, n==10, n==10}>
+
+   init_1D(n, array_1D);
+
+//  <array_1D[PHI1]-R-EXACT-{0<=PHI1, PHI1<=9, n==10, n==10}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+   display_1D(n, array_1D);
+
+//  <"ici"-R-EXACT-{}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+   error("ici");
+
+   return 0;
+}
