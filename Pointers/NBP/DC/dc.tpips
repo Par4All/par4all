@@ -1,0 +1,23 @@
+setenv WS="dc2"
+#setenv PIPS_CPP_FLAGS="-I$WS"
+setproperty ABORT_ON_USER_ERROR TRUE
+delete $WS
+create $WS adc.c  dc.c  extbuild.c  jobcntl.c  rbt.c ../common/randdp.c ../common/wtime.c ../common/c_print_results.c ../common/c_timers.c 
+
+activate C_PARSER
+
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+activate PROPER_EFFECTS_WITH_POINTS_TO
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+
+
+
+close
+quit
+
