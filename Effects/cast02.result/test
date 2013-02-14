@@ -17,6 +17,7 @@ void cast_implicit()
 {
 //             <    is written>: n
    int n = 10;
+//             <    is read   >: n
    int a[n][n];
 //             <may be written>: a[*][*]
 //             <    is read   >: n
