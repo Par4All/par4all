@@ -1,5 +1,5 @@
-delete exp_intra_etendu11
-create exp_intra_etendu11 exp_intra_etendu11.c 
+delete exp_intra_etendu12
+create exp_intra_etendu12 exp_intra_etendu12.c 
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
@@ -19,5 +19,5 @@ activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[initialize]
 
 close
-delete exp_intra_etendu11
+delete exp_intra_etendu12
 quit

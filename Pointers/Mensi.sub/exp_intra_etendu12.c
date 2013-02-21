@@ -1,11 +1,8 @@
-/* A possible example for the section about loops
- *
- * The "break" construct leads to a control flow graph. Its analysis
- * leads to a bug.
- */
+/* A possible example for the section about loops */
 
 #include<stdlib.h>
 #include<stdio.h>
+#include<stdbool.h>
 
 typedef struct LinkedList{
   int val;
@@ -15,11 +12,12 @@ typedef struct LinkedList{
 list * initialize()
 {
   list *first = NULL, *previous = NULL;
-  while(!feof(stdin)){
+  bool break_p = false; // added to avoid an untructured...
+  while(!feof(stdin) && !break_p){
     list * nl = (list *) malloc(sizeof(list));
     nl->next = NULL;
     if(scanf("%d",&nl->val)!=1)
-      break;
+      break_p = true;
     if(first == NULL)
       first = nl;
     if(previous != NULL)
