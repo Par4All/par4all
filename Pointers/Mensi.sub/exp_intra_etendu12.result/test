@@ -7,7 +7,7 @@ POINTS-TO
 
 // Points To OUT:
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> undefined , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
 // initialize -> *HEAP*_l_17 , MAY
 // initialize -> *NULL_POINTER* , MAY
 
@@ -33,7 +33,7 @@ list * initialize()
 
 // Points To:
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> undefined , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
 // first -> *HEAP*_l_17 , MAY
 // first -> *NULL_POINTER* , MAY
 // previous -> *HEAP*_l_17 , MAY
@@ -44,6 +44,17 @@ list * initialize()
 // Points To:
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
 // *HEAP*_l_17.next -> undefined , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// first -> *HEAP*_l_17 , MAY
+// first -> *NULL_POINTER* , MAY
+// nl -> *HEAP*_l_17 , MAY
+// previous -> *HEAP*_l_17 , MAY
+// previous -> *NULL_POINTER* , MAY
+
+      nl->next = (void *) 0;
+
+// Points To:
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
 // first -> *HEAP*_l_17 , MAY
 // first -> *NULL_POINTER* , MAY
 // nl -> *HEAP*_l_17 , MAY
@@ -53,8 +64,7 @@ list * initialize()
       if (scanf("%d", &nl->val)!=1)
 
 // Points To:
-// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> undefined , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
 // first -> *HEAP*_l_17 , MAY
 // first -> *NULL_POINTER* , MAY
 // nl -> *HEAP*_l_17 , MAY
@@ -64,8 +74,7 @@ list * initialize()
          break_p = 1;
 
 // Points To:
-// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> undefined , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
 // first -> *HEAP*_l_17 , MAY
 // first -> *NULL_POINTER* , MAY
 // nl -> *HEAP*_l_17 , MAY
@@ -75,8 +84,7 @@ list * initialize()
       if (first==(void *) 0)
 
 // Points To:
-// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> undefined , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
 // first -> *NULL_POINTER* , EXACT
 // nl -> *HEAP*_l_17 , MAY
 // previous -> *HEAP*_l_17 , MAY
@@ -85,8 +93,7 @@ list * initialize()
          first = nl;
 
 // Points To:
-// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> undefined , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
 // first -> *HEAP*_l_17 , MAY
 // nl -> *HEAP*_l_17 , MAY
 // previous -> *HEAP*_l_17 , MAY
@@ -95,8 +102,7 @@ list * initialize()
       if (previous!=(void *) 0)
 
 // Points To:
-// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> undefined , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
 // first -> *HEAP*_l_17 , MAY
 // nl -> *HEAP*_l_17 , MAY
 // previous -> *HEAP*_l_17 , MAY
@@ -105,7 +111,7 @@ list * initialize()
 
 // Points To:
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> undefined , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
 // first -> *HEAP*_l_17 , MAY
 // nl -> *HEAP*_l_17 , MAY
 // previous -> *HEAP*_l_17 , MAY
@@ -116,7 +122,7 @@ list * initialize()
 
 // Points To:
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> undefined , MAY
+// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
 // first -> *HEAP*_l_17 , MAY
 // first -> *NULL_POINTER* , MAY
 // previous -> *HEAP*_l_17 , MAY
@@ -142,6 +148,9 @@ list * initialize()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: nl _MALLOC_EFFECTS:_MALLOC_
       list *nl = (list *) malloc(sizeof(list));
+//             <may be written>: *HEAP*_l_17.next
+//             <    is read   >: nl
+      nl->next = (void *) 0;
 //             <may be read   >: stdin[0]
 //             <may be written>: *HEAP*_l_17.val stdin[0]
 //             <    is read   >: nl stdin __IO_EFFECTS:LUNS[0]
