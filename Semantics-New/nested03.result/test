@@ -2,7 +2,7 @@
 TRANSFORMERS
 
 
-//  T() {}
+//  T(main) {main==0}
 
 int main()
 {
@@ -32,6 +32,10 @@ int main()
 
 
    printf("l=%d\n", l);
+
+//  T(main) {i==10, j==10, k==10, l==1000, main==0, n==10}
+
+   return 0;
 }
 
 PRECONDITIONS
@@ -68,4 +72,8 @@ int main()
 
 
    printf("l=%d\n", l);
+
+//  P(i,j,k,l,n) {i==10, j==10, k==10, l==1000, n==10}
+
+   return 0;
 }
