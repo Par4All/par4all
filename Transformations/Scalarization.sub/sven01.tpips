@@ -2,6 +2,9 @@ delete sven01
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
+# Suggestion by Mehdi, it is effective, but it does not fic the bug
+# setproperty SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST TRUE
+
 ##TODO: explain
 setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
 

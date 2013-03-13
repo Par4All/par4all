@@ -20,7 +20,7 @@ double g(double x, double y)
   return x+y;
 }
 
-void sven01(int n, double x[n])
+double sven01(int n, double x[n])
 {
   int i, j, k;
   double y[n];
@@ -30,5 +30,6 @@ void sven01(int n, double x[n])
 	y[n] = f(i,j,k);
 	x[i] = g(x[i], y[n]);
       }
-  return;
+  return x[n];
+  //return x[0];
 }
