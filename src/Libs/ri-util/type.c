@@ -5360,6 +5360,22 @@ type array_type_to_sub_array_type(type t)
   return et; 
 }
 
+/* Allocate a new type that is the type of an array constant. For
+ * instance, int t[10] gives type int * to t, int t[10][20] gives type
+ * int (*)[20]
+ */
+type array_type_to_pointer_type(type t)
+{
+  type et = type_undefined;
+  if(array_type_p(t)) {
+    type sat = array_type_to_sub_array_type(t);
+    et = type_to_pointer_type(sat);
+  }
+  else
+    pips_internal_error("Ill. arg.\n");
+  return et; 
+}
+
 /* Minimal information to build a d-dimensional array type. */
 list make_unbounded_dimensions(int d)
 {
