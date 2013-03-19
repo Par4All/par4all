@@ -903,6 +903,7 @@ list cast_to_points_to_sinks(cast c,
 			     bool eval_p)
 {
   list sinks = list_undefined;
+  list nsinks = NIL; // In case the cast cannot be handled precisely
   expression e = cast_expression(c);
   type t = compute_basic_concrete_type(cast_type(c));
   // FI: should we pass down the expected type? It would be useful for
@@ -923,14 +924,11 @@ list cast_to_points_to_sinks(cast c,
       // the arcs of the points-to graph
       FOREACH(CELL, c, sinks) {
 	if(!null_cell_p(c) && !nowhere_cell_p(c) && !anywhere_cell_p(c)) {
-	  bool to_be_freed;
-	  type ct = points_to_cell_to_type(c, &to_be_freed);
-	  type cct = compute_basic_concrete_type(ct);
+	  type cct = points_to_cell_to_concrete_type(c);
 	  if(array_pointer_type_equal_p(pt, cct))
 	    ; // nothing to do
 	  else {
-	    bool m_to_be_freed;
-	    type mct = points_to_cell_to_type(c, &m_to_be_freed);
+	    type mct = points_to_cell_to_concrete_type(c);
 	    if(overloaded_type_p(mct))
 	      ; // nothing to do... to be checked
 	    else {
@@ -938,25 +936,31 @@ list cast_to_points_to_sinks(cast c,
 	      // type is reached.
 	      reference r = cell_any_reference(c);
 	      complete_points_to_reference_with_zero_subscripts(r);
-	      if(adapt_reference_to_type(r, pt))
-		;
-	      else
-		pips_internal_error("Cast handling failure 1.\n");
-	      if(to_be_freed) free_type(mct);
-	      mct = points_to_cell_to_type(c, &m_to_be_freed);
+	      if(adapt_reference_to_type(r, pt)) {
+		mct = points_to_cell_to_concrete_type(c);
 
-	      if(array_pointer_type_equal_p(pt, mct))
-		; // nothing to do
-	      else if(array_type_p(mct)
-		      && array_pointer_type_equal_p(pt, array_type_to_element_type(mct)))
-		; // nothing to do
+		if(array_pointer_type_equal_p(pt, mct))
+		  ; // nothing to do
+		else if(array_type_p(mct)
+			&& array_pointer_type_equal_p(pt, array_type_to_element_type(mct)))
+		  ; // nothing to do
+		else {
+		  pips_internal_error("Not implemented yet.\n");
+		}
+	      }
 	      else {
-		pips_internal_error("Not implemented yet.\n");
+		/* The types are really incompatible, let's use the
+		 * type lattice, max(cct, mct).
+		 *
+		 * Could we do better for a cast to (void *)? See cast03.
+		 */
+		type t = make_scalar_overloaded_type();
+		cell nc = make_anywhere_points_to_cell(t);
+		nsinks = CONS(CELL, nc, nsinks);
+		// pips_internal_error("Cast handling failure 1.\n");
 	      }
 	    }
-	    if(m_to_be_freed) free_type(mct);
 	  }
-	  if(to_be_freed) free_type(ct);
 	}
       }
     }
@@ -996,6 +1000,12 @@ list cast_to_points_to_sinks(cast c,
       ;
     }
   }
+
+  if(!ENDP(nsinks)) {
+    gen_free_list(sinks);
+    sinks = nsinks;
+  }
+
   return sinks;
 }
 
@@ -1302,7 +1312,7 @@ bool adapt_reference_to_type(reference r, type et)
     t = compute_basic_concrete_type(nrt);
   }
   if(!array_pointer_string_type_equal_p(at, t)) {
-    pips_user_warning("There may be a typing error at line %d (e.g. improper malloc call).",
+    pips_user_warning("There may be a typing error at line %d (e.g. improper malloc call).\n",
 		      points_to_context_statement_line_number());
     //pips_internal_error("Cell type mismatch.");
     succeed_p = false;
@@ -1580,6 +1590,31 @@ list expression_to_points_to_cells(expression e,
     pips_internal_error("unknown expression tag %d\n", tt);
     break;
   }
+
+  ifdebug(1) {
+    type e_t = expression_to_type(e);
+    type e_c_t = compute_basic_concrete_type(e_t);
+    type f_e_t = e_c_t;
+    bool free_f_e_t = false;
+    if(eval_p) {
+      if(pointer_type_p(e_c_t))
+	f_e_t = type_to_pointed_type(e_c_t);
+      else if(array_type_p(e_c_t)) {
+	free_f_e_t = true;
+	f_e_t = array_type_to_pointer_type(e_c_t);
+      }
+    }
+    FOREACH(CELL, s, sinks) {
+      if(!null_cell_p(s)) {
+	type s_t = points_to_cell_to_concrete_type(s);
+	if(!array_pointer_string_type_equal_p(f_e_t, s_t)) {
+	  pips_internal_error("Type discrepancy\n");
+	}
+      }
+    }
+    free_type(e_t);
+    if(free_f_e_t) free_type(f_e_t);
+ }
 
   return sinks;
 }
