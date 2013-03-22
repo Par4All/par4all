@@ -1,0 +1,278 @@
+
+Proper effects 
+
+void memcopy_2a(int size, void *src, void *dst)
+{
+   //char* s = (char*) src;
+   //char* d = (char*) dst;
+//             <    is declared>: i
+   int i;
+//             <    is read   >: dst src
+//             <    is referenced>: dst src
+   if (src!=(void *) 0&&dst!=(void *) 0) {
+//             <    is read   >: src
+//             <    is written>: s
+//             <    is referenced>: s src
+//             <    is declared>: s
+      char *s = (char *) src;
+//             <    is read   >: dst
+//             <    is written>: d
+//             <    is referenced>: d dst
+//             <    is declared>: d
+      char *d = (char *) dst;
+//             <    is read   >: size
+//             <    is written>: i
+//             <    is referenced>: i size
+      for(i = 0; i <= size-1; i += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is referenced>: d i s size
+         d[i] = s[i];
+   }
+}
+
+Regions
+
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+void memcopy_2a(int size, void *src, void *dst)
+{
+   //char* s = (char*) src;
+   //char* d = (char*) dst;
+   int i;
+
+//  <dst-RE-EXACT-{}>
+//  <src-RE-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+   if (src!=(void *) 0&&dst!=(void *) 0) {
+
+//  <s-RE-EXACT-{}>
+//  <s-WE-EXACT-{}>
+//  <s-W-EXACT-{}>
+//  <src-R-EXACT-{}>
+//  <src-RE-EXACT-{}>
+
+      char *s = (char *) src;
+
+//  <d-RE-EXACT-{}>
+//  <d-WE-EXACT-{}>
+//  <d-W-EXACT-{}>
+//  <dst-R-EXACT-{}>
+//  <dst-RE-EXACT-{}>
+
+      char *d = (char *) dst;
+
+//  <d-RE-EXACT-{}>
+//  <s-RE-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+      for(i = 0; i <= size-1; i += 1)
+
+//  <d-RE-EXACT-{}>
+//  <s-RE-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+         d[i] = s[i];
+   }
+}
+
+Point-to
+
+
+// Points To IN:
+// dst -> *NULL_POINTER* , MAY
+// dst -> _dst_3 , MAY
+// src -> *NULL_POINTER* , MAY
+// src -> _src_2 , MAY
+
+
+// Points To OUT:
+// dst -> *NULL_POINTER* , MAY
+// dst -> _dst_3 , MAY
+// src -> *NULL_POINTER* , MAY
+// src -> _src_2 , MAY
+
+void memcopy_2a(int size, void *src, void *dst)
+{
+   //char* s = (char*) src;
+   //char* d = (char*) dst;
+
+// Points To: none
+
+   int i;
+
+// Points To:
+// dst -> *NULL_POINTER* , MAY
+// dst -> _dst_3 , MAY
+// src -> *NULL_POINTER* , MAY
+// src -> _src_2 , MAY
+
+   if (src!=(void *) 0&&dst!=(void *) 0) {
+
+// Points To:
+// dst -> _dst_3 , EXACT
+// src -> _src_2 , EXACT
+
+      char *s = (char *) src;
+
+// Points To:
+// dst -> _dst_3 , EXACT
+// s -> _src_2 , EXACT
+// src -> _src_2 , EXACT
+
+      char *d = (char *) dst;
+
+// Points To:
+// d -> _dst_3 , EXACT
+// dst -> _dst_3 , EXACT
+// s -> _src_2 , EXACT
+// src -> _src_2 , EXACT
+
+      for(i = 0; i <= size-1; i += 1)
+
+// Points To:
+// d -> _dst_3 , EXACT
+// dst -> _dst_3 , EXACT
+// s -> _src_2 , EXACT
+// src -> _src_2 , EXACT
+
+         d[i] = s[i];
+   }
+}
+
+Proper effects with point to
+
+void memcopy_2a(int size, void *src, void *dst)
+{
+   //char* s = (char*) src;
+   //char* d = (char*) dst;
+//             <    is declared>: i
+   int i;
+//             <    is read   >: dst src
+//             <    is referenced>: dst src
+   if (src!=(void *) 0&&dst!=(void *) 0) {
+//             <    is read   >: src
+//             <    is written>: s
+//             <    is referenced>: s src
+//             <    is declared>: s
+      char *s = (char *) src;
+//             <    is read   >: dst
+//             <    is written>: d
+//             <    is referenced>: d dst
+//             <    is declared>: d
+      char *d = (char *) dst;
+//             <    is read   >: size
+//             <    is written>: i
+//             <    is referenced>: i size
+      for(i = 0; i <= size-1; i += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is referenced>: d i s size
+         d[i] = s[i];
+   }
+}
+
+Regions with point to
+
+
+//  <_dst_3-W-MAY-{}>
+//  <_src_2-R-MAY-{}>
+//  <dst-R-EXACT-{}>
+//  <src-R-EXACT-{}>
+
+void memcopy_2a(int size, void *src, void *dst)
+{
+   //char* s = (char*) src;
+   //char* d = (char*) dst;
+   int i;
+
+//  <_dst_3-W-MAY-{}>
+//  <_src_2-R-MAY-{}>
+//  <dst-R-EXACT-{}>
+//  <dst-RE-MAY-{}>
+//  <src-RE-MAY-{}>
+//  <src-R-EXACT-{}>
+
+   if (src!=(void *) 0&&dst!=(void *) 0) {
+
+//  <s-RE-EXACT-{}>
+//  <s-WE-EXACT-{}>
+//  <s-W-EXACT-{}>
+//  <src-R-EXACT-{}>
+//  <src-RE-EXACT-{}>
+
+      char *s = (char *) src;
+
+//  <d-RE-EXACT-{}>
+//  <d-WE-EXACT-{}>
+//  <d-W-EXACT-{}>
+//  <dst-R-EXACT-{}>
+//  <dst-RE-EXACT-{}>
+
+      char *d = (char *) dst;
+
+//  <_dst_3-W-EXACT-{}>
+//  <_src_2-R-EXACT-{}>
+//  <d-R-EXACT-{}>
+//  <d-RE-EXACT-{}>
+//  <s-R-EXACT-{}>
+//  <s-RE-EXACT-{}>
+
+      for(i = 0; i <= size-1; i += 1)
+
+//  <_dst_3-W-EXACT-{}>
+//  <_src_2-R-EXACT-{}>
+//  <d-R-EXACT-{}>
+//  <d-RE-EXACT-{}>
+//  <s-R-EXACT-{}>
+//  <s-RE-EXACT-{}>
+
+         d[i] = s[i];
+   }
+}
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 13 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	07 --> 14 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	11 --> 14 with conflicts
+		from <s-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <s-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <s-WE-EXACT> to <s-RE-EXACT>
+		from <src-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	12 --> 14 with conflicts
+		from <d-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <d-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <d-WE-EXACT> to <d-RE-EXACT>
+		from <dst-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	13 --> 14 with conflicts
+		from <size-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	14 --> 14 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+
+****************** End of Dependence Graph ******************
+
+Parallel code
+
+void memcopy_2a(int size, void *src, void *dst)
+{
+   //char* s = (char*) src;
+   //char* d = (char*) dst;
+   int i;
+   if (src!=(void *) 0&&dst!=(void *) 0) {
+      char *s = (char *) src;
+      char *d = (char *) dst;
+      for(i = 0; i <= size-1; i += 1)
+         d[i] = s[i];
+   }
+}
