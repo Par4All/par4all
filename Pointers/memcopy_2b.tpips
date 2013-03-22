@@ -7,28 +7,13 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "flow-sensitive"
 setproperty MEMORY_EFFECTS_ONLY FALSE
 
-
 set POINTS_TO_STRICT_POINTER_TYPES FALSE
-
-echo 
-echo Proper effects 
-echo
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE [$WSPACE]
-
-echo
-echo Regions
-echo
-activate PRINT_CODE_REGIONS
-display PRINTED_FILE
-
 
 echo 
 echo Point-to
 echo
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE [$WSPACE]
-
 
 echo 
 echo Proper effects with point to
@@ -44,9 +29,12 @@ activate MUST_REGIONS_WITH_POINTS_TO
 activate PRINT_CODE_REGIONS
 display PRINTED_FILE
 
+echo
+echo Data dependence graph
+echo
+
 activate PRINT_CHAINS_GRAPH
 display DG_FILE 
-
 
 echo
 echo Parallel code

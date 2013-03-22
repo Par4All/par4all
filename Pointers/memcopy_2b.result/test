@@ -1,116 +1,31 @@
 
-Proper effects 
-
-void memcopy_2b(int size, char *src, char *dst)
-{
-   //char* s = (char*) src;
-   //char* d = (char*) dst;
-//             <    is declared>: i
-   int i;
-//             <    is read   >: dst src
-//             <    is referenced>: dst src
-   if (src!=(void *) 0&&dst!=(void *) 0) {
-//             <    is read   >: src
-//             <    is written>: s
-//             <    is referenced>: s src
-//             <    is declared>: s
-      char *s = (char *) src;
-//             <    is read   >: dst
-//             <    is written>: d
-//             <    is referenced>: d dst
-//             <    is declared>: d
-      char *d = (char *) dst;
-//             <    is read   >: size
-//             <    is written>: i
-//             <    is referenced>: i size
-      for(i = 0; i <= size-1; i += 1)
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is referenced>: d i s size
-         d[i] = s[i];
-   }
-}
-
-Regions
-
-
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-
-void memcopy_2b(int size, char *src, char *dst)
-{
-   //char* s = (char*) src;
-   //char* d = (char*) dst;
-   int i;
-
-//  <dst-RE-EXACT-{}>
-//  <src-RE-EXACT-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-
-   if (src!=(void *) 0&&dst!=(void *) 0) {
-
-//  <s-RE-EXACT-{}>
-//  <s-WE-EXACT-{}>
-//  <s-W-EXACT-{}>
-//  <src-R-EXACT-{}>
-//  <src-RE-EXACT-{}>
-
-      char *s = (char *) src;
-
-//  <d-RE-EXACT-{}>
-//  <d-WE-EXACT-{}>
-//  <d-W-EXACT-{}>
-//  <dst-R-EXACT-{}>
-//  <dst-RE-EXACT-{}>
-
-      char *d = (char *) dst;
-
-//  <d-RE-EXACT-{}>
-//  <s-RE-EXACT-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-
-      for(i = 0; i <= size-1; i += 1)
-
-//  <d-RE-EXACT-{}>
-//  <s-RE-EXACT-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-
-         d[i] = s[i];
-   }
-}
-
 Point-to
 
 
 // Points To IN:
-// dst -> *NULL_POINTER* , MAY
+// dst -> *NULL* , MAY
 // dst -> _dst_3[0] , MAY
-// src -> *NULL_POINTER* , MAY
+// src -> *NULL* , MAY
 // src -> _src_2[0] , MAY
 
 
 // Points To OUT:
-// dst -> *NULL_POINTER* , MAY
+// dst -> *NULL* , MAY
 // dst -> _dst_3[0] , MAY
-// src -> *NULL_POINTER* , MAY
+// src -> *NULL* , MAY
 // src -> _src_2[0] , MAY
 
 void memcopy_2b(int size, char *src, char *dst)
 {
-   //char* s = (char*) src;
-   //char* d = (char*) dst;
 
 // Points To: none
 
    int i;
 
 // Points To:
-// dst -> *NULL_POINTER* , MAY
+// dst -> *NULL* , MAY
 // dst -> _dst_3[0] , MAY
-// src -> *NULL_POINTER* , MAY
+// src -> *NULL* , MAY
 // src -> _src_2[0] , MAY
 
    if (src!=(void *) 0&&dst!=(void *) 0) {
@@ -150,8 +65,6 @@ Proper effects with point to
 
 void memcopy_2b(int size, char *src, char *dst)
 {
-   //char* s = (char*) src;
-   //char* d = (char*) dst;
 //             <    is declared>: i
    int i;
 //             <    is read   >: dst src
@@ -188,8 +101,6 @@ Regions with point to
 
 void memcopy_2b(int size, char *src, char *dst)
 {
-   //char* s = (char*) src;
-   //char* d = (char*) dst;
    int i;
 
 //  <_dst_3[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=size}>
@@ -237,19 +148,22 @@ void memcopy_2b(int size, char *src, char *dst)
    }
 }
 
+Data dependence graph
+
+
  *********************** Use-Def Chains *********************
 
-	08 --> 14 with conflicts
+	12 --> 18 with conflicts
 		from <i-WE-EXACT> to <i-RE-EXACT>
-	08 --> 15 with conflicts
+	12 --> 19 with conflicts
 		from <i-WE-EXACT> to <i-RE-EXACT>
-	12 --> 15 with conflicts
+	16 --> 19 with conflicts
 		from <s-W-EXACT> to <s-R-EXACT>
 		from <s-WE-EXACT> to <s-RE-EXACT>
-	13 --> 15 with conflicts
+	17 --> 19 with conflicts
 		from <d-W-EXACT> to <d-R-EXACT>
 		from <d-WE-EXACT> to <d-RE-EXACT>
-	15 --> 15 with conflicts
+	19 --> 19 with conflicts
 		from <_dst_3[i]-W-EXACT> to <_dst_3[i]-W-EXACT>
 
 ****************** End of Dependence Graph ******************
@@ -258,8 +172,6 @@ Parallel code
 
 void memcopy_2b(int size, char *src, char *dst)
 {
-   //char* s = (char*) src;
-   //char* d = (char*) dst;
    int i;
    if (src!=(void *) 0&&dst!=(void *) 0) {
       char *s = (char *) src;
