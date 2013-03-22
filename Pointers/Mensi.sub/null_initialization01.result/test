@@ -29,13 +29,13 @@ int foo(int *q)
    if (p==(void *) 0)
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 // q -> _q_1 , EXACT
 
       printf("i = %d", i);
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _q_1 , MAY
 // q -> _q_1 , EXACT
 
@@ -118,13 +118,13 @@ int foo(int *q)
    if (p==(void *) 0)
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 // q -> _q_1 , EXACT
 
       printf("i = %d", i);
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _q_1 , MAY
 // q -> _q_1 , EXACT
 

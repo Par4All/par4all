@@ -3,24 +3,24 @@ POINTS TO for inter05
 
 
 // Points To IN:
-// _ppp_1[0] -> *NULL_POINTER* , MAY
+// _ppp_1[0] -> *NULL* , MAY
 // _ppp_1[0] -> _ppp_1_1[0][0] , MAY
-// _qqq_2[0] -> *NULL_POINTER* , MAY
+// _qqq_2[0] -> *NULL* , MAY
 // _qqq_2[0] -> _qqq_2_2[0][0] , MAY
-// _qqq_2_2[0][0] -> *NULL_POINTER* , MAY
+// _qqq_2_2[0][0] -> *NULL* , MAY
 // _qqq_2_2[0][0] -> _qqq_2_2_2[0][0][0] , MAY
-// ppp -> *NULL_POINTER* , MAY
+// ppp -> *NULL* , MAY
 // ppp -> _ppp_1[0] , MAY
-// qqq -> *NULL_POINTER* , MAY
+// qqq -> *NULL* , MAY
 // qqq -> _qqq_2[0] , MAY
 
 
 // Points To OUT:
 // _ppp_1[0] -> _ppp_1_1[0][0] , EXACT
-// _ppp_1_1[0][0] -> *NULL_POINTER* , MAY
+// _ppp_1_1[0][0] -> *NULL* , MAY
 // _ppp_1_1[0][0] -> _qqq_2_2_2[0][0][0] , MAY
 // _qqq_2[0] -> _qqq_2_2[0][0] , EXACT
-// _qqq_2_2[0][0] -> *NULL_POINTER* , MAY
+// _qqq_2_2[0][0] -> *NULL* , MAY
 // _qqq_2_2[0][0] -> _qqq_2_2_2[0][0][0] , MAY
 // ppp -> _ppp_1[0] , EXACT
 // qqq -> _qqq_2[0] , EXACT
@@ -29,25 +29,25 @@ void bar(int ***ppp, int ***qqq)
 {
 
 // Points To:
-// _ppp_1[0] -> *NULL_POINTER* , MAY
+// _ppp_1[0] -> *NULL* , MAY
 // _ppp_1[0] -> _ppp_1_1[0][0] , MAY
-// _qqq_2[0] -> *NULL_POINTER* , MAY
+// _qqq_2[0] -> *NULL* , MAY
 // _qqq_2[0] -> _qqq_2_2[0][0] , MAY
-// _qqq_2_2[0][0] -> *NULL_POINTER* , MAY
+// _qqq_2_2[0][0] -> *NULL* , MAY
 // _qqq_2_2[0][0] -> _qqq_2_2_2[0][0][0] , MAY
-// ppp -> *NULL_POINTER* , MAY
+// ppp -> *NULL* , MAY
 // ppp -> _ppp_1[0] , MAY
-// qqq -> *NULL_POINTER* , MAY
+// qqq -> *NULL* , MAY
 // qqq -> _qqq_2[0] , MAY
 
    **ppp = **qqq;
 
 // Points To:
 // _ppp_1[0] -> _ppp_1_1[0][0] , EXACT
-// _ppp_1_1[0][0] -> *NULL_POINTER* , MAY
+// _ppp_1_1[0][0] -> *NULL* , MAY
 // _ppp_1_1[0][0] -> _qqq_2_2_2[0][0][0] , MAY
 // _qqq_2[0] -> _qqq_2_2[0][0] , EXACT
-// _qqq_2_2[0][0] -> *NULL_POINTER* , MAY
+// _qqq_2_2[0][0] -> *NULL* , MAY
 // _qqq_2_2[0][0] -> _qqq_2_2_2[0][0][0] , MAY
 // ppp -> _ppp_1[0] , EXACT
 // qqq -> _qqq_2[0] , EXACT
@@ -89,7 +89,7 @@ void inter05()
    bar(ppp, qqq);
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> j , MAY
 // pp -> p , EXACT
 // ppp -> pp , EXACT

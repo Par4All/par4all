@@ -3,14 +3,14 @@ POINTS TO for assignment18
 
 
 // Points To IN:
-// _qq_1[0] -> *NULL_POINTER* , MAY
+// _qq_1[0] -> *NULL* , MAY
 // _qq_1[0] -> _qq_1_1[0][0] , MAY
-// qq -> *NULL_POINTER* , MAY
+// qq -> *NULL* , MAY
 // qq -> _qq_1[0] , MAY
 
 
 // Points To OUT:
-// _qq_1[0] -> *NULL_POINTER* , MAY
+// _qq_1[0] -> *NULL* , MAY
 // _qq_1[0] -> _qq_1_1[0][0] , MAY
 // qq -> _qq_1[0] , EXACT
 
@@ -22,25 +22,25 @@ void assignment18(int **qq)
    int *p, i;
 
 // Points To:
-// _qq_1[0] -> *NULL_POINTER* , MAY
+// _qq_1[0] -> *NULL* , MAY
 // _qq_1[0] -> _qq_1_1[0][0] , MAY
 // p -> undefined , EXACT
-// qq -> *NULL_POINTER* , MAY
+// qq -> *NULL* , MAY
 // qq -> _qq_1[0] , MAY
 
    p = *qq;
 
 // Points To:
-// _qq_1[0] -> *NULL_POINTER* , MAY
+// _qq_1[0] -> *NULL* , MAY
 // _qq_1[0] -> _qq_1_1[0][0] , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _qq_1_1[0][0] , MAY
 // qq -> _qq_1[0] , EXACT
 
    i = *p;
 
 // Points To:
-// _qq_1[0] -> *NULL_POINTER* , MAY
+// _qq_1[0] -> *NULL* , MAY
 // _qq_1[0] -> _qq_1_1[0][0] , MAY
 // p -> _qq_1_1[0][0] , EXACT
 // qq -> _qq_1[0] , EXACT

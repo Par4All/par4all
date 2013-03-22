@@ -3,7 +3,7 @@ POINTS TO for "allocate_array"
 
 
 // Points To IN:
-// pa -> *NULL_POINTER* , MAY
+// pa -> *NULL* , MAY
 // pa -> _pa_1 , MAY
 
 
@@ -15,7 +15,7 @@ void allocate_array(parray_t pa)
 {
 
 // Points To:
-// pa -> *NULL_POINTER* , MAY
+// pa -> *NULL* , MAY
 // pa -> _pa_1 , MAY
 
    pa->data = (float *) malloc(pa->dim*sizeof(float));
@@ -31,7 +31,7 @@ POINTS TO for "init_array"
 
 
 // Points To IN:
-// pa -> *NULL_POINTER* , MAY
+// pa -> *NULL* , MAY
 // pa -> _pa_1 , MAY
 
 
@@ -50,7 +50,7 @@ void init_array(parray_t pa)
    for(i = 0; i <= pa->dim-1; i += 1)
 
 // Points To:
-// pa -> *NULL_POINTER* , MAY
+// pa -> *NULL* , MAY
 // pa -> _pa_1 , MAY
 
       (pa->data)[i] = (float) i;

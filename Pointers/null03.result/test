@@ -44,7 +44,7 @@ int main()
    p = (void *) 0;
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 
 
    return 0;

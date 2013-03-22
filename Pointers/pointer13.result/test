@@ -3,13 +3,13 @@ POINTS TO for pointer13
 
 
 // Points To IN:
-// a -> *NULL_POINTER* , MAY
+// a -> *NULL* , MAY
 // a -> _a_1[0] , MAY
-// b -> *NULL_POINTER* , MAY
+// b -> *NULL* , MAY
 // b -> _b_2[0] , MAY
-// c -> *NULL_POINTER* , MAY
+// c -> *NULL* , MAY
 // c -> _c_3[0] , MAY
-// cnt -> *NULL_POINTER* , MAY
+// cnt -> *NULL* , MAY
 // cnt -> _cnt_5[0] , MAY
 
 
@@ -27,15 +27,15 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
    double *w = (void *) 0;
 
 // Points To:
-// a -> *NULL_POINTER* , MAY
+// a -> *NULL* , MAY
 // a -> _a_1[0] , MAY
-// b -> *NULL_POINTER* , MAY
+// b -> *NULL* , MAY
 // b -> _b_2[0] , MAY
-// c -> *NULL_POINTER* , MAY
+// c -> *NULL* , MAY
 // c -> _c_3[0] , MAY
-// cnt -> *NULL_POINTER* , MAY
+// cnt -> *NULL* , MAY
 // cnt -> _cnt_5[0] , MAY
-// w -> *NULL_POINTER* , EXACT
+// w -> *NULL* , EXACT
 
    /* w is the workspace */
    a&&b&&c&&cnt?(void) 0:__assert_fail("a&&b&&c&&cnt", "./pointer13.c", 15, (const char *) 0);
@@ -45,7 +45,7 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
 // b -> _b_2[0] , EXACT
 // c -> _c_3[0] , EXACT
 // cnt -> _cnt_5[0] , EXACT
-// w -> *NULL_POINTER* , EXACT
+// w -> *NULL* , EXACT
 
    int sz = 0;
 
@@ -54,7 +54,7 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
 // b -> _b_2[0] , EXACT
 // c -> _c_3[0] , EXACT
 // cnt -> _cnt_5[0] , EXACT
-// w -> *NULL_POINTER* , EXACT
+// w -> *NULL* , EXACT
 
    int i;
 
@@ -63,7 +63,7 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
 // b -> _b_2[0] , EXACT
 // c -> _c_3[0] , EXACT
 // cnt -> _cnt_5[0] , EXACT
-// w -> *NULL_POINTER* , EXACT
+// w -> *NULL* , EXACT
 
 
    if (sz<*cnt) {
@@ -73,7 +73,7 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
 // b -> _b_2[0] , EXACT
 // c -> _c_3[0] , EXACT
 // cnt -> _cnt_5[0] , EXACT
-// w -> *NULL_POINTER* , EXACT
+// w -> *NULL* , EXACT
 
       if (w)
 
@@ -86,7 +86,7 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
 // b -> _b_2[0] , EXACT
 // c -> _c_3[0] , EXACT
 // cnt -> _cnt_5[0] , EXACT
-// w -> *NULL_POINTER* , EXACT
+// w -> *NULL* , EXACT
 
       w = (double *) malloc(*cnt*sizeof(double));
 
@@ -106,7 +106,7 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
 // c -> _c_3[0] , EXACT
 // cnt -> _cnt_5[0] , EXACT
 // w -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// w -> *NULL_POINTER* , MAY
+// w -> *NULL* , MAY
 
    for(i = 0; i <= *cnt-1; i += 1)
 
@@ -116,7 +116,7 @@ void pointer13(double *a, double *b, double *c, double *d, int *cnt)
 // c -> _c_3[0] , EXACT
 // cnt -> _cnt_5[0] , EXACT
 // w -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// w -> *NULL_POINTER* , MAY
+// w -> *NULL* , MAY
 
       w[i] = c[i]+a[i]*b[i];
 }

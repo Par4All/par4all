@@ -63,23 +63,23 @@ int main(void)
    int **pp = (void *) 0;
 
 // Points To:
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 
    srand(time((void *) 0));
 
 // Points To:
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 
    if (alea()) {
 
 // Points To:
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 
       int *pi = &i;
 
 // Points To:
 // pi -> i , EXACT
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 
       pp = &pi;
 
@@ -92,7 +92,7 @@ int main(void)
 
 // Points To:
 // pp -> undefined , MAY
-// pp -> *NULL_POINTER* , MAY
+// pp -> *NULL* , MAY
 
    
    // pp points to a dead value in the stack
@@ -100,7 +100,7 @@ int main(void)
 
 // Points To:
 // pp -> undefined , MAY
-// pp -> *NULL_POINTER* , MAY
+// pp -> *NULL* , MAY
 
    
    // possible segfault.
@@ -113,7 +113,7 @@ int main(void)
       **pp = 0;
 
 // Points To:
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 
    return 0;
 }

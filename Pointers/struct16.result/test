@@ -21,9 +21,9 @@ POINTS-TO
 
 
 // Points To IN:
-// x.first -> *NULL_POINTER* , MAY
-// x.second -> *NULL_POINTER* , MAY
-// x.third -> *NULL_POINTER* , MAY
+// x.first -> *NULL* , MAY
+// x.second -> *NULL* , MAY
+// x.third -> *NULL* , MAY
 // x.first -> _x_1__0[0] , MAY
 // x.second -> _x_2__0[0] , MAY
 // x.third -> _x_3__0[0] , MAY
@@ -39,14 +39,14 @@ int main()
    int y[10];
 
 // Points To:
-// x.first -> *NULL_POINTER* , MAY
+// x.first -> *NULL* , MAY
 // x.first -> _x_1__0[0] , MAY
 
    *x.first = &y[5];
 
 // Points To:
 // _x_1__0[0] -> y[5] , EXACT
-// x.second -> *NULL_POINTER* , MAY
+// x.second -> *NULL* , MAY
 // x.first -> _x_1__0[0] , EXACT
 // x.second -> _x_2__0[0] , MAY
 
@@ -55,7 +55,7 @@ int main()
 // Points To:
 // _x_1__0[0] -> y[5] , EXACT
 // _x_2__0[0] -> y[6] , EXACT
-// x.third -> *NULL_POINTER* , MAY
+// x.third -> *NULL* , MAY
 // x.first -> _x_1__0[0] , EXACT
 // x.second -> _x_2__0[0] , EXACT
 // x.third -> _x_3__0[0] , MAY

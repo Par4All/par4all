@@ -3,7 +3,7 @@ Points-to for ""
 
 
 // Points To IN:
-// msg -> *NULL_POINTER* , MAY
+// msg -> *NULL* , MAY
 // msg -> _msg_1[0] , MAY
 
 
@@ -13,13 +13,13 @@ void msg_error(char *msg)
 {
 
 // Points To:
-// msg -> *NULL_POINTER* , MAY
+// msg -> *NULL* , MAY
 // msg -> _msg_1[0] , MAY
 
    printf("%s", msg);
 
 // Points To:
-// msg -> *NULL_POINTER* , MAY
+// msg -> *NULL* , MAY
 // msg -> _msg_1[0] , MAY
 
    exit(1);

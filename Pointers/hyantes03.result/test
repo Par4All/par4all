@@ -3,7 +3,7 @@ Points-to for "read_towns"
 
 
 // Points To IN:
-// stderr -> *NULL_POINTER* , MAY
+// stderr -> *NULL* , MAY
 // stderr -> _stderr_[0] , MAY
 
 
@@ -30,7 +30,7 @@ towns read_towns(const  char fname[])
 
 // Points To:
 // fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// stderr -> *NULL_POINTER* , MAY
+// stderr -> *NULL* , MAY
 // stderr -> _stderr_[0] , MAY
 // the_towns.data -> *HEAP*_l_31[0] , MAY
 
@@ -184,16 +184,16 @@ Points-to for "run"
 
 
 // Points To IN:
-// stderr -> *NULL_POINTER* , MAY
+// stderr -> *NULL* , MAY
 // stderr -> _stderr_[0] , MAY
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 
 
 // Points To OUT:
 // run.data -> *HEAP*_l_76[0] , MAY
 // stderr -> _stderr_[0] , EXACT
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 
 towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step, data_t range)
@@ -220,7 +220,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
    towns tout = {nb, malloc(sizeof(town)*nb)};
 
 // Points To:
-// stderr -> *NULL_POINTER* , MAY
+// stderr -> *NULL* , MAY
 // stderr -> _stderr_[0] , MAY
 // tout.data -> *HEAP*_l_76[0] , MAY
 
@@ -247,7 +247,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 
 // Points To:
 // stderr -> _stderr_[0] , EXACT
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_76[0] , MAY
 
@@ -255,7 +255,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 
 // Points To:
 // stderr -> _stderr_[0] , EXACT
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_76[0] , MAY
 
@@ -263,7 +263,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 
 // Points To:
 // stderr -> _stderr_[0] , EXACT
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_76[0] , MAY
 
@@ -271,7 +271,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 
 // Points To:
 // stderr -> _stderr_[0] , EXACT
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_76[0] , MAY
 
@@ -279,7 +279,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 
 // Points To:
 // stderr -> _stderr_[0] , EXACT
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_76[0] , MAY
 
@@ -287,7 +287,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 
 // Points To:
 // stderr -> _stderr_[0] , EXACT
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_76[0] , MAY
 
@@ -295,7 +295,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 
 // Points To:
 // stderr -> _stderr_[0] , EXACT
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_76[0] , MAY
 
@@ -303,7 +303,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 
 // Points To:
 // stderr -> _stderr_[0] , EXACT
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_76[0] , MAY
 
@@ -313,7 +313,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 
 // Points To:
 // stderr -> _stderr_[0] , EXACT
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_76[0] , MAY
 
@@ -321,7 +321,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 
 // Points To:
 // stderr -> _stderr_[0] , EXACT
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_76[0] , MAY
 
@@ -332,12 +332,12 @@ Points-to for "display"
 
 
 // Points To IN:
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 
 
 // Points To OUT:
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 
 void display(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step)
@@ -356,19 +356,19 @@ void display(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t
    for(i = 0; i < rangex; i += 1) {
 
 // Points To:
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 
       for(j = 0; j < rangey; j += 1)
 
 // Points To:
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 
          printf("%lf %lf %lf\n", ((t.data)[i*rangey+j])[0], ((t.data)[i*rangey+j])[1], ((t.data)[i*rangey+j])[2]);
 
 // Points To:
-// t.data -> *NULL_POINTER* , MAY
+// t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 
       printf("\n");
@@ -836,7 +836,7 @@ Points-to for "main"
 
 
 // Points To IN:
-// stderr -> *NULL_POINTER* , MAY
+// stderr -> *NULL* , MAY
 // stderr -> _stderr_[0] , MAY
 
 
@@ -864,7 +864,7 @@ int main(int argc, char *argv[])
       towns t;
 
 // Points To:
-// stderr -> *NULL_POINTER* , MAY
+// stderr -> *NULL* , MAY
 // stderr -> _stderr_[0] , MAY
 // t.data -> undefined , EXACT
 

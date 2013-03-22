@@ -3,19 +3,19 @@ POINTS-TO
 
 
 // Points To IN:
-// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> *NULL* , MAY
 // _l_1[0].next -> _l_1_2__1[0][0] , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // l -> _l_1[0] , MAY
-// nil -> *NULL_POINTER* , EXACT
+// nil -> *NULL* , EXACT
 
 
 // Points To OUT:
-// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> *NULL* , MAY
 // _l_1[0].next -> _l_1_2__1[0][0] , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // l -> _l_1[0] , MAY
-// nil -> *NULL_POINTER* , EXACT
+// nil -> *NULL* , EXACT
 
 int list_len(list l)
 {
@@ -25,19 +25,19 @@ int list_len(list l)
    int n = 0;
 
 // Points To:
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // l -> _l_1[0] , MAY
 
    list c = l;
 
 // Points To:
-// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> *NULL* , MAY
 // _l_1[0].next -> _l_1_2__1[0][0] , MAY
-// c -> *NULL_POINTER* , MAY
+// c -> *NULL* , MAY
 // c -> _l_1[0] , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // l -> _l_1[0] , MAY
-// nil -> *NULL_POINTER* , EXACT
+// nil -> *NULL* , EXACT
 
    //while (c!=nil)
    //{
@@ -45,24 +45,24 @@ int list_len(list l)
    c = c==nil?nil:c->next;
 
 // Points To:
-// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> *NULL* , MAY
 // _l_1[0].next -> _l_1_2__1[0][0] , MAY
-// c -> *NULL_POINTER* , MAY
+// c -> *NULL* , MAY
 // c -> _l_1_2__1[0][0] , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // l -> _l_1[0] , MAY
-// nil -> *NULL_POINTER* , EXACT
+// nil -> *NULL* , EXACT
 
    n++;
 
 // Points To:
-// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> *NULL* , MAY
 // _l_1[0].next -> _l_1_2__1[0][0] , MAY
-// c -> *NULL_POINTER* , MAY
+// c -> *NULL* , MAY
 // c -> _l_1_2__1[0][0] , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // l -> _l_1[0] , MAY
-// nil -> *NULL_POINTER* , EXACT
+// nil -> *NULL* , EXACT
 
    //}
    return n;

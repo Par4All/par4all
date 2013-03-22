@@ -77,7 +77,7 @@ int main()
 // *HEAP*_l_17[*].first -> undefined , MAY
 // *HEAP*_l_17[*].second -> undefined , MAY
 // fp -> undefined , EXACT
-// ps -> *NULL_POINTER* , EXACT
+// ps -> *NULL* , EXACT
 // qs -> *HEAP*_l_17[1] , MAY
 
    fp = (qs-1)->first;
@@ -89,7 +89,7 @@ int main()
 // *HEAP*_l_17[*].second -> undefined , MAY
 // fp -> *HEAP*_l_21[0] , MAY
 // fp -> undefined , MAY
-// ps -> *NULL_POINTER* , EXACT
+// ps -> *NULL* , EXACT
 // qs -> *HEAP*_l_17[1] , MAY
 
    *fp = 0;
@@ -100,7 +100,7 @@ int main()
 // *HEAP*_l_17[*].first -> undefined , MAY
 // *HEAP*_l_17[*].second -> undefined , MAY
 // fp -> *HEAP*_l_21[0] , MAY
-// ps -> *NULL_POINTER* , EXACT
+// ps -> *NULL* , EXACT
 // qs -> *HEAP*_l_17[1] , MAY
 
 

@@ -3,9 +3,9 @@ POINTS-TO
 
 
 // Points To IN:
-// _p_1[3] -> *NULL_POINTER* , MAY
+// _p_1[3] -> *NULL* , MAY
 // _p_1[3] -> _p_1_1[3][0] , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
 
@@ -17,9 +17,9 @@ int pointer_reference04(char **p)
 {
 
 // Points To:
-// _p_1[3] -> *NULL_POINTER* , MAY
+// _p_1[3] -> *NULL* , MAY
 // _p_1[3] -> _p_1_1[3][0] , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
    char *q = p[3];

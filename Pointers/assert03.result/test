@@ -3,9 +3,9 @@ POINTS-TO
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_2[0] , MAY
 
 
@@ -21,9 +21,9 @@ void assert03(int *p, int *q)
    int i;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_2[0] , MAY
 
    p&&q?(void) 0:__assert_fail("p&&q", "./assert03.c", 15, (const char *) 0);

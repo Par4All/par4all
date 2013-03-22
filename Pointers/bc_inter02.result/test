@@ -96,7 +96,7 @@ int main()
 // Points To:
 // *HEAP*_l_27.q -> *HEAP*_l_21 , MAY
 // *HEAP*_l_27.q -> *HEAP*_l_22 , MAY
-// *HEAP*_l_27.q -> *NULL_POINTER* , MAY
+// *HEAP*_l_27.q -> *NULL* , MAY
 // p1 -> *HEAP*_l_27 , MAY
 // p2 -> *HEAP*_l_27 , MAY
 // q1 -> *HEAP*_l_21 , MAY
@@ -108,7 +108,7 @@ int main()
 // Points To:
 // *HEAP*_l_27.q -> *HEAP*_l_21 , MAY
 // *HEAP*_l_27.q -> *HEAP*_l_22 , MAY
-// *HEAP*_l_27.q -> *NULL_POINTER* , MAY
+// *HEAP*_l_27.q -> *NULL* , MAY
 // p1 -> *HEAP*_l_27 , MAY
 // p2 -> *HEAP*_l_27 , MAY
 // q1 -> *HEAP*_l_21 , MAY

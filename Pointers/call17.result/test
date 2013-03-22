@@ -17,12 +17,12 @@ POINTS-TO
 
 
 // Points To IN:
-// x -> *NULL_POINTER* , MAY
+// x -> *NULL* , MAY
 // x -> _x_1[0] , MAY
 
 
 // Points To OUT:
-// x -> *NULL_POINTER* , MAY
+// x -> *NULL* , MAY
 // x -> _x_1[0] , MAY
 
 void call17(int *x)
@@ -30,21 +30,21 @@ void call17(int *x)
    /* check aliases */
 
 // Points To:
-// x -> *NULL_POINTER* , MAY
+// x -> *NULL* , MAY
 // x -> _x_1[0] , MAY
 
    int *y = x;
 
 // Points To:
-// x -> *NULL_POINTER* , MAY
+// x -> *NULL* , MAY
 // x -> _x_1[0] , MAY
-// y -> *NULL_POINTER* , MAY
+// y -> *NULL* , MAY
 // y -> _x_1[0] , MAY
 
    y[0] = 1;
 
 // Points To:
-// x -> *NULL_POINTER* , MAY
+// x -> *NULL* , MAY
 // x -> _x_1[0] , MAY
 // y -> _x_1[0] , EXACT
 

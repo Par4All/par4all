@@ -109,36 +109,36 @@ int main(void)
    int **pp = (void *) 0;
 
 // Points To:
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 
    srand(time((void *) 0));
 
 // Points To:
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 
    if (alea()) {
 
 // Points To:
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 
       int *pi = &i;
 
 // Points To:
 // pi -> i , EXACT
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 
       pp = &pi;
    }
    else {
 
 // Points To:
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 
       int *pj = &j;
 
 // Points To:
 // pj -> j , EXACT
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 
       pp = &pj;
    }

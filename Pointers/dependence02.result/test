@@ -17,12 +17,12 @@ POINTS TO for "dependence02"
 
 
 // Points To IN:
-// b -> *NULL_POINTER* , MAY
+// b -> *NULL* , MAY
 // b -> _b_1[0] , MAY
 
 
 // Points To OUT:
-// b -> *NULL_POINTER* , MAY
+// b -> *NULL* , MAY
 // b -> _b_1[0] , MAY
 
 void dependence02(int *b)
@@ -34,16 +34,16 @@ void dependence02(int *b)
 
 // Points To:
 // a -> undefined , EXACT
-// b -> *NULL_POINTER* , MAY
+// b -> *NULL* , MAY
 // b -> _b_1[0] , MAY
 
 
    a = b;
 
 // Points To:
-// a -> *NULL_POINTER* , MAY
+// a -> *NULL* , MAY
 // a -> _b_1[0] , MAY
-// b -> *NULL_POINTER* , MAY
+// b -> *NULL* , MAY
 // b -> _b_1[0] , MAY
 
    *a = 0;

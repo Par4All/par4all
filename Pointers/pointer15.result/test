@@ -3,7 +3,7 @@ POINTS TO for pointer15
 
 
 // Points To IN:
-// t[1][2] -> *NULL_POINTER* , MAY
+// t[1][2] -> *NULL* , MAY
 // t[1][2] -> _t_1[1][2][0][0][0][0] , MAY
 
 
@@ -19,7 +19,7 @@ void pointer15(double *(*t[3][4])[5][6][7])
    double z;
 
 // Points To:
-// t[1][2] -> *NULL_POINTER* , MAY
+// t[1][2] -> *NULL* , MAY
 // t[1][2] -> _t_1[1][2][0][0][0][0] , MAY
 
    (((*t[1][2])[3])[4])[5] = &z;

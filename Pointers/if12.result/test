@@ -26,13 +26,13 @@ void if12(char *filename)
    if (file==(void *) 0)
 
 // Points To:
-// file -> *NULL_POINTER* , EXACT
+// file -> *NULL* , EXACT
 
       printf("ouverture du fichier impossible\n");
 
 // Points To:
 // file -> *ANY_MODULE*:*ANYWHERE* , MAY
-// file -> *NULL_POINTER* , MAY
+// file -> *NULL* , MAY
 
 
    return;

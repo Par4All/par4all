@@ -18,7 +18,7 @@ POINTS TO for pointer_free04
 
 
 // Points To IN:
-// fp -> *NULL_POINTER* , MAY
+// fp -> *NULL* , MAY
 // fp -> _fp_1 , MAY
 
 
@@ -30,7 +30,7 @@ pointer pointer_free(pointer fp)
 {
 
 // Points To:
-// fp -> *NULL_POINTER* , MAY
+// fp -> *NULL* , MAY
 // fp -> _fp_1 , MAY
 
    free(fp);

@@ -43,7 +43,7 @@ POINTS TO
 
 
 // Points To IN:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
 
 
@@ -69,22 +69,22 @@ void formal_parameter00(int *pi)
    i = 0;
 
 // Points To:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
 // q -> undefined , EXACT
 
    q = pi;
 
 // Points To:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _pi_1[0] , MAY
 
    q++;
 
 // Points To:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
 // q -> _pi_1[1] , EXACT
 

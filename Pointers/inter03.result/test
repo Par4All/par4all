@@ -3,7 +3,7 @@ Points-to for "foo"
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
 
@@ -23,7 +23,7 @@ void foo(int *p)
    for(i = 0; i <= 9; i += 1)
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
       p[i] = i;
@@ -38,7 +38,7 @@ Points-to for "myprint"
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
 
@@ -58,7 +58,7 @@ void myprint(int *p)
    for(i = 0; i <= 9; i += 1)
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
       printf("\t%d\n", p[i]);

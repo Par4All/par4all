@@ -3,7 +3,7 @@ Points-to for "flatten_code12"
 
 
 // Points To IN:
-// stdout -> *NULL_POINTER* , MAY
+// stdout -> *NULL* , MAY
 // stdout -> _stdout_[0] , MAY
 
 
@@ -34,7 +34,7 @@ void flatten_code12(void)
       foo++;
 
 // Points To:
-// stdout -> *NULL_POINTER* , MAY
+// stdout -> *NULL* , MAY
 // stdout -> _stdout_[0] , MAY
 
 
@@ -46,7 +46,7 @@ Points-to for \"main\"
 
 
 // Points To IN:
-// stdout -> *NULL_POINTER* , MAY
+// stdout -> *NULL* , MAY
 // stdout -> _stdout_[0] , MAY
 
 
@@ -56,7 +56,7 @@ int main()
 {
 
 // Points To:
-// stdout -> *NULL_POINTER* , MAY
+// stdout -> *NULL* , MAY
 // stdout -> _stdout_[0] , MAY
 
    flatten_code12();

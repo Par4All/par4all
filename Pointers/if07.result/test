@@ -15,7 +15,7 @@ int main()
    int *p = (void *) 0, i;
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 
    if (p!=(void *) 0)
 
@@ -25,7 +25,7 @@ int main()
    else
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 
       *p = 1;
 

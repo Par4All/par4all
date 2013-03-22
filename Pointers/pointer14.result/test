@@ -3,7 +3,7 @@ POINTS TO for "foo"
 
 
 // Points To IN:
-// t[2][3] -> *NULL_POINTER* , MAY
+// t[2][3] -> *NULL* , MAY
 // t[2][3] -> _t_1[2][3][0][0][0][0] , MAY
 
 
@@ -14,7 +14,7 @@ void foo(double *(*t[3][4])[5][6][7])
 {
 
 // Points To:
-// t[2][3] -> *NULL_POINTER* , MAY
+// t[2][3] -> *NULL* , MAY
 // t[2][3] -> _t_1[2][3][0][0][0][0] , MAY
 
    *(((*t[2][3])[1])[2])[3] = 2.5;

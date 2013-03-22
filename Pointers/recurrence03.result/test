@@ -3,11 +3,11 @@ POINTS TO for "recurrence03"
 
 
 // Points To IN:
-// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> *NULL* , MAY
 // _l_1[0].next -> _l_1_2__1[0][0] , MAY
-// _l_1_2__1[0][0].next -> *NULL_POINTER* , MAY
+// _l_1_2__1[0][0].next -> *NULL* , MAY
 // _l_1_2__1[0][0].next -> _l_1_2__1[0][0] , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // l -> _l_1[0] , MAY
 
 
@@ -20,11 +20,11 @@ void recurrence03(list l)
 {
 
 // Points To:
-// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> *NULL* , MAY
 // _l_1[0].next -> _l_1_2__1[0][0] , MAY
-// _l_1_2__1[0][0].next -> *NULL_POINTER* , MAY
+// _l_1_2__1[0][0].next -> *NULL* , MAY
 // _l_1_2__1[0][0].next -> _l_1_2__1[0][0] , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // l -> _l_1[0] , MAY
 
    l->next->next->next = l->next;

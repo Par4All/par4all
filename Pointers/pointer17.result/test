@@ -3,9 +3,9 @@ POINTS TO for pointer17
 
 
 // Points To IN:
-// _p_1[1] -> *NULL_POINTER* , MAY
+// _p_1[1] -> *NULL* , MAY
 // _p_1[1] -> _p_1_1[1][0] , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
 
@@ -22,9 +22,9 @@ void pointer17(float ***p)
    float z = 0;
 
 // Points To:
-// _p_1[1] -> *NULL_POINTER* , MAY
+// _p_1[1] -> *NULL* , MAY
 // _p_1[1] -> _p_1_1[1][0] , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
 

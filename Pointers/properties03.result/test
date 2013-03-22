@@ -3,7 +3,7 @@ Points-to for properties03
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_2[0] , MAY
 
 
@@ -18,29 +18,29 @@ void properties03(int n, int *p)
    int i;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_2[0] , MAY
 
    int *q = p+i;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_2[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _p_2[*] , MAY
 
    p!=0?(void) 0:__assert_fail("p!=0", "./properties03.c", 12, (const char *) 0);
 
 // Points To:
 // p -> _p_2[0] , EXACT
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _p_2[*] , MAY
 
    *(p+i) = 19;
 
 // Points To:
 // p -> _p_2[0] , EXACT
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _p_2[*] , MAY
 
 

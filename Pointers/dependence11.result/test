@@ -30,14 +30,14 @@ POINTS TO for "dependence11"
 
 
 // Points To IN:
-// _s_1[0].b -> *NULL_POINTER* , MAY
+// _s_1[0].b -> *NULL* , MAY
 // _s_1[0].b -> _s_1_2__1[0][0] , MAY
-// s -> *NULL_POINTER* , MAY
+// s -> *NULL* , MAY
 // s -> _s_1[0] , MAY
 
 
 // Points To OUT:
-// _s_1[0].b -> *NULL_POINTER* , MAY
+// _s_1[0].b -> *NULL* , MAY
 // _s_1[0].b -> _s_1_2__1[0][0] , MAY
 // s -> _s_1[0] , EXACT
 
@@ -57,13 +57,13 @@ void dependence11(struct my_struct *s)
 // Points To:
 // a -> undefined , EXACT
 // b -> undefined , EXACT
-// s -> *NULL_POINTER* , MAY
+// s -> *NULL* , MAY
 // s -> _s_1[0] , MAY
 
    a = s->a;
 
 // Points To:
-// _s_1[0].b -> *NULL_POINTER* , MAY
+// _s_1[0].b -> *NULL* , MAY
 // _s_1[0].b -> _s_1_2__1[0][0] , MAY
 // a -> _s_1[0].a[0] , EXACT
 // b -> undefined , EXACT
@@ -73,10 +73,10 @@ void dependence11(struct my_struct *s)
    b = s->b;
 
 // Points To:
-// _s_1[0].b -> *NULL_POINTER* , MAY
+// _s_1[0].b -> *NULL* , MAY
 // _s_1[0].b -> _s_1_2__1[0][0] , MAY
 // a -> _s_1[0].a[0] , EXACT
-// b -> *NULL_POINTER* , MAY
+// b -> *NULL* , MAY
 // b -> _s_1_2__1[0][0] , MAY
 // s -> _s_1[0] , EXACT
 
@@ -86,20 +86,20 @@ void dependence11(struct my_struct *s)
    for(i = 0; i <= 9; i += 1) {
 
 // Points To:
-// _s_1[0].b -> *NULL_POINTER* , MAY
+// _s_1[0].b -> *NULL* , MAY
 // _s_1[0].b -> _s_1_2__1[0][0] , MAY
 // a -> _s_1[0].a[0] , EXACT
-// b -> *NULL_POINTER* , MAY
+// b -> *NULL* , MAY
 // b -> _s_1_2__1[0][0] , MAY
 // s -> _s_1[0] , EXACT
 
       a[i] = 0;
 
 // Points To:
-// _s_1[0].b -> *NULL_POINTER* , MAY
+// _s_1[0].b -> *NULL* , MAY
 // _s_1[0].b -> _s_1_2__1[0][0] , MAY
 // a -> _s_1[0].a[0] , EXACT
-// b -> *NULL_POINTER* , MAY
+// b -> *NULL* , MAY
 // b -> _s_1_2__1[0][0] , MAY
 // s -> _s_1[0] , EXACT
 

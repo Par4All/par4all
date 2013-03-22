@@ -3,7 +3,7 @@ Points-to for "formal_parameter01a"
 
 
 // Points To IN:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
 
 
@@ -37,25 +37,25 @@ int formal_parameter01a(int **pi)
    i = 0;
 
 // Points To:
-// i -> *NULL_POINTER* , EXACT
-// pi -> *NULL_POINTER* , MAY
+// i -> *NULL* , EXACT
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
 // q -> undefined , EXACT
 
    q = pi;
 
 // Points To:
-// i -> *NULL_POINTER* , EXACT
-// pi -> *NULL_POINTER* , MAY
+// i -> *NULL* , EXACT
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _pi_1[0] , MAY
 
    q++;
 
 // Points To:
-// i -> *NULL_POINTER* , EXACT
-// pi -> *NULL_POINTER* , MAY
+// i -> *NULL* , EXACT
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
 // q -> _pi_1[1] , EXACT
 
@@ -63,7 +63,7 @@ int formal_parameter01a(int **pi)
    pi = &i;
 
 // Points To:
-// i -> *NULL_POINTER* , EXACT
+// i -> *NULL* , EXACT
 // pi -> i , EXACT
 // q -> _pi_1[1] , EXACT
 

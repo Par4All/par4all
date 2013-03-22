@@ -3,9 +3,9 @@ Points-to for "global03"
 
 
 // Points To IN:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_84[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_92[0] , MAY
 
 
@@ -22,7 +22,7 @@ int global03a()
 
 // Points To:
 // p -> i[0] , EXACT
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_84[0] , MAY
 
    *pi = 1;
@@ -36,7 +36,7 @@ int global03a()
 // Points To:
 // p -> i[0] , EXACT
 // pi -> _pi_84[1] , EXACT
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_92[0] , MAY
 
    q->one = 1;

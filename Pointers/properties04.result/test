@@ -3,7 +3,7 @@ Points-to for properties04
 
 
 // Points To IN:
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_1[0] , MAY
 
 
@@ -19,7 +19,7 @@ int properties04(int **q)
    int i;
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_1[0] , MAY
 
 

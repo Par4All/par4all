@@ -3,35 +3,35 @@ Points-to for "chain"
 
 
 // Points To IN:
-// c1 -> *NULL_POINTER* , MAY
+// c1 -> *NULL* , MAY
 // c1 -> _c1_1 , MAY
-// c2 -> *NULL_POINTER* , MAY
+// c2 -> *NULL* , MAY
 // c2 -> _c2_2 , MAY
 
 
 // Points To OUT:
-// _c1_1.next -> *NULL_POINTER* , MAY
+// _c1_1.next -> *NULL* , MAY
 // _c1_1.next -> _c2_2 , MAY
 // c1 -> _c1_1 , EXACT
-// c2 -> *NULL_POINTER* , MAY
+// c2 -> *NULL* , MAY
 // c2 -> _c2_2 , MAY
 
 void chain(ilp_t c1, ilp_t c2)
 {
 
 // Points To:
-// c1 -> *NULL_POINTER* , MAY
+// c1 -> *NULL* , MAY
 // c1 -> _c1_1 , MAY
-// c2 -> *NULL_POINTER* , MAY
+// c2 -> *NULL* , MAY
 // c2 -> _c2_2 , MAY
 
    c1->next = c2;
 
 // Points To:
-// _c1_1.next -> *NULL_POINTER* , MAY
+// _c1_1.next -> *NULL* , MAY
 // _c1_1.next -> _c2_2 , MAY
 // c1 -> _c1_1 , EXACT
-// c2 -> *NULL_POINTER* , MAY
+// c2 -> *NULL* , MAY
 // c2 -> _c2_2 , MAY
 
 
@@ -96,7 +96,7 @@ int main()
 
 // Points To:
 // *HEAP*_l_17.ip -> undefined , EXACT
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // *HEAP*_l_18.ip -> undefined , EXACT
 // *HEAP*_l_18.next -> undefined , EXACT
 // x1 -> *HEAP*_l_17 , MAY
@@ -106,9 +106,9 @@ int main()
 
 // Points To:
 // *HEAP*_l_17.ip -> undefined , EXACT
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // *HEAP*_l_18.ip -> undefined , EXACT
-// *HEAP*_l_18.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_18.next -> *NULL* , MAY
 // x1 -> *HEAP*_l_17 , MAY
 // x2 -> *HEAP*_l_18 , MAY
 
@@ -118,9 +118,9 @@ int main()
 // Points To:
 // *HEAP*_l_17.next -> *HEAP*_l_18 , MAY
 // *HEAP*_l_17.ip -> undefined , EXACT
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // *HEAP*_l_18.ip -> undefined , EXACT
-// *HEAP*_l_18.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_18.next -> *NULL* , MAY
 // x1 -> *HEAP*_l_17 , MAY
 // x2 -> *HEAP*_l_18 , MAY
 

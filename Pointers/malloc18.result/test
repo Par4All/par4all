@@ -65,7 +65,7 @@ int main()
 // *HEAP*_l_18[0].second -> *HEAP*_l_22[0] , MAY
 // *HEAP*_l_18[*].first -> undefined , MAY
 // *HEAP*_l_18[*].second -> undefined , MAY
-// ps -> *NULL_POINTER* , EXACT
+// ps -> *NULL* , EXACT
 // qs -> *HEAP*_l_18[1] , MAY
 
 

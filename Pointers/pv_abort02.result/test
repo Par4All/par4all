@@ -39,7 +39,7 @@ int main()
    a = (int **) (void *) 0;
 
 // Points To:
-// a -> *NULL_POINTER* , EXACT
+// a -> *NULL* , EXACT
 
    a[0] = &b;
 

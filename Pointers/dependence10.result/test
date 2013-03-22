@@ -30,12 +30,12 @@ POINTS TO for "dependence10"
 
 
 // Points To IN:
-// a -> *NULL_POINTER* , MAY
+// a -> *NULL* , MAY
 // a -> _a_2[0] , MAY
 
 
 // Points To OUT:
-// a -> *NULL_POINTER* , MAY
+// a -> *NULL* , MAY
 // a -> _a_2[0] , MAY
 
 void dependence10(int flag, int *a)
@@ -56,7 +56,7 @@ void dependence10(int flag, int *a)
    int i;
 
 // Points To:
-// a -> *NULL_POINTER* , MAY
+// a -> *NULL* , MAY
 // a -> _a_2[0] , MAY
 // p -> undefined , EXACT
 
@@ -65,7 +65,7 @@ void dependence10(int flag, int *a)
    if (flag)
 
 // Points To:
-// a -> *NULL_POINTER* , MAY
+// a -> *NULL* , MAY
 // a -> _a_2[0] , MAY
 // p -> undefined , EXACT
 
@@ -78,9 +78,9 @@ void dependence10(int flag, int *a)
       p = b;
 
 // Points To:
-// a -> *NULL_POINTER* , MAY
+// a -> *NULL* , MAY
 // a -> _a_2[0] , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _a_2[0] , MAY
 // p -> b[0] , MAY
 
@@ -90,9 +90,9 @@ void dependence10(int flag, int *a)
    for(i = 0; i <= 9; i += 1)
 
 // Points To:
-// a -> *NULL_POINTER* , MAY
+// a -> *NULL* , MAY
 // a -> _a_2[0] , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _a_2[0] , MAY
 // p -> b[0] , MAY
 

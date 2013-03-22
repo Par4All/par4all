@@ -40,9 +40,9 @@ POINTS-TO
 
 
 // Points To IN:
-// col -> *NULL_POINTER* , MAY
+// col -> *NULL* , MAY
 // col -> _col_4[0] , MAY
-// nbout -> *NULL_POINTER* , MAY
+// nbout -> *NULL* , MAY
 // nbout -> _nbout_6[0] , MAY
 
 
@@ -54,13 +54,13 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 {
 
 // Points To:
-// nbout -> *NULL_POINTER* , MAY
+// nbout -> *NULL* , MAY
 // nbout -> _nbout_6[0] , MAY
 
    if (c=='\n'||c=='\r')
 
 // Points To:
-// col -> *NULL_POINTER* , MAY
+// col -> *NULL* , MAY
 // col -> _col_4[0] , MAY
 
       /* on change de ligne */
@@ -69,7 +69,7 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
    else {
 
 // Points To:
-// col -> *NULL_POINTER* , MAY
+// col -> *NULL* , MAY
 // col -> _col_4[0] , MAY
 
       /* indentation ok ? */
@@ -84,7 +84,7 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 
 // Points To:
 // col -> _col_4[0] , EXACT
-// nbout -> *NULL_POINTER* , MAY
+// nbout -> *NULL* , MAY
 // nbout -> _nbout_6[0] , MAY
 
          (*nbout)++;
@@ -105,7 +105,7 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 
 // Points To:
 // col -> _col_4[0] , EXACT
-// nbout -> *NULL_POINTER* , MAY
+// nbout -> *NULL* , MAY
 // nbout -> _nbout_6[0] , MAY
 
    
@@ -115,7 +115,7 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 
 // Points To:
 // col -> _col_4[0] , EXACT
-// nbout -> *NULL_POINTER* , MAY
+// nbout -> *NULL* , MAY
 // nbout -> _nbout_6[0] , MAY
 
    (*nbout)++;

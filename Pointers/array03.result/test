@@ -3,7 +3,7 @@ Points-to for "foo"
 
 
 // Points To IN:
-// b -> *NULL_POINTER* , MAY
+// b -> *NULL* , MAY
 // b -> _b_1[0][0] , MAY
 
 
@@ -18,7 +18,7 @@ int foo(float (*b)[3])
    float c;
 
 // Points To:
-// b -> *NULL_POINTER* , MAY
+// b -> *NULL* , MAY
 // b -> _b_1[0][0] , MAY
 
    (*b)[3] = 2.0;

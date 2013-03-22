@@ -64,7 +64,7 @@ POINTS-TO
 
 
 // Points To IN:
-// stdout -> *NULL_POINTER* , MAY
+// stdout -> *NULL* , MAY
 // stdout -> _stdout_[0] , MAY
 
 
@@ -113,7 +113,7 @@ int main(void)
 // p1 -> alloc_pointer:*HEAP*_l_14 , MAY
 // p2 -> alloc_pointer:*HEAP*_l_14 , MAY
 // p3 -> alloc_pointer:*HEAP*_l_14 , MAY
-// stdout -> *NULL_POINTER* , MAY
+// stdout -> *NULL* , MAY
 // stdout -> _stdout_[0] , MAY
 
    

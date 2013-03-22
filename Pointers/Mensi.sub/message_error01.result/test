@@ -15,7 +15,7 @@ POINTS TO for message_error01
 
 
 // Points To IN:
-// msg -> *NULL_POINTER* , MAY
+// msg -> *NULL* , MAY
 // msg -> _msg_1 , MAY
 
 
@@ -25,13 +25,13 @@ void msg_error(char *msg)
 {
 
 // Points To:
-// msg -> *NULL_POINTER* , MAY
+// msg -> *NULL* , MAY
 // msg -> _msg_1 , MAY
 
    printf("%s", msg);
 
 // Points To:
-// msg -> *NULL_POINTER* , MAY
+// msg -> *NULL* , MAY
 // msg -> _msg_1 , MAY
 
    exit(1);

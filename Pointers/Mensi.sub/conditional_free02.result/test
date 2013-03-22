@@ -3,7 +3,7 @@ Points-to for "conditional_free02"
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
 
 
@@ -11,48 +11,48 @@ Points-to for "conditional_free02"
 // p -> *HEAP*_l_13 , MAY
 // p -> *HEAP*_l_8 , MAY
 // p -> undefined , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
 
 int conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 {
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
 
    int *q = p, i = 0;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _p_1 , MAY
 
    if (c1)
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _p_1 , MAY
 
       p = (int *) malloc(sizeof(int));
 
 // Points To:
 // p -> *HEAP*_l_8 , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _p_1 , MAY
 
    if (c2) {
 
 // Points To:
 // p -> *HEAP*_l_8 , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _p_1 , MAY
 
       free(p);
@@ -60,7 +60,7 @@ int conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 // Points To:
 // p -> undefined , EXACT
 // q -> undefined , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _p_1 , MAY
 
       i++;
@@ -69,10 +69,10 @@ int conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 // Points To:
 // p -> *HEAP*_l_8 , MAY
 // p -> undefined , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
 // q -> undefined , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _p_1 , MAY
 
    if (c3)
@@ -80,10 +80,10 @@ int conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 // Points To:
 // p -> *HEAP*_l_8 , MAY
 // p -> undefined , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
 // q -> undefined , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _p_1 , MAY
 
       p = (int *) malloc(sizeof(int));
@@ -92,10 +92,10 @@ int conditional_free02(int *p, _Bool c1, _Bool c2, _Bool c3)
 // p -> *HEAP*_l_13 , MAY
 // p -> *HEAP*_l_8 , MAY
 // p -> undefined , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
 // q -> undefined , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _p_1 , MAY
 
    return *q;

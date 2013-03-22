@@ -3,30 +3,30 @@ Points-to for "foo"
 
 
 // Points To IN:
-// _p2_2[0] -> *NULL_POINTER* , MAY
+// _p2_2[0] -> *NULL* , MAY
 // _p2_2[0] -> _p2_2_2[0][0] , MAY
-// p1 -> *NULL_POINTER* , MAY
+// p1 -> *NULL* , MAY
 // p1 -> _p1_1[0] , MAY
-// p2 -> *NULL_POINTER* , MAY
+// p2 -> *NULL* , MAY
 // p2 -> _p2_2[0] , MAY
-// q3 -> *NULL_POINTER* , MAY
+// q3 -> *NULL* , MAY
 // q3 -> _q3_3[0] , MAY
-// r4 -> *NULL_POINTER* , MAY
+// r4 -> *NULL* , MAY
 // r4 -> _r4_4[0] , MAY
 
 
 // Points To OUT:
-// _p1_1[0] -> *NULL_POINTER* , MAY
+// _p1_1[0] -> *NULL* , MAY
 // _p1_1[0] -> _q3_3[0] , MAY
-// _p2_2[0] -> *NULL_POINTER* , MAY
+// _p2_2[0] -> *NULL* , MAY
 // _p2_2[0] -> _p2_2_2[0][0] , MAY
-// _p2_2_2[0][0] -> *NULL_POINTER* , MAY
+// _p2_2_2[0][0] -> *NULL* , MAY
 // _p2_2_2[0][0] -> _r4_4[0] , MAY
 // p1 -> _p1_1[0] , EXACT
 // p2 -> _p2_2[0] , EXACT
-// q3 -> *NULL_POINTER* , MAY
+// q3 -> *NULL* , MAY
 // q3 -> _q3_3[0] , MAY
-// r4 -> *NULL_POINTER* , MAY
+// r4 -> *NULL* , MAY
 // r4 -> _r4_4[0] , MAY
 
 void foo(int ***p1, int ***p2, int **q3, int *r4)
@@ -37,39 +37,39 @@ void foo(int ***p1, int ***p2, int **q3, int *r4)
    int **l;
 
 // Points To:
-// _p2_2[0] -> *NULL_POINTER* , MAY
+// _p2_2[0] -> *NULL* , MAY
 // _p2_2[0] -> _p2_2_2[0][0] , MAY
 // l -> undefined , EXACT
-// p2 -> *NULL_POINTER* , MAY
+// p2 -> *NULL* , MAY
 // p2 -> _p2_2[0] , MAY
 
    l = *p2;
 
 // Points To:
-// _p2_2[0] -> *NULL_POINTER* , MAY
+// _p2_2[0] -> *NULL* , MAY
 // _p2_2[0] -> _p2_2_2[0][0] , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // l -> _p2_2_2[0][0] , MAY
-// p1 -> *NULL_POINTER* , MAY
+// p1 -> *NULL* , MAY
 // p1 -> _p1_1[0] , MAY
 // p2 -> _p2_2[0] , EXACT
-// q3 -> *NULL_POINTER* , MAY
+// q3 -> *NULL* , MAY
 // q3 -> _q3_3[0] , MAY
 
    *p1 = q3;
 
 // Points To:
-// _p1_1[0] -> *NULL_POINTER* , MAY
+// _p1_1[0] -> *NULL* , MAY
 // _p1_1[0] -> _q3_3[0] , MAY
-// _p2_2[0] -> *NULL_POINTER* , MAY
+// _p2_2[0] -> *NULL* , MAY
 // _p2_2[0] -> _p2_2_2[0][0] , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // l -> _p2_2_2[0][0] , MAY
 // p1 -> _p1_1[0] , EXACT
 // p2 -> _p2_2[0] , EXACT
-// q3 -> *NULL_POINTER* , MAY
+// q3 -> *NULL* , MAY
 // q3 -> _q3_3[0] , MAY
-// r4 -> *NULL_POINTER* , MAY
+// r4 -> *NULL* , MAY
 // r4 -> _r4_4[0] , MAY
 
    *l = r4;
@@ -281,10 +281,10 @@ int main()
 // Points To:
 // *HEAP*_l_24 -> *HEAP*_l_25 , MAY
 // *HEAP*_l_24 -> *HEAP*_l_33 , MAY
-// *HEAP*_l_24 -> *NULL_POINTER* , MAY
+// *HEAP*_l_24 -> *NULL* , MAY
 // *HEAP*_l_25 -> *HEAP*_l_26 , MAY
 // *HEAP*_l_25 -> *HEAP*_l_37 , MAY
-// *HEAP*_l_25 -> *NULL_POINTER* , MAY
+// *HEAP*_l_25 -> *NULL* , MAY
 // *HEAP*_l_30 -> *HEAP*_l_25 , MAY
 // *HEAP*_l_33 -> *HEAP*_l_34 , MAY
 // a1 -> *HEAP*_l_24 , MAY
@@ -298,10 +298,10 @@ int main()
 // Points To:
 // *HEAP*_l_24 -> *HEAP*_l_25 , MAY
 // *HEAP*_l_24 -> *HEAP*_l_33 , MAY
-// *HEAP*_l_24 -> *NULL_POINTER* , MAY
+// *HEAP*_l_24 -> *NULL* , MAY
 // *HEAP*_l_25 -> *HEAP*_l_26 , MAY
 // *HEAP*_l_25 -> *HEAP*_l_37 , MAY
-// *HEAP*_l_25 -> *NULL_POINTER* , MAY
+// *HEAP*_l_25 -> *NULL* , MAY
 // *HEAP*_l_30 -> *HEAP*_l_25 , MAY
 // *HEAP*_l_33 -> *HEAP*_l_34 , MAY
 // a1 -> *HEAP*_l_24 , MAY
@@ -314,10 +314,10 @@ int main()
 // Points To:
 // *HEAP*_l_24 -> *HEAP*_l_25 , MAY
 // *HEAP*_l_24 -> *HEAP*_l_33 , MAY
-// *HEAP*_l_24 -> *NULL_POINTER* , MAY
+// *HEAP*_l_24 -> *NULL* , MAY
 // *HEAP*_l_25 -> *HEAP*_l_26 , MAY
 // *HEAP*_l_25 -> *HEAP*_l_37 , MAY
-// *HEAP*_l_25 -> *NULL_POINTER* , MAY
+// *HEAP*_l_25 -> *NULL* , MAY
 // *HEAP*_l_30 -> *HEAP*_l_25 , MAY
 // *HEAP*_l_33 -> *HEAP*_l_34 , MAY
 // a1 -> *HEAP*_l_24 , MAY

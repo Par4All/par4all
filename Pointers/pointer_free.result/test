@@ -3,7 +3,7 @@ Points-to for "pointer_free"
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
 
@@ -14,7 +14,7 @@ void pointer_free(pointer p)
 {
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
    free(p);
@@ -56,7 +56,7 @@ Points-to for "pointer_free"
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
 
@@ -67,7 +67,7 @@ void pointer_free(pointer p)
 {
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
    free(p);

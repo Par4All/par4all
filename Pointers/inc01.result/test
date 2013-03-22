@@ -3,12 +3,12 @@ POINTS TO for "inc01"
 
 
 // Points To IN:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
 
 
 // Points To OUT:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
 
 int inc01(int *pi)
@@ -24,29 +24,29 @@ int inc01(int *pi)
    int i = 0;
 
 // Points To:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
 // q -> undefined , EXACT
 
    q = pi;
 
 // Points To:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _pi_1[0] , MAY
 
    i = *q;
 
 // Points To:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
 // q -> _pi_1[0] , EXACT
 
    *q = i++;
 
 // Points To:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
 // q -> _pi_1[0] , EXACT
 

@@ -3,12 +3,12 @@ POINTS TO for "main"
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
 
 // Points To OUT:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
 int if15(int *p)
@@ -19,14 +19,14 @@ int if15(int *p)
    int *q, i;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 // q -> undefined , EXACT
 
    if (p==(void *) 0)
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 // q -> undefined , EXACT
 
       q = &i;
@@ -39,7 +39,7 @@ int if15(int *p)
       q = p;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 // q -> _p_1[0] , MAY
 // q -> i , MAY

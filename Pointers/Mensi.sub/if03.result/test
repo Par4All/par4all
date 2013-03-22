@@ -3,7 +3,7 @@ Points-to for "init"
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
 
 
@@ -14,13 +14,13 @@ void init(int *p)
 {
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
 
    if (p==(void *) 0)
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 
       exit(1);
    else
@@ -48,18 +48,18 @@ int main()
    int *q = (void *) 0;
 
 // Points To:
-// q -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
 
    if (init_p)
 
 // Points To:
-// q -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
 
       q = (int *) malloc(4*sizeof(int));
 
 // Points To:
 // q -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 
    init(q);
 
@@ -118,18 +118,18 @@ int main()
    int *q = (void *) 0;
 
 // Points To:
-// q -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
 
    if (init_p)
 
 // Points To:
-// q -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
 
       q = (int *) malloc(4*sizeof(int));
 
 // Points To:
 // q -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 
    init(q);
 

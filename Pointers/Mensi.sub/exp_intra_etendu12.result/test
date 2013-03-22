@@ -7,9 +7,9 @@ POINTS-TO
 
 // Points To OUT:
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // initialize -> *HEAP*_l_17 , MAY
-// initialize -> *NULL_POINTER* , MAY
+// initialize -> *NULL* , MAY
 
 list * initialize()
 {
@@ -19,90 +19,90 @@ list * initialize()
    list *first = (void *) 0, *previous = (void *) 0;
 
 // Points To:
-// first -> *NULL_POINTER* , EXACT
-// previous -> *NULL_POINTER* , EXACT
+// first -> *NULL* , EXACT
+// previous -> *NULL* , EXACT
 
    _Bool break_p = 0;
 
 // Points To:
-// first -> *NULL_POINTER* , EXACT
-// previous -> *NULL_POINTER* , EXACT
+// first -> *NULL* , EXACT
+// previous -> *NULL* , EXACT
 
    // added to avoid an untructured...
    while (!feof(stdin)&&!break_p) {
 
 // Points To:
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // first -> *HEAP*_l_17 , MAY
-// first -> *NULL_POINTER* , MAY
+// first -> *NULL* , MAY
 // previous -> *HEAP*_l_17 , MAY
-// previous -> *NULL_POINTER* , MAY
+// previous -> *NULL* , MAY
 
       list *nl = (list *) malloc(sizeof(list));
 
 // Points To:
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
 // *HEAP*_l_17.next -> undefined , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // first -> *HEAP*_l_17 , MAY
-// first -> *NULL_POINTER* , MAY
+// first -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // previous -> *HEAP*_l_17 , MAY
-// previous -> *NULL_POINTER* , MAY
+// previous -> *NULL* , MAY
 
       nl->next = (void *) 0;
 
 // Points To:
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // first -> *HEAP*_l_17 , MAY
-// first -> *NULL_POINTER* , MAY
+// first -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // previous -> *HEAP*_l_17 , MAY
-// previous -> *NULL_POINTER* , MAY
+// previous -> *NULL* , MAY
 
       if (scanf("%d", &nl->val)!=1)
 
 // Points To:
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // first -> *HEAP*_l_17 , MAY
-// first -> *NULL_POINTER* , MAY
+// first -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // previous -> *HEAP*_l_17 , MAY
-// previous -> *NULL_POINTER* , MAY
+// previous -> *NULL* , MAY
 
          break_p = 1;
 
 // Points To:
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // first -> *HEAP*_l_17 , MAY
-// first -> *NULL_POINTER* , MAY
+// first -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // previous -> *HEAP*_l_17 , MAY
-// previous -> *NULL_POINTER* , MAY
+// previous -> *NULL* , MAY
 
       if (first==(void *) 0)
 
 // Points To:
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
-// first -> *NULL_POINTER* , EXACT
+// *HEAP*_l_17.next -> *NULL* , MAY
+// first -> *NULL* , EXACT
 // nl -> *HEAP*_l_17 , MAY
 // previous -> *HEAP*_l_17 , MAY
-// previous -> *NULL_POINTER* , MAY
+// previous -> *NULL* , MAY
 
          first = nl;
 
 // Points To:
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // first -> *HEAP*_l_17 , MAY
 // nl -> *HEAP*_l_17 , MAY
 // previous -> *HEAP*_l_17 , MAY
-// previous -> *NULL_POINTER* , MAY
+// previous -> *NULL* , MAY
 
       if (previous!=(void *) 0)
 
 // Points To:
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // first -> *HEAP*_l_17 , MAY
 // nl -> *HEAP*_l_17 , MAY
 // previous -> *HEAP*_l_17 , MAY
@@ -111,22 +111,22 @@ list * initialize()
 
 // Points To:
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // first -> *HEAP*_l_17 , MAY
 // nl -> *HEAP*_l_17 , MAY
 // previous -> *HEAP*_l_17 , MAY
-// previous -> *NULL_POINTER* , MAY
+// previous -> *NULL* , MAY
 
       previous = nl;
    }
 
 // Points To:
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // first -> *HEAP*_l_17 , MAY
-// first -> *NULL_POINTER* , MAY
+// first -> *NULL* , MAY
 // previous -> *HEAP*_l_17 , MAY
-// previous -> *NULL_POINTER* , MAY
+// previous -> *NULL* , MAY
 
    return first;
 }

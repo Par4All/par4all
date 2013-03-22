@@ -20,7 +20,7 @@ int if14()
    p = (void *) 0;
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 
    if (p!=(void *) 0)
 
@@ -30,7 +30,7 @@ int if14()
    else
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 
       p = &j;
 

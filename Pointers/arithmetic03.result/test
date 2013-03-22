@@ -21,12 +21,12 @@ POINTS-TO
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
 
 // Points To OUT:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
 void arithmetic03(int *p)
@@ -37,7 +37,7 @@ void arithmetic03(int *p)
    int *q;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 // q -> undefined , EXACT
 
@@ -45,9 +45,9 @@ void arithmetic03(int *p)
    q = p;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _p_1[0] , MAY
 
    // not standard compliant as p does not points towards an array, but
@@ -56,7 +56,7 @@ void arithmetic03(int *p)
    q++;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 // q -> _p_1[1] , EXACT
 

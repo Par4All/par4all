@@ -48,9 +48,9 @@ POINTS-TO
 // Points To OUT:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // initialize -> *HEAP*_l_17 , MAY
-// initialize -> *NULL_POINTER* , MAY
+// initialize -> *NULL* , MAY
 
 list * initialize()
 {
@@ -65,7 +65,7 @@ list * initialize()
    list *l = (void *) 0, *nl;
 
 // Points To:
-// l -> *NULL_POINTER* , EXACT
+// l -> *NULL* , EXACT
 // nl -> undefined , EXACT
 // pi -> undefined , EXACT
 
@@ -74,9 +74,9 @@ list * initialize()
 // Points To:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // l -> *HEAP*_l_17 , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
@@ -87,9 +87,9 @@ list * initialize()
 // Points To:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // l -> *HEAP*_l_17 , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
@@ -100,9 +100,9 @@ list * initialize()
 // Points To:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // l -> *HEAP*_l_17 , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
@@ -112,9 +112,9 @@ list * initialize()
 // Points To:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // l -> *HEAP*_l_17 , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
@@ -126,9 +126,9 @@ list * initialize()
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
 // *HEAP*_l_17.val -> undefined , MAY
 // *HEAP*_l_17.next -> undefined , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // l -> *HEAP*_l_17 , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // pi -> *HEAP*_l_15 , MAY
 
@@ -138,9 +138,9 @@ list * initialize()
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
 // *HEAP*_l_17.next -> undefined , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // l -> *HEAP*_l_17 , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // pi -> *HEAP*_l_15 , MAY
 
@@ -149,9 +149,9 @@ list * initialize()
 // Points To:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // l -> *HEAP*_l_17 , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // pi -> *HEAP*_l_15 , MAY
 
@@ -161,9 +161,9 @@ list * initialize()
 // Points To:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // l -> *HEAP*_l_17 , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY

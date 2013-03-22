@@ -3,7 +3,7 @@ POINTS-TO
 
 
 // Points To IN:
-// argv[0] -> *NULL_POINTER* , MAY
+// argv[0] -> *NULL* , MAY
 // argv[0] -> _argv_2[0][0] , MAY
 
 
@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
    float *px;
 
 // Points To:
-// argv[0] -> *NULL_POINTER* , MAY
+// argv[0] -> *NULL* , MAY
 // argv[0] -> _argv_2[0][0] , MAY
 // pi -> undefined , EXACT
 // px -> undefined , EXACT
@@ -30,9 +30,9 @@ int main(int argc, char *argv[])
    char *pc = argv[0];
 
 // Points To:
-// argv[0] -> *NULL_POINTER* , MAY
+// argv[0] -> *NULL* , MAY
 // argv[0] -> _argv_2[0][0] , MAY
-// pc -> *NULL_POINTER* , MAY
+// pc -> *NULL* , MAY
 // pc -> _argv_2[0][0] , MAY
 // pi -> undefined , EXACT
 // px -> undefined , EXACT
@@ -41,9 +41,9 @@ int main(int argc, char *argv[])
    pi = (int *) malloc(sizeof(int));
 
 // Points To:
-// argv[0] -> *NULL_POINTER* , MAY
+// argv[0] -> *NULL* , MAY
 // argv[0] -> _argv_2[0][0] , MAY
-// pc -> *NULL_POINTER* , MAY
+// pc -> *NULL* , MAY
 // pc -> _argv_2[0][0] , MAY
 // pi -> *HEAP*_l_11 , MAY
 // px -> undefined , EXACT
@@ -51,9 +51,9 @@ int main(int argc, char *argv[])
    px = (float *) malloc(sizeof(float));
 
 // Points To:
-// argv[0] -> *NULL_POINTER* , MAY
+// argv[0] -> *NULL* , MAY
 // argv[0] -> _argv_2[0][0] , MAY
-// pc -> *NULL_POINTER* , MAY
+// pc -> *NULL* , MAY
 // pc -> _argv_2[0][0] , MAY
 // pi -> *HEAP*_l_11 , MAY
 // px -> *HEAP*_l_12 , MAY

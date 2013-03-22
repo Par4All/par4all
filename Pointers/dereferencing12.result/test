@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 
 // Points To:
 // p -> undefined , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> argc , MAY
 
    

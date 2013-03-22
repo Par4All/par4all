@@ -3,7 +3,7 @@ POINTS TO for pointer02
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_2[0] , MAY
 
 
@@ -18,7 +18,7 @@ void pointer02(int n, float *p)
    int i;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_2[0] , MAY
 
    p!=(void *) 0?(void) 0:__assert_fail("p!=((void *)0)", "./pointer02.c", 11, (const char *) 0);

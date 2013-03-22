@@ -3,11 +3,11 @@ POINTS-TO
 
 
 // Points To IN:
-// _p_1[1] -> *NULL_POINTER* , MAY
-// _p_1[3] -> *NULL_POINTER* , MAY
+// _p_1[1] -> *NULL* , MAY
+// _p_1[3] -> *NULL* , MAY
 // _p_1[1] -> _p_1_1[1][0] , MAY
 // _p_1[3] -> _p_1_1[3][0] , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
 
@@ -20,9 +20,9 @@ int pointer_reference03(char **p)
 {
 
 // Points To:
-// _p_1[1] -> *NULL_POINTER* , MAY
+// _p_1[1] -> *NULL* , MAY
 // _p_1[1] -> _p_1_1[1][0] , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
    char *q = p[1];
@@ -35,7 +35,7 @@ int pointer_reference03(char **p)
    char *r;
 
 // Points To:
-// _p_1[3] -> *NULL_POINTER* , MAY
+// _p_1[3] -> *NULL* , MAY
 // _p_1[1] -> _p_1_1[1][0] , EXACT
 // _p_1[3] -> _p_1_1[3][0] , MAY
 // p -> _p_1[0] , EXACT

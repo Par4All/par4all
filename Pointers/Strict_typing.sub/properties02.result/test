@@ -3,7 +3,7 @@ Points-to properties02
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_2 , MAY
 
 
@@ -22,7 +22,7 @@ void properties02(int n, int *p)
    int *q = &i;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_2 , MAY
 // q -> i , EXACT
 
