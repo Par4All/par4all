@@ -1,7 +1,8 @@
 /* Same as memcopy_2a, but the formal parameters src and dst are
  * declared char * instead of void *.
  *
- * In this case, the effects with points-to are precise.
+ * In this case, the effects with points-to are precise and the loop
+ * is parallelized.
  */
 
 // Definition of NULL

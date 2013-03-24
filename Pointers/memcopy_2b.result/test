@@ -153,17 +153,17 @@ Data dependence graph
 
  *********************** Use-Def Chains *********************
 
-	12 --> 18 with conflicts
+	13 --> 19 with conflicts
 		from <i-WE-EXACT> to <i-RE-EXACT>
-	12 --> 19 with conflicts
+	13 --> 20 with conflicts
 		from <i-WE-EXACT> to <i-RE-EXACT>
-	16 --> 19 with conflicts
+	17 --> 20 with conflicts
 		from <s-W-EXACT> to <s-R-EXACT>
 		from <s-WE-EXACT> to <s-RE-EXACT>
-	17 --> 19 with conflicts
+	18 --> 20 with conflicts
 		from <d-W-EXACT> to <d-R-EXACT>
 		from <d-WE-EXACT> to <d-RE-EXACT>
-	19 --> 19 with conflicts
+	20 --> 20 with conflicts
 		from <_dst_3[i]-W-EXACT> to <_dst_3[i]-W-EXACT>
 
 ****************** End of Dependence Graph ******************
