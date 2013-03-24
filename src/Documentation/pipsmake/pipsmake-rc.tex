@@ -2450,6 +2450,17 @@ proper_effects_with_points_to > MODULE.proper_effects
         < CALLEES.summary_effects
 \end{PipsMake}
 
+% Specific functions used:
+%
+% simple_effect_to_constant_path_effects_with_points_to
+% eval_simple_cell_with_points_to()
+% generic_eval_cell_with_points_to()
+% transform_sink_cells_from_matching_list
+% simple_cell_reference_with_address_of_cell_reference_translation
+% simple_cell_reference_with_address_of_cell_reference_translation_fi
+%
+% For debugging: EVAL_CELL_WITH_POINTS_TO_DEBUG_LEVEL
+
 \begin{PipsMake}
 proper_effects_with_pointer_values > MODULE.proper_effects
         < PROGRAM.entities
@@ -9482,7 +9493,7 @@ replaced by an index initialization and the loop body. Zero-trip loops are
 replaced by an index initialization. Effects in bound computations are
 preserved.
 
-A lot of dead code can simply be eliminated by testing its precondition
+A lot of unexecuted code can simply be eliminated by testing its precondition
 feasibility. A very simple and fast test may be used if the preconditions
 are normalized when they are computed, but this slows down the
 precondition computation. Or non-normalized preconditions are stored in
@@ -9497,19 +9508,6 @@ property \PipsPropRef{GATHER_FORMATS_AT_BEGINNING} or
 control flow graph of the module is computed.
 
 The cumulated effects are used in debug mode to display information.
-
-%% FIXME : is the following still applicable ? We renamed dead_code_elimination
-%% as expected
-%%
-%% Note that according to~\cite{ASU86}
-%% and~\cite{Muc97} , there is confusion between Dead-code elimination
-%% and Unreachable-code elimination. {\em Unreachable code} is code that
-%% cannot possibly be executed, regardless of the input data. {\em Dead code}
-%% elimination removes code that is executable but that has no effect on the
-%% result of the computation being performed (see Section $18.1$ and Section
-%% $18.10$ of~\cite{Muc97}). So \PipsPassRef{simplify_control} in PIPS is in
-%% fact unreachable code elimination. Dead code elimination is performed by
-%% phase \PipsPassRef{dead_code_elimination}.
 
 The \PipsPassRef{simplify_control} phase also performs some {\em If
   Simplifications} and {\em Loop Simplifications}~\cite{Muc97}.
@@ -9639,7 +9637,7 @@ and removes such dead code is called dead code elimination. So in
 fact, the {\em Use-def elimination} pass in PIPS is a {\em Dead code
   elimination} pass and the {\em Suppress dead code} pass (see
 Section~\ref{sec:dead-code-elimination}) does not have a standard
-name. It could be {\em If and loop simplification} pass.
+name. It could be the {\em control simplification} pass.
 
 The following properties are intended to force some functions to be kept by the
 algorithm, \PipsPropRef{DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS} expect a space
@@ -9669,7 +9667,7 @@ dead_code_elimination          > MODULE.code
         < MODULE.chains
 \end{PipsMake}
 
-For backward compatibility, the previous pass name is preserved.
+For backward compatibility, the next pass name is preserved.
 
 \begin{PipsMake}
 alias use_def_elimination 'Use-Def elimination'
