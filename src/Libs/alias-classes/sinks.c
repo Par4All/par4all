@@ -702,9 +702,9 @@ list reference_to_points_to_sinks(reference r, type et, pt_map in,
     fprintf(stderr, "\n");
   }
 
-  bool to_be_freed;
-  type srt = points_to_reference_to_type(r, &to_be_freed);
-  type rt = compute_basic_concrete_type(srt);
+  //bool to_be_freed;
+  type rt = points_to_reference_to_concrete_type(r);
+  //type rt = compute_basic_concrete_type(srt);
   if(false && eval_p && !pointer_type_p(rt)) {
     // There must be a type mismatch
     pips_user_error("Type mmismatch for reference \"%s\" at line %d.",
@@ -883,7 +883,7 @@ list reference_to_points_to_sinks(reference r, type et, pt_map in,
 	      array_pointer_type_equal_p(et, rt));
   check_type_of_points_to_cells(sinks, rt, eval_p);
 
-  if(to_be_freed) free_type(srt);
+  //if(to_be_freed) free_type(srt);
 
   ifdebug(8) {
     pips_debug(8, "Resulting cells: ");

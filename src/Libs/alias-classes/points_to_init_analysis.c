@@ -584,8 +584,13 @@ points_to create_stub_points_to(cell c, // source of the points-to
     if(source_cd==0 /* && vd==0*/ ) {
       /* You may have a pointer or an unbounded array for source_t... */
       type sink_t = C_type_to_pointed_type(source_t);
-      type stub_t = (strict_p || !type_variable_p(sink_t))?
-		     copy_type(sink_t) : type_to_array_type(sink_t);
+      /* Take care of void * */
+      type r_sink_t = type_void_p(sink_t)? 
+	make_scalar_integer_type(DEFAULT_CHARACTER_TYPE_SIZE)
+	: copy_type(sink_t);
+      type stub_t = (strict_p || !type_variable_p(r_sink_t))?
+		     copy_type(r_sink_t) : type_to_array_type(r_sink_t);
+      free_type(r_sink_t);
       sink_cell = create_scalar_stub_sink_cell(v, stub_t, sink_t, 0, NIL, fs);
       e_exact_p = exact_p;
       free_type(sink_t);

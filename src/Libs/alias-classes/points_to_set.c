@@ -1365,10 +1365,13 @@ list formal_source_to_sinks(cell source, pt_map pts, bool fresh_p)
 
   reference r = cell_any_reference(source);
   entity v = reference_variable(r);
-  type vt = compute_basic_concrete_type(entity_type(v));
-  bool to_be_freed;
-  type source_t =
-    compute_basic_concrete_type(points_to_cell_to_type(source, &to_be_freed));
+  //type vt = compute_basic_concrete_type(entity_type(v));
+  type vt = entity_basic_concrete_type(v);
+  //bool to_be_freed;
+  //type source_t =
+  //  compute_basic_concrete_type(points_to_cell_to_type(source, &to_be_freed));
+  type source_t = points_to_cell_to_concrete_type(source);
+
   pips_assert("The source type is a pointer type", C_pointer_type_p(source_t));
   type st = compute_basic_concrete_type(type_to_pointed_type(source_t));
 
@@ -1381,7 +1384,19 @@ list formal_source_to_sinks(cell source, pt_map pts, bool fresh_p)
   // Should be points_to_cell_dimension(), counting the number of
   // numerical or unbounded dimensions.
 
+  // Beware of void *: it is hard to declare an array of "void", make it "char"
+  // But this is performed at a lower level
+  /*
+  type ast = type_undefined;
+  if(type_void_p(st))
+    ast = make_scalar_integer_type(DEFAULT_CHARACTER_TYPE_SIZE);
+  else
+    ast = copy_type(st);
+  */
+
   points_to pt = create_k_limited_stub_points_to(source, st, array_p, pts);
+
+  //free_type(ast);
 
   if(null_initialization_p) {
     free_approximation(points_to_approximation(pt));
