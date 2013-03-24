@@ -10857,9 +10857,13 @@ LINEARIZE_ARRAY_SKIP_LOCAL_ARRAYS FALSE
 
 \begin{PipsPass}{optimize_expressions}
 This is an experimental section developed by Julien \textsc{Zory} as PhD work~\cite{Zor99}.
-This phase aims at optimizing expression evaluation using algebraic
+%
+This phase aims at optimizing Fortran expression evaluation using algebraic
 properties such as associativity, commutativity, neutral elements and so
 forth.
+%
+It is unfortunately obsolete because it relies on external pieces of
+software.
 
 This phase restructure arithmetic expressions in order (1) to decrease the
 number of operations (e.g. through factorization), (2) to increase the ILP
@@ -10885,11 +10889,14 @@ expressions of mixed types such as \verb|X+1| where \verb|1| is implictly
 promoted from integer to real.
 
 \textbf{Warning}: this phase relies on an external (and unavailable) binary.
-To make it work, you can set \PipsPropRef{EOLE_OPTIMIZATION_STRATEGY} to
+To use it partly, you can set \PipsPropRef{EOLE_OPTIMIZATION_STRATEGY} to
 \verb+"CSE"+ or \verb+"ICM"+, or even \texttt{ICMCSE} to have both.
+%
 This will only activate common subexpressions elimination or invariant
-code motion. Since it is a quite common use case, they have been defined
-as independent phase too. See~\ref{sec:comm-subexpr-elim-1}.
+code motion (in fact, invariant sub-expression hoisting).
+%
+Since it is a quite common use case, they have been defined
+as independent phases too. See~\ref{sec:comm-subexpr-elim-1}.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10946,6 +10953,9 @@ One can use \PipsPropRef{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT} t
 
 The heuristic used for common subexpression elimination is described
 in Chapter~15 of Julien Zory's PhD dissertation~\cite{Zor99}.
+%
+It was designed for Fortran code. Its use for C code is experimental
+and flawed in general.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10980,7 +10990,7 @@ COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS TRUE
 \end{PipsProp}
 
 \begin{PipsPass}{icm}
-Performs invariant code motion over sub expressions
+The icm pass performs invariant code motion over sub-expressions.
 \end{PipsPass}
 
 
