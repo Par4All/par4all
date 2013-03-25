@@ -11318,6 +11318,19 @@ Whether to generate \emph{tiled} kernels on the first thread dimension,
 HWAC_OPENCL_TILING FALSE
 \end{PipsProp}
 
+\subsection{FREIA SigmaC pour MPPA Kalray}
+\label{hwac-freia-opencl}
+
+FREIA compiler for MMPA Kalray SigmaC target.
+
+\begin{PipsMake}
+freia_sigmac_compiler > MODULE.code
+                      > MODULE.callees
+                      > MODULE.sigmac_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+\end{PipsMake}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FUNCTIONS TRANSFORMATIONS
 

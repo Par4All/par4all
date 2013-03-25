@@ -28,6 +28,7 @@ LIB_CFILES = \
 	freia_terapix.c \
 	freia_opencl.c \
 	freia_aipo.c \
+	freia_sigmac.c \
 	dag-utils.c \
 	freia-utils.c \
 	freia_transformations.c

@@ -48,6 +48,9 @@
 #define FREIA_OPENCL_CL_INCLUDES                \
   "#include <freia_opencl_runtime.hcl>"
 
+#define FREIA_SIGMAC_INCLUDES                   \
+  "// sigmac includes: not defined yet\n"
+
 // information about OpenCL handling of an operation
 typedef struct {
   // whether it can be merged

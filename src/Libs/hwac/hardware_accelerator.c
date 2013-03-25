@@ -101,6 +101,8 @@ static bool freia_compiler(const string module, const string hardware)
     DB_PUT_NEW_FILE_RESOURCE(DBR_TERAPIX_FILE, module, freia_file);
   else if (freia_opencl_p(hardware))
     DB_PUT_NEW_FILE_RESOURCE(DBR_OPENCL_FILE, module, freia_file);
+  else if (freia_sigmac_p(hardware))
+    DB_PUT_NEW_FILE_RESOURCE(DBR_SIGMAC_FILE, module, freia_file);
   // else no helper file for AIPO target, which is just a code transformation
 
   // release resources
@@ -135,6 +137,11 @@ bool freia_aipo_compiler(const string module)
 bool freia_opencl_compiler(const string module)
 {
   return freia_compiler(module, "opencl");
+}
+
+bool freia_sigmac_compiler(const string module)
+{
+  return freia_compiler(module, "sigmac");
 }
 
 /* int freia_vhdl_compiler(string module) :-)
