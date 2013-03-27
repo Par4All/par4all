@@ -2238,7 +2238,8 @@ static void xml_Pattern_Paving( region reg,entity var, bool effet_read, Pvecteur
       Psysteme ps1;
       bool  feasible;
       dimension vreg_dim;
-      sc_transform_eg_in_ineg(ps_reg);
+      if (!SC_UNDEFINED_P(ps_reg))
+	sc_transform_eg_in_ineg(ps_reg);
       string_buffer_append_word("Pattern",buffer_pattern);
       string_buffer_append_word("Pavage",buffer_paving);
       global_margin++;
@@ -2253,7 +2254,7 @@ static void xml_Pattern_Paving( region reg,entity var, bool effet_read, Pvecteur
 	find_pattern(ps_reg, paving_indices, formal_parameters, i, &bound_inf, &bound_up, &pattern_up_bound, &iterator);
 
 		phi = (Variable) make_phi_entity(dim);
-	if(base_contains_variable_p(sc_base(ps_reg),phi)) {
+	if(!SC_UNDEFINED_P(ps_reg) && base_contains_variable_p(sc_base(ps_reg),phi)) {
 	  ps1 = sc_dup(ps_reg);
 	  feasible = sc_minmax_of_variable(ps1, (Variable)phi, &min, &max);
 	  if (feasible && min!=VALUE_MIN)
@@ -2351,7 +2352,7 @@ void vars_read_or_written(list effects_list, Pvecteur *vl)
   for (pc= effects_list;pc != NIL; pc = CDR(pc)){
     effect e = EFFECT(CAR(pc));
     reference r = effect_any_reference(e);
-    if (array_entity_p(reference_variable(r))) {
+    if (store_effect_p(e) && array_entity_p(reference_variable(r))) {
       entity v = reference_variable(r);
       if (effect_read_p(e))
 	vect_add_elem(&vin,v,1);
@@ -2389,63 +2390,65 @@ static void  xml_Region_Range(region reg, string_buffer sb_result)
 	}
 	sc_projection_along_variables_ofl_ctrl(&ps_reg,vva , NO_OFL_CTRL);
       */
-      sc_transform_eg_in_ineg(ps_reg);
-      for (i=1;i<=dim;i++) {
-	string_buffer sbi_result=string_buffer_make(true);
-	string_buffer sbu_result=string_buffer_make(true);
-	string string_sbi, string_sbu;
-	int fub = 0;
-	int fib = 0;
-	phi = (Variable) make_phi_entity(i);
-	string_buffer_append(sbi_result,
-			     concatenate("[", NULL));
-	string_buffer_append(sbu_result,
-			     concatenate(";",NULL));
-	for(pc = sc_inegalites(ps_reg); pc!=NULL;pc= pc->succ)
-	  {
-	    int vc = vect_coeff(phi, pc->vecteur);
-	    Pvecteur vvc = vect_dup(pc->vecteur);
-	    string sb= NULL;
-	    string scst;
-	    if (value_pos_p(vc)) { // borne sup
-	      vect_erase_var(&vvc,phi);
-	      vect_chg_sgn(vvc);
-	      sb = vect_to_string(vvc);
-	      if (vc-1)
-		scst =strdup(itoa(vc));
-	      if (fub++)
-		string_buffer_append(sbu_result,
-				     concatenate(",",sb, NULL));
-	      else
-		string_buffer_append(sbu_result,
-				     concatenate(sb, NULL));
-	      if (vc-1)
-		string_buffer_append(sbu_result,
-				     concatenate("/",scst, NULL));
+      if (!SC_UNDEFINED_P(ps_reg)) {
+	sc_transform_eg_in_ineg(ps_reg);
+	for (i=1;i<=dim;i++) {
+	  string_buffer sbi_result=string_buffer_make(true);
+	  string_buffer sbu_result=string_buffer_make(true);
+	  string string_sbi, string_sbu;
+	  int fub = 0;
+	  int fib = 0;
+	  phi = (Variable) make_phi_entity(i);
+	  string_buffer_append(sbi_result,
+			       concatenate("[", NULL));
+	  string_buffer_append(sbu_result,
+			       concatenate(";",NULL));
+	  for(pc = sc_inegalites(ps_reg); pc!=NULL;pc= pc->succ)
+	    {
+	      int vc = vect_coeff(phi, pc->vecteur);
+	      Pvecteur vvc = vect_dup(pc->vecteur);
+	      string sb= NULL;
+	      string scst;
+	      if (value_pos_p(vc)) { // borne sup
+		vect_erase_var(&vvc,phi);
+		vect_chg_sgn(vvc);
+		sb = vect_to_string(vvc);
+		if (vc-1)
+		  scst =strdup(itoa(vc));
+		if (fub++)
+		  string_buffer_append(sbu_result,
+				       concatenate(",",sb, NULL));
+		else
+		  string_buffer_append(sbu_result,
+				       concatenate(sb, NULL));
+		if (vc-1)
+		  string_buffer_append(sbu_result,
+				       concatenate("/",scst, NULL));
+	      }
+	      else if (value_neg_p(vc)) {
+		vect_erase_var(&vvc,phi);
+		sb = vect_to_string(vvc);
+		if (vc+1) scst =strdup(itoa(-1*vc));
+		if (fib++)
+		  string_buffer_append(sbi_result,
+				       concatenate(",",sb, NULL));
+		else
+		  string_buffer_append(sbi_result,
+				       concatenate(sb, NULL));
+		if (vc+1)
+		  string_buffer_append(sbi_result,
+				       concatenate("/",scst, NULL));
+	      }
 	    }
-	    else if (value_neg_p(vc)) {
-	      vect_erase_var(&vvc,phi);
-	      sb = vect_to_string(vvc);
-	      if (vc+1) scst =strdup(itoa(-1*vc));
-	      if (fib++)
-		string_buffer_append(sbi_result,
-				     concatenate(",",sb, NULL));
-	      else
-		string_buffer_append(sbi_result,
-				     concatenate(sb, NULL));
-	      if (vc+1)
-		string_buffer_append(sbi_result,
-				     concatenate("/",scst, NULL));
-	    }
-	  }
-	string_buffer_append(sbu_result,
-			     concatenate("]",NULL));
-	string_sbi = string_buffer_to_string(sbi_result);
-	string_sbu = string_buffer_to_string(sbu_result);
-	string_buffer_append(sb_result,string_sbi);
-	string_buffer_append(sb_result,string_sbu);
+	  string_buffer_append(sbu_result,
+			       concatenate("]",NULL));
+	  string_sbi = string_buffer_to_string(sbi_result);
+	  string_sbu = string_buffer_to_string(sbu_result);
+	  string_buffer_append(sb_result,string_sbi);
+	  string_buffer_append(sb_result,string_sbu);
+	}
+	sc_rm(ps_reg);
       }
-      sc_rm(ps_reg);
     }
   }
 }
@@ -2476,7 +2479,7 @@ static void xml_Region_Parameter(list pattern_region, string_buffer sb_result)
       reg = REGION(CAR(lr));
       ref = effect_any_reference(reg);
       v = reference_variable(ref);
-      if (array_entity_p(reference_variable(ref))
+      if (store_effect_p(reg) && array_entity_p(reference_variable(ref))
 	  && !(entity_static_variable_p(v) && !top_level_entity_p(v))) {
 	string ts = strdup(entity_user_name(v));
 	effet_read = region_read_p(reg);
@@ -2526,7 +2529,7 @@ int find_effect_actions_for_entity(list leff, effect *effr, effect *effw, entity
     effect eff=  EFFECT(CAR(lr));
     reference ref = effect_any_reference(eff);
     entity v = reference_variable(ref);
-    if (same_entity_p(v,e)) {
+    if (store_effect_p(eff) && same_entity_p(v,e)) {
       if (action_read_p(effect_action(eff)))
 	er = true, *effr =eff;
       else ew = true, *effw=eff;
@@ -3704,7 +3707,7 @@ void  xml_Compute_and_Need(entity func,list effects_list, Pvecteur vargs,string_
     reference r = effect_any_reference(e);
     action ac = effect_action(e);
     entity v =  reference_variable(r);
-    if ( array_entity_p(v) &&!io_entity_p(v) && !rand_effects_entity_p(v) 
+    if ( store_effect_p(e) && array_entity_p(v) &&!io_entity_p(v) && !rand_effects_entity_p(v) 
 	 // pour eviter les variables privees et  traiter les tableaux en R+W
 	 &&  (vect_coeff(v,vl) ||  (vect_coeff(v,va2) && !action_read_p(ac))) 
 	 && !(entity_static_variable_p(v) && !top_level_entity_p(v))) {
