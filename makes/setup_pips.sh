@@ -261,8 +261,9 @@ PATH=$prod/newgen/bin:$prod/newgen/bin/$PIPS_ARCH:$PATH \
     $make $target
 
 echo
-echo "### checking useful softwares"
-for exe in bash m4 wish latex htlatex javac emacs indent
+echo "### checking for useful softwares"
+# not really: wish htlatex
+for exe in bash m4 latex javac emacs indent
 do
   type $exe || echo "no such executable, consider installing: $exe"
 done
