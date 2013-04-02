@@ -1,0 +1,94 @@
+
+PROPER  EFFECTS
+
+void array_addition01(float **a1, float **a2, int m, int n)
+{
+   int i, j;
+//             <    is read   >: m
+//             <    is written>: i
+   for(i = 0; i <= m-1; i += 1)
+//             <    is read   >: m n
+//             <    is written>: j
+      for(j = 0; j <= n-1; j += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+         a2[i][j] = a1[i][j]+2;
+   return;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// a1 -> *NULL* , MAY
+// a1 -> _a1_1[0] , MAY
+// a2 -> *NULL* , MAY
+// a2 -> _a2_2[0] , MAY
+
+
+// Points To OUT:
+// a1 -> _a1_1[0] , EXACT
+// a2 -> _a2_2[0] , EXACT
+
+void array_addition01(float **a1, float **a2, int m, int n)
+{
+
+// Points To: none
+
+   int i, j;
+
+// Points To: none
+
+   for(i = 0; i <= m-1; i += 1)
+
+// Points To:
+// a1 -> _a1_1[0] , EXACT
+// a2 -> _a2_2[0] , EXACT
+
+      for(j = 0; j <= n-1; j += 1)
+
+// Points To:
+// a1 -> *NULL* , MAY
+// a1 -> _a1_1[0] , MAY
+// a2 -> *NULL* , MAY
+// a2 -> _a2_2[0] , MAY
+
+         a2[i][j] = a1[i][j]+2;
+
+// Points To:
+// a1 -> _a1_1[0] , EXACT
+// a2 -> _a2_2[0] , EXACT
+
+   return;
+}
+
+PROPER  EFFECTS WITH POINTS-TO
+
+void array_addition01(float **a1, float **a2, int m, int n)
+{
+   int i, j;
+//             <    is read   >: m
+//             <    is written>: i
+   for(i = 0; i <= m-1; i += 1)
+//             <    is read   >: m n
+//             <    is written>: j
+      for(j = 0; j <= n-1; j += 1)
+//             <    is read   >: _a1_1[i] _a2_2[i] a1 a2 i j m n
+         a2[i][j] = a1[i][j]+2;
+   return;
+}
+
+RW regions
+
+void array_addition01(float **a1, float **a2, int m, int n)
+{
+   int i, j;
+   for(i = 0; i <= m-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+         a2[i][j] = a1[i][j]+2;
+   return;
+}

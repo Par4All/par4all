@@ -15,6 +15,13 @@ setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
 create printf printf.c
 
 
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[error]
+
 echo 
 echo POINTS-TO
 echo
