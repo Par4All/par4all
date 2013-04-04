@@ -39,7 +39,7 @@ POLYLIB='polylib-5.22.5'
 
 # minimal help
 command=${0/*\//}
-usage="$command [destination-directory [developer [checkout|export]]]"
+usage="$command [--opts] [directory [developer [checkout|export]]]"
 
 function error()
 {
@@ -61,22 +61,34 @@ function warn()
   read
 }
 
-case $1 in
-  -h|--help)
-    echo "usage: $usage" ;
-    echo " directory defaults to ./MYPIPS" ;
-    echo " default user is current user" ;
-    echo " default svn command is checkout" ;
-    exit 0 ;
-    ;;
-  -v|--version)
+# compilation option
+gpips=
+
+while [[ $1 == -* ]]
+do
+  opt=$1
+  shift
+  case $opt in
+    --gpips)
+      gpips=1
+      ;;
+    -h|--help)
+      echo "usage: $usage" ;
+      echo " directory defaults to ./MYPIPS" ;
+      echo " default user is current user" ;
+      echo " default svn command is checkout" ;
+      echo " options: --gpips to compile gpips" ;
+      exit 0 ;
+      ;;
+    -v|--version)
     echo 'version is $Id$' ;
-    exit 0 ;
-    ;;
-  -*)
-    error "unexpected option $1" ;
-    ;;
-esac
+      exit 0 ;
+      ;;
+    -*)
+      error "unexpected option $1" ;
+      ;;
+  esac
+done
 
 # arguments
 destination=${1:-`pwd`/MYPIPS}
@@ -159,7 +171,7 @@ type htlatex && echo '_HAS_HTLATEX_ = 1' >> $config
 type emacs && echo '_HAS_EMACS_ = 1' >> $config
 type pkg-config && has_pkgconfig=1
 
-if [ "$has_pkgconfig" ]
+if [ "$has_pkgconfig" -a "$gpips" ]
 then
   echo '_HAS_PKGCONFIG_ = 1' >> $config
   if pkg-config --exists gtk+-2.0
