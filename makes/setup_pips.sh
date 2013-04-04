@@ -30,16 +30,53 @@
 }
 
 # where to get pips
-SVN_CRI='https://svn.cri.ensmp.fr/svn'
+SVN_CRI='https://scm.cri.ensmp.fr/svn'
 PIPS_SVN=$SVN_CRI/pips
 
 #POLYLIB_SITE='http://www.cri.ensmp.fr/pips'
 POLYLIB_SITE='http://icps.u-strasbg.fr/polylib/polylib_src'
 POLYLIB='polylib-5.22.5'
 
-# help
+# minimal help
 command=${0/*\//}
-usage="usage: $command [destination-directory [developer [checkout|export]]]"
+usage="$command [destination-directory [developer [checkout|export]]]"
+
+function error()
+{
+  echo "$@" >&2
+  echo "usage: $usage" >&2
+  exit 1
+}
+
+function warn()
+{
+  {
+    echo
+    echo "WARNING"
+    for msg in "$@" ; do
+      echo $msg ;
+    done
+    echo "Type return to continue"
+  } >&2
+  read
+}
+
+case $1 in
+  -h|--help)
+    echo "usage: $usage" ;
+    echo " directory defaults to ./MYPIPS" ;
+    echo " default user is current user" ;
+    echo " default svn command is checkout" ;
+    exit 0 ;
+    ;;
+  -v|--version)
+    echo 'version is $Id$' ;
+    exit 0 ;
+    ;;
+  -*)
+    error "unexpected option $1" ;
+    ;;
+esac
 
 # arguments
 destination=${1:-`pwd`/MYPIPS}
@@ -52,25 +89,6 @@ make=${MAKE:-make}
 # If the destination directory is relative, transform it in an absolute
 # path name:
 [[ $destination != /* ]] && destination=`pwd`/$destination
-
-error()
-{
-  echo "$@" >&2
-  exit 1
-}
-
-warn()
-{
-  {
-    echo
-    echo "WARNING"
-    for msg in "$@" ; do
-      echo $msg ;
-    done
-    echo "Type return to continue"
-  } >&2
-  read
-}
 
 test -d $destination  && \
     warn "Directory $destination already exists!" \
