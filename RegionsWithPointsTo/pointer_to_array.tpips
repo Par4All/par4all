@@ -8,6 +8,28 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 create pointer_to_array pointer_to_array.c
 
 
+
+echo
+echo Points-to lists
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[init_tab_dynamique]
+
+echo 
+echo PROPER  EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[init_tab_dynamique]
+
+
+echo 
+echo  CUMULATED EFFECTS WITH POINTS TO
+echo
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[init_tab_dynamique]
+
 echo
 echo Points-to lists
 echo
@@ -28,6 +50,8 @@ echo
 activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[main]
+
+
 
 
 
