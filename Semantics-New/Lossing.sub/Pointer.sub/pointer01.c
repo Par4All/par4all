@@ -1,17 +1,19 @@
 
-
+/*
 int mainChar()
 {
   char a[10];
   char *p, *q;
   
-  q=&a[0];
+  q=a;
   p=q+1;
   
   *q = 0;
   *p = 0;
+  
+  return 0;
 }
-/*
+*/
 int mainInt()
 {
   int a[10];
@@ -22,8 +24,10 @@ int mainInt()
   
   *q = 0;
   *p = 0;
+  
+  return 0;
 }
-
+/*
 int mainFloat()
 {
   float a[10];
@@ -34,6 +38,8 @@ int mainFloat()
   
   *q = 0;
   *p = 0;
+  
+  return 0;
 }
 
 int mainDouble()
@@ -46,5 +52,7 @@ int mainDouble()
   
   *q = 0;
   *p = 0;
+  
+  return 0;
 }
 */

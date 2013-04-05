@@ -1,4 +1,4 @@
-setenv WSPACE=pointer01
+setenv WSPACE=memcopy01
 delete $WSPACE
 create $WSPACE $WSPACE.c 
 
@@ -14,10 +14,7 @@ echo
 echo Points-to
 echo
 #activate PRINT_CODE_POINTS_TO_LIST
-#display PRINTED_FILE[mainChar]
-#display PRINTED_FILE[mainInt]
-#display PRINTED_FILE[mainFloat]
-#display PRINTED_FILE[mainDouble]
+#display PRINTED_FILE[$WSPACE]
 
 #setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES FALSE
 setproperty SEMANTICS_ANALYZE_SCALAR_POINTER_VARIABLES TRUE
@@ -27,19 +24,13 @@ echo
 echo Transformers
 echo
 activate PRINT_CODE_TRANSFORMERS
-#display PRINTED_FILE[mainChar]
-display PRINTED_FILE[mainInt]
-#display PRINTED_FILE[mainFloat]
-#display PRINTED_FILE[mainDouble]
+display PRINTED_FILE[$WSPACE]
 
 echo
 echo Preconditions
 echo
 activate PRINT_CODE_PRECONDITIONS
-#display PRINTED_FILE[mainChar]
-display PRINTED_FILE[mainInt]
-#display PRINTED_FILE[mainFloat]
-#display PRINTED_FILE[mainDouble]
+display PRINTED_FILE[$WSPACE]
 
 close
 delete $WSPACE

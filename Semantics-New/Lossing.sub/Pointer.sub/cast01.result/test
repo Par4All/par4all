@@ -1,0 +1,57 @@
+
+Points-to
+
+
+Transformers
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(p) {}
+
+   float *p;
+
+//  T(q) {}
+
+   double *q;
+
+//  T(q) {p==q}
+
+
+   q = (float *) p;
+
+//  T(main) {main==0, p==q}
+
+
+   return 0;
+}
+
+Preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   float *p;
+
+//  P(p) {}
+
+   double *q;
+
+//  P(p,q) {}
+
+
+   q = (float *) p;
+
+//  P(p,q) {p==q}
+
+
+   return 0;
+}

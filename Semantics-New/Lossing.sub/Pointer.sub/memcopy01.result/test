@@ -1,0 +1,45 @@
+
+Points-to
+
+
+Transformers
+
+
+//  T() {}
+
+void memcopy01(int size, char src[size], char dst[size])
+{
+
+//  T(i) {}
+
+   int i;
+
+//  T(i) {0<=i, i+1<=size}
+
+   for(i = 0; i <= size-1; i += 1)
+
+//  T() {0<=i, i+1<=size}
+
+      dst[i] = src[i];
+}
+
+Preconditions
+
+
+//  P() {}
+
+void memcopy01(int size, char src[size], char dst[size])
+{
+
+//  P() {}
+
+   int i;
+
+//  P(i) {}
+
+   for(i = 0; i <= size-1; i += 1)
+
+//  P(i) {0<=i, i+1<=size}
+
+      dst[i] = src[i];
+}

@@ -1,0 +1,83 @@
+
+Points-to
+
+
+Transformers
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T() {}
+
+   BYTE a[10];
+
+//  T(p,q) {}
+
+   P_BYTE p, q;
+
+//  T(q) {}
+
+
+   q = a;
+
+//  T(p) {p==q+1}
+
+   p = q+1;
+
+//  T(p,q) {p#init==q#init+1}
+
+
+   *q = 0;
+
+//  T(p,q) {p#init==q#init+1}
+
+   *p = 0;
+
+//  T(main) {main==0, p==q+1}
+
+
+   return 0;
+}
+
+Preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   BYTE a[10];
+
+//  P() {}
+
+   P_BYTE p, q;
+
+//  P(p,q) {}
+
+
+   q = a;
+
+//  P(p,q) {}
+
+   p = q+1;
+
+//  P(p,q) {p==q+1}
+
+
+   *q = 0;
+
+//  P(p,q) {}
+
+   *p = 0;
+
+//  P(p,q) {}
+
+
+   return 0;
+}

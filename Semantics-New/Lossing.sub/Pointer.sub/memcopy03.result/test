@@ -1,0 +1,107 @@
+
+Points-to
+
+
+Transformers
+
+
+//  T() {}
+
+void memcopy03(int size, void *src, void *dst)
+{
+
+//  T(i) {i==size}
+
+   int i = size;
+
+//  T(d,dst,i,s,size,src) {}
+
+   if (src!=(void *) 0&&dst!=(void *) 0) {
+
+//  T(s) {i==size}
+
+      char *s = (char *) src;
+
+//  T(d) {i==size}
+
+      char *d = (char *) dst;
+
+//  T(d,dst,i,s,size,src) {i#init==size#init, 8<=i#init}
+
+      for(i = i; i >= 8; i += -8) {
+
+//  T(d,dst,i,s,size,src) {8<=i#init}
+
+         *((double *) d) = *((double *) s);
+
+//  T(s) {s==s#init+8}
+
+         s += 8;
+      }
+
+//  T(d,dst,i,s,size,src) {i#init<=7}
+
+      while (i!=0) {
+
+//  T(d,dst,i,s,size,src) {}
+
+         *d = *s;
+
+//  T(d,i,s) {d==d#init+1, i==i#init-1, s==s#init+1}
+
+         i--, s++, d++;
+      }
+   }
+}
+
+Preconditions
+
+
+//  P() {}
+
+void memcopy03(int size, void *src, void *dst)
+{
+
+//  P() {}
+
+   int i = size;
+
+//  P(i) {i==size}
+
+   if (src!=(void *) 0&&dst!=(void *) 0) {
+
+//  P(i) {i==size}
+
+      char *s = (char *) src;
+
+//  P(i,s) {i==size}
+
+      char *d = (char *) dst;
+
+//  P(d,i,s) {i==size}
+
+      for(i = i; i >= 8; i += -8) {
+
+//  P(d,dst,i,s,size,src) {8<=i}
+
+         *((double *) d) = *((double *) s);
+
+//  P(d,dst,i,s,size,src) {}
+
+         s += 8;
+      }
+
+//  P(d,dst,i,s,size,src) {i<=7}
+
+      while (i!=0) {
+
+//  P(d,dst,i,s,size,src) {}
+
+         *d = *s;
+
+//  P(d,dst,i,s,size,src) {}
+
+         i--, s++, d++;
+      }
+   }
+}

@@ -1,0 +1,71 @@
+
+Points-to
+
+
+Transformers
+
+
+//  T() {}
+
+void memcopy04(int size, char *src, char *dst)
+{
+
+//  T(i) {}
+
+   int i;
+
+//  T(d,dst,i,s,size,src) {}
+
+   if (src!=(void *) 0&&dst!=(void *) 0) {
+
+//  T(s) {s==src}
+
+      char *s = (char *) src;
+
+//  T(d) {d==dst, s==src}
+
+      char *d = (char *) dst;
+
+//  T(d,dst,i,s,size,src) {d#init==dst#init, s#init==src#init}
+
+      for(i = 0; i <= size-1; i += 1)
+
+//  T(d,dst,i,s,size,src) {0<=i#init}
+
+         *d++ = *s++;
+   }
+}
+
+Preconditions
+
+
+//  P() {}
+
+void memcopy04(int size, char *src, char *dst)
+{
+
+//  P() {}
+
+   int i;
+
+//  P(i) {}
+
+   if (src!=(void *) 0&&dst!=(void *) 0) {
+
+//  P(i) {}
+
+      char *s = (char *) src;
+
+//  P(i,s) {s==src}
+
+      char *d = (char *) dst;
+
+//  P(d,i,s) {d==dst, s==src}
+
+      for(i = 0; i <= size-1; i += 1)
+
+//  P(d,dst,i,s,size,src) {0<=i}
+
+         *d++ = *s++;
+   }
+}
