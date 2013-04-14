@@ -1,0 +1,102 @@
+
+TRANSFORMERS
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i,j,k,k0,n,n0) {}
+
+   int i, j, k, n, k0, n0;
+
+//  T(k,n) {k==k0, n==n0}
+
+   k = k0, n = n0;
+
+//  T(i,j,k,n) {i+j==i#init+j#init, k#init==k0, n#init==n0, k<=k#init,
+//    k#init+n#init<=k+n, k+n<=k#init+n#init+1}
+
+   
+   
+   if (i+j==5) {
+
+//  T(i,j,k,n) {i+j==5, i#init+j#init==5, k+n==k#init+n#init,
+//    k+n==k0+n#init, n#init==n0, 1<=k, 1<=k#init, n#init<=n}
+
+      while (k>0) {
+
+//  T(i,j) {i#init+n==i, j+n==j#init, 1<=k, 1<=k0}
+
+         i += n, j -= n;
+
+//  T(k) {k==k#init-1, 0<=k, 1<=k0}
+
+
+         k--;
+
+//  T(n) {n==n#init+1, 0<=k, 1<=k0}
+
+         n++;
+      }
+
+//  T(n) {i+j==5, k+n==k0+n0+1, n==n#init+1, k<=0, k<=k0}
+
+      n++;
+   }
+
+//  T(main) {main==0, k<=k0, k0+n0<=k+n, k+n<=k0+n0+1}
+
+   return 0;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i, j, k, n, k0, n0;
+
+//  P(i,j,k,k0,n,n0) {}
+
+   k = k0, n = n0;
+
+//  P(i,j,k,k0,n,n0) {k==k0, n==n0}
+
+   
+   
+   if (i+j==5) {
+
+//  P(i,j,k,k0,n,n0) {i+j==5, k==k0, n==n0}
+
+      while (k>0) {
+
+//  P(i,j,k,k0,n,n0) {i+j==5, k+n==k0+n0, 1<=k, k<=k0}
+
+         i += n, j -= n;
+
+//  P(i,j,k,k0,n,n0) {i+j==5, k+n==k0+n0, 1<=k, k<=k0, 1<=k0}
+
+
+         k--;
+
+//  P(i,j,k,k0,n,n0) {i+j==5, k+n==k0+n0-1, 0<=k, k+1<=k0, 1<=k0}
+
+         n++;
+      }
+
+//  P(i,j,k,k0,n,n0) {i+j==5, k+n==k0+n0, k<=0, k<=k0}
+
+      n++;
+   }
+
+//  P(i,j,k,k0,n,n0) {k<=k0, k0+n0<=k+n, k+n<=k0+n0+1}
+
+   return 0;
+}
