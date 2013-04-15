@@ -1,0 +1,138 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// *HEAP*_l_20[*] -> undefined , EXACT
+
+void smvp(int nodes)
+{
+
+// Points To: none
+
+   // BEGIN BLOCK
+
+// Points To: none
+
+   int i, j;
+
+// Points To: none
+
+   int **w2 = (int **) malloc(2*sizeof(int *));
+
+// Points To:
+// *HEAP*_l_20[*] -> undefined , EXACT
+// w2 -> *HEAP*_l_20[0] , MAY
+
+   for(j = 0; j <= 1; j += 1)
+
+// Points To:
+// *HEAP*_l_20[*] -> undefined , EXACT
+// w2 -> *HEAP*_l_20[0] , MAY
+
+      for(i = 0; i <= nodes-1; i += 1)
+
+// Points To:
+// *HEAP*_l_20[*] -> undefined , EXACT
+// w2 -> *HEAP*_l_20[0] , MAY
+
+         w2[j][i] = i;
+
+// Points To:
+// *HEAP*_l_20[*] -> undefined , EXACT
+// w2 -> *HEAP*_l_20[0] , MAY
+
+   
+   
+   return;
+   // END BLOCK
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void smvp(int nodes)
+{
+   // BEGIN BLOCK
+   int i, j;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: w2 _MALLOC_EFFECTS:_MALLOC_
+   int **w2 = (int **) malloc(2*sizeof(int *));
+//             <    is written>: j
+   for(j = 0; j <= 1; j += 1)
+//             <    is read   >: nodes
+//             <    is written>: i
+      for(i = 0; i <= nodes-1; i += 1)
+//             <may be read   >: *HEAP*_l_20[j]
+//             <may be written>: *HEAP*_l_20[j][i]
+//             <    is read   >: i j nodes w2
+         w2[j][i] = i;
+   
+   
+   return;
+   // END BLOCK
+}
+
+CUMULATED EFFECTS WITH POINTS TO
+
+//             <    is read   >: nodes _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+void smvp(int nodes)
+{
+//             <may be read   >: *HEAP*_l_20[*]
+//             <may be written>: *HEAP*_l_20
+//             <    is read   >: nodes _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   // BEGIN BLOCK
+   int i, j;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: w2 _MALLOC_EFFECTS:_MALLOC_
+   int **w2 = (int **) malloc(2*sizeof(int *));
+//             <may be read   >: *HEAP*_l_20[*] i j w2
+//             <may be written>: *HEAP*_l_20[*][*]
+//             <    is read   >: nodes
+//             <    is written>: i j
+   for(j = 0; j <= 1; j += 1)
+//             <may be read   >: *HEAP*_l_20[*] i j w2
+//             <may be written>: *HEAP*_l_20[*][*]
+//             <    is read   >: nodes
+//             <    is written>: i
+      for(i = 0; i <= nodes-1; i += 1)
+//             <may be read   >: *HEAP*_l_20[*]
+//             <may be written>: *HEAP*_l_20[*][*]
+//             <    is read   >: i j nodes w2
+         w2[j][i] = i;
+   
+   
+   return;
+   // END BLOCK
+}
+
+RW regions
+
+void smvp(int nodes)
+{
+   // BEGIN BLOCK
+   int i, j;
+
+//  <w2-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   int **w2 = (int **) malloc(2*sizeof(int *));
+   for(j = 0; j <= 1; j += 1)
+      for(i = 0; i <= nodes-1; i += 1)
+
+//  <*HEAP*_l_20[PHI1]-R-MAY-{PHI1==j, 0<=i, i+1<=nodes, 0<=j, j<=1}>
+//  <*HEAP*_l_20[PHI1][PHI2]-W-MAY-{PHI1==j, PHI2==i, 0<=i,
+//    i+1<=nodes, 0<=j, j<=1}>
+//  <w2-R-EXACT-{}>
+
+         w2[j][i] = i;
+   
+   
+   return;
+   // END BLOCK
+}

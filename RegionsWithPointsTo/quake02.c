@@ -19,7 +19,7 @@ void smvp(int nodes)
   int i,j;
   int **w2 = (int **) malloc(2 * sizeof(int *));
   for (j = 0; j < 2; j++) {
-      for (i = 0; i < nodes; i++) {
+    for (i = 0; i < nodes; i++) {
       w2[j][i] = i;
     }
   }
