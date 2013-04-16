@@ -2,6 +2,25 @@
 POINTS-TO
 
 
+// Points To IN:
+// msg -> _msg_1[0] , EXACT
+
+
+// Points To OUT:
+// msg -> _msg_1[0] , EXACT
+
+void error(const char *msg)
+{
+
+// Points To:
+// msg -> _msg_1[0] , EXACT
+
+   printf("%s\n", msg);
+}
+
+POINTS-TO
+
+
 // Points To IN: none
 
 
