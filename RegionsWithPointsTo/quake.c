@@ -80,4 +80,5 @@ void smvp(int nodes, double (*A)[3][3], int *Acol, int *Aindex,
       }
     }
   }
+  return;
 }
