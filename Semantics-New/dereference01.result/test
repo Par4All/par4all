@@ -1,0 +1,100 @@
+
+Transformers 
+
+
+//  T(main) {main==1}
+
+int main()
+{
+
+//  T(a,b) {}
+
+   int a, b;
+
+//  T() {}
+
+   int *p;
+
+//  T() {}
+
+
+   p = &a;
+
+//  T(a) {a==1}
+
+   a = 1;
+
+//  T(a,b) {a#init==1}
+
+
+   *p = 0;
+
+//  T() {}
+
+
+   if (a==1)
+
+//  T() {}
+
+      b = 1;
+   else
+
+//  T() {}
+
+      b = 0;
+
+//  T(main) {main==b}
+
+
+   return b;
+}
+
+Preconditions 
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int a, b;
+
+//  P(a,b) {}
+
+   int *p;
+
+//  P(a,b) {}
+
+
+   p = &a;
+
+//  P(a,b) {}
+
+   a = 1;
+
+//  P(a,b) {a==1}
+
+
+   *p = 0;
+
+//  P(a,b) {}
+
+
+   if (a==1)
+
+//  P(a,b) {}
+
+      b = 1;
+   else
+
+//  P(a,b) {}
+
+      b = 0;
+
+//  P(a,b) {}
+
+
+   return b;
+}
