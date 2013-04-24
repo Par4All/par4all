@@ -1,0 +1,38 @@
+setenv WSPACE=memcopy01
+delete $WSPACE
+create $WSPACE $WSPACE.c 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty ALIASING_ACROSS_TYPES FALSE
+
+#setenv SEMANTICS_DEBUG_LEVEL 1
+
+echo 
+echo Points-to
+echo
+#activate PRINT_CODE_POINTS_TO_LIST
+#display PRINTED_FILE[$WSPACE]
+
+#setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES FALSE
+setproperty SEMANTICS_ANALYZE_SCALAR_POINTER_VARIABLES TRUE
+
+
+echo
+echo Transformers with point-to
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[$WSPACE]
+
+echo
+echo Preconditions with point-to
+echo
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[$WSPACE]
+
+close
+delete $WSPACE
+quit

@@ -1,4 +1,7 @@
 
+PRINT_CODE_SIMPLE_POINTER_VALUES
+
+
 // IN Pointer values: none
 
 
@@ -98,6 +101,9 @@ int main()
 
    return 1;
 }
+
+PROPER_EFFECTS_WITH_POINTER_VALUES
+
 void dereferencing02()
 {
 //             <may be written>: x[*]
@@ -138,6 +144,9 @@ int main()
    dereferencing02();
    return 1;
 }
+
+MUST_REGIONS_WITH_POINTER_VALUES
+
 void dereferencing02()
 {
 
@@ -206,6 +215,9 @@ int main()
    dereferencing02();
    return 1;
 }
+
+PRINT_CODE_REGIONS
+
 void dereferencing02()
 {
 

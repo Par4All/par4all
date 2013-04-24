@@ -1,0 +1,67 @@
+
+Points-to
+
+
+Transformers with point-to
+
+
+//  T(mainInt) {mainInt==0}
+
+int mainInt()
+{
+
+//  T(a) {}
+
+   int a;
+
+//  T(p) {}
+
+   int *p;
+
+//  T(p) {}
+
+
+   p = &a;
+
+//  T(a) {a==0}
+
+
+   *p = 0;
+
+//  T(mainInt) {a==0, mainInt==0}
+
+
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int mainInt()
+{
+
+//  P() {}
+
+   int a;
+
+//  P(a) {}
+
+   int *p;
+
+//  P(a,p) {}
+
+
+   p = &a;
+
+//  P(a,p) {}
+
+
+   *p = 0;
+
+//  P(a,p) {a==0}
+
+
+   return 0;
+}

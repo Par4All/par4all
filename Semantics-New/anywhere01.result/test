@@ -202,7 +202,7 @@ void anywhere01()
    
    n = 23;
 
-//  T(m) {}
+//  T(m) {m==31}
 
    // assuming this is an anywhere write effect (without points-to
    // info), the information on n should be preserved because n is
@@ -257,7 +257,7 @@ void anywhere01()
    // never referenced (i.e. &n does not appear in source code).
    *p = 31;
 
-//  P(m,n) {n==23}
+//  P(m,n) {m==31, n==23}
 
    
    // n == 23
