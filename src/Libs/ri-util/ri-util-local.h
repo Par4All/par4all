@@ -68,7 +68,7 @@
 #define MAIN_PREFIX                      "%"
 #define COMMON_PREFIX                    "~"
 #define BLOCKDATA_PREFIX                 "&"
-#define F95MODULE_PREFIX                 "¤"
+#define F95MODULE_PREFIX                 "â‚¬"
 
 #define FILE_SEP_CHAR                    '!'
 #define FILE_SEP                         FILE_SEP_CHAR
@@ -1218,6 +1218,20 @@
 #define ENTITY_IABS_P(e) entity_an_operator_p(e, IABS)
 #define ENTITY_DABS_P(e) entity_an_operator_p(e, DABS)
 #define ENTITY_CABS_P(e) entity_an_operator_p(e, CABS)
+//abs in stdlib.h C89
+#define ENTITY_C_ABS_P(e) entity_a_function_p(e, C_ABS)
+#define ENTITY_LABS_P(e) entity_a_function_p(e, LABS)
+#define ENTITY_LLABS_P(e) entity_a_function_p(e, LLABS)     //C99
+//abs in inttypes.h C99
+#define ENTITY_IMAXABS_P(e) entity_a_function_p(e, IMAXABS)
+//abs in math.h C99
+#define ENTITY_FABS_P(e) entity_an_operator_p(e, FABS)
+#define ENTITY_FABSF_P(e) entity_an_operator_p(e, FABSF)
+#define ENTITY_FABSL_P(e) entity_an_operator_p(e, FABSL)
+//abs in complex.h C99
+#define ENTITY_C_CABS_P(e) entity_an_operator_p(e, C_CABS)
+#define ENTITY_CABSF_P(e) entity_an_operator_p(e, CABSF)
+#define ENTITY_CABSL_P(e) entity_an_operator_p(e, CABSL)
 
 #define ENTITY_AND_P(e) (entity_an_operator_p(e, AND) || entity_an_operator_p(e, C_AND))
 #define ENTITY_OR_P(e) (entity_an_operator_p(e, OR) || entity_an_operator_p(e, C_OR))

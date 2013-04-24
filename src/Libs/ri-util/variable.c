@@ -1504,15 +1504,28 @@ bool variable_in_list_p(entity e, list l)
   return(is_in_list);
 }
 
-bool volatile_variable_p(entity v)
+/* @return whether entity is a "volatile" variable
+ *
+ * See also entity_register_p()
+ */
+bool entity_volatile_variable_p(entity v)
+{
+  type t = entity_type(v);
+  pips_assert("the entity must have type variable", type_variable_p(t));
+
+  return volatile_variable_p(type_variable(t));
+}
+
+/* @return whether variable is a "volatile" variable
+ *
+ * See also entity_register_p()
+ */
+bool volatile_variable_p(variable v)
 {
   bool volatile_p = false;
-  type t = entity_type(v);
-  // ifdebug(1) pips_assert("the entity must have type variable",
-  // type_variable_p(t));
+
   // FI: no idea if volatile can he hidden in a typedef...
-  variable vt = type_variable(t);
-  list ql = variable_qualifiers(vt);
+  list ql = variable_qualifiers(v);
 
   FOREACH(QUALIFIER, q, ql) {
     if(qualifier_volatile_p(q)) {

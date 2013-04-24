@@ -1166,7 +1166,7 @@ static bool statement_scalarization(statement s,
              // several times in the
              // effect list
        && nd > 0 // Only array references can be scalarized
-       && !volatile_variable_p(pv) // Volatile arrays cannot be scalarized
+       && !entity_volatile_variable_p(pv) // Volatile arrays cannot be scalarized
        && (!top_level_entity_p(pv) || !entity_accessed_through_calls_in_statement_p(pv, s)) // global arrays accessed through calls cannot yet be scalarized
        ) { 
       // Does the current variable appear in the in effect?
@@ -1825,7 +1825,7 @@ static bool scalarizable_entity_p(entity e) {
        we allow scalarization of arrays with "static" qualifier when
        they are declared in the "main" module of a C application.
      */
-    result = entity_array_p( e ) && !volatile_variable_p(e) &&
+    result = entity_array_p( e ) && !entity_volatile_variable_p(e) &&
         ((storage_formal_p( s )
           && parameter_passing_by_value_p(get_current_module_entity()))
          ||

@@ -66,72 +66,236 @@
 
 #include "semantics.h"
 
-/* Make sure that all variables modified according to the effect list
+/**
+ * \details         Apply or add an "concrete" effect e on a transformer tf
+ *                  we must verify that the effect e is a write effect and
+ *                  the effect of e is on abstract variable
+ * \param args      arguments for assign (*p=v), list_undefined if no args
+ * \param tf        transformer
+ * \param e         write effects
+ * \return          transformer with the effect
+ */
+static transformer apply_concrete_effect_to_transformer(list args, transformer tf, effect e)
+{
+  ifdebug(8) {
+    pips_debug(8, "Begin\n");
+    (void) print_transformer(tf);
+  }
+  entity v = reference_variable(effect_any_reference(e));
+
+  if (!approximation_may_p(effect_approximation(e))) // NL : a may effect don't permit to know anything
+  {
+    expression rhs = EXPRESSION(CAR(CDR(args)));
+    pips_assert("2 args to assign", CDR(CDR(args))==NIL);
+
+    ifdebug(8) {
+      (void) print_expression(rhs);
+    }
+
+    transformer post = any_scalar_assign_to_transformer_without_effect(v, rhs, tf);
+    if(!transformer_undefined_p(post))
+    {
+      free_transformer(tf);
+      tf = post;
+    }
+  }
+  else {
+    // NL : if we had a may effect, we make a projection for the variable
+    // NL : need to make a function to make transformer_cylinder_base_projection(tf, v)
+    //TODO : transformer_cylinder_base_projection(tf, v);
+    transformer_add_variable_update(tf, v);
+
+    //TODO : delete this part when transformer_cylinder_base_projection done
+    // NL : reset all the sc can be to much,
+    //      but don't see how to do otherwise without a projection function
+    {
+    Psysteme sc = predicate_system(transformer_relation(tf));
+    sc_egalites(sc) = contraintes_free(sc_egalites(sc));
+    sc_nbre_egalites(sc) = 0;
+    sc_inegalites(sc) = contraintes_free(sc_inegalites(sc));
+    sc_nbre_inegalites(sc) = 0;
+    }
+  }
+
+
+  ifdebug(8) {
+    (void) print_transformer(tf);
+    pips_debug(8, "Ends\n");
+  }
+  return tf;
+}
+
+/**
+ * \details         Apply or add an abstract effect e on a transformer tf
+ *                  we must verify that the effect e is a write effect and
+ *                  the effect of e is on abstract variable
+ * \param tf        transformer
+ * \param e         abstract write effects
+ * \param apply_p   if we apply or add an effect, true if we apply
+ * \return          transformer with the effect
+ */
+static transformer apply_abstract_effect_to_transformer(transformer tf, effect e, bool apply_p)
+{
+  ifdebug(8) {
+    pips_debug(8, "Begin\n");
+    (void) print_transformer(tf);
+  }
+  entity v = reference_variable(effect_any_reference(e));
+
+  /* All analyzed variables conflicting with v must be considered
+   *  written.
+   *
+   * This should depend on the abstract location, its type when
+   * anywhere effects are typed, and its scope when abstract
+   * locations can be restricted to a module or a compilation
+   * unit. See the lattice defined by Amira Mensi.
+   */
+  list wvl = modified_variables_with_values();
+
+  FOREACH(ENTITY, wv, wvl)
+  {
+    ifdebug(8) {
+      (void) print_entity_variable(wv);
+    }
+    //NL : only modified variable with conflict with the effect is treat
+    if(entities_may_conflict_p(v,wv) && entity_has_values_p(wv)) {
+      if (apply_p) {
+        //NL : if we apply effect, we need to check where the effect take place
+        if (entity_all_module_locations_p(v)) {
+          // NL : need to make a function to make transformer_cylinder_base_projection(tf, wv)
+          //TODO : transformer_cylinder_base_projection(tf, wv);
+          transformer_add_variable_update(tf, wv);
+        }
+        else {
+          // NL : v and not wv, don't know why (come from effect with pointer values)
+          // for testcase Effects/Effects_With_Pointer_Values.sub/dereferencing04(_2)
+          // NL : transformer_add_variable_update need to be complete
+          //      not sure if we have to use transformer_add_variable_update or transformer_add_value_update
+          transformer_add_variable_update(tf, v);
+          //transformer_add_value_update(tf, v);
+        }
+      }
+      //NL : else we add effect, we just need to add the variable
+      else {
+        // NL : transformer_add_variable_update need to be complete
+        //      not sure if we have to use transformer_add_variable_update or transformer_add_value_update
+        transformer_add_variable_update(tf, wv);
+        //transformer_add_value_update(tf, wv);
+      }
+    }
+  }
+
+  //TODO : delete this IF when transformer_cylinder_base_projection done
+  // NL : if the effect is to write *ANYWHERE*, we lose all the constraint
+  if (apply_p && entity_all_module_locations_p(v))
+  {
+    Psysteme sc = predicate_system(transformer_relation(tf));
+    sc_egalites(sc) = contraintes_free(sc_egalites(sc));
+    sc_nbre_egalites(sc) = 0;
+    sc_inegalites(sc) = contraintes_free(sc_inegalites(sc));
+    sc_nbre_inegalites(sc) = 0;
+  }
+
+  ifdebug(8) {
+    (void) print_transformer(tf);
+    pips_debug(8, "Ends\n");
+  }
+  return tf;
+}
+
+/**
+ * \details         Apply or add an effect e on a transformer tf
+ *                  only the write effects is compute
+ * \param args      arguments for assign (*p=v), list_undefined if no args
+ * \param tf        transformer
+ * \param e         effect
+ * \param apply_p   if we apply or add an effect, true if we apply
+ * \return          transformer with the effect
+ */
+//must be static because of the dependence (type effect only declare on effects.h)
+static transformer apply_effect_to_transformer(list args, transformer tf, effect e, bool apply_p)
+{
+  ifdebug(8) {
+    pips_debug(8, "Begin\n");
+    (void) print_transformer(tf);
+  }
+  entity v = reference_variable(effect_any_reference(e));
+
+  //action a = effect_action(e);
+  //normally this test is already done by the caller function
+  //if(action_write_p(a))
+  {
+    /* The check on static should be useless because already taken
+       into account when effects are computed. And it is harmful here
+       since most effects on static variables cannot be ignored. */
+    if(entity_has_values_p(v)
+        && store_effect_p(e) // FI: we should have action_memory_write_p()
+        //&& !variable_static_p(v)
+    ) {
+      pips_debug(8, "\"concrete\" effect\n");
+      if (apply_p
+          //&& !list_undefined_p(args) // NL : apply_p=false <-> args=list_undefined
+      ) {
+        // NL : case *p=v
+        tf = apply_concrete_effect_to_transformer(args, tf, e);
+      }
+      else {
+        // NL : general case, don't understand what exactly we do in this case (what kind of case it is)
+        // NL : transformer_add_variable_update need to be complete
+        //      not sure if we have to use transformer_add_variable_update or transformer_add_value_update
+        transformer_add_variable_update(tf, v);
+        //transformer_add_value_update(tf, v);
+      }
+    }
+    else if(entity_abstract_location_p(v)) {
+      pips_debug(8, "abstract effect\n");
+      tf = apply_abstract_effect_to_transformer(tf, e, apply_p);
+    }
+  }
+
+  ifdebug(8) {
+    (void) print_transformer(tf);
+    pips_debug(8, "Ends\n");
+  }
+  return tf;
+}
+
+/**
+ * old name add_effects_to_transformer
+ *
+ * \details
+ * Make sure that all variables modified according to the effect list
  * e and taken into account by the semantics analysis is an argument
  * of tf and that the corresponding variables are declared in the
  * basis.
  *
  * Non allocation, just a side effect on tf.
+ *
+ * \brief           Apply or add a list of effect el on a transformer tf
+ *                  only the write effects is compute
+ * \param args      arguments for assign (*p=v), list_undefined if no args
+ * \param tf        transformer
+ * \param el        list of effects
+ * \param apply_p   if we apply or add the list of effect, true if we apply
+ * \return          transformer with the effects
  */
-transformer add_effects_to_transformer(transformer tf, list e)
+transformer apply_effects_to_transformer(list args, transformer tf, list el, bool apply_p)
 {
-  list args = transformer_arguments(tf);
-  Psysteme sc = predicate_system(transformer_relation(tf));
-  Pbase b = sc_base(sc);
-
   /* algorithm: keep only memory write effects on variables with values */
-  FOREACH(EFFECT, ef, e) {
-    reference r = effect_any_reference(ef);
-    action a = effect_action(ef);
-    entity v = reference_variable(r);
+  FOREACH(EFFECT, e, el) {
+    action a = effect_action(e);
 
-    /* The check on static should be useless because already taken
-       into account when effects are computed. And it is harmful here
-       since most effects on static variables cannot be ignored. */
-    if(action_write_p(a)
-       && entity_has_values_p(v)
-       && store_effect_p(ef) // FI: we should have action_memory_write_p()
-       /*&& !variable_static_p(v)*/)
-    {
-      entity new_val = entity_to_new_value(v);
-      args = arguments_add_entity(args, new_val);
-      b = vect_add_variable(b, (Variable) new_val);
-    }
-    else if(action_write_p(a) && entity_abstract_location_p(v)) {
-      /* All analyzed variables conflicting with v must be considered
-       *  written.
-       *
-       * This should depend on the abstract location, its type when
-       * anywhere effects are typed, and its scope when abstract
-       * locations can be restricted to a module or a compilation
-       * unit. See the lattice defined by Amira Mensi.
-       */
-      list wvl = modified_variables_with_values();
-
-      FOREACH(ENTITY, wv, wvl) {
-	if(entities_may_conflict_p(v,wv) && entity_has_values_p(wv)) {
-	  /* FI->FI: I do not understand why these three lines copied
-	     from above are sufficient, nor why they were not packed
-	     together. */
-	  entity new_val = entity_to_new_value(wv);
-	  args = arguments_add_entity(args, new_val);
-	  b = vect_add_variable(b, (Variable) new_val);
-	}
-      }
-    }
+    if(action_write_p(a))
+      tf = apply_effect_to_transformer(args, tf, e, apply_p);
   }
-
-  transformer_arguments(tf) = args;
-  sc->base = b;
-  sc->dimension = vect_size(b);
-
   return tf;
 }
+
 
 transformer effects_to_transformer(list e) /* list of effects */
 {
   transformer tf = transformer_identity();
-  tf =  add_effects_to_transformer(tf, e);
+  tf =  apply_effects_to_transformer(list_undefined, tf, e, false);
   return tf;
 }
 
@@ -1844,10 +2008,19 @@ transformer integer_assign_to_transformer(expression lhs,
   return tf;
 }
 
-transformer any_scalar_assign_to_transformer(entity v,
-					     expression rhs,
-					     list ef, /* effects of assign */
-					     transformer pre) /* precondition */
+
+
+/**
+ * \brief           assign to the variable v the expression rhs
+ *                  WARNING : this function can return transformer_undefined
+ * \param v         entity/variable to be assign
+ * \param rhs       expression/value to assign
+ * \param pre       transformer already present
+ * \return          transformer_undefined or transformer with the scalar_assign
+ */
+transformer any_scalar_assign_to_transformer_without_effect(entity v,
+                                                       expression rhs,
+                                                       transformer pre) /* precondition */
 {
   transformer tf = transformer_undefined;
 
@@ -1864,34 +2037,34 @@ transformer any_scalar_assign_to_transformer(entity v,
       ifdebug(9) dump_transformer(tf);
 
       if(entity_is_argument_p(v, transformer_arguments(tf))) {
-	/* Is it standard compliant? The assigned variable is modified by the rhs. */
-	transformer teq = simple_equality_to_transformer(v, tmp, true);
-	string s = words_to_string(words_syntax(expression_syntax(rhs),NIL));
+          /* Is it standard compliant? The assigned variable is modified by the rhs. */
+          transformer teq = simple_equality_to_transformer(v, tmp, true);
+          string s = words_to_string(words_syntax(expression_syntax(rhs),NIL));
 
-	pips_user_warning("Variable %s in lhs is uselessly updated by the rhs '%s'\n",
-			  entity_local_name(v), s);
+          pips_user_warning("Variable %s in lhs is uselessly updated by the rhs '%s'\n",
+                                entity_local_name(v), s);
 
-	free(s);
+          free(s);
 
-	tf = transformer_combine(tf, teq);
-	free_transformer(teq);
+          tf = transformer_combine(tf, teq);
+          free_transformer(teq);
       }
       else {
-	/* Take care of aliasing */
-	entity v_repr = value_to_variable(v_new);
+          /* Take care of aliasing */
+          entity v_repr = value_to_variable(v_new);
 
-	/* tf = transformer_value_substitute(tf, v_new, v_old); */
-	tf = transformer_value_substitute(tf, v_new, v_old);
+          /* tf = transformer_value_substitute(tf, v_new, v_old); */
+          tf = transformer_value_substitute(tf, v_new, v_old);
 
-	pips_debug(9,"After substitution v_new=%s -> v_old=%s\n",
-	      entity_local_name(v_new), entity_local_name(v_old));
+          pips_debug(9,"After substitution v_new=%s -> v_old=%s\n",
+                entity_local_name(v_new), entity_local_name(v_old));
 
-	tf = transformer_value_substitute(tf, tmp, v_new);
+          tf = transformer_value_substitute(tf, tmp, v_new);
 
-	pips_debug(9,"After substitution tmp=%s -> v_new=%s\n",
-	      entity_local_name(tmp), entity_local_name(v_new));
+          pips_debug(9,"After substitution tmp=%s -> v_new=%s\n",
+                entity_local_name(tmp), entity_local_name(v_new));
 
-	transformer_add_modified_variable(tf, v_repr);
+          transformer_add_modified_variable(tf, v_repr);
       }
     }
     if(!transformer_undefined_p(tf)) {
@@ -1901,6 +2074,16 @@ transformer any_scalar_assign_to_transformer(entity v,
     }
     reset_temporary_value_counter();
   }
+
+  return tf;
+}
+
+transformer any_scalar_assign_to_transformer(entity v,
+    expression rhs,
+    list ef, /* effects of assign */
+    transformer pre) /* precondition */
+{
+  transformer tf = any_scalar_assign_to_transformer_without_effect(v, rhs, pre);
 
   if(transformer_undefined_p(tf))
     tf = effects_to_transformer(ef);
@@ -1956,7 +2139,7 @@ transformer any_assign_to_transformer(list args, /* arguments for assign */
     free_transformer(tf2); // tf1 is exported in tf
     // FI: previous solution, only based on effects, was much safer
     // and simpler !
-    tf = add_effects_to_transformer(tf, ef);
+    tf = apply_effects_to_transformer(args, tf, ef, true);
   }
 
   pips_debug(6,"return tf=%p\n", tf);

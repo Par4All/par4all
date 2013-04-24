@@ -283,22 +283,38 @@ Pvecteur incr;
 
 /* Add an update of variable v into t
  *
- * FI: I do not understand why v_old is not added to the system
- * basis. t is unlikely to be consistent after a call to this
- * function. See transformer_add_value_update().
+ * NL : this function is not finish
+ *      do the same thing than transformer_add_value_update for the moment
+ * TODO
  */
 transformer transformer_add_variable_update(transformer t, entity v)
 {
   Psysteme psyst = predicate_system(transformer_relation(t));
   entity v_new = entity_to_new_value(v);
+  entity v_old = entity_to_old_value(v);
   entity v_rep = value_to_variable(v_new);
 
   transformer_arguments(t) = arguments_add_entity(transformer_arguments(t), v_rep);
   if(!base_contains_variable_p(psyst->base, (Variable) v_new)) {
     psyst->base = base_add_variable(psyst->base, (Variable) v_new);
-    psyst->dimension = vect_size(psyst->base);
   }
+  if(!base_contains_variable_p(psyst->base, (Variable) v_old)) {
+    psyst->base = base_add_variable(psyst->base, (Variable) v_old);
+  }
+  psyst->dimension = vect_size(psyst->base);
 
+//
+//  pips_assert("before value substitution\n", transformer_consistency_p(t));
+////  t = transformer_value_substitute(t, v_new, v_old);
+//
+//  pips_debug(0, "before tes\nt");
+//  if(base_contains_variable_p(psyst->base, (Variable) v_new)) {
+//    if(!base_contains_variable_p(psyst->base, (Variable) v_old)) {
+//      pips_debug(0, "rename variable\n");
+//      (void) sc_variable_rename(psyst,(Variable) v_new, (Variable)v_old);
+//    }
+//  }
+//  pips_assert("after value substitution\n", transformer_consistency_p(t));
   return t;
 }
 

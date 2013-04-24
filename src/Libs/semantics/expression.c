@@ -288,7 +288,11 @@ generic_unary_operation_to_transformer(
     tf = unary_minus_operation_to_transformer(e, e1, pre, is_internal);
   }
   else if(ENTITY_IABS_P(op) || ENTITY_ABS_P(op) || ENTITY_DABS_P(op)
-	  || ENTITY_CABS_P(op)) {
+      || ENTITY_CABS_P(op)
+      || ENTITY_C_ABS_P(op) || ENTITY_LABS_P(op) || ENTITY_LLABS_P(op)
+      || ENTITY_IMAXABS_P(op)
+      || ENTITY_FABS_P(op) || ENTITY_FABSF_P(op) || ENTITY_FABSL_P(op)
+      || ENTITY_C_CABS_P(op) || ENTITY_CABSF_P(op) || ENTITY_CABSL_P(op)) {
     tf = generic_abs_to_transformer(e, e1, pre, is_internal);
   }
   else if(ENTITY_POST_INCREMENT_P(op) || ENTITY_POST_DECREMENT_P(op)
@@ -2278,6 +2282,7 @@ integer_nullary_operation_to_transformer(
 					 transformer pre __attribute__ ((unused)),
 					 bool is_internal __attribute__ ((unused)))
 {
+  // eg : getchar and sizeof are nullary_operation
   transformer tf = transformer_undefined;
   /* rand() returns an integer between 0 and RAND_MAX. See
      Semantics/rand01.c
@@ -2285,10 +2290,12 @@ integer_nullary_operation_to_transformer(
      How do you make sure that RAND_MAX is the same for the analyzed
      code and for the analyzer?
  */
+  /* NL already parse by the function which call him (integer_call_expression_to_transformer)
   if (ENTITY_RAND_P(f)) {
     tf = transformer_add_inequality_with_integer_constraint(transformer_identity(),
 							    e, 0, true);
   }
+  */
 
   return tf;
 }
@@ -2304,7 +2311,8 @@ static transformer integer_unary_operation_to_transformer(entity e,
   tf = generic_unary_operation_to_transformer(e, op, e1, pre, is_internal);
 
   if(transformer_undefined_p(tf)) {
-    if(ENTITY_IABS_P(op)) {
+    if(ENTITY_IABS_P(op)
+        || ENTITY_C_ABS_P(op) || ENTITY_LABS_P(op) || ENTITY_LLABS_P(op)) {
       tf = iabs_to_transformer(e, e1, pre, is_internal);
     }
   }
@@ -3145,6 +3153,253 @@ transformer float_expression_to_transformer(entity v,
 
   return tf;
 }
+
+/* POINTER EXPRESSION */
+
+static transformer pointer_unary_operation_to_transformer(
+    entity e,
+    entity op,
+    expression e1,
+    transformer pre,
+    bool is_internal)
+{
+  transformer tf = transformer_undefined;
+
+  //tf = generic_unary_operation_to_transformer(e, op, e1, pre, is_internal);
+  // NL: can't call generic_unary_operation_to_transformer because of the case ABS
+  //     it's a copy of generic_unary_operation_to_transformer without the case ABS
+  if(ENTITY_UNARY_MINUS_P(op)) {
+    tf = unary_minus_operation_to_transformer(e, e1, pre, is_internal);
+  }
+  else if(ENTITY_POST_INCREMENT_P(op) || ENTITY_POST_DECREMENT_P(op)
+            || ENTITY_PRE_INCREMENT_P(op) || ENTITY_PRE_DECREMENT_P(op)) {
+    syntax s1 = expression_syntax(e1);
+    entity v1 = reference_variable(syntax_reference(s1));
+
+    if(entity_has_values_p(v1)) {
+      transformer tfu = any_basic_update_operation_to_transformer(e, v1, op);
+      if(transformer_undefined_p(pre)) {
+          tf = tfu;
+      }
+      else {
+          /* FI: Oops, the precondition is lost here! See any_basic_update_to_transformer() */
+          tf = transformer_combine(transformer_range(pre), tfu);
+          free_transformer(tfu);
+      }
+    }
+  }
+
+  return tf;
+}
+
+static transformer pointer_binary_operation_to_transformer(
+    entity e,
+    entity op,
+    expression e1,
+    expression e2,
+    transformer pre,
+    bool is_internal)
+{
+  transformer tf = transformer_undefined;
+
+  pips_debug(8, "Begin\n");
+
+  if(ENTITY_PLUS_P(op) || ENTITY_MINUS_P(op)
+     || ENTITY_PLUS_C_P(op) || ENTITY_MINUS_C_P(op)) {
+    tf = addition_operation_to_transformer(e, e1, e2, pre,
+                                                     ENTITY_PLUS_P(op) || ENTITY_PLUS_C_P(op),
+                                                     is_internal);
+  }
+  else if(ENTITY_PLUS_UPDATE_P(op) || ENTITY_MINUS_UPDATE_P(op)) {
+    tf = update_operation_to_transformer(e, op, e1, e2, pre, is_internal);
+  }
+  else if(ENTITY_ASSIGN_P(op)) {
+    tf = assign_operation_to_transformer(e, e1, e2, pre);
+  }
+  else {
+    pips_user_warning("Operator %s not analyzed\n", entity_name(op));
+  }
+
+  pips_debug(8, "End with tf=%p\n", tf);
+
+  return tf;
+}
+
+static transformer pointer_call_expression_to_transformer(
+    entity e,
+    expression expr, /* needed to compute effects for user calls */
+    transformer pre, /* Predicate on current store assumed not modified by
+                        expr's side effects */
+    bool is_internal)
+{
+  syntax sexpr = expression_syntax(expr);
+  call c = syntax_call(sexpr);
+  entity f = call_function(c);
+  list args = call_arguments(c);
+  transformer tf = transformer_undefined;
+  int arity = gen_length(args);
+
+  pips_debug(8, "Begin with precondition %p\n", pre);
+
+  /* tests are organized to trap 0-ary user-defined functions as well as
+     binary min and max */
+
+  if(ENTITY_MIN0_P(f) || ENTITY_MIN_P(f)) {
+    tf = min0_to_transformer(e, args, pre, is_internal);
+  }
+  else if(ENTITY_C_MIN_P(f)) {
+    args=CDR(args);
+    --arity;
+    tf = min0_to_transformer(e,args,pre,is_internal);
+  }
+  else if(ENTITY_MAX0_P(f) || ENTITY_MAX_P(f)) {
+    tf = max0_to_transformer(e, args, pre, is_internal);
+  }
+  else if(ENTITY_COMMA_P(f)) {
+    // is_internal is dropped...
+    tf = any_expressions_to_transformer(e, args, pre);
+  }
+  else if(ENTITY_CONDITIONAL_P(f)) {
+    tf = any_conditional_to_transformer(e, args, pre);
+  }
+  /*else if(ENTITY_NOT_P(f)) {
+    // FI: should only happen for C code because int are often used
+    //   as bool since there was no other way before C99. Quite time
+    //   consuming here because it is applied to an int and not a
+    //   bool argument.
+    tf = logical_not_to_transformer(e, args, pre);
+  }*/
+  /*else if(ENTITY_BITWISE_XOR_P(f)) {
+  // FI: it might be useful to handle here the bit wise XOR as in
+  //   logical_binary_operation_to_transformer().
+    tf = bitwise_xor_to_transformer(e, args, pre);
+  }*/
+  /*else if(ENTITY_RAND_P(f)) {
+    tf = transformer_identity();
+    tf = transformer_add_inequality_with_integer_constraint(tf, e, VALUE_ZERO, false);
+  }*/
+  /*else if(ENTITY_MODULO_P(f) || ENTITY_C_MODULO_P(f)) {
+    expression arg1 = EXPRESSION(CAR(args));
+    expression arg2 = EXPRESSION(CAR(CDR(args)));
+    tf = modulo_to_transformer(e, arg1, arg2, pre, false);
+  }*/
+  else if(value_code_p(entity_initial(f)) &&
+          get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
+      tf = user_function_call_to_transformer(e, expr, pre);
+  }
+  else {
+    switch(arity) {
+    case 0:
+      // tf = constant_to_transformer(e, call_function(syntax_call(srhs)));
+      // Normally already detected like integer constant?
+      tf = constant_to_transformer(e, expr);
+      break;
+    case 1:
+    {
+      expression e1 = EXPRESSION(CAR(args));
+      tf = pointer_unary_operation_to_transformer(e, f, e1, pre, is_internal);
+      break;
+    }
+    case 2:
+    {
+      expression e1 = EXPRESSION(CAR(args));
+      expression e2 = EXPRESSION(CAR(CDR(args)));
+      tf = pointer_binary_operation_to_transformer(e, f, e1, e2, pre, is_internal);
+      break;
+    }
+    default:
+      pips_user_warning("Operator %s not analyzed\n", entity_name(f));
+    }
+  }
+
+  pips_debug(8, "End with tf=%p\n", tf);
+
+  return tf;
+}
+
+/**
+ * \details         This function may return an undefined transformers if it fails to
+ *                  capture the semantics of expr in the polyhedral framework.
+ *                  cf any_expression_to_transformer which call it
+ * \param v         value of the expression
+ * \param expr      pointer expression
+ * \param pre       transformer without the pointer expression, no side effect
+ * \param is_internal ??
+ * \return          transformer with the pointer expression
+ *                  or transformer_undefined if failed
+ */
+transformer pointer_expression_to_transformer(entity v,  // value of the expression
+                                            expression expr,
+                                            transformer pre,
+                                            bool is_internal)
+{
+  transformer tf = transformer_undefined;
+  normalized n = NORMALIZE_EXPRESSION(expr);
+  syntax sexpr = expression_syntax(expr);
+
+  pips_debug(8, "begin with precondition %p for expression: ", pre);
+  ifdebug(8) print_expression(expr);
+
+  /* Assume: e is a value */
+  if(normalized_linear_p(n))
+  {
+    // Is it really useful to keep using this function which does not
+    //   take the precondition into acount?
+    if(transformer_undefined_p(pre)) {
+      tf = simple_affine_to_transformer(v, (Pvecteur) normalized_linear(n), is_internal);
+    }
+    else {
+      transformer tfl = simple_affine_to_transformer(v, (Pvecteur) normalized_linear(n), is_internal);
+      if(transformer_undefined_p(tfl)) {
+        tfl = expression_effects_to_transformer(expr);
+      }
+
+      tf = transformer_combine(copy_transformer(pre), tfl);
+      free_transformer(tfl);
+    }
+  }
+  else
+  {
+    switch (syntax_tag(sexpr)) {
+    case is_syntax_call:
+    {
+      //pips_user_warning("No call for pointer analysis");
+      tf = transformer_undefined;
+      tf = pointer_call_expression_to_transformer(v, expr, pre, is_internal);
+      break;
+    }
+    case is_syntax_reference:
+    {
+      reference r = syntax_reference(sexpr);
+      tf = generic_reference_to_transformer(v, r, pre, is_internal);
+      break;
+    }
+    case is_syntax_cast:
+    {
+      cast c = syntax_cast(sexpr);
+      type ct = cast_type(c);
+      expression cexp = cast_expression(c);
+      type cexpt = expression_to_type(cexp);
+      if (type_equal_p(ct, cexpt))
+        tf = pointer_expression_to_transformer(v, cexp, pre, is_internal);
+      else
+        tf = transformer_undefined;
+        //pips_internal_error("Illegal tag %d", syntax_tag(sexpr));
+      free_type(cexpt);
+      break;
+    }
+    default:
+      tf = transformer_undefined;
+      //pips_internal_error("Illegal tag %d", syntax_tag(sexpr));
+    }
+  }
+
+  pips_debug(8, "end with tf=%p\n", tf);
+
+  return tf;
+}
+
+
 
 /* Assimilate enum and logical to int (used when they appear in logical
  * operations)
@@ -3325,7 +3580,7 @@ transformer transformer_add_any_relation_information(
    The choices are:
 
    1. Do I need the value of the expression? It seems strange but in
-   some cases, the expression value is discarded. See ofr instance the C for construct.
+   some cases, the expression value is discarded. See for instance the C for construct.
 
    Keyword: "any" implies that the expression value is needed
 
@@ -3423,7 +3678,8 @@ transformer any_expression_to_transformer(
 	tf = float_expression_to_transformer(v, expr, pre, is_internal);
       break;
     case is_basic_pointer:
-      /* case not handleld yet, skip instead of internal_error*/
+      if(pointer_analyzed_p())
+        tf = pointer_expression_to_transformer(v, expr, pre, is_internal);
       break;
     case is_basic_complex:
       /* PIPS does not represent complex constants: call to CMPLX */

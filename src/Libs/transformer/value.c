@@ -260,6 +260,7 @@ static bool analyze_boolean_scalar_entities = false;
 static bool analyze_string_scalar_entities = false;
 static bool analyze_float_scalar_entities = false;
 static bool analyze_complex_scalar_entities = false;
+static bool analyze_pointer_scalar_entities = false;
 
 void set_analyzed_types()
 {
@@ -273,6 +274,8 @@ void set_analyzed_types()
     get_bool_property("SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES");
   analyze_complex_scalar_entities =
     get_bool_property("SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES");
+  analyze_pointer_scalar_entities =
+    get_bool_property("SEMANTICS_ANALYZE_SCALAR_POINTER_VARIABLES");
 }
 
 void reset_analyzed_types()
@@ -282,6 +285,7 @@ void reset_analyzed_types()
   analyze_string_scalar_entities = false;
   analyze_float_scalar_entities = false;
   analyze_complex_scalar_entities = false;
+  analyze_pointer_scalar_entities = false;
 }
 
 bool integer_analyzed_p()
@@ -309,24 +313,33 @@ bool complex_analyzed_p()
   return analyze_complex_scalar_entities;
 }
 
+bool pointer_analyzed_p()
+{
+  return analyze_pointer_scalar_entities;
+}
+
 /* The entity is type of one of the analyzed types */
 bool analyzable_basic_p(basic b)
 {
   bool analyzable_p = false;
 
-  if(basic_int_p(b) && analyze_integer_scalar_entities)
+  if(analyze_integer_scalar_entities && basic_int_p(b))
     analyzable_p = true;
-  else if(basic_string_p(b) && analyze_string_scalar_entities)
+  else if(analyze_string_scalar_entities && basic_string_p(b))
     analyzable_p = true;
-  else if(basic_logical_p(b) && analyze_boolean_scalar_entities)
+  else if(analyze_boolean_scalar_entities && basic_logical_p(b))
     analyzable_p = true;
-  else if(basic_float_p(b) && analyze_float_scalar_entities)
+  else if(analyze_float_scalar_entities && basic_float_p(b))
     analyzable_p = true;
-  else if(basic_complex_p(b) && analyze_complex_scalar_entities)
+  else if(analyze_pointer_scalar_entities && basic_pointer_p(b)) {
+    pips_debug(9,"pointer type : %s\n", type_to_string(basic_pointer(b)));
     analyzable_p = true;
-  else if(basic_derived_p(b) && analyze_integer_scalar_entities) {
+  }
+  else if(analyze_complex_scalar_entities && basic_complex_p(b))
+    analyzable_p = true;
+  else if(analyze_integer_scalar_entities && basic_derived_p(b)) {
     entity de = basic_derived(b);
-    type dt = ultimate_type(entity_type(de));
+    type dt = entity_basic_concrete_type(de);
     analyzable_p = type_enum_p(dt);
   }
   else
@@ -339,12 +352,15 @@ bool analyzable_basic_p(basic b)
 bool analyzable_type_p(type t)
 {
   bool result = false;
-  type ut = ultimate_type(t);
+  type bct = compute_basic_concrete_type(t);
 
-  /* The type dimension or type_depth could be checked also... */
-  if(type_variable_p(ut) /* && entity_scalar_p(e)*/) {
-    basic b = variable_basic(type_variable(ut));
-    result = analyzable_basic_p(b);
+  if(type_variable_p(bct)) {
+    variable v = type_variable(bct);
+    if (!volatile_variable_p(v)
+        && ENDP(variable_dimensions(v))           //NL : for checking the dimension instead of entity_scalar_p which filter pointer type
+    ) {
+      result = analyzable_basic_p(variable_basic(v));
+    }
   }
 
   return result;
@@ -356,17 +372,8 @@ bool analyzable_scalar_entity_p(entity e)
   bool result = false;
 
   if(!abstract_state_variable_p(e) && !typedef_entity_p(e) ) {
-    type ut = ultimate_type(entity_type(e));
-
-    /* entity_scalar_p(e) is information provided by the type. It should
-       be checked by type_variable_p() but I'm not sure of the dimension
-       information carried by ultimate_type() whose purpose was quite
-       different for the C scanner, providing the proper basic. */
-    if(type_variable_p(ut)
-       && entity_scalar_p(e)
-       && !volatile_variable_p(e)) {
-      result = analyzable_type_p(ut);
-    }
+    type bct = entity_basic_concrete_type(e);
+    result = analyzable_type_p(bct);
   }
   return result;
 }
@@ -387,12 +394,10 @@ bool analyzed_constant_p(entity f)
       return true;
     if(basic_complex_p(b) && analyze_complex_scalar_entities)
       return true;
-    else
-      return false;
+    if(basic_pointer_p(b) && analyze_pointer_scalar_entities)
+      return true;
   }
-  else {
-    return false;
-  }
+  return false;
 }
 
 /* LOCAL VALUE ENTITY */
@@ -403,7 +408,7 @@ bool analyzed_constant_p(entity f)
 static entity make_local_value_entity(int n, int nature, type t)
 {
   entity v;
-  /* 13 is a magic number that can accomodate 2 prefix characters,
+  /* 13 is a magic number that can accommodate 2 prefix characters,
      10 digits and a null character */
   char value_name[13];
   char * s;
@@ -423,9 +428,9 @@ static entity make_local_value_entity(int n, int nature, type t)
   v = gen_find_tabulated(s, entity_domain);
   if(v==entity_undefined)
     v = make_entity(s,
-		    copy_type(t),
-		    make_storage(is_storage_rom, UU),
-		    value_undefined);
+          copy_type(t),
+          make_storage(is_storage_rom, UU),
+          value_undefined);
   else {
     free(s);
     /* Another option might be to undefine types when counters are
@@ -574,9 +579,9 @@ entity global_new_value_to_global_old_value(entity v_new)
 	      strcmp(entity_module_name(v_new), SEMANTICS_MODULE_NAME) != 0);
 
   v_old = (entity) gen_find_tabulated(concatenate(entity_name(v_new),
-						  OLD_VALUE_SUFFIX,
-						  NULL),
-				      entity_domain);
+                                                  OLD_VALUE_SUFFIX,
+                                                  NULL),
+                                      entity_domain);
   if(v_old==NULL) v_old = entity_undefined;
 
   return v_old;
@@ -646,9 +651,9 @@ const char* external_value_name(entity e)
 }
 
 /* This function is called many times when the constraints and the
-   system of contraints are sorted using lexicographic information
+   system of constraints are sorted using lexicographic information
    based on this particular value name. See for instance
-   Semantics-New/freia_52.c. Hence it is memoized.
+   Semantics-New/freia_52.c. Hence it is memorized.
 */
 const char * pips_user_value_name(entity e)
 {
@@ -737,7 +742,7 @@ bool old_value_entity_p(entity e)
   /* string s = strstr(entity_local_name(e), OLD_VALUE_PREFIX); */
 
   if(!local_temporary_value_entity_p(e)) {
-    string s1 = strstr(entity_local_name(e), OLD_VALUE_SUFFIX);
+    string s1 = strstr(entity_local_name(e), OLD_VALUE_SUFFIX);       //NL->FI:doublon?
     string s2 = strstr(entity_local_name(e), OLD_VALUE_PREFIX);
     return s1!=NULL || s2!=NULL;
   }

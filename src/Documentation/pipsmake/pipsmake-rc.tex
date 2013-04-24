@@ -3628,6 +3628,7 @@ according to some parameter value.} :
 \PipsPropRef{SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES}
 \PipsPropRef{SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES}
 \PipsPropRef{SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES}
+\PipsPropRef{SEMANTICS_ANALYZE_SCALAR_POINTER_VARIABLES}
 
 Transformers can be computed intraprocedurally by looking at each
 function independently or they can be computed interprocedurally
@@ -4238,6 +4239,7 @@ program_postcondition     > PROGRAM.program_postcondition
 \index{SEMANTICS\_ANALYZE\_SCALAR\_BOOLEAN\_VARIABLES}
 \index{SEMANTICS\_ANALYZE\_SCALAR\_STRING\_VARIABLES}
 \index{SEMANTICS\_ANALYZE\_SCALAR\_FLOAT\_VARIABLES}
+\index{SEMANTICS\_ANALYZE\_SCALAR\_POINTER\_VARIABLES}
 
 By default, the semantic analysis is restricted to scalar integer
 variables as they are key variables to understand scientific code
@@ -4247,7 +4249,7 @@ integers. Character string constants and floating point constants are
 represented as undefined values.
 
 The analysis is thus limited to constant propagation for character strings
-and floating point values whereas integer and boolean variables are
+and floating point values whereas integer, boolean and pointer variables are
 processed with a relational analysis.
 
 Character string constants of fixed maximal length could be translated
@@ -4255,6 +4257,9 @@ into integers but the benefit is not yet assessed because they are not
 much used in the benchmark and commercial applications we have studied.
 The risk is to increase significantly the number of overflows encountered
 during the analysis.
+
+For the pointer analysis, it's strongly recommended to activate \PipsPassRef{proper_effects_with_points_to}
+to perform this analysis.
 
 \begin{PipsProp}{SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES}
 SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE
@@ -4274,6 +4279,10 @@ SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES FALSE
 
 \begin{PipsProp}{SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES}
 SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES FALSE
+\end{PipsProp}
+
+\begin{PipsProp}{SEMANTICS_ANALYZE_SCALAR_POINTER_VARIABLES}
+SEMANTICS_ANALYZE_SCALAR_POINTER_VARIABLES FALSE
 \end{PipsProp}
 
 \subsubsection{Array Declarations and Accesses}
