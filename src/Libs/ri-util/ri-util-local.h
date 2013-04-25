@@ -68,7 +68,7 @@
 #define MAIN_PREFIX                      "%"
 #define COMMON_PREFIX                    "~"
 #define BLOCKDATA_PREFIX                 "&"
-#define F95MODULE_PREFIX                 "€"
+#define F95MODULE_PREFIX                 "¤"
 
 #define FILE_SEP_CHAR                    '!'
 #define FILE_SEP                         FILE_SEP_CHAR
