@@ -5,7 +5,7 @@
  * operator on Vref.
  *
  * In fact, the intersection operator in the PhD is implemented as a
- * conflict detection operator, references_may/must_conflict_() in
+ * conflict detection operator, references_may/must_conflict_p() in
  * effects-util/conflicts.c.
  *
  * The result is not as precise as it could/should be. The last update
