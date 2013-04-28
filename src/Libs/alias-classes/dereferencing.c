@@ -112,7 +112,7 @@ pt_map dereferencing_to_points_to(expression p, pt_map in)
       // FI: you do not want to apply side-effects twice...
       // But you then miss the detection of pointers that are not NULL
       // because they are dereferenced
-      //in = expressions_to_points_to(al, in);
+      //in = expressions_to_points_to(al, in, false);
       //in = call_to_points_to(c, in);
       
       /* You must take care of s.tab, which is encoded by a call */

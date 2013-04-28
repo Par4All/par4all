@@ -61,6 +61,33 @@
 #include "points_to_private.h"
 #include "alias-classes.h"
 
+void subscripted_reference_to_points_to(reference r, list sl, pt_map pt_in)
+{
+  if(!ENDP(sl)) {
+    type rt = points_to_reference_to_concrete_type(r);
+    if(pointer_type_p(rt)) {
+      //type pt = type_to_pointed_type(rt);
+      //list cl = reference_to_points_to_sinks(r, pt, pt_in, false, true);
+      list cl = reference_to_points_to_sinks(r, rt, pt_in, true, true);
+      // FI: the arc between "r" and NULL should be removed...
+      remove_impossible_arcs_to_null(&cl, pt_in);
+      FOREACH(CELL, c, cl) {
+	if(!ENDP(CDR(sl))) {
+	  expression fs = EXPRESSION(CAR(sl));
+	  points_to_cell_update_last_subscript(c, fs);
+	  reference nr = cell_any_reference(c);
+	  subscripted_reference_to_points_to(nr, CDR(sl), pt_in);
+	}
+      }
+    }
+    else if(array_of_pointers_type_p(rt)) {
+      pips_internal_error("Not implemented yet.\n");
+    }
+    else
+      pips_internal_error("Meaningless call.\n");
+  }
+}
+
 /* Update pt_in and pt_out according to expression e.
  *
  * Ignore side effects due to pointer arithmetic and assignment and
@@ -82,11 +109,24 @@ pt_map expression_to_points_to(expression e, pt_map pt_in, bool side_effect_p)
       type vt = entity_basic_concrete_type(v);
       // FI: call16.c shows that the C parser does not generate the
       // right construct, a subscript, when a scalar pointer is indexed
-      if(pointer_type_p(vt) && !ENDP(sl)) {
-	expression tmp = entity_to_expression(v);
-	pt_out = dereferencing_to_points_to(tmp, pt_in);
-	pt_out = expressions_to_points_to(sl, pt_out, side_effect_p);
-	free_expression(tmp);
+      if(!ENDP(sl)) {
+	if(pointer_type_p(vt)) {
+	  // expression tmp = entity_to_expression(v);
+	  // pt_out = dereferencing_to_points_to(tmp, pt_in);
+	  // pt_out = expressions_to_points_to(sl, pt_out, side_effect_p);
+	  // free_expression(tmp);
+	  reference nr = make_reference(v, NIL);
+	  subscripted_reference_to_points_to(nr, sl, pt_in);
+	}
+	else if(array_of_pointers_type_p(vt)) {
+	  int td = type_depth(vt);
+	  int sn = (int) gen_length(sl);
+	  if(sn<=td) {
+	    ; // Nothing to do: a standard array subscript list
+	  }
+	  else
+	    pips_internal_error("Not implemented yet.\n");
+	}
       }
       pt_out = reference_to_points_to(r, pt_in, side_effect_p);
       break;
@@ -197,7 +237,9 @@ pt_map expressions_to_points_to(list el, pt_map pt_in, bool side_effect_p)
 /* The subscript expressions may impact the points-to
  * information. E.g. a[*(p++)]
  *
- * I'm surprised that pointers can be indexed instead of being subscripted...
+ * FI: I'm surprised that pointers can be indexed instead of being
+ * subscripted... This is linked to the parser in
+ * expression_to_points_to().
  */
 pt_map reference_to_points_to(reference r, pt_map pt_in, bool side_effect_p)
 {
@@ -205,7 +247,7 @@ pt_map reference_to_points_to(reference r, pt_map pt_in, bool side_effect_p)
   if(!points_to_graph_bottom(pt_in)) {
     list sel = reference_indices(r);
     entity v = reference_variable(r);
-    type t = ultimate_type(entity_type(v));
+    type t = entity_basic_concrete_type(v);
     // FI: some or all of these tests could be placed in
     // dereferencing_to_points_to()
     if(!entity_stub_sink_p(v)
