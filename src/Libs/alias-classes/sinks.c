@@ -950,7 +950,7 @@ list cast_to_points_to_sinks(cast c,
 	      }
 	      else {
 		/* The types are really incompatible, let's use the
-		 * type lattice, max(cct, mct).
+		 * type lattice, max_type(cct, mct)... if it were implemented
 		 *
 		 * Could we do better for a cast to (void *)? See cast03.
 		 */
