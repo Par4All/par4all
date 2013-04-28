@@ -2229,7 +2229,7 @@ expression make_lin_op_exp(entity op_ent, expression exp1, expression exp2)
  * EvalExpression(). See also extended_expression_constant_p() for
  * more comments about what is called a "constant" expression.
  *
- * For a cleaner implementation of this function as it was originally
+ * For a cleaner implementation of this function, as it was originally
  * intended, see below expression_to_float().
  */
 int expression_to_int(expression exp)
