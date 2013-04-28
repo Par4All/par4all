@@ -1529,6 +1529,37 @@ void points_to_cell_add_unbounded_subscripts(cell c)
   points_to_cell_add_fixed_subscripts(c, false);
 }
 
+/* Transform reference a[i]...[j] and expression s into reference
+ * a[i]..[j+s] if j and s are constant integer expressions, and into
+ * reference a[i]..[*] otherwise. Cell c is updated by side effect.
+ *
+ * This has been implemented in several places...
+ */
+void points_to_cell_update_last_subscript(cell c, expression s)
+{
+  reference r = cell_any_reference(c);
+  list sl = reference_indices(r);
+  if(ENDP(sl)) {
+    // FI: we could do something special for heap abstract locations...
+    // entity v = reference_variable(r);
+    pips_internal_error("Wrong argument c.\n");
+  }
+  else {
+    list lsl = gen_last(sl);
+    expression is = EXPRESSION(CAR(lsl));
+    intptr_t c1, c2;
+    expression ns = expression_undefined;
+    if(expression_integer_value(is, &c1) && expression_integer_value(s, &c2)) {
+      ns = int_to_expression((int) c1+c2);
+    }
+    else {
+      ns = make_unbounded_expression();
+    }
+    EXPRESSION_(CAR(lsl)) = ns;
+  }
+}
+
+
 bool atomic_effect_p(effect e)
 {
   bool atomic_p = effect_scalar_p(e);
@@ -1539,7 +1570,7 @@ bool atomic_effect_p(effect e)
   }
   return atomic_p;
 }
-
+
 // static list recursive_cell_to_pointer_cells(cell c)
 list recursive_cell_to_pointer_cells(cell c)
 {
