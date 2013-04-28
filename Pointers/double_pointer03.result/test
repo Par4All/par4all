@@ -1,0 +1,35 @@
+
+POINTS-TO
+
+
+// Points To IN:
+// a1 -> *NULL* , MAY
+// a1 -> _a1_1[0] , MAY
+
+
+// Points To OUT:
+// a1 -> _a1_1[0] , EXACT
+
+void double_pointer03(float **a1)
+{
+
+// Points To:
+// a1 -> *NULL* , MAY
+// a1 -> _a1_1[0] , MAY
+
+   **a1 = 0;
+
+// Points To:
+// a1 -> _a1_1[0] , EXACT
+
+   return;
+}
+
+PROPER  EFFECTS WITH POINTS-TO
+
+void double_pointer03(float **a1)
+{
+//             <    is read   >: _a1_1[0] a1
+   **a1 = 0;
+   return;
+}

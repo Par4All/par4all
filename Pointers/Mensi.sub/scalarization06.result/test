@@ -32,75 +32,75 @@ int main(int argc, char **argv)
 
 // Points To:
 // t -> undefined , EXACT
-// x -> *HEAP*_l_18 , MAY
+// x -> *HEAP*_l_23 , MAY
 // y -> undefined , EXACT
 
    y = (int *) malloc(sizeof(int));
 
 // Points To:
 // t -> undefined , EXACT
-// x -> *HEAP*_l_18 , MAY
-// y -> *HEAP*_l_19 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
 
    t = (int *) malloc(sizeof(int));
 
 // Points To:
-// t -> *HEAP*_l_20 , MAY
-// x -> *HEAP*_l_18 , MAY
-// y -> *HEAP*_l_19 , MAY
+// t -> *HEAP*_l_25 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
 
 
    for(i = 0; i <= n-1; i += 1)
 
 // Points To:
-// t -> *HEAP*_l_20 , MAY
-// x -> *HEAP*_l_18 , MAY
-// y -> *HEAP*_l_19 , MAY
+// t -> *HEAP*_l_25 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
 
       scanf("%d %d", &x[i], &y[i]);
 
 // Points To:
-// t -> *HEAP*_l_20 , MAY
-// x -> *HEAP*_l_18 , MAY
-// y -> *HEAP*_l_19 , MAY
+// t -> *HEAP*_l_25 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
 
 
    for(i = 0; i <= n-1; i += 1) {
 
 // Points To:
-// t -> *HEAP*_l_20 , MAY
-// x -> *HEAP*_l_18 , MAY
-// y -> *HEAP*_l_19 , MAY
+// t -> *HEAP*_l_25 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
 
       // BEGIN BLOCK
 
 // Points To:
-// t -> *HEAP*_l_20 , MAY
-// x -> *HEAP*_l_18 , MAY
-// y -> *HEAP*_l_19 , MAY
+// t -> *HEAP*_l_25 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
 
       t[1] = x[i];
 
 // Points To:
-// t -> *HEAP*_l_20 , MAY
-// x -> *HEAP*_l_18 , MAY
-// y -> *HEAP*_l_19 , MAY
+// t -> *HEAP*_l_25 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
 
       x[i] = y[i];
 
 // Points To:
-// t -> *HEAP*_l_20 , MAY
-// x -> *HEAP*_l_18 , MAY
-// y -> *HEAP*_l_19 , MAY
+// t -> *HEAP*_l_25 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
 
       y[i] = t[1];
       // END BLOCK
    }
 
 // Points To:
-// t -> *HEAP*_l_20 , MAY
-// x -> *HEAP*_l_18 , MAY
-// y -> *HEAP*_l_19 , MAY
+// t -> *HEAP*_l_25 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
 
    printf("%d %d", x[n-1], y[n-1]);
    // END BLOCK
@@ -129,7 +129,7 @@ int main(int argc, char **argv)
 
    for(i = 0; i <= n-1; i += 1)
 //             <may be read   >: stdin[0]
-//             <may be written>: *HEAP*_l_18 *HEAP*_l_19 stdin[0]
+//             <may be written>: *HEAP*_l_23 *HEAP*_l_24 stdin[0]
 //             <    is read   >: i n stdin __IO_EFFECTS:LUNS[0]
 //             <    is written>: __IO_EFFECTS:LUNS[0]
       scanf("%d %d", &x[i], &y[i]);
@@ -138,21 +138,21 @@ int main(int argc, char **argv)
 
    for(i = 0; i <= n-1; i += 1) {
       // BEGIN BLOCK
-//             <may be read   >: *HEAP*_l_18
-//             <may be written>: *HEAP*_l_20
+//             <may be read   >: *HEAP*_l_23
+//             <may be written>: *HEAP*_l_25
 //             <    is read   >: i n t x
       t[1] = x[i];
-//             <may be read   >: *HEAP*_l_19
-//             <may be written>: *HEAP*_l_18
+//             <may be read   >: *HEAP*_l_24
+//             <may be written>: *HEAP*_l_23
 //             <    is read   >: i n x y
       x[i] = y[i];
-//             <may be read   >: *HEAP*_l_20
-//             <may be written>: *HEAP*_l_19
+//             <may be read   >: *HEAP*_l_25
+//             <may be written>: *HEAP*_l_24
 //             <    is read   >: i n t y
       y[i] = t[1];
       // END BLOCK
    }
-//             <may be read   >: *HEAP*_l_18 *HEAP*_l_19 stdout[0]
+//             <may be read   >: *HEAP*_l_23 *HEAP*_l_24 stdout[0]
 //             <may be written>: stdout[0]
 //             <    is read   >: n stdout x y __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]

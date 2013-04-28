@@ -2,11 +2,8 @@
  *
  */
 
-void double_pointer01(float**  a1)
+void double_pointer03(float**  a1)
 {
-  int i,j ;
-  a1[i][j] = 0.;
-  *a1[0] = 0;
   **a1 = 0;
   return ;
 }

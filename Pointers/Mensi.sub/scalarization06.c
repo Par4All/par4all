@@ -4,8 +4,13 @@
    b) a declaration should be created for the corresponding scalar
 
    -> THIS TEST FAILS because as of today, regions are not computed
-   for pointers (LD, 19 May 2009)
-*/
+   for pointers (LD, 19 May 2009).
+
+   -> this test stinks as x, y and t are not properly allocated: the
+   malloc arguments should be n*sizeof(int) instead of sizeof(int).
+   (FI, 28 May 2013)
+
+  */
 
 #include <stdio.h>
 #include <malloc.h>

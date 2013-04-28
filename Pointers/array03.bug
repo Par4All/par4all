@@ -1,0 +1,4 @@
+  INTERPROCEDURAL_POINTS_TO_ANALYSIS building   POINTS_TO(foo)
+                                 building   POINTS_TO_OUT(foo)
+                                 building   POINTS_TO_IN(foo)
+pips error in subscripted_reference_to_points_to: (/home/francois/MYPIPS/prod/pips/src/Libs/alias-classes/expression.c:87) Meaningless call.

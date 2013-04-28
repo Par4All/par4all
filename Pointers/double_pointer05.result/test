@@ -1,0 +1,57 @@
+
+POINTS-TO
+
+
+// Points To IN:
+// _a1_1[*] -> *NULL* , MAY
+// _a1_1[*] -> _a1_1_1[*][0] , MAY
+// a1 -> *NULL* , MAY
+// a1 -> _a1_1[0] , MAY
+
+
+// Points To OUT:
+// _a1_1[*] -> _a1_1_1[*][0] , MAY
+// a1 -> _a1_1[0] , EXACT
+
+int double_pointer05(float **a1, int i, int j)
+{
+
+// Points To: none
+
+   int c = 1;
+
+// Points To:
+// _a1_1[*] -> *NULL* , MAY
+// _a1_1[*] -> _a1_1_1[*][0] , MAY
+// a1 -> *NULL* , MAY
+// a1 -> _a1_1[0] , MAY
+
+   if (a1[i][j]==0.)
+
+// Points To:
+// _a1_1[*] -> _a1_1_1[*][0] , MAY
+// a1 -> _a1_1[0] , EXACT
+
+      c = 0;
+
+// Points To:
+// _a1_1[*] -> _a1_1_1[*][0] , MAY
+// a1 -> _a1_1[0] , EXACT
+
+   return c;
+}
+
+PROPER  EFFECTS WITH POINTS-TO
+
+int double_pointer05(float **a1, int i, int j)
+{
+//             <    is written>: c
+   int c = 1;
+//             <may be read   >: _a1_1_1[*][j]
+//             <    is read   >: _a1_1[i] a1 i j
+   if (a1[i][j]==0.)
+//             <    is written>: c
+      c = 0;
+//             <    is read   >: c
+   return c;
+}
