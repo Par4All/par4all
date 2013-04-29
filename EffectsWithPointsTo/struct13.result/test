@@ -3,7 +3,7 @@ Points-to for "init"
 
 
 // Points To IN:
-// m -> *NULL_POINTER* , MAY
+// m -> *NULL* , MAY
 // m -> _m_1[0] , MAY
 
 
@@ -19,7 +19,7 @@ void init(mys *m)
    int i;
 
 // Points To:
-// m -> *NULL_POINTER* , MAY
+// m -> *NULL* , MAY
 // m -> _m_1[0] , MAY
 
    m->num = 5;

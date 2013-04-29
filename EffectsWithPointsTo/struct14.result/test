@@ -3,14 +3,14 @@ Points-to for "init2"
 
 
 // Points To IN:
-// _n_1[0].tab2 -> *NULL_POINTER* , MAY
+// _n_1[0].tab2 -> *NULL* , MAY
 // _n_1[0].tab2 -> _n_1_3__1[0][0] , MAY
-// n -> *NULL_POINTER* , MAY
+// n -> *NULL* , MAY
 // n -> _n_1[0] , MAY
 
 
 // Points To OUT:
-// _n_1[0].tab2 -> *NULL_POINTER* , MAY
+// _n_1[0].tab2 -> *NULL* , MAY
 // _n_1[0].tab2 -> _n_1_3__1[0][0] , MAY
 // n -> _n_1[0] , EXACT
 
@@ -26,35 +26,35 @@ void init2(mys *n)
    mys m;
 
 // Points To:
-// _n_1[0].tab2 -> *NULL_POINTER* , MAY
+// _n_1[0].tab2 -> *NULL* , MAY
 // _n_1[0].tab2 -> _n_1_3__1[0][0] , MAY
 // m.tab2 -> undefined , EXACT
-// n -> *NULL_POINTER* , MAY
+// n -> *NULL* , MAY
 // n -> _n_1[0] , MAY
 
 
    m = *n;
 
 // Points To:
-// _n_1[0].tab2 -> *NULL_POINTER* , MAY
+// _n_1[0].tab2 -> *NULL* , MAY
 // _n_1[0].tab2 -> _n_1_3__1[0][0] , MAY
-// m.tab2 -> *NULL_POINTER* , MAY
+// m.tab2 -> *NULL* , MAY
 // m.tab2 -> _n_1_3__1[0][0] , MAY
 // n -> _n_1[0] , EXACT
 
    m.num = 5;
 
 // Points To:
-// _n_1[0].tab2 -> *NULL_POINTER* , MAY
+// _n_1[0].tab2 -> *NULL* , MAY
 // _n_1[0].tab2 -> _n_1_3__1[0][0] , MAY
-// m.tab2 -> *NULL_POINTER* , MAY
+// m.tab2 -> *NULL* , MAY
 // m.tab2 -> _n_1_3__1[0][0] , MAY
 // n -> _n_1[0] , EXACT
 
    m.tab2 = malloc(5*sizeof(int));
 
 // Points To:
-// _n_1[0].tab2 -> *NULL_POINTER* , MAY
+// _n_1[0].tab2 -> *NULL* , MAY
 // _n_1[0].tab2 -> _n_1_3__1[0][0] , MAY
 // m.tab2 -> *HEAP*_l_23[0] , MAY
 // n -> _n_1[0] , EXACT
@@ -62,7 +62,7 @@ void init2(mys *n)
    (m.tab1)[0] = 10;
 
 // Points To:
-// _n_1[0].tab2 -> *NULL_POINTER* , MAY
+// _n_1[0].tab2 -> *NULL* , MAY
 // _n_1[0].tab2 -> _n_1_3__1[0][0] , MAY
 // m.tab2 -> *HEAP*_l_23[0] , MAY
 // n -> _n_1[0] , EXACT
@@ -70,7 +70,7 @@ void init2(mys *n)
    (m.tab2)[0] = 20;
 
 // Points To:
-// _n_1[0].tab2 -> *NULL_POINTER* , MAY
+// _n_1[0].tab2 -> *NULL* , MAY
 // _n_1[0].tab2 -> _n_1_3__1[0][0] , MAY
 // m.tab2 -> *HEAP*_l_23[0] , MAY
 // n -> _n_1[0] , EXACT
@@ -78,7 +78,7 @@ void init2(mys *n)
    for(i = 0; i <= 4; i += 1) {
 
 // Points To:
-// _n_1[0].tab2 -> *NULL_POINTER* , MAY
+// _n_1[0].tab2 -> *NULL* , MAY
 // _n_1[0].tab2 -> _n_1_3__1[0][0] , MAY
 // m.tab2 -> *HEAP*_l_23[0] , MAY
 // n -> _n_1[0] , EXACT
@@ -86,7 +86,7 @@ void init2(mys *n)
       (m.tab1)[i] = 1;
 
 // Points To:
-// _n_1[0].tab2 -> *NULL_POINTER* , MAY
+// _n_1[0].tab2 -> *NULL* , MAY
 // _n_1[0].tab2 -> _n_1_3__1[0][0] , MAY
 // m.tab2 -> *HEAP*_l_23[0] , MAY
 // n -> _n_1[0] , EXACT

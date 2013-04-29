@@ -3,7 +3,7 @@ Points-to for call30
 
 
 // Points To IN:
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_1[0] , MAY
 
 
@@ -14,7 +14,7 @@ void call30(int *q)
 {
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_1[0] , MAY
 
    free(q);
@@ -29,7 +29,7 @@ Points-to for "call30_caller"
 
 
 // Points To IN:
-// qq -> *NULL_POINTER* , MAY
+// qq -> *NULL* , MAY
 // qq -> _qq_1[0] , MAY
 
 
@@ -44,7 +44,7 @@ int call30_caller(int *qq)
    int i = 0;
 
 // Points To:
-// qq -> *NULL_POINTER* , MAY
+// qq -> *NULL* , MAY
 // qq -> _qq_1[0] , MAY
 
    call30(qq);

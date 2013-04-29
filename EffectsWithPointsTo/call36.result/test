@@ -3,7 +3,7 @@ Points-to for call36
 
 
 // Points To IN:
-// q[*] -> *NULL_POINTER* , MAY
+// q[*] -> *NULL* , MAY
 // q[*] -> _q_2[*][0] , MAY
 
 
@@ -14,7 +14,7 @@ void call36(int i, int *q[10])
 {
 
 // Points To:
-// q[*] -> *NULL_POINTER* , MAY
+// q[*] -> *NULL* , MAY
 // q[*] -> _q_2[*][0] , MAY
 
    /* This is going to lead to _q_2[*][0] since any pointer points

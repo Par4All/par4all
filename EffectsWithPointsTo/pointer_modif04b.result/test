@@ -3,7 +3,7 @@ Points-to for "main"
 
 
 // Points To IN:
-// stderr -> *NULL_POINTER* , MAY
+// stderr -> *NULL* , MAY
 // stderr -> _stderr_[0] , MAY
 
 
@@ -23,7 +23,7 @@ int main()
 
 // Points To:
 // s.tab -> undefined , EXACT
-// stderr -> *NULL_POINTER* , MAY
+// stderr -> *NULL* , MAY
 // stderr -> _stderr_[0] , MAY
 
 

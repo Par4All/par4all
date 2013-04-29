@@ -3,11 +3,11 @@ Points-to for call16
 
 
 // Points To IN:
-// _a -> *NULL_POINTER* , MAY
+// _a -> *NULL* , MAY
 // _a -> __a_2[0] , MAY
-// _b -> *NULL_POINTER* , MAY
+// _b -> *NULL* , MAY
 // _b -> __b_3[0] , MAY
-// _c -> *NULL_POINTER* , MAY
+// _c -> *NULL* , MAY
 // _c -> __c_4[0] , MAY
 
 
@@ -20,11 +20,11 @@ void call16(int _i, int *_a, int *_b, int *_c)
 {
 
 // Points To:
-// _a -> *NULL_POINTER* , MAY
+// _a -> *NULL* , MAY
 // _a -> __a_2[0] , MAY
-// _b -> *NULL_POINTER* , MAY
+// _b -> *NULL* , MAY
 // _b -> __b_3[0] , MAY
-// _c -> *NULL_POINTER* , MAY
+// _c -> *NULL* , MAY
 // _c -> __c_4[0] , MAY
 
    _a[_i] = _b[_i]+_c[_i];
@@ -56,11 +56,11 @@ Points-to for "dotprod"
 
 
 // Points To IN:
-// a -> *NULL_POINTER* , MAY
+// a -> *NULL* , MAY
 // a -> _a_1[0] , MAY
-// b -> *NULL_POINTER* , MAY
+// b -> *NULL* , MAY
 // b -> _b_2[0] , MAY
-// c -> *NULL_POINTER* , MAY
+// c -> *NULL* , MAY
 // c -> _c_3[0] , MAY
 
 
@@ -81,11 +81,11 @@ void dotprod(int *a, int *b, int *c)
    for(i = 0; i <= 999999; i += 1)
 
 // Points To:
-// a -> *NULL_POINTER* , MAY
+// a -> *NULL* , MAY
 // a -> _a_1[0] , MAY
-// b -> *NULL_POINTER* , MAY
+// b -> *NULL* , MAY
 // b -> _b_2[0] , MAY
-// c -> *NULL_POINTER* , MAY
+// c -> *NULL* , MAY
 // c -> _c_3[0] , MAY
 
       call16(i, a, b, c);

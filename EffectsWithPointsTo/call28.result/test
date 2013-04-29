@@ -3,7 +3,7 @@ Points-to for call28
 
 
 // Points To IN:
-// qq -> *NULL_POINTER* , MAY
+// qq -> *NULL* , MAY
 // qq -> _qq_1[0] , MAY
 
 
@@ -14,7 +14,7 @@ void call28(int *qq)
 {
 
 // Points To:
-// qq -> *NULL_POINTER* , MAY
+// qq -> *NULL* , MAY
 // qq -> _qq_1[0] , MAY
 
    *qq = 1;
@@ -51,7 +51,7 @@ Points-to for "call28_caller"
 
 
 // Points To IN:
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_1[0] , MAY
 
 
@@ -62,7 +62,7 @@ int call28_caller(int *q)
 {
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_1[0] , MAY
 
    call28(q);

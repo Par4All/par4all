@@ -3,7 +3,7 @@ Points-to for fpointer02
 
 
 // Points To IN:
-// col -> *NULL_POINTER* , MAY
+// col -> *NULL* , MAY
 // col -> _col_1[0] , MAY
 
 
@@ -14,7 +14,7 @@ void fpointer02(int *col, int indent)
 {
 
 // Points To:
-// col -> *NULL_POINTER* , MAY
+// col -> *NULL* , MAY
 // col -> _col_1[0] , MAY
 
    // *col = 0;

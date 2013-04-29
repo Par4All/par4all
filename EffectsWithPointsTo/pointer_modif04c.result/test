@@ -3,12 +3,12 @@ Points-to for "compute_s"
 
 
 // Points To IN:
-// s.tab -> *NULL_POINTER* , MAY
+// s.tab -> *NULL* , MAY
 // s.tab -> _s_2__1[0] , MAY
 
 
 // Points To OUT:
-// s.tab -> *NULL_POINTER* , MAY
+// s.tab -> *NULL* , MAY
 // s.tab -> _s_2__1[0] , MAY
 
 void compute_s(s_t s, int max)
@@ -24,13 +24,13 @@ void compute_s(s_t s, int max)
    for(i = 0; i <= max-1; i += 1)
 
 // Points To:
-// s.tab -> *NULL_POINTER* , MAY
+// s.tab -> *NULL* , MAY
 // s.tab -> _s_2__1[0] , MAY
 
       (s.tab)[i] = i*2.0;
 
 // Points To:
-// s.tab -> *NULL_POINTER* , MAY
+// s.tab -> *NULL* , MAY
 // s.tab -> _s_2__1[0] , MAY
 
 

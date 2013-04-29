@@ -3,7 +3,7 @@ Points-to for call25
 
 
 // Points To IN:
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_1[0] , MAY
 
 
@@ -14,7 +14,7 @@ void call25(int *q)
 {
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_1[0] , MAY
 
    *q = 3;
@@ -56,13 +56,13 @@ int main()
    int i, *ip = (void *) 0;
 
 // Points To:
-// ip -> *NULL_POINTER* , EXACT
+// ip -> *NULL* , EXACT
 
 
    call25(ip);
 
 // Points To:
-// ip -> *NULL_POINTER* , EXACT
+// ip -> *NULL* , EXACT
 
    return 0;
 }

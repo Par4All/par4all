@@ -83,13 +83,13 @@ POINTS-TO
 
 
 // Points To IN:
-// nch -> *NULL_POINTER* , MAY
+// nch -> *NULL* , MAY
 // nch -> _nch_5[0] , MAY
-// ncl -> *NULL_POINTER* , MAY
+// ncl -> *NULL* , MAY
 // ncl -> _ncl_4[0] , MAY
-// nrh -> *NULL_POINTER* , MAY
+// nrh -> *NULL* , MAY
 // nrh -> _nrh_3[0] , MAY
-// nrl -> *NULL_POINTER* , MAY
+// nrl -> *NULL* , MAY
 // nrl -> _nrl_2[0] , MAY
 
 
@@ -155,7 +155,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 
 // Points To:
 // buffer -> *HEAP*_l_25[0] , MAY
-// file -> *NULL_POINTER* , EXACT
+// file -> *NULL* , EXACT
 // m -> undefined , EXACT
 
       nrerror("ouverture du fichier impossible\n");
@@ -163,7 +163,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // Points To:
 // buffer -> *HEAP*_l_25[0] , MAY
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// file -> *NULL_POINTER* , MAY
+// file -> *NULL* , MAY
 // m -> undefined , EXACT
 
    
@@ -174,7 +174,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // Points To:
 // buffer -> *HEAP*_l_25[0] , MAY
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// file -> *NULL_POINTER* , MAY
+// file -> *NULL* , MAY
 // m -> undefined , EXACT
 
       nrerror("entete du fichier %s invalide\n");
@@ -182,9 +182,9 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // Points To:
 // buffer -> *HEAP*_l_25[0] , MAY
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// file -> *NULL_POINTER* , MAY
+// file -> *NULL* , MAY
 // m -> undefined , EXACT
-// nrl -> *NULL_POINTER* , MAY
+// nrl -> *NULL* , MAY
 // nrl -> _nrl_2[0] , MAY
 
    
@@ -197,9 +197,9 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // Points To:
 // buffer -> *HEAP*_l_25[0] , MAY
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// file -> *NULL_POINTER* , MAY
+// file -> *NULL* , MAY
 // m -> undefined , EXACT
-// nrh -> *NULL_POINTER* , MAY
+// nrh -> *NULL* , MAY
 // nrh -> _nrh_3[0] , MAY
 // nrl -> _nrl_2[0] , EXACT
 
@@ -208,9 +208,9 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // Points To:
 // buffer -> *HEAP*_l_25[0] , MAY
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// file -> *NULL_POINTER* , MAY
+// file -> *NULL* , MAY
 // m -> undefined , EXACT
-// ncl -> *NULL_POINTER* , MAY
+// ncl -> *NULL* , MAY
 // ncl -> _ncl_4[0] , MAY
 // nrh -> _nrh_3[0] , EXACT
 // nrl -> _nrl_2[0] , EXACT
@@ -220,9 +220,9 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // Points To:
 // buffer -> *HEAP*_l_25[0] , MAY
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// file -> *NULL_POINTER* , MAY
+// file -> *NULL* , MAY
 // m -> undefined , EXACT
-// nch -> *NULL_POINTER* , MAY
+// nch -> *NULL* , MAY
 // nch -> _nch_5[0] , MAY
 // ncl -> _ncl_4[0] , EXACT
 // nrh -> _nrh_3[0] , EXACT
@@ -233,7 +233,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // Points To:
 // buffer -> *HEAP*_l_25[0] , MAY
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// file -> *NULL_POINTER* , MAY
+// file -> *NULL* , MAY
 // m -> undefined , EXACT
 // nch -> _nch_5[0] , EXACT
 // ncl -> _ncl_4[0] , EXACT
@@ -245,7 +245,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 // Points To:
 // buffer -> *HEAP*_l_25[0] , MAY
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// file -> *NULL_POINTER* , MAY
+// file -> *NULL* , MAY
 // m -> undefined , EXACT
 // nch -> _nch_5[0] , EXACT
 // ncl -> _ncl_4[0] , EXACT
@@ -279,7 +279,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 }
 
 // Points To IN:
-// line -> *NULL_POINTER* , MAY
+// line -> *NULL* , MAY
 // line -> _line_3[0] , MAY
 
 
@@ -290,7 +290,7 @@ void ReadPGMrow(FILE *file, int width, byte *line)
 {
 
 // Points To:
-// line -> *NULL_POINTER* , MAY
+// line -> *NULL* , MAY
 // line -> _line_3[0] , MAY
 
    fread(&line[0], sizeof(byte), width, file);

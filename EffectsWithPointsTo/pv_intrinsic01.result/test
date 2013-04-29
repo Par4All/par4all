@@ -1,9 +1,9 @@
-
+ 
 Points-to for "main"
 
 
 // Points To IN:
-// stderr -> *NULL_POINTER* , MAY
+// stderr -> *NULL* , MAY
 // stderr -> _stderr_[0] , MAY
 
 
@@ -444,7 +444,7 @@ int main()
 // fp -> undefined , EXACT
 // fp_pos -> pos , EXACT
 // i_name -> "i=" , EXACT
-// stderr -> *NULL_POINTER* , MAY
+// stderr -> *NULL* , MAY
 // stderr -> _stderr_[0] , MAY
 
 

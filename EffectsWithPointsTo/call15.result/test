@@ -3,9 +3,9 @@ Points-to for "call15"
 
 
 // Points To IN:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_2[0] , MAY
 
 
@@ -17,14 +17,14 @@ void call15(int *pi, tf_t *q)
 {
 
 // Points To:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
 
    *pi = 1;
 
 // Points To:
 // pi -> _pi_1[0] , EXACT
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_2[0] , MAY
 
    q->one = 1;

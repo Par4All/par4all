@@ -3,7 +3,7 @@ Points-to for call22
 
 
 // Points To IN:
-// q[4] -> *NULL_POINTER* , MAY
+// q[4] -> *NULL* , MAY
 // q[4] -> _q_1[4][0] , MAY
 
 
@@ -14,7 +14,7 @@ void call22(int *q[10])
 {
 
 // Points To:
-// q[4] -> *NULL_POINTER* , MAY
+// q[4] -> *NULL* , MAY
 // q[4] -> _q_1[4][0] , MAY
 
    *q[4] = 3;

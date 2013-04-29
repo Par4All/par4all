@@ -73,7 +73,7 @@ void exit02()
 
 // Points To:
 // j -> undefined , EXACT
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 
       p = malloc(i*sizeof(int));
    }

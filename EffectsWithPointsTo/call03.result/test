@@ -3,9 +3,9 @@ Points-to for "call03"
 
 
 // Points To IN:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_84[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_92[0] , MAY
 
 
@@ -17,7 +17,7 @@ void call03()
 {
 
 // Points To:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_84[0] , MAY
 
    *pi = 1;
@@ -34,7 +34,7 @@ void call03()
 
 // Points To:
 // pi -> _pi_84[1] , EXACT
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_92[0] , MAY
 
    q->one = 1;
@@ -103,9 +103,9 @@ Points-to for "main"
 
 
 // Points To IN:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_84[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_92[0] , MAY
 
 
@@ -115,9 +115,9 @@ int main()
 {
 
 // Points To:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_84[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_92[0] , MAY
 
    call03();

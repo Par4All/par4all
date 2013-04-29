@@ -3,9 +3,9 @@ Points-to for call02
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_5[0] , MAY
-// q[*] -> *NULL_POINTER* , MAY
+// q[*] -> *NULL* , MAY
 // q[*] -> _q_4[*][0] , MAY
 
 
@@ -28,7 +28,7 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
    y[i] = 0;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_5[0] , MAY
 
    p->one = 1;
@@ -40,7 +40,7 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 
 // Points To:
 // p -> _p_5[0] , EXACT
-// q[*] -> *NULL_POINTER* , MAY
+// q[*] -> *NULL* , MAY
 // q[*] -> _q_4[*][0] , MAY
 
    *q[i] = 3;

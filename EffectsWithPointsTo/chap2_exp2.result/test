@@ -56,9 +56,9 @@ int jas_free(char *f1)
 
 
 // Points To OUT:
-// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].desc -> *NULL* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL* , MAY
+// jas_image_fmtinfos[*].name -> *NULL* , MAY
 
 void jas_image_clearfmts(int jas_image_numfmts)
 {
@@ -79,83 +79,83 @@ void jas_image_clearfmts(int jas_image_numfmts)
 // Points To:
 // fmtinfo -> undefined , MAY
 // fmtinfo -> jas_image_fmtinfos[*] , MAY
-// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].desc -> *NULL* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL* , MAY
+// jas_image_fmtinfos[*].name -> *NULL* , MAY
 
       fmtinfo = &jas_image_fmtinfos[i];
 
 // Points To:
 // fmtinfo -> jas_image_fmtinfos[*] , MAY
-// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].desc -> *NULL* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL* , MAY
+// jas_image_fmtinfos[*].name -> *NULL* , MAY
 
       if (fmtinfo->name) {
 
 // Points To:
 // fmtinfo -> jas_image_fmtinfos[*] , MAY
-// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].desc -> *NULL* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL* , MAY
+// jas_image_fmtinfos[*].name -> *NULL* , MAY
 
          jas_free(fmtinfo->name);
 
 // Points To:
 // fmtinfo -> jas_image_fmtinfos[*] , MAY
-// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].desc -> *NULL* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL* , MAY
+// jas_image_fmtinfos[*].name -> *NULL* , MAY
 
          fmtinfo->name = 0;
       }
 
 // Points To:
 // fmtinfo -> jas_image_fmtinfos[*] , MAY
-// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].desc -> *NULL* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL* , MAY
+// jas_image_fmtinfos[*].name -> *NULL* , MAY
 
       if (fmtinfo->ext) {
 
 // Points To:
 // fmtinfo -> jas_image_fmtinfos[*] , MAY
-// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].desc -> *NULL* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL* , MAY
+// jas_image_fmtinfos[*].name -> *NULL* , MAY
 
          jas_free(fmtinfo->ext);
 
 // Points To:
 // fmtinfo -> jas_image_fmtinfos[*] , MAY
-// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].desc -> *NULL* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL* , MAY
+// jas_image_fmtinfos[*].name -> *NULL* , MAY
 
          fmtinfo->ext = 0;
       }
 
 // Points To:
 // fmtinfo -> jas_image_fmtinfos[*] , MAY
-// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].desc -> *NULL* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL* , MAY
+// jas_image_fmtinfos[*].name -> *NULL* , MAY
 
       if (fmtinfo->desc) {
 
 // Points To:
 // fmtinfo -> jas_image_fmtinfos[*] , MAY
-// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].desc -> *NULL* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL* , MAY
+// jas_image_fmtinfos[*].name -> *NULL* , MAY
 
          jas_free(fmtinfo->desc);
 
 // Points To:
 // fmtinfo -> jas_image_fmtinfos[*] , MAY
-// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].desc -> *NULL* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL* , MAY
+// jas_image_fmtinfos[*].name -> *NULL* , MAY
 
          fmtinfo->desc = 0;
       }
@@ -164,9 +164,9 @@ void jas_image_clearfmts(int jas_image_numfmts)
 // Points To:
 // fmtinfo -> undefined , MAY
 // fmtinfo -> jas_image_fmtinfos[*] , MAY
-// jas_image_fmtinfos[*].desc -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].ext -> *NULL_POINTER* , MAY
-// jas_image_fmtinfos[*].name -> *NULL_POINTER* , MAY
+// jas_image_fmtinfos[*].desc -> *NULL* , MAY
+// jas_image_fmtinfos[*].ext -> *NULL* , MAY
+// jas_image_fmtinfos[*].name -> *NULL* , MAY
 
    jas_image_numfmts = 0;
 }
