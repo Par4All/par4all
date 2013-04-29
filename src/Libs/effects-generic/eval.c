@@ -42,6 +42,27 @@
 #include "points_to_private.h"
 #include "effects-generic.h"
 
+/* In case, the points-to information is not complete, use anywhere
+ * locations to convert the reference.
+ *
+ * FI: I do not understand why it is always a write effect. I do not
+ * understand why the type should always be lost.
+ *
+ */
+static list use_default_sink_cell
+(reference input_ref __attribute__ ((__unused__)),
+ descriptor input_desc __attribute__ ((__unused__)),
+ void (*cell_reference_with_address_of_cell_reference_translation_func)
+ (reference, descriptor, reference, descriptor, int, reference *, descriptor *,
+  bool *) __attribute__ ((__unused__)),
+ void (*cell_reference_conversion_func)(reference, reference *, descriptor *) __attribute__ ((__unused__))
+ )
+{
+  type t = points_to_reference_to_concrete_type(input_ref);
+  list l = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), NIL);
+  return l;
+}
+
 /* Build the return list with the points-to sinks to which we
  * add/append the indices of input_ref which are not in the points-to
  * source reference. This is comparable to an interprocedural
@@ -356,6 +377,16 @@ list generic_eval_cell_with_points_to(
       fprintf(stderr, "*exact_p is %s\n", *exact_p? "true":"false");
     }
 
+    if(ENDP(matching_list)) {
+      pips_user_warning
+	("Insufficient points-to information for reference \"%s\".\n",
+	 reference_to_string(input_ref));
+      l = use_default_sink_cell(input_ref, input_desc,
+       cell_reference_with_address_of_cell_reference_translation_func,
+       cell_reference_conversion_func);
+      *exact_p = false;
+    }
+    else {
     l = transform_sink_cells_from_matching_list
       (matching_list,
        current_max_path_length,
@@ -364,7 +395,7 @@ list generic_eval_cell_with_points_to(
        input_desc,
        cell_reference_with_address_of_cell_reference_translation_func,
        cell_reference_conversion_func);
-
+    }
 
   } /* else branche of if (input_path_length == 0) */
 
