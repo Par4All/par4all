@@ -6,7 +6,7 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 
 # Show the iteration control property
-setproperty POINTS_TO_PATH_LIMIT 4
+setproperty POINTS_TO_PATH_LIMIT 2
 
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
