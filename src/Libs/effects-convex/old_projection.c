@@ -440,8 +440,8 @@ void regions_transformer_apply(list l_reg, transformer trans,
 	  if(store_effect_p(reg))
 	    {
 	      Psysteme sc_reg = region_system(reg);
-
-	      if (!sc_empty_p(sc_reg) && !sc_rn_p(sc_reg))
+	      
+	      if (!SC_UNDEFINED_P(sc_reg) && !sc_empty_p(sc_reg) && !sc_rn_p(sc_reg))
 		{
 		  debug_region_consistency(reg);
 
@@ -1145,7 +1145,7 @@ void region_exact_projection_along_variable(region reg, entity var)
 
     sc = region_system(reg);
 
-    if (!sc_empty_p(sc) && !sc_rn_p(sc))
+    if (!SC_UNDEFINED_P(sc) && !sc_empty_p(sc) && !sc_rn_p(sc))
     {
 	if (op_statistics_p())
 	{

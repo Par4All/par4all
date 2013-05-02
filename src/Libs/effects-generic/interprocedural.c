@@ -365,8 +365,30 @@ list backward_translation_of_points_to_formal_context_effect(entity callee,
 		  !set_undefined_p(pt_in_callee_filtered));
 
       ifdebug(8) print_points_to_set("binding", binding);
+      effect n_eff ;
+      if(descriptor_convex_p(effect_descriptor(eff))) {
+	cell n_c = effect_cell(eff);
+	reference n_r = cell_reference(n_c);
+	entity n_e = reference_variable(n_r);
+	int i = 0;
+	list inds = NIL;
+	int len = gen_length(reference_indices(n_r));
+	for(i = 0; i < len ; i++) {
+	expression ex = make_unbounded_expression();
+	inds = gen_nconc(inds,CONS(EXPRESSION,ex,NIL));
+	}
+	reference r = make_reference(n_e,inds);
+	cell c = make_cell_reference(r);
+	action ac = copy_action(effect_action(eff));
+	approximation ap = copy_approximation(effect_approximation(eff));
+	descriptor d = make_descriptor_none();
+	n_eff =  make_effect(c, ac, ap, d);
+      }
+      else{
+	n_eff = copy_effect(eff);
+      }
  
-      cell eff_c = effect_cell(eff);
+      cell eff_c = effect_cell(n_eff);
       points_to_graph bm_g = make_points_to_graph(false, binding);
       list n_eff_cells = points_to_source_to_translations(eff_c, bm_g, true);
 
