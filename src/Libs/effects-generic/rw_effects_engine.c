@@ -791,43 +791,76 @@ static list rw_effects_of_declarations(list lrw_after_decls, list l_decl)
   return lrw_before_decls;
 }
 
-static list r_rw_effects_of_sequence(list l_inst)
+/* Compute backwards the cumulated effects of the non-empty statement
+ * list "sl" as it is necessary to translate convex effects into
+ * the initial state.
+ *
+ * To do so, call recursively r_rw_effects_of_sequence() on the CDR of
+ * "sl" and translate them in the current state thanks to "t1", the
+ * transformer of the first statement, "s1", add the effects of the
+ * first statement "s1" which are already available in that same
+ * state, and remove effects related to variables declared in the
+ * first statement, "s1".
+ *
+ * rw_effects(sl) = projection(rw_effects(CDR(sl)) o transformer(s1)
+ *                                 U effects(s1),
+ *                                 declarations(s1))
+ * 
+ * The implementation is slightly different from the equations above
+ * if the first statement is a C declaration statement. The effect of
+ * the first statement are neglected at first and the effects of the
+ * initialization expressions are added later:
+ *
+ * rw_effects(sl) = if(declaration_p(s1)) then
+ *                        projection(rw_effects(CDR(sl)) o transformer(s1),
+ *                                   declarations(s1))
+ *                        U effects(initializations(s1))
+ *                      else
+ *                        rw_effects(CDR(l_inst)) o transformer(s1)
+ *                        U effects(s1)
+ *
+ * In both cases, a special process is used when "sl" is a singleton list:
+ *
+ * rw_effects(sl) = if(constant_p) then 
+ *                    constant_effects(projection(effects(s1), declaration(s1)))
+ *                  else
+ *                    projection(effects(s1), declaration(s1))
+ *
+ * This equation is altered with the implemented scheme because
+ * "effects(s1)" is not used when "s1" is a declaration.
+ */
+static list r_rw_effects_of_sequence(list sl)
 {
-    statement first_statement;
-    list remaining_block = NIL;
+    statement s1 = STATEMENT(CAR(sl));
+    list remaining_block = CDR(sl);
 
     list s1_lrw; /* rw effects of first statement */
     list rb_lrw; /* rw effects of remaining block */
     list l_rw = NIL; /* resulting rw effects */
-    transformer t1; /* transformer of first statement */
     list l_decl = NIL; /* declarations if first_statement is a declaration statement */
 
-    first_statement = STATEMENT(CAR(l_inst));
-    transformer context = (*load_context_func)(first_statement);
-    effects_private_current_context_push((*load_context_func)(first_statement));
-
-    remaining_block = CDR(l_inst);
+    transformer context = (*load_context_func)(s1);
+    effects_private_current_context_push((*load_context_func)(s1));
 
     if (c_module_p(get_current_module_entity()) &&
-	(declaration_statement_p(first_statement) ))
+	(declaration_statement_p(s1) ))
       {
 	// if it's a declaration statement, effects will be added on the fly
 	// as declarations are handled.
 	pips_debug(5, "first statement is a declaration statement\n");
-	l_decl = statement_declarations(first_statement);
+	l_decl = statement_declarations(s1);
 	s1_lrw = NIL;
-	//s1_lrw = load_rw_effects_list(first_statement);
+	//s1_lrw = load_rw_effects_list(s1);
       }
     else
-      s1_lrw = load_rw_effects_list(first_statement);
+      s1_lrw = load_rw_effects_list(s1);
 
     /* Is it the last instruction of the block */
-    if (!ENDP(remaining_block))
-    {
-	t1 = (*load_transformer_func)(first_statement);
+    if (!ENDP(remaining_block)) {
+	transformer t1 = (*load_transformer_func)(s1);
 	rb_lrw = r_rw_effects_of_sequence(remaining_block);
 
-	ifdebug(3){
+	ifdebug(3) {
 	    pips_debug(3, "R/W effects of first statement: \n");
 	    (*effects_prettyprint_func)(s1_lrw);
 	    pips_debug(3, "R/W effects of remaining sequence: \n");
@@ -838,21 +871,18 @@ static list r_rw_effects_of_sequence(list l_inst)
 	      fprint_transformer(stderr, t1, (get_variable_name_t) entity_local_name);
 	      //print_transformer(t1);
 	    }
-	    if (!transformer_undefined_p(context))
-	    {
-	      pips_debug(3, "precondition of first statement:\n");
+	    if (!transformer_undefined_p(context)) {
+	      pips_debug(3, "Precondition of first statement:\n");
 	      fprint_transformer(stderr, context, (get_variable_name_t) entity_local_name);
 	      //print_transformer(t1);
 	    }
 	}
-	if (rb_lrw !=NIL)
-	  {
-	    rb_lrw = generic_effects_store_update(rb_lrw, first_statement, true);
+	if (rb_lrw !=NIL) {
+	    rb_lrw = generic_effects_store_update(rb_lrw, s1, true);
 	  }
 	else {
 	  ifdebug(3){
-	    pips_debug(3, "warning - no effect on  remaining block\n");
-
+	    pips_debug(3, "Warning - no effect on remaining block\n");
 	  }
 	}
 	ifdebug(5){
@@ -879,11 +909,13 @@ static list r_rw_effects_of_sequence(list l_inst)
 	    (*effects_prettyprint_func)(l_rw);
 	}
     }
-    else /* We are on the last statement of the block and end the recursion */
-    {
+    else {
+      /* We are on the last statement of the block and end the recursion */
       l_rw = rw_effects_of_declarations(effects_dup(s1_lrw), l_decl);
-      if (get_constant_paths_p())
-	  {
+      /* This should be useless because cumulated effects are applied
+	 to constant proper effects most of the time... Maybe it is
+	 useful for cumulated pointer effects? */
+      if (get_constant_paths_p()) {
 	    list l_tmp = l_rw;
 	    l_rw = pointer_effects_to_constant_path_effects(l_rw);
 	    effects_free(l_tmp);
@@ -895,6 +927,14 @@ static list r_rw_effects_of_sequence(list l_inst)
     return(l_rw);
 }
 
+/* The real work is performed by r_rw_effects_of_sequence(), the
+ * recursive backward walk of the sequence.
+ *
+ * Here, anywhere effects are dealt with, the effects are normalized
+ * and store in the cumulate effects mapping.
+ *
+ * Empty sequences are also dealt with directly here.
+ */
 static void rw_effects_of_sequence(sequence seq)
 {
     statement current_stat = effects_private_current_stmt_head();
@@ -911,7 +951,7 @@ static void rw_effects_of_sequence(sequence seq)
     else
     {
 	list l_tmp = r_rw_effects_of_sequence(l_inst);
-	le = clean_anywhere_effects( l_tmp);
+	le = clean_anywhere_effects(l_tmp);
 	gen_full_free_list(l_tmp);
     }
 
