@@ -58,7 +58,8 @@ static list use_default_sink_cell
  void (*cell_reference_conversion_func)(reference, reference *, descriptor *) __attribute__ ((__unused__))
  )
 {
-  type t = points_to_reference_to_concrete_type(input_ref);
+  // FI: the anywhere effects could be typed
+  // type t = points_to_reference_to_concrete_type(input_ref);
   list l = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), NIL);
   return l;
 }
@@ -379,7 +380,7 @@ list generic_eval_cell_with_points_to(
 
     if(ENDP(matching_list)) {
       pips_user_warning
-	("Insufficient points-to information for reference \"%s\".\n",
+	("NULL pointer dereferencing... or insufficient points-to information for reference \"%s\".\n",
 	 reference_to_string(input_ref));
       l = use_default_sink_cell(input_ref, input_desc,
        cell_reference_with_address_of_cell_reference_translation_func,

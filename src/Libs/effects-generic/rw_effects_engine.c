@@ -678,6 +678,78 @@ static void rw_effects_of_test(test t)
 }
 
 /**
+   computes the cumulated effects of the declaration from the list of
+   effects that occur after the declaration
+
+   @param[out] lrw_before_decl is the list of effects in the store before the declaration;
+   it is a modified version of lrw_after_first_decl.
+   @param[inout] lrw_after_first_decl is the list of effects in the store after the declaration;
+   @param[in] decl is the declared variable
+
+   possible usage: l = rw_effects_of_declaration(l, decl)
+
+   This is used at least in rw_effects_of_sequence to compute the
+   cumulated effect of a sequence. The statements are walked backward
+   from the last one to the first one. Each time a declaration is hit,
+   the declared variables are also analyzed backwards to project past
+   effects that cannot be moved up because the variables is no longer
+   in the environment.
+
+   For reasons I (FI) still do not understand, the effect of
+   initialization expressions are (re(re?)?) computed here. At least
+   when this code is used for the computation of the cumulated
+   effects, I'd rather use the statement effects, whether they are
+   declarations or not and only filter them, igonring initialization
+   expressions if any.
+
+   This function has been outlined from
+   rw_effects_of_declaration(). The names of the local variables
+   should probably be updated according to its signature and
+   semantics.
+ */
+static list rw_effects_of_declaration(list lrw_after_first_decl, entity decl)
+{
+  list lrw_before_decls = NIL; /* the returned list */
+  storage decl_s = entity_storage(decl);
+
+  ifdebug(8)
+    {
+      type ct = entity_basic_concrete_type(decl);
+      pips_debug(8, "dealing with entity : %s with type %s\n", entity_local_name(decl), words_to_string(words_type(ct,NIL,false)));
+    }
+
+  if (storage_ram_p(decl_s)
+      /* static variable declaration has no effect, even in case of initialization. */
+      && !static_area_p(ram_section(storage_ram(decl_s)))
+      && type_variable_p(entity_type(decl)))
+    {
+      value v_init = entity_initial(decl);
+      expression exp_init = expression_undefined;
+      if(value_expression_p(v_init))
+	exp_init = value_expression(v_init);
+
+      // filter l_rw_after_decls with the declaration
+      lrw_before_decls = filter_effects_with_declaration(lrw_after_first_decl, decl);
+      // and then add the effects due to the initialization part
+      if(/*false &&*/ !expression_undefined_p(exp_init))
+	{
+	  pips_debug(8, "initial value: %s\n", expression_to_string(exp_init));
+	  list l_exp_init = generic_proper_effects_of_expression(exp_init);
+	  if (contract_p)
+	    l_exp_init = proper_to_summary_effects(l_exp_init);
+	  lrw_before_decls = (*effects_union_op)(l_exp_init,
+						 lrw_before_decls, effects_same_action_p);
+	}
+
+    } /* if (storage_ram(decl_s) && !static_area_p(ram_section(storage_ram(decl_s)))) */
+  else
+    {
+      lrw_before_decls = lrw_after_first_decl;
+    }
+  return lrw_before_decls;
+}
+
+/**
    computes the cumulated effects of the declarations from the list of
    effects after the declaration
 
@@ -694,49 +766,16 @@ static list rw_effects_of_declarations(list lrw_after_decls, list l_decl)
 
   if (!ENDP(l_decl))
     {
-      // treat last declarations first
+      // treat last declarations first: n recursive calls instead of a
+      // gen_reverse()...
       if (!ENDP(CDR(l_decl)))
 	lrw_after_first_decl = rw_effects_of_declarations(lrw_after_decls, CDR(l_decl));
       else
 	lrw_after_first_decl = lrw_after_decls;
       // then handle top declaration
       entity decl = ENTITY(CAR(l_decl));
-      storage decl_s = entity_storage(decl);
+      lrw_before_decls = rw_effects_of_declaration(lrw_after_first_decl, decl);
 
-      ifdebug(8)
-	{
-	  type ct = entity_basic_concrete_type(decl);
-	  pips_debug(8, "dealing with entity : %s with type %s\n", entity_local_name(decl),words_to_string(words_type(ct,NIL,false)));
-	}
-
-      if (storage_ram_p(decl_s)
-	  /* static variable declaration has no effect, even in case of initialization. */
-	  && !static_area_p(ram_section(storage_ram(decl_s)))
-	  && type_variable_p(entity_type(decl)))
-	{
-	  value v_init = entity_initial(decl);
-	  expression exp_init = expression_undefined;
-	  if(value_expression_p(v_init))
-	    exp_init = value_expression(v_init);
-
-	  // filter l_rw_after_decls with the declaration
-	  lrw_before_decls = filter_effects_with_declaration(lrw_after_first_decl, decl);
-	  // and then add the effects due to the initialization part
-	  if(!expression_undefined_p(exp_init))
-	    {
-	      pips_debug(8, "initial value: %s\n", expression_to_string(exp_init));
-	      list l_exp_init = generic_proper_effects_of_expression(exp_init);
-	      if (contract_p)
-		l_exp_init = proper_to_summary_effects(l_exp_init);
-	      lrw_before_decls = (*effects_union_op)(l_exp_init,
-						     lrw_before_decls, effects_same_action_p);
-	    }
-
-	} /* if (storage_ram(decl_s) && !static_area_p(ram_section(storage_ram(decl_s)))) */
-      else
-	{
-	  lrw_before_decls = lrw_after_first_decl;
-	}
     } /* if (!ENDP(CDR(l_decl))) */
   else
      lrw_before_decls = lrw_after_decls;
@@ -777,6 +816,7 @@ static list r_rw_effects_of_sequence(list l_inst)
 	pips_debug(5, "first statement is a declaration statement\n");
 	l_decl = statement_declarations(first_statement);
 	s1_lrw = NIL;
+	//s1_lrw = load_rw_effects_list(first_statement);
       }
     else
       s1_lrw = load_rw_effects_list(first_statement);
@@ -839,7 +879,7 @@ static list r_rw_effects_of_sequence(list l_inst)
 	    (*effects_prettyprint_func)(l_rw);
 	}
     }
-    else
+    else /* We are on the last statement of the block and end the recursion */
     {
       l_rw = rw_effects_of_declarations(effects_dup(s1_lrw), l_decl);
       if (get_constant_paths_p())
