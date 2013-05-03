@@ -751,7 +751,9 @@ static list rw_effects_of_declaration(list lrw_after_first_decl, entity decl)
 
 /**
    computes the cumulated effects of the declarations from the list of
-   effects after the declaration
+   effects after the declaration and make sure that all effects are
+   constant (FI: with respect to dereferencements I guess) to be sure
+   that can be unioned properly.
 
    @param[out] lrw_after_decls is the list of effects in the store after the declarations;
    it is modified.
@@ -781,8 +783,7 @@ static list rw_effects_of_declarations(list lrw_after_decls, list l_decl)
      lrw_before_decls = lrw_after_decls;
       // we should also do some kind of unioning...
 
-  if (get_constant_paths_p())
-    {
+  if (get_constant_paths_p()) {
       list l_tmp = lrw_before_decls;
       lrw_before_decls = pointer_effects_to_constant_path_effects(lrw_before_decls);
       effects_free(l_tmp);
@@ -828,6 +829,9 @@ static list rw_effects_of_declarations(list lrw_after_decls, list l_decl)
  *
  * This equation is altered with the implemented scheme because
  * "effects(s1)" is not used when "s1" is a declaration.
+ *
+ * The precondition of "s1", called "context" is also used and should
+ * appear in the equations above.
  */
 static list r_rw_effects_of_sequence(list sl)
 {
@@ -839,12 +843,12 @@ static list r_rw_effects_of_sequence(list sl)
     list l_rw = NIL; /* resulting rw effects */
     list l_decl = NIL; /* declarations if first_statement is a declaration statement */
 
+    /* Precondition of s1. Could be called p1... */
     transformer context = (*load_context_func)(s1);
     effects_private_current_context_push((*load_context_func)(s1));
 
     if (c_module_p(get_current_module_entity()) &&
-	(declaration_statement_p(s1) ))
-      {
+	(declaration_statement_p(s1) )) {
 	// if it's a declaration statement, effects will be added on the fly
 	// as declarations are handled.
 	pips_debug(5, "first statement is a declaration statement\n");
@@ -855,7 +859,7 @@ static list r_rw_effects_of_sequence(list sl)
     else
       s1_lrw = load_rw_effects_list(s1);
 
-    /* Is it the last instruction of the block */
+    /* Is it the last instruction of the block? */
     if (!ENDP(remaining_block)) {
 	transformer t1 = (*load_transformer_func)(s1);
 	rb_lrw = r_rw_effects_of_sequence(remaining_block);
@@ -865,8 +869,7 @@ static list r_rw_effects_of_sequence(list sl)
 	    (*effects_prettyprint_func)(s1_lrw);
 	    pips_debug(3, "R/W effects of remaining sequence: \n");
 	    (*effects_prettyprint_func)(rb_lrw);
-	    if (!transformer_undefined_p(t1))
-	    {
+	    if (!transformer_undefined_p(t1)) {
 	      pips_debug(3, "transformer of first statement:\n");
 	      fprint_transformer(stderr, t1, (get_variable_name_t) entity_local_name);
 	      //print_transformer(t1);
@@ -878,6 +881,8 @@ static list r_rw_effects_of_sequence(list sl)
 	    }
 	}
 	if (rb_lrw !=NIL) {
+	  /* FI: I do not understand this update; do we store each
+	     partial accumulation of effects at each statement? */
 	    rb_lrw = generic_effects_store_update(rb_lrw, s1, true);
 	  }
 	else {
@@ -891,7 +896,9 @@ static list r_rw_effects_of_sequence(list sl)
 	    (*effects_prettyprint_func)(rb_lrw);
 	}
 
-	/* then take care of declarations if any */
+	/* then take care of declarations if any: project effects
+	   based on declared variables and add effects of
+	   initialization expressions. */
 	rb_lrw = rw_effects_of_declarations(rb_lrw, l_decl);
 
 	ifdebug(5){
@@ -900,7 +907,7 @@ static list r_rw_effects_of_sequence(list sl)
 	    (*effects_prettyprint_func)(rb_lrw);
 	}
 
-	/* RW(block) = RW(rest_of_block) U RW(S1) */
+	/* RW(block) = RW(rest_of_block) U RW(s1) */
 	l_rw = (*effects_union_op)(rb_lrw, effects_dup(s1_lrw), effects_same_action_p);
 
 	ifdebug(5){
@@ -911,6 +918,8 @@ static list r_rw_effects_of_sequence(list sl)
     }
     else {
       /* We are on the last statement of the block and end the recursion */
+      /* If l_decl is not empty, then s1_lrw is empty, and
+	 vice-versa. See prologue. */
       l_rw = rw_effects_of_declarations(effects_dup(s1_lrw), l_decl);
       /* This should be useless because cumulated effects are applied
 	 to constant proper effects most of the time... Maybe it is
