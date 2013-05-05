@@ -2132,6 +2132,25 @@ bool sinks_fully_matches_source_p(cell source, list sinks)
 }
 
 
+/*
+ * A set of functions to find the sinks associated to a source cell
+ * according to a points-to relation:
+ *
+ *  - source_to_sinks(): the source has to be an "effective" pointer;
+ *    its evaluation requires a dereferencing.
+ *
+ *  - extended_source_to_sinks(): special handling for NULL and undefined?
+ *
+ *  - extended_sources_to_sinks(): same as previous one, but for a set of cells
+ *
+ *  - any_source_to_sinks(): the source does not have to be of type
+ *    pointer; indirect sinks of struct and arrays are computed
+ *
+ *  - pointer_source_to_sinks(): the source is of pointer type, but may
+ *    be a partially subscripted array, i.e. not an "effective"
+ *    pointer because no dereferencing is involved.
+ */
+
 /* Return a list of cells, "sinks", that are sink for some arc whose
  * source is "source" or related to "source" in set "pts". If no such
  * arc is found, add new points-to stubs and new arcs in "pts" when
@@ -2326,6 +2345,7 @@ list extended_source_to_sinks(cell sc, pt_map in)
   return sinks;
 }
 
+/* Same as extended_source_to_sinks, but for a set of cells, "pointed". */
 list extended_sources_to_sinks(list pointed, pt_map in)
 {
   list sinks = NIL;
@@ -2378,6 +2398,41 @@ list any_source_to_sinks(cell source, pt_map pts, bool fresh_p)
   return sinks;
 }
 
+/* Returns the sinks for a source cell "sc" of type pointer according
+ * to the points-to relation "in".
+ *
+ * This is an extension of extended_source_to_sinks() that also take
+ * into account partially subscribed arrays. Such references end up
+ * with a pointer type, but "in" is not involved in the
+ * dereferencing... since no dereferencing is necessary.  An extra 0
+ * subscript must be added.
+ *
+ * FI: This issue is also dealt elsewhere, but I do not know where nor
+ * how often.
+ */
+list pointer_source_to_sinks(cell sc, pt_map in)
+{
+  list sinks = NIL;
+  reference r = cell_any_reference(sc);
+  entity v = reference_variable(r);
+  type t = entity_basic_concrete_type(v);
+  if(array_type_p(t)) {
+    int dn = (int) type_depth(t);
+    list sl = reference_indices(r);
+    int sn = (int) gen_length(sl);
+    if(sn<dn) {
+      cell sink = copy_cell(sc);
+      reference sink_r = cell_any_reference(sink);
+      reference_indices(sink_r) = gen_nconc(reference_indices(sink_r),
+					    CONS(EXPRESSION, make_zero_expression(), NIL));
+      sinks = CONS(CELL, sink, NIL);
+    }
+  }
+  if(ENDP(sinks))
+    sinks = extended_source_to_sinks(sc, in);
+  return sinks;
+}
+
 /* Return all cells in points-to set "pts" who source is based on entity "e". 
  *
  * Similar to points_to_source_to_sinks, but much easier and shorter.

@@ -111,9 +111,9 @@ pt_map dereferencing_to_points_to(expression p, pt_map in)
       
       // FI: you do not want to apply side-effects twice...
       // But you then miss the detection of pointers that are not NULL
-      // because they are dereferenced
+      // because they are dereferenced and you miss the recursive descent
       //in = expressions_to_points_to(al, in, false);
-      //in = call_to_points_to(c, in);
+      //in = call_to_points_to(c, in, el, false);
       
       /* You must take care of s.tab, which is encoded by a call */
       entity f = call_function(c);
@@ -130,21 +130,18 @@ pt_map dereferencing_to_points_to(expression p, pt_map in)
 	if(pointer_type_p(ft) || struct_type_p(ft)
 	   || array_of_pointers_type_p(ft) 
 	   || array_of_struct_type_p(ft)) {
-#if 0
-	  reference r = copy_reference(ar);
-	  expression s = entity_to_expression(fv);
-	  reference_indices(r) = gen_nconc(reference_indices(r),
-					   CONS(EXPRESSION, s, NIL));
-	  /*out = */reference_dereferencing_to_points_to(r, in,
-							 nowhere_dereferencing_p,
-							 null_dereferencing_p);
-	  free_reference(r);
-#endif
 	  in = dereferencing_to_points_to(ae, in);
 	  /* For side effects on "in" */
 	  list sink_l = expression_to_points_to_sinks(p, in);
 	  gen_free_list(sink_l);
 	}
+      }
+      else {
+	// Do not take side-effects into account or they will be applied twice
+	in = expressions_to_points_to(al, in, false);
+	in = call_to_points_to(c, in, NIL, false);
+	list sl = expression_to_points_to_sinks(p, in);
+	gen_free_list(sl);
       }
       break;
     }
@@ -381,7 +378,7 @@ list dereferencing_to_sinks(expression a, pt_map in, bool eval_p)
 		pips_internal_error("sc assume saturated with 0 subscripts and/or field susbscripts.\n");
 	      }
 	      else {
-		list starpointed = extended_source_to_sinks(sc, in);
+		list starpointed = pointer_source_to_sinks(sc, in);
 		// sinks = gen_nconc(sinks, starpointed);
 		sinks = merge_points_to_cell_lists(sinks, starpointed);
 	      }
