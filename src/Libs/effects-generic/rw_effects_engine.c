@@ -897,7 +897,8 @@ static list r_rw_effects_of_sequence(list sl)
 
 	/* then take care of declarations if any: project effects
 	   based on declared variables and add effects of
-	   initialization expressions. */
+	   initialization expressions and translate non constant
+	   effects into constant effects if necessary. */
 	effects_private_current_stmt_push(s1);
 	rb_lrw = rw_effects_of_declarations(rb_lrw, l_decl);
 	effects_private_current_stmt_pop();
