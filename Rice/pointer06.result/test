@@ -141,6 +141,61 @@ void pointer06()
       (t->val)[i] = (tl->val)[i]+(tr->val)[i];
 }
 
+Cumulated effects
+
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+void pointer06()
+{
+//             <    is declared>: tree
+   struct tree {
+      int val[10];
+      struct tree *left;
+      struct tree *right;
+   };
+//             <    is declared>: i
+   int i;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: t _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: t
+//             <    is declared>: t
+   struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
+//             <may be written>: *HEAP*_l_10.left
+//             <    is read   >: t _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: t
+   t->left = (struct tree *) malloc(sizeof(struct tree ));
+//             <may be written>: *HEAP*_l_10.right
+//             <    is read   >: t _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is referenced>: t
+   t->right = (struct tree *) malloc(sizeof(struct tree ));
+//             <may be read   >: *HEAP*_l_10.left
+//             <    is read   >: t
+//             <    is written>: tl
+//             <    is referenced>: t tl
+//             <    is declared>: tl
+   struct tree *tl = t->left;
+//             <may be read   >: *HEAP*_l_10.right
+//             <    is read   >: t
+//             <    is written>: tr
+//             <    is referenced>: t tr
+//             <    is declared>: tr
+   struct tree *tr = t->right;
+//             <may be read   >: *HEAP*_l_11.val[*] *HEAP*_l_12.val[*]
+//             <may be written>: *HEAP*_l_10.val[*]
+//             <    is read   >: i t tl tr
+//             <    is written>: i
+//             <    is referenced>: i t tl tr
+   for(i = 0; i <= 9; i += 1)
+//             <may be read   >: *HEAP*_l_11.val[*] *HEAP*_l_12.val[*]
+//             <may be written>: *HEAP*_l_10.val[*]
+//             <    is read   >: i t tl tr
+//             <    is referenced>: i t tl tr
+      (t->val)[i] = (tl->val)[i]+(tr->val)[i];
+}
+
 Parallel code
 
 void pointer06()
@@ -162,7 +217,6 @@ void pointer06()
 
 Error and warnings:
 
-unknown[unknown] (activate_phase) Rule `PROPER_EFFECTS' already active
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer06] (points_to_set_block_projection) Memory leak for bucket "pointer06:*HEAP*_l_10".
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer06] (memory_leak_to_more_memory_leaks) Heap bucket "*HEAP*_l_11" leaked at line -1.
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer06] (memory_leak_to_more_memory_leaks) Heap bucket "*HEAP*_l_12" leaked at line -1.
