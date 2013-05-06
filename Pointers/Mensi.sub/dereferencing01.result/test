@@ -1,0 +1,161 @@
+
+Points-to for dereferencing01 for main
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   struct MyStr {
+      int ***p;
+   };
+
+// Points To: none
+
+   struct MyStr *s, *r, t, v;
+
+// Points To:
+// r -> undefined , EXACT
+// s -> undefined , EXACT
+// t.p -> undefined , EXACT
+// v.p -> undefined , EXACT
+
+   int i = 0, j = 1, *p1 = &i, **p2 = &p1, *p3 = &j, **p4 = &p3;
+
+// Points To:
+// p1 -> i , EXACT
+// p2 -> p1 , EXACT
+// p3 -> j , EXACT
+// p4 -> p3 , EXACT
+// r -> undefined , EXACT
+// s -> undefined , EXACT
+// t.p -> undefined , EXACT
+// v.p -> undefined , EXACT
+
+   s = &t;
+
+// Points To:
+// p1 -> i , EXACT
+// p2 -> p1 , EXACT
+// p3 -> j , EXACT
+// p4 -> p3 , EXACT
+// r -> undefined , EXACT
+// s -> t , EXACT
+// t.p -> undefined , EXACT
+// v.p -> undefined , EXACT
+
+   s->p = &p2;
+
+// Points To:
+// p1 -> i , EXACT
+// p2 -> p1 , EXACT
+// p3 -> j , EXACT
+// p4 -> p3 , EXACT
+// r -> undefined , EXACT
+// s -> t , EXACT
+// t.p -> p2 , EXACT
+// v.p -> undefined , EXACT
+
+   r = &v;
+
+// Points To:
+// p1 -> i , EXACT
+// p2 -> p1 , EXACT
+// p3 -> j , EXACT
+// p4 -> p3 , EXACT
+// r -> v , EXACT
+// s -> t , EXACT
+// t.p -> p2 , EXACT
+// v.p -> undefined , EXACT
+
+   r->p = &p4;
+
+// Points To:
+// p1 -> i , EXACT
+// p2 -> p1 , EXACT
+// p3 -> j , EXACT
+// p4 -> p3 , EXACT
+// r -> v , EXACT
+// s -> t , EXACT
+// t.p -> p2 , EXACT
+// v.p -> p4 , EXACT
+
+   **s->p = **r->p;
+
+// Points To:
+// p1 -> j , EXACT
+// p2 -> p1 , EXACT
+// p3 -> j , EXACT
+// p4 -> p3 , EXACT
+// r -> v , EXACT
+// s -> t , EXACT
+// t.p -> p2 , EXACT
+// v.p -> p4 , EXACT
+
+
+   return 0;
+}
+
+Proper effects with points-to for "main"
+
+int main()
+{
+   struct MyStr {
+      int ***p;
+   };
+   struct MyStr *s, *r, t, v;
+//             <    is written>: i j p1 p2 p3 p4
+   int i = 0, j = 1, *p1 = &i, **p2 = &p1, *p3 = &j, **p4 = &p3;
+//             <    is written>: s
+   s = &t;
+//             <    is read   >: s
+//             <    is written>: t.p
+   s->p = &p2;
+//             <    is written>: r
+   r = &v;
+//             <    is read   >: r
+//             <    is written>: v.p
+   r->p = &p4;
+//             <    is read   >: p2 p3 p4 r s t.p v.p
+//             <    is written>: p1
+   **s->p = **r->p;
+
+   return 0;
+}
+
+Cumulated effects with points-to for "main"
+
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+int main()
+{
+   struct MyStr {
+      int ***p;
+   };
+   struct MyStr *s, *r, t, v;
+//             <    is written>: i j p1 p2 p3 p4
+   int i = 0, j = 1, *p1 = &i, **p2 = &p1, *p3 = &j, **p4 = &p3;
+//             <    is written>: s
+   s = &t;
+//             <    is read   >: s
+//             <    is written>: t.p
+   s->p = &p2;
+//             <    is written>: r
+   r = &v;
+//             <    is read   >: r
+//             <    is written>: v.p
+   r->p = &p4;
+//             <    is read   >: p2 p3 p4 r s t.p v.p
+//             <    is written>: p1
+   **s->p = **r->p;
+
+   return 0;
+}
+C_PARSER[main] (simplify_C_expression) Variable "i" is probably used before it is defined
+C_PARSER[main] (simplify_C_expression) Variable "j" is probably used before it is defined
