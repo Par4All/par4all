@@ -712,8 +712,7 @@ static list rw_effects_of_declaration(list lrw_after_first_decl, entity decl)
   list lrw_before_decls = NIL; /* the returned list */
   storage decl_s = entity_storage(decl);
 
-  ifdebug(8)
-    {
+  ifdebug(8) {
       type ct = entity_basic_concrete_type(decl);
       pips_debug(8, "dealing with entity : %s with type %s\n", entity_local_name(decl), words_to_string(words_type(ct,NIL,false)));
     }
