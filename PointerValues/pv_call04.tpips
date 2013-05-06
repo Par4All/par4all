@@ -1,0 +1,16 @@
+setenv WSPACE=pv_call04
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+#setenv POINTER_VALUES_DEBUG_LEVEL 5
+
+module main
+activate PRINT_CODE_SIMPLE_POINTER_VALUES
+display PRINTED_FILE[%ALLFUNC]
+
+close
+delete $WSPACE
+quit
