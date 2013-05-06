@@ -1,5 +1,5 @@
 
-POINTS TO for "allocate_array"
+Points-to for "allocate_array"
 
 
 // Points To IN:
@@ -27,15 +27,29 @@ void allocate_array(parray_t pa)
    return;
 }
 
+Proper effects with points-to for "allocate_array"
+
+void allocate_array(parray_t pa)
+{
+//             <    is read   >: _pa_1.dim pa _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _pa_1.data _MALLOC_EFFECTS:_MALLOC_
+   pa->data = (float *) malloc(pa->dim*sizeof(float));
+   return;
+}
+
 POINTS TO for "init_array"
 
 
 // Points To IN:
+// _pa_1.data -> *NULL* , MAY
+// _pa_1.data -> _pa_1_2__1 , MAY
 // pa -> *NULL* , MAY
 // pa -> _pa_1 , MAY
 
 
 // Points To OUT:
+// _pa_1.data -> *NULL* , MAY
+// _pa_1.data -> _pa_1_2__1 , MAY
 // pa -> _pa_1 , EXACT
 
 void init_array(parray_t pa)
@@ -50,19 +64,38 @@ void init_array(parray_t pa)
    for(i = 0; i <= pa->dim-1; i += 1)
 
 // Points To:
+// _pa_1.data -> *NULL* , MAY
+// _pa_1.data -> _pa_1_2__1 , MAY
 // pa -> *NULL* , MAY
 // pa -> _pa_1 , MAY
 
       (pa->data)[i] = (float) i;
 
 // Points To:
+// _pa_1.data -> *NULL* , MAY
+// _pa_1.data -> _pa_1_2__1 , MAY
 // pa -> _pa_1 , EXACT
 
 
    return;
 }
 
-POINTS TO for "main"
+Proper effects with points-to for "init_array"
+
+void init_array(parray_t pa)
+{
+   int i;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: i
+   for(i = 0; i <= pa->dim-1; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _pa_1.data _pa_1.dim i pa
+      (pa->data)[i] = (float) i;
+
+   return;
+}
+
+Points-to for "main"
 
 
 // Points To IN: none
@@ -99,7 +132,7 @@ int main()
    return 0;
 }
 
-PROPER EFFECTS WITH POINTS TO
+Proper effects with points-to for "main"
 
 int main()
 {
@@ -118,7 +151,7 @@ int main()
    return 0;
 }
 
-CUMULATED EFFECTS WITH POINTS TO
+Cumulated effects for "main"
 
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_

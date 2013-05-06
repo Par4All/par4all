@@ -1,4 +1,4 @@
-setenv WSPACE=dereferencing13
+setenv WSPACE=dereferencing15
 delete $WSPACE
 create $WSPACE $WSPACE.c
 

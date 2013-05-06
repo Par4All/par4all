@@ -9,44 +9,56 @@ setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 create $WS $WS.c
 
-
 echo
-echo POINTS TO for "allocate_array"
+echo Points-to for "allocate_array"
 echo
 #activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[allocate_array]
 
+echo 
+echo Proper effects with points-to for "allocate_array"
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[allocate_array]
+
 echo
 echo POINTS TO for "init_array"
 echo
+# Default option is interprocedural_points_to_analysis
 #activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[init_array]
 
+echo 
+echo Proper effects with points-to for "init_array"
 echo
-echo POINTS TO for "main"
+#activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[init_array]
+
 echo
+echo Points-to for "main"
+echo
+# Default option is interprocedural_points_to_analysis
 #activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[main]
 
 echo 
-echo PROPER EFFECTS WITH POINTS TO
+echo Proper effects with points-to for "main"
 echo
-activate PROPER_EFFECTS_WITH_POINTS_TO
+#activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[main]
 
-
 echo 
-echo CUMULATED EFFECTS WITH POINTS TO
+echo Cumulated effects for "main"
 echo
-activate CUMULATED_EFFECTS_WITH_POINTS_TO
+# activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[main]
-
-
 
 close
 shell cat $WS.database/Warnings

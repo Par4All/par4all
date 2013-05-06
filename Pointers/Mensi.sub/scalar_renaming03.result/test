@@ -1,5 +1,5 @@
 
-PROPER  EFFECTS 
+Proper effects for "scalar_renaming03" 
 
 int scalar_renaming03()
 {
@@ -29,7 +29,7 @@ int scalar_renaming03()
    return T;                                                            /*0014*/
 }
 
-POINTS-TO
+Points-to for "scalar_renaming03"
 
 
 // Points To IN: none
@@ -87,7 +87,7 @@ int scalar_renaming03()
    return T;                                                            /*0014*/
 }
 
-PROPER  EFFECTS WITH POINTS TO
+Proper effects with points-to for "scalar_renaming03"
 
 int scalar_renaming03()
 {
@@ -116,6 +116,9 @@ int scalar_renaming03()
 
    return T;                                                            /*0014*/
 }
+
+Code for "scalar_renaming03" before scalar renaming
+
 int scalar_renaming03()
 {
 //             <    is declared>: A B C D T i p
@@ -152,45 +155,28 @@ int scalar_renaming03()
 
    return T;                                                            /*0014*/
 }
+
+Code for "scalar_renaming03" after scalar renaming
+
 int scalar_renaming03()
 {
-//             <    is declared>: A B C D T p
    int *p, T, A[100], B[100], C[100], D[100];                           /*0004*/
    //PIPS generated variable
-//             <    is declared>: T0 T1 T2 i0
    int i0, T0, T1, T2;
-//             <    is written>: p
-//             <    is referenced>: T p
    p = &T;                                                              /*0005*/
-//             <    is written>: i0
-//             <    is referenced>: i0
    for(i0 = 0; i0 <= 99; i0 += 1) {                                     /*0006*/
-//             <    is read   >: A[i0] B[i0] i0
-//             <    is written>: T0
-//             <    is referenced>: A B T0 i0
       T0 = A[i0]+B[i0];                                                 /*0007*/
-//             <    is read   >: T0 i0
-//             <    is written>: C[i0]
-//             <    is referenced>: C T0 i0
       C[i0] = T0+T0;                                                    /*0008*/
-//             <    is read   >: B[i0] D[i0] i0
-//             <    is written>: T1
-//             <    is referenced>: B D T1 i0
       T1 = D[i0]-B[i0];                                                 /*0009*/
-//             <    is read   >: p
-//             <    is written>: T
-//             <    is referenced>: p
       *p = 1;                                                           /*0010*/
-//             <    is read   >: T2 i0
-//             <    is written>: A[i0]
-//             <    is referenced>: A T2 i0
       A[i0] = T2*T2;                                                    /*0011*/
    }
-//             <    is read   >: T2
-//             <    is referenced>: T2
 
    return T2;                                                           /*0014*/
 }
+
+Parallel code for "scalar_renaming03"
+
 int scalar_renaming03()
 {
    int *p, T, A[100], B[100], C[100], D[100];                           /*0004*/

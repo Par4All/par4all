@@ -1,0 +1,38 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int t[100][10][3];
+
+
+// Points To: none
+
+   int (*p)[3];
+
+// Points To:
+// p -> undefined , EXACT
+
+
+   p = &t[1][2];
+
+// Points To:
+// p -> t[1][2] , EXACT
+
+   (*p)[1] = 0;
+
+// Points To:
+// p -> t[1][2] , EXACT
+
+
+   return 0;
+}

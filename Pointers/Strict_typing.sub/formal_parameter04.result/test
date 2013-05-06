@@ -76,27 +76,33 @@ int formal_parameter04(my_struct *p)
    (p->one)[0] = 0;
 
 // Points To:
+// _p_1.two -> *NULL* , MAY
+// _p_1.two -> _p_1_2__1 , MAY
 // p -> _p_1 , EXACT
 
    (p->two->one)[0] = 0;
 
 // Points To:
+// _p_1.two -> _p_1_2__1 , EXACT
+// _p_1_2__1.two -> *NULL* , MAY
+// _p_1_2__1.two -> _p_1_2__1_2__1 , MAY
 // p -> _p_1 , EXACT
 
    (p->two->two->one)[0] = 0;
 
 // Points To:
+// _p_1.two -> _p_1_2__1 , EXACT
+// _p_1_2__1.two -> _p_1_2__1_2__1 , EXACT
+// _p_1_2__1_2__1.two -> *NULL* , MAY
+// _p_1_2__1_2__1.two -> _p_1_2__1_2__1_2__1 , MAY
 // p -> _p_1 , EXACT
 
    (p->two->two->two->one)[0] = 0;
 
 // Points To:
-// _p_1.two -> *NULL* , MAY
-// _p_1.two -> _p_1_2__1 , MAY
-// _p_1_2__1.two -> *NULL* , MAY
-// _p_1_2__1.two -> _p_1_2__1_2__1 , MAY
-// _p_1_2__1_2__1.two -> *NULL* , MAY
-// _p_1_2__1_2__1.two -> _p_1_2__1_2__1_2__1 , MAY
+// _p_1.two -> _p_1_2__1 , EXACT
+// _p_1_2__1.two -> _p_1_2__1_2__1 , EXACT
+// _p_1_2__1_2__1.two -> _p_1_2__1_2__1_2__1 , EXACT
 // p -> _p_1 , EXACT
 
    p->two->two->two->two = 0;

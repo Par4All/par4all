@@ -3,23 +3,38 @@ POINTS-TO
 
 
 // Points To IN:
+// _a1_1[0] -> *NULL* , MAY
+// _a1_1[0] -> _a1_1_1[0][0] , MAY
 // a1 -> *NULL* , MAY
 // a1 -> _a1_1[0] , MAY
 
 
 // Points To OUT:
+// _a1_1[0] -> *NULL* , MAY
+// _a1_1[0] -> _a1_1_1[0][0] , MAY
 // a1 -> _a1_1[0] , EXACT
 
 void double_pointer03(float **a1)
 {
 
 // Points To:
+// _a1_1[0] -> *NULL* , MAY
+// _a1_1[0] -> _a1_1_1[0][0] , MAY
 // a1 -> *NULL* , MAY
 // a1 -> _a1_1[0] , MAY
+
+   float y = **a1;
+
+// Points To:
+// _a1_1[0] -> *NULL* , MAY
+// _a1_1[0] -> _a1_1_1[0][0] , MAY
+// a1 -> _a1_1[0] , EXACT
 
    **a1 = 0;
 
 // Points To:
+// _a1_1[0] -> *NULL* , MAY
+// _a1_1[0] -> _a1_1_1[0][0] , MAY
 // a1 -> _a1_1[0] , EXACT
 
    return;
@@ -29,7 +44,11 @@ PROPER  EFFECTS WITH POINTS-TO
 
 void double_pointer03(float **a1)
 {
+//             <    is read   >: _a1_1[0] _a1_1_1[0][0] a1
+//             <    is written>: y
+   float y = **a1;
 //             <    is read   >: _a1_1[0] a1
+//             <    is written>: _a1_1_1[0][0]
    **a1 = 0;
    return;
 }

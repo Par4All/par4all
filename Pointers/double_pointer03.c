@@ -4,6 +4,7 @@
 
 void double_pointer03(float**  a1)
 {
+  float y = **a1;
   **a1 = 0;
   return ;
 }

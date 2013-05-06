@@ -3,14 +3,18 @@ POINTS-TO
 
 
 // Points To IN:
+// _ap_2[0][0] -> *NULL* , MAY
 // _ap_2[0][1] -> *NULL* , MAY
+// _ap_2[0][0] -> _ap_2_2[0][0][0] , MAY
 // _ap_2[0][1] -> _ap_2_2[0][1][0] , MAY
 // ap -> *NULL* , MAY
 // ap -> _ap_2[0][0] , MAY
 
 
 // Points To OUT:
+// _ap_2[0][0] -> *NULL* , MAY
 // _ap_2[0][1] -> *NULL* , MAY
+// _ap_2[0][0] -> _ap_2_2[0][0][0] , MAY
 // _ap_2[0][1] -> _ap_2_2[0][1][0] , MAY
 // ap -> _ap_2[0][0] , EXACT
 
@@ -18,7 +22,9 @@ int argv07(int n, char *(*ap)[n])
 {
 
 // Points To:
+// _ap_2[0][0] -> *NULL* , MAY
 // _ap_2[0][1] -> *NULL* , MAY
+// _ap_2[0][0] -> _ap_2_2[0][0][0] , MAY
 // _ap_2[0][1] -> _ap_2_2[0][1][0] , MAY
 // ap -> *NULL* , MAY
 // ap -> _ap_2[0][0] , MAY
@@ -26,7 +32,9 @@ int argv07(int n, char *(*ap)[n])
    char *p = (*ap)[1];
 
 // Points To:
+// _ap_2[0][0] -> *NULL* , MAY
 // _ap_2[0][1] -> *NULL* , MAY
+// _ap_2[0][0] -> _ap_2_2[0][0][0] , MAY
 // _ap_2[0][1] -> _ap_2_2[0][1][0] , MAY
 // ap -> _ap_2[0][0] , EXACT
 // p -> *NULL* , MAY
@@ -35,7 +43,9 @@ int argv07(int n, char *(*ap)[n])
    printf("\"%s\"\n", p);
 
 // Points To:
+// _ap_2[0][0] -> *NULL* , MAY
 // _ap_2[0][1] -> *NULL* , MAY
+// _ap_2[0][0] -> _ap_2_2[0][0][0] , MAY
 // _ap_2[0][1] -> _ap_2_2[0][1][0] , MAY
 // ap -> _ap_2[0][0] , EXACT
 // p -> *NULL* , MAY

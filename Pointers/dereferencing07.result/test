@@ -22,7 +22,7 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 int main()
 {
@@ -46,8 +46,7 @@ int main()
 
    *(p+tab1[tab2[x]]) = 0;
 
-// Points To:
-// p -> undefined , EXACT
+// Points To: unreachable
 
    return 1;
 }

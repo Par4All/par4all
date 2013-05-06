@@ -4,14 +4,28 @@ create $WS $WS.c
 
 
 echo
-echo POINTS TO for "foo"
+echo Points-to for "foo"
 echo
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[foo]
 
 echo
-echo POINTS TO for "$WS"
+echo Proper effects with points-to for "foo"
 echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[foo]
+
+echo
+echo Cumulated effects for "foo"
+echo
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[foo]
+
+echo
+echo Points-to for "$WS"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[$WS]
 
 close

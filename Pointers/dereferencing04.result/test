@@ -9,6 +9,7 @@ void dereferencing04()
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p q r
    *(p+(q-r)) = 0.;
+   return;
 }
 
 POINTS-TO
@@ -17,7 +18,7 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 void dereferencing04()
 {
@@ -43,4 +44,8 @@ void dereferencing04()
 // r -> undefined , EXACT
 
    *(p+(q-r)) = 0.;
+
+// Points To: unreachable
+
+   return;
 }

@@ -88,7 +88,7 @@ void swap01(int **p, int **q)
 
 CUMULATED EFFECTS WITH POINTS TO
 
-//             <    is read   >: _q_2 p q
+//             <    is read   >: _p_1 _q_2 p q
 //             <    is written>: _p_1 _q_2
 void swap01(int **p, int **q)
 {
@@ -188,7 +188,11 @@ int main()
 
 // Points To: none
 
-   int i = 1, j = 2, z = 3, *pi = &i, *pj = &j, *pz = &z, **ppi = &pi, **ppj = &pj;
+   int i = 1, j = 2, z = 3;
+
+// Points To: none
+
+   int *pi = &i, *pj = &j, *pz = &z, **ppi = &pi, **ppj = &pj;
 
 // Points To:
 // pi -> i , EXACT
@@ -211,9 +215,3 @@ int main()
 
    return 0;
 }
-unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
-unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
-unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active
-C_PARSER[main] (simplify_C_expression) Variable "i" is probably used before it is defined
-C_PARSER[main] (simplify_C_expression) Variable "j" is probably used before it is defined
-C_PARSER[main] (simplify_C_expression) Variable "z" is probably used before it is defined

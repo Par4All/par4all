@@ -5,9 +5,9 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: unreachable
+// Points To OUT: none
 
-double dereferencing13()
+double dereferencing16()
 {
 
 // Points To: none
@@ -27,19 +27,11 @@ double dereferencing13()
 // p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // q -> p[0] , EXACT
 
-   double **w;
-
-// Points To:
-// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// q -> p[0] , EXACT
-// w -> undefined , EXACT
-
    int i = 1;
 
 // Points To:
 // p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // q -> p[0] , EXACT
-// w -> undefined , EXACT
 
    
    
@@ -48,44 +40,51 @@ double dereferencing13()
 // Points To:
 // p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // q -> p[0] , EXACT
-// w -> undefined , EXACT
 
    **(q+(i = 0)) = 3.;
 
 // Points To:
 // p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // q -> p[0] , EXACT
-// w -> undefined , EXACT
-
-   // w is used unitialized and this was not detected by the points-to analysis
-   **(w+(i = 2)) = 4.;
-
-// Points To: unreachable
 
    x[0] = **q;
 
-// Points To: unreachable
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> p[0] , EXACT
 
    q++;
    // *q++;
 
-// Points To: unreachable
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> p[1] , EXACT
 
    double *z1 = *q++;
 
-// Points To: unreachable
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> p[2] , EXACT
+// z1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
    double *z2;
 
-// Points To: unreachable
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> p[2] , EXACT
+// z1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// z2 -> undefined , EXACT
 
    z2 = *q++;
 
-// Points To: unreachable
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> p[3] , EXACT
+// z1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// z2 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 
-   return *z1+*z2-**w;
+   return *z1+*z2;
 }
 
 Warnings
 
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[dereferencing13] (reference_dereferencing_to_points_to) Null or undefined pointer may be dereferenced because of "w" at line 19.

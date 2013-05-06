@@ -88,7 +88,7 @@ void swap(int **p, int **q)
 
 CUMULATED EFFECTS WITH POINTS TO
 
-//             <    is read   >: _q_2 p q
+//             <    is read   >: _p_1 _q_2 p q
 //             <    is written>: _p_1 _q_2
 void swap(int **p, int **q)
 {

@@ -5,8 +5,10 @@ setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 
-# Show the iteration control property
-setproperty POINTS_TO_PATH_LIMIT 2
+# Show the iteration control property The initial value used was 4. It
+# can be set to 2 in order to show easily the cycle created to
+# represent unbounded access paths.
+setproperty POINTS_TO_PATH_LIMIT 4
 
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
