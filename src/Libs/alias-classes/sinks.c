@@ -301,6 +301,25 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p, boo
       offset_points_to_cells(sinks, delta, dt);
       free_expression(delta);
     }
+    else {
+      if(false) {
+	/* Needed for dereferencing17.c, but not for properties03
+	   because in the second case the dereferencing is
+	   delayed... */
+      /* There is an issue with eval_p: since we are looking for
+	 sinks, we always have to dereference "a" at least once. */
+      type dt = points_to_expression_to_pointed_type(a);
+      sinks = expression_to_points_to_sinks(a, in);
+      /* We have to undo the impact of side effects performed when the arguments were analyzed for points-to information */
+      expression delta = expression_undefined;
+      if(ENTITY_POST_INCREMENT_P(f))
+	delta = int_to_expression(-1);
+      else
+	delta = int_to_expression(1);
+      offset_points_to_cells(sinks, delta, dt);
+      free_expression(delta);
+      }
+    }
   }
   else {
   // FI: to be continued

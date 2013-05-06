@@ -468,6 +468,19 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in, bool side_effect_p)
     expression p = EXPRESSION(CAR(al));
     pt_out = dereferencing_to_points_to(p, pt_out);
   }
+  else if(ENTITY_PLUS_C_P(f) || ENTITY_MINUS_C_P(f)) {
+    /* Is the dereferenced pointer null or undefined? */
+    expression p1 = EXPRESSION(CAR(al));
+    type t1 = expression_to_type(p1);
+    if(pointer_type_p(t1))
+      pt_out = dereferencing_to_points_to(p1, pt_out);
+    else {
+      expression p2 = EXPRESSION(CAR(CDR(al)));
+      type t2 = expression_to_type(p2);
+      if(pointer_type_p(t2))
+	pt_out = dereferencing_to_points_to(p2, pt_out);
+    }
+  }
   else if(ENTITY_ASSERT_FAIL_SYSTEM_P(f)) {
     // FI: I needs this piece of code for assert();
     // FI: why? it looks like the evaluation of a conditional expression...
