@@ -305,6 +305,16 @@ bool anywhere_cell_p(cell c)
   return anywhere_p;
 }
 
+bool anywhere_reference_p(reference r)
+{
+  bool anywhere_p;
+  entity v = reference_variable(r);
+
+  anywhere_p =  entity_all_locations_p(v);
+
+  return anywhere_p;
+}
+
 
 
 
