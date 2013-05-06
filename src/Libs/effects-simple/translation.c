@@ -165,9 +165,20 @@ bool simple_cell_reference_with_address_of_cell_reference_translation_fi
 	free_reference(n_input_ref);
 	type cat = points_to_reference_to_concrete_type(address_of_ref);
 	if(type_equal_p(cit, cat)) {
-	  *output_ref = copy_reference(address_of_ref); // No subscripts
-	  *exact_p = exact_points_to_subscript_list_p(CDR(isl));
-	  reference_indices(*output_ref) = gen_full_copy_list(CDR(isl));
+	  /* FI: this is not always correct because the index list may hide
+	   * dereferencings... We should use only the indices that
+	   * match the type of address_of_ref and call recursively the
+	   * translation. Or rely on Beatrice's code.
+	   */
+	  type rt = points_to_reference_to_concrete_type(address_of_ref);
+	  int nd = type_depth(rt);
+	  if(nis<=nd) {
+	    *output_ref = copy_reference(address_of_ref); // No subscripts
+	    *exact_p = exact_points_to_subscript_list_p(CDR(isl));
+	    reference_indices(*output_ref) = gen_full_copy_list(CDR(isl));
+	  }
+	  else
+	    ok_p = false; // Let Beatrice take care of it...
 	}
 	else
 	  ok_p = false;
@@ -177,6 +188,14 @@ bool simple_cell_reference_with_address_of_cell_reference_translation_fi
     }
     else
       ok_p = false;
+  }
+  if(ok_p) {
+    ifdebug(1) {
+      type it = points_to_reference_to_concrete_type(input_ref);
+      type ot = points_to_reference_to_concrete_type(*output_ref);
+      if(!type_equal_up_to_qualifiers_p(it,ot))
+	pips_internal_error("Translation failure: the type of the translated cells is different from the type of the input cell.\n");
+    }
   }
   return ok_p;
 }
@@ -206,7 +225,7 @@ bool simple_cell_reference_with_address_of_cell_reference_translation_fi
 
     FI->BC: another example due to Pointers/array15.c. Input_ref is
     b[0][3] and address_of_ref is _b_1[0][0]. nb_common_indices is
-    0. b os a pointer to an array and the thing to do is to add the
+    0. b is a pointer to an array and the thing to do is to add the
     indices one by one, not to concatenate anything...
 
     FI->BC: this function is way too long. It must handle very
@@ -381,6 +400,13 @@ void simple_cell_reference_with_address_of_cell_reference_translation
   // by computing its type, if only, under a ifdebug() guard...
   pips_debug(8, "output reference %s\n",
 	     reference_to_string(*output_ref));
+  ifdebug(1) {
+    type it = points_to_reference_to_concrete_type(input_ref);
+    type ot = points_to_reference_to_concrete_type(*output_ref);
+    if(!anywhere_reference_p(*output_ref)
+       && !type_equal_up_to_qualifiers_p(it,ot))
+      pips_internal_error("Translation failure: the type of the translated cells is different from the type of the input cell.\n");
+  }
   return;
 }
 
