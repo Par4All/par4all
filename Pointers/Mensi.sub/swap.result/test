@@ -1,5 +1,5 @@
 
-POINTS TO for swap
+Points-to for "swap"
 
 
 // Points To IN:
@@ -70,7 +70,7 @@ void swap(int **p, int **q)
    return;
 }
 
-PROPER EFFECTS WITH POINTS TO
+Proper effects with points-to for "swap"
 
 void swap(int **p, int **q)
 {
@@ -86,7 +86,7 @@ void swap(int **p, int **q)
    return;
 }
 
-CUMULATED EFFECTS WITH POINTS TO
+Cumulated effects for "swap"
 
 //             <    is read   >: _p_1 _q_2 p q
 //             <    is written>: _p_1 _q_2
@@ -104,7 +104,7 @@ void swap(int **p, int **q)
    return;
 }
 
-POINTS TO for "main"
+Points-to for "main"
 
 
 // Points To IN: none

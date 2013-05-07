@@ -8,16 +8,15 @@ setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
 create $WS $WS.c
 
-
 echo
-echo POINTS TO for "$WS"
+echo Points-to for \"$WS\"
 echo
 #activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[swap01]
 
 echo 
-echo PROPER EFFECTS WITH POINTS TO
+echo Proper effects with points-to for "swap01"
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
@@ -25,24 +24,17 @@ display PRINTED_FILE[swap01]
 
 
 echo 
-echo CUMULATED EFFECTS WITH POINTS TO
+echo Cumulated effects with points-to for "swap01"
 echo
-#activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[swap01]
 
 echo
-echo POINTS TO for "$WS"
+echo Points-to for "main"
 echo
 #activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[swap01]
-
-echo
-echo POINTS TO for "main"
-echo
-#activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
-#activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[main]
 
 close

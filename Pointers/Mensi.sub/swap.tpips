@@ -12,7 +12,7 @@ activate PROPER_EFFECTS_WITH_POINTS_TO
 #activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
 
 echo
-echo Points-to for "$WS"
+echo Points-to for \"$WS\"
 echo
 
 activate PRINT_CODE_POINTS_TO_LIST
@@ -31,7 +31,7 @@ echo
 
 # CUMULATED_EFFECTS_WITH_POINTS_TO is assumed useless after
 # PROPER_EFFECTS_WITH_POINTS_TO
-#activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
 
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[swap]
