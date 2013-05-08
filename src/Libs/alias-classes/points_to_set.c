@@ -784,6 +784,14 @@ list anywhere_source_to_sinks(cell source, pt_map pts)
 	reference_add_zero_subscripts(r, vt);
       }
     }
+    else if(overloaded_type_p(vt)) {
+      cell c = make_anywhere_points_to_cell(copy_type(vt));
+      sinks = CONS(CELL, c, NIL);
+      points_to pt = make_points_to(copy_cell(source), c,
+				    make_approximation_may(),
+				    make_descriptor_none());
+      pts = add_arc_to_pt_map(pt, pts);
+    }
     else
       // FI: struct might be dereferenced?
       // FI: should this be tested when entering this function rather

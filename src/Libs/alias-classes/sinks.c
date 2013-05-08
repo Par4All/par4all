@@ -912,19 +912,127 @@ list reference_to_points_to_sinks(reference r, type et, pt_map in,
 
   return sinks;
 }
+
+static list process_casted_sinks(list sinks, type t)
+{
+  type pt = compute_basic_concrete_type(type_to_pointed_type(t));
+  list nsinks = NIL;
+  // You may have to update the subscript lists to fit the type
+  // This can only be done on *copies* of references included into
+  // the arcs of the points-to graph
+  FOREACH(CELL, c, sinks) {
+    if(!null_cell_p(c) && !nowhere_cell_p(c) && !anywhere_cell_p(c)) {
+      type cct = points_to_cell_to_concrete_type(c);
+      if(array_pointer_type_equal_p(pt, cct))
+	; // nothing to do
+      else {
+	type mct = points_to_cell_to_concrete_type(c);
+	if(overloaded_type_p(mct))
+	  ; // nothing to do... to be checked
+	else {
+	  // You should try to add or remove zero subscripts till the expected
+	  // type is reached.
+	  reference r = cell_any_reference(c);
+	  complete_points_to_reference_with_zero_subscripts(r);
+	  if(adapt_reference_to_type(r, pt)) {
+	    mct = points_to_cell_to_concrete_type(c);
 
+	    if(array_pointer_type_equal_p(pt, mct))
+	      ; // nothing to do
+	    else if(array_type_p(mct)
+		    && array_pointer_type_equal_p(pt, array_type_to_element_type(mct)))
+	      ; // nothing to do
+	    else {
+	      pips_internal_error("Not implemented yet.\n");
+	    }
+	  }
+	  else {
+	    /* The types are really incompatible, let's use the
+	     * type lattice, max_type(cct, mct)... if it were implemented
+	     *
+	     * Could we do better for a cast to (void *)? See cast03.
+	     */
+	    type ot = make_scalar_overloaded_type();
+	    cell nc = make_anywhere_points_to_cell(ot);
+	    nsinks = CONS(CELL, nc, nsinks);
+	    // pips_internal_error("Cast handling failure 1.\n");
+	  }
+	}
+      }
+    }
+  }
 
-/* FI: do we need eval_p? Yes! We may need to produce the source or the sink
+  return nsinks;
+}
+
+/* FI: I am not sure that process_casted_sources() is nor should be
+ * different from process_casted_sinks()
  */
-list cast_to_points_to_sinks(cast c,
+static list process_casted_sources(list sinks, type t)
+{
+  list nsinks = NIL; // New sink list
+  FOREACH(CELL, c, sinks) {
+    if(!null_cell_p(c) && !nowhere_cell_p(c) && !anywhere_cell_p(c)) {
+      type cct = points_to_cell_to_concrete_type(c);
+      if(array_pointer_type_equal_p(t, cct))
+	; // nothing to do
+      else { // We should create a stub of the proper type because a
+	// reference cannot include the address-of operator, "&"
+	if(pointer_type_p(t) && array_type_p(cct)) {
+	  reference r = cell_any_reference(c);
+	  complete_points_to_reference_with_zero_subscripts(r);
+	  if(adapt_reference_to_type(r, t))
+	    ;
+	  else
+	    pips_internal_error("Cast handling failure 2.\n");
+	}
+	else {
+	  if(type_void_p(cct)) {
+	    /* Cell c is OK if it points towards cells of type
+	       compatible with the type pointed to by type t*/
+	  }
+	  else {
+	    type ot = make_scalar_overloaded_type();
+	    cell nc = make_anywhere_points_to_cell(ot);
+	    nsinks = CONS(CELL, nc, nsinks);
+	    break;
+	    //pips_internal_error("Not implemented yet: stub with proper type needed.\n");
+	  }
+	}
+      }
+    }
+  }
+
+  /* Update "sinks" with "dsl" and "nsl" */
+
+  return nsinks;
+}
+
+/* Handling of cast: play it safe! Either the cast is partly redundant
+ * and can be ignored or anywhere is returned.
+ *
+ * Design choice: can we have static aliasing with constant paths? Can
+ * we have different types for one constant path? Maybe we could have
+ * some static aliasing for stubs, using an offset in the formal
+ * context, but we cannot manage static aliasing at the reference
+ * level, i.e. at the constant path level.
+ *
+ * FI: do we need eval_p? Yes! We may need to produce the source or the sink.
+ *
+ * Note: the problem linked to eval_p has not been analyzed properly;
+ * the code should be simplified.
+ *
+ * Relevant test cases: Rice/test03
+ */
+list cast_to_points_to_sinks(cast ce,
 			     type et __attribute__ ((unused)),
 			     pt_map in,
 			     bool eval_p)
 {
   list sinks = list_undefined;
   list nsinks = NIL; // In case the cast cannot be handled precisely
-  expression e = cast_expression(c);
-  type t = compute_basic_concrete_type(cast_type(c));
+  expression e = cast_expression(ce);
+  type t = compute_basic_concrete_type(cast_type(ce));
   // FI: should we pass down the expected type? It would be useful for
   // heap modelling. No, we might ass well fix the type in the list of
   // sinks returned, especially for malloced buckets.
@@ -937,96 +1045,31 @@ list cast_to_points_to_sinks(cast c,
   if(eval_p) {
     sinks = expression_to_points_to_sinks(e, in);
     if(pointer_type_p(t)) {
-      type pt = compute_basic_concrete_type(type_to_pointed_type(t));
-      // You may have to update the subscript lists to fit the type
-      // This can only be done on *copies* of references included into
-      // the arcs of the points-to graph
-      FOREACH(CELL, c, sinks) {
-	if(!null_cell_p(c) && !nowhere_cell_p(c) && !anywhere_cell_p(c)) {
-	  type cct = points_to_cell_to_concrete_type(c);
-	  if(array_pointer_type_equal_p(pt, cct))
-	    ; // nothing to do
-	  else {
-	    type mct = points_to_cell_to_concrete_type(c);
-	    if(overloaded_type_p(mct))
-	      ; // nothing to do... to be checked
-	    else {
-	      // You should try to add or remove zero subscripts till the expected
-	      // type is reached.
-	      reference r = cell_any_reference(c);
-	      complete_points_to_reference_with_zero_subscripts(r);
-	      if(adapt_reference_to_type(r, pt)) {
-		mct = points_to_cell_to_concrete_type(c);
-
-		if(array_pointer_type_equal_p(pt, mct))
-		  ; // nothing to do
-		else if(array_type_p(mct)
-			&& array_pointer_type_equal_p(pt, array_type_to_element_type(mct)))
-		  ; // nothing to do
-		else {
-		  pips_internal_error("Not implemented yet.\n");
-		}
-	      }
-	      else {
-		/* The types are really incompatible, let's use the
-		 * type lattice, max_type(cct, mct)... if it were implemented
-		 *
-		 * Could we do better for a cast to (void *)? See cast03.
-		 */
-		type t = make_scalar_overloaded_type();
-		cell nc = make_anywhere_points_to_cell(t);
-		nsinks = CONS(CELL, nc, nsinks);
-		// pips_internal_error("Cast handling failure 1.\n");
-	      }
-	    }
-	  }
-	}
-      }
+      nsinks = process_casted_sinks(sinks, t);
     }
     else {
       pips_internal_error("Not implemented yet.\n");
     }
   }
   else {
-    sinks = expression_to_points_to_sources(e, in);
-    if(pointer_type_p(t)) {
-      FOREACH(CELL, c, sinks) {
-	if(!null_cell_p(c) && !nowhere_cell_p(c) && !anywhere_cell_p(c)) {
-	  bool to_be_freed;
-	  type ct = points_to_cell_to_type(c, &to_be_freed);
-	  type cct = compute_basic_concrete_type(ct);
-	  if(array_pointer_type_equal_p(t, cct))
-	    ; // nothing to do
-	  else { // We should create a stub of the proper type because a
-	    // reference cannot include the address-of operator, "&"
-	    if(pointer_type_p(t) && array_type_p(cct)) {
-	      reference r = cell_any_reference(c);
-	      complete_points_to_reference_with_zero_subscripts(r);
-	      if(adapt_reference_to_type(r, t))
-		;
-	      else
-		pips_internal_error("Cast handling failure 2.\n");
-	    }
-	    else
-	      pips_internal_error("Not implemented yet: stub with proper type needed.\n");
-	  }
-	}
+      sinks = expression_to_points_to_sources(e, in);
+      if(pointer_type_p(t)) {
+	nsinks = process_casted_sources(sinks, t);
+      }
+      else {
+	// FI: should we make sure that we do not tranformer pointers
+	// into integers or other types?
+	;
       }
     }
-    else {
-      // FI: should we make sure that we do not tranformer pointers
-      // into integers or other types?
-      ;
+
+    if(!ENDP(nsinks)) {
+      gen_free_list(sinks);
+      sinks = nsinks;
     }
-  }
 
-  if(!ENDP(nsinks)) {
-    gen_free_list(sinks);
-    sinks = nsinks;
+    return sinks;
   }
-
-  return sinks;
-}
 
 // FI: do we need eval_p? eval_p is assumed always true
 list sizeofexpression_to_points_to_sinks(sizeofexpression soe,
