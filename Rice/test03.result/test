@@ -37,66 +37,74 @@ int main(int argc, char **argv)
    toto = malloc(sizeof(double)*a_d1*a_d2);
 
 // Points To:
-// toto -> *HEAP*_l_14[0] , MAY
+// toto -> *HEAP*_l_25[0] , MAY
 
 
    for(i = 0; i <= a_d1-1; i += 1)
 
 // Points To:
-// toto -> *HEAP*_l_14[0] , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// toto -> *HEAP*_l_25[0] , MAY
 
       for(j = 0; j <= a_d2-1; j += 1)
 
 // Points To:
-// toto -> *HEAP*_l_14[0] , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// toto -> *HEAP*_l_25[0] , MAY
 
          ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
 
 // Points To:
-// toto -> *HEAP*_l_14[0] , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// toto -> *HEAP*_l_25[0] , MAY
 
 
    free(toto);
 
 // Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // toto -> undefined , EXACT
 
-   
-   
+
    a_d1 = a_d2 = 10;
 
 // Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // toto -> undefined , EXACT
 
    toto = malloc(sizeof(double)*a_d1*a_d2);
 
 // Points To:
-// toto -> *HEAP*_l_26[0] , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// toto -> *HEAP*_l_36[0] , MAY
 
 
    for(i = 0; i <= a_d1-1; i += 1)
 
 // Points To:
-// toto -> *HEAP*_l_26[0] , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// toto -> *HEAP*_l_36[0] , MAY
 
       for(j = 0; j <= a_d2-1; j += 1)
 
 // Points To:
-// toto -> *HEAP*_l_26[0] , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// toto -> *HEAP*_l_36[0] , MAY
 
          ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
 
 // Points To:
-// toto -> *HEAP*_l_26[0] , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// toto -> *HEAP*_l_36[0] , MAY
 
 
    free(toto);
 
 // Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // toto -> undefined , EXACT
 
-   
-   
+
    return 0;
 }
 
@@ -140,8 +148,7 @@ int main(int argc, char **argv)
    free(toto);
 //             <    is written>: a_d1 a_d2
 //             <    is referenced>: a_d1 a_d2
-   
-   
+
    a_d1 = a_d2 = 10;
 //             <    is read   >: a_d1 a_d2 _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: toto _MALLOC_EFFECTS:_MALLOC_
@@ -165,8 +172,7 @@ int main(int argc, char **argv)
 //             <    is referenced>: toto
 
    free(toto);
-   
-   
+
    return 0;
 }
 
@@ -221,8 +227,7 @@ int main(int argc, char **argv)
 
 //  T(a_d1,a_d2) {a_d1==10, a_d2==10}
 
-   
-   
+
    a_d1 = a_d2 = 10;
 
 //  T() {a_d1==10, a_d2==10}
@@ -249,8 +254,7 @@ int main(int argc, char **argv)
 
 //  T(main) {main==0}
 
-   
-   
+
    return 0;
 }
 
@@ -305,8 +309,7 @@ int main(int argc, char **argv)
 
 //  P(a_d1,a_d2,argc,i,j) {}
 
-   
-   
+
    a_d1 = a_d2 = 10;
 
 //  P(a_d1,a_d2,argc,i,j) {a_d1==10, a_d2==10}
@@ -333,8 +336,7 @@ int main(int argc, char **argv)
 
 //  P(a_d1,a_d2,argc,i,j) {}
 
-   
-   
+
    return 0;
 }
 
@@ -356,8 +358,7 @@ int main(int argc, char **argv)
          ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
 
    free(toto);
-   
-   
+
    a_d1 = a_d2 = 10;
    toto = malloc(100*sizeof(double));
 
@@ -366,8 +367,7 @@ int main(int argc, char **argv)
          ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
 
    free(toto);
-   
-   
+
    return 0;
 }
 
@@ -408,66 +408,74 @@ int main(int argc, char **argv)
    toto = malloc(25*sizeof(double));
 
 // Points To:
-// toto -> *HEAP*_l_14[0] , MAY
+// toto -> *HEAP*_l_25[0] , MAY
 
 
    for(i = 0; i <= 4; i += 1)
 
 // Points To:
-// toto -> *HEAP*_l_14[0] , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// toto -> *HEAP*_l_25[0] , MAY
 
       for(j = 0; j <= a_d2-1; j += 1)
 
 // Points To:
-// toto -> *HEAP*_l_14[0] , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// toto -> *HEAP*_l_25[0] , MAY
 
          ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
 
 // Points To:
-// toto -> *HEAP*_l_14[0] , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// toto -> *HEAP*_l_25[0] , MAY
 
 
    free(toto);
 
 // Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // toto -> undefined , EXACT
 
-   
-   
+
    a_d1 = a_d2 = 10;
 
 // Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // toto -> undefined , EXACT
 
    toto = malloc(100*sizeof(double));
 
 // Points To:
-// toto -> *HEAP*_l_26[0] , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// toto -> *HEAP*_l_36[0] , MAY
 
 
    for(i = 0; i <= 9; i += 1)
 
 // Points To:
-// toto -> *HEAP*_l_26[0] , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// toto -> *HEAP*_l_36[0] , MAY
 
       for(j = 0; j <= a_d2-1; j += 1)
 
 // Points To:
-// toto -> *HEAP*_l_26[0] , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// toto -> *HEAP*_l_36[0] , MAY
 
          ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
 
 // Points To:
-// toto -> *HEAP*_l_26[0] , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// toto -> *HEAP*_l_36[0] , MAY
 
 
    free(toto);
 
 // Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // toto -> undefined , EXACT
 
-   
-   
+
    return 0;
 }
 int main(int argc, char **argv)
@@ -486,8 +494,7 @@ int main(int argc, char **argv)
          ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
 
    free(toto);
-   
-   
+
    a_d1 = a_d2 = 10;
    toto = malloc(100*sizeof(double));
 
@@ -496,7 +503,6 @@ int main(int argc, char **argv)
          ((*((double (*)[a_d1][a_d2]) toto))[i])[j] = (double) i+j*a_d2;
 
    free(toto);
-   
-   
+
    return 0;
 }

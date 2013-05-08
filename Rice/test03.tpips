@@ -2,7 +2,7 @@
 
 delete test03
 
-setproprety ABORT_ON_USER_ERROR TRUE
+setproperty ABORT_ON_USER_ERROR TRUE
 
 create test03 test03.c
 
