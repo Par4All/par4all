@@ -1244,6 +1244,11 @@ list flow_sensitive_malloc_to_points_to_sinks(expression e)
   cell mc = make_cell_reference(mr);
   list sinks  = CONS(CELL, mc, NIL);
 
+  if(!get_bool_property("POINTS_TO_SUCCESSFUL_MALLOC_ASSUMED")) {
+    cell nc = make_null_cell();
+    sinks = CONS(CELL, nc, sinks);
+  }
+
   return sinks;
 }
 

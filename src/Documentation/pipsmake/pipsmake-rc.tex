@@ -5779,6 +5779,17 @@ safe result is the top abstract location.
 ABSTRACT_HEAP_LOCATIONS "unique"
 \end{PipsProp}
 
+Property \PipsPropRef{POINTS_TO_SUCCESSFUL_MALLOC_ASSUMED} is used to
+control the analysis of a malloc call. The call may return either a
+unique target in the heap, or a pair of targets, one in the heap and
+NULL. The default value is true for historical reasons and because the
+result is shorter and correct almost all the time.
+\begin{PipsProp}{POINTS_TO_SUCCESSFUL_MALLOC_ASSUMED}
+POINTS_TO_SUCCESSFUL_MALLOC_ASSUMED TRUE
+\end{PipsProp}
+
+\subsubsection{Type Handling}
+
 The property \PipsPropRef{POINTS_TO_STRICT_POINTER_TYPES}
 is used to handle pointer arithmetic. According to C standard(section 6.5.6, item 8)
 the following C code :
@@ -13762,7 +13773,7 @@ print_code_static_control       > MODULE.printed_file
         < MODULE.static_control
 \end{PipsMake}
 
-\subsection{Sequential View with Points-To  Information}
+\subsection{Sequential View with Points-To Information}
 
 %%@UserManualDocumentation: print_code_points_to_sets
 Display the code decorated with the points to information.
