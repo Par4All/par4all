@@ -1,0 +1,132 @@
+
+Points-to for "fulguro02"
+
+
+// Points To IN:
+// _img_1[0].array -> *NULL* , MAY
+// _img_1[0].array -> _img_1_6__1[0][0] , MAY
+// _img_1_6__1[0][*] -> *NULL* , MAY
+// _img_1_6__1[0][*] -> _img_1_6__1_1[0][*][0] , MAY
+// img -> *NULL* , MAY
+// img -> _img_1[0] , MAY
+
+
+// Points To OUT:
+// *HEAP*_l_29[*] -> undefined , MAY
+// *HEAP*_l_29[*] -> *NULL* , MAY
+// *HEAP*_l_29[*] -> _img_1_6__1_1[0][*][0] , MAY
+// _img_1[0].array -> *NULL* , MAY
+// _img_1[0].array -> _img_1_6__1[0][0] , MAY
+// _img_1_6__1[0][*] -> _img_1_6__1_1[0][*][0] , MAY
+// img -> _img_1[0] , EXACT
+
+void fulguro02(FLGR_Data2D *img)
+{
+
+
+// Points To: none
+
+   int i, size_y = 5;
+
+// Points To: none
+
+   png_bytep *row_pointers = (void *) 0;
+
+// Points To:
+// row_pointers -> *NULL* , EXACT
+
+
+   row_pointers = (png_bytep *) malloc(sizeof(png_bytep)*size_y);
+
+// Points To:
+// *HEAP*_l_29[*] -> undefined , EXACT
+// row_pointers -> *HEAP*_l_29[0] , MAY
+
+
+   for(i = 0; i <= size_y-1; i += 1)
+
+// Points To:
+// *HEAP*_l_29[*] -> undefined , MAY
+// *HEAP*_l_29[*] -> *NULL* , MAY
+// *HEAP*_l_29[*] -> _img_1_6__1_1[0][*][0] , MAY
+// _img_1[0].array -> *NULL* , MAY
+// _img_1[0].array -> _img_1_6__1[0][0] , MAY
+// _img_1_6__1[0][*] -> *NULL* , MAY
+// _img_1_6__1[0][*] -> _img_1_6__1_1[0][*][0] , MAY
+// img -> *NULL* , MAY
+// img -> _img_1[0] , MAY
+// row_pointers -> *HEAP*_l_29[0] , MAY
+
+      row_pointers[i] = (png_bytep) (img->array)[i];
+}
+
+Proper effects with points-to for "fulguro02"
+
+void fulguro02(FLGR_Data2D *img)
+{
+
+//             <    is written>: size_y
+   int i, size_y = 5;
+//             <    is written>: row_pointers
+   png_bytep *row_pointers = (void *) 0;
+//             <    is read   >: size_y _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: row_pointers _MALLOC_EFFECTS:_MALLOC_
+
+   row_pointers = (png_bytep *) malloc(sizeof(png_bytep)*size_y);
+//             <    is read   >: size_y
+//             <    is written>: i
+
+   for(i = 0; i <= size_y-1; i += 1)
+//             <may be written>: *HEAP*_l_29[i]
+//             <    is read   >: _img_1[0].array _img_1_6__1[0][i] i 
+//                               img row_pointers size_y
+      row_pointers[i] = (png_bytep) (img->array)[i];
+}
+
+Cumulated effects with points-to for "fulguro02"
+
+//             <may be read   >: _img_1[0].array _img_1_6__1[0][*] img
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+void fulguro02(FLGR_Data2D *img)
+{
+
+//             <    is written>: size_y
+   int i, size_y = 5;
+//             <    is written>: row_pointers
+   png_bytep *row_pointers = (void *) 0;
+//             <    is read   >: size_y _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: row_pointers _MALLOC_EFFECTS:_MALLOC_
+
+   row_pointers = (png_bytep *) malloc(sizeof(png_bytep)*size_y);
+//             <may be read   >: _img_1[0].array _img_1_6__1[0][*] i 
+//                               img row_pointers
+//             <may be written>: *HEAP*_l_29[*]
+//             <    is read   >: size_y
+//             <    is written>: i
+
+   for(i = 0; i <= size_y-1; i += 1)
+//             <may be read   >: _img_1_6__1[0][*]
+//             <may be written>: *HEAP*_l_29[*]
+//             <    is read   >: _img_1[0].array i img row_pointers 
+//                               size_y
+      row_pointers[i] = (png_bytep) (img->array)[i];
+}
+
+Parallel code
+
+void fulguro02(FLGR_Data2D *img)
+{
+
+   int i, size_y = 5;
+   png_bytep *row_pointers = (void *) 0;
+
+   row_pointers = (png_bytep *) malloc(sizeof(png_bytep)*size_y);
+
+#pragma omp parallel for 
+   for(i = 0; i <= size_y-1; i += 1)
+      row_pointers[i] = (png_bytep) (img->array)[i];
+}
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[fulguro02] (points_to_set_block_projection) Memory leak for bucket "fulguro02:*HEAP*_l_29".
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning fulguro02 instead
