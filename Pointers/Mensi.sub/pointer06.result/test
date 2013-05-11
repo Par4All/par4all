@@ -226,5 +226,4 @@ unknown[unknown] (activate_phase) Rule `PROPER_EFFECTS' already active
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer06] (points_to_set_block_projection) Memory leak for bucket "pointer06:*HEAP*_l_10".
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer06] (memory_leak_to_more_memory_leaks) Heap bucket "*HEAP*_l_11" leaked at line -1.
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer06] (memory_leak_to_more_memory_leaks) Heap bucket "*HEAP*_l_12" leaked at line -1.
-CUMULATED_EFFECTS_WITH_POINTS_TO[pointer06] (generic_eval_cell_with_points_to) Insufficient points-to information for reference "t[0][right]".
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning pointer06 instead
