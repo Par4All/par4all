@@ -53,7 +53,8 @@ void fclose01()
    f = fopen("toto", "r");
 
 // Points To:
-// f -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// f -> *NULL* , MAY
+// f -> __IO_EFFECTS:IO_FILES[*] , MAY
 
    fclose(f);
 

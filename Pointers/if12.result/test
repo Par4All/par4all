@@ -2,10 +2,13 @@
 POINTS TO for "main"
 
 
-// Points To IN: none
+// Points To IN:
+// filename -> *NULL* , MAY
+// filename -> _filename_1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// filename -> _filename_1[0] , EXACT
 
 void if12(char *filename)
 {
@@ -16,25 +19,30 @@ void if12(char *filename)
 
 // Points To:
 // file -> undefined , EXACT
+// filename -> *NULL* , MAY
+// filename -> _filename_1[0] , MAY
 
 
    file = fopen(filename, "rb");
 
 // Points To:
-// file -> *ANY_MODULE*:*ANYWHERE* , MAY
+// file -> *NULL* , MAY
+// file -> __IO_EFFECTS:IO_FILES[*] , MAY
+// filename -> _filename_1[0] , EXACT
 
    if (file==(void *) 0)
 
 // Points To:
 // file -> *NULL* , EXACT
+// filename -> _filename_1[0] , EXACT
 
       printf("ouverture du fichier impossible\n");
 
 // Points To:
-// file -> *ANY_MODULE*:*ANYWHERE* , MAY
 // file -> *NULL* , MAY
+// file -> __IO_EFFECTS:IO_FILES[*] , MAY
+// filename -> _filename_1[0] , EXACT
 
 
    return;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[if12] (binary_intrinsic_call_to_points_to_sinks) Fopen() not precisely implemented.

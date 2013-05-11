@@ -19,17 +19,20 @@ towns read_towns(const  char fname[])
    FILE *fd = fopen(fname, "r");
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> *NULL* , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 
    size_t curr = 0;
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> *NULL* , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 
    towns the_towns = {1, malloc(sizeof(town))};
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> *NULL* , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 // stderr -> *NULL* , MAY
 // stderr -> _stderr_[0] , MAY
 // the_towns.data -> *HEAP*_l_25[0] , MAY
@@ -37,7 +40,8 @@ towns read_towns(const  char fname[])
    fprintf(stderr, "begin parsing ...\n");
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> *NULL* , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 // stderr -> _stderr_[0] , EXACT
 // the_towns.data -> *HEAP*_l_25[0] , MAY
 
@@ -45,7 +49,7 @@ towns read_towns(const  char fname[])
    while (!feof(fd)) {
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 // stderr -> _stderr_[0] , EXACT
 // the_towns.data -> *HEAP*_l_25[0] , MAY
 // the_towns.data -> *HEAP*_l_33[0] , MAY
@@ -53,7 +57,7 @@ towns read_towns(const  char fname[])
       if (the_towns.nb==curr) {
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 // stderr -> _stderr_[0] , EXACT
 // the_towns.data -> *HEAP*_l_25[0] , MAY
 // the_towns.data -> *HEAP*_l_33[0] , MAY
@@ -61,7 +65,7 @@ towns read_towns(const  char fname[])
          the_towns.nb *= 2;
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 // stderr -> _stderr_[0] , EXACT
 // the_towns.data -> *HEAP*_l_25[0] , MAY
 // the_towns.data -> *HEAP*_l_33[0] , MAY
@@ -70,7 +74,7 @@ towns read_towns(const  char fname[])
       }
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 // stderr -> _stderr_[0] , EXACT
 // the_towns.data -> *HEAP*_l_25[0] , MAY
 // the_towns.data -> *HEAP*_l_33[0] , MAY
@@ -78,7 +82,7 @@ towns read_towns(const  char fname[])
       if (fscanf(fd, "%lf%*[ \t]%lf%*[ \t]%lf", &((the_towns.data)[curr])[0], &((the_towns.data)[curr])[1], &((the_towns.data)[curr])[2])!=3) {
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 // stderr -> _stderr_[0] , EXACT
 // the_towns.data -> *HEAP*_l_25[0] , MAY
 // the_towns.data -> *HEAP*_l_33[0] , MAY
@@ -103,7 +107,7 @@ l99999:         ;
          }
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 // stderr -> _stderr_[0] , EXACT
 // the_towns.data -> *HEAP*_l_25[0] , MAY
 // the_towns.data -> *HEAP*_l_33[0] , MAY
@@ -113,7 +117,7 @@ _break_2:         ;
       else {
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 // stderr -> _stderr_[0] , EXACT
 // the_towns.data -> *HEAP*_l_25[0] , MAY
 // the_towns.data -> *HEAP*_l_33[0] , MAY
@@ -121,7 +125,7 @@ _break_2:         ;
          ((the_towns.data)[curr])[0] *= 3.14159265358979323846/180;
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 // stderr -> _stderr_[0] , EXACT
 // the_towns.data -> *HEAP*_l_25[0] , MAY
 // the_towns.data -> *HEAP*_l_33[0] , MAY
@@ -129,7 +133,7 @@ _break_2:         ;
          ((the_towns.data)[curr])[1] *= 3.14159265358979323846/180;
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 // stderr -> _stderr_[0] , EXACT
 // the_towns.data -> *HEAP*_l_25[0] , MAY
 // the_towns.data -> *HEAP*_l_33[0] , MAY
@@ -139,7 +143,7 @@ _break_2:         ;
    }
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 // stderr -> _stderr_[0] , EXACT
 // the_towns.data -> *HEAP*_l_25[0] , MAY
 // the_towns.data -> *HEAP*_l_33[0] , MAY
@@ -414,10 +418,11 @@ _break_2:         ;
          ++curr;
       }
    }
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: __IO_EFFECTS:IO_FILES[*] 
 //                               __IO_EFFECTS:LUNS[*]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: __IO_EFFECTS:IO_FILES[*] 
 //                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
    fclose(fd);
 //             <    is read   >: curr the_towns.data 
 //                               _MALLOC_EFFECTS:_MALLOC_

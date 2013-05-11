@@ -61,22 +61,23 @@ int main()
    fp = fopen("file.txt", "rb");
 
 // Points To:
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp -> *NULL* , MAY
+// fp -> __IO_EFFECTS:IO_FILES[*] , MAY
 
    n = fread(&buf[0], sizeof(double), 50, fp);
 
 // Points To:
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp -> __IO_EFFECTS:IO_FILES[*] , MAY
 
    if (n==-1)
 
 // Points To:
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp -> __IO_EFFECTS:IO_FILES[*] , MAY
 
       printf("fread failed");
 
 // Points To:
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp -> __IO_EFFECTS:IO_FILES[*] , MAY
 
    fclose(fp);
 

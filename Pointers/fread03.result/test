@@ -70,7 +70,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 
 // Points To:
 // buffer -> *ANY_MODULE*:*HEAP*_b1[0] , MAY
-// file -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// file -> __IO_EFFECTS:IO_FILES[*] , MAY
 // m -> undefined , EXACT
 
    if (file==(void *) 0)

@@ -17,24 +17,28 @@ towns read_towns(const  char fname[])
    /* = { 1 , malloc(sizeof(town)) }*/
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> *NULL* , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 
    towns the_towns;
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> *NULL* , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 // the_towns.data -> undefined , EXACT
 
    the_towns.nb = 1;
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> *NULL* , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 // the_towns.data -> undefined , EXACT
 
    the_towns.data = (town *) malloc(sizeof(town));
 
 // Points To:
-// fd -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fd -> *NULL* , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 // the_towns.data -> *HEAP*_l_30 , MAY
 
    return the_towns;
@@ -64,5 +68,4 @@ int main(int argc, char *argv[])
 
 Warnings
 
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (binary_intrinsic_call_to_points_to_sinks) Fopen() not precisely implemented.
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active
