@@ -12,11 +12,12 @@ Points-to for "fulguro02"
 
 
 // Points To OUT:
-// *HEAP*_l_29[*] -> undefined , MAY
-// *HEAP*_l_29[*] -> *NULL* , MAY
-// *HEAP*_l_29[*] -> _img_1_6__1_1[0][*][0] , MAY
+// *HEAP*_l_31[*] -> undefined , MAY
+// *HEAP*_l_31[*] -> *NULL* , MAY
+// *HEAP*_l_31[*] -> _img_1_6__1_1[0][*][0] , MAY
 // _img_1[0].array -> *NULL* , MAY
 // _img_1[0].array -> _img_1_6__1[0][0] , MAY
+// _img_1_6__1[0][*] -> *NULL* , MAY
 // _img_1_6__1[0][*] -> _img_1_6__1_1[0][*][0] , MAY
 // img -> _img_1[0] , EXACT
 
@@ -46,23 +47,23 @@ void fulguro02(FLGR_Data2D *img)
    row_pointers = (png_bytep *) malloc(sizeof(png_bytep)*size_y);
 
 // Points To:
-// *HEAP*_l_29[*] -> undefined , EXACT
+// *HEAP*_l_31[*] -> undefined , EXACT
 // img -> _img_1[0] , EXACT
-// row_pointers -> *HEAP*_l_29[0] , MAY
+// row_pointers -> *HEAP*_l_31[0] , MAY
 
 
    for(i = 0; i <= size_y-1; i += 1)
 
 // Points To:
-// *HEAP*_l_29[*] -> undefined , MAY
-// *HEAP*_l_29[*] -> *NULL* , MAY
-// *HEAP*_l_29[*] -> _img_1_6__1_1[0][*][0] , MAY
+// *HEAP*_l_31[*] -> undefined , MAY
+// *HEAP*_l_31[*] -> *NULL* , MAY
+// *HEAP*_l_31[*] -> _img_1_6__1_1[0][*][0] , MAY
 // _img_1[0].array -> *NULL* , MAY
 // _img_1[0].array -> _img_1_6__1[0][0] , MAY
 // _img_1_6__1[0][*] -> *NULL* , MAY
 // _img_1_6__1[0][*] -> _img_1_6__1_1[0][*][0] , MAY
 // img -> _img_1[0] , EXACT
-// row_pointers -> *HEAP*_l_29[0] , MAY
+// row_pointers -> *HEAP*_l_31[0] , MAY
 
       row_pointers[i] = (png_bytep) (img->array)[i];
 }
@@ -85,7 +86,7 @@ void fulguro02(FLGR_Data2D *img)
 //             <    is written>: i
 
    for(i = 0; i <= size_y-1; i += 1)
-//             <may be written>: *HEAP*_l_29[i]
+//             <may be written>: *HEAP*_l_31[i]
 //             <    is read   >: _img_1[0].array _img_1_6__1[0][i] i 
 //                               img row_pointers size_y
       row_pointers[i] = (png_bytep) (img->array)[i];
@@ -111,13 +112,13 @@ void fulguro02(FLGR_Data2D *img)
    row_pointers = (png_bytep *) malloc(sizeof(png_bytep)*size_y);
 //             <may be read   >: _img_1[0].array _img_1_6__1[0][*] i 
 //                               img row_pointers
-//             <may be written>: *HEAP*_l_29[*]
+//             <may be written>: *HEAP*_l_31[*]
 //             <    is read   >: size_y
 //             <    is written>: i
 
    for(i = 0; i <= size_y-1; i += 1)
 //             <may be read   >: _img_1_6__1[0][*]
-//             <may be written>: *HEAP*_l_29[*]
+//             <may be written>: *HEAP*_l_31[*]
 //             <    is read   >: _img_1[0].array i img row_pointers 
 //                               size_y
       row_pointers[i] = (png_bytep) (img->array)[i];
@@ -138,5 +139,5 @@ void fulguro02(FLGR_Data2D *img)
       row_pointers[i] = (png_bytep) (img->array)[i];
 }
 unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[fulguro02] (points_to_set_block_projection) Memory leak for bucket "fulguro02:*HEAP*_l_29".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[fulguro02] (points_to_set_block_projection) Memory leak for bucket "fulguro02:*HEAP*_l_31".
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning fulguro02 instead
