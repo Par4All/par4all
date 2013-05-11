@@ -26,20 +26,28 @@ void fulguro02(FLGR_Data2D *img)
 
 // Points To: none
 
-   int i, size_y = 5;
+   int i;
 
 // Points To: none
 
    png_bytep *row_pointers = (void *) 0;
 
 // Points To:
+// img -> *NULL* , MAY
+// img -> _img_1[0] , MAY
 // row_pointers -> *NULL* , EXACT
 
+   int size_y = img->size_y;
+
+// Points To:
+// img -> _img_1[0] , EXACT
+// row_pointers -> *NULL* , EXACT
 
    row_pointers = (png_bytep *) malloc(sizeof(png_bytep)*size_y);
 
 // Points To:
 // *HEAP*_l_29[*] -> undefined , EXACT
+// img -> _img_1[0] , EXACT
 // row_pointers -> *HEAP*_l_29[0] , MAY
 
 
@@ -53,8 +61,7 @@ void fulguro02(FLGR_Data2D *img)
 // _img_1[0].array -> _img_1_6__1[0][0] , MAY
 // _img_1_6__1[0][*] -> *NULL* , MAY
 // _img_1_6__1[0][*] -> _img_1_6__1_1[0][*][0] , MAY
-// img -> *NULL* , MAY
-// img -> _img_1[0] , MAY
+// img -> _img_1[0] , EXACT
 // row_pointers -> *HEAP*_l_29[0] , MAY
 
       row_pointers[i] = (png_bytep) (img->array)[i];
@@ -65,13 +72,14 @@ Proper effects with points-to for "fulguro02"
 void fulguro02(FLGR_Data2D *img)
 {
 
-//             <    is written>: size_y
-   int i, size_y = 5;
+   int i;
 //             <    is written>: row_pointers
    png_bytep *row_pointers = (void *) 0;
+//             <    is read   >: _img_1[0].size_y img
+//             <    is written>: size_y
+   int size_y = img->size_y;
 //             <    is read   >: size_y _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: row_pointers _MALLOC_EFFECTS:_MALLOC_
-
    row_pointers = (png_bytep *) malloc(sizeof(png_bytep)*size_y);
 //             <    is read   >: size_y
 //             <    is written>: i
@@ -85,19 +93,21 @@ void fulguro02(FLGR_Data2D *img)
 
 Cumulated effects with points-to for "fulguro02"
 
-//             <may be read   >: _img_1[0].array _img_1_6__1[0][*] img
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <may be read   >: _img_1[0].array _img_1_6__1[0][*]
+//             <    is read   >: _img_1[0].size_y img 
+//                               _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 void fulguro02(FLGR_Data2D *img)
 {
 
-//             <    is written>: size_y
-   int i, size_y = 5;
+   int i;
 //             <    is written>: row_pointers
    png_bytep *row_pointers = (void *) 0;
+//             <    is read   >: _img_1[0].size_y img
+//             <    is written>: size_y
+   int size_y = img->size_y;
 //             <    is read   >: size_y _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: row_pointers _MALLOC_EFFECTS:_MALLOC_
-
    row_pointers = (png_bytep *) malloc(sizeof(png_bytep)*size_y);
 //             <may be read   >: _img_1[0].array _img_1_6__1[0][*] i 
 //                               img row_pointers
@@ -118,9 +128,9 @@ Parallel code
 void fulguro02(FLGR_Data2D *img)
 {
 
-   int i, size_y = 5;
+   int i;
    png_bytep *row_pointers = (void *) 0;
-
+   int size_y = img->size_y;
    row_pointers = (png_bytep *) malloc(sizeof(png_bytep)*size_y);
 
 #pragma omp parallel for 

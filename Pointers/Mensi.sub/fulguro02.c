@@ -23,9 +23,9 @@ typedef struct {
 void fulguro02(FLGR_Data2D *img)
 {
 
-  int i, size_y = 5;
+  int i;
   png_bytep *row_pointers = NULL;
- 
+  int  size_y = img->size_y;
   row_pointers = (png_bytep*) malloc(sizeof(png_bytep)*size_y);
   
   for(i=0;i<size_y;i++) {
