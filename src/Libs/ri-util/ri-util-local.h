@@ -828,6 +828,8 @@
 #define FPUTC_FUNCTION_NAME             "fputc"
 #define FGETC_FUNCTION_NAME             "fgetc"
 #define FOPEN_FUNCTION_NAME             "fopen"
+#define FDOPEN_FUNCTION_NAME            "fdopen"
+#define FREOPEN_FUNCTION_NAME           "freopen"
 #define FCLOSE_FUNCTION_NAME            "fclose"
 #define SNPRINTF_FUNCTION_NAME          "snprintf"
 #define SSCANF_FUNCTION_NAME            "sscanf"
@@ -864,6 +866,7 @@
 #define CLEARERR_FUNCTION_NAME          "clearerr"
 #define FEOF_FUNCTION_NAME              "feof"
 #define FERROR_FUNCTION_NAME            "ferror"
+#define FILENO_FUNCTION_NAME            "fileno"
 #define PERROR_FUNCTION_NAME            "perror"
 // #define WRITE_SYSTEM_FUNCTION_NAME      "write"
 // #define READ_SYSTEM_FUNCTION_NAME       "read"
@@ -1330,6 +1333,8 @@
 #define ENTITY_FPUTC_P(e)                ENTITY_NAME_P(e, "fputc")
 #define ENTITY_FGETC_P(e)                ENTITY_NAME_P(e, "fgetc")
 #define ENTITY_FOPEN_P(e)                ENTITY_NAME_P(e, "fopen")
+#define ENTITY_FDOPEN_P(e)               ENTITY_NAME_P(e, "fdopen")
+#define ENTITY_FREOPEN_P(e)              ENTITY_NAME_P(e, "freopen")
 #define ENTITY_FCLOSE_P(e)               ENTITY_NAME_P(e, "fclose")
 #define ENTITY_SNPRINTF_P(e)             ENTITY_NAME_P(e, "snprintf")
 #define ENTITY_SSCANF_P(e)               ENTITY_NAME_P(e, "sscanf")
@@ -1362,6 +1367,7 @@
 #define ENTITY_CLEARERR_P(e)             ENTITY_NAME_P(e, "clearer")
 #define ENTITY_FEOF_P(e)                 ENTITY_NAME_P(e, "feof")
 #define ENTITY_FERROR_P(e)               ENTITY_NAME_P(e, "ferror")
+#define ENTITY_FILENO_P(e)               ENTITY_NAME_P(e, "fileno")
 #define ENTITY_PERROR_P(e)               ENTITY_NAME_P(e, "perror")
 
 /*io functions: C library and system io.Amira Mensi*/
@@ -1883,8 +1889,11 @@ the variable is unsigned, signed or not */
 #define MEMMOVE_EFFECTS_PACKAGE_NAME "_MEMMOVE_EFFECTS"
 /* variable name for memmove unit */
 #define MEMMOVE_EFFECTS_NAME "_MEMMOVE_"
-/* array of Logical UNits; it is more or less handled as the current file pointer */
+/* array of Logical UNits; it is more or less handled as the current file pointer; in C, used for open, close, read, write... */
 #define IO_EFFECTS_ARRAY_NAME "LUNS"
+/* Array of struct io_files pointed to by pointers returned by fopen
+   and used by fclose, fscanf, fprintf... */
+#define IO_EFFECTS_IO_FILE_NAME "IO_FILES"
 /* To express C IO intrinsics effects */
 #define IO_EFFECTS_PTR_NAME "_C_IO_ptr"
 /* array of end of file codes */

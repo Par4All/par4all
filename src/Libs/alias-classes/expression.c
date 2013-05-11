@@ -482,36 +482,6 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in, bool side_effect_p)
     }
   }
   else if(ENTITY_ASSERT_FAIL_SYSTEM_P(f)) {
-    // FI: I needs this piece of code for assert();
-    // FI: why? it looks like the evaluation of a conditional expression...
-    // See assert01.c and its expansion?
-    // This piece of code seems completety wrong
-    // The actual arguments of __assert_fail() are two character
-    // strings, an integer and a NULL pointer for assert01.c
-#if 0
-    expression c = EXPRESSION(CAR(al));
-    pt_map in_t = full_copy_pt_map(pt_out);
-    pt_map in_f = full_copy_pt_map(pt_out);
-    in_t = condition_to_points_to(c, in_t, true);
-    in_f = condition_to_points_to(c, in_f, true);
-    expression e1 = EXPRESSION(CAR(CDR(al)));
-    expression e2 = EXPRESSION(CAR(CDR(CDR(al))));
-    pt_map out_t = pt_map_undefined;
-    if(!points_to_graph_bottom(in_t))
-      out_t = expression_to_points_to(e1, in_t, side_effect_p);
-    pt_map out_f = pt_map_undefined;
-    // FI: should be factored out in a more general merge function...
-    if(!points_to_graph_bottom(in_f))
-      out_f = expression_to_points_to(e2, in_f, side_effect_p);
-    if(points_to_graph_bottom(in_t))
-      pt_out = out_f;
-    else if(points_to_graph_bottom(in_f))
-      pt_out = out_t;
-    else
-      pt_out = merge_points_to_graphs(out_t, out_f);
-    // FI: this destroys pt_out for test case pointer02
-    //free_pt_map(in_t), free_pt_map(in_f), free_pt_map(out_t), free_pt_map(out_f);
-#endif
     // FI: no return from assert failure
     clear_pt_map(pt_out);
     points_to_graph_bottom(pt_out) = true;
@@ -565,17 +535,6 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in, bool side_effect_p)
       type rhst = expression_to_type(rhs);
       // FI: should we use the type of the current module?
       if(pointer_type_p(rhst) || struct_type_p(rhst)) {
-#if 0
-	list sinks = expression_to_points_to_sinks(rhs, pt_out);
-	entity rv = function_to_return_value(get_current_module_entity());
-	reference rvr = make_reference(rv, NIL);
-	cell rvc = make_cell_reference(rvr);
-	list sources = CONS(CELL, rvc, NIL);
-	pt_out = list_assignment_to_points_to(sources, sinks, pt_out);
-	gen_free_list(sources);
-	// FI: not too sure about "sinks" being or not a memory leak
-	; // The necessary projections are performed elsewhere
-#endif
 	entity rv = function_to_return_value(get_current_module_entity());
 	expression lhs = entity_to_expression(rv);
 	pt_out = assignment_to_points_to(lhs, rhs, pt_out);
@@ -585,7 +544,11 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in, bool side_effect_p)
   }
   else if(ENTITY_FCLOSE_P(f)) {
     expression lhs = EXPRESSION(CAR(al));
-    pt_out = freed_pointer_to_points_to(lhs, pt_out, side_effect_p);
+    // pt_out = freed_pointer_to_points_to(lhs, pt_out, side_effect_p);
+    list lhc = expression_to_points_to_sources(lhs, pt_out);
+    cell uc = make_nowhere_cell();
+    list rhc = CONS(CELL, uc, NIL);
+    pt_out = list_assignment_to_points_to(lhc, rhc, pt_out);
   }
   else if(ENTITY_CONDITIONAL_P(f)) {
     // FI: I needs this piece of code for assert();
@@ -618,6 +581,35 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in, bool side_effect_p)
       pt_out = merge_points_to_graphs(out_t, out_f);
     // FI: this destroys pt_out for test case pointer02, Memory leaks...
     //free_pt_map(in_t), free_pt_map(in_f), free_pt_map(out_t), free_pt_map(out_f);
+  }
+  else if(ENTITY_FOPEN_P(f)) {
+    expression e1 = EXPRESSION(CAR(al));
+    pt_out = dereferencing_to_points_to(e1, pt_out);
+    expression e2 = EXPRESSION(CAR(CDR(al)));
+    pt_out = dereferencing_to_points_to(e2, pt_out);
+  }
+  else if(ENTITY_FDOPEN_P(f)) {
+    expression e2 = EXPRESSION(CAR(CDR(al)));
+    pt_out = dereferencing_to_points_to(e2, pt_out);
+  }
+  else if(ENTITY_FREOPEN_P(f)) {
+    expression e1 = EXPRESSION(CAR(al));
+    pt_out = dereferencing_to_points_to(e1, pt_out);
+    expression e2 = EXPRESSION(CAR(CDR(al)));
+    pt_out = dereferencing_to_points_to(e2, pt_out);
+    expression e3 = EXPRESSION(CAR(CDR(CDR(al))));
+    pt_out = dereferencing_to_points_to(e3, pt_out);
+  }
+  else if(ENTITY_FREAD_P(f) || ENTITY_FWRITE_P(f)) {
+    expression e1 = EXPRESSION(CAR(al));
+    pt_out = dereferencing_to_points_to(e1, pt_out);
+    expression e4 = EXPRESSION(CAR(CDR(CDR(CDR(al)))));
+    pt_out = dereferencing_to_points_to(e4, pt_out);
+  }
+  else if(ENTITY_CLEARERR_P(f) || ENTITY_FEOF_P(f)
+	  || ENTITY_FERROR_P(f) || ENTITY_FILENO_P(f)) {
+    expression e1 = EXPRESSION(CAR(al));
+    pt_out = dereferencing_to_points_to(e1, pt_out);
   }
   else {
     // FI: fopen(), fclose() should be dealt with

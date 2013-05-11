@@ -478,11 +478,46 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     sinks = malloc_to_points_to_sinks(a2, in);
   }
   else if(ENTITY_FOPEN_P(f)) {
-    /* Should be handled like a malloc, using the line number for malloc() */
-    pips_user_warning("Fopen() not precisely implemented.\n");
-    type rt = functional_result(type_functional(entity_type(f)));
-    type ct = copy_type(type_to_pointed_type(rt)); // FI: no risk with typedefs?
-    sinks = CONS(CELL, make_anywhere_cell(ct), NIL);
+    cell ac = cell_undefined;
+    // entity luns = FindEntity(IO_EFFECTS_PACKAGE_NAME, IO_EFFECTS_ARRAY_NAME);
+    entity io_files = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME, IO_EFFECTS_IO_FILE_NAME);
+    // entity luns = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME, IO_EFFECTS_PTR_NAME);
+    if(type_undefined_p(entity_type(io_files))) {
+      /* FI: this initialization is usually performed in
+	 bootstrap.c, but it is easier to do it here because the
+	 IO_FILE type does not have to be built from scratch. */
+      type rt = functional_result(type_functional(entity_type(f)));
+      type ct = copy_type(type_to_pointed_type(rt)); // FI: no risk with typedef
+      pips_assert("ct is a scalar type",
+		  ENDP(variable_dimensions(type_variable(ct))));
+      variable_dimensions(type_variable(ct)) =
+	CONS(DIMENSION,
+	     make_dimension(int_to_expression(0),
+			    /*
+			      MakeNullaryCall
+			      (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
+			    */
+			    int_to_expression(2000)
+			    ),
+	     NIL);
+      entity_type(io_files) = ct;
+      entity ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,
+				      IO_EFFECTS_PACKAGE_NAME);
+      entity_storage(io_files) =
+	make_storage(is_storage_ram,
+		     make_ram(ent,
+			      FindEntity(IO_EFFECTS_PACKAGE_NAME,
+					 STATIC_AREA_LOCAL_NAME),
+			      0, NIL));
+      entity_initial(io_files) = make_value(is_value_unknown, UU);
+      expression s = make_unbounded_expression();
+      //reference r = make_reference(luns, CONS(EXPRESSION, s, NIL));
+      reference r = make_reference(io_files, CONS(EXPRESSION, s, NIL));
+      ac = make_cell_reference(r);
+    }
+    // fopen may fail
+    cell nc = make_null_cell();
+    sinks = CONS(CELL, ac, CONS(CELL, nc, NIL));
   }
   else {
     // FI: two options, 1) generate an anywhere as sink to be always safe,
