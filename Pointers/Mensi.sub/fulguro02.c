@@ -1,7 +1,7 @@
 #include<assert.h>
 #include<stdio.h>
 #include<stdlib.h>
-#include <png.h>
+//#include <png.h>
 typedef struct {
   int size_struct;
   void* array;
@@ -16,6 +16,8 @@ typedef struct {
   FLGR_Data1D **row;
   void** array;
 }FLGR_Data2D;
+
+typedef void* png_bytep;
 
 
 
