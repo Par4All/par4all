@@ -65,7 +65,7 @@ POINTS-TO
 
 // Points To IN:
 // stdout -> *NULL* , MAY
-// stdout -> _stdout_[0] , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
 
 
 // Points To OUT: none
@@ -114,7 +114,7 @@ int main(void)
 // p2 -> alloc_pointer:*HEAP*_l_14 , MAY
 // p3 -> alloc_pointer:*HEAP*_l_14 , MAY
 // stdout -> *NULL* , MAY
-// stdout -> _stdout_[0] , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
 
    
    // 36 17 19
@@ -124,7 +124,7 @@ int main(void)
 // p1 -> alloc_pointer:*HEAP*_l_14 , MAY
 // p2 -> alloc_pointer:*HEAP*_l_14 , MAY
 // p3 -> alloc_pointer:*HEAP*_l_14 , MAY
-// stdout -> _stdout_[0] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
    
    // no pointer assigned! can keep all points-to
@@ -134,7 +134,7 @@ int main(void)
 // p1 -> alloc_pointer:*HEAP*_l_14 , MAY
 // p2 -> alloc_pointer:*HEAP*_l_14 , MAY
 // p3 -> alloc_pointer:*HEAP*_l_14 , MAY
-// stdout -> _stdout_[0] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
    
    // no pointer assigned! can keep all points-to
@@ -144,7 +144,7 @@ int main(void)
 // p1 -> alloc_pointer:*HEAP*_l_14 , MAY
 // p2 -> alloc_pointer:*HEAP*_l_14 , MAY
 // p3 -> alloc_pointer:*HEAP*_l_14 , MAY
-// stdout -> _stdout_[0] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
    
    // 36 17 53
@@ -154,7 +154,7 @@ int main(void)
 // p1 -> alloc_pointer:*HEAP*_l_14 , MAY
 // p2 -> alloc_pointer:*HEAP*_l_14 , MAY
 // p3 -> alloc_pointer:*HEAP*_l_14 , MAY
-// stdout -> _stdout_[0] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
 
    pointer_free(p1);
@@ -163,7 +163,7 @@ int main(void)
 // p1 -> undefined , EXACT
 // p2 -> alloc_pointer:*HEAP*_l_14 , MAY
 // p3 -> alloc_pointer:*HEAP*_l_14 , MAY
-// stdout -> _stdout_[0] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
    pointer_free(p2);
 
@@ -171,7 +171,7 @@ int main(void)
 // p1 -> undefined , EXACT
 // p2 -> undefined , EXACT
 // p3 -> alloc_pointer:*HEAP*_l_14 , MAY
-// stdout -> _stdout_[0] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
    pointer_free(p3);
 
@@ -179,7 +179,7 @@ int main(void)
 // p1 -> undefined , EXACT
 // p2 -> undefined , EXACT
 // p3 -> undefined , EXACT
-// stdout -> _stdout_[0] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
    return 0;
 }

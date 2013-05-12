@@ -4,7 +4,7 @@ POINTS-TO
 
 // Points To IN:
 // stderr -> *NULL* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
 
 
 // Points To OUT: none
@@ -446,7 +446,7 @@ int main()
 // fp_pos -> pos , EXACT
 // i_name -> "i=" , EXACT
 // stderr -> *NULL* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
 
 
    fprintf(stderr, "The END\n");
@@ -457,7 +457,7 @@ int main()
 // fp -> undefined , EXACT
 // fp_pos -> pos , EXACT
 // i_name -> "i=" , EXACT
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 
    return 0;
 }

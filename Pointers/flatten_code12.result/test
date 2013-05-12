@@ -4,11 +4,11 @@ Points-to for "flatten_code12"
 
 // Points To IN:
 // stdout -> *NULL* , MAY
-// stdout -> _stdout_[0] , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
 
 
 // Points To OUT:
-// stdout -> _stdout_[0] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
 void flatten_code12(void)
 {
@@ -23,19 +23,19 @@ void flatten_code12(void)
    for(i = 0; i <= 3; i += 1) {
 
 // Points To:
-// stdout -> _stdout_[0] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
       static int foo = 0;
 
 // Points To:
-// stdout -> _stdout_[0] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
 
       foo++;
 
 // Points To:
 // stdout -> *NULL* , MAY
-// stdout -> _stdout_[0] , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
 
 
       fprintf(stdout, "foo=%d\n", foo);
@@ -47,7 +47,7 @@ Points-to for \"main\"
 
 // Points To IN:
 // stdout -> *NULL* , MAY
-// stdout -> _stdout_[0] , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
 
 
 // Points To OUT: none
@@ -57,12 +57,12 @@ int main()
 
 // Points To:
 // stdout -> *NULL* , MAY
-// stdout -> _stdout_[0] , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
 
    flatten_code12();
 
 // Points To:
-// stdout -> _stdout_[0] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
 
    return 0;

@@ -44,7 +44,7 @@ POINTS-TO
 
 // Points To IN:
 // stdin -> *NULL* , MAY
-// stdin -> _stdin_ , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , MAY
 
 
 // Points To OUT:
@@ -53,7 +53,7 @@ POINTS-TO
 // *HEAP*_l_17.next -> *NULL* , MAY
 // initialize -> *HEAP*_l_17 , MAY
 // initialize -> *NULL* , MAY
-// stdin -> _stdin_ , EXACT
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
 list * initialize()
 {
@@ -72,7 +72,7 @@ list * initialize()
 // nl -> undefined , EXACT
 // pi -> undefined , EXACT
 // stdin -> *NULL* , MAY
-// stdin -> _stdin_ , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , MAY
 
    while (!feof(stdin)) {
 
@@ -86,7 +86,7 @@ list * initialize()
 // nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
 // pi -> undefined , MAY
-// stdin -> _stdin_ , EXACT
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
       scanf("%d", &i);
 
@@ -100,7 +100,7 @@ list * initialize()
 // nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
 // pi -> undefined , MAY
-// stdin -> _stdin_ , EXACT
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
       pi = malloc(sizeof(int));
 
@@ -113,7 +113,7 @@ list * initialize()
 // nl -> *HEAP*_l_17 , MAY
 // nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
-// stdin -> _stdin_ , EXACT
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
       *pi = i;
 
@@ -126,7 +126,7 @@ list * initialize()
 // nl -> *HEAP*_l_17 , MAY
 // nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
-// stdin -> _stdin_ , EXACT
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
       nl = malloc(sizeof(list));
 
@@ -140,7 +140,7 @@ list * initialize()
 // l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // pi -> *HEAP*_l_15 , MAY
-// stdin -> _stdin_ , EXACT
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
       nl->val = pi;
 
@@ -153,7 +153,7 @@ list * initialize()
 // l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // pi -> *HEAP*_l_15 , MAY
-// stdin -> _stdin_ , EXACT
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
       nl->next = l;
 
@@ -165,7 +165,7 @@ list * initialize()
 // l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // pi -> *HEAP*_l_15 , MAY
-// stdin -> _stdin_ , EXACT
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
       l = nl;
    }
@@ -180,7 +180,7 @@ list * initialize()
 // nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
 // pi -> undefined , MAY
-// stdin -> _stdin_ , EXACT
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
    return l;
 }

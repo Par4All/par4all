@@ -115,7 +115,7 @@ pointer alloc_pointer(int v)
 
 // Points To IN:
 // stdout -> *NULL* , MAY
-// stdout -> _stdout_[0] , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
 
 
 // Points To OUT: none
@@ -167,7 +167,7 @@ int main(void)
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
 // stdout -> *NULL* , MAY
-// stdout -> _stdout_[0] , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
 
    // 36 17 19
    // no pointer assigned
@@ -177,7 +177,7 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
-// stdout -> _stdout_[0] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
    
    // no pointer assigned! can keep all points-to
@@ -187,7 +187,7 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
-// stdout -> _stdout_[0] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
    
    // no pointer assigned! can keep all points-to
@@ -197,7 +197,7 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
-// stdout -> _stdout_[0] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
    
    // 36 17 53
@@ -208,7 +208,7 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
-// stdout -> _stdout_[0] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
    return 0;
 }
