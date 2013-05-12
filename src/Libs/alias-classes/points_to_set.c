@@ -1429,7 +1429,7 @@ list global_source_to_sinks(cell source, pt_map pts, bool fresh_p)
   entity v = reference_variable(r);
   type t = entity_type(v);
   list sinks = NIL;
-  type ist = type_to_pointed_type(ultimate_type(entity_type(v)));
+  type ist = type_to_pointed_type(entity_basic_concrete_type(v));
   type st = type_undefined;
   points_to pt = points_to_undefined;
 

@@ -492,7 +492,8 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in, bool side_effect_p)
     points_to_graph_bottom(pt_out) = true;
   }
   else if(ENTITY_PRINTF_P(f) || ENTITY_FPRINTF_P(f) || ENTITY_SPRINTF_P(f)
-	  || ENTITY_SCANF_P(f) || ENTITY_FSCANF_P(f) || ENTITY_SSCANF_P(f)) {
+	  || ENTITY_SCANF_P(f) || ENTITY_FSCANF_P(f) || ENTITY_SSCANF_P(f)
+	  || ENTITY_ISOC99_FSCANF_P(f)|| ENTITY_ISOC99_SSCANF_P(f)) {
     FOREACH(EXPRESSION, a, al) {
       type at = points_to_expression_to_concrete_type(a);
       if(C_pointer_type_p(at)) {
@@ -511,7 +512,8 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in, bool side_effect_p)
       }
     }
     if(!points_to_graph_bottom(pt_out)
-       && (ENTITY_FPRINTF_P(f) || ENTITY_FSCANF_P(f))) {
+       && (ENTITY_FPRINTF_P(f) || ENTITY_FSCANF_P(f)
+	   || ENTITY_ISOC99_FSCANF_P(f))) {
       /* stdin, stdout, stderr, fd... must be defined and not NULL */
       expression a1 = EXPRESSION(CAR(al));
       if(expression_reference_p(a1)) {

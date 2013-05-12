@@ -10,6 +10,7 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "bootstrap.h"
 #include "effects.h"
 #include "database.h"
 #include "ri-util.h"
@@ -574,7 +575,16 @@ points_to create_stub_points_to(cell c, // source of the points-to
   cell sink_cell = cell_undefined;
   bool e_exact_p = true;
 
-  if(type_variable_p(source_t)) {
+  if(ENTITY_STDIN_P(v)||ENTITY_STDOUT_P(v)||ENTITY_STDERR_P(v)) {
+    entity f = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, FOPEN_FUNCTION_NAME);
+    pips_assert("fopen is fully defined", !type_undefined_p(entity_type(f)));
+    entity io_files = MakeIoFileArray(f);
+    int n = ENTITY_STDIN_P(v) ? STDIN_FILENO :
+      ENTITY_STDOUT_P(v) ? STDOUT_FILENO: STDERR_FILENO;
+    reference sr = make_reference(io_files, CONS(EXPRESSION, int_to_expression(n), NIL));
+    sink_cell = make_cell_reference(sr);
+  }
+  else if(type_variable_p(source_t)) {
     bool strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
     //variable source_tv = type_variable(source_t);
     //list source_dl = variable_dimensions(source_tv);

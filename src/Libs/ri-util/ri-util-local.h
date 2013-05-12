@@ -1166,6 +1166,8 @@
   (same_string_p(global_name_to_user_name(entity_name(e)), name##_OPERATOR_NAME))
 #define entity_a_function_p(e,name) \
   (same_string_p(global_name_to_user_name(entity_name(e)), name##_FUNCTION_NAME))
+#define entity_a_special_entity_p(e,name) \
+  (same_string_p(global_name_to_user_name(entity_name(e)), name))
 
 #define ENTITY_CONVERSION_P(e,name) \
   (strcmp(entity_local_name(e), name##_GENERIC_CONVERSION_NAME)==0)
@@ -1907,8 +1909,13 @@ the variable is unsigned, signed or not */
 /* Standard unit numbers depend on the operating system. Here are UNIX definitions. */
 #define STDERR_LUN (0)
 #define STDERR_NAME "stderr"
+#define ENTITY_STDERR_P(e) entity_a_special_entity_p(e, STDERR_NAME)
 #define STDIN_LUN (5)
+#define STDIN_NAME "stdin"
+#define ENTITY_STDIN_P(e) entity_a_special_entity_p(e, STDIN_NAME)
 #define STDOUT_LUN (6)
+#define STDOUT_NAME "stdout"
+#define ENTITY_STDOUT_P(e) entity_a_special_entity_p(e, STDOUT_NAME)
 
 /*Symbolic constants for the file descriptors belonging to the standard streams: unistd.h */
 #if !defined(HAVE_UNISTD_H) && !defined(_UNISTD_H)
