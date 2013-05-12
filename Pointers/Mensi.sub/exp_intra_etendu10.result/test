@@ -29,11 +29,14 @@ list * initialize()
 POINTS-TO
 
 
-// Points To IN: none
+// Points To IN:
+// stdin -> *NULL* , MAY
+// stdin -> _stdin_ , MAY
 
 
 // Points To OUT:
 // initialize -> *NULL* , EXACT
+// stdin -> _stdin_ , EXACT
 
 list * initialize()
 {
@@ -51,6 +54,8 @@ list * initialize()
 // l -> *NULL* , EXACT
 // nl -> undefined , EXACT
 // pi -> i , EXACT
+// stdin -> *NULL* , MAY
+// stdin -> _stdin_ , MAY
 
    while (!feof(stdin)) {
 
@@ -61,6 +66,7 @@ list * initialize()
 // nl -> *HEAP*_l_14 , MAY
 // nl -> undefined , MAY
 // pi -> i , EXACT
+// stdin -> _stdin_ , EXACT
 
       nl = malloc(sizeof(list));
 
@@ -72,6 +78,7 @@ list * initialize()
 // l -> *NULL* , EXACT
 // nl -> *HEAP*_l_14 , MAY
 // pi -> i , EXACT
+// stdin -> _stdin_ , EXACT
 
       nl->val = pi;
 
@@ -82,6 +89,7 @@ list * initialize()
 // l -> *NULL* , EXACT
 // nl -> *HEAP*_l_14 , MAY
 // pi -> i , EXACT
+// stdin -> _stdin_ , EXACT
 
       nl->next = l;
    }
@@ -93,6 +101,7 @@ list * initialize()
 // nl -> *HEAP*_l_14 , MAY
 // nl -> undefined , MAY
 // pi -> i , EXACT
+// stdin -> _stdin_ , EXACT
 
    return l;
 }
