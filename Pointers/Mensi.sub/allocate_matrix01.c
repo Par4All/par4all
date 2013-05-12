@@ -3,8 +3,7 @@
 #define NR_END 1
 #define FREE_ARG char*
 
-float **matrix(nrl,nrh,ncl,nch)
-long nch,ncl,nrh,nrl;
+float ** matrix(long nrl,long nrh,long ncl,long nch)
 /* allocate a float matrix with subscript range m[nrl..nrh][ncl..nch] */
 {
 	long i, nrow=nrh-nrl+1,ncol=nch-ncl+1;

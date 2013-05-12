@@ -36,8 +36,15 @@ activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[matrix]
 
-#setproperty MEMORY_EFFECTS_ONLY  TRUE
+setproperty MEMORY_EFFECTS_ONLY  TRUE
 #apply PRINT_DOT_DEPENDENCE_GRAPH[matrix]
+activate RICE_FULL_DEPENDENCE_GRAPH
+activate PRINT_LOOP_CARRIED_DEPENDENCE_GRAPH
+
+display DG_FILE
+
+
+#apply PRINT_LOOP_CARRIED_DEPENDENCE_GRAPH[matrix]
 #shell dot -Tpng allocate_matrix01.database/matrix/matrix.dot >matrix_dg.png
 #shell gqview matrix_dg.png
 

@@ -1,0 +1,224 @@
+
+Points-to for "matrix"
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// *HEAP*_l_13[*] -> *HEAP*_l_19[*] , MAY
+// matrix -> *HEAP*_l_13[*] , MAY
+
+float * * matrix(long int nrl, long int nrh, long int ncl, long int nch)
+{
+
+// Points To: none
+
+   long int i, nrow = nrh-nrl+1, ncol = nch-ncl+1;
+
+// Points To: none
+
+   float **m;
+
+// Points To:
+// m -> undefined , EXACT
+
+   
+   /* allocate pointers to rows */
+   m = (float **) malloc((unsigned int) ((nrow+1)*sizeof(float *)));
+
+// Points To:
+// *HEAP*_l_13[*] -> undefined , EXACT
+// m -> *HEAP*_l_13[0] , MAY
+
+   //if (!m) nrerror("allocation failure 1 in matrix()");
+   m += 1;
+
+// Points To:
+// *HEAP*_l_13[*] -> undefined , EXACT
+// m -> *HEAP*_l_13[1] , MAY
+
+   m -= nrl;
+
+// Points To:
+// *HEAP*_l_13[*] -> undefined , EXACT
+// m -> *HEAP*_l_13[*] , MAY
+
+   
+   /* allocate rows and set pointers to them */
+   m[nrl] = (float *) malloc((unsigned int) ((nrow*ncol+1)*sizeof(float)));
+
+// Points To:
+// *HEAP*_l_13[*] -> *HEAP*_l_19[0] , MAY
+// *HEAP*_l_13[*] -> undefined , MAY
+// m -> *HEAP*_l_13[*] , MAY
+
+   //if (!m[nrl]) nrerror("allocation failure 2 in matrix()");
+   m[nrl] += 1;
+
+// Points To:
+// *HEAP*_l_13[*] -> *HEAP*_l_19[*] , MAY
+// *HEAP*_l_13[*] -> *HEAP*_l_19[1] , MAY
+// m -> *HEAP*_l_13[*] , MAY
+
+   m[nrl] -= ncl;
+
+// Points To:
+// *HEAP*_l_13[*] -> *HEAP*_l_19[*] , MAY
+// m -> *HEAP*_l_13[*] , MAY
+
+
+   for(i = nrl+1; i <= nrh; i += 1)
+
+// Points To:
+// *HEAP*_l_13[*] -> *HEAP*_l_19[*] , MAY
+// m -> *HEAP*_l_13[*] , MAY
+
+      m[i] = m[i-1]+ncol;
+
+// Points To:
+// *HEAP*_l_13[*] -> *HEAP*_l_19[*] , MAY
+// m -> *HEAP*_l_13[*] , MAY
+
+   
+   /* return pointer to array of pointers to rows */
+   return m;
+}
+
+Proper effects with points-to for "matrix"
+
+float * * matrix(long int nrl, long int nrh, long int ncl, long int nch)
+{
+//             <    is read   >: nch ncl nrh nrl
+//             <    is written>: ncol nrow
+   long int i, nrow = nrh-nrl+1, ncol = nch-ncl+1;
+   float **m;
+//             <    is read   >: nrow _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: m _MALLOC_EFFECTS:_MALLOC_
+   
+   /* allocate pointers to rows */
+   m = (float **) malloc((unsigned int) ((nrow+1)*sizeof(float *)));
+//             <    is read   >: m
+//             <    is written>: m
+   //if (!m) nrerror("allocation failure 1 in matrix()");
+   m += 1;
+//             <    is read   >: m nrl
+//             <    is written>: m
+   m -= nrl;
+//             <may be written>: *HEAP*_l_13[*]
+//             <    is read   >: m ncol nrl nrow 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   
+   /* allocate rows and set pointers to them */
+   m[nrl] = (float *) malloc((unsigned int) ((nrow*ncol+1)*sizeof(float)));
+//             <may be read   >: *HEAP*_l_13[*]
+//             <may be written>: *HEAP*_l_13[*]
+//             <    is read   >: m nrl
+   //if (!m[nrl]) nrerror("allocation failure 2 in matrix()");
+   m[nrl] += 1;
+//             <may be read   >: *HEAP*_l_13[*]
+//             <may be written>: *HEAP*_l_13[*]
+//             <    is read   >: m ncl nrl
+   m[nrl] -= ncl;
+//             <    is read   >: nrh nrl
+//             <    is written>: i
+
+   for(i = nrl+1; i <= nrh; i += 1)
+//             <may be read   >: *HEAP*_l_13[*]
+//             <may be written>: *HEAP*_l_13[*]
+//             <    is read   >: i m ncol nrh nrl
+      m[i] = m[i-1]+ncol;
+//             <    is read   >: m
+   
+   /* return pointer to array of pointers to rows */
+   return m;
+}
+
+Cumulated effects with points-to for "matrix"
+
+//             <    is read   >: nch ncl nrh nrl 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+float * * matrix(long int nrl, long int nrh, long int ncl, long int nch)
+{
+//             <    is read   >: nch ncl nrh nrl
+//             <    is written>: ncol nrow
+   long int i, nrow = nrh-nrl+1, ncol = nch-ncl+1;
+   float **m;
+//             <    is read   >: nrow _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: m _MALLOC_EFFECTS:_MALLOC_
+   
+   /* allocate pointers to rows */
+   m = (float **) malloc((unsigned int) ((nrow+1)*sizeof(float *)));
+//             <    is read   >: m
+//             <    is written>: m
+   //if (!m) nrerror("allocation failure 1 in matrix()");
+   m += 1;
+//             <    is read   >: m nrl
+//             <    is written>: m
+   m -= nrl;
+//             <may be written>: *HEAP*_l_13[*]
+//             <    is read   >: m ncol nrl nrow 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   
+   /* allocate rows and set pointers to them */
+   m[nrl] = (float *) malloc((unsigned int) ((nrow*ncol+1)*sizeof(float)));
+//             <may be read   >: *HEAP*_l_13[*]
+//             <may be written>: *HEAP*_l_13[*]
+//             <    is read   >: m nrl
+   //if (!m[nrl]) nrerror("allocation failure 2 in matrix()");
+   m[nrl] += 1;
+//             <may be read   >: *HEAP*_l_13[*]
+//             <may be written>: *HEAP*_l_13[*]
+//             <    is read   >: m ncl nrl
+   m[nrl] -= ncl;
+//             <may be read   >: *HEAP*_l_13[*] i m ncol
+//             <may be written>: *HEAP*_l_13[*]
+//             <    is read   >: nrh nrl
+//             <    is written>: i
+
+   for(i = nrl+1; i <= nrh; i += 1)
+//             <may be read   >: *HEAP*_l_13[*]
+//             <may be written>: *HEAP*_l_13[*]
+//             <    is read   >: i m ncol nrh nrl
+      m[i] = m[i-1]+ncol;
+//             <    is read   >: m
+   
+   /* return pointer to array of pointers to rows */
+   return m;
+}
+
+ **** Loop Carried Dependence Graph with Dependence Cones ***
+
+	24 --> 24 with conflicts
+		from <*HEAP*_l_13[*]-W-MAY> to <*HEAP*_l_13[*]-W-MAY> at levels  1
+Generating system:
+1 Vertex 
+(1)
+1 Ray 
+(1)
+End of generating system ****
+
+	24 --> 24 with conflicts
+		from <*HEAP*_l_13[*]-W-MAY> to <*HEAP*_l_13[*]-R-MAY> at levels  1
+Generating system:
+1 Vertex 
+(1)
+1 Ray 
+(1)
+End of generating system ****
+
+	24 --> 24 with conflicts
+		from <*HEAP*_l_13[*]-R-MAY> to <*HEAP*_l_13[*]-W-MAY> at levels  1
+Generating system:
+1 Vertex 
+(1)
+1 Ray 
+(1)
+End of generating system ****
+
+
+****************** End of Dependence Graph ******************
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
