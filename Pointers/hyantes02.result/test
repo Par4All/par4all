@@ -4,12 +4,12 @@ Points-to for "read_towns"
 
 // Points To IN:
 // stderr -> *NULL* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
 
 
 // Points To OUT:
 // read_towns.data -> *HEAP*_l_54[0] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 
 towns read_towns(const  char fname[])
 {
@@ -34,7 +34,7 @@ towns read_towns(const  char fname[])
 // fd -> *NULL* , MAY
 // fd -> __IO_EFFECTS:IO_FILES[*] , MAY
 // stderr -> *NULL* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
 // the_towns.data -> *HEAP*_l_27[0] , MAY
 
    fprintf(stderr, "begin parsing ...\n");
@@ -42,7 +42,7 @@ towns read_towns(const  char fname[])
 // Points To:
 // fd -> *NULL* , MAY
 // fd -> __IO_EFFECTS:IO_FILES[*] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // the_towns.data -> *HEAP*_l_27[0] , MAY
 
 
@@ -50,7 +50,7 @@ towns read_towns(const  char fname[])
 
 // Points To:
 // fd -> __IO_EFFECTS:IO_FILES[*] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // the_towns.data -> *HEAP*_l_27[0] , MAY
 // the_towns.data -> *HEAP*_l_35[0] , MAY
 
@@ -58,7 +58,7 @@ towns read_towns(const  char fname[])
 
 // Points To:
 // fd -> __IO_EFFECTS:IO_FILES[*] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // the_towns.data -> *HEAP*_l_27[0] , MAY
 // the_towns.data -> *HEAP*_l_35[0] , MAY
 
@@ -66,7 +66,7 @@ towns read_towns(const  char fname[])
 
 // Points To:
 // fd -> __IO_EFFECTS:IO_FILES[*] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // the_towns.data -> *HEAP*_l_27[0] , MAY
 // the_towns.data -> *HEAP*_l_35[0] , MAY
 
@@ -75,7 +75,7 @@ towns read_towns(const  char fname[])
 
 // Points To:
 // fd -> __IO_EFFECTS:IO_FILES[*] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // the_towns.data -> *HEAP*_l_27[0] , MAY
 // the_towns.data -> *HEAP*_l_35[0] , MAY
 
@@ -83,7 +83,7 @@ towns read_towns(const  char fname[])
 
 // Points To:
 // fd -> __IO_EFFECTS:IO_FILES[*] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // the_towns.data -> *HEAP*_l_27[0] , MAY
 // the_towns.data -> *HEAP*_l_35[0] , MAY
 
@@ -108,7 +108,7 @@ l99999:         ;
 
 // Points To:
 // fd -> __IO_EFFECTS:IO_FILES[*] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // the_towns.data -> *HEAP*_l_27[0] , MAY
 // the_towns.data -> *HEAP*_l_35[0] , MAY
 
@@ -118,7 +118,7 @@ _break_2:         ;
 
 // Points To:
 // fd -> __IO_EFFECTS:IO_FILES[*] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // the_towns.data -> *HEAP*_l_27[0] , MAY
 // the_towns.data -> *HEAP*_l_35[0] , MAY
 
@@ -126,7 +126,7 @@ _break_2:         ;
 
 // Points To:
 // fd -> __IO_EFFECTS:IO_FILES[*] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // the_towns.data -> *HEAP*_l_27[0] , MAY
 // the_towns.data -> *HEAP*_l_35[0] , MAY
 
@@ -134,7 +134,7 @@ _break_2:         ;
 
 // Points To:
 // fd -> __IO_EFFECTS:IO_FILES[*] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // the_towns.data -> *HEAP*_l_27[0] , MAY
 // the_towns.data -> *HEAP*_l_35[0] , MAY
 
@@ -144,7 +144,7 @@ _break_2:         ;
 
 // Points To:
 // fd -> __IO_EFFECTS:IO_FILES[*] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // the_towns.data -> *HEAP*_l_27[0] , MAY
 // the_towns.data -> *HEAP*_l_35[0] , MAY
 
@@ -152,7 +152,7 @@ _break_2:         ;
 
 // Points To:
 // fd -> undefined , EXACT
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // the_towns.data -> *HEAP*_l_27[0] , MAY
 // the_towns.data -> *HEAP*_l_35[0] , MAY
 
@@ -160,21 +160,21 @@ _break_2:         ;
 
 // Points To:
 // fd -> undefined , EXACT
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // the_towns.data -> *HEAP*_l_54[0] , MAY
 
    the_towns.nb = curr;
 
 // Points To:
 // fd -> undefined , EXACT
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // the_towns.data -> *HEAP*_l_54[0] , MAY
 
    fprintf(stderr, "parsed %d towns\n", (int) curr);
 
 // Points To:
 // fd -> undefined , EXACT
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // the_towns.data -> *HEAP*_l_54[0] , MAY
 
    /*
@@ -189,14 +189,14 @@ Points-to for "run"
 
 // Points To IN:
 // stderr -> *NULL* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
 // t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 
 
 // Points To OUT:
 // run.data -> *HEAP*_l_72[0] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 
@@ -225,32 +225,32 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 
 // Points To:
 // stderr -> *NULL* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
 // tout.data -> *HEAP*_l_72[0] , MAY
 
    fprintf(stderr, "begin computation ...\n");
 
 // Points To:
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // tout.data -> *HEAP*_l_72[0] , MAY
 
    fprintf(stderr, "xrange: ""%lf %lf %lf\n", xmin, xmax, (double) rangex);
 
 // Points To:
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // tout.data -> *HEAP*_l_72[0] , MAY
 
    fprintf(stderr, "yrange: ""%lf %lf %lf\n", ymin, ymax, (double) rangey);
 
 // Points To:
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // tout.data -> *HEAP*_l_72[0] , MAY
 
 
    for(i = 0; i < rangex; i += 1)
 
 // Points To:
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_72[0] , MAY
@@ -258,7 +258,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
       for(j = 0; j < rangey; j += 1) {
 
 // Points To:
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_72[0] , MAY
@@ -266,7 +266,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
          ((tout.data)[i*rangey+j])[0] = (xmin+step*i)*180/3.14159265358979323846;
 
 // Points To:
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_72[0] , MAY
@@ -274,7 +274,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
          ((tout.data)[i*rangey+j])[1] = (ymin+step*j)*180/3.14159265358979323846;
 
 // Points To:
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_72[0] , MAY
@@ -282,7 +282,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
          ((tout.data)[i*rangey+j])[2] = 0.;
 
 // Points To:
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_72[0] , MAY
@@ -290,7 +290,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
          for(k = 0; k < t.nb-1+1; k += 1) {
 
 // Points To:
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_72[0] , MAY
@@ -298,7 +298,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
             data_t tmp = 6368.*acos(cos(xmin+step*i)*cos(((t.data)[k])[0])*cos(ymin+step*j-((t.data)[k])[1])+sin(xmin+step*i)*sin(((t.data)[k])[0]));
 
 // Points To:
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_72[0] , MAY
@@ -306,7 +306,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
             if (tmp<range)
 
 // Points To:
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_72[0] , MAY
@@ -316,7 +316,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
       }
 
 // Points To:
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_72[0] , MAY
@@ -324,7 +324,7 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
    fprintf(stderr, "end computation ...\n");
 
 // Points To:
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // t.data -> *NULL* , MAY
 // t.data -> _t_2__1[0][0] , MAY
 // tout.data -> *HEAP*_l_72[0] , MAY
@@ -852,7 +852,7 @@ Points-to for "main"
 
 // Points To IN:
 // stderr -> *NULL* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
 
 
 // Points To OUT: none
@@ -876,7 +876,7 @@ int main(int argc, char *argv[])
 
 // Points To:
 // stderr -> *NULL* , MAY
-// stderr -> _stderr_[0] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
 
       towns t = read_towns(argv[1]);
       
@@ -887,14 +887,14 @@ int main(int argc, char *argv[])
 
 // Points To:
 // read_towns:read_towns.data -> read_towns:*HEAP*_l_54[0] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // t.data -> read_towns:*HEAP*_l_54[0] , MAY
 
       data_t xmin = atof(argv[2])*3.14159265358979323846/180., ymin = atof(argv[3])*3.14159265358979323846/180., xmax = atof(argv[4])*3.14159265358979323846/180., ymax = atof(argv[5])*3.14159265358979323846/180., step = atof(argv[6])*3.14159265358979323846/180., range = atof(argv[7]);
 
 // Points To:
 // read_towns:read_towns.data -> read_towns:*HEAP*_l_54[0] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // t.data -> read_towns:*HEAP*_l_54[0] , MAY
 
       towns out = run(t, xmin, ymin, xmax, ymax, step, range);
@@ -903,7 +903,7 @@ int main(int argc, char *argv[])
 // out.data -> run:*HEAP*_l_72[0] , MAY
 // read_towns:read_towns.data -> read_towns:*HEAP*_l_54[0] , MAY
 // run:run.data -> run:*HEAP*_l_72[0] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 // t.data -> read_towns:*HEAP*_l_54[0][0] , MAY
 
       display(out, xmin, ymin, xmax, ymax, step);
@@ -912,7 +912,7 @@ int main(int argc, char *argv[])
 // Points To:
 // read_towns:read_towns.data -> read_towns:*HEAP*_l_54[0] , MAY
 // run:run.data -> run:*HEAP*_l_72[0] , MAY
-// stderr -> _stderr_[0] , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 
 
    return code;
