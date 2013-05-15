@@ -90,15 +90,27 @@ towns read_towns(const  char fname[])
          char c;
 l99999:         ;
 
-// Points To: none
+// Points To:
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_25[0] , MAY
+// the_towns.data -> *HEAP*_l_33[0] , MAY
 
          if (!!feof(fd)) goto _break_2;
 
-// Points To: none
+// Points To:
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_25[0] , MAY
+// the_towns.data -> *HEAP*_l_33[0] , MAY
 
          c = (char) fgetc(fd);
 
-// Points To: none
+// Points To:
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_25[0] , MAY
+// the_towns.data -> *HEAP*_l_33[0] , MAY
 
          if (c=='\n'||c=='\r') {
          }
@@ -334,9 +346,10 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 
 Cumulated effects for "read_towns"
 
-//             <may be read   >: stderr[0] *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: fname[*] stderr[0] 
+//                               __IO_EFFECTS:IO_FILES[*] 
 //                               __IO_EFFECTS:LUNS[*]
-//             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: stderr[0] __IO_EFFECTS:IO_FILES[*] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
@@ -357,12 +370,17 @@ towns read_towns(const  char fname[])
 //             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
 //             <    is written>: __IO_EFFECTS:LUNS[2]
    fprintf(stderr, "begin parsing ...\n");
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: *HEAP*_l_25[*][1] *HEAP*_l_33[*][1] 
+//                               curr the_towns.data the_towns.nb 
 //                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:IO_FILES[*] 
 //                               __IO_EFFECTS:LUNS[*]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: *HEAP*_l_25[*][1] *HEAP*_l_33[*][1] 
+//                               curr the_towns.data the_towns.nb 
 //                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:IO_FILES[*] 
 //                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
 
    while (!feof(fd)) {
 //             <may be read   >: the_towns.data 
@@ -380,19 +398,26 @@ towns read_towns(const  char fname[])
 //                               _MALLOC_EFFECTS:_MALLOC_
          the_towns.data = realloc(the_towns.data, the_towns.nb*sizeof(town));
       }
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: *HEAP*_l_25[*][1] *HEAP*_l_33[*][1] 
+//                               __IO_EFFECTS:IO_FILES[*] 
 //                               __IO_EFFECTS:LUNS[*]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: *HEAP*_l_25[*][1] *HEAP*_l_33[*][1] 
+//                               curr __IO_EFFECTS:IO_FILES[*] 
 //                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: curr fd the_towns.data
       if (fscanf(fd, "%lf%*[ \t]%lf%*[ \t]%lf", &((the_towns.data)[curr])[0], &((the_towns.data)[curr])[1], &((the_towns.data)[curr])[2])!=3) {
          char c;
 l99999:         ;
-//             <may be read   >: __IO_EFFECTS:LUNS[*]
-//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <may be read   >: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
 //             <    is read   >: fd
          if (!!feof(fd)) goto _break_2;
-//             <may be read   >: __IO_EFFECTS:LUNS[*]
-//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <may be read   >: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
 //             <    is read   >: fd
 //             <    is written>: c
          c = (char) fgetc(fd);

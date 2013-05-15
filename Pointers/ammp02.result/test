@@ -25,6 +25,7 @@ int a_number()
 // Points To:
 // _first_8[0].next -> *NULL* , MAY
 // _first_8[0].next -> _first_8_3__8[0][0] , MAY
+// ap -> undefined , MAY
 // ap -> _first_8[0] , MAY
 // first -> *NULL* , MAY
 // first -> _first_8[0] , MAY
