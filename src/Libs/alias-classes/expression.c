@@ -875,7 +875,7 @@ points_to offset_cell(points_to pt, expression delta, type et)
 void offset_points_to_cells(list sinks, expression delta, type t)
 {
   FOREACH(CELL, sink, sinks) {
-    offset_points_to_cell(sink, delta, t);
+    offset_points_to_cell(sink, delta, t, ENDP(CDR(sinks)));
   }
 }
 
@@ -888,7 +888,10 @@ void offset_points_to_cells(list sinks, expression delta, type t)
  *
  * Type "t" is used to decide which subscript should be updated by delta.
  */
-void offset_points_to_cell(cell sink, expression delta, type t)
+void offset_points_to_cell(cell sink,
+			   expression delta,
+			   type t,
+			   bool unique_p __attribute__ ((__unused__)))
 {
   /* "&a[i]" should be transformed into "&a[i+eval(delta)]" when
      "delta" can be statically evaluated */
@@ -925,32 +928,42 @@ void offset_points_to_cell(cell sink, expression delta, type t)
       else {
 	// FI: this is wrong, there is no reason to update the last
 	// subscript; the type of the offset should be passed as an
-	// argument. See for instance dereferencing08.c
+	// argument. See for instance dereferencing08.c. And
+	// dereferencing18.c
 	list tsl = find_points_to_subscript_for_type(sink, t);
-	// expression lse = EXPRESSION(CAR(gen_last(sl)));
-	expression lse = EXPRESSION(CAR(tsl));
-	value vlse = EvalExpression(lse);
-	if(value_constant_p(vlse) && constant_int_p(value_constant(vlse))) {
-	  int ov =  constant_int(value_constant(vlse));
-	  int k = get_int_property("POINTS_TO_SUBSCRIPT_LIMIT");
-	  if(-k <= ov && ov <= k) {
-	    expression nse = int_to_expression(dv+ov);
-	    //EXPRESSION_(CAR(gen_last(sl))) = nse;
-	    EXPRESSION_(CAR(tsl)) = nse;
+	if(ENDP(tsl)) {
+	  // dereferencing18: the only possible offset is 0, dv==0,
+	  // Or the points-to information is approximate.
+	  // unique_p should be used here to decide if a warning should
+	  // be emitted
+	  ;
+	}
+	else {
+	  // expression lse = EXPRESSION(CAR(gen_last(sl)));
+	  expression lse = EXPRESSION(CAR(tsl));
+	  value vlse = EvalExpression(lse);
+	  if(value_constant_p(vlse) && constant_int_p(value_constant(vlse))) {
+	    int ov =  constant_int(value_constant(vlse));
+	    int k = get_int_property("POINTS_TO_SUBSCRIPT_LIMIT");
+	    if(-k <= ov && ov <= k) {
+	      expression nse = int_to_expression(dv+ov);
+	      //EXPRESSION_(CAR(gen_last(sl))) = nse;
+	      EXPRESSION_(CAR(tsl)) = nse;
+	    }
+	    else {
+	      expression nse = make_unbounded_expression();
+	      //EXPRESSION_(CAR(gen_last(sl))) = nse;
+	      EXPRESSION_(CAR(tsl)) = nse;
+	    }
+	    free_expression(lse);
 	  }
 	  else {
+	    // If the index cannot be computed, used the unbounded expression
 	    expression nse = make_unbounded_expression();
 	    //EXPRESSION_(CAR(gen_last(sl))) = nse;
 	    EXPRESSION_(CAR(tsl)) = nse;
+	    free_expression(lse);
 	  }
-	  free_expression(lse);
-	}
-	else {
-	  // If the index cannot be computed, used the unbounded expression
-	  expression nse = make_unbounded_expression();
-	  //EXPRESSION_(CAR(gen_last(sl))) = nse;
-	  EXPRESSION_(CAR(tsl)) = nse;
-	  free_expression(lse);
 	}
       }
     }
@@ -961,12 +974,25 @@ void offset_points_to_cell(cell sink, expression delta, type t)
       }
       else {
 	list tsl = find_points_to_subscript_for_type(sink, t);
+	if(ENDP(tsl)) {
+	  /* No subscript is possible, but 0 and it does not need to appear */
+	  /* dereferencing18.c: a scalar was malloced */
+	  if(zero_expression_p(delta))
+	    ; // Nothing to be done: the subscript is ignored
+	  else {
+	    /* We might use unique_p and the value of delta to detect
+	       an error or to warn the user about a possible error */
+	    ;
+	  }
+	}
+	else {
 	//expression ose = EXPRESSION(CAR(gen_last(sl)));
 	expression ose = EXPRESSION(CAR(tsl));
 	expression nse = make_unbounded_expression();
 	//EXPRESSION_(CAR(gen_last(sl))) = nse;
 	EXPRESSION_(CAR(tsl)) = nse;
 	free_expression(ose);
+	}
       }
     }
   }

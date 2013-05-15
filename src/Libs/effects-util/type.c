@@ -1213,41 +1213,44 @@ list find_points_to_subscript_for_type(cell c, type t)
   list csl = list_undefined;
   reference r = cell_any_reference(c);
   entity v = reference_variable(r);
-  bool to_be_freed;
-  type rt = points_to_reference_to_type(r, &to_be_freed); // reference type
+  type rt = points_to_reference_to_concrete_type(r); // reference type
   list sl = reference_indices(r); // subscript list
   list rsl = gen_nreverse(sl); // temporary side-effect on "r" (and "c")
   list crsl = rsl; // current reverse subscript list
 
   while(!array_pointer_type_equal_p(t, rt) && !ENDP(crsl)) {
-    if(to_be_freed) free_type(rt);
     POP(crsl);
     list nsl = gen_copy_seq(crsl);
     reference nr = make_reference(v, nsl);
-    rt = points_to_reference_to_type(nr, &to_be_freed);
+    rt = points_to_reference_to_concrete_type(nr);
     reference_indices(nr) = NIL;
     free_reference(nr);
   }
 
-  if(to_be_freed) free_type(rt);
   reference_indices(r)= gen_nreverse(rsl);
 
   if(!ENDP(crsl)) {
     csl = crsl;
   }
   else {
-    /* Let's try to add a zero subscript instead... */
-    expression z = make_zero_expression();
-    list nsl = CONS(EXPRESSION, z, NIL);
-    /* For the time being, no need to restore the reference in case of
-       failure. */
-    reference_indices(r) = gen_nconc(reference_indices(r), nsl);
-    rt = points_to_reference_to_type(r, &to_be_freed);
-    if(array_pointer_type_equal_p(t, rt))
-      csl = nsl;
-    else
-      pips_internal_error("Type t and reference r are incompatible.\n");
-    if(to_be_freed) free_type(rt);
+    if(array_pointer_type_equal_p(t, rt)) {
+      // dereferencing18.c: only one element is allocated. 0 is the
+      // only possible subscript;
+      csl = NIL; // ==crsl
+    }
+    else {
+      /* Let's try to add a zero subscript instead... */
+      expression z = make_zero_expression();
+      list nsl = CONS(EXPRESSION, z, NIL);
+      /* For the time being, no need to restore the reference in case of
+	 failure. */
+      reference_indices(r) = gen_nconc(reference_indices(r), nsl);
+      rt = points_to_reference_to_concrete_type(r);
+      if(array_pointer_type_equal_p(t, rt))
+	csl = nsl;
+      else
+	pips_internal_error("Type t and reference r are incompatible.\n");
+    }
   }
 
   return csl;

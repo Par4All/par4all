@@ -1511,7 +1511,10 @@ list subscript_to_points_to_sinks(subscript s,
 	  /* The reference "p[i][j]" is transformed into an expression
 	     "*(*(p+i)+j)" if "p" is really a pointer expression, not a
 	     partial array reference. */
-	  expression pae = pointer_subscript_to_expression(c, csl);
+	  //expression pae = pointer_subscript_to_expression(c, csl);
+	  // FI: I guess csl might have to be freed...
+	  list nsl = gen_full_copy_list(sl);
+	  expression pae = pointer_subscript_to_expression(c, nsl);
 	  i_sources = expression_to_points_to_sources(pae, in);
 	  free_expression(pae);
 	}
