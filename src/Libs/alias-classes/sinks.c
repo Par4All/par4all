@@ -1705,15 +1705,23 @@ list expression_to_points_to_sinks(expression e, pt_map in)
   return sinks;
 }
 
+/* expression_to_points_to_sources() does not always work, especially
+   with pointer arithmetic or subscripting because p[3], for instance,
+   is not recognized as a valid source: it is not a constant path */
 list expression_to_points_to_sources(expression e, pt_map in)
 {
   list sinks = expression_to_points_to_cells(e, in, false, true);
 
   /* Scalar pointers are expected but [0] subscript may have been added */
-  if(!expression_to_points_to_cell_p(e))
-    sinks = reduce_cells_to_pointer_type(sinks);
-  ifdebug(1) {
-    bool to_be_freed;
+  if(!expression_to_points_to_cell_p(e)) {
+    /* Trouble for fread04... An array element, _line_3[0], is reduced
+       to an array, _line_3, and you want to capture its address */
+    // sinks = reduce_cells_to_pointer_type(sinks);
+    ;
+  }
+
+  ifdebug(1) { bool
+    to_be_freed;
     type tmp_t = points_to_expression_to_type(e, &to_be_freed);
     type et = compute_basic_concrete_type(tmp_t);
     FOREACH(CELL, c, sinks) {

@@ -61,6 +61,9 @@
 #include "points_to_private.h"
 #include "alias-classes.h"
 
+/* FI: what is this function supposed to do? Just update "pt_in" to
+   make sure that "r" can be dereferenced? And then recursively, with
+   the different subscripts? */
 void subscripted_reference_to_points_to(reference r, list sl, pt_map pt_in)
 {
   if(!ENDP(sl)) {

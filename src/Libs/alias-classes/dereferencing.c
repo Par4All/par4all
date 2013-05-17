@@ -288,7 +288,7 @@ pt_map reference_dereferencing_to_points_to(reference r,
  *
  * For instance expression "p" can be reduced to reference "p".
  *
- * Expression "p+i" annot be reduced to a reference.
+ * Expression "p+i" cannot be reduced to a source reference, unless i==0.
  *
  * Ad'hoc development for dereferencing_to_sinks.
  */
