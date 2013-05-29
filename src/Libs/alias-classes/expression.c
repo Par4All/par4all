@@ -77,9 +77,34 @@ void subscripted_reference_to_points_to(reference r, list sl, pt_map pt_in)
       FOREACH(CELL, c, cl) {
 	if(!ENDP(CDR(sl))) {
 	  expression fs = EXPRESSION(CAR(sl));
-	  points_to_cell_update_last_subscript(c, fs);
-	  reference nr = cell_any_reference(c);
-	  subscripted_reference_to_points_to(nr, CDR(sl), pt_in);
+	  /* FI: we have to find the right location for the subscript
+	   * to update. Some dimensions are due to the dimension of
+	   * the source in pt_in, one dimension is due to the fact
+	   * that we are dealing with a pointer, some dimensions are
+	   * due to the fact that an array is pointed. The dimension
+	   * to update may be the first one, the last one, or one in
+	   * the middle.
+	   *
+	   * This also depends on strict typing...
+	   *
+	   * See for instance, Pointers/pointer20.c
+	   */
+	  reference or = cell_any_reference(c);
+	  if(adapt_reference_to_type(or, rt)) {
+	    list osl = reference_indices(or);
+	    if(ENDP(osl)) {
+	      reference_indices(or) = CONS(EXPRESSION,
+					   copy_expression(EXPRESSION(CAR(sl))),
+					   NIL);
+	    }
+	    else {
+	      points_to_cell_update_last_subscript(c, fs);
+	    }
+	    reference nr = cell_any_reference(c);
+	    subscripted_reference_to_points_to(nr, CDR(sl), pt_in);
+	  }
+	  else
+	    pips_internal_error("reference could not be updated.\n");
 	}
       }
     }

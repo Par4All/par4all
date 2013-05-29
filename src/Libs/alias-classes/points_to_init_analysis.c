@@ -324,10 +324,9 @@ cell create_scalar_stub_sink_cell(entity v, // source entity
   cell sink_cell = make_cell_reference(sink_ref);
 
   ifdebug(1) {
-    bool to_be_freed;
-    type ept = points_to_cell_to_type(sink_cell, & to_be_freed);
+    type ept = points_to_cell_to_concrete_type(sink_cell);
     if(!array_pointer_type_equal_p(pt, ept)
-       && !(type_void_p(pt) && overloaded_type_p(ept))) {
+       && !(type_void_p(pt) || overloaded_type_p(ept))) {
       bool ok_p = false;
       if(array_type_p(pt)) {
 	if(!array_type_p(ept)) {
@@ -346,7 +345,6 @@ cell create_scalar_stub_sink_cell(entity v, // source entity
       pips_internal_error("Effective type of sink cell does not match its expected type\n");
       }
     }
-    if(to_be_freed) free_type(ept);
     pips_debug(1, "source entity: \"%s\", sink_cell: ", entity_user_name(v));
     print_points_to_cell(sink_cell);
     fprintf(stderr, "\n");
@@ -569,9 +567,10 @@ points_to create_stub_points_to(cell c, // source of the points-to
   // The indices of a points-to reference may include fields as well as
   // usual array subscripts
   list sl = gen_full_copy_list(reference_indices(source_r));
-  bool to_be_freed;
-  type c_t = points_to_cell_to_type(c, &to_be_freed);
-  type source_t = compute_basic_concrete_type(c_t);
+  //bool to_be_freed;
+  //type c_t = points_to_cell_to_type(c, &to_be_freed);
+  //type source_t = compute_basic_concrete_type(c_t);
+  type source_t = points_to_cell_to_concrete_type(c);
   cell sink_cell = cell_undefined;
   bool e_exact_p = true;
 
@@ -616,17 +615,22 @@ points_to create_stub_points_to(cell c, // source of the points-to
       // with unbounded expressions
 	sl = points_to_indices_to_subscript_indices(sl);
       }
-      // dimensions to be added to the dimensions of "st"
+      // dimensions to be added to the dimensions of "sink_t"
       list ndl = make_unbounded_dimensions(source_cd);
       type sink_t = copy_type(type_to_pointed_type(source_t));
       if(type_void_p(sink_t)) {
 	free_type(sink_t);
 	sink_t = make_type_variable(make_variable(make_basic_overloaded(), NIL, NIL));
       }
+      /* Update sink_t to take into account all the dimensions
+	 existing in the source */
       pips_assert("type_variable_p(sink_t)", type_variable_p(sink_t));
       variable nstv = type_variable(sink_t);
       variable_dimensions(nstv) = gen_nconc(ndl, variable_dimensions(nstv));
+
+      /* stub_t is same as sink_t, but add a dimension array arithmetic */
       type stub_t = strict_p ? copy_type(sink_t) : type_to_array_type(sink_t);
+
       sink_cell = create_scalar_stub_sink_cell(v, stub_t, sink_t, source_cd, sl, fs);
       // FI: this should be performed by the previous function
       // points_to_cell_add_unbounded_subscripts(sink_cell);
@@ -648,7 +652,7 @@ points_to create_stub_points_to(cell c, // source of the points-to
 			 make_descriptor_none());
   pointer_index ++; // FI: is not used for formal parameters, is this the right place for the increment
 
-  if(to_be_freed) free_type(c_t);
+  //if(to_be_freed) free_type(c_t);
   
   return pt_to;
 }

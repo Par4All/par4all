@@ -1673,15 +1673,48 @@ list expression_to_points_to_cells(expression e,
       if(pointer_type_p(e_c_t))
 	f_e_t = type_to_pointed_type(e_c_t);
       else if(array_type_p(e_c_t)) {
-	free_f_e_t = true;
-	f_e_t = array_type_to_pointer_type(e_c_t);
+	// free_f_e_t = true;
+	// f_e_t = array_type_to_pointer_type(e_c_t);
+	type et = array_type_to_element_type(e_c_t);
+	if(pointer_type_p(et)) {
+	  f_e_t = type_to_pointed_type(et);
+	}
+	else {
+	  pips_internal_error("could be a struct - not implemented");
+	}
       }
     }
     FOREACH(CELL, s, sinks) {
       if(!null_cell_p(s)) {
 	type s_t = points_to_cell_to_concrete_type(s);
+	/* This test does not make sense for pointer19.c. Since the
+	   sink_cell is saturated with indices, its type is
+	   double. e_c_t is a 3-D array of pointers to double, f_e_t is a
+	   pointer towards a 2-D array of pointers to double... What
+	   could be checked here? */
 	if(!array_pointer_string_type_equal_p(f_e_t, s_t)) {
-	  pips_internal_error("Type discrepancy\n");
+	  if(array_type_p(f_e_t)) {
+	    type et = array_type_to_element_type(e_c_t);
+	    if(pointer_type_p(et)) {
+	      type pet = type_to_pointed_type(et);
+	      if(!array_pointer_string_type_equal_p(pet, s_t)) {
+		pips_internal_error("Type discrepancy\n");
+	      }
+	      else {
+		; // We are fine
+	      }
+	    }
+	    else {
+	      if(!array_pointer_string_type_equal_p(et, s_t)) {
+		pips_internal_error("Type discrepancy\n");
+	      }
+	      else {
+		; // We are fine
+	      }
+	    }
+	  }
+	  else
+	    pips_internal_error("Type discrepancy\n");
 	}
       }
     }
