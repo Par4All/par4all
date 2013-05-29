@@ -1,4 +1,4 @@
-setenv WS=pointer14
+setenv WS=pointer20
 delete $WS
 create $WS $WS.c
 
@@ -8,29 +8,25 @@ setenv PROPER_EFFECTS_DEBUG_LEVEL=1
 setenv CUMULATED_EFFECTS_DEBUG_LEVEL=1
 
 echo
-echo Points-to for "foo"
+echo Points-to for "pointer20"
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[foo]
+display PRINTED_FILE[pointer20]
+
+#quit
 
 echo
-echo Proper effects with points-to for "foo"
+echo Proper effects with points-to for "pointer20"
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[foo]
+display PRINTED_FILE[pointer20]
 
 echo
-echo Cumulated effects for "foo"
+echo Cumulated effects for "pointer20"
 echo
 activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[foo]
-
-echo
-echo Points-to for "$WS"
-echo
-activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[$WS]
+display PRINTED_FILE[pointer20]
 
 close
 shell cat $WS.database/Warnings

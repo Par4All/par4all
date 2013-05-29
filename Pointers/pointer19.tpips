@@ -1,4 +1,4 @@
-setenv WS=pointer14
+setenv WS=pointer19
 delete $WS
 create $WS $WS.c
 
@@ -13,6 +13,8 @@ echo
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[foo]
 
+#quit
+
 echo
 echo Proper effects with points-to for "foo"
 echo
@@ -25,12 +27,6 @@ echo Cumulated effects for "foo"
 echo
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[foo]
-
-echo
-echo Points-to for "$WS"
-echo
-activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[$WS]
 
 close
 shell cat $WS.database/Warnings
