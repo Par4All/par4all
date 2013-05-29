@@ -1,0 +1,70 @@
+
+Points-to for "pointer20"
+
+
+// Points To IN:
+// pa -> *NULL* , MAY
+// pa -> _pa_1[0][0] , MAY
+
+
+// Points To OUT:
+// pa -> _pa_1[0][0] , EXACT
+
+int pointer20(int (*pa)[5], int i)
+{
+
+// Points To: none
+
+   int j;
+
+// Points To:
+// pa -> *NULL* , MAY
+// pa -> _pa_1[0][0] , MAY
+
+   j = pa[i][0];
+
+// Points To:
+// pa -> _pa_1[0][0] , EXACT
+
+   return j;
+}
+
+Proper effects with points-to for "pointer20"
+
+int pointer20(int (*pa)[5], int i)
+{
+   int j;
+//             <    is read   >: _pa_1[i][0] i pa
+//             <    is written>: j
+   j = pa[i][0];
+//             <    is read   >: j
+   return j;
+}
+
+Cumulated effects for "pointer20"
+
+//             <may be read   >: _pa_1[*][0]
+//             <    is read   >: i pa
+int pointer20(int (*pa)[5], int i)
+{
+   int j;
+//             <may be read   >: _pa_1[*][0]
+//             <    is read   >: i pa
+//             <    is written>: j
+   j = pa[i][0];
+//             <    is read   >: j
+   return j;
+}
+
+Must regions with points-to for "pointer20"
+
+int pointer20(int (*pa)[5], int i)
+{
+   int j;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+   j = pa[i][0];
+   return j;
+}
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning pointer20 instead
