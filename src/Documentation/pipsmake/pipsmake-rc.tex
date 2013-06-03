@@ -143,10 +143,10 @@
 
 \title{PIPS High-Level Software Interface \\
     Pipsmake configuration}
-\author{Remi Triolet and Fran\c{c}ois Irigoin\\
+\author{R\'emi Triolet and Fran\c{c}ois Irigoin\\
   with many other contributors\\
         MINES ParisTech \\
-        Math�matiques et Syst�mes \\
+        Math\'ematiques et Syst\`emes \\
         Centre de Recherche en Informatique \\
         77305 Fontainebleau Cedex \\
         France \\}
@@ -250,7 +250,7 @@
 %% \newcommand{\Delete}{\LINK{\texttt{Delete}}{http://www.cri.ensmp.fr/pips/Delete.html}}
 \newcommand{\Delete}{{\em Delete}}
 
-%% Pour B�atrice :
+%% Pour Beatrice :
 \newcommand{\exact}[0]{{\tt EXACT}}
 \newcommand{\incluseg}{\subseteq}
 \newcommand{\phik}[1]{\ifmmode\phi_{#1}\else$\phi_{#1}$\fi}
@@ -272,7 +272,6 @@
 
 %\begin{PipsExample}
 %petit essai
-%� mettre ailleurs ! @!#%!#&@*I#(**()\\$$ pour tester
 %\end{PipsExample}
 
 %% The environment used to mark up the menus layout :
@@ -3179,7 +3178,7 @@ algorithms. A dependence graph is a refinement of use-def chains
 
 There are several ways to compute a dependence graph. Some of them are
 fast (\textsc{Banerjee}'s one for instance) but provide poor results, others
-might be slower (R�mi Triolet's one for instance) but produce better
+might be slower (R\'emi Triolet's one for instance) but produce better
 results.
 
 Three different dependence tests are available, all based on
@@ -3233,9 +3232,9 @@ dependence graph. If they were removed instead of being ignored,
 use-def elimination would remove all \verb/free/ statements.
 
 The main contributors for the design and development of dependence
-analysis are R�mi \textsc{Triolet}, Fran�ois \textsc{Irigoin} and Yi-qing
+analysis are R\'emi \textsc{Triolet}, Fran\c{c}ois \textsc{Irigoin} and Yi-qing
 \textsc{Yang}~\cite{Yan93}. The code was improved by Corinne
-\textsc{Ancourt} and B�atrice \textsc{Creusillet}.
+\textsc{Ancourt} and B\'eatrice \textsc{Creusillet}.
 \end{PipsPass}
 
 \subsection{Menu for Dependence Tests}
@@ -3601,7 +3600,7 @@ polynomial} equations between scalar integer variables. SUIF~\cite{}
 also performs some kind of semantics analysis.
 
 The semantics analysis part of \Pips{} was designed and developed by
-Fran�ois \textsc{Irigoin}.
+Fran\c{c}ois \textsc{Irigoin}.
 
 \subsection{Transformers}
 \label{subsubsection-transformers}
@@ -3644,7 +3643,7 @@ since call statements are accepted. Interprocedural algorithms use the
 Fast algorithms use a very primitive non-iterative transitive closure
 algorithm (two possible versions: flow sensitive or flow insensitive).
 Full algorithms use a transitive closure algorithm based on vector
-subspace (i.e. \emph{� la} K{\sc arr}~\cite{Kar76}) or one based on
+subspace (i.e. \emph{\`a la} K{\sc arr}~\cite{Kar76}) or one based on
 the discrete derivatives~\cite{Iri05,ACI10}. The iterative fix point
 algorithm for transformers (i.e. H{\sc albwachs}/C{\sc
 ousot}~\cite{CH78} is implemented but not used because the results
@@ -4695,7 +4694,7 @@ The first version of the complexity estimator was designed and
 developed by Pierre \textsc{Berthomier}. It was restricted to intra-procedural
 analysis. This first version was enlarged and validated on real code for
 SPARC-2 machines by Lei Z{\sc hou}~\cite{Zho94}. Since, it has been modified
-slightly by Fran�ois I{\sc rigoin}. For simple programs, complexity
+slightly by Fran\c{c}ois I{\sc rigoin}. For simple programs, complexity
 estimation are strongly correlated with execution times. The estimations
 can be used to see if program transformations are beneficial.
 
@@ -5052,11 +5051,11 @@ body, and which appears in the loop body region polyhedron, does not appear
 anymore in the invariant region polyhedron.
 
 \verb+MAY+ \verb+READ+ and \verb+WRITE+ region analysis was first designed
-by R�mi \textsc{Triolet}~\cite{Tri84} and then revisited by Fran�ois
+by R\'emi \textsc{Triolet}~\cite{Tri84} and then revisited by Fran\c{c}ois
 \textsc{Irigoin}~\cite{TIF86}. Alexis \textsc{Platonoff}~\cite{Pla90}
 implemented the first version of region analysis in \Pips{}. These
 regions were computed with respect to the initial stores of the
-modules. Fran�ois \textsc{Irigoin} and, mainly, B�atrice
+modules. Fran\c{c}ois \textsc{Irigoin} and, mainly, B\'eatrice
 \textsc{Creusillet}~\cite{CI95,CI96,Cre96}, added new functionalities to
 this first version as well as functions to compute \verb+MUST+
 regions, and \verb+IN+ and \verb+OUT+ regions.
@@ -6417,7 +6416,7 @@ PARALLELIZE_AGAIN_PARALLEL_CODE FALSE
 \end{PipsProp}
 The motivation is we may want to parallelize with a coarse grain method
 first, and finish with a fine grain method here to try to parallelize what
-has not been parallelized.  When applying \emph{� la} Rice parallelizing
+has not been parallelized.  When applying \emph{\`a la} Rice parallelizing
 to parallelize some (still) sequential code, we may not want loop
 distribution on already parallel code to preserve cache resources, etc.
 
@@ -7163,7 +7162,7 @@ generated code, e.g. to propagate constant or eliminate dead code.
 Note that use-use dependencies are used to allocate temporary arrays in
 local memory (i.e. in the software cache).
 
-This compilation scheme was designed by Corinne \textsc{Ancourt} and Fran�ois
+This compilation scheme was designed by Corinne \textsc{Ancourt} and Fran\c{c}ois
 \textsc{Irigoin}. It uses theoretical results in~\cite{AI91}. Its input is a very
 small subset of Fortran program (e.g. procedure calls are not supported).
 It was implemented by the designers, with help from Lei \textsc{Zhou}.
@@ -8453,7 +8452,7 @@ of wrapper is the normal behaviour but for simulation of an accelerator
 code, not using a wrapper is useful.
 
 The intrinsics function names to get an $i^{th}$ coordinate in the
-iteration space are defined by this GNU \emph{� la} \texttt{printf}
+iteration space are defined by this GNU \emph{\`a la} \texttt{printf}
 format:
 \begin{PipsProp}{GPU_COORDINATE_INTRINSICS_FORMAT}
 GPU_COORDINATE_INTRINSICS_FORMAT "P4A_vp_%d"
@@ -9705,6 +9704,10 @@ use_def_elimination          > MODULE.code
 \index{Restructurer}
 \index{Control Restructurer}
 
+% FI: we might be interested in F. Zhang and E. H. D’Hollander, “Using
+% hammock graphs to structure programs,” IEEE Trans. Softw. Eng.,
+% vol. 30, no. 4, pp. 231–245, 2004.
+
 Two control restructurers are available: \PipsPassRef{unspaghettify} which is
 used by default in conjunction with \PipsPassRef{controlizer} and
 \PipsPassRef{restructure_control} which must be explicitly applied\footnote{A property
@@ -10108,7 +10111,7 @@ logic (such as FPGAs or DataPaths).
 
 This library provides phases allowing to build and modify "Finite State
 Machine"-like code portions which will be later synthesized in
-reconfigurable units. This was implemented by Sylvain \textsc{Gu�rin}.
+reconfigurable units. This was implemented by Sylvain \textsc{Gu\'erin}.
 
 \subsubsection{FSM Generation}
 \label{paragraph-fsm-generation}
@@ -12188,7 +12191,7 @@ quick_scalarization  > MODULE.code
         < MODULE.dg
 \end{PipsMake}
 
-Pass \PipsPassRef{quick_scalarization} was implemented by Beatrice Creusillet.
+Pass \PipsPassRef{quick_scalarization} was implemented by B\'eatrice Creusillet.
 
 \subsection{Induction Variable Substitution}
 
@@ -12275,7 +12278,7 @@ accelerator is performed by another phase, see for instance
 Section~\ref{hardware-accelerator}.
 
 Initially developed in August 2009 by Laurent \textsc{Daverio}, with
-help from Fabien \textsc{Coelho} and Francois \textsc{Irigoin}.
+help from Fabien \textsc{Coelho} and Fran\c{c}ois \textsc{Irigoin}.
 
 \begin{PipsMake}
 alias flatten_code 'Flatten Code'
@@ -15986,6 +15989,7 @@ print_code_smalltalk        > MODULE.smalltalk_code_file
 \label{subsection-prettyprinter-pocc}
 \index{Prettyprinter PoCC}
 \index{OpenGPU}
+\index{PoCC}
 
 \begin{PipsPass}{pocc_prettyprinter}
   This pass is used for printing pragmas \verb/scop/ and
@@ -16002,10 +16006,7 @@ pocc_prettyprinter      >    MODULE.code
     < MODULE.code
     < MODULE.static_control
 
-
 \end{PipsMake}
-
-
 
 For the outlining of the control static parts, function prefix names to
 be used during the generation:
@@ -16013,11 +16014,10 @@ be used during the generation:
 SCOP_PREFIX "SCoP"
 \end{PipsProp}
 
-
-Because of user function calls are not allowed in PoCC static control
+Because user function calls are not allowed in PoCC static control
 parts, whereas they are generally accepted in PIPS (see Arnauld
 Leservot's PhD), we introduce a property to control the impact of user
-calls. This property could be called \verb/POCC_COMPATIBILIRY/ if
+calls. This property could be called \verb/POCC_COMPATIBILITY/ if
 there were a set of limiting rules to apply for PoCC, but user calls
 are the only current issue\footnote{The PLUTO compiler does not
   support intrinsics calls either, althoug it is part of the PoCC
@@ -16137,8 +16137,8 @@ print_xml_application      > MODULE.xml_printed_file
 \chapter{Feautrier Methods (a.k.a. Polyhedral Method)}
 \label{section-feautrier-methods}
 
-This part of \Pips{} was implemented at Centre d'�tudes Atomiques,
-Limeil-Br�vannes, by Beno�t de \textsc{Dinechin}, Arnauld
+This part of \Pips{} was implemented at Centre d'\'Etudes Atomiques,
+Limeil-Br\'evannes, by Beno\^it de \textsc{Dinechin}, Arnauld
 \textsc{Leservot} and Alexis \textsc{Platonoff}.
 
 Unfortunately, this part is no longer used in PIPS right now because of
