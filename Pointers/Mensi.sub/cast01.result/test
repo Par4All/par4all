@@ -1,0 +1,111 @@
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *pi;
+
+// Points To:
+// pi -> undefined , EXACT
+
+   short *ps;
+
+// Points To:
+// pi -> undefined , EXACT
+// ps -> undefined , EXACT
+
+   pi = (int *) malloc(4*sizeof(int));
+
+// Points To:
+// pi -> *HEAP*_l_7[0] , MAY
+// ps -> undefined , EXACT
+
+   pi = pi+2;
+
+// Points To:
+// pi -> *HEAP*_l_7[2] , MAY
+// ps -> undefined , EXACT
+
+   ps = (short *) pi;
+
+// Points To:
+// pi -> *HEAP*_l_7[2] , MAY
+// ps -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+   ps -= 4;
+
+// Points To:
+// pi -> *HEAP*_l_7[2] , MAY
+// ps -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+   free(ps);
+
+// Points To:
+// pi -> *HEAP*_l_7[2] , MAY
+// ps -> undefined , EXACT
+
+
+   return 0;
+}
+
+Proper effects with points-to for "main"
+
+int main()
+{
+   int *pi;
+   short *ps;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: pi _MALLOC_EFFECTS:_MALLOC_
+   pi = (int *) malloc(4*sizeof(int));
+//             <    is read   >: pi
+//             <    is written>: pi
+   pi = pi+2;
+//             <    is read   >: pi
+//             <    is written>: ps
+   ps = (short *) pi;
+//             <    is read   >: ps
+//             <    is written>: ps
+   ps -= 4;
+//             <    is read   >: ps _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(ps);
+
+   return 0;
+}
+
+Cumulated effects with points-to for "main"
+
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+int main()
+{
+   int *pi;
+   short *ps;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: pi _MALLOC_EFFECTS:_MALLOC_
+   pi = (int *) malloc(4*sizeof(int));
+//             <    is read   >: pi
+//             <    is written>: pi
+   pi = pi+2;
+//             <    is read   >: pi
+//             <    is written>: ps
+   ps = (short *) pi;
+//             <    is read   >: ps
+//             <    is written>: ps
+   ps -= 4;
+//             <    is read   >: ps _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(ps);
+
+   return 0;
+}
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (adapt_reference_to_type) There may be a typing error at line 9 (e.g. improper malloc call).
