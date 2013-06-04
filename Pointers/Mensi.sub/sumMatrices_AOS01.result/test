@@ -1,0 +1,1267 @@
+
+Points-to for "sumMatrices_AOS"
+
+
+// Points To IN:
+// _fmat_1[*] -> *NULL* , MAY
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> *NULL* , MAY
+// fmat -> _fmat_1[0] , MAY
+// prmat -> *NULL* , MAY
+// prmat -> _prmat_2[0] , MAY
+
+
+// Points To OUT:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+void sumMatrices_AOS(float * restrict *fmat, float * restrict *prmat, int i0, int i1, int j0, int j1)
+{
+
+
+// Points To: none
+
+   int m = i1-i0+1;
+
+// Points To: none
+
+   int n = j1-j0+1;
+
+// Points To: none
+
+   int i, j, k;
+
+// Points To: none
+
+   int pos = 0;
+   {
+
+// Points To: none
+
+      int i;
+
+// Points To: none
+
+      // block #1
+      for(i = 0; i <= m-1; i += 1) {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+         int j;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+         for(j = 0; j <= n-1; j += 1) {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+
+            pos = 0;
+            {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+               int k1;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+               for(k1 = 0; k1 <= 6; k1 += 1) {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+                  int k2;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+                  for(k2 = k1; k2 <= 6; k2 += 1) {
+
+// Points To:
+// _fmat_1[*] -> *NULL* , MAY
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> *NULL* , MAY
+// fmat -> _fmat_1[0] , MAY
+// prmat -> *NULL* , MAY
+// prmat -> _prmat_2[0] , MAY
+
+
+                     prmat[i][j*28+pos] = fmat[i][j*7+k1]*fmat[i][j*7+k2];
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+                     pos++;
+                  }
+               }
+            }
+         }
+      }
+   }
+   {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+      int i;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+      
+      // block #2: prolog
+      for(i = 1; i <= m-1; i += 1) {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+         int k;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+         for(k = 0; k <= 27; k += 1)
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+            prmat[i][0*28+k] += prmat[i-1][0*28+k];
+      }
+   }
+   {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+      int j;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+      for(j = 1; j <= n-1; j += 1) {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+         int k;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+         for(k = 0; k <= 27; k += 1)
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+            prmat[0][j*28+k] += prmat[0][(j-1)*28+k];
+      }
+   }
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+   
+   // block #2
+   for(i = 1; i <= m-1; i += 1)
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+      for(j = 1; j <= n-1; j += 1)
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+         for(k = 0; k <= 27; k += 1)
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+            prmat[i][j*28+k] += prmat[i][(j-1)*28+k]+prmat[i-1][j*28+k]-prmat[i-1][(j-1)*28+k];
+   {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+      int i;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+      
+      
+      // block #3 prolog
+      for(i = 1; i <= m-1; i += 1) {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+         int k;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+         for(k = 0; k <= 6; k += 1)
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+            fmat[i][0*7+k] += fmat[i-1][0*7+k];
+      }
+   }
+   {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+      int j;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+      for(j = 1; j <= n-1; j += 1) {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+         int k;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+         for(k = 0; k <= 6; k += 1)
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+            fmat[0][j*7+k] += fmat[0][(j-1)*7+k];
+      }
+   }
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+   
+   
+   
+   // block #3
+   for(i = 1; i <= m-1; i += 1)
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+      for(j = 1; j <= n-1; j += 1)
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+         for(k = 0; k <= 6; k += 1)
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+            fmat[i][j*7+k] += fmat[i][(j-1)*7+k]+fmat[i-1][j*7+k]-fmat[i-1][(j-1)*7+k];
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+   return;
+}
+
+Proper effects with points-to for "sumMatrices_AOS"
+
+void sumMatrices_AOS(float * restrict *fmat, float * restrict *prmat, int i0, int i1, int j0, int j1)
+{
+
+//             <    is read   >: i0 i1
+//             <    is written>: m
+   int m = i1-i0+1;
+//             <    is read   >: j0 j1
+//             <    is written>: n
+   int n = j1-j0+1;
+   int i, j, k;
+//             <    is written>: pos
+   int pos = 0;
+   {
+      int i;
+//             <    is read   >: m
+//             <    is written>: 0`1`i
+      // block #1
+      for(i = 0; i <= m-1; i += 1) {
+         int j;
+//             <    is read   >: m n
+//             <    is written>: 0`1`2`3`j
+         for(j = 0; j <= n-1; j += 1) {
+//             <    is read   >: m n
+//             <    is written>: pos
+
+            pos = 0;
+            {
+               int k1;
+//             <    is read   >: m n
+//             <    is written>: k1
+               for(k1 = 0; k1 <= 6; k1 += 1) {
+                  int k2;
+//             <    is read   >: k1 m n
+//             <    is written>: k2
+                  for(k2 = k1; k2 <= 6; k2 += 1) {
+//             <may be read   >: _fmat_1_1[*][j*7+k1] 
+//                               _fmat_1_1[*][j*7+k2]
+//             <may be written>: _prmat_2_2[*][j*28+pos]
+//             <    is read   >: _fmat_1[i] _fmat_1[i] _prmat_2[i] 
+//                               fmat 0`1`i 0`1`2`3`j k1 k2 m n pos 
+//                               prmat
+
+                     prmat[i][j*28+pos] = fmat[i][j*7+k1]*fmat[i][j*7+k2];
+//             <    is read   >: k1 m n pos
+//             <    is written>: pos
+                     pos++;
+                  }
+               }
+            }
+         }
+      }
+   }
+   {
+      int i;
+//             <    is read   >: m
+//             <    is written>: 0`9`i
+      
+      // block #2: prolog
+      for(i = 1; i <= m-1; i += 1) {
+         int k;
+//             <    is read   >: m
+//             <    is written>: 0`9`10`11`k
+         for(k = 0; k <= 27; k += 1)
+//             <may be read   >: _prmat_2_2[*][0*28+k] 
+//                               _prmat_2_2[*][0*28+k]
+//             <may be written>: _prmat_2_2[*][0*28+k]
+//             <    is read   >: _prmat_2[i] _prmat_2[i] _prmat_2[i-1]
+//                               0`9`i 0`9`10`11`k m prmat
+            prmat[i][0*28+k] += prmat[i-1][0*28+k];
+      }
+   }
+   {
+      int j;
+//             <    is read   >: n
+//             <    is written>: 0`13`j
+      for(j = 1; j <= n-1; j += 1) {
+         int k;
+//             <    is read   >: n
+//             <    is written>: 0`13`14`15`k
+         for(k = 0; k <= 27; k += 1)
+//             <may be read   >: _prmat_2_2[*][(j-1)
+//                               *28+k] _prmat_2_2[*][j*28+k]
+//             <may be written>: _prmat_2_2[*][j*28+k]
+//             <    is read   >: _prmat_2[0] _prmat_2[0] _prmat_2[0] 
+//                               0`13`j 0`13`14`15`k n prmat
+            prmat[0][j*28+k] += prmat[0][(j-1)*28+k];
+      }
+   }
+//             <    is read   >: m
+//             <    is written>: 0`i
+   
+   // block #2
+   for(i = 1; i <= m-1; i += 1)
+//             <    is read   >: m n
+//             <    is written>: 0`j
+      for(j = 1; j <= n-1; j += 1)
+//             <    is read   >: m n
+//             <    is written>: 0`k
+         for(k = 0; k <= 27; k += 1)
+//             <may be read   >: _prmat_2_2[*][(j-1)
+//                               *28+k] _prmat_2_2[*][(j-1)
+//                               *28+k] _prmat_2_2[*][j*28+k] 
+//                               _prmat_2_2[*][j*28+k]
+//             <may be written>: _prmat_2_2[*][j*28+k]
+//             <    is read   >: _prmat_2[i] _prmat_2[i] _prmat_2[i] 
+//                               _prmat_2[i-1] _prmat_2[i-1] 0`i 0`j 
+//                               0`k m n prmat
+            prmat[i][j*28+k] += prmat[i][(j-1)*28+k]+prmat[i-1][j*28+k]-prmat[i-1][(j-1)*28+k];
+   {
+      int i;
+//             <    is read   >: m
+//             <    is written>: 0`20`i
+      
+      
+      // block #3 prolog
+      for(i = 1; i <= m-1; i += 1) {
+         int k;
+//             <    is read   >: m
+//             <    is written>: 0`20`21`22`k
+         for(k = 0; k <= 6; k += 1)
+//             <may be read   >: _fmat_1_1[*][0*7+k] 
+//                               _fmat_1_1[*][0*7+k]
+//             <may be written>: _fmat_1_1[*][0*7+k]
+//             <    is read   >: _fmat_1[i] _fmat_1[i] _fmat_1[i-1] 
+//                               fmat 0`20`i 0`20`21`22`k m
+            fmat[i][0*7+k] += fmat[i-1][0*7+k];
+      }
+   }
+   {
+      int j;
+//             <    is read   >: n
+//             <    is written>: 0`24`j
+      for(j = 1; j <= n-1; j += 1) {
+         int k;
+//             <    is read   >: n
+//             <    is written>: 0`24`25`26`k
+         for(k = 0; k <= 6; k += 1)
+//             <may be read   >: _fmat_1_1[*][(j-1)
+//                               *7+k] _fmat_1_1[*][j*7+k]
+//             <may be written>: _fmat_1_1[*][j*7+k]
+//             <    is read   >: _fmat_1[0] _fmat_1[0] _fmat_1[0] fmat
+//                               0`24`j 0`24`25`26`k n
+            fmat[0][j*7+k] += fmat[0][(j-1)*7+k];
+      }
+   }
+//             <    is read   >: m
+//             <    is written>: 0`i
+   
+   
+   
+   // block #3
+   for(i = 1; i <= m-1; i += 1)
+//             <    is read   >: m n
+//             <    is written>: 0`j
+      for(j = 1; j <= n-1; j += 1)
+//             <    is read   >: m n
+//             <    is written>: 0`k
+         for(k = 0; k <= 6; k += 1)
+//             <may be read   >: _fmat_1_1[*][(j-1)
+//                               *7+k] _fmat_1_1[*][(j-1)
+//                               *7+k] _fmat_1_1[*][j*7+k] 
+//                               _fmat_1_1[*][j*7+k]
+//             <may be written>: _fmat_1_1[*][j*7+k]
+//             <    is read   >: _fmat_1[i] _fmat_1[i] _fmat_1[i] 
+//                               _fmat_1[i-1] _fmat_1[i-1] fmat 0`i 
+//                               0`j 0`k m n
+            fmat[i][j*7+k] += fmat[i][(j-1)*7+k]+fmat[i-1][j*7+k]-fmat[i-1][(j-1)*7+k];
+   return;
+}
+
+Cumulated effects with points-to for "sumMatrices_AOS"
+
+//             <may be read   >: _fmat_1[*] _fmat_1_1[*][*] 
+//                               _prmat_2[*] _prmat_2_2[*][*] fmat 
+//                               prmat
+//             <may be written>: _fmat_1_1[*][*] _prmat_2_2[*][*]
+//             <    is read   >: i0 i1 j0 j1
+void sumMatrices_AOS(float * restrict *fmat, float * restrict *prmat, int i0, int i1, int j0, int j1)
+{
+
+//             <    is read   >: i0 i1
+//             <    is written>: m
+   int m = i1-i0+1;
+//             <    is read   >: j0 j1
+//             <    is written>: n
+   int n = j1-j0+1;
+   int i, j, k;
+//             <    is written>: pos
+   int pos = 0;
+   {
+      int i;
+//             <may be read   >: _fmat_1[*] _fmat_1_1[*][*] 
+//                               _prmat_2[*] fmat 0`1`i n pos prmat
+//             <may be written>: _prmat_2_2[*][*] pos
+//             <    is read   >: m
+//             <    is written>: 0`1`i
+      // block #1
+      for(i = 0; i <= m-1; i += 1) {
+         int j;
+//             <may be read   >: _fmat_1[*] _fmat_1_1[*][*] 
+//                               _prmat_2[*] fmat 0`1`i 0`1`2`3`j pos 
+//                               prmat
+//             <may be written>: _prmat_2_2[*][*] pos
+//             <    is read   >: m n
+//             <    is written>: 0`1`2`3`j
+         for(j = 0; j <= n-1; j += 1) {
+//             <    is read   >: m n
+//             <    is written>: pos
+
+            pos = 0;
+            {
+               int k1;
+//             <may be read   >: _fmat_1[*] _fmat_1_1[*][*] 
+//                               _prmat_2[*] fmat 0`1`i 0`1`2`3`j pos 
+//                               prmat
+//             <may be written>: _prmat_2_2[*][*] pos
+//             <    is read   >: k1 m n
+//             <    is written>: k1
+               for(k1 = 0; k1 <= 6; k1 += 1) {
+                  int k2;
+//             <may be read   >: _fmat_1[*] _fmat_1_1[*][*] 
+//                               _prmat_2[*] fmat 0`1`i 0`1`2`3`j k2 
+//                               pos prmat
+//             <may be written>: _prmat_2_2[*][*] pos
+//             <    is read   >: k1 m n
+//             <    is written>: k2
+                  for(k2 = k1; k2 <= 6; k2 += 1) {
+//             <may be read   >: _fmat_1[*] _fmat_1_1[*][*] 
+//                               _prmat_2[*]
+//             <may be written>: _prmat_2_2[*][*]
+//             <    is read   >: fmat 0`1`i 0`1`2`3`j k1 k2 m n pos 
+//                               prmat
+
+                     prmat[i][j*28+pos] = fmat[i][j*7+k1]*fmat[i][j*7+k2];
+//             <    is read   >: k1 m n pos
+//             <    is written>: pos
+                     pos++;
+                  }
+               }
+            }
+         }
+      }
+   }
+   {
+      int i;
+//             <may be read   >: _prmat_2[*] _prmat_2_2[*][*] 0`9`i 
+//                               prmat
+//             <may be written>: _prmat_2_2[*][*]
+//             <    is read   >: m
+//             <    is written>: 0`9`i
+      
+      // block #2: prolog
+      for(i = 1; i <= m-1; i += 1) {
+         int k;
+//             <may be read   >: _prmat_2[*] _prmat_2_2[*][*]
+//             <may be written>: _prmat_2_2[*][*]
+//             <    is read   >: 0`9`i 0`9`10`11`k m prmat
+//             <    is written>: 0`9`10`11`k
+         for(k = 0; k <= 27; k += 1)
+//             <may be read   >: _prmat_2[*] _prmat_2_2[*][*]
+//             <may be written>: _prmat_2_2[*][*]
+//             <    is read   >: 0`9`i 0`9`10`11`k m prmat
+            prmat[i][0*28+k] += prmat[i-1][0*28+k];
+      }
+   }
+   {
+      int j;
+//             <may be read   >: _prmat_2[0] _prmat_2_2[*][*] 0`13`j 
+//                               prmat
+//             <may be written>: _prmat_2_2[*][*]
+//             <    is read   >: n
+//             <    is written>: 0`13`j
+      for(j = 1; j <= n-1; j += 1) {
+         int k;
+//             <may be read   >: _prmat_2_2[*][*]
+//             <may be written>: _prmat_2_2[*][*]
+//             <    is read   >: _prmat_2[0] 0`13`j 0`13`14`15`k n 
+//                               prmat
+//             <    is written>: 0`13`14`15`k
+         for(k = 0; k <= 27; k += 1)
+//             <may be read   >: _prmat_2_2[*][*]
+//             <may be written>: _prmat_2_2[*][*]
+//             <    is read   >: _prmat_2[0] 0`13`j 0`13`14`15`k n 
+//                               prmat
+            prmat[0][j*28+k] += prmat[0][(j-1)*28+k];
+      }
+   }
+//             <may be read   >: _prmat_2[*] _prmat_2_2[*][*] 0`i 0`j 
+//                               0`k n prmat
+//             <may be written>: _prmat_2_2[*][*] 0`j 0`k
+//             <    is read   >: m
+//             <    is written>: 0`i
+   
+   // block #2
+   for(i = 1; i <= m-1; i += 1)
+//             <may be read   >: _prmat_2[*] _prmat_2_2[*][*] 0`i 0`j 
+//                               0`k prmat
+//             <may be written>: _prmat_2_2[*][*] 0`k
+//             <    is read   >: m n
+//             <    is written>: 0`j
+      for(j = 1; j <= n-1; j += 1)
+//             <may be read   >: _prmat_2[*] _prmat_2_2[*][*]
+//             <may be written>: _prmat_2_2[*][*]
+//             <    is read   >: 0`i 0`j 0`k m n prmat
+//             <    is written>: 0`k
+         for(k = 0; k <= 27; k += 1)
+//             <may be read   >: _prmat_2[*] _prmat_2_2[*][*]
+//             <may be written>: _prmat_2_2[*][*]
+//             <    is read   >: 0`i 0`j 0`k m n prmat
+            prmat[i][j*28+k] += prmat[i][(j-1)*28+k]+prmat[i-1][j*28+k]-prmat[i-1][(j-1)*28+k];
+   {
+      int i;
+//             <may be read   >: _fmat_1[*] _fmat_1_1[*][*] fmat 
+//                               0`20`i
+//             <may be written>: _fmat_1_1[*][*]
+//             <    is read   >: m
+//             <    is written>: 0`20`i
+      
+      
+      // block #3 prolog
+      for(i = 1; i <= m-1; i += 1) {
+         int k;
+//             <may be read   >: _fmat_1[*] _fmat_1_1[*][*]
+//             <may be written>: _fmat_1_1[*][*]
+//             <    is read   >: fmat 0`20`i 0`20`21`22`k m
+//             <    is written>: 0`20`21`22`k
+         for(k = 0; k <= 6; k += 1)
+//             <may be read   >: _fmat_1[*] _fmat_1_1[*][*]
+//             <may be written>: _fmat_1_1[*][*]
+//             <    is read   >: fmat 0`20`i 0`20`21`22`k m
+            fmat[i][0*7+k] += fmat[i-1][0*7+k];
+      }
+   }
+   {
+      int j;
+//             <may be read   >: _fmat_1[0] _fmat_1_1[*][*] fmat 
+//                               0`24`j
+//             <may be written>: _fmat_1_1[*][*]
+//             <    is read   >: n
+//             <    is written>: 0`24`j
+      for(j = 1; j <= n-1; j += 1) {
+         int k;
+//             <may be read   >: _fmat_1_1[*][*]
+//             <may be written>: _fmat_1_1[*][*]
+//             <    is read   >: _fmat_1[0] fmat 0`24`j 0`24`25`26`k n
+//             <    is written>: 0`24`25`26`k
+         for(k = 0; k <= 6; k += 1)
+//             <may be read   >: _fmat_1_1[*][*]
+//             <may be written>: _fmat_1_1[*][*]
+//             <    is read   >: _fmat_1[0] fmat 0`24`j 0`24`25`26`k n
+            fmat[0][j*7+k] += fmat[0][(j-1)*7+k];
+      }
+   }
+//             <may be read   >: _fmat_1[*] _fmat_1_1[*][*] fmat 0`i 
+//                               0`j 0`k n
+//             <may be written>: _fmat_1_1[*][*] 0`j 0`k
+//             <    is read   >: m
+//             <    is written>: 0`i
+   
+   
+   
+   // block #3
+   for(i = 1; i <= m-1; i += 1)
+//             <may be read   >: _fmat_1[*] _fmat_1_1[*][*] fmat 0`i 
+//                               0`j 0`k
+//             <may be written>: _fmat_1_1[*][*] 0`k
+//             <    is read   >: m n
+//             <    is written>: 0`j
+      for(j = 1; j <= n-1; j += 1)
+//             <may be read   >: _fmat_1[*] _fmat_1_1[*][*]
+//             <may be written>: _fmat_1_1[*][*]
+//             <    is read   >: fmat 0`i 0`j 0`k m n
+//             <    is written>: 0`k
+         for(k = 0; k <= 6; k += 1)
+//             <may be read   >: _fmat_1[*] _fmat_1_1[*][*]
+//             <may be written>: _fmat_1_1[*][*]
+//             <    is read   >: fmat 0`i 0`j 0`k m n
+            fmat[i][j*7+k] += fmat[i][(j-1)*7+k]+fmat[i-1][j*7+k]-fmat[i-1][(j-1)*7+k];
+   return;
+}
+void sumMatrices_AOS(float * restrict *fmat, float * restrict *prmat, int i0, int i1, int j0, int j1)
+{
+
+   int m = i1-i0+1;
+   int n = j1-j0+1;
+   int i, j, k;
+   int pos = 0;
+   {
+      int i;
+      // block #1
+      for(i = 0; i <= m-1; i += 1) {
+         int j;
+         for(j = 0; j <= n-1; j += 1) {
+
+            pos = 0;
+            {
+               int k1;
+               for(k1 = 0; k1 <= 6; k1 += 1) {
+                  int k2;
+                  for(k2 = k1; k2 <= 6; k2 += 1) {
+
+                     prmat[i][j*28+pos] = fmat[i][j*7+k1]*fmat[i][j*7+k2];
+                     pos++;
+                  }
+               }
+            }
+         }
+      }
+   }
+   {
+      int i;
+      
+      // block #2: prolog
+      for(i = 1; i <= m-1; i += 1) {
+         int k;
+         for(k = 0; k <= 27; k += 1)
+            prmat[i][0*28+k] += prmat[i-1][0*28+k];
+      }
+   }
+   {
+      int j;
+      for(j = 1; j <= n-1; j += 1) {
+         int k;
+         for(k = 0; k <= 27; k += 1)
+            prmat[0][j*28+k] += prmat[0][(j-1)*28+k];
+      }
+   }
+   
+   // block #2
+   for(i = 1; i <= m-1; i += 1)
+      for(j = 1; j <= n-1; j += 1)
+         for(k = 0; k <= 27; k += 1)
+            prmat[i][j*28+k] += prmat[i][(j-1)*28+k]+prmat[i-1][j*28+k]-prmat[i-1][(j-1)*28+k];
+   {
+      int i;
+      
+      
+      // block #3 prolog
+      for(i = 1; i <= m-1; i += 1) {
+         int k;
+         for(k = 0; k <= 6; k += 1)
+            fmat[i][0*7+k] += fmat[i-1][0*7+k];
+      }
+   }
+   {
+      int j;
+      for(j = 1; j <= n-1; j += 1) {
+         int k;
+         for(k = 0; k <= 6; k += 1)
+            fmat[0][j*7+k] += fmat[0][(j-1)*7+k];
+      }
+   }
+   
+   
+   
+   // block #3
+   for(i = 1; i <= m-1; i += 1)
+      for(j = 1; j <= n-1; j += 1)
+         for(k = 0; k <= 6; k += 1)
+            fmat[i][j*7+k] += fmat[i][(j-1)*7+k]+fmat[i-1][j*7+k]-fmat[i-1][(j-1)*7+k];
+   return;
+}
+void sumMatrices_AOS(float * restrict *fmat, float * restrict *prmat, int i0, int i1, int j0, int j1)
+{
+
+   int m = i1-i0+1;
+   int n = j1-j0+1;
+   int i, j, k;
+   int pos = 0;
+   {
+      int i;
+      // block #1
+l99996:
+      for(i = 0; i <= m-1; i += 1) {
+         int j;
+l99997:
+         for(j = 0; j <= n-1; j += 1) {
+
+            pos = 0;
+            {
+               int k1;
+l99998:
+               for(k1 = 0; k1 <= 6; k1 += 1) {
+                  int k2;
+l99999:
+                  for(k2 = k1; k2 <= 6; k2 += 1) {
+
+                     prmat[i][j*28+pos] = fmat[i][j*7+k1]*fmat[i][j*7+k2];
+                     pos++;
+                  }
+               }
+            }
+         }
+      }
+   }
+   {
+      int i;
+      
+      // block #2: prolog
+l99994:
+      for(i = 1; i <= m-1; i += 1) {
+         int k;
+l99995:
+         for(k = 0; k <= 27; k += 1)
+            prmat[i][0*28+k] += prmat[i-1][0*28+k];
+      }
+   }
+   {
+      int j;
+l99992:
+      for(j = 1; j <= n-1; j += 1) {
+         int k;
+l99993:
+         for(k = 0; k <= 27; k += 1)
+            prmat[0][j*28+k] += prmat[0][(j-1)*28+k];
+      }
+   }
+   
+   // block #2
+l99989:
+   for(i = 1; i <= m-1; i += 1)
+l99990:
+      for(j = 1; j <= n-1; j += 1)
+l99991:
+         for(k = 0; k <= 27; k += 1)
+            prmat[i][j*28+k] += prmat[i][(j-1)*28+k]+prmat[i-1][j*28+k]-prmat[i-1][(j-1)*28+k];
+   {
+      int i;
+      
+      
+      // block #3 prolog
+l99987:
+      for(i = 1; i <= m-1; i += 1) {
+         int k;
+l99988:
+         for(k = 0; k <= 6; k += 1)
+            fmat[i][0*7+k] += fmat[i-1][0*7+k];
+      }
+   }
+   {
+      int j;
+l99985:
+      for(j = 1; j <= n-1; j += 1) {
+         int k;
+l99986:
+         for(k = 0; k <= 6; k += 1)
+            fmat[0][j*7+k] += fmat[0][(j-1)*7+k];
+      }
+   }
+   
+   
+   
+   // block #3
+l99982:
+   for(i = 1; i <= m-1; i += 1)
+l99983:
+      for(j = 1; j <= n-1; j += 1)
+l99984:
+         for(k = 0; k <= 6; k += 1)
+            fmat[i][j*7+k] += fmat[i][(j-1)*7+k]+fmat[i-1][j*7+k]-fmat[i-1][(j-1)*7+k];
+   return;
+}
+void sumMatrices_AOS(float * restrict *fmat, float * restrict *prmat, int i0, int i1, int j0, int j1)
+{
+
+   int m = i1-i0+1;
+   int n = j1-j0+1;
+   int i, j, k;
+   int pos = 0;
+   //PIPS generated variable
+   int i_1;
+   {
+      int i;
+      // block #1
+l99996:
+      for(i_1 = 0; i_1 <= m-1; i_1 += (m+29)/30)
+         for(i = i_1; i <= MIN(i_1+((m+29)/30-1), m-1); i += 1) {
+            int j;
+l99997:
+            for(j = 0; j <= n-1; j += 1) {
+
+               pos = 0;
+               {
+                  int k1;
+l99998:
+                  for(k1 = 0; k1 <= 6; k1 += 1) {
+                     int k2;
+l99999:
+                     for(k2 = k1; k2 <= 6; k2 += 1) {
+
+                        prmat[i][j*28+pos] = fmat[i][j*7+k1]*fmat[i][j*7+k2];
+                        pos++;
+                     }
+                  }
+               }
+            }
+         }
+   }
+   {
+      int i;
+      
+      // block #2: prolog
+l99994:
+      for(i = 1; i <= m-1; i += 1) {
+         int k;
+l99995:
+         for(k = 0; k <= 27; k += 1)
+            prmat[i][0*28+k] += prmat[i-1][0*28+k];
+      }
+   }
+   {
+      int j;
+l99992:
+      for(j = 1; j <= n-1; j += 1) {
+         int k;
+l99993:
+         for(k = 0; k <= 27; k += 1)
+            prmat[0][j*28+k] += prmat[0][(j-1)*28+k];
+      }
+   }
+   
+   // block #2
+l99989:
+   for(i = 1; i <= m-1; i += 1)
+l99990:
+      for(j = 1; j <= n-1; j += 1)
+l99991:
+         for(k = 0; k <= 27; k += 1)
+            prmat[i][j*28+k] += prmat[i][(j-1)*28+k]+prmat[i-1][j*28+k]-prmat[i-1][(j-1)*28+k];
+   {
+      int i;
+      
+      
+      // block #3 prolog
+l99987:
+      for(i = 1; i <= m-1; i += 1) {
+         int k;
+l99988:
+         for(k = 0; k <= 6; k += 1)
+            fmat[i][0*7+k] += fmat[i-1][0*7+k];
+      }
+   }
+   {
+      int j;
+l99985:
+      for(j = 1; j <= n-1; j += 1) {
+         int k;
+l99986:
+         for(k = 0; k <= 6; k += 1)
+            fmat[0][j*7+k] += fmat[0][(j-1)*7+k];
+      }
+   }
+   
+   
+   
+   // block #3
+l99982:
+   for(i = 1; i <= m-1; i += 1)
+l99983:
+      for(j = 1; j <= n-1; j += 1)
+l99984:
+         for(k = 0; k <= 6; k += 1)
+            fmat[i][j*7+k] += fmat[i][(j-1)*7+k]+fmat[i-1][j*7+k]-fmat[i-1][(j-1)*7+k];
+   return;
+}
+void sumMatrices_AOS(float * restrict *fmat, float * restrict *prmat, int i0, int i1, int j0, int j1)
+{
+
+   int m = i1-i0+1;
+   int n = j1-j0+1;
+   int i, j, k;
+   int pos = 0;
+   //PIPS generated variable
+   int i_1;
+   {
+      int i;
+      // block #1
+l99996:
+      for(i_1 = 0; i_1 <= m-1; i_1 += (m+29)/30)
+         for(i = i_1; i <= MIN(i_1+((m+29)/30-1), m-1); i += 1) {
+            int j;
+l99997:
+            for(j = 0; j <= n-1; j += 1) {
+
+               pos = 0;
+               {
+                  int k1;
+l99998:
+                  for(k1 = 0; k1 <= 6; k1 += 1) {
+                     int k2;
+l99999:
+                     for(k2 = k1; k2 <= 6; k2 += 1) {
+
+                        prmat[i][j*28+pos] = fmat[i][j*7+k1]*fmat[i][j*7+k2];
+                        pos++;
+                     }
+                  }
+               }
+            }
+         }
+   }
+   {
+      int i;
+      
+      // block #2: prolog
+l99994:
+      for(i = 1; i <= m-1; i += 1) {
+         int k;
+l99995:
+         for(k = 0; k <= 27; k += 1)
+            prmat[i][0*28+k] += prmat[i-1][0*28+k];
+      }
+   }
+   {
+      int j;
+l99992:
+      for(j = 1; j <= n-1; j += 1) {
+         int k;
+l99993:
+         for(k = 0; k <= 27; k += 1)
+            prmat[0][j*28+k] += prmat[0][(j-1)*28+k];
+      }
+   }
+   {
+      int i;
+      
+      
+      // block #3 prolog
+l99987:
+      for(i = 1; i <= m-1; i += 1) {
+         int k;
+l99988:
+         for(k = 0; k <= 6; k += 1)
+            fmat[i][0*7+k] += fmat[i-1][0*7+k];
+      }
+   }
+   {
+      int j;
+l99985:
+      for(j = 1; j <= n-1; j += 1) {
+         int k;
+l99986:
+         for(k = 0; k <= 6; k += 1)
+            fmat[0][j*7+k] += fmat[0][(j-1)*7+k];
+      }
+   }
+   
+   // block #2
+   
+   
+   
+   // block #3
+l99989:
+   for(i = 1; i <= m-1; i += 1)
+l99990:
+      for(j = 1; j <= n-1; j += 1) {
+l99991:
+         for(k = 0; k <= 27; k += 1)
+            prmat[i][j*28+k] += prmat[i][(j-1)*28+k]+prmat[i-1][j*28+k]-prmat[i-1][(j-1)*28+k];
+l99984:
+         for(k = 0; k <= 6; k += 1)
+            fmat[i][j*7+k] += fmat[i][(j-1)*7+k]+fmat[i-1][j*7+k]-fmat[i-1][(j-1)*7+k];
+      }
+   return;
+}
+void sumMatrices_AOS(float * restrict *fmat, float * restrict *prmat, int i0, int i1, int j0, int j1)
+{
+
+   int m = i1-i0+1;
+   int n = j1-j0+1;
+   int i, j, k;
+   int pos = 0;
+   //PIPS generated variable
+   int i_1;
+   {
+      int i;
+      // block #1
+l99996:
+      for(i_1 = 0; i_1 <= m-1; i_1 += (m+29)/30)
+         for(i = i_1; i <= MIN(i_1+((m+29)/30-1), m-1); i += 1) {
+            int j;
+l99997:
+            for(j = 0; j <= n-1; j += 1) {
+
+               pos = 0;
+               {
+                  int k1;
+l99998:
+                  for(k1 = 0; k1 <= 6; k1 += 1) {
+                     int k2;
+l99999:
+                     for(k2 = k1; k2 <= 6; k2 += 1) {
+
+                        prmat[i][j*28+pos] = fmat[i][j*7+k1]*fmat[i][j*7+k2];
+                        pos++;
+                     }
+                  }
+               }
+            }
+         }
+   }
+   {
+      int i;
+      
+      // block #2: prolog
+l99994:
+      for(i = 1; i <= m-1; i += 1) {
+         int k;
+l99995:
+         for(k = 0; k <= 27; k += 1)
+            prmat[i][0*28+k] += prmat[i-1][0*28+k];
+      }
+   }
+   {
+      int j;
+l99992:
+      for(j = 1; j <= n-1; j += 1) {
+         int k;
+l99993:
+         for(k = 0; k <= 27; k += 1)
+            prmat[0][j*28+k] += prmat[0][(j-1)*28+k];
+      }
+   }
+   {
+      int i;
+      
+      
+      // block #3 prolog
+l99987:
+      for(i = 1; i <= m-1; i += 1) {
+         int k;
+l99988:
+         for(k = 0; k <= 6; k += 1)
+            fmat[i][0*7+k] += fmat[i-1][0*7+k];
+      }
+   }
+   {
+      int j;
+l99985:
+      for(j = 1; j <= n-1; j += 1) {
+         int k;
+l99986:
+         for(k = 0; k <= 6; k += 1)
+            fmat[0][j*7+k] += fmat[0][(j-1)*7+k];
+      }
+   }
+   
+   // block #2
+   
+   
+   
+   // block #3
+l99989:
+   for(i = 1; i <= m-1; i += 1)
+l99990:
+      for(j = 1; j <= n-1; j += 1) {
+l99991:
+         for(k = 0; k <= 27; k += 1)
+            prmat[i][j*28+k] += prmat[i][(j-1)*28+k]+prmat[i-1][j*28+k]-prmat[i-1][(j-1)*28+k];
+l99984:
+         for(k = 0; k <= 6; k += 1)
+            fmat[i][j*7+k] += fmat[i][(j-1)*7+k]+fmat[i-1][j*7+k]-fmat[i-1][(j-1)*7+k];
+      }
+   return;
+}
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning sumMatrices_AOS instead
+unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
+PRINT_CODE[sumMatrices_AOS] (C_loop_range) loop increment sign is unknown: assumed positive
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning sumMatrices_AOS instead
+PRINT_CODE[sumMatrices_AOS] (C_loop_range) loop increment sign is unknown: assumed positive
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning sumMatrices_AOS instead
+PRINT_CODE[sumMatrices_AOS] (C_loop_range) loop increment sign is unknown: assumed positive

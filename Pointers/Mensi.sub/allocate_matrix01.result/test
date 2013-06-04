@@ -6,8 +6,9 @@ Points-to for "matrix"
 
 
 // Points To OUT:
-// *HEAP*_l_13[*] -> *HEAP*_l_19[*] , MAY
-// matrix -> *HEAP*_l_13[*] , MAY
+// *HEAP*_l_16[*] -> *HEAP*_l_21[*] , MAY
+// *HEAP*_l_16[*] -> undefined , MAY
+// matrix -> *HEAP*_l_16[*] , MAY
 
 float * * matrix(long int nrl, long int nrh, long int ncl, long int nch)
 {
@@ -25,62 +26,44 @@ float * * matrix(long int nrl, long int nrh, long int ncl, long int nch)
 
    
    /* allocate pointers to rows */
-   m = (float **) malloc((unsigned int) ((nrow+1)*sizeof(float *)));
+   m = (float **) malloc((size_t) (nrow*sizeof(float *)));
 
 // Points To:
-// *HEAP*_l_13[*] -> undefined , EXACT
-// m -> *HEAP*_l_13[0] , MAY
+// *HEAP*_l_16[*] -> undefined , EXACT
+// m -> *HEAP*_l_16[0] , MAY
 
    //if (!m) nrerror("allocation failure 1 in matrix()");
-   m += 1;
-
-// Points To:
-// *HEAP*_l_13[*] -> undefined , EXACT
-// m -> *HEAP*_l_13[1] , MAY
-
    m -= nrl;
 
 // Points To:
-// *HEAP*_l_13[*] -> undefined , EXACT
-// m -> *HEAP*_l_13[*] , MAY
+// *HEAP*_l_16[*] -> undefined , EXACT
+// m -> *HEAP*_l_16[*] , MAY
 
-   
-   /* allocate rows and set pointers to them */
-   m[nrl] = (float *) malloc((unsigned int) ((nrow*ncol+1)*sizeof(float)));
 
-// Points To:
-// *HEAP*_l_13[*] -> *HEAP*_l_19[0] , MAY
-// *HEAP*_l_13[*] -> undefined , MAY
-// m -> *HEAP*_l_13[*] , MAY
-
-   //if (!m[nrl]) nrerror("allocation failure 2 in matrix()");
-   m[nrl] += 1;
+   for(i = nrl; i <= nrh; i += 1) {
 
 // Points To:
-// *HEAP*_l_13[*] -> *HEAP*_l_19[*] , MAY
-// *HEAP*_l_13[*] -> *HEAP*_l_19[1] , MAY
-// m -> *HEAP*_l_13[*] , MAY
+// *HEAP*_l_16[*] -> *HEAP*_l_21[*] , MAY
+// *HEAP*_l_16[*] -> undefined , MAY
+// m -> *HEAP*_l_16[*] , MAY
 
-   m[nrl] -= ncl;
-
-// Points To:
-// *HEAP*_l_13[*] -> *HEAP*_l_19[*] , MAY
-// m -> *HEAP*_l_13[*] , MAY
-
-
-   for(i = nrl+1; i <= nrh; i += 1)
+      m[i] = malloc((size_t) ncol*sizeof(float));
 
 // Points To:
-// *HEAP*_l_13[*] -> *HEAP*_l_19[*] , MAY
-// m -> *HEAP*_l_13[*] , MAY
+// *HEAP*_l_16[*] -> *HEAP*_l_21[*] , MAY
+// *HEAP*_l_16[*] -> *HEAP*_l_21[0] , MAY
+// *HEAP*_l_16[*] -> undefined , MAY
+// m -> *HEAP*_l_16[*] , MAY
 
-      m[i] = m[i-1]+ncol;
+      //if (!m[if]) nrerror("allocation failure 2 in matrix()");
+      m[i] -= ncl;
+   }
 
 // Points To:
-// *HEAP*_l_13[*] -> *HEAP*_l_19[*] , MAY
-// m -> *HEAP*_l_13[*] , MAY
+// *HEAP*_l_16[*] -> *HEAP*_l_21[*] , MAY
+// *HEAP*_l_16[*] -> undefined , MAY
+// m -> *HEAP*_l_16[*] , MAY
 
-   
    /* return pointer to array of pointers to rows */
    return m;
 }
@@ -97,40 +80,27 @@ float * * matrix(long int nrl, long int nrh, long int ncl, long int nch)
 //             <    is written>: m _MALLOC_EFFECTS:_MALLOC_
    
    /* allocate pointers to rows */
-   m = (float **) malloc((unsigned int) ((nrow+1)*sizeof(float *)));
-//             <    is read   >: m
+   m = (float **) malloc((size_t) (nrow*sizeof(float *)));
+//             <    is read   >: m nrl
 //             <    is written>: m
    //if (!m) nrerror("allocation failure 1 in matrix()");
-   m += 1;
-//             <    is read   >: m nrl
-//             <    is written>: m
    m -= nrl;
-//             <may be written>: *HEAP*_l_13[*]
-//             <    is read   >: m ncol nrl nrow 
-//                               _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   
-   /* allocate rows and set pointers to them */
-   m[nrl] = (float *) malloc((unsigned int) ((nrow*ncol+1)*sizeof(float)));
-//             <may be read   >: *HEAP*_l_13[*]
-//             <may be written>: *HEAP*_l_13[*]
-//             <    is read   >: m nrl
-   //if (!m[nrl]) nrerror("allocation failure 2 in matrix()");
-   m[nrl] += 1;
-//             <may be read   >: *HEAP*_l_13[*]
-//             <may be written>: *HEAP*_l_13[*]
-//             <    is read   >: m ncl nrl
-   m[nrl] -= ncl;
 //             <    is read   >: nrh nrl
 //             <    is written>: i
 
-   for(i = nrl+1; i <= nrh; i += 1)
-//             <may be read   >: *HEAP*_l_13[*]
-//             <may be written>: *HEAP*_l_13[*]
-//             <    is read   >: i m ncol nrh nrl
-      m[i] = m[i-1]+ncol;
+   for(i = nrl; i <= nrh; i += 1) {
+//             <may be written>: *HEAP*_l_16[*]
+//             <    is read   >: i m ncol nrh nrl 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+      m[i] = malloc((size_t) ncol*sizeof(float));
+//             <may be read   >: *HEAP*_l_16[*]
+//             <may be written>: *HEAP*_l_16[*]
+//             <    is read   >: i m ncl nrh nrl
+      //if (!m[if]) nrerror("allocation failure 2 in matrix()");
+      m[i] -= ncl;
+   }
 //             <    is read   >: m
-   
    /* return pointer to array of pointers to rows */
    return m;
 }
@@ -150,50 +120,39 @@ float * * matrix(long int nrl, long int nrh, long int ncl, long int nch)
 //             <    is written>: m _MALLOC_EFFECTS:_MALLOC_
    
    /* allocate pointers to rows */
-   m = (float **) malloc((unsigned int) ((nrow+1)*sizeof(float *)));
-//             <    is read   >: m
+   m = (float **) malloc((size_t) (nrow*sizeof(float *)));
+//             <    is read   >: m nrl
 //             <    is written>: m
    //if (!m) nrerror("allocation failure 1 in matrix()");
-   m += 1;
-//             <    is read   >: m nrl
-//             <    is written>: m
    m -= nrl;
-//             <may be written>: *HEAP*_l_13[*]
-//             <    is read   >: m ncol nrl nrow 
+//             <may be read   >: *HEAP*_l_16[*] i m ncl ncol 
 //                               _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   
-   /* allocate rows and set pointers to them */
-   m[nrl] = (float *) malloc((unsigned int) ((nrow*ncol+1)*sizeof(float)));
-//             <may be read   >: *HEAP*_l_13[*]
-//             <may be written>: *HEAP*_l_13[*]
-//             <    is read   >: m nrl
-   //if (!m[nrl]) nrerror("allocation failure 2 in matrix()");
-   m[nrl] += 1;
-//             <may be read   >: *HEAP*_l_13[*]
-//             <may be written>: *HEAP*_l_13[*]
-//             <    is read   >: m ncl nrl
-   m[nrl] -= ncl;
-//             <may be read   >: *HEAP*_l_13[*] i m ncol
-//             <may be written>: *HEAP*_l_13[*]
+//             <may be written>: *HEAP*_l_16[*] 
+//                               _MALLOC_EFFECTS:_MALLOC_
 //             <    is read   >: nrh nrl
 //             <    is written>: i
 
-   for(i = nrl+1; i <= nrh; i += 1)
-//             <may be read   >: *HEAP*_l_13[*]
-//             <may be written>: *HEAP*_l_13[*]
-//             <    is read   >: i m ncol nrh nrl
-      m[i] = m[i-1]+ncol;
+   for(i = nrl; i <= nrh; i += 1) {
+//             <may be written>: *HEAP*_l_16[*]
+//             <    is read   >: i m ncol nrh nrl 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+      m[i] = malloc((size_t) ncol*sizeof(float));
+//             <may be read   >: *HEAP*_l_16[*]
+//             <may be written>: *HEAP*_l_16[*]
+//             <    is read   >: i m ncl nrh nrl
+      //if (!m[if]) nrerror("allocation failure 2 in matrix()");
+      m[i] -= ncl;
+   }
 //             <    is read   >: m
-   
    /* return pointer to array of pointers to rows */
    return m;
 }
 
  **** Loop Carried Dependence Graph with Dependence Cones ***
 
-	24 --> 24 with conflicts
-		from <*HEAP*_l_13[*]-W-MAY> to <*HEAP*_l_13[*]-W-MAY> at levels  1
+	23 --> 23 with conflicts
+		from <*HEAP*_l_16[*]-W-MAY> to <*HEAP*_l_16[*]-W-MAY> at levels  1
 Generating system:
 1 Vertex 
 (1)
@@ -201,8 +160,8 @@ Generating system:
 (1)
 End of generating system ****
 
-	24 --> 24 with conflicts
-		from <*HEAP*_l_13[*]-W-MAY> to <*HEAP*_l_13[*]-R-MAY> at levels  1
+	23 --> 23 with conflicts
+		from <*HEAP*_l_16[*]-W-MAY> to <*HEAP*_l_16[*]-R-MAY> at levels  1
 Generating system:
 1 Vertex 
 (1)
@@ -210,14 +169,68 @@ Generating system:
 (1)
 End of generating system ****
 
-	24 --> 24 with conflicts
-		from <*HEAP*_l_13[*]-R-MAY> to <*HEAP*_l_13[*]-W-MAY> at levels  1
+	23 --> 23 with conflicts
+		from <*HEAP*_l_16[*]-R-MAY> to <*HEAP*_l_16[*]-W-MAY> at levels  1
 Generating system:
 1 Vertex 
 (1)
 1 Ray 
 (1)
 End of generating system ****
+
+	23 --> 21 with conflicts
+		from <*HEAP*_l_16[*]-W-MAY> to <*HEAP*_l_16[*]-W-MAY> at levels  1
+Generating system:
+1 Vertex 
+(1)
+1 Ray 
+(1)
+End of generating system ****
+
+	23 --> 21 with conflicts
+		from <*HEAP*_l_16[*]-R-MAY> to <*HEAP*_l_16[*]-W-MAY> at levels  1
+Generating system:
+1 Vertex 
+(1)
+1 Ray 
+(1)
+End of generating system ****
+
+	21 --> 23 with conflicts
+		from <*HEAP*_l_16[*]-W-MAY> to <*HEAP*_l_16[*]-W-MAY> at levels  1
+Generating system:
+1 Vertex 
+(1)
+1 Ray 
+(1)
+End of generating system ****
+
+	21 --> 23 with conflicts
+		from <*HEAP*_l_16[*]-W-MAY> to <*HEAP*_l_16[*]-R-MAY> at levels  1
+Generating system:
+1 Vertex 
+(1)
+1 Ray 
+(1)
+End of generating system ****
+
+	21 --> 21 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> at levels  1
+
+	21 --> 21 with conflicts
+		from <*HEAP*_l_16[*]-W-MAY> to <*HEAP*_l_16[*]-W-MAY> at levels  1
+Generating system:
+1 Vertex 
+(1)
+1 Ray 
+(1)
+End of generating system ****
+
+	21 --> 21 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> at levels  1
+
+	21 --> 21 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> at levels  1
 
 
 ****************** End of Dependence Graph ******************

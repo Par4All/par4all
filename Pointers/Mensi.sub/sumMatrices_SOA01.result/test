@@ -1,0 +1,1292 @@
+
+Points-to for "sumMatrices_SOA"
+
+
+// Points To IN:
+// _fmat_1[*] -> *NULL* , MAY
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> *NULL* , MAY
+// fmat -> _fmat_1[0] , MAY
+// prmat -> *NULL* , MAY
+// prmat -> _prmat_2[0] , MAY
+
+
+// Points To OUT:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+void sumMatrices_SOA(float ***fmat, float ***prmat, int i0, int i1, int j0, int j1)
+{
+   // 1 = 0 + restrict
+   
+
+// Points To: none
+
+   int m = i1-i0+1;
+
+// Points To: none
+
+   int n = j1-j0+1;
+   
+   // loop #1
+
+// Points To: none
+
+   int pos = 0;
+   {
+
+// Points To: none
+
+      int k1;
+
+// Points To: none
+
+      for(k1 = 0; k1 <= 6; k1 += 1) {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+         int k2;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+         for(k2 = k1; k2 <= 6; k2 += 1) {
+            {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+               int i;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+               for(i = 0; i <= m-1; i += 1) {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+                  int j;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+                  for(j = 0; j <= n-1; j += 1)
+
+// Points To:
+// _fmat_1[*] -> *NULL* , MAY
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> *NULL* , MAY
+// fmat -> _fmat_1[0] , MAY
+// prmat -> *NULL* , MAY
+// prmat -> _prmat_2[0] , MAY
+
+                     prmat[pos][i][j] = fmat[k1][i][j]*fmat[k2][i][j];
+               }
+            }
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+            pos++;
+         }
+      }
+   }
+   {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+      int k;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+      
+      // loop #2
+      for(k = 0; k <= 27; k += 1) {
+         {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+            int i;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+
+            for(i = 1; i <= m-1; i += 1)
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+               prmat[k][i][0] += prmat[k][i-1][0];
+         }
+         {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+            int j;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+
+            for(j = 1; j <= n-1; j += 1)
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+               prmat[k][0][j] += prmat[k][0][j-1];
+         }
+         {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+            int i;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+
+            for(i = 1; i <= m-1; i += 1) {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+               int j;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+               for(j = 1; j <= n-1; j += 1)
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+                  prmat[k][i][j] += prmat[k][i][j-1]+prmat[k][i-1][j]-prmat[k][i-1][j-1];
+            }
+         }
+      }
+   }
+   {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+      int k;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+      
+      // loop #3
+      for(k = 0; k <= 6; k += 1) {
+         {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+            int i;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+
+            for(i = 1; i <= m-1; i += 1)
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+               fmat[k][i][0] += fmat[k][i-1][0];
+         }
+         {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+            int j;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+
+            for(j = 1; j <= n-1; j += 1)
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+               fmat[k][0][j] += fmat[k][0][j-1];
+         }
+         {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+            int i;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+
+            for(i = 1; i <= m-1; i += 1) {
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+               int j;
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+               for(j = 1; j <= n-1; j += 1)
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+                  fmat[k][i][j] += fmat[k][i][j-1]+fmat[k][i-1][j]-fmat[k][i-1][j-1];
+            }
+         }
+      }
+   }
+
+// Points To:
+// _fmat_1[*] -> _fmat_1_1[*][0] , MAY
+// _prmat_2[*] -> *NULL* , MAY
+// _prmat_2[*] -> _prmat_2_2[*][0] , MAY
+// fmat -> _fmat_1[0] , EXACT
+// prmat -> _prmat_2[0] , EXACT
+
+   return;
+}
+
+Proper effects with points-to for "sumMatrices_SOA"
+
+void sumMatrices_SOA(float ***fmat, float ***prmat, int i0, int i1, int j0, int j1)
+{
+   // 1 = 0 + restrict
+   
+//             <    is read   >: i0 i1
+//             <    is written>: m
+   int m = i1-i0+1;
+//             <    is read   >: j0 j1
+//             <    is written>: n
+   int n = j1-j0+1;
+   
+   // loop #1
+//             <    is written>: pos
+   int pos = 0;
+   {
+      int k1;
+//             <    is written>: k1
+      for(k1 = 0; k1 <= 6; k1 += 1) {
+         int k2;
+//             <    is read   >: k1
+//             <    is written>: k2
+         for(k2 = k1; k2 <= 6; k2 += 1) {
+            {
+               int i;
+//             <    is read   >: k1 m
+//             <    is written>: 0`1`2`3`4`5`i
+               for(i = 0; i <= m-1; i += 1) {
+                  int j;
+//             <    is read   >: k1 m n
+//             <    is written>: 0`1`2`3`4`5`6`7`j
+                  for(j = 0; j <= n-1; j += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+                     prmat[pos][i][j] = fmat[k1][i][j]*fmat[k2][i][j];
+               }
+            }
+//             <    is read   >: k1 pos
+//             <    is written>: pos
+            pos++;
+         }
+      }
+   }
+   {
+      int k;
+//             <    is written>: 0`9`k
+      
+      // loop #2
+      for(k = 0; k <= 27; k += 1) {
+         {
+            int i;
+//             <    is read   >: m
+//             <    is written>: 0`9`10`11`i
+
+            for(i = 1; i <= m-1; i += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+               prmat[k][i][0] += prmat[k][i-1][0];
+         }
+         {
+            int j;
+//             <    is read   >: n
+//             <    is written>: 0`9`10`12`j
+
+            for(j = 1; j <= n-1; j += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+               prmat[k][0][j] += prmat[k][0][j-1];
+         }
+         {
+            int i;
+//             <    is read   >: m
+//             <    is written>: 0`9`10`13`i
+
+            for(i = 1; i <= m-1; i += 1) {
+               int j;
+//             <    is read   >: m n
+//             <    is written>: 0`9`10`13`14`15`j
+               for(j = 1; j <= n-1; j += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+                  prmat[k][i][j] += prmat[k][i][j-1]+prmat[k][i-1][j]-prmat[k][i-1][j-1];
+            }
+         }
+      }
+   }
+   {
+      int k;
+//             <    is written>: 0`17`k
+      
+      // loop #3
+      for(k = 0; k <= 6; k += 1) {
+         {
+            int i;
+//             <    is read   >: m
+//             <    is written>: 0`17`18`19`i
+
+            for(i = 1; i <= m-1; i += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+               fmat[k][i][0] += fmat[k][i-1][0];
+         }
+         {
+            int j;
+//             <    is read   >: n
+//             <    is written>: 0`17`18`20`j
+
+            for(j = 1; j <= n-1; j += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+               fmat[k][0][j] += fmat[k][0][j-1];
+         }
+         {
+            int i;
+//             <    is read   >: m
+//             <    is written>: 0`17`18`21`i
+
+            for(i = 1; i <= m-1; i += 1) {
+               int j;
+//             <    is read   >: m n
+//             <    is written>: 0`17`18`21`22`23`j
+               for(j = 1; j <= n-1; j += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+                  fmat[k][i][j] += fmat[k][i][j-1]+fmat[k][i-1][j]-fmat[k][i-1][j-1];
+            }
+         }
+      }
+   }
+   return;
+}
+
+Cumulated effects with points-to for "sumMatrices_SOA"
+
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+void sumMatrices_SOA(float ***fmat, float ***prmat, int i0, int i1, int j0, int j1)
+{
+   // 1 = 0 + restrict
+   
+//             <    is read   >: i0 i1
+//             <    is written>: m
+   int m = i1-i0+1;
+//             <    is read   >: j0 j1
+//             <    is written>: n
+   int n = j1-j0+1;
+   
+   // loop #1
+//             <    is written>: pos
+   int pos = 0;
+   {
+      int k1;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      for(k1 = 0; k1 <= 6; k1 += 1) {
+         int k2;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+         for(k2 = k1; k2 <= 6; k2 += 1) {
+            {
+               int i;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+               for(i = 0; i <= m-1; i += 1) {
+                  int j;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+                  for(j = 0; j <= n-1; j += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+                     prmat[pos][i][j] = fmat[k1][i][j]*fmat[k2][i][j];
+               }
+            }
+//             <    is read   >: k1 pos
+//             <    is written>: pos
+            pos++;
+         }
+      }
+   }
+   {
+      int k;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      
+      // loop #2
+      for(k = 0; k <= 27; k += 1) {
+         {
+            int i;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+
+            for(i = 1; i <= m-1; i += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+               prmat[k][i][0] += prmat[k][i-1][0];
+         }
+         {
+            int j;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+
+            for(j = 1; j <= n-1; j += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+               prmat[k][0][j] += prmat[k][0][j-1];
+         }
+         {
+            int i;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+
+            for(i = 1; i <= m-1; i += 1) {
+               int j;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+               for(j = 1; j <= n-1; j += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+                  prmat[k][i][j] += prmat[k][i][j-1]+prmat[k][i-1][j]-prmat[k][i-1][j-1];
+            }
+         }
+      }
+   }
+   {
+      int k;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      
+      // loop #3
+      for(k = 0; k <= 6; k += 1) {
+         {
+            int i;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+
+            for(i = 1; i <= m-1; i += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+               fmat[k][i][0] += fmat[k][i-1][0];
+         }
+         {
+            int j;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+
+            for(j = 1; j <= n-1; j += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+               fmat[k][0][j] += fmat[k][0][j-1];
+         }
+         {
+            int i;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+
+            for(i = 1; i <= m-1; i += 1) {
+               int j;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+               for(j = 1; j <= n-1; j += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+                  fmat[k][i][j] += fmat[k][i][j-1]+fmat[k][i-1][j]-fmat[k][i-1][j-1];
+            }
+         }
+      }
+   }
+   return;
+}
+void sumMatrices_SOA(float ***fmat, float ***prmat, int i0, int i1, int j0, int j1)
+{
+   // 1 = 0 + restrict
+   
+   int m = i1-i0+1;
+   int n = j1-j0+1;
+   
+   // loop #1
+   int pos = 0;
+   {
+      int k1;
+      for(k1 = 0; k1 <= 6; k1 += 1) {
+         int k2;
+         for(k2 = k1; k2 <= 6; k2 += 1) {
+            {
+               int i;
+               for(i = 0; i <= m-1; i += 1) {
+                  int j;
+                  for(j = 0; j <= n-1; j += 1)
+                     prmat[pos][i][j] = fmat[k1][i][j]*fmat[k2][i][j];
+               }
+            }
+            pos++;
+         }
+      }
+   }
+   {
+      int k;
+      
+      // loop #2
+      for(k = 0; k <= 27; k += 1) {
+         {
+            int i;
+
+            for(i = 1; i <= m-1; i += 1)
+               prmat[k][i][0] += prmat[k][i-1][0];
+         }
+         {
+            int j;
+
+            for(j = 1; j <= n-1; j += 1)
+               prmat[k][0][j] += prmat[k][0][j-1];
+         }
+         {
+            int i;
+
+            for(i = 1; i <= m-1; i += 1) {
+               int j;
+               for(j = 1; j <= n-1; j += 1)
+                  prmat[k][i][j] += prmat[k][i][j-1]+prmat[k][i-1][j]-prmat[k][i-1][j-1];
+            }
+         }
+      }
+   }
+   {
+      int k;
+      
+      // loop #3
+      for(k = 0; k <= 6; k += 1) {
+         {
+            int i;
+
+            for(i = 1; i <= m-1; i += 1)
+               fmat[k][i][0] += fmat[k][i-1][0];
+         }
+         {
+            int j;
+
+            for(j = 1; j <= n-1; j += 1)
+               fmat[k][0][j] += fmat[k][0][j-1];
+         }
+         {
+            int i;
+
+            for(i = 1; i <= m-1; i += 1) {
+               int j;
+               for(j = 1; j <= n-1; j += 1)
+                  fmat[k][i][j] += fmat[k][i][j-1]+fmat[k][i-1][j]-fmat[k][i-1][j-1];
+            }
+         }
+      }
+   }
+   return;
+}
+
+Parallel code
+
+void sumMatrices_SOA(float ***fmat, float ***prmat, int i0, int i1, int j0, int j1)
+{
+   // 1 = 0 + restrict
+   
+   int m = i1-i0+1;
+   int n = j1-j0+1;
+   
+   // loop #1
+   int pos = 0;
+   {
+      int k1;
+      for(k1 = 0; k1 <= 6; k1 += 1) {
+         int k2;
+         for(k2 = k1; k2 <= 6; k2 += 1) {
+            int i;
+            for(i = 0; i <= m-1; i += 1) {
+               int j;
+               for(j = 0; j <= n-1; j += 1)
+                  prmat[pos][i][j] = fmat[k1][i][j]*fmat[k2][i][j];
+            }
+            pos++;
+         }
+      }
+   }
+   {
+      int k;
+      
+      // loop #2
+      for(k = 0; k <= 27; k += 1) {
+         int i;
+         for(i = 1; i <= m-1; i += 1)
+            prmat[k][i][0] += prmat[k][i-1][0];
+         int j;
+         for(j = 1; j <= n-1; j += 1)
+            prmat[k][0][j] += prmat[k][0][j-1];
+         int i;
+         for(i = 1; i <= m-1; i += 1) {
+            int j;
+            for(j = 1; j <= n-1; j += 1)
+               prmat[k][i][j] += prmat[k][i][j-1]+prmat[k][i-1][j]-prmat[k][i-1][j-1];
+         }
+      }
+   }
+   {
+      int k;
+      
+      // loop #3
+      for(k = 0; k <= 6; k += 1) {
+         int i;
+         for(i = 1; i <= m-1; i += 1)
+            fmat[k][i][0] += fmat[k][i-1][0];
+         int j;
+         for(j = 1; j <= n-1; j += 1)
+            fmat[k][0][j] += fmat[k][0][j-1];
+         int i;
+         for(i = 1; i <= m-1; i += 1) {
+            int j;
+            for(j = 1; j <= n-1; j += 1)
+               fmat[k][i][j] += fmat[k][i][j-1]+fmat[k][i-1][j]-fmat[k][i-1][j-1];
+         }
+      }
+   }
+   return;
+}
+void sumMatrices_SOA(float ***fmat, float ***prmat, int i0, int i1, int j0, int j1)
+{
+   // 1 = 0 + restrict
+   
+   int m = i1-i0+1;
+   int n = j1-j0+1;
+   
+   // loop #1
+   int pos = 0;
+   {
+      int k1;
+l99996:
+      for(k1 = 0; k1 <= 6; k1 += 1) {
+         int k2;
+l99997:
+         for(k2 = k1; k2 <= 6; k2 += 1) {
+            {
+               int i;
+l99998:
+               for(i = 0; i <= m-1; i += 1) {
+                  int j;
+l99999:
+                  for(j = 0; j <= n-1; j += 1)
+                     prmat[pos][i][j] = fmat[k1][i][j]*fmat[k2][i][j];
+               }
+            }
+            pos++;
+         }
+      }
+   }
+   {
+      int k;
+      
+      // loop #2
+l99991:
+      for(k = 0; k <= 27; k += 1) {
+         {
+            int i;
+
+l99995:
+            for(i = 1; i <= m-1; i += 1)
+               prmat[k][i][0] += prmat[k][i-1][0];
+         }
+         {
+            int j;
+
+l99994:
+            for(j = 1; j <= n-1; j += 1)
+               prmat[k][0][j] += prmat[k][0][j-1];
+         }
+         {
+            int i;
+
+l99992:
+            for(i = 1; i <= m-1; i += 1) {
+               int j;
+l99993:
+               for(j = 1; j <= n-1; j += 1)
+                  prmat[k][i][j] += prmat[k][i][j-1]+prmat[k][i-1][j]-prmat[k][i-1][j-1];
+            }
+         }
+      }
+   }
+   {
+      int k;
+      
+      // loop #3
+l99986:
+      for(k = 0; k <= 6; k += 1) {
+         {
+            int i;
+
+l99990:
+            for(i = 1; i <= m-1; i += 1)
+               fmat[k][i][0] += fmat[k][i-1][0];
+         }
+         {
+            int j;
+
+l99989:
+            for(j = 1; j <= n-1; j += 1)
+               fmat[k][0][j] += fmat[k][0][j-1];
+         }
+         {
+            int i;
+
+l99987:
+            for(i = 1; i <= m-1; i += 1) {
+               int j;
+l99988:
+               for(j = 1; j <= n-1; j += 1)
+                  fmat[k][i][j] += fmat[k][i][j-1]+fmat[k][i-1][j]-fmat[k][i-1][j-1];
+            }
+         }
+      }
+   }
+   return;
+}
+void sumMatrices_SOA(float ***fmat, float ***prmat, int i0, int i1, int j0, int j1)
+{
+   // 1 = 0 + restrict
+   
+   int m = i1-i0+1;
+   int n = j1-j0+1;
+   
+   // loop #1
+   int pos = 0;
+   //PIPS generated variable
+   int k1_1;
+   {
+      int k1;
+l99996:
+      for(k1_1 = 0; k1_1 <= 6; k1_1 += 1)
+         for(k1 = k1_1; k1 <= MIN(k1_1+0, 6); k1 += 1) {
+            int k2;
+l99997:
+            for(k2 = k1; k2 <= 6; k2 += 1) {
+               {
+                  int i;
+l99998:
+                  for(i = 0; i <= m-1; i += 1) {
+                     int j;
+l99999:
+                     for(j = 0; j <= n-1; j += 1)
+                        prmat[pos][i][j] = fmat[k1][i][j]*fmat[k2][i][j];
+                  }
+               }
+               pos++;
+            }
+         }
+   }
+   {
+      int k;
+      
+      // loop #2
+l99991:
+      for(k = 0; k <= 27; k += 1) {
+         {
+            int i;
+
+l99995:
+            for(i = 1; i <= m-1; i += 1)
+               prmat[k][i][0] += prmat[k][i-1][0];
+         }
+         {
+            int j;
+
+l99994:
+            for(j = 1; j <= n-1; j += 1)
+               prmat[k][0][j] += prmat[k][0][j-1];
+         }
+         {
+            int i;
+
+l99992:
+            for(i = 1; i <= m-1; i += 1) {
+               int j;
+l99993:
+               for(j = 1; j <= n-1; j += 1)
+                  prmat[k][i][j] += prmat[k][i][j-1]+prmat[k][i-1][j]-prmat[k][i-1][j-1];
+            }
+         }
+      }
+   }
+   {
+      int k;
+      
+      // loop #3
+l99986:
+      for(k = 0; k <= 6; k += 1) {
+         {
+            int i;
+
+l99990:
+            for(i = 1; i <= m-1; i += 1)
+               fmat[k][i][0] += fmat[k][i-1][0];
+         }
+         {
+            int j;
+
+l99989:
+            for(j = 1; j <= n-1; j += 1)
+               fmat[k][0][j] += fmat[k][0][j-1];
+         }
+         {
+            int i;
+
+l99987:
+            for(i = 1; i <= m-1; i += 1) {
+               int j;
+l99988:
+               for(j = 1; j <= n-1; j += 1)
+                  fmat[k][i][j] += fmat[k][i][j-1]+fmat[k][i-1][j]-fmat[k][i-1][j-1];
+            }
+         }
+      }
+   }
+   return;
+}
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning sumMatrices_SOA instead
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning sumMatrices_SOA instead
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`pos and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`pos and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`pos and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`1`k1
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`1`k1
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`m
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`n
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`1`2`3`4`5`6`7`j
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`1`2`3`4`5`6`7`j
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`1`k1
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`m
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`1`2`3`4`5`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`1`2`3`4`5`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`1`k1
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`1`2`3`k2
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`1`2`3`k2
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`m
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`n
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`9`10`13`14`15`j
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`9`10`13`14`15`j
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`m
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`9`10`13`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`9`10`13`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`n
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`9`10`12`j
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`9`10`12`j
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`m
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`9`10`11`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`9`10`11`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`9`10`13`14`15`j and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`9`10`13`14`15`j and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`n and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`m and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`9`10`13`14`15`j and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`9`10`13`14`15`j and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`n and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`m and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`9`10`13`i and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`9`10`13`i and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`m and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`9`10`13`i and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`9`10`13`i and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`m and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`n
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`9`10`12`j
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`9`10`12`j
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`m
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`9`10`11`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`9`10`11`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`9`10`12`j and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`9`10`12`j and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`n and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`m
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`9`10`11`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`9`10`11`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`m
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`n
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`17`18`21`22`23`j
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`17`18`21`22`23`j
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`m
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`17`18`21`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`17`18`21`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`n
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`17`18`20`j
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`17`18`20`j
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`m
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`17`18`19`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`17`18`19`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`17`18`21`22`23`j and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`17`18`21`22`23`j and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`m and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`n and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`17`18`21`22`23`j and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`17`18`21`22`23`j and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`m and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`n and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`17`18`21`i and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`17`18`21`i and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`m and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`17`18`21`i and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`17`18`21`i and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`m and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`n
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`17`18`20`j
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`17`18`20`j
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`m
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`17`18`19`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`17`18`19`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`17`18`20`j and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`17`18`20`j and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: 0`n and *ANYWHERE*
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`m
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`17`18`19`i
+Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and 0`17`18`19`i
+Dependence assumed
+unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
