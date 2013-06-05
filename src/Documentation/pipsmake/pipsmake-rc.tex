@@ -5344,10 +5344,14 @@ EXACT_REGIONS TRUE
 MUST_REGIONS FALSE
 \end{PipsProp}
 
-The default option is to compute regions without taking into account array
-bounds. The next property can be turned to {\tt TRUE} to
-systematically add them in
-the region descriptors. Both options have their advantages and drawbacks.
+The default option is to compute regions without taking into account
+declared array bounds. The next property can be turned to {\tt TRUE}
+to systematically add them in the region descriptors. Both options
+have their advantages and drawbacks, but the second one implies that
+the \PIPS{} user is sure that her/his program is correct with respect
+to array accesses. In case of doubt, you might want to run pass
+\PipsPassRef{array_bound_check_bottom_up} or
+\PipsPassRef{array_bound_check_top_down}.
 
 \begin{PipsProp}{REGIONS_WITH_ARRAY_BOUNDS}
 REGIONS_WITH_ARRAY_BOUNDS FALSE
