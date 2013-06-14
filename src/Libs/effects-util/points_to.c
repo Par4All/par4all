@@ -671,7 +671,7 @@ type points_to_array_reference_to_type(reference r)
 }
 
 
-/* Add a set of zero subscripts to a reference "r" by side effect.
+/* Add a set of zero subscripts to a constant memory path reference "r" by side effect.
  *
  * Used when a partial array reference must be converted into a
  * reference to the first array element (zero_p==true) or to any
@@ -691,12 +691,12 @@ void complete_points_to_reference_with_fixed_subscripts(reference r, bool zero_p
      subscript somewhere? */
   list sl = reference_indices(r);
   entity v = reference_variable(r);
-  list rsl = gen_nreverse(sl);
+  list rsl = gen_nreverse(sl); // sl is no longer available
   int i = 0;
   bool field_found_p = false;
 
   FOREACH(EXPRESSION, se, rsl) {
-    if(expression_field_p(se)) {
+    if(field_expression_p(se)) {
       reference fr = expression_reference(se);
       entity f = reference_variable(fr);
       t = entity_basic_concrete_type(f); 
@@ -713,7 +713,8 @@ void complete_points_to_reference_with_fixed_subscripts(reference r, bool zero_p
   list dl = variable_dimensions(vt);
   int d = (int) gen_length(dl);
 
-  pips_assert("Not Too many subscripts wrt the type.\n", i<=d);
+  /* FI: this may happen when reference "r" is not a constant memory path */
+  pips_assert("Not too many subscripts wrt the type.\n", i<=d);
 
   list nsl = NIL; // subscript list
   int j;

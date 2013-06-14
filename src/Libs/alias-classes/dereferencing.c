@@ -69,6 +69,10 @@
  * restriction to pointer type only expressions. But all pointer
  * values must be generated, whether they point to pointers or
  * anything else.
+ *
+ * This piece of code is designed to handle pointer19.c, and hence
+ * pointer14.c, where arrays of pointers toward arrays of pointers are
+ * used.
  */
 pt_map dereferencing_subscript_to_points_to(subscript sub, pt_map in)
 {
@@ -82,65 +86,77 @@ pt_map dereferencing_subscript_to_points_to(subscript sub, pt_map in)
   /* We have to take "sel" into account since only the base of the
      target array is pointed to. */
   list source_l = expression_to_points_to_sources(a, in);
-
-  /* Look for points-to arcs that must be duplicated using the
-     subscripts as offsets */
   list n_arc_l = NIL;
-  SET_FOREACH(points_to, pt, points_to_graph_set(in)) {
-    cell pt_source = points_to_source(pt);
-    if(points_to_cell_in_list_p(pt_source, source_l)) {
-      /* We must generate a new source with the offset defined by sel,
-	 and a new sink, with or without a an offset */
-      cell pt_sink = points_to_sink(pt);
-      cell n_sink = copy_cell(pt_sink);
-      cell n_source = copy_cell(pt_source);
 
-      /* Update the sink cell if necessary */
-      if(null_cell_p(pt_sink)) {
-	;
-      }
-      else if(anywhere_cell_p(pt_sink)
-	      || cell_typed_anywhere_locations_p(pt_sink)) {
-	;
-      }
-      else {
-	reference n_sink_r = cell_any_reference(n_sink);
-	if(adapt_reference_to_type(n_sink_r, apt,
-				   points_to_context_statement_line_number)) {
-	  reference_indices(n_sink_r) = gen_nconc(reference_indices(n_sink_r),
-						  gen_full_copy_list(sel));
-	  complete_points_to_reference_with_zero_subscripts(n_sink_r);
+  FOREACH(CELL, source, source_l) {
+    /* We have to bother with the source if it is an array, not if it
+       is simply a pointer dereferenced by some subscripts as in
+       dereferencing18.c. */
+    reference source_r = cell_any_reference(source);
+    entity source_v = reference_variable(source_r);
+    type source_v_t =  entity_basic_concrete_type(source_v);
+
+    if(array_type_p(source_v_t)) {
+      /* Look for points-to arcs that must be duplicated using the
+	 subscripts as offsets */
+      SET_FOREACH(points_to, pt, points_to_graph_set(in)) {
+	cell pt_source = points_to_source(pt);
+	//if(points_to_cell_in_list_p(pt_source, source_l)) {
+	if(points_to_cell_equal_p(pt_source, source)) {
+	  /* We must generate a new source with the offset defined by sel,
+	     and a new sink, with or without a an offset */
+	  cell pt_sink = points_to_sink(pt);
+	  cell n_sink = copy_cell(pt_sink);
+	  cell n_source = copy_cell(pt_source);
+
+	  /* Update the sink cell if necessary */
+	  if(null_cell_p(pt_sink)) {
+	    ;
+	  }
+	  else if(anywhere_cell_p(pt_sink)
+		  || cell_typed_anywhere_locations_p(pt_sink)) {
+	    ;
+	  }
+	  else {
+	    reference n_sink_r = cell_any_reference(n_sink);
+	    if(adapt_reference_to_type(n_sink_r, apt,
+				       points_to_context_statement_line_number)) {
+	      reference_indices(n_sink_r) = gen_nconc(reference_indices(n_sink_r),
+						      gen_full_copy_list(sel));
+	      complete_points_to_reference_with_zero_subscripts(n_sink_r);
+	    }
+	    else
+	      pips_internal_error("No idea how to deal with this sink cell.\n");
+	  }
+
+	  /* Update the source cell */
+	  if(null_cell_p(pt_source)) {
+	    pips_internal_error("NULL cannot be a source cell.\n");;
+	  }
+	  else if(anywhere_cell_p(pt_source)
+		  || cell_typed_anywhere_locations_p(pt_source)) {
+	    pips_internal_error("Not sure what should be done here!\n");
+	  }
+	  else {
+	    reference n_source_r = cell_any_reference(n_source);
+	    if(adapt_reference_to_type(n_source_r, at,
+				       points_to_context_statement_line_number)) {
+	      reference_indices(n_source_r) = gen_nconc(reference_indices(n_source_r),
+							gen_full_copy_list(sel));
+	      complete_points_to_reference_with_zero_subscripts(n_source_r);
+	    }
+	    else
+	      pips_internal_error("No idea how to deal with this source cell.\n");
+	  }
+
+	  /* Build the new points-to arc */
+	  approximation ap = copy_approximation(points_to_approximation(pt));
+	  points_to n_pt = make_points_to(n_source, n_sink, ap,
+					  make_descriptor_none());
+	  /* Do not update set "in" while you are enumerating its elements */
+	  n_arc_l = CONS(POINTS_TO, n_pt, n_arc_l);
 	}
-	else
-	  pips_internal_error("No idea how to deal with this sink cell.\n");
       }
-
-      /* Update the source cell */
-      if(null_cell_p(pt_source)) {
-	pips_internal_error("NULL cannot be a source cell.\n");;
-      }
-      else if(anywhere_cell_p(pt_source)
-	      || cell_typed_anywhere_locations_p(pt_source)) {
-	pips_internal_error("Not sure what should be done here!\n");
-      }
-      else {
-	reference n_source_r = cell_any_reference(n_source);
-	if(adapt_reference_to_type(n_source_r, at,
-				   points_to_context_statement_line_number)) {
-	  reference_indices(n_source_r) = gen_nconc(reference_indices(n_source_r),
-						    gen_full_copy_list(sel));
-	  complete_points_to_reference_with_zero_subscripts(n_source_r);
-	}
-	else
-	  pips_internal_error("No idea how to deal with this source cell.\n");
-      }
-
-      /* Build the new points-to arc */
-      approximation ap = copy_approximation(points_to_approximation(pt));
-      points_to n_pt = make_points_to(n_source, n_sink, ap,
-				     make_descriptor_none());
-      /* Do not update set "in" while you are enumerating its elements */
-      n_arc_l = CONS(POINTS_TO, n_pt, n_arc_l);
     }
   }
 
