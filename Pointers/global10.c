@@ -1,6 +1,10 @@
 /* Building points-to in demand for global variables
  *
  * See what happens when the callee builds up the global stubs
+ *
+ * Note: this program is bugged because p is dereferenced while
+ * undefined, but gcc does not detect the issue since an
+ * interprocedural analysis is necessary.
  */
 
 int ***p;

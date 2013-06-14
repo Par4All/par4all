@@ -472,8 +472,8 @@ _break_2:         ;
 
 Cumulated effects for "run"
 
-//             <may be read   >: _t_2__1[0][*][2] _t_2__1[0][*][*] 
-//                               range stderr[0] t.data t.nb
+//             <may be read   >: _t_2__1[*][2] _t_2__1[*][*] range 
+//                               stderr[0] t.data t.nb
 //             <may be written>: stderr[0]
 //             <    is read   >: stderr step xmax xmin ymax ymin 
 //                               _MALLOC_EFFECTS:_MALLOC_ 
@@ -511,17 +511,17 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 //                               __IO_EFFECTS:LUNS[2]
 //             <    is written>: __IO_EFFECTS:LUNS[2]
    fprintf(stderr, "yrange: ""%lf %lf %lf\n", ymin, ymax, (double) rangey);
-//             <may be read   >: *HEAP*_l_70[*][2] _t_2__1[0][*][2] 
-//                               _t_2__1[0][*][*] i j k range rangey 
-//                               step t.data t.nb tout.data xmin ymin
+//             <may be read   >: *HEAP*_l_70[*][2] _t_2__1[*][2] 
+//                               _t_2__1[*][*] i j k range rangey step
+//                               t.data t.nb tout.data xmin ymin
 //             <may be written>: *HEAP*_l_70[*][2] j k
 //             <    is read   >: rangex
 //             <    is written>: i
 
    for(i = 0; i < rangex; i += 1)
-//             <may be read   >: *HEAP*_l_70[*][2] _t_2__1[0][*][2] 
-//                               _t_2__1[0][*][*] i j k range step 
-//                               t.data t.nb tout.data xmin ymin
+//             <may be read   >: *HEAP*_l_70[*][2] _t_2__1[*][2] 
+//                               _t_2__1[*][*] i j k range step t.data
+//                               t.nb tout.data xmin ymin
 //             <may be written>: *HEAP*_l_70[*][2] k
 //             <    is read   >: rangex rangey
 //             <    is written>: j
@@ -535,23 +535,23 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
 //             <may be written>: *HEAP*_l_70[*][2]
 //             <    is read   >: i j rangex rangey tout.data
          ((tout.data)[i*rangey+j])[2] = 0.;
-//             <may be read   >: *HEAP*_l_70[*][2] _t_2__1[0][*][2] 
-//                               _t_2__1[0][*][*] i j k range step 
-//                               t.data tout.data xmin ymin
+//             <may be read   >: *HEAP*_l_70[*][2] _t_2__1[*][2] 
+//                               _t_2__1[*][*] i j k range step t.data
+//                               tout.data xmin ymin
 //             <may be written>: *HEAP*_l_70[*][2]
 //             <    is read   >: rangex rangey t.nb
 //             <    is written>: k
          for(k = 0; k < t.nb-1+1; k += 1) {
-//             <may be read   >: _t_2__1[0][*][*]
+//             <may be read   >: _t_2__1[*][*]
 //             <    is read   >: i j k step t.data xmin ymin
 //             <    is written>: tmp
             data_t tmp = 6368.*acos(cos(xmin+step*i)*cos(((t.data)[k])[0])*cos(ymin+step*j-((t.data)[k])[1])+sin(xmin+step*i)*sin(((t.data)[k])[0]));
-//             <may be read   >: *HEAP*_l_70[*][2] _t_2__1[0][*][2] i 
-//                               j k t.data tout.data
+//             <may be read   >: *HEAP*_l_70[*][2] _t_2__1[*][2] i j k
+//                               t.data tout.data
 //             <may be written>: *HEAP*_l_70[*][2]
 //             <    is read   >: range rangex rangey t.nb tmp
             if (tmp<range)
-//             <may be read   >: *HEAP*_l_70[*][2] _t_2__1[0][*][2]
+//             <may be read   >: *HEAP*_l_70[*][2] _t_2__1[*][2]
 //             <may be written>: *HEAP*_l_70[*][2]
 //             <    is read   >: i j k rangex rangey t.data t.nb tmp 
 //                               tout.data

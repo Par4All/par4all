@@ -64,6 +64,10 @@ display PRINTED_FILE[%ALLFUNC]
 
 
 close
-shell cat $WS.database/Warnings
+
+# Warning messages from TestCoupleOfReferences() do not appear in a
+# deterministic order. Hence the sort:
+
+shell cat $WS.database/Warnings | sort
 delete $WS
 quit

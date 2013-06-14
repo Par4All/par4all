@@ -12,6 +12,8 @@ setproperty POINTS_TO_PATH_LIMIT 2
 
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
+setproperty POINTS_TO_PATH_LIMIT 4
+
 # This property is an aberration wrt to the constant path lattice:
 # either NULL is included in any stub and then conditions cannot be
 # analyzed or NULL is not included and it must be added explicitly

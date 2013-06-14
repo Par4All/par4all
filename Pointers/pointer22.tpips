@@ -1,0 +1,34 @@
+setenv WS=pointer22
+delete $WS
+create $WS $WS.c
+
+# Enforce type checking as often as possible
+setenv POINTS_TO_DEBUG_LEVEL=1
+setenv PROPER_EFFECTS_DEBUG_LEVEL=1
+setenv CUMULATED_EFFECTS_DEBUG_LEVEL=1
+
+echo
+echo Points-to for \"$WS\"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[$WS]
+
+#quit
+
+echo
+echo Proper effects with points-to for \"$WS\"
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[$WS]
+
+echo
+echo Cumulated effects for \"$WS\"
+echo
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[$WS]
+
+close
+shell cat $WS.database/Warnings
+delete $WS
+quit
