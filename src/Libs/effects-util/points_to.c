@@ -39,6 +39,7 @@
 #include "text-util.h"
 
 #include "misc.h"
+#include "properties.h"
 
 /***************************************/
 /* Function storing points to information attached to a statement
@@ -903,7 +904,7 @@ list points_to_cells_to_upper_bound_points_to_cells(list cl)
 }
 
 /* See if the subscript list sl is precise, i.e. if is does not
- * contain any unbuounded expression.
+ * contain any unbounded expression.
  *
  * It is assumed that it is a points-to subscript list. Each subscript
  * is either an integer constant, or a field reference or an unbounded
@@ -938,4 +939,92 @@ bool compatible_points_to_subscripts_p(expression s1, expression s2)
     }
   }
   return compatible_p;
+}
+
+/* The value of the source can often be expressed with different
+ * subscript lists. For instance, a, a[0], a[0][0] have different
+ * types but the same value if a is a 2-D array.
+ *
+ * This function allocated a new points-to object whose sink has a
+ * minimal number of indices.
+ *
+ * FI: I have added this function to deal with pointers to arrays. It
+ * is called from generic_reference_to_points_to_matching_list() to
+ * try to adapt the points-to information to the undefined
+ * requirements of Beatrice's functions for regions_with_points_to. I
+ * do not think the function below is correct when structs are
+ * involved... The stripping may be useful, but it should be much more careful.
+ *
+ * adapt_reference_to_type() might be better here to adjust the
+ * subscripts in sink.
+ *
+ */
+points_to points_to_with_stripped_sink(points_to pt,
+				       int (*line_number_func)(void))
+{
+  cell source = points_to_source(pt);
+  cell sink = points_to_sink(pt);
+  cell new_sink_cell = cell_undefined;
+
+  // FI: first implementation
+  if(false) {
+    reference source_r = cell_any_reference(source);
+    list source_sl = reference_indices(source_r);
+    list c_source_sl = list_undefined;
+
+    reference sink_r = cell_any_reference(sink);
+    // FI: sink_sl is longer than source_sl if pt is semantically correct
+    list sink_sl = reference_indices(sink_r);
+    list c_sink_sl = list_undefined;
+    entity sink_e = reference_variable(sink_r);
+
+    list new_sink_sl = NIL;
+    for(c_source_sl = source_sl, c_sink_sl = sink_sl;
+	!ENDP(c_source_sl);
+	POP(c_source_sl), POP(c_sink_sl)) {
+      expression s = copy_expression(EXPRESSION(CAR(c_sink_sl)));
+      new_sink_sl = CONS(EXPRESSION, s, new_sink_sl);
+    }
+    if(!get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")
+       && !anywhere_cell_p(sink)
+       && !cell_typed_anywhere_locations_p(sink)
+       && !ENDP(c_sink_sl)) {
+      /* Add the implicit dimension */
+      expression s = copy_expression(EXPRESSION(CAR(c_sink_sl)));
+      new_sink_sl = CONS(EXPRESSION, s, new_sink_sl);
+    }
+    new_sink_sl = gen_nreverse(new_sink_sl);
+
+    new_sink_cell = make_cell_reference(make_reference(sink_e, new_sink_sl));
+  }
+  else {
+    // Second implementation
+    if(anywhere_cell_p(sink) || cell_typed_anywhere_locations_p(sink)
+       || null_cell_p(sink) || nowhere_cell_p(sink)
+       // FI: why is the typed heap cell not handled too?
+       || heap_cell_p(sink)) {
+      new_sink_cell = copy_cell(sink);
+    }
+    else {
+      new_sink_cell = copy_cell(sink);
+      reference n_sink_r = cell_any_reference(new_sink_cell);
+      type source_t = points_to_cell_to_concrete_type(source);
+      if(pointer_type_p(source_t)) {
+	type source_pt = type_to_pointed_type(source_t);
+	if(adapt_reference_to_type(n_sink_r, source_pt, line_number_func))
+	  ;
+	else
+	  pips_internal_error("The type of a sink cell is not compatible with the source cell.\n");
+      }
+
+      else
+	pips_internal_error("The type of a source cell is not a pointer.\n");
+    }
+  }
+
+  points_to npt = make_points_to(copy_cell(source),
+				 new_sink_cell,
+				 copy_approximation(points_to_approximation(pt)),
+				 make_descriptor_none());
+  return npt;
 }

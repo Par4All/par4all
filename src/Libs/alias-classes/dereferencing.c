@@ -64,6 +64,105 @@
 #include "points_to_private.h"
 #include "alias-classes.h"
 
+/* FI: As usual in dereferencing.c, it is not clear that this piece of
+ * code has not been implemented somewhere else because of the early
+ * restriction to pointer type only expressions. But all pointer
+ * values must be generated, whether they point to pointers or
+ * anything else.
+ */
+pt_map dereferencing_subscript_to_points_to(subscript sub, pt_map in)
+{
+  expression a = subscript_array(sub);
+  type at = expression_to_type(a);
+  type apt = type_to_pointed_type(at);
+  list sel = subscript_indices(sub);
+  /* a cannot evaluate to null or undefined */
+  /* FI: we may need a special case for stubs... */
+  in = dereferencing_to_points_to(a, in);
+  /* We have to take "sel" into account since only the base of the
+     target array is pointed to. */
+  list source_l = expression_to_points_to_sources(a, in);
+
+  /* Look for points-to arcs that must be duplicated using the
+     subscripts as offsets */
+  list n_arc_l = NIL;
+  SET_FOREACH(points_to, pt, points_to_graph_set(in)) {
+    cell pt_source = points_to_source(pt);
+    if(points_to_cell_in_list_p(pt_source, source_l)) {
+      /* We must generate a new source with the offset defined by sel,
+	 and a new sink, with or without a an offset */
+      cell pt_sink = points_to_sink(pt);
+      cell n_sink = copy_cell(pt_sink);
+      cell n_source = copy_cell(pt_source);
+
+      /* Update the sink cell if necessary */
+      if(null_cell_p(pt_sink)) {
+	;
+      }
+      else if(anywhere_cell_p(pt_sink)
+	      || cell_typed_anywhere_locations_p(pt_sink)) {
+	;
+      }
+      else {
+	reference n_sink_r = cell_any_reference(n_sink);
+	if(adapt_reference_to_type(n_sink_r, apt,
+				   points_to_context_statement_line_number)) {
+	  reference_indices(n_sink_r) = gen_nconc(reference_indices(n_sink_r),
+						  gen_full_copy_list(sel));
+	  complete_points_to_reference_with_zero_subscripts(n_sink_r);
+	}
+	else
+	  pips_internal_error("No idea how to deal with this sink cell.\n");
+      }
+
+      /* Update the source cell */
+      if(null_cell_p(pt_source)) {
+	pips_internal_error("NULL cannot be a source cell.\n");;
+      }
+      else if(anywhere_cell_p(pt_source)
+	      || cell_typed_anywhere_locations_p(pt_source)) {
+	pips_internal_error("Not sure what should be done here!\n");
+      }
+      else {
+	reference n_source_r = cell_any_reference(n_source);
+	if(adapt_reference_to_type(n_source_r, at,
+				   points_to_context_statement_line_number)) {
+	  reference_indices(n_source_r) = gen_nconc(reference_indices(n_source_r),
+						    gen_full_copy_list(sel));
+	  complete_points_to_reference_with_zero_subscripts(n_source_r);
+	}
+	else
+	  pips_internal_error("No idea how to deal with this source cell.\n");
+      }
+
+      /* Build the new points-to arc */
+      approximation ap = copy_approximation(points_to_approximation(pt));
+      points_to n_pt = make_points_to(n_source, n_sink, ap,
+				     make_descriptor_none());
+      /* Do not update set "in" while you are enumerating its elements */
+      n_arc_l = CONS(POINTS_TO, n_pt, n_arc_l);
+    }
+  }
+
+  /* Update sets "in" with the new arcs. The arc must pre-exist the
+     reference for the effects to be able to translate a non-constant
+     effect. Thus, it should pre-exist the call site. */
+  FOREACH(POINTS_TO, n_pt, n_arc_l) {
+    add_arc_to_pt_map(n_pt, in);
+    add_arc_to_statement_points_to_context(copy_points_to(n_pt));
+    add_arc_to_points_to_context(copy_points_to(n_pt));
+  }
+  gen_free_list(n_arc_l);
+
+  /* FI: I am not sure this is useful... */
+  in = expression_to_points_to(a, in, false); // side effects
+
+  in = expressions_to_points_to(sel, in, false);
+
+  free_type(at);
+  return in;
+}
+
 
 /* Make sure that expression p can be dereferenced in points-to graph "in" 
  *
@@ -166,13 +265,7 @@ pt_map dereferencing_to_points_to(expression p, pt_map in)
     }
     case is_syntax_subscript: {
       subscript sub = syntax_subscript(s);
-      expression a = subscript_array(sub);
-      list sel = subscript_indices(sub);
-      /* a cannot evaluate to null or undefined */
-      /* FI: we may need a special case for stubs... */
-      in = dereferencing_to_points_to(a, in);
-      in = expression_to_points_to(a, in, false);
-      in = expressions_to_points_to(sel, in, false);
+      in = dereferencing_subscript_to_points_to(sub, in);
       break;
     }
     case is_syntax_application: {

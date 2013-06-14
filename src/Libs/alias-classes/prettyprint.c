@@ -363,8 +363,13 @@ void dprint(expression x)
       print_type((type) x);
     else if(ot==statement_domain)
       print_statement((statement) x);
-    else if(ot==effect_domain)
-      print_effect((effect) x);
+    else if(ot==effect_domain) {
+      descriptor d = effect_descriptor((effect) x);
+      if(descriptor_none_p(d))
+	print_effect((effect) x);
+      else
+	print_region((effect) x);
+    }
     else if(ot==points_to_list_domain)
       print_points_to_list((points_to_list) x);
     else if(ot==points_to_graph_domain)

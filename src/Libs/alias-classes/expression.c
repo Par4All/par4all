@@ -90,7 +90,7 @@ void subscripted_reference_to_points_to(reference r, list sl, pt_map pt_in)
 	   * See for instance, Pointers/pointer20.c
 	   */
 	  reference or = cell_any_reference(c);
-	  if(adapt_reference_to_type(or, rt)) {
+	  if(adapt_reference_to_type(or, rt, points_to_context_statement_line_number)) {
 	    list osl = reference_indices(or);
 	    if(ENDP(osl)) {
 	      reference_indices(or) = CONS(EXPRESSION,

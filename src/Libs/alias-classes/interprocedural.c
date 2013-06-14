@@ -690,7 +690,7 @@ set filter_formal_context_according_to_actual_context(list fpcl,
 	      }
 	      else {
 		reference fr = cell_any_reference(fc);
-		if(adapt_reference_to_type(fr, ac_t))
+		if(adapt_reference_to_type(fr, ac_t, points_to_context_statement_line_number))
 		  ;
 		else {
 		  reference ar = cell_any_reference(ac);

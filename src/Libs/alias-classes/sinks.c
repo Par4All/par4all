@@ -937,7 +937,8 @@ static list process_casted_sinks(list sinks, type t)
 	  // type is reached.
 	  reference r = cell_any_reference(c);
 	  complete_points_to_reference_with_zero_subscripts(r);
-	  if(adapt_reference_to_type(r, pt)) {
+	  if(!type_void_p(pt)
+	     && adapt_reference_to_type(r, pt, points_to_context_statement_line_number)) {
 	    mct = points_to_cell_to_concrete_type(c);
 
 	    if(array_pointer_type_equal_p(pt, mct))
@@ -984,7 +985,7 @@ static list process_casted_sources(list sinks, type t)
 	if(pointer_type_p(t) && array_type_p(cct)) {
 	  reference r = cell_any_reference(c);
 	  complete_points_to_reference_with_zero_subscripts(r);
-	  if(adapt_reference_to_type(r, t))
+	  if(adapt_reference_to_type(r, t, points_to_context_statement_line_number))
 	    ;
 	  else
 	    pips_internal_error("Cast handling failure 2.\n");
@@ -1353,44 +1354,6 @@ expression pointer_subscript_to_expression(cell c, list csl)
   return pae;
 }
 
-/* FI: a really stupid function... Why do we add zero subscript right
- *  away when building the sink cell to remove them later? Let's now
- * remove the excessive subscripts of "r" with respect to type
- * "at"...
- */
-bool adapt_reference_to_type(reference r, type et)
-{
-  bool succeed_p = true;
-  bool to_be_freed;
-  type at = compute_basic_concrete_type(et);
-  type rt = points_to_reference_to_type(r, &to_be_freed);
-  type t = compute_basic_concrete_type(rt);
-  while(!array_pointer_type_equal_p(at, t) && !ENDP(reference_indices(r))) {
-    if(to_be_freed) free_type(t);
-    list sl = reference_indices(r);
-    list last = gen_last(sl);
-    expression e = EXPRESSION(CAR(last));
-    if(expression_field_p(e))
-      break;
-    int l1 = (int) gen_length(sl);
-    gen_remove_once(&sl, (void *) e);
-    int l2 = (int) gen_length(sl);
-    if(l1==l2)
-      pips_internal_error("gen_remove() is ineffective.\n");
-    reference_indices(r) = sl;
-    type nrt = points_to_reference_to_type(r, &to_be_freed);
-    t = compute_basic_concrete_type(nrt);
-  }
-  if(!array_pointer_string_type_equal_p(at, t)) {
-    pips_user_warning("There may be a typing error at line %d (e.g. improper malloc call).\n",
-		      points_to_context_statement_line_number());
-    //pips_internal_error("Cell type mismatch.");
-    succeed_p = false;
-  }
-  if(to_be_freed) free_type(t);
-  return succeed_p;
-}
-
  /* Generate the corresponding points-to reference(s). All access
   * operators such as ., ->, * are replaced by subscripts.
   *
@@ -1456,7 +1419,7 @@ list subscript_to_points_to_sinks(subscript s,
 	  // FI: an horror... fixing a design mistake by a kludge...
 	  // useful for argv03, disastrous for dereferencing08
 	  if(!points_to_array_reference_p(r)) {
-	    if(adapt_reference_to_type(r, at))
+	    if(adapt_reference_to_type(r, at, points_to_context_statement_line_number))
 	      ;
 	    else
 	      pips_internal_error("Subscript handling failure 1.\n");
@@ -1474,7 +1437,7 @@ list subscript_to_points_to_sinks(subscript s,
 	  // the new indices (Strict_typing.sub/assignment11.c
 
 	  // FI: an horror... fixing a design mistake by a kludge...
-	  if(adapt_reference_to_type(r, at))
+	  if(adapt_reference_to_type(r, at, points_to_context_statement_line_number))
 	    ;
 	  else
 	      pips_internal_error("Subscript handling failure 1.\n");
@@ -1540,7 +1503,7 @@ list subscript_to_points_to_sinks(subscript s,
       reference r = cell_any_reference(source);
       if(points_to_array_reference_p(r)) {
 	//points_to_cell_add_zero_subscripts(source);
-	//adapt_reference_to_type(r, at);
+	//adapt_reference_to_type(r, at, points_to_context_statement_line_number);
 	expression z = make_zero_expression();
 	reference_indices(r) = gen_nconc(reference_indices(r),
 					 CONS(EXPRESSION, z, NIL));
@@ -1692,13 +1655,20 @@ list expression_to_points_to_cells(expression e,
 	   double. e_c_t is a 3-D array of pointers to double, f_e_t is a
 	   pointer towards a 2-D array of pointers to double... What
 	   could be checked here? */
+	/* This test does not make sence for pointer22.c either. We
+	   only need to check that the sink reference can be modified
+	   by dropping a few subscript to match the pointer type. */
 	if(!array_pointer_string_type_equal_p(f_e_t, s_t)) {
 	  if(array_type_p(f_e_t)) {
 	    type et = array_type_to_element_type(e_c_t);
 	    if(pointer_type_p(et)) {
 	      type pet = type_to_pointed_type(et);
 	      if(!array_pointer_string_type_equal_p(pet, s_t)) {
-		pips_internal_error("Type discrepancy\n");
+		reference sink_r = copy_reference(cell_any_reference(s));
+		if(!adapt_reference_to_type(sink_r, pet, points_to_context_statement_line_number)) {
+		  ; // pips_internal_error("Possible type discrepancy\n");
+		}
+		free_reference(sink_r);
 	      }
 	      else {
 		; // We are fine

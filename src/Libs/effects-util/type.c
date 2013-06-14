@@ -1255,3 +1255,46 @@ list find_points_to_subscript_for_type(cell c, type t)
 
   return csl;
 }
+
+/* FI: a really stupid function... Why do we add zero subscript right
+ *  away when building the sink cell to remove them later? Let's now
+ * remove the excessive subscripts of "r" with respect to type
+ * "at"...
+ */
+bool adapt_reference_to_type(reference r, type et,
+			     int (*line_number_func)(void))
+{
+  bool succeed_p = true;
+  bool to_be_freed;
+  type at = compute_basic_concrete_type(et);
+  type rt = points_to_reference_to_type(r, &to_be_freed);
+  type t = compute_basic_concrete_type(rt);
+  while(!array_pointer_type_equal_p(at, t) && !ENDP(reference_indices(r))) {
+    if(to_be_freed) free_type(t);
+    list sl = reference_indices(r);
+    list last = gen_last(sl);
+    expression e = EXPRESSION(CAR(last));
+    if(expression_field_p(e))
+      break;
+    int l1 = (int) gen_length(sl);
+    gen_remove_once(&sl, (void *) e);
+    int l2 = (int) gen_length(sl);
+    if(l1==l2)
+      pips_internal_error("gen_remove() is ineffective.\n");
+    reference_indices(r) = sl;
+    type nrt = points_to_reference_to_type(r, &to_be_freed);
+    t = compute_basic_concrete_type(nrt);
+  }
+  if(!array_pointer_string_type_equal_p(at, t)) {
+    // FI: this function used to be in library alias_classes
+    // It should be passed as a functional argument.
+    //int points_to_context_statement_line_number(void);
+    pips_user_warning("There may be a typing error at line %d (e.g. improper malloc call).\n",
+		      // points_to_context_statement_line_number());
+		      (*line_number_func)());
+    //pips_internal_error("Cell type mismatch.");
+    succeed_p = false;
+  }
+  if(to_be_freed) free_type(t);
+  return succeed_p;
+}

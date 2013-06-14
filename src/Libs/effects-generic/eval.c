@@ -91,7 +91,7 @@ static list use_default_sink_cell
  * generic_eval_cell_with_points_to() to reduce its size to about one
  * page.
  */
-static list transform_sink_cells_from_matching_list
+static list generic_transform_sink_cells_from_matching_list
 (list matching_list,
  size_t current_max_path_length,
  bool * exact_p,
@@ -175,26 +175,34 @@ static list transform_sink_cells_from_matching_list
   return l;
 }
 
+/* To provide information when a but is encountered in the source file or within PIPS. */
+int effects_statement_line_number(void)
+{
+  statement s = effects_private_current_stmt_head();
+  return statement_number(s);
+}
+
 /* This function has been outlined from
  * generic_eval_cell_with_points_to() to reduce the size of a function
  * to about one page.
  *
  * It computes a list of points-to arcs whose source is compatible
  * with the input reference, "input_ref". It provides information about
- * the number of common indices, "p_current_max_path" and about the
+ * the number of common indices, "p_current_max_path_length" and about the
  * approximation of the points-to informationx(?).
  */
-list reference_to_points_to_matching_list(reference input_ref,
-					  descriptor input_desc,
-					  size_t * p_current_max_path_length,
-					  bool * exact_p,
-					  transformer current_precondition,
-					  list ptl,
-					  void (*cell_reference_conversion_func)(reference, reference *, descriptor *),
-  bool (*cell_reference_preceding_p_func)(reference, descriptor,
-                                          reference, descriptor ,
-                                          transformer, bool, bool * )
-)
+list generic_reference_to_points_to_matching_list
+(reference input_ref,
+ descriptor input_desc,
+ size_t * p_current_max_path_length,
+ bool * exact_p,
+ transformer current_precondition,
+ list ptl,
+ void (*cell_reference_conversion_func)(reference, reference *, descriptor *),
+ bool (*cell_reference_preceding_p_func)(reference, descriptor,
+					 reference, descriptor ,
+					 transformer, bool, bool * )
+ )
 {
   list matching_list = NIL;
   *exact_p = true; /* assume exactness */
@@ -248,10 +256,12 @@ list reference_to_points_to_matching_list(reference input_ref,
 	}
 	else
 	  *exact_p = *exact_p && exact_prec;
-	/* I keep the whole points_to and not only the sink because I will need the approximation to further test
-	   the exactness
+	/* I keep the whole points_to and not only the sink because I
+	   will need the approximation to further test the exactness
 	*/
-	matching_list = CONS(POINTS_TO, pt, matching_list);
+	/* FI: I try adding the stripping... */
+	points_to npt = points_to_with_stripped_sink(pt, effects_statement_line_number);
+	matching_list = CONS(POINTS_TO, npt, matching_list);
       }
       if(source_cell != points_to_source(pt)) free_cell(source_cell);
     }
@@ -364,12 +374,12 @@ list generic_eval_cell_with_points_to(
   else {
     /* first build a temporary list with matching points-to of maximum length */
     size_t current_max_path_length = 0; /* the current maximum length */
-    list matching_list
-      = reference_to_points_to_matching_list(input_ref, input_desc,
-					     &current_max_path_length,
-					     exact_p, current_precondition, ptl,
-					     cell_reference_conversion_func,
-					     cell_reference_preceding_p_func);
+    list matching_list = generic_reference_to_points_to_matching_list
+      (input_ref, input_desc,
+       &current_max_path_length,
+       exact_p, current_precondition, ptl,
+       cell_reference_conversion_func,
+       cell_reference_preceding_p_func);
 
     ifdebug(8) {
       fprintf(stderr, "matching points-to list:\n");
@@ -388,7 +398,7 @@ list generic_eval_cell_with_points_to(
       *exact_p = false;
     }
     else {
-    l = transform_sink_cells_from_matching_list
+    l = generic_transform_sink_cells_from_matching_list
       (matching_list,
        current_max_path_length,
        exact_p,

@@ -381,6 +381,7 @@ bool all_heap_locations_cell_p(cell c)
 //  return heap_p;
 //}
 
+/* Target of an undefined pointer */
 bool nowhere_cell_p(cell c)
 {
   bool nowhere_p;
