@@ -1023,270 +1023,270 @@ l99988:
    }
    return;
 }
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j-1]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j-1]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j-1]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j-1]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j-1]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j-1]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j-1]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j-1]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j-1]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j-1]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j-1]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j-1]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
+Dependence assumed
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning sumMatrices_SOA instead
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j-1]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j-1]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j-1]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning sumMatrices_SOA instead
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j-1]".
 PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j-1]".
 PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j]".
 PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j-1]".
-PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][0]".
 PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i-1][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j-1]".
 PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
 PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
-PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning sumMatrices_SOA instead
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: pos and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: pos and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: pos and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and k1
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and k1
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and n
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and k1
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
-Dependence assumed
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_fmat_1_1[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][0][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i-1][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][0]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j-1]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
+PROPER_EFFECTS_WITH_POINTS_TO[sumMatrices_SOA] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "_prmat_2_2[*][i][j]".
 RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
 RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
 RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and k1
-Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and k1
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and k1
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and k1
 RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and k2
-Dependence assumed
 RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and k2
-Dependence assumed
 RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
-Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
 RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and n
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
 RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and n
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: m and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: n and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: m and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: n and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: i and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: i and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: m and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: i and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: i and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: m and *ANYWHERE*
-Dependence assumed
 RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and n
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: n and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
-Dependence assumed
 RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and n
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
 RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and n
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: m and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: n and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: m and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: n and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: i and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: i and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: m and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: i and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: i and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: m and *ANYWHERE*
-Dependence assumed
 RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and n
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and j
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and n
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: i and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: i and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: i and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: i and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: i and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: i and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: i and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: i and *ANYWHERE*
 RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
-Dependence assumed
 RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
-Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: j and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: m and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: m and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: m and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: m and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: m and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: m and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: m and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: m and *ANYWHERE*
 RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: n and *ANYWHERE*
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and m
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
-RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: *ANYWHERE* and i
-Dependence assumed
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: n and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: n and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: n and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: n and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: n and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: pos and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: pos and *ANYWHERE*
+RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: pos and *ANYWHERE*
 unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
 unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active

@@ -21,15 +21,16 @@ void init_array(parray_t pa)
 
    int i;
 
-// Points To: none
+// Points To:
+// pa -> *NULL* , MAY
+// pa -> _pa_1 , MAY
 
    for(i = 0; i <= pa->dim-1; i += 1)
 
 // Points To:
 // _pa_1.data -> *NULL* , MAY
 // _pa_1.data -> _pa_1_2__1 , MAY
-// pa -> *NULL* , MAY
-// pa -> _pa_1 , MAY
+// pa -> _pa_1 , EXACT
 
       (pa->data)[i] = (float) i;
 
@@ -47,7 +48,7 @@ Proper effects with points-to for "init_array"
 void init_array(parray_t pa)
 {
    int i;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _pa_1.dim pa
 //             <    is written>: i
    for(i = 0; i <= pa->dim-1; i += 1)
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
@@ -57,4 +58,3 @@ void init_array(parray_t pa)
    return;
 }
 PROPER_EFFECTS_WITH_POINTS_TO[init_array] (simple_cell_reference_with_address_of_cell_reference_translation) potential memory overflow due to effect -> returning anywhere
-PROPER_EFFECTS_WITH_POINTS_TO[init_array] (generic_eval_cell_with_points_to) NULL pointer dereferencing... or insufficient points-to information for reference "pa[0][dim]".
