@@ -73,6 +73,10 @@
  * This piece of code is designed to handle pointer19.c, and hence
  * pointer14.c, where arrays of pointers toward arrays of pointers are
  * used.
+ *
+ * It generates too many arcs, useless arcs, when the subscript list
+ * is broken down into many subscript constructs by PIPS C
+ * parser. This shows in Pointers/pointer14, 15 and 19.
  */
 pt_map dereferencing_subscript_to_points_to(subscript sub, pt_map in)
 {
@@ -106,28 +110,7 @@ pt_map dereferencing_subscript_to_points_to(subscript sub, pt_map in)
 	  /* We must generate a new source with the offset defined by sel,
 	     and a new sink, with or without a an offset */
 	  cell pt_sink = points_to_sink(pt);
-	  cell n_sink = copy_cell(pt_sink);
-	  cell n_source = copy_cell(pt_source);
-
-	  /* Update the sink cell if necessary */
-	  if(null_cell_p(pt_sink)) {
-	    ;
-	  }
-	  else if(anywhere_cell_p(pt_sink)
-		  || cell_typed_anywhere_locations_p(pt_sink)) {
-	    ;
-	  }
-	  else {
-	    reference n_sink_r = cell_any_reference(n_sink);
-	    if(adapt_reference_to_type(n_sink_r, apt,
-				       points_to_context_statement_line_number)) {
-	      reference_indices(n_sink_r) = gen_nconc(reference_indices(n_sink_r),
-						      gen_full_copy_list(sel));
-	      complete_points_to_reference_with_zero_subscripts(n_sink_r);
-	    }
-	    else
-	      pips_internal_error("No idea how to deal with this sink cell.\n");
-	  }
+	  cell n_source = cell_undefined;
 
 	  /* Update the source cell */
 	  if(null_cell_p(pt_source)) {
@@ -138,6 +121,7 @@ pt_map dereferencing_subscript_to_points_to(subscript sub, pt_map in)
 	    pips_internal_error("Not sure what should be done here!\n");
 	  }
 	  else {
+	    n_source = copy_cell(pt_source);
 	    reference n_source_r = cell_any_reference(n_source);
 	    if(adapt_reference_to_type(n_source_r, at,
 				       points_to_context_statement_line_number)) {
@@ -149,12 +133,40 @@ pt_map dereferencing_subscript_to_points_to(subscript sub, pt_map in)
 	      pips_internal_error("No idea how to deal with this source cell.\n");
 	  }
 
-	  /* Build the new points-to arc */
-	  approximation ap = copy_approximation(points_to_approximation(pt));
-	  points_to n_pt = make_points_to(n_source, n_sink, ap,
-					  make_descriptor_none());
-	  /* Do not update set "in" while you are enumerating its elements */
-	  n_arc_l = CONS(POINTS_TO, n_pt, n_arc_l);
+	  /* Is the source cell already known in the points-to relation? */
+
+	  if(!cell_undefined_p(n_source) && !source_in_pt_map_p(n_source, in)) {
+	    cell n_sink = copy_cell(pt_sink);
+
+	    /* Update the sink cell if necessary */
+	    if(null_cell_p(pt_sink)) {
+	      ;
+	    }
+	    else if(anywhere_cell_p(pt_sink)
+		    || cell_typed_anywhere_locations_p(pt_sink)) {
+	      ;
+	    }
+	    else {
+	      reference n_sink_r = cell_any_reference(n_sink);
+	      if(adapt_reference_to_type(n_sink_r, apt,
+					 points_to_context_statement_line_number)) {
+		reference_indices(n_sink_r) = gen_nconc(reference_indices(n_sink_r),
+							gen_full_copy_list(sel));
+		complete_points_to_reference_with_zero_subscripts(n_sink_r);
+	      }
+	      else
+		pips_internal_error("No idea how to deal with this sink cell.\n");
+	    }
+
+	    /* Build the new points-to arc */
+	    approximation ap = copy_approximation(points_to_approximation(pt));
+	    points_to n_pt = make_points_to(n_source, n_sink, ap,
+					    make_descriptor_none());
+	    /* Do not update set "in" while you are enumerating its elements */
+	    n_arc_l = CONS(POINTS_TO, n_pt, n_arc_l);
+	  }
+	  else
+	    free_cell(n_source);
 	}
       }
     }
