@@ -584,6 +584,22 @@ pt_map loop_to_points_to(loop l, pt_map pt_in)
   statement b = loop_body(l);
   //bool store = false;
   //pt_out = points_to_loop(l, pt_in, store);
+
+  /* loop range expressions may require some points-to information 
+   * See for instance Pointers/Mensi.sub/array_init02.c
+   *
+   * Side effects might have to be taken into account... But side
+   * effects should also prevent PIPS from transforming a for loop
+   * into a do loop.
+   */
+  range r = loop_range(l);
+  expression init = range_lower(r);
+  expression bound = range_upper(r);
+  expression inc = range_increment(r);
+  pt_in = expression_to_points_to(init, pt_in, false);
+  pt_in = expression_to_points_to(bound, pt_in, false);
+  pt_in = expression_to_points_to(inc, pt_in, false);
+
   pt_out = any_loop_to_points_to(b,
 				 expression_undefined,
 				 expression_undefined,
@@ -669,6 +685,7 @@ pt_map any_loop_to_points_to(statement b,
       pt_out = expression_to_points_to(init, pt_out, true);
     pt_map pt_out_skip = full_copy_pt_map(pt_out);
     if(!expression_undefined_p(c)) {
+      pt_out = expression_to_points_to(c, pt_out, true);
       pt_out = condition_to_points_to(c, pt_out, true);
       pt_out_skip = condition_to_points_to(c, pt_out_skip, false);
     }
