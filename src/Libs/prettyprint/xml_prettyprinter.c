@@ -102,6 +102,7 @@ static const char* global_module_name;
 #define TB1            "\t"
 
 static hash_table hash_entity_def_to_task = hash_table_undefined;
+static hash_table hash_entity_onlydef_into_task = hash_table_undefined;
 static const char* global_module_name;
 static int global_margin =0;
 
@@ -2173,7 +2174,7 @@ static void  find_pattern(Psysteme ps, Pvecteur paving_indices, Pvecteur formal_
     }
     else if (!CONTRAINTE_UNDEFINED_P(bounds[lower][1])
 	     && !CONTRAINTE_UNDEFINED_P(bounds[upper][1])) {
-      /* case where loop bounds are numeric */
+      /* case where loop bounds are numeric or symbolic*/
       for(cl = bounds[lower][1]; cl !=NULL; cl=cl->succ)  {
 	*bound_inf= cl;
 	for(cu = bounds[upper][1]; cu !=NULL; cu =cu->succ) {
@@ -2196,8 +2197,10 @@ static void  find_pattern(Psysteme ps, Pvecteur paving_indices, Pvecteur formal_
 	}
       }
       //      printf("Liste des contraintes sur PHI-%d: \n",dim);
-      // inegalites_fprint(stdout,*pattern_up_bound, (char * (*)(Variable)) entity_local_name);
-       *pattern_up_bound = choose_pattern(*pattern_up_bound);
+      // inegalites_fprint(stdout,*pattern_up_bound, (char * (*)(Variable)) entity_local_name);    
+       *pattern_up_bound = choose_pattern(*pattern_up_bound); 
+       //   printf("Pattern choisi \n");
+       //  inegalites_fprint(stdout,*pattern_up_bound, (char * (*)(Variable)) entity_local_name);
        }
     else {
       /* Only bounds with several loop indices */
@@ -2240,8 +2243,18 @@ static void xml_Pattern_Paving( region reg,entity var, bool effet_read, Pvecteur
       dimension vreg_dim;
       if (!SC_UNDEFINED_P(ps_reg))
 	sc_transform_eg_in_ineg(ps_reg);
-      string_buffer_append_word("Pattern",buffer_pattern);
-      string_buffer_append_word("Pavage",buffer_paving);
+      add_margin(global_margin,buffer_pattern);
+      string_buffer_append(buffer_pattern,
+			       concatenate(OPENANGLE,
+					   "Pattern AccessMode=",
+					   QUOTE,(effet_read)? "USE":"DEF",QUOTE,CLOSEANGLE,NL,NULL));
+      add_margin(global_margin,buffer_paving);
+      string_buffer_append(buffer_paving,
+			       concatenate(OPENANGLE,
+					   "Pavage AccessMode=",
+					   QUOTE,(effet_read)? "USE":"DEF",QUOTE,CLOSEANGLE,NL,NULL));
+      //string_buffer_append_word("Pattern",buffer_pattern);
+      //string_buffer_append_word("Pavage",buffer_paving);
       global_margin++;
       // pour chaque dimension : generer en meme temps le pattern et le pavage
       for(i=1; i<=dim; i++) {
@@ -2249,11 +2262,11 @@ static void xml_Pattern_Paving( region reg,entity var, bool effet_read, Pvecteur
 	bound_up = CONTRAINTE_UNDEFINED;
 	pattern_up_bound = CONTRAINTE_UNDEFINED;
 	voffset =vect_new(TCST,0);
-	//printf("find pattern for entity %s [dim=%d]\n",entity_local_name(var),i);
-	//sc_fprint(stdout,ps_reg,(char * (*)(Variable)) entity_local_name);
+	//	printf("find pattern for entity %s [dim=%d]\n",entity_local_name(var),i);
+	//	sc_fprint(stdout,ps_reg,(char * (*)(Variable)) entity_local_name);
 	find_pattern(ps_reg, paving_indices, formal_parameters, i, &bound_inf, &bound_up, &pattern_up_bound, &iterator);
 
-		phi = (Variable) make_phi_entity(dim);
+	phi = (Variable) make_phi_entity(dim);
 	if(!SC_UNDEFINED_P(ps_reg) && base_contains_variable_p(sc_base(ps_reg),phi)) {
 	  ps1 = sc_dup(ps_reg);
 	  feasible = sc_minmax_of_variable(ps1, (Variable)phi, &min, &max);
@@ -2280,6 +2293,7 @@ static void xml_Pattern_Paving( region reg,entity var, bool effet_read, Pvecteur
 			       concatenate(OPENANGLE,
 					   "DimPattern Index=",
 					   QUOTE,QUOTE,CLOSEANGLE,NL,NULL));
+
 	  global_margin++;
 	  string_buffer_append_word("Offset",buffer_pattern);
 	  string_buffer_append_symbolic(vect_to_string(voffset),
@@ -2312,6 +2326,11 @@ static void xml_Pattern_Paving( region reg,entity var, bool effet_read, Pvecteur
 	}
 	if (!CONTRAINTE_UNDEFINED_P(iterator) &&!CONTRAINTE_NULLE_P(iterator)) {
 	  string_buffer_append_word("DimPavage",buffer_paving);
+	  add_margin(global_margin,buffer_paving);
+	  string_buffer_append(buffer_paving,
+			       concatenate(OPENANGLE,"AccessMode",CLOSEANGLE,
+					   (effet_read)? "USE":"DEF",
+					   OPENANGLE,"/AccessMode",CLOSEANGLE,NL,NULL));
 	  for (iterat = paving_indices; !VECTEUR_NUL_P(iterat); iterat = iterat->succ) {
 	    if ((inc = vect_coeff(var_of(iterat),iterator->vecteur)) !=0) {
 	      add_margin(global_margin,buffer_paving);
@@ -2367,6 +2386,23 @@ void vars_read_or_written(list effects_list, Pvecteur *vl)
   vect_rm(vout);
 }
 
+void vars_read_and_written(list effects_list, Pvecteur *vr, Pvecteur *vw)
+{
+  list pc;
+  for (pc= effects_list;pc != NIL; pc = CDR(pc)){
+    effect e = EFFECT(CAR(pc));
+    reference r = effect_any_reference(e);
+    if (store_effect_p(e) && array_entity_p(reference_variable(r))) {
+      entity v = reference_variable(r);
+      if (effect_read_p(e))
+	vect_add_elem(vr,v,1);
+      else  vect_add_elem(vw,v,1);
+    }
+  }
+  *vr = base_normalize(*vr);
+  *vw = base_normalize(*vw);
+}
+
 static void  xml_Region_Range(region reg, string_buffer sb_result)
 {
   Variable phi;
@@ -2416,28 +2452,40 @@ static void  xml_Region_Range(region reg, string_buffer sb_result)
 		if (vc-1)
 		  scst =strdup(itoa(vc));
 		if (fub++)
-		  string_buffer_append(sbu_result,
-				       concatenate(",",sb, NULL));
+		  if  (vc-1)
+		    string_buffer_append(sbu_result,
+					 concatenate(",(",sb, NULL));
+		  else  string_buffer_append(sbu_result,
+					     concatenate(",",sb, NULL));
 		else
-		  string_buffer_append(sbu_result,
-				       concatenate(sb, NULL));
+		  if  (vc-1)
+		    string_buffer_append(sbu_result,
+					 concatenate("(",sb, NULL));
+		  else string_buffer_append(sbu_result,
+					    concatenate(sb, NULL));
 		if (vc-1)
 		  string_buffer_append(sbu_result,
-				       concatenate("/",scst, NULL));
+				       concatenate(")/",scst, NULL));
 	      }
 	      else if (value_neg_p(vc)) {
 		vect_erase_var(&vvc,phi);
 		sb = vect_to_string(vvc);
 		if (vc+1) scst =strdup(itoa(-1*vc));
 		if (fib++)
-		  string_buffer_append(sbi_result,
-				       concatenate(",",sb, NULL));
+		  if (vc+1)
+		    string_buffer_append(sbi_result,
+					 concatenate(",(",sb, NULL));
+		  else string_buffer_append(sbi_result,
+					    concatenate(",",sb, NULL));
 		else
-		  string_buffer_append(sbi_result,
-				       concatenate(sb, NULL));
+		  if (vc+1)
+		    string_buffer_append(sbi_result,
+					 concatenate("(",sb, NULL));
+		  else   string_buffer_append(sbi_result,
+					      concatenate(sb, NULL));
 		if (vc+1)
 		  string_buffer_append(sbi_result,
-				       concatenate("/",scst, NULL));
+				       concatenate(")/",scst, NULL));
 	      }
 	    }
 	  string_buffer_append(sbu_result,
@@ -2581,7 +2629,7 @@ static void xml_TaskParameter(bool assign_function,bool is_not_main_p, entity va
   region rwr = region_undefined;
   region rre = region_undefined;
   const char* datatype ="";
-  int size=0;
+  int size=0, rw_ef=0;
   reference ref;
   region reg;
   entity v;
@@ -2599,9 +2647,11 @@ static void xml_TaskParameter(bool assign_function,bool is_not_main_p, entity va
   }
   else { // c'est une fonction -->  impression selon l'ordre des parametres formels
     // recherche des regions du parametre formel
-    effet_read = (find_effect_actions_for_entity(pattern_region,&rre, &rwr,var)==1);
-    // choix des regions write de preference
-    reg = (rwr != region_undefined)? rwr : rre;
+    rw_ef= find_effect_actions_for_entity(pattern_region,&rre, &rwr,var);
+    // choix de l'affichage des regions write en premier lorsque R&W existent
+    if (rwr != region_undefined)
+      reg=rwr, effet_read=false;
+    else reg= rre, effet_read=true;
     if (reg != region_undefined) {
       ref = effect_any_reference(reg);
       v = reference_variable(ref);
@@ -2619,7 +2669,7 @@ static void xml_TaskParameter(bool assign_function,bool is_not_main_p, entity va
 				     QUOTE,entity_user_name(v),QUOTE, BL,
 				     "Type=", QUOTE,(entity_xml_parameter_p(v))? "CONTROL":"DATA",QUOTE,BL,
 				     "DataType=",QUOTE,datatype,QUOTE,BL,
-				     "AccessMode=", QUOTE, (effet_read)? "USE":"DEF",QUOTE,BL,
+				     "AccessMode=", QUOTE, (rw_ef>=2)? ((rw_ef==2)? "DEF":"DEF_USE"):"USE",QUOTE,BL,
 				     "ArrayP=", QUOTE, (array_entity_p(v))?"TRUE":"FALSE",QUOTE, BL,
 				     "Kind=", QUOTE,  "VARIABLE",QUOTE,
 				     CLOSEANGLE,
@@ -2627,6 +2677,9 @@ static void xml_TaskParameter(bool assign_function,bool is_not_main_p, entity va
     xml_ParameterUseToArrayBound(var,sb_result);
     global_margin++;
     xml_Pattern_Paving(reg,v, effet_read, formal_parameters,
+		       paving_indices, sb_result);
+    if (rw_ef>=3)
+      xml_Pattern_Paving(rre,v, true, formal_parameters,
 		       paving_indices, sb_result);
     global_margin--;
     if (assign_function)
@@ -3576,7 +3629,7 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
 				       aan,
 				       quote_p,BL,
 				       "FormalName=", QUOTE,entity_user_name(FormalArrayName), QUOTE,BL,
-				       "AccessMode=",QUOTE,(rw_ef>=2)? "DEF": "USE", QUOTE,CLOSEANGLE,
+				       "AccessMode=",QUOTE,(rw_ef>=2)? ((rw_ef==2)? "DEF":"DEF_USE"):"USE", QUOTE,CLOSEANGLE,
 				       NL, NULL));
 
       if (expression_integer_value(exp, &iexp))
@@ -3594,7 +3647,9 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
       int ActualArrayDim = variable_entity_dimension(ActualArrayName);
       char *  SActualArrayDim = strdup(itoa(ActualArrayDim));
       int FormalArrayDim = variable_entity_dimension(FormalArrayName);
-      list ActualArrayInd = reference_indices(ActualRef);
+      list ActualArrayInd = reference_indices(ActualRef); 
+      entity t =  hash_get(hash_entity_onlydef_into_task,(char *) ActualArrayName);
+      
       global_margin++;
       add_margin(global_margin,sb_result);
       string_buffer_append(sb_result,
@@ -3605,11 +3660,11 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
 				       "ActualDim=", QUOTE,SActualArrayDim,QUOTE,BL,
 				       "FormalName=", QUOTE,entity_user_name(FormalArrayName), QUOTE,BL,
 				       "FormalDim=", QUOTE,itoa(FormalArrayDim),QUOTE,BL,
-				       "AccessMode=",QUOTE,(rw_ef>=2)? "DEF":"USE",QUOTE,CLOSEANGLE,
+				       "AccessMode=",QUOTE,(rw_ef>=2)? ((t== HASH_UNDEFINED_VALUE)? "DEF":"DEF_USE"):"USE",QUOTE,CLOSEANGLE,
 				       NL, NULL));
       /* Save information to generate Task Graph */
       if (rw_ef>=2)
-	hash_put(hash_entity_def_to_task, (char *)ActualArrayName,(char *)function);
+	hash_put(hash_entity_onlydef_into_task, (char *)ActualArrayName,(char *)function);
       free(SActualArrayDim);
 
       xml_Connection(ActualArrayInd,ActualArrayDim,FormalArrayDim,sb_result);
@@ -3691,54 +3746,63 @@ static void xml_Call(entity module,  int code_tag,int taskNumber, nest_context_p
   sc_free(prec);
 }
 
-
 void  xml_Compute_and_Need(entity func,list effects_list, Pvecteur vargs,string_buffer sb_result)
 {
   string_buffer buffer_needs = string_buffer_make(true);
   string string_needs = "";
-  Pvecteur vl = VECTEUR_NUL;
+  Pvecteur vr = VECTEUR_NUL,vw = VECTEUR_NUL;
   list pc;
   Pvecteur va2 = vect_dup(vargs);
 
-  vars_read_or_written(effects_list,&vl);
+  vars_read_and_written(effects_list,&vr,&vw);
 
   for (pc= effects_list;pc != NIL; pc = CDR(pc)){
     effect e = EFFECT(CAR(pc));
     reference r = effect_any_reference(e);
     action ac = effect_action(e);
     entity v =  reference_variable(r);
-    if ( store_effect_p(e) && array_entity_p(v) &&!io_entity_p(v) && !rand_effects_entity_p(v) 
-	 // pour eviter les variables privees et  traiter les tableaux en R+W
-	 &&  (vect_coeff(v,vl) ||  (vect_coeff(v,va2) && !action_read_p(ac))) 
+    entity t =  hash_get(hash_entity_def_to_task,(char *) v);
+    if ( store_effect_p(e) && array_entity_p(v) &&!io_entity_p(v) && !rand_effects_entity_p(v)
+	 // pour eviter les variables privees, les tableaux de structures presents plusieurs fois et traiter les tableaux en R+W
+	 && action_read_p(ac) && vect_coeff(v,vr) && ((vect_coeff(v,vw) && (t!= HASH_UNDEFINED_VALUE)) || !vect_coeff(v,vw) )
+	 // pour eviter les variables privees et  les variables globales
 	 && !(entity_static_variable_p(v) && !top_level_entity_p(v))) {
-      if (action_read_p(ac)) {
-	vect_chg_coeff(&vl,v,0);
-	entity t =  hash_get(hash_entity_def_to_task,(char *) v);
-	global_margin++;
-	add_margin(global_margin,buffer_needs);
-	string_buffer_append(buffer_needs,
-			     concatenate(OPENANGLE,"Needs ArrayName=",
-					 QUOTE,entity_user_name(v),QUOTE, BL,
-					 "DefinedBy=",QUOTE,
-					 (t!= HASH_UNDEFINED_VALUE) ? entity_local_name(t): "IN_VALUE",QUOTE,"/",
-						   CLOSEANGLE,NL,NULL));
-	global_margin--;
-      }
-      else {
-	vect_chg_coeff(&vl,v,0);
-	if (vect_coeff(v,va2)) vect_chg_coeff(&va2,v,0);
-	global_margin++;
-	add_margin(global_margin,sb_result);
-	string_buffer_append(sb_result,
-			     concatenate(OPENANGLE,"Computes ArrayName=",
-					 QUOTE,entity_user_name(v),QUOTE,"/",
-					 CLOSEANGLE,NL,
-					 NULL));
-	hash_put(hash_entity_def_to_task, (char *) v,(char *)func);
-	global_margin--;
-      }
+      vect_chg_coeff(&vr,v,0);
+      global_margin++;
+      add_margin(global_margin,buffer_needs);
+      string_buffer_append(buffer_needs,
+			   concatenate(OPENANGLE,"Needs ArrayName=",
+				       QUOTE,entity_user_name(v),QUOTE, BL,
+				       "DefinedBy=",QUOTE,
+				       (t!= HASH_UNDEFINED_VALUE) ? entity_local_name(t): "IN_VALUE",QUOTE,"/",
+				       CLOSEANGLE,NL,NULL));
+      global_margin--;
     }
   }
+  // Pour eviter de faire des doublons dans la table de hashage avec les parametres RW
+  for (pc= effects_list;pc != NIL; pc = CDR(pc)){
+    effect e = EFFECT(CAR(pc));
+    reference r = effect_any_reference(e);
+    action ac = effect_action(e);
+    entity v =  reference_variable(r);
+    if ( store_effect_p(e) && array_entity_p(v) &&!io_entity_p(v) && !rand_effects_entity_p(v)
+	 // pour eviter les variables privees et  traiter les tableaux en R+W
+	 &&!action_read_p(ac) &&  vect_coeff(v,vw)
+	 && !(entity_static_variable_p(v) && !top_level_entity_p(v))) {
+      vect_chg_coeff(&vw,v,0);
+      //if (vect_coeff(v,va2)) vect_chg_coeff(&va2,v,0);
+      global_margin++;
+      add_margin(global_margin,sb_result);
+      string_buffer_append(sb_result,
+			   concatenate(OPENANGLE,"Computes ArrayName=",
+				       QUOTE,entity_user_name(v),QUOTE,"/",
+				       CLOSEANGLE,NL,
+				       NULL));
+      hash_put(hash_entity_def_to_task, (char *) v,(char *)func);
+      global_margin--;
+    }
+  }
+
   vect_rm(va2);
   string_needs =string_buffer_to_string(buffer_needs);
   string_buffer_append(sb_result,string_needs);
@@ -3992,6 +4056,7 @@ bool print_xml_application(const char* module_name)
   statement stat;
   string_buffer sb_result=string_buffer_make(true);
   hash_entity_def_to_task = hash_table_make(hash_pointer,0);
+  hash_entity_onlydef_into_task = hash_table_make(hash_pointer,0);
   int code_tag;
 
   module = module_name_to_entity(module_name);
@@ -4051,6 +4116,7 @@ bool print_xml_application(const char* module_name)
   debug_off();
   string_buffer_free(&sb_result);
   hash_table_free(hash_entity_def_to_task);
+  hash_table_free(hash_entity_onlydef_into_task);
   free(dir);
   free(filename);
 
