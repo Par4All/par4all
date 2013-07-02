@@ -2633,7 +2633,9 @@ static void xml_TaskParameter(bool assign_function,bool is_not_main_p, entity va
   reference ref;
   region reg;
   entity v;
+  list pc;
   bool  pavp=true;
+  int prems=0;
 
   // rappel : les regions contiennent les effects sur les scalaires
   // pour les fonctions, on ecrit les parametres formels dans l'ordre
@@ -2659,9 +2661,22 @@ static void xml_TaskParameter(bool assign_function,bool is_not_main_p, entity va
     else  // cas ou il n'y a pas d'effet sur le parametre formel,
       //  mais il fait partie de la liste des parametres de la fonction
       v = var, effet_read = true;
+
+    // La liste des effects de la fonction a ete completee dans le TaskParameters
+    // On recherche le premier effect sur la variable pour en deduire l'info Use OU Def dans la fonction
+    if((rw_ef>=3) && (int)gen_length(cumulated_list) >0) {
+      for (pc= cumulated_list;pc != NIL && prems ==0; pc = CDR(pc)){
+	effect e = EFFECT(CAR(pc));
+	reference r = effect_any_reference(e);
+	if (store_effect_p(e) && array_entity_p(reference_variable(r)) && (same_entity_p(v,reference_variable(r))) ) {
+	  prems=(effect_read_p(e)) ? 1:2;
+	}
+      }
+      //  printf("DEBUG - DEF_USE detection %s \n",(prems)? ((prems==1)?"USE":"DEF"):"Erreur pas d'effets sur cette variable");
+    }
   }
-  if (pavp) {
-    type_and_size_of_var(v, &datatype,&size);
+   if (pavp) {
+   type_and_size_of_var(v, &datatype,&size);
     add_margin(global_margin,sb_result);
     string_buffer_append(sb_result,
 			 concatenate(OPENANGLE,
@@ -2669,7 +2684,7 @@ static void xml_TaskParameter(bool assign_function,bool is_not_main_p, entity va
 				     QUOTE,entity_user_name(v),QUOTE, BL,
 				     "Type=", QUOTE,(entity_xml_parameter_p(v))? "CONTROL":"DATA",QUOTE,BL,
 				     "DataType=",QUOTE,datatype,QUOTE,BL,
-				     "AccessMode=", QUOTE, (rw_ef>=2)? ((rw_ef==2)? "DEF":"DEF_USE"):"USE",QUOTE,BL,
+				     "AccessMode=", QUOTE, (rw_ef==2 || prems==2)? "DEF":"USE",QUOTE,BL,
 				     "ArrayP=", QUOTE, (array_entity_p(v))?"TRUE":"FALSE",QUOTE, BL,
 				     "Kind=", QUOTE,  "VARIABLE",QUOTE,
 				     CLOSEANGLE,
@@ -2692,6 +2707,11 @@ static void xml_TaskParameter(bool assign_function,bool is_not_main_p, entity va
 
 
 
+static void cumul_effects_of_statement(statement s)
+{
+  cumulated_list = gen_append(cumulated_list,load_proper_rw_effects_list(s));
+}
+
 static void xml_TaskParameters(bool assign_function, int code_tag, entity module, list pattern_region, Pvecteur paving_indices, string_buffer sb_result)
 {
 
@@ -2700,6 +2720,9 @@ static void xml_TaskParameters(bool assign_function, int code_tag, entity module
   Pvecteur formal_parameters = VECTEUR_NUL;
   entity FormalArrayName = entity_undefined;
   list lr=NIL;
+  statement s = get_current_module_statement();
+  cumulated_list = NIL;
+  gen_recurse(s, statement_domain, gen_true, cumul_effects_of_statement);
 
   if (assign_function)
     string_buffer_append_word("AssignParameters",sb_result);
@@ -2717,6 +2740,7 @@ static void xml_TaskParameters(bool assign_function, int code_tag, entity module
     // les parametres formels doivent etre introduits dans l'ordre.
     for (ith=1;ith<=FormalParameterNumber;ith++) {
       FormalArrayName = find_ith_formal_parameter(module,ith);
+
       xml_TaskParameter(assign_function,true,FormalArrayName,
 			formal_parameters,pattern_region,paving_indices,sb_result);
     }
@@ -2965,11 +2989,6 @@ static void xml_Array(entity var,Psysteme prec,string_buffer sb_result)
   global_margin--;
   string_buffer_append_word("/Layout",sb_result);
   string_buffer_append_word("/Array",sb_result);
-}
-
-static void cumul_effects_of_statement(statement s)
-{
-  cumulated_list = gen_append(cumulated_list,load_proper_rw_effects_list(s));
 }
 
 static void xml_GlobalArrays(Psysteme prec,string_buffer sb_result)
