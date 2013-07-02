@@ -2326,11 +2326,6 @@ static void xml_Pattern_Paving( region reg,entity var, bool effet_read, Pvecteur
 	}
 	if (!CONTRAINTE_UNDEFINED_P(iterator) &&!CONTRAINTE_NULLE_P(iterator)) {
 	  string_buffer_append_word("DimPavage",buffer_paving);
-	  add_margin(global_margin,buffer_paving);
-	  string_buffer_append(buffer_paving,
-			       concatenate(OPENANGLE,"AccessMode",CLOSEANGLE,
-					   (effet_read)? "USE":"DEF",
-					   OPENANGLE,"/AccessMode",CLOSEANGLE,NL,NULL));
 	  for (iterat = paving_indices; !VECTEUR_NUL_P(iterat); iterat = iterat->succ) {
 	    if ((inc = vect_coeff(var_of(iterat),iterator->vecteur)) !=0) {
 	      add_margin(global_margin,buffer_paving);
