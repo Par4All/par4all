@@ -13,9 +13,9 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 echo 
 echo Points-to
 echo
-#activate PRINT_CODE_POINTS_TO_LIST
+activate PRINT_CODE_POINTS_TO_LIST
 #display PRINTED_FILE[mainChar]
-#display PRINTED_FILE[mainInt]
+display PRINTED_FILE[mainInt]
 #display PRINTED_FILE[mainFloat]
 #display PRINTED_FILE[mainDouble]
 

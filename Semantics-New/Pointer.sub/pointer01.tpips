@@ -13,9 +13,9 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 echo 
 echo Points-to
 echo
-#activate PRINT_CODE_POINTS_TO_LIST
+activate PRINT_CODE_POINTS_TO_LIST
 #display PRINTED_FILE[mainChar]
-#display PRINTED_FILE[mainInt]
+display PRINTED_FILE[mainInt]
 #display PRINTED_FILE[mainFloat]
 #display PRINTED_FILE[mainDouble]
 
@@ -23,10 +23,17 @@ echo
 setproperty SEMANTICS_ANALYZE_SCALAR_POINTER_VARIABLES TRUE
 
 
+echo 
+echo PROPER  EFFECTS
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[mainInt]
+
 echo
 echo Transformers with point-to
 echo
-activate PROPER_EFFECTS_WITH_POINTS_TO
+#activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_TRANSFORMERS
 #display PRINTED_FILE[mainChar]
 display PRINTED_FILE[mainInt]

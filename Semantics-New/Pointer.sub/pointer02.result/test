@@ -2,6 +2,41 @@
 Points-to
 
 
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int mainInt()
+{
+
+// Points To: none
+
+   int a;
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> undefined , EXACT
+
+
+   p = &a;
+
+// Points To:
+// p -> a , EXACT
+
+
+   *p = 0;
+
+// Points To:
+// p -> a , EXACT
+
+
+   return 0;
+}
+
 Transformers with point-to
 
 
@@ -18,17 +53,17 @@ int mainInt()
 
    int *p;
 
-//  T(p) {}
+//  T(p) {&a==p}
 
 
    p = &a;
 
-//  T(a) {a==0}
+//  T(a) {&a==p, a==0}
 
 
    *p = 0;
 
-//  T(mainInt) {a==0, mainInt==0}
+//  T(mainInt) {&a==p, a==0, mainInt==0}
 
 
    return 0;
@@ -55,12 +90,12 @@ int mainInt()
 
    p = &a;
 
-//  P(a,p) {}
+//  P(a,p) {&a==p}
 
 
    *p = 0;
 
-//  P(a,p) {a==0}
+//  P(a,p) {&a==p, a==0}
 
 
    return 0;

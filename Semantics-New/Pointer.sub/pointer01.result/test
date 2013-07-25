@@ -2,6 +2,79 @@
 Points-to
 
 
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int mainInt()
+{
+
+// Points To: none
+
+   int a[10];
+
+// Points To: none
+
+   int *p, *q;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+
+   q = &a[0];
+
+// Points To:
+// p -> undefined , EXACT
+// q -> a[0] , EXACT
+
+   p = q+1;
+
+// Points To:
+// p -> a[1] , EXACT
+// q -> a[0] , EXACT
+
+
+   *q = 0;
+
+// Points To:
+// p -> a[1] , EXACT
+// q -> a[0] , EXACT
+
+   *p = 0;
+
+// Points To:
+// p -> a[1] , EXACT
+// q -> a[0] , EXACT
+
+
+   return 0;
+}
+
+PROPER  EFFECTS
+
+int mainInt()
+{
+   int a[10];
+   int *p, *q;
+//             <    is written>: q
+
+   q = &a[0];
+//             <    is read   >: q
+//             <    is written>: p
+   p = q+1;
+//             <    is read   >: q
+//             <    is written>: a[0]
+
+   *q = 0;
+//             <    is read   >: p
+//             <    is written>: a[1]
+   *p = 0;
+
+   return 0;
+}
+
 Transformers with point-to
 
 
@@ -18,25 +91,25 @@ int mainInt()
 
    int *p, *q;
 
-//  T(q) {}
+//  T(q) {&a==q}
 
 
    q = &a[0];
 
-//  T(p) {p==q+1}
+//  T(p) {&a==p-1, &a==q}
 
    p = q+1;
 
-//  T() {p==q+1}
+//  T() {&a==p-1, &a==q}
 
 
    *q = 0;
 
-//  T() {p==q+1}
+//  T() {&a==p-1, &a==q}
 
    *p = 0;
 
-//  T(mainInt) {mainInt==0, p==q+1}
+//  T(mainInt) {&a==p-1, &a==q, mainInt==0}
 
 
    return 0;
@@ -63,20 +136,20 @@ int mainInt()
 
    q = &a[0];
 
-//  P(p,q) {}
+//  P(p,q) {&a==q}
 
    p = q+1;
 
-//  P(p,q) {p==q+1}
+//  P(p,q) {&a==p-1, &a==q}
 
 
    *q = 0;
 
-//  P(p,q) {p==q+1}
+//  P(p,q) {&a==p-1, &a==q}
 
    *p = 0;
 
-//  P(p,q) {p==q+1}
+//  P(p,q) {&a==p-1, &a==q}
 
 
    return 0;
