@@ -1,0 +1,96 @@
+
+Points-to
+
+
+// Points To IN:
+// _tab_1[0] -> *NULL* , MAY
+// _tab_1[0] -> _tab_1_1[0][0] , MAY
+// tab -> *NULL* , MAY
+// tab -> _tab_1[0] , MAY
+
+
+// Points To OUT:
+// _tab_1[0] -> *NULL* , MAY
+// _tab_1[0] -> _tab_1_1[0][0] , MAY
+// tab -> _tab_1[0] , EXACT
+
+void foo(int **tab)
+{
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// _tab_1[0] -> *NULL* , MAY
+// _tab_1[0] -> _tab_1_1[0][0] , MAY
+// p -> undefined , EXACT
+// tab -> *NULL* , MAY
+// tab -> _tab_1[0] , MAY
+
+   p = *tab;
+
+// Points To:
+// _tab_1[0] -> *NULL* , MAY
+// _tab_1[0] -> _tab_1_1[0][0] , MAY
+// p -> *NULL* , MAY
+// p -> _tab_1_1[0][0] , MAY
+// tab -> _tab_1[0] , EXACT
+
+   p = p;
+}
+
+PROPER  EFFECTS
+
+void foo(int **tab)
+{
+   int *p;
+//             <    is read   >: _tab_1[0] tab
+//             <    is written>: p
+   p = *tab;
+//             <    is read   >: p
+//             <    is written>: p
+   p = p;
+}
+
+Transformers with point-to
+
+
+//  T() {}
+
+void foo(int **tab)
+{
+
+//  T(p) {}
+
+   int *p;
+
+//  T(p) {}
+
+   p = *tab;
+
+//  T(p) {p==p#init}
+
+   p = p;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+void foo(int **tab)
+{
+
+//  P() {}
+
+   int *p;
+
+//  P(p) {}
+
+   p = *tab;
+
+//  P(p) {}
+
+   p = p;
+}
