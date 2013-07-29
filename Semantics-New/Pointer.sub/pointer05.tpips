@@ -31,6 +31,7 @@ echo
 echo Transformers with point-to
 echo
 #activate PROPER_EFFECTS_WITH_POINTS_TO
+activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[foo]
 

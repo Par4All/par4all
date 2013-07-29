@@ -150,12 +150,12 @@ int main()
 
    pp = &p;
 
-//  T(q) {&i==p, &p==pp, i==0}
+//  T(q) {&i==p, &i==q, &p==pp, i==0}
 
    //On veut avoir p=q
    q = *pp;
 
-//  T(q) {&i==p, &i==q, &p==pp, i==0}
+//  T(q) {&i==p, &i==q, &i==q#init, &p==pp, i==0}
 
    q = p;
 
@@ -213,7 +213,7 @@ int main()
    //On veut avoir p=q
    q = *pp;
 
-//  P(i,p,pp,q) {&i==p, &p==pp, i==0}
+//  P(i,p,pp,q) {&i==p, &i==q, &p==pp, i==0}
 
    q = p;
 

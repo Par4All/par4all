@@ -146,12 +146,13 @@ int main()
       k = j;
    }
 
-//  T(i,j) {i#init==0, j#init==1, 0<=k, k<=1}
+//  T(i,j) {9i+10j==100, i#init==0, j#init==1, 0<=i, i<=10, 0<=k,
+//    k<=1}
 
 
    *p = 10;
 
-//  T(main) {main==0, 0<=k, k<=1}
+//  T(main) {9i+10j==100, main==0, 0<=i, i<=10, 0<=k, k<=1}
 
 
    return 0;
@@ -206,7 +207,7 @@ int main()
 
    *p = 10;
 
-//  P(i,j,k,p) {0<=k, k<=1}
+//  P(i,j,k,p) {9i+10j==100, 0<=i, i<=10, 0<=k, k<=1}
 
 
    return 0;

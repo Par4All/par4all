@@ -117,13 +117,13 @@ int main()
 
    q = &j;
 
-//  T() {&i==p, &j==q, i==0, j==10}
+//  T(i) {&i==p, &j==q, i==10, i#init==0, j==10}
 
    
    //on modifie i
    *p = *q;
 
-//  T(main) {&i==p, &j==q, i==0, j==10, main==0}
+//  T(main) {&i==p, &j==q, i==10, j==10, main==0}
 
 
    return 0;
@@ -169,7 +169,7 @@ int main()
    //on modifie i
    *p = *q;
 
-//  P(i,j,p,q) {&i==p, &j==q, i==0, j==10}
+//  P(i,j,p,q) {&i==p, &j==q, i==10, j==10}
 
 
    return 0;
