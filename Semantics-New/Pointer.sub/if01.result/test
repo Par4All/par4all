@@ -12,7 +12,7 @@ int main()
 
 // Points To: none
 
-   int i, j, k, *p;
+   int i, j, l1, l2, *p;
 
 // Points To:
 // p -> undefined , EXACT
@@ -22,7 +22,17 @@ int main()
 // Points To:
 // p -> undefined , EXACT
 
+   l1 = i;
+
+// Points To:
+// p -> undefined , EXACT
+
    j = 1;
+
+// Points To:
+// p -> undefined , EXACT
+
+   l2 = j;
 
 // Points To:
 // p -> undefined , EXACT
@@ -38,7 +48,7 @@ int main()
 // Points To:
 // p -> i , EXACT
 
-      k = i;
+      l1 = 10;
    }
    else {
 
@@ -50,7 +60,7 @@ int main()
 // Points To:
 // p -> j , EXACT
 
-      k = j;
+      l2 = 10;
    }
 
 // Points To:
@@ -72,27 +82,31 @@ PROPER  EFFECTS
 
 int main()
 {
-   int i, j, k, *p;
+   int i, j, l1, l2, *p;
 //             <    is written>: i
    i = 0;
+//             <    is read   >: i
+//             <    is written>: l1
+   l1 = i;
 //             <    is written>: j
    j = 1;
+//             <    is read   >: j
+//             <    is written>: l2
+   l2 = j;
 //             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
 //             <    is written>: _RANDOM_EFFECTS:GEN_SEED
 
    if (rand()) {
 //             <    is written>: p
       p = &i;
-//             <    is read   >: i
-//             <    is written>: k
-      k = i;
+//             <    is written>: l1
+      l1 = 10;
    }
    else {
 //             <    is written>: p
       p = &j;
-//             <    is read   >: j
-//             <    is written>: k
-      k = j;
+//             <    is written>: l2
+      l2 = 10;
    }
 //             <may be written>: i j
 //             <    is read   >: p
@@ -110,49 +124,59 @@ Transformers with point-to
 int main()
 {
 
-//  T(i,j,k,p) {}
+//  T(i,j,l1,l2,p) {}
 
-   int i, j, k, *p;
+   int i, j, l1, l2, *p;
 
 //  T(i) {i==0}
 
    i = 0;
 
-//  T(j) {i==0, j==1}
+//  T(l1) {i==0, l1==0}
+
+   l1 = i;
+
+//  T(j) {i==0, j==1, l1==0}
 
    j = 1;
 
-//  T(k,p) {i==0, j==1, 0<=k, k<=1}
+//  T(l2) {i==0, j==1, l1==0, l2==1}
+
+   l2 = j;
+
+//  T(l1,l2,p) {i==0, j==1, 9l1+10l2==100, l1#init==0, l2#init==1,
+//    0<=l1, l1<=10}
 
 
    if (rand()) {
 
-//  T(p) {&i==p, i==0, j==1}
+//  T(p) {&i==p, i==0, j==1, l1==0, l2==1}
 
       p = &i;
 
-//  T(k) {&i==p, i==0, j==1, k==0}
+//  T(l1) {&i==p, i==0, j==1, l1==10, l1#init==0, l2==1}
 
-      k = i;
+      l1 = 10;
    }
    else {
 
-//  T(p) {&j==p, i==0, j==1}
+//  T(p) {&j==p, i==0, j==1, l1==0, l2==1}
 
       p = &j;
 
-//  T(k) {&j==p, i==0, j==1, k==1}
+//  T(l2) {&j==p, i==0, j==1, l1==0, l2==10, l2#init==1}
 
-      k = j;
+      l2 = 10;
    }
 
-//  T(i,j) {9i+10j==100, i#init==0, j#init==1, 0<=i, i<=10, 0<=k,
-//    k<=1}
+//  T(i,j) {9i+10j==100, i#init==0, j#init==1, 9l1+10l2==100, 0<=i,
+//    i<=10, 0<=l1, l1<=10}
 
 
    *p = 10;
 
-//  T(main) {9i+10j==100, main==0, 0<=i, i<=10, 0<=k, k<=1}
+//  T(main) {9i+10j==100, 9l1+10l2==100, main==0, 0<=i, i<=10, 0<=l1,
+//    l1<=10}
 
 
    return 0;
@@ -168,46 +192,55 @@ int main()
 
 //  P() {}
 
-   int i, j, k, *p;
+   int i, j, l1, l2, *p;
 
-//  P(i,j,k,p) {}
+//  P(i,j,l1,l2,p) {}
 
    i = 0;
 
-//  P(i,j,k,p) {i==0}
+//  P(i,j,l1,l2,p) {i==0}
+
+   l1 = i;
+
+//  P(i,j,l1,l2,p) {i==0, l1==0}
 
    j = 1;
 
-//  P(i,j,k,p) {i==0, j==1}
+//  P(i,j,l1,l2,p) {i==0, j==1, l1==0}
+
+   l2 = j;
+
+//  P(i,j,l1,l2,p) {i==0, j==1, l1==0, l2==1}
 
 
    if (rand()) {
 
-//  P(i,j,k,p) {i==0, j==1}
+//  P(i,j,l1,l2,p) {i==0, j==1, l1==0, l2==1}
 
       p = &i;
 
-//  P(i,j,k,p) {&i==p, i==0, j==1}
+//  P(i,j,l1,l2,p) {&i==p, i==0, j==1, l1==0, l2==1}
 
-      k = i;
+      l1 = 10;
    }
    else {
 
-//  P(i,j,k,p) {i==0, j==1}
+//  P(i,j,l1,l2,p) {i==0, j==1, l1==0, l2==1}
 
       p = &j;
 
-//  P(i,j,k,p) {&j==p, i==0, j==1}
+//  P(i,j,l1,l2,p) {&j==p, i==0, j==1, l1==0, l2==1}
 
-      k = j;
+      l2 = 10;
    }
 
-//  P(i,j,k,p) {i==0, j==1, 0<=k, k<=1}
+//  P(i,j,l1,l2,p) {i==0, j==1, 9l1+10l2==100, 0<=l1, l1<=10}
 
 
    *p = 10;
 
-//  P(i,j,k,p) {9i+10j==100, 0<=i, i<=10, 0<=k, k<=1}
+//  P(i,j,l1,l2,p) {9i+10j==100, 9l1+10l2==100, 0<=i, i<=10, 0<=l1,
+//    l1<=10}
 
 
    return 0;
