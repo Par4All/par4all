@@ -1,0 +1,34 @@
+setenv WSPACE=if03
+delete $WSPACE
+create $WSPACE $WSPACE.c 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+#setenv SEMANTICS_DEBUG_LEVEL 1
+
+echo 
+echo PROPER  EFFECTS
+echo
+#activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Transformers with point-to
+echo
+#activate PROPER_EFFECTS_WITH_POINTS_TO
+#activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+echo
+echo Preconditions with point-to
+echo
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+close
+delete $WSPACE
+quit
