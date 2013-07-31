@@ -1,0 +1,26 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create sequence_sb_loop_se sequence_sb_loop_se.c
+
+activate C_PARSER
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE
+setproperty SEMANTICS_FILTER_INITIAL_VALUES TRUE
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE 
+
+
+
+setproperty PATH_TRANSFORMER_BEGIN "sbegin"
+setproperty PATH_TRANSFORMER_END "send"
+
+apply PATH_TRANSFORMER[main]
+shell cp sequence_sb_loop_se.database/main/main.pt sequence_sb_loop_se.result/test
+
+close
+delete sequence_sb_loop_se
+quit
+
+
