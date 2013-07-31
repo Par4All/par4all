@@ -1,0 +1,55 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: unreachable
+
+int main()
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> undefined , EXACT
+
+   p = (void *) 0;
+
+// Points To:
+// p -> *NULL* , EXACT
+
+
+   i = *p;
+
+// Points To: unreachable
+
+
+   return 0;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+   int i;
+   int *p;
+//             <    is written>: p
+   p = (void *) 0;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: i
+
+   i = *p;
+
+   return 0;
+}
+
+Transformers with point-to
+

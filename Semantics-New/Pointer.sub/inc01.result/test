@@ -1,0 +1,141 @@
+
+Points-to inc01
+
+
+// Points To IN:
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
+
+
+// Points To OUT:
+// p -> _p_1 , EXACT
+
+void inc01(int *p)
+{
+
+// Points To:
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
+
+   (*p)++;
+}
+
+PROPER  EFFECTS inc01
+
+void inc01(int *p)
+{
+//             <    is read   >: _p_1 p
+//             <    is written>: _p_1
+   (*p)++;
+}
+
+Transformers with point-to inc01
+
+
+//  T(_p_1) {}
+
+void inc01(int *p)
+{
+
+//  T(_p_1) {}
+
+   (*p)++;
+}
+
+Points-to 
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i = 0;
+
+// Points To: none
+
+   inc01(&i);
+
+// Points To: none
+
+   inc01(&i);
+
+// Points To: none
+
+
+   return i;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: i
+   int i = 0;
+//             <    is read   >: i
+//             <    is written>: i
+   inc01(&i);
+//             <    is read   >: i
+//             <    is written>: i
+   inc01(&i);
+//             <    is read   >: i
+
+   return i;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T() {i==0}
+
+   inc01(&i);
+
+//  T() {i==0}
+
+   inc01(&i);
+
+//  T(main) {i==0, main==0}
+
+
+   return i;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   inc01(&i);
+
+//  P(i) {i==0}
+
+   inc01(&i);
+
+//  P(i) {i==0}
+
+
+   return i;
+}

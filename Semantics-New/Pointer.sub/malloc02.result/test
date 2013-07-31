@@ -1,0 +1,180 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> undefined , EXACT
+
+   int **pp;
+
+// Points To:
+// p -> undefined , EXACT
+// pp -> undefined , EXACT
+
+   pp = malloc(sizeof(*pp));
+
+// Points To:
+// *HEAP*_l_11 -> undefined , EXACT
+// p -> undefined , EXACT
+// pp -> *HEAP*_l_11 , MAY
+
+   *pp = malloc(sizeof(**pp));
+
+// Points To:
+// *HEAP*_l_11 -> *HEAP*_l_12 , MAY
+// p -> undefined , EXACT
+// pp -> *HEAP*_l_11 , MAY
+
+   p = *pp;
+
+// Points To:
+// *HEAP*_l_11 -> *HEAP*_l_12 , MAY
+// p -> *HEAP*_l_12 , MAY
+// pp -> *HEAP*_l_11 , MAY
+
+
+   free(*pp);
+
+// Points To:
+// *HEAP*_l_11 -> undefined , MAY
+// p -> *HEAP*_l_12 , MAY
+// p -> undefined , MAY
+// pp -> *HEAP*_l_11 , MAY
+
+   free(pp);
+
+// Points To:
+// p -> *HEAP*_l_12 , MAY
+// p -> undefined , MAY
+// pp -> undefined , EXACT
+
+
+   return 0;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+   int *p;
+   int **pp;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: pp _MALLOC_EFFECTS:_MALLOC_
+   pp = malloc(sizeof(*pp));
+//             <may be written>: *HEAP*_l_11
+//             <    is read   >: pp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   *pp = malloc(sizeof(**pp));
+//             <may be read   >: *HEAP*_l_11
+//             <    is read   >: pp
+//             <    is written>: p
+   p = *pp;
+//             <may be read   >: *HEAP*_l_11
+//             <    is read   >: pp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+   free(*pp);
+//             <    is read   >: pp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(pp);
+
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(p) {}
+
+   int *p;
+
+//  T(pp) {}
+
+   int **pp;
+
+//  T(pp) {}
+
+   pp = malloc(sizeof(*pp));
+
+//  T(*HEAP*_l_11) {}
+
+   *pp = malloc(sizeof(**pp));
+
+//  T(p) {}
+
+   p = *pp;
+
+//  T() {*HEAP*_l_11==p}
+
+
+   free(*pp);
+
+//  T() {*HEAP*_l_11==p}
+
+   free(pp);
+
+//  T(main) {*HEAP*_l_11==p, main==0}
+
+
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int *p;
+
+//  P(p) {}
+
+   int **pp;
+
+//  P(p,pp) {}
+
+   pp = malloc(sizeof(*pp));
+
+//  P(p,pp) {}
+
+   *pp = malloc(sizeof(**pp));
+
+//  P(*HEAP*_l_11,p,pp) {}
+
+   p = *pp;
+
+//  P(*HEAP*_l_11,p,pp) {}
+
+
+   free(*pp);
+
+//  P(*HEAP*_l_11,p,pp) {*HEAP*_l_11==p}
+
+   free(pp);
+
+//  P(*HEAP*_l_11,p,pp) {*HEAP*_l_11==p}
+
+
+   return 0;
+}

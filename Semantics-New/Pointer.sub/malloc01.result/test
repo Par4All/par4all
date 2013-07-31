@@ -1,0 +1,99 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> undefined , EXACT
+
+   p = malloc(sizeof(*p));
+
+// Points To:
+// p -> *HEAP*_l_9 , MAY
+
+   free(p);
+
+// Points To:
+// p -> undefined , EXACT
+
+
+   return 0;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+   int *p;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   p = malloc(sizeof(*p));
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(p);
+
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(p) {}
+
+   int *p;
+
+//  T(p) {}
+
+   p = malloc(sizeof(*p));
+
+//  T() {}
+
+   free(p);
+
+//  T(main) {main==0}
+
+
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int *p;
+
+//  P(p) {}
+
+   p = malloc(sizeof(*p));
+
+//  P(p) {}
+
+   free(p);
+
+//  P(p) {}
+
+
+   return 0;
+}

@@ -1,0 +1,46 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   struct Mastruct toto;
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> undefined , EXACT
+
+   p = &toto.first;
+
+// Points To:
+// p -> toto.first , EXACT
+
+
+   return 0;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+   struct Mastruct toto;
+   int *p;
+//             <    is written>: p
+   p = &toto.first;
+
+   return 0;
+}
+
+Transformers with point-to
+
