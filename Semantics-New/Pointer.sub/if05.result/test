@@ -54,8 +54,7 @@ int main()
 // p -> undefined , EXACT
 // q -> undefined , EXACT
 
-   //l1=-1; l2 =-1;
-   
+
    if (rand()) {
 
 // Points To:
@@ -210,8 +209,7 @@ int main()
    n = 11;
 //             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
 //             <    is written>: _RANDOM_EFFECTS:GEN_SEED
-   //l1=-1; l2 =-1;
-   
+
    if (rand()) {
 //             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
 //             <    is written>: _RANDOM_EFFECTS:GEN_SEED
@@ -314,8 +312,7 @@ int main()
 //    9l1+10l2<=10k, 11k<=10l1+11l2, 10l1+11l2<=10k+11,
 //    9k+10<=9l1+10l2}
 
-   //l1=-1; l2 =-1;
-   
+
    if (rand()) {
 
 //  T(k,q) {i==0, j==1, l1==0, l2==1, m==10, n==11, 10<=k, k<=11}
@@ -449,8 +446,7 @@ int main()
 
 //  P(i,j,k,l1,l2,m,n,p,q) {i==0, j==1, l1==0, l2==1, m==10, n==11}
 
-   //l1=-1; l2 =-1;
-   
+
    if (rand()) {
 
 //  P(i,j,k,l1,l2,m,n,p,q) {i==0, j==1, l1==0, l2==1, m==10, n==11}

@@ -15,7 +15,6 @@ int main()
   j=1; l2=j;
   m=10;
   n =11;
-  //l1=-1; l2 =-1;
   
   if (rand()) {
     if (rand()) {

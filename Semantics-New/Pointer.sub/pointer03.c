@@ -9,7 +9,7 @@ int main()
   pp = &p;
   //On veut avoir p=q
   q = *pp;
-  q = p;
+  // q = p;
   
   //on modifie i
   *q = 1;

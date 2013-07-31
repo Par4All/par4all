@@ -52,13 +52,7 @@ int main()
 // pp -> p , EXACT
 // q -> i , EXACT
 
-   q = p;
-
-// Points To:
-// p -> i , EXACT
-// pp -> p , EXACT
-// q -> i , EXACT
-
+   // q = p;
    
    //on modifie i
    *q = 1;
@@ -103,11 +97,9 @@ int main()
 //             <    is written>: q
    //On veut avoir p=q
    q = *pp;
-//             <    is read   >: p
-//             <    is written>: q
-   q = p;
 //             <    is read   >: q
 //             <    is written>: i
+   // q = p;
    
    //on modifie i
    *q = 1;
@@ -155,12 +147,9 @@ int main()
    //On veut avoir p=q
    q = *pp;
 
-//  T(q) {&i==p, &i==q, &i==q#init, &p==pp, i==0}
-
-   q = p;
-
 //  T(i) {&i==p, &i==q, &p==pp, i==1, i#init==0}
 
+   // q = p;
    
    //on modifie i
    *q = 1;
@@ -215,10 +204,7 @@ int main()
 
 //  P(i,p,pp,q) {&i==p, &i==q, &p==pp, i==0}
 
-   q = p;
-
-//  P(i,p,pp,q) {&i==p, &i==q, &p==pp, i==0}
-
+   // q = p;
    
    //on modifie i
    *q = 1;
