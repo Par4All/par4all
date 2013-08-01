@@ -1,0 +1,126 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: unreachable
+
+int main()
+{
+
+// Points To: none
+
+   int i, j = 0;
+
+// Points To: none
+
+   int *p, *q;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+   p = (void *) 0;
+
+// Points To:
+// p -> *NULL* , EXACT
+// q -> undefined , EXACT
+
+   q = p+(1+j);
+
+// Points To: unreachable
+
+   i = q-p;
+
+// Points To: unreachable
+
+
+   return 0;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: j
+   int i, j = 0;
+   int *p, *q;
+//             <    is written>: p
+   p = (void *) 0;
+//             <    is read   >: j p
+//             <    is written>: q
+   q = p+(1+j);
+   i = q-p;
+
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i,j) {j==0}
+
+   int i, j = 0;
+
+//  T(p,q) {j==0}
+
+   int *p, *q;
+
+//  T(p) {NULL==p, j==0}
+
+   p = (void *) 0;
+
+//  T(q) {NULL==p, NULL==q-1, j==0}
+
+   q = p+(1+j);
+
+//  T(i) {NULL==p, NULL==q-1, i==1, j==0}
+
+   i = q-p;
+
+//  T(main) {NULL==p, NULL==q-1, i==1, j==0, main==0}
+
+
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i, j = 0;
+
+//  P(i,j) {j==0}
+
+   int *p, *q;
+
+//  P(i,j,p,q) {j==0}
+
+   p = (void *) 0;
+
+//  P(i,j,p,q) {NULL==p, j==0}
+
+   q = p+(1+j);
+
+//  P(i,j,p,q) {NULL==p, NULL==q-1, j==0}
+
+   i = q-p;
+
+//  P(i,j,p,q) {NULL==p, NULL==q-1, i==1, j==0}
+
+
+   return 0;
+}

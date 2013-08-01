@@ -1,4 +1,4 @@
-setenv WSPACE=inc01
+setenv WSPACE=inc01b
 delete $WSPACE
 create $WSPACE $WSPACE.c 
 

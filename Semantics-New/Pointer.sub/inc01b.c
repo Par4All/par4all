@@ -1,16 +1,16 @@
 
-int inc01()
+int inc01b()
 {
   int i = 0;
   int *p;
   
   p=&i;
-  *p = *p + 1;
+  (*p)++;
   
   return i;
 }
 
 int main()
 {
-  return inc01();
+  return inc01b();
 }

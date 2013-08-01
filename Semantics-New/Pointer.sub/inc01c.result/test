@@ -1,10 +1,10 @@
 
-Points-to inc01
+Points-to inc01c
 
 
-PROPER EFFECTS inc01
+PROPER EFFECTS inc01c
 
-int inc01()
+int inc01c()
 {
 //             <    is written>: i
    int i = 0;
@@ -14,15 +14,15 @@ int inc01()
    p = &i;
 //             <    is read   >: i p
 //             <    is written>: i
-   *p = *p+1;
+   *p += 1;
 //             <    is read   >: i
 
    return i;
 }
 
-CUMULATED EFFECTS inc01
+CUMULATED EFFECTS inc01c
 
-int inc01()
+int inc01c()
 {
 //             <    is written>: i
    int i = 0;
@@ -32,18 +32,18 @@ int inc01()
    p = &i;
 //             <    is read   >: i p
 //             <    is written>: i
-   *p = *p+1;
+   *p += 1;
 //             <    is read   >: i
 
    return i;
 }
 
-Transformers with point-to inc01
+Transformers with point-to inc01c
 
 
-//  T(inc01) {inc01==1}
+//  T(inc01c) {inc01c==1}
 
-int inc01()
+int inc01c()
 {
 
 //  T(i) {i==0}
@@ -61,20 +61,20 @@ int inc01()
 
 //  T(i) {&i==p, i==1, i#init==0}
 
-   *p = *p+1;
+   *p += 1;
 
-//  T(inc01) {&i==p, i==1, inc01==1}
+//  T(inc01c) {&i==p, i==1, inc01c==1}
 
 
    return i;
 }
 
-Preconditions with point-to inc01
+Preconditions with point-to inc01c
 
 
 //  P() {}
 
-int inc01()
+int inc01c()
 {
 
 //  P() {}
@@ -92,7 +92,7 @@ int inc01()
 
 //  P(i,p) {&i==p, i==0}
 
-   *p = *p+1;
+   *p += 1;
 
 //  P(i,p) {&i==p, i==1}
 
