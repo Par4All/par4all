@@ -35,6 +35,6 @@ apply UNSPLIT
 shell gfortran -fopenmp -c split_pragma2.database/Src/split_pragma2.f -o split_pragma2.database/Src/split_pragma2.o
 
 close
-#delete split_pragma2
+delete split_pragma2
 quit
 # EOF
