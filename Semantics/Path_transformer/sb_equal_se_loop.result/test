@@ -1,0 +1,20 @@
+int main()
+{
+   int a[20], b[20];
+
+   int i = 0, k1 = 0, k2 = 0, k3 = 0, n;
+   for(i = 0; i <= n-1; i += 1) {
+      k1++;
+sb:      k2++;
+      k3++;
+   }
+   return i;
+}
+The path transformer between Sbegin and Send is
+arguments:relation:VAR k1#init, k1#new, k3#init, k3#new, k2#init, k2#new, i#new, i#init, n#new 
+ { 
+- k2#new + k2#init  <= 0 ,
+- k2#new + k2#init + k1#new - k1#init  == 0 ,
+- k2#new + k2#init + i#new - i#init  == 0 ,
+- k2#new + k2#init + k3#new - k3#init  == 0 ,
+ } 

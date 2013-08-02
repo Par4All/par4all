@@ -1,12 +1,11 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-delete se_loop
+
+delete sb_se_loop
 
 setenv PIPS_CPP_FLAGS " -D TIME "
 
-create se_loop se_loop.c
+create sb_se_loop sb_se_loop.c
 activate C_PARSER
-activate REGION_CHAINS
-activate MUST_REGIONS
 
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL
@@ -15,15 +14,12 @@ setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE
 setproperty SEMANTICS_FILTER_INITIAL_VALUES TRUE
 setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE 
 
-apply LOOP_NORMALIZE[%ALLFUNC]
-setproperty CONSTANT_PATH_EFFECTS FALSE
-
-
-setproperty PATH_TRANSFORMER_BEGIN "sb"
-setproperty PATH_TRANSFORMER_END "se"
 apply PATH_TRANSFORMER[main]
-shell cat se_loop.database/main/main.pt
+shell cat sb_se_loop.database/main/main.pt
+
 close
-delete se_loop
+delete sb_se_loop
 quit
+
+
 

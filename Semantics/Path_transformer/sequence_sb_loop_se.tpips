@@ -17,7 +17,7 @@ setproperty PATH_TRANSFORMER_BEGIN "sbegin"
 setproperty PATH_TRANSFORMER_END "send"
 
 apply PATH_TRANSFORMER[main]
-shell cp sequence_sb_loop_se.database/main/main.pt sequence_sb_loop_se.result/test
+shell cat sequence_sb_loop_se.database/main/main.pt 
 
 close
 delete sequence_sb_loop_se

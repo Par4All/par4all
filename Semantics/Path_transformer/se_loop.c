@@ -7,7 +7,7 @@
   - n#init + n#new  == 1 ,
   i#new >= 0
   i#new <= n#new - 1
-  k1#new - k1#init  ==  i#new -1 ,
+  k1#new - k1#init  ==  i#new + 1 ,
   k2#new - k2#init  ==  i#new ,
  } 
 */

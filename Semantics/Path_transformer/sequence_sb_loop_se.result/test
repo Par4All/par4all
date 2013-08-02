@@ -13,8 +13,8 @@ send:   b[i] = a[i]+a[i+1];
 The path transformer between Sbegin and Send is
 arguments:relation:VAR n#new, i#new, k#new, k#init, n#init, i#init 
  { 
-  n#init - k#new + k#init  <= 0 ,
-- k#new + k#init  <= 0 ,
+- i#new  <= -1 ,
+  i#new + k#init - k#new  == 0 ,
+- n#init + i#new  == 0 ,
 - n#init + n#new  == 1 ,
-  k#new - k#init - i#new  == 0 ,
  } 

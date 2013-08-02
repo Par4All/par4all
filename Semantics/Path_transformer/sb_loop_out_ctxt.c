@@ -3,8 +3,8 @@
 
 
 /*
-  i#init >=0 is lost because of the use of the transitive closure
-  i#new == n#init is approximated by i#new  >= n#init because of the use of transitive closure
+  i#init >=0 is lost in the transitive closure approximation.
+  i#new == n#init is approximated by i#new  >= n#init because the prologue is computed out-of-context and because the preconditions are not used
 */
 
 int main(int x)

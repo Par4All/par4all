@@ -1,0 +1,27 @@
+When the transformer for the empty path is identity:
+int main()
+{
+   int i = 0, k1 = 0, k2 = 42, k3 = 0;
+   k1++;
+sb:   k2++;
+   k3++;
+   return i;
+}
+The path transformer between Sbegin and Send is
+arguments:relation: 
+ { 
+ } 
+When The transformer for the empty path is false:
+int main()
+{
+   int i = 0, k1 = 0, k2 = 42, k3 = 0;
+   k1++;
+sb:   k2++;
+   k3++;
+   return i;
+}
+The path transformer between Sbegin and Send is
+arguments:relation: 
+ { 
+ 1  == -1 ,
+ } 

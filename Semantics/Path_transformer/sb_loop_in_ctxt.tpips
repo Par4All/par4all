@@ -22,7 +22,7 @@ setproperty CONSTANT_PATH_EFFECTS FALSE
 setproperty PATH_TRANSFORMER_BEGIN "sbegin"
 setproperty PATH_TRANSFORMER_END "send"
 apply PATH_TRANSFORMER[main]
-shell cp sb_loop_in_ctxt.database/main/main.pt sb_loop_in_ctxt.result/test
+shell cat sb_loop_in_ctxt.database/main/main.pt
 
 close
 delete sb_loop_in_ctxt
