@@ -1,0 +1,14 @@
+int main()
+{
+   int i;
+sb:   i = 42;
+   i = i+5;
+   i = i*3;
+se:   i = i+4;
+   return i;
+}
+The path transformer between Sbegin and Send is
+arguments:relation:VAR i#new 
+ { 
+  i#new  == 141 ,
+ } 
