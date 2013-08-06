@@ -19,8 +19,7 @@ int main()
 //             <    is written>: _RANDOM_EFFECTS:GEN_SEED
       rand();
    }
-   
-   // we lost the constraint k<=l
+
    return 0;
 }
 
@@ -61,8 +60,7 @@ int main()
 
 //  T(main) {main==0}
 
-   
-   // we lost the constraint k<=l
+
    return 0;
 }
 
@@ -103,7 +101,6 @@ int main()
 
 //  P(i,j,k,l) {}
 
-   
-   // we lost the constraint k<=l
+
    return 0;
 }

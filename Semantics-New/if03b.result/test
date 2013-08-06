@@ -42,7 +42,7 @@ int main()
    return 0;
 }
 
-Transformers with point-to
+Transformers
 
 
 //  T(main) {main==0}
@@ -112,7 +112,7 @@ int main()
    return 0;
 }
 
-Preconditions with point-to
+Preconditions
 
 
 //  P() {}
