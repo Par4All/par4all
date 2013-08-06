@@ -1,0 +1,182 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   int k, m, n, l1, l2;
+//             <    is written>: l1
+   l1 = 0;
+//             <    is written>: l2
+   l2 = 1;
+//             <    is written>: m
+   m = 10;
+//             <    is written>: n
+   n = 11;
+//             <    is written>: k
+   k = -1;
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+
+   if (rand())
+//             <    is read   >: m
+//             <    is written>: k
+      k = m;
+   else
+//             <    is read   >: n
+//             <    is written>: k
+      k = n;
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+
+   if (rand())
+//             <    is read   >: k
+//             <    is written>: l1
+      l1 = k;
+   else
+//             <    is read   >: k
+//             <    is written>: l2
+      l2 = k;
+   
+   //We lost the info on k why? useless? 10<=k<=11
+   
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(k,l1,l2,m,n) {}
+
+   int k, m, n, l1, l2;
+
+//  T(l1) {l1==0}
+
+   l1 = 0;
+
+//  T(l2) {l1==0, l2==1}
+
+   l2 = 1;
+
+//  T(m) {l1==0, l2==1, m==10}
+
+   m = 10;
+
+//  T(n) {l1==0, l2==1, m==10, n==11}
+
+   n = 11;
+
+//  T(k) {k==-1, l1==0, l2==1, m==10, n==11}
+
+   k = -1;
+
+//  T(k) {k#init==-1, l1==0, l2==1, m==10, n==11, 10<=k, k<=11}
+
+
+   if (rand())
+
+//  T(k) {k==10, k#init==-1, l1==0, l2==1, m==10, n==11}
+
+      k = m;
+   else
+
+//  T(k) {k==11, k#init==-1, l1==0, l2==1, m==10, n==11}
+
+      k = n;
+
+//  T(l1,l2) {l1#init==0, l2#init==1, m==10, n==11, 9l1+10l2<=10k,
+//    11k<=10l1+11l2, 10l1+11l2<=10k+11, 9k+10<=9l1+10l2}
+
+
+   if (rand())
+
+//  T(l1) {k==l1, l1#init==0, l2==1, m==10, n==11, 10<=k, k<=11}
+
+      l1 = k;
+   else
+
+//  T(l2) {k==l2, l1==0, l2#init==1, m==10, n==11, 10<=k, k<=11}
+
+      l2 = k;
+
+//  T(main) {m==10, main==0, n==11, 10<=k, k<=11, 9l1+10l2<=10k,
+//    11k<=10l1+11l2, 10l1+11l2<=10k+11, 9k+10<=9l1+10l2}
+
+   
+   //We lost the info on k why? useless? 10<=k<=11
+   
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int k, m, n, l1, l2;
+
+//  P(k,l1,l2,m,n) {}
+
+   l1 = 0;
+
+//  P(k,l1,l2,m,n) {l1==0}
+
+   l2 = 1;
+
+//  P(k,l1,l2,m,n) {l1==0, l2==1}
+
+   m = 10;
+
+//  P(k,l1,l2,m,n) {l1==0, l2==1, m==10}
+
+   n = 11;
+
+//  P(k,l1,l2,m,n) {l1==0, l2==1, m==10, n==11}
+
+   k = -1;
+
+//  P(k,l1,l2,m,n) {k==-1, l1==0, l2==1, m==10, n==11}
+
+
+   if (rand())
+
+//  P(k,l1,l2,m,n) {k==-1, l1==0, l2==1, m==10, n==11}
+
+      k = m;
+   else
+
+//  P(k,l1,l2,m,n) {k==-1, l1==0, l2==1, m==10, n==11}
+
+      k = n;
+
+//  P(k,l1,l2,m,n) {l1==0, l2==1, m==10, n==11, 10<=k, k<=11}
+
+
+   if (rand())
+
+//  P(k,l1,l2,m,n) {l1==0, l2==1, m==10, n==11, 10<=k, k<=11}
+
+      l1 = k;
+   else
+
+//  P(k,l1,l2,m,n) {l1==0, l2==1, m==10, n==11, 10<=k, k<=11}
+
+      l2 = k;
+
+//  P(k,l1,l2,m,n) {m==10, n==11, 9l1+10l2<=10k, 11k<=10l1+11l2,
+//    10l1+11l2<=10k+11, 9k+10<=9l1+10l2}
+
+   
+   //We lost the info on k why? useless? 10<=k<=11
+   
+   return 0;
+}

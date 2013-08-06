@@ -52,6 +52,19 @@ void foo(int **tab)
 //             <    is written>: p
    p = p;
 }
+void main()
+{
+   int i, *p, **pp;
+//             <    is written>: i
+   i = 0;
+//             <    is written>: p
+   p = &i;
+//             <    is written>: pp
+   pp = &p;
+//             <    is read   >: p pp
+
+   foo(pp);
+}
 
 Transformers with point-to
 
@@ -74,8 +87,62 @@ void foo(int **tab)
    p = p;
 }
 
+//  T() {}
+
+void main()
+{
+
+//  T(i,p,pp) {}
+
+   int i, *p, **pp;
+
+//  T(i) {i==0}
+
+   i = 0;
+
+//  T(p) {&i==p, i==0}
+
+   p = &i;
+
+//  T(pp) {&i==p, &p==pp, i==0}
+
+   pp = &p;
+
+//  T() {&i==p, &p==pp, i==0}
+
+
+   foo(pp);
+}
+
 Preconditions with point-to
 
+
+//  P() {}
+
+void main()
+{
+
+//  P() {}
+
+   int i, *p, **pp;
+
+//  P(i,p,pp) {}
+
+   i = 0;
+
+//  P(i,p,pp) {i==0}
+
+   p = &i;
+
+//  P(i,p,pp) {&i==p, i==0}
+
+   pp = &p;
+
+//  P(i,p,pp) {&i==p, &p==pp, i==0}
+
+
+   foo(pp);
+}
 
 //  P() {}
 

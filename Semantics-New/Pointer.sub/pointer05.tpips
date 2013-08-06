@@ -26,6 +26,7 @@ echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[foo]
+display PRINTED_FILE[main]
 
 echo
 echo Transformers with point-to
@@ -34,11 +35,13 @@ echo
 activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[foo]
+display PRINTED_FILE[main]
 
 echo
 echo Preconditions with point-to
 echo
 activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
 display PRINTED_FILE[foo]
 
 close

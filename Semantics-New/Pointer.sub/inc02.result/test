@@ -50,12 +50,12 @@ void inc02(int *p)
 Transformers with point-to inc02
 
 
-//  T(_p_1) {}
+//  T(_p_1) {_p_1==_p_1#init+1}
 
 void inc02(int *p)
 {
 
-//  T(_p_1) {}
+//  T(_p_1) {_p_1==_p_1#init+1}
 
    *p = *p+1;
 

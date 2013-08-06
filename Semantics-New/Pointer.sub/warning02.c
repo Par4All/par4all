@@ -1,4 +1,4 @@
-// warning, we can to access a var initialize to NULL
+// warning, we can access a var initialize to NULL
 
 #include<stdlib.h>
 
