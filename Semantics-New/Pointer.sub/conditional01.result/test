@@ -72,11 +72,11 @@ int main()
 
    p = &i;
 
-//  T(i,j,p) {&i==p#init, i#init==0, j#init==-1, 0<=j, j<=1}
+//  T(i,j,p) {&i==p, i==0, j#init==-1, j==0}
 
    j = (*p = 0)?0:1;
 
-//  T(main) {j==main, 0<=j, j<=1}
+//  T(main) {&i==p, i==0, main==0, j==0}
 
 
    return j;
@@ -106,7 +106,7 @@ int main()
 
    j = (*p = 0)?0:1;
 
-//  P(i,j,p) {0<=j, j<=1}
+//  P(i,j,p) {&i==p, i==0, j==0}
 
 
    return j;
