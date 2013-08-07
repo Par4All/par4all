@@ -1,11 +1,13 @@
+setenv WS=se_test_false
+delete $WS
 setproperty ABORT_ON_USER_ERROR TRUE
-
-delete sb_loop_se_loop
 
 setenv PIPS_CPP_FLAGS " -D TIME "
 
-create sb_loop_se_loop sb_loop_se_loop.c
+create $WS $WS.c
 activate C_PARSER
+activate REGION_CHAINS
+activate MUST_REGIONS
 
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL
@@ -14,18 +16,14 @@ setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE
 setproperty SEMANTICS_FILTER_INITIAL_VALUES TRUE
 setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE 
 
-setproperty PATH_TRANSFORMER_BEGIN "sb"
-setproperty PATH_TRANSFORMER_END "se"
-apply PATH_TRANSFORMER[main]
-shell cat  sb_loop_se_loop.database/main/main.pt
+apply LOOP_NORMALIZE[%ALLFUNC]
+setproperty CONSTANT_PATH_EFFECTS FALSE
 
-setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
 apply PATH_TRANSFORMER[main]
-shell cat  sb_loop_se_loop.database/main/main.pt
+shell cat $WS.database/main/main.pt
 
 close
-delete sb_loop_se_loop
+delete $WS
 quit
-
-
 
