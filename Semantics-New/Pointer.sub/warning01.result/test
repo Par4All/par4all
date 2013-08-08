@@ -136,3 +136,11 @@ int main()
 
    return 0;
 }
+
+Warnings
+
+PROPER_EFFECTS_WITH_POINTS_TO[main] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (points_to_unary_operation_to_transformer) The pointer p can points to undefined/indeterminate (*NOWHERE*_b0)
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (points_to_unary_operation_to_transformer) The pointer p can points to undefined/indeterminate (*NOWHERE*_b0)
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer

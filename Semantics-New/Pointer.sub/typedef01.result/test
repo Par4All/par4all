@@ -23,20 +23,20 @@ int main()
 
    q = a;
 
-//  T(p) {p==q+1}
+//  T(p) {q+sizeof(BYTE *)==p}
 
    p = q+1;
 
-//  T() {p==q+1}
+//  T() {q+sizeof(BYTE *)==p}
 
 
    *q = 0;
 
-//  T() {p==q+1}
+//  T() {q+sizeof(BYTE *)==p}
 
    *p = 0;
 
-//  T(main) {main==0, p==q+1}
+//  T(main) {main==0, q+sizeof(BYTE *)==p}
 
 
    return 0;
@@ -67,16 +67,16 @@ int main()
 
    p = q+1;
 
-//  P(p,q) {p==q+1}
+//  P(p,q) {q+sizeof(BYTE *)==p}
 
 
    *q = 0;
 
-//  P(p,q) {p==q+1}
+//  P(p,q) {q+sizeof(BYTE *)==p}
 
    *p = 0;
 
-//  P(p,q) {p==q+1}
+//  P(p,q) {q+sizeof(BYTE *)==p}
 
 
    return 0;

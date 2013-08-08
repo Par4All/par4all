@@ -7,7 +7,7 @@ Points-to
 
 // Points To OUT: none
 
-int mainInt()
+int main()
 {
 
 // Points To: none
@@ -36,25 +36,12 @@ int mainInt()
 // q -> a[0] , EXACT
 
 
-   *q = 0;
-
-// Points To:
-// p -> a[1] , EXACT
-// q -> a[0] , EXACT
-
-   *p = 0;
-
-// Points To:
-// p -> a[1] , EXACT
-// q -> a[0] , EXACT
-
-
    return 0;
 }
 
 PROPER  EFFECTS
 
-int mainInt()
+int main()
 {
    int a[10];
    int *p, *q;
@@ -64,13 +51,6 @@ int mainInt()
 //             <    is read   >: q
 //             <    is written>: p
    p = q+1;
-//             <    is read   >: q
-//             <    is written>: a[0]
-
-   *q = 0;
-//             <    is read   >: p
-//             <    is written>: a[1]
-   *p = 0;
 
    return 0;
 }
@@ -78,9 +58,9 @@ int mainInt()
 Transformers with point-to
 
 
-//  T(mainInt) {mainInt==0}
+//  T(main) {main==0}
 
-int mainInt()
+int main()
 {
 
 //  T() {}
@@ -100,17 +80,7 @@ int mainInt()
 
    p = q+1;
 
-//  T(a[0]) {&a[0]+sizeof(int *)==p, &a[0]==q, a[0]==0}
-
-
-   *q = 0;
-
-//  T(a[1]) {&a[0]+sizeof(int *)==p, &a[0]==q, a[0]==0, a[1]==0}
-
-   *p = 0;
-
-//  T(mainInt) {&a[0]+sizeof(int *)==p, &a[0]==q, a[0]==0, a[1]==0,
-//    mainInt==0}
+//  T(main) {&a[0]+sizeof(int *)==p, &a[0]==q, main==0}
 
 
    return 0;
@@ -121,7 +91,7 @@ Preconditions with point-to
 
 //  P() {}
 
-int mainInt()
+int main()
 {
 
 //  P() {}
@@ -142,16 +112,6 @@ int mainInt()
    p = q+1;
 
 //  P(p,q) {&a[0]+sizeof(int *)==p, &a[0]==q}
-
-
-   *q = 0;
-
-//  P(a[0],p,q) {&a[0]+sizeof(int *)==p, &a[0]==q, a[0]==0}
-
-   *p = 0;
-
-//  P(a[0],a[1],p,q) {&a[0]+sizeof(int *)==p, &a[0]==q, a[0]==0,
-//    a[1]==0}
 
 
    return 0;

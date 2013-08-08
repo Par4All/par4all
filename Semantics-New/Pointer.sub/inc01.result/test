@@ -2,6 +2,40 @@
 Points-to inc01
 
 
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int inc01()
+{
+
+// Points To: none
+
+   int i = 0;
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> undefined , EXACT
+
+
+   p = &i;
+
+// Points To:
+// p -> i , EXACT
+
+   *p = *p+1;
+
+// Points To:
+// p -> i , EXACT
+
+
+   return i;
+}
+
 PROPER EFFECTS inc01
 
 int inc01()

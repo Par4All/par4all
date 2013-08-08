@@ -1,0 +1,217 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int a[10], *p;
+
+// Points To:
+// p -> undefined , EXACT
+
+   double b[10], *q;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+   p = &a[5];
+
+// Points To:
+// p -> a[5] , EXACT
+// q -> undefined , EXACT
+
+   q = &b[4];
+
+// Points To:
+// p -> a[5] , EXACT
+// q -> b[4] , EXACT
+
+
+   if (rand()) {
+
+// Points To:
+// p -> a[5] , EXACT
+// q -> b[4] , EXACT
+
+      p++;
+
+// Points To:
+// p -> a[*] , EXACT
+// q -> b[4] , EXACT
+
+      q--;
+   }
+   else {
+
+// Points To:
+// p -> a[5] , EXACT
+// q -> b[4] , EXACT
+
+      p--;
+
+// Points To:
+// p -> a[*] , EXACT
+// q -> b[4] , EXACT
+
+      q++;
+   }
+
+// Points To:
+// p -> a[*] , EXACT
+// q -> b[*] , EXACT
+
+
+   return 0;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+   int a[10], *p;
+   double b[10], *q;
+//             <    is written>: p
+   p = &a[5];
+//             <    is written>: q
+   q = &b[4];
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+
+   if (rand()) {
+//             <    is read   >: p
+//             <    is written>: p
+      p++;
+//             <    is read   >: q
+//             <    is written>: q
+      q--;
+   }
+   else {
+//             <    is read   >: p
+//             <    is written>: p
+      p--;
+//             <    is read   >: q
+//             <    is written>: q
+      q++;
+   }
+
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(p) {}
+
+   int a[10], *p;
+
+//  T(q) {}
+
+   double b[10], *q;
+
+//  T(p) {&a[5]==p}
+
+   p = &a[5];
+
+//  T(q) {&a[5]==p, &b[4]==q}
+
+   q = &b[4];
+
+//  T(p,q) {&a[5]==p#init, &b[4]==q#init}
+
+
+   if (rand()) {
+
+//  T(p) {&a[5]+sizeof(int *)==p, &a[5]==p#init, &b[4]==q}
+
+      p++;
+
+//  T(q) {&a[5]+sizeof(int *)==p, q+sizeof(double *)==&b[4],
+//    &b[4]==q#init}
+
+      q--;
+   }
+   else {
+
+//  T(p) {p+sizeof(int *)==&a[5], &a[5]==p#init, &b[4]==q}
+
+      p--;
+
+//  T(q) {p+sizeof(int *)==&a[5], &b[4]+sizeof(int *)==q,
+//    &b[4]==q#init}
+
+      q++;
+   }
+
+//  T(main) {main==0}
+
+
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int a[10], *p;
+
+//  P(p) {}
+
+   double b[10], *q;
+
+//  P(p,q) {}
+
+   p = &a[5];
+
+//  P(p,q) {&a[5]==p}
+
+   q = &b[4];
+
+//  P(p,q) {&a[5]==p, &b[4]==q}
+
+
+   if (rand()) {
+
+//  P(p,q) {&a[5]==p, &b[4]==q}
+
+      p++;
+
+//  P(p,q) {&a[5]+sizeof(int *)==p, &b[4]==q}
+
+      q--;
+   }
+   else {
+
+//  P(p,q) {&a[5]==p, &b[4]==q}
+
+      p--;
+
+//  P(p,q) {p+sizeof(double *)==&a[5], &b[4]==q}
+
+      q++;
+   }
+
+//  P(p,q) {&a[5]+&b[4]+sizeof(int *)==p+q+sizeof(double *)}
+
+
+   return 0;
+}

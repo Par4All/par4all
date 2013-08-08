@@ -1,0 +1,489 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   long int a[10], *p, i, *q;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+   for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+      a[i] = i*i;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+
+   p = &a[0];
+
+// Points To:
+// p -> a[0] , EXACT
+// q -> undefined , EXACT
+
+   printf("%i\n", p);
+
+// Points To:
+// p -> a[0] , EXACT
+// q -> undefined , EXACT
+
+   printf("%i\n", *p);
+
+// Points To:
+// p -> a[0] , EXACT
+// q -> undefined , EXACT
+
+   p++;
+
+// Points To:
+// p -> a[1] , EXACT
+// q -> undefined , EXACT
+
+   printf("%i\n", p);
+
+// Points To:
+// p -> a[1] , EXACT
+// q -> undefined , EXACT
+
+   printf("%i\n", *p);
+
+// Points To:
+// p -> a[1] , EXACT
+// q -> undefined , EXACT
+
+   p += 1;
+
+// Points To:
+// p -> a[2] , EXACT
+// q -> undefined , EXACT
+
+   printf("%i\n", p);
+
+// Points To:
+// p -> a[2] , EXACT
+// q -> undefined , EXACT
+
+   printf("%i\n", *p);
+
+// Points To:
+// p -> a[2] , EXACT
+// q -> undefined , EXACT
+
+   q = p+1;
+
+// Points To:
+// p -> a[2] , EXACT
+// q -> a[3] , EXACT
+
+   printf("p=%i\n", p);
+
+// Points To:
+// p -> a[2] , EXACT
+// q -> a[3] , EXACT
+
+   printf("*p=%i\n", *p);
+
+// Points To:
+// p -> a[2] , EXACT
+// q -> a[3] , EXACT
+
+   printf("q=%i\n", q);
+
+// Points To:
+// p -> a[2] , EXACT
+// q -> a[3] , EXACT
+
+   printf("*q=%i\n", *q);
+
+// Points To:
+// p -> a[2] , EXACT
+// q -> a[3] , EXACT
+
+   i = q-p;
+
+// Points To:
+// p -> a[2] , EXACT
+// q -> a[3] , EXACT
+
+   printf("q-p=%i\n", i);
+
+// Points To:
+// p -> a[2] , EXACT
+// q -> a[3] , EXACT
+
+   //   
+   //   
+   //   p = malloc(10*sizeof(*p));
+   //   q=p;
+   //   printf("%i\n", p);
+   //   printf("%i\n", *p);
+   //   p++;
+   //   printf("%i\n", p);
+   //   printf("%i\n", *p);
+   //   p+=1;
+   //   printf("%i\n", p);
+   //   printf("%i\n", *p);
+   //   p=p+1;
+   //   printf("%i\n", p);
+   //   printf("%i\n", *p);
+   //   
+   //   free(q);
+   
+   return 0;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+   long int a[10], *p, i, *q;
+//             <    is written>: i
+   for(i = 0; i <= 9; i += 1)
+//             <    is read   >: i
+//             <    is written>: a[i]
+      a[i] = i*i;
+//             <    is written>: p
+
+   p = &a[0];
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: p stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%i\n", p);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: a[0] p stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%i\n", *p);
+//             <    is read   >: p
+//             <    is written>: p
+   p++;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: p stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%i\n", p);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: a[1] p stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%i\n", *p);
+//             <    is read   >: p
+//             <    is written>: p
+   p += 1;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: p stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%i\n", p);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: a[2] p stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%i\n", *p);
+//             <    is read   >: p
+//             <    is written>: q
+   q = p+1;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: p stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("p=%i\n", p);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: a[2] p stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("*p=%i\n", *p);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: q stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("q=%i\n", q);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: a[3] q stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("*q=%i\n", *q);
+//             <    is read   >: p q
+//             <    is written>: i
+   i = q-p;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("q-p=%i\n", i);
+   //   
+   //   
+   //   p = malloc(10*sizeof(*p));
+   //   q=p;
+   //   printf("%i\n", p);
+   //   printf("%i\n", *p);
+   //   p++;
+   //   printf("%i\n", p);
+   //   printf("%i\n", *p);
+   //   p+=1;
+   //   printf("%i\n", p);
+   //   printf("%i\n", *p);
+   //   p=p+1;
+   //   printf("%i\n", p);
+   //   printf("%i\n", *p);
+   //   
+   //   free(q);
+   
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i,p,q) {}
+
+   long int a[10], *p, i, *q;
+
+//  T(a[i],i) {0<=i, i<=9}
+
+   for(i = 0; i <= 9; i += 1)
+
+//  T(a[i]) {0<=a[i], a[i]<=9i, 0<=i, i<=9}
+
+      a[i] = i*i;
+
+//  T(p) {&a[0]==p, i==10, 0<=a[i], a[i]<=81}
+
+
+   p = &a[0];
+
+//  T(stdout) {&a[0]==p, i==10, 0<=a[i], a[i]<=81}
+
+   printf("%i\n", p);
+
+//  T(stdout) {&a[0]==p, i==10, 0<=a[i], a[i]<=81}
+
+   printf("%i\n", *p);
+
+//  T(p) {&a[0]==a[i]#init, &a[0]+sizeof(long int *)==p, i==10,
+//    0<=a[i], a[i]<=81}
+
+   p++;
+
+//  T(stdout) {&a[0]+sizeof(long int *)==p, i==10, 0<=a[i], a[i]<=81}
+
+   printf("%i\n", p);
+
+//  T(stdout) {&a[0]+sizeof(long int *)==p, i==10, 0<=a[i], a[i]<=81}
+
+   printf("%i\n", *p);
+
+//  T(p) {&a[0]+sizeof(long int *)==a[i]#init,
+//    a[i]#init+sizeof(long int *)==p, i==10, 0<=a[i], a[i]<=81}
+
+   p += 1;
+
+//  T(stdout) {&a[0]+2sizeof(long int *)==p, i==10, 0<=a[i], a[i]<=81}
+
+   printf("%i\n", p);
+
+//  T(stdout) {&a[0]+2sizeof(long int *)==p, i==10, 0<=a[i], a[i]<=81}
+
+   printf("%i\n", *p);
+
+//  T(q) {&a[0]+2sizeof(long int *)==p, i==10, p+sizeof(long int *)
+//    ==q, 0<=a[i], a[i]<=81}
+
+   q = p+1;
+
+//  T(stdout) {&a[0]+2sizeof(long int *)==p, i==10,
+//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+
+   printf("p=%i\n", p);
+
+//  T(stdout) {&a[0]+2sizeof(long int *)==p, i==10,
+//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+
+   printf("*p=%i\n", *p);
+
+//  T(stdout) {&a[0]+2sizeof(long int *)==p, i==10,
+//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+
+   printf("q=%i\n", q);
+
+//  T(stdout) {&a[0]+2sizeof(long int *)==p, i==10,
+//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+
+   printf("*q=%i\n", *q);
+
+//  T(i) {&a[0]+2sizeof(long int *)==p, i+p==q, p+sizeof(long int *)
+//    ==q, p#init==10, 0<=a[i], a[i]<=81}
+
+   i = q-p;
+
+//  T(stdout) {&a[0]+2sizeof(long int *)==p, i+p==q,
+//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+
+   printf("q-p=%i\n", i);
+
+//  T(main) {&a[0]+2sizeof(long int *)==p, i+p==q, main==0,
+//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+
+   //   
+   //   
+   //   p = malloc(10*sizeof(*p));
+   //   q=p;
+   //   printf("%i\n", p);
+   //   printf("%i\n", *p);
+   //   p++;
+   //   printf("%i\n", p);
+   //   printf("%i\n", *p);
+   //   p+=1;
+   //   printf("%i\n", p);
+   //   printf("%i\n", *p);
+   //   p=p+1;
+   //   printf("%i\n", p);
+   //   printf("%i\n", *p);
+   //   
+   //   free(q);
+   
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   long int a[10], *p, i, *q;
+
+//  P(i,p,q) {}
+
+   for(i = 0; i <= 9; i += 1)
+
+//  P(a[i],i,p,q) {0<=i, i<=9}
+
+      a[i] = i*i;
+
+//  P(a[i],i,p,q) {i==10, 0<=a[i], a[i]<=81}
+
+
+   p = &a[0];
+
+//  P(a[i],i,p,q) {&a[0]==p, i==10, 0<=a[i], a[i]<=81}
+
+   printf("%i\n", p);
+
+//  P(a[i],i,p,q,stdout) {&a[0]==p, i==10, 0<=a[i], a[i]<=81}
+
+   printf("%i\n", *p);
+
+//  P(a[i],i,p,q,stdout) {&a[0]==p, i==10, 0<=a[i], a[i]<=81}
+
+   p++;
+
+//  P(a[i],i,p,q,stdout) {&a[0]+sizeof(long int *)==p, i==10, 0<=a[i],
+//    a[i]<=81}
+
+   printf("%i\n", p);
+
+//  P(a[i],i,p,q,stdout) {&a[0]+sizeof(long int *)==p, i==10, 0<=a[i],
+//    a[i]<=81}
+
+   printf("%i\n", *p);
+
+//  P(a[i],i,p,q,stdout) {&a[0]+sizeof(long int *)==p, i==10, 0<=a[i],
+//    a[i]<=81}
+
+   p += 1;
+
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i==10,
+//    0<=a[i], a[i]<=81}
+
+   printf("%i\n", p);
+
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i==10,
+//    0<=a[i], a[i]<=81}
+
+   printf("%i\n", *p);
+
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i==10,
+//    0<=a[i], a[i]<=81}
+
+   q = p+1;
+
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i==10,
+//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+
+   printf("p=%i\n", p);
+
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i==10,
+//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+
+   printf("*p=%i\n", *p);
+
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i==10,
+//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+
+   printf("q=%i\n", q);
+
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i==10,
+//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+
+   printf("*q=%i\n", *q);
+
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i==10,
+//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+
+   i = q-p;
+
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i+p==q,
+//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+
+   printf("q-p=%i\n", i);
+
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i+p==q,
+//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+
+   //   
+   //   
+   //   p = malloc(10*sizeof(*p));
+   //   q=p;
+   //   printf("%i\n", p);
+   //   printf("%i\n", *p);
+   //   p++;
+   //   printf("%i\n", p);
+   //   printf("%i\n", *p);
+   //   p+=1;
+   //   printf("%i\n", p);
+   //   printf("%i\n", *p);
+   //   p=p+1;
+   //   printf("%i\n", p);
+   //   printf("%i\n", *p);
+   //   
+   //   free(q);
+   
+   return 0;
+}

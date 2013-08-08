@@ -1,4 +1,4 @@
-setenv WSPACE=malloc01
+setenv WSPACE=arithmetic05
 delete $WSPACE
 create $WSPACE $WSPACE.c 
 
