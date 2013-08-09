@@ -666,6 +666,12 @@ bool value_mappings_compatible_vector_p(Pvecteur v)
 	  return false;
       }
 
+      /* Or a phi variable, when transformers are computed by the
+	 region analysis */
+      else if(variable_phi_p(e)) {
+	;
+      }
+
       /* Or the vector cannot be used in the semantics analysis */
       else {
 	return false;
