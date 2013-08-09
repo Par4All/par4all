@@ -1,0 +1,11 @@
+delete conditional01
+setproperty ABORT_ON_USER_ERROR TRUE
+create conditional01 conditional01.c
+
+setproperty REGIONS_WITH_ARRAY_BOUNDS TRUE
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[conditional01]
+
+close
+delete conditional01
+quit
