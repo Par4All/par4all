@@ -1823,18 +1823,21 @@ static transformer integer_multiply_to_transformer(entity v,
 static transformer integer_left_shift_to_transformer(entity v,
 						expression e1,
 						expression e2,
-						transformer ipre,
+						transformer prec,
 						bool is_internal)
 {
   transformer tf = transformer_undefined;
   // FI: ultimate_type should be called? Or int assumed?
   entity v1 = make_local_temporary_value_entity(entity_type(v));
+  transformer ipre = transformer_undefined_p(prec)?
+    transformer_identity() : transformer_range(prec);
   transformer t1 = safe_integer_expression_to_transformer(v1, e1, ipre, is_internal);
   entity v2 = make_local_temporary_value_entity(entity_type(v));
   transformer npre = transformer_safe_apply(t1, ipre);
   transformer t2 = safe_integer_expression_to_transformer(v2, e2, npre, is_internal);
-  transformer pre = transformer_undefined_p(ipre)? transformer_identity() :
-    copy_transformer(ipre);
+  //transformer pre = transformer_undefined_p(ipre)? transformer_identity() :
+  //  copy_transformer(ipre);
+  transformer pre = ipre;
 
   pips_debug(8, "Begin\n");
 
@@ -1961,12 +1964,14 @@ static transformer integer_left_shift_to_transformer(entity v,
 static transformer integer_power_to_transformer(entity e,
 						expression arg1,
 						expression arg2,
-						transformer pre,
+						transformer prec,
 						bool is_internal)
 {
   transformer tf = transformer_undefined;
   normalized n1 = NORMALIZE_EXPRESSION(arg1);
   normalized n2 = NORMALIZE_EXPRESSION(arg2);
+  transformer pre = transformer_undefined_p(prec)?
+    transformer_identity() : transformer_range(prec);
 
   pips_debug(8, "begin\n");
 
@@ -2155,6 +2160,8 @@ static transformer integer_power_to_transformer(entity e,
 			    make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
     }
   }
+
+  free_transformer(pre);
 
   ifdebug(8) {
     pips_debug(8, "result:\n");
