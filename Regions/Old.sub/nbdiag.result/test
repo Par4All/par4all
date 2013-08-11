@@ -142,7 +142,7 @@ C     END BLOCK
 C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
 C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
 C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=3NP+2, 1<=PHI2, PHI2<=3NP}>
-C  <RL(PHI1,PHI2)-R-MAY-{PHI2==1, 1<=NP}>
+C  <RL(PHI1,PHI2)-R-MAY-{PHI2==1, 1<=PHI1, 1<=NP}>
 C  <Z1(PHI1)-R-EXACT-{1<=PHI1, PHI1<=3NP}>
 C  <Z1(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP}>
 C  <Z2(PHI1)-R-MAY-{1<=PHI1, PHI1<=3NP+2, 1<=NP}>
@@ -165,7 +165,7 @@ C  ROUTINE DE CALCUL DE A=A-TB*DIAG(RL)*B .
 C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
 C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
 C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=3NP+2, 1<=PHI2, PHI2<=3NP}>
-C  <RL(PHI1,PHI2)-R-MAY-{PHI2==1, 1<=NP}>
+C  <RL(PHI1,PHI2)-R-MAY-{PHI2==1, 1<=PHI1, 1<=NP}>
 C  <Z1(PHI1)-R-EXACT-{1<=PHI1, PHI1<=3NP}>
 C  <Z1(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP}>
 C  <Z2(PHI1)-R-MAY-{1<=PHI1, PHI1<=3NP+2, 1<=NP}>
@@ -175,12 +175,14 @@ C     BEGIN BLOCK
 C     added to simulate actual preconditions
       N = 3*NP                                                          0015
 
-C  <RL(PHI1,PHI2)-R-MAY-{PHI2==1, N==3NP, 1<=NP}>
+C  <RL(PHI1,PHI2)-R-MAY-{PHI2==1, 4<=PHI1+N, 3NP+1<=PHI1+N, N==3NP,
+C    1<=NP}>
 C  <Z1(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP}>
 
       DO 1 K = 1, N                                                     0016
 
-C  <RL(PHI1,PHI2)-R-MAY-{PHI2==1, N==3NP, 1<=K, K<=3NP}>
+C  <RL(PHI1,PHI2)-R-MAY-{PHI2==1, 4<=PHI1+N, 3NP+1<=PHI1+N, N==3NP,
+C    1<=K, K<=3NP}>
 C  <Z1(PHI1)-W-EXACT-{PHI1==K, N==3NP, 1<=K, K<=3NP}>
 
 1        Z1(K) = RL(K*(N+1)-N,1)                                        0017
@@ -262,7 +264,7 @@ C     END BLOCK
 
 C  <A(PHI1,PHI2)-IN-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
 C  <B(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=3NP+2, 1<=PHI2, PHI2<=3NP}>
-C  <RL(PHI1,PHI2)-IN-MAY-{PHI2==1, 1<=NP}>
+C  <RL(PHI1,PHI2)-IN-MAY-{PHI2==1, 1<=PHI1, 4<=PHI1+3NP, 1<=NP}>
 C  <Z2(PHI1)-IN-MAY-{3NP+1<=PHI1, PHI1<=3NP+2, 1<=3NP}>
 
 C Nga Nguyen 5 March 2002 : this example violates the Fortran standard 
@@ -281,18 +283,20 @@ C  ROUTINE DE CALCUL DE A=A-TB*DIAG(RL)*B .
 
 C  <A(PHI1,PHI2)-IN-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
 C  <B(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=3NP+2, 1<=PHI2, PHI2<=3NP}>
-C  <RL(PHI1,PHI2)-IN-MAY-{PHI2==1, 1<=NP}>
+C  <RL(PHI1,PHI2)-IN-MAY-{PHI2==1, 1<=PHI1, 4<=PHI1+3NP, 1<=NP}>
 C  <Z2(PHI1)-IN-MAY-{3NP+1<=PHI1, PHI1<=3NP+2, 1<=3NP}>
 
 C     BEGIN BLOCK
 C     added to simulate actual preconditions
       N = 3*NP                                                          0015
 
-C  <RL(PHI1,PHI2)-IN-MAY-{PHI2==1, N==3NP, 1<=NP}>
+C  <RL(PHI1,PHI2)-IN-MAY-{PHI2==1, 4<=PHI1+N, 3NP+1<=PHI1+N, N==3NP,
+C    1<=NP}>
 
       DO 1 K = 1, N                                                     0016
 
-C  <RL(PHI1,PHI2)-IN-MAY-{PHI2==1, N==3NP, 1<=K, K<=3NP}>
+C  <RL(PHI1,PHI2)-IN-MAY-{PHI2==1, 4<=PHI1+N, 3NP+1<=PHI1+N, N==3NP,
+C    1<=K, K<=3NP}>
 
 1        Z1(K) = RL(K*(N+1)-N,1)                                        0017
 

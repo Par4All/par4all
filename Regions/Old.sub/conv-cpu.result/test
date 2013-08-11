@@ -71,24 +71,26 @@ void main()
 
    int i, j;
 
-//  <h_A[PHI1]-W-MAY-{loops==10, n==10000}>
-//  <h_C[PHI1]-W-MAY-{loops==10, n==10000}>
+//  <h_A[PHI1]-W-MAY-{0<=PHI1, PHI1<=99999999, loops==10, n==10000}>
+//  <h_C[PHI1]-W-MAY-{0<=PHI1, PHI1<=99999999, loops==10, n==10000}>
 
 
    for(i = 0; i <= n-1; i += 1)
 
-//  <h_A[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999}>
-//  <h_C[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999}>
+//  <h_A[PHI1]-W-MAY-{0<=PHI1, PHI1<=99999999, loops==10, n==10000,
+//    0<=i, i<=9999}>
+//  <h_C[PHI1]-W-MAY-{0<=PHI1, PHI1<=99999999, loops==10, n==10000,
+//    0<=i, i<=9999}>
 
       for(j = 0; j <= n-1; j += 1) {
 
-//  <h_A[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999, 0<=j,
-//    j<=9999}>
+//  <h_A[PHI1]-W-MAY-{j<=PHI1, PHI1<=j+99990000, loops==10, n==10000,
+//    0<=i, i<=9999, 0<=j, j<=9999}>
 
          h_A[i*n+j] = 1;
 
-//  <h_C[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999, 0<=j,
-//    j<=9999}>
+//  <h_C[PHI1]-W-MAY-{j<=PHI1, PHI1<=j+99990000, loops==10, n==10000,
+//    0<=i, i<=9999, 0<=j, j<=9999}>
 
          h_C[i*n+j] = 0;
       }
@@ -106,24 +108,26 @@ void main()
 
    int i, j;
 
-//  <h_A[PHI1]-W-MAY-{loops==10, n==10000}>
-//  <h_C[PHI1]-W-MAY-{loops==10, n==10000}>
+//  <h_A[PHI1]-W-MAY-{0<=PHI1, PHI1<=99999999, loops==10, n==10000}>
+//  <h_C[PHI1]-W-MAY-{0<=PHI1, PHI1<=99999999, loops==10, n==10000}>
 
 
    for(i = 0; i <= n-1; i += 1)
 
-//  <h_A[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999}>
-//  <h_C[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999}>
+//  <h_A[PHI1]-W-MAY-{0<=PHI1, PHI1<=99999999, loops==10, n==10000,
+//    0<=i, i<=9999}>
+//  <h_C[PHI1]-W-MAY-{0<=PHI1, PHI1<=99999999, loops==10, n==10000,
+//    0<=i, i<=9999}>
 
       for(j = 0; j <= n-1; j += 1) {
 
-//  <h_A[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999, 0<=j,
-//    j<=9999}>
+//  <h_A[PHI1]-W-MAY-{j<=PHI1, PHI1<=j+99990000, loops==10, n==10000,
+//    0<=i, i<=9999, 0<=j, j<=9999}>
 
          h_A[i*n+j] = 1;
 
-//  <h_C[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999, 0<=j,
-//    j<=9999}>
+//  <h_C[PHI1]-W-MAY-{j<=PHI1, PHI1<=j+99990000, loops==10, n==10000,
+//    0<=i, i<=9999, 0<=j, j<=9999}>
 
          h_C[i*n+j] = 0;
       }
