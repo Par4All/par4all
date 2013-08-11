@@ -35,6 +35,8 @@ activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[main]
 
+quit
+
 echo
 echo Preconditions with point-to
 echo
