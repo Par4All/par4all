@@ -1612,17 +1612,20 @@ static transformer integer_right_shift_to_transformer(entity e,
 static transformer integer_multiply_to_transformer(entity v,
 						   expression e1,
 						   expression e2,
-						   transformer ipre,
+						   transformer prec,
 						   bool is_internal)
 {
   transformer tf = transformer_undefined;
   entity v1 = make_local_temporary_value_entity(entity_type(v));
+  transformer ipre = transformer_undefined_p(prec)? transformer_identity() : transformer_range(prec);
   transformer t1 = safe_integer_expression_to_transformer(v1, e1, ipre, is_internal);
   entity v2 = make_local_temporary_value_entity(entity_type(v));
   transformer npre = transformer_safe_apply(t1, ipre);
   transformer t2 = safe_integer_expression_to_transformer(v2, e2, npre, is_internal);
+  //transformer pre = transformer_undefined_p(ipre)? transformer_identity() :
+  //copy_transformer(ipre);
   transformer pre = transformer_undefined_p(ipre)? transformer_identity() :
-    copy_transformer(ipre);
+    ipre;
 
   pips_debug(8, "Begin\n");
 
@@ -2275,10 +2278,11 @@ transformer assign_operation_to_transformer(entity val, // assumed to be a value
 
 /* */
 
+/* FI: this function is no longer useful (11 August 2013) */
 static transformer 
 integer_nullary_operation_to_transformer(
-					 entity e,
-					 entity f,
+					 entity e __attribute__ ((unused)),
+					 entity f __attribute__ ((unused)),
 					 transformer pre __attribute__ ((unused)),
 					 bool is_internal __attribute__ ((unused)))
 {
