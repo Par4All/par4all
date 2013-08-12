@@ -2149,14 +2149,15 @@ instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c) {
 
     message_assert( "error in data instruction", ins != instruction_undefined );
     list lst = CONS( STATEMENT, make_statement( entity_empty_label( ),
-            STATEMENT_NUMBER_UNDEFINED,
-            STATEMENT_ORDERING_UNDEFINED,
-            //comments,
-        empty_comments,
-        ins,
-        NULL,
-        NULL,
-        empty_extensions( ) ), NULL );
+						STATEMENT_NUMBER_UNDEFINED,
+						STATEMENT_ORDERING_UNDEFINED,
+						//comments,
+						empty_comments,
+						ins,
+						NULL,
+						NULL,
+						empty_extensions(),
+						make_synchronization_none()), NULL );
     code mc = entity_code(get_current_module_entity());
     sequence_statements(code_initializations(mc))
         = gen_nconc(sequence_statements(code_initializations(mc)), lst);
@@ -2261,7 +2262,8 @@ instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c) {
                                    i,
                                    NULL,
                                    NULL,
-                                   empty_extensions());
+                                   empty_extensions(),
+				   make_synchronization_none());
       /* unlike the classical method, we don't know if we have had
        * a first statement (data inst)
        */
@@ -2311,7 +2313,8 @@ instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c) {
                              i,
                              NULL,
                              NULL,
-                             empty_extensions());
+                             empty_extensions(),
+			     make_synchronization_none());
         list_of_statements = gen_nconc(list_of_statements, CONS( STATEMENT,
             s,
             NIL ));
@@ -2342,7 +2345,8 @@ instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c) {
                        i,
                        NULL,
                        NULL,
-                       empty_extensions());
+                       empty_extensions(),
+		       make_synchronization_none());
     //unlike the classical method, we don't know if we have had a first statement (data inst)
     list_of_statements_format = gen_nconc(list_of_statements_format,
                                           CONS( STATEMENT, s, NIL ));
@@ -2400,16 +2404,17 @@ instruction gfc2pips_code2instruction(gfc_code* c, bool force_sequence) {
       if(i != instruction_undefined) {
         string comments = gfc2pips_get_comment_of_code(c);//fprintf(stderr,"comment founded")
         list_of_statements = CONS( STATEMENT,
-            make_statement( gfc2pips_code2get_label( c ),
-                STATEMENT_NUMBER_UNDEFINED,
-                STATEMENT_ORDERING_UNDEFINED,
-                comments,
-                //empty_comments,
-            i,
-            NIL,
-            NULL,
-            empty_extensions( ) ),
-        list_of_statements );
+				   make_statement( gfc2pips_code2get_label( c ),
+						   STATEMENT_NUMBER_UNDEFINED,
+						   STATEMENT_ORDERING_UNDEFINED,
+						   comments,
+						   //empty_comments,
+						   i,
+						   NIL,
+						   NULL,
+						   empty_extensions( ),
+						   make_synchronization_none()),
+				   list_of_statements );
       }
     }
     c = c->next;
@@ -2440,7 +2445,8 @@ instruction gfc2pips_code2instruction(gfc_code* c, bool force_sequence) {
                            i,
                            NULL,
                            NULL,
-                           empty_extensions());
+                           empty_extensions(),
+			   make_synchronization_none());
         if(s != statement_undefined) {
           list_of_statements = gen_nconc(list_of_statements, CONS( STATEMENT,
               s,
@@ -3404,16 +3410,17 @@ list gfc2pips_dumpSELECT(gfc_code *c) {
   if(c->here) {
     list_of_statements
         = gen_nconc(CONS( STATEMENT,
-                        make_statement( gfc2pips_code2get_label( c ),
-                            STATEMENT_NUMBER_UNDEFINED,
-                            STATEMENT_ORDERING_UNDEFINED,
-                            empty_comments,
-                            make_instruction_call( make_call( CreateIntrinsic( CONTINUE_FUNCTION_NAME ),
-                                    NULL ) ),
-                            NULL,
-                            NULL,
-                            empty_extensions( ) ),
-                        NULL ),
+			  make_statement( gfc2pips_code2get_label( c ),
+					  STATEMENT_NUMBER_UNDEFINED,
+					  STATEMENT_ORDERING_UNDEFINED,
+					  empty_comments,
+					  make_instruction_call( make_call( CreateIntrinsic( CONTINUE_FUNCTION_NAME ),
+									    NULL ) ),
+					  NULL,
+					  NULL,
+					  empty_extensions( ),
+					  make_synchronization_none()),
+			  NULL ),
                     list_of_statements);
   }
 
