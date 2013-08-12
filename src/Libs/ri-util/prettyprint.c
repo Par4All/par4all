@@ -4502,6 +4502,8 @@ text text_statement_enclosed(entity module,
     case is_synchronization_barrier:
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(imargin, "barrier("));
       break;
+    default:
+      break;
     }
   }
  
@@ -4788,6 +4790,8 @@ text text_statement_enclosed(entity module,
       break;
     case is_synchronization_barrier:
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(imargin, ")"));
+      break;
+    default:
       break;
     }
   }

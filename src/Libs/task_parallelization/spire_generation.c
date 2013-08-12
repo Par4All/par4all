@@ -45,19 +45,15 @@ typedef dg_vertex_label vertex_label;
 #include "chains.h"
 #include "task_parallelization.h"
 
-static int next_ordering = 999999;// blah
-
-
 /* 
  *return SPIRE for a cluster stage
  */
 static statement cluster_stage_spire(persistant_statement_to_schedule stmt_to_schedule, graph tg, list cluster_stage, int p) {
   int i = -1;
-  intptr_t stnum;
   list list_cl = NIL;
   statement stmt_spawn = statement_undefined, stmt_finish = statement_undefined; 
   int stage_mod = gen_length(cluster_stage);int physical_cluster, minus;
-  int Ps = p - stage_mod;// + 1; //use current processor
+  int Ps = p - stage_mod;// + 1;  // plus one if we use the current cluster
   bool costly_p = false;
   FOREACH(LIST, list_stmts, cluster_stage){
     FOREACH(statement, st, list_stmts){
@@ -74,14 +70,13 @@ static statement cluster_stage_spire(persistant_statement_to_schedule stmt_to_sc
       minus = (NBCLUSTERS==p)?0:1;
       physical_cluster = NBCLUSTERS - p + i;// + 1 ;
       FOREACH(statement, st, list_stmts){
-	stnum = statement_number(st);
 	update_persistant_statement_to_schedule(stmt_to_schedule, st, physical_cluster);
       }
       entity k_ent = make_constant_entity(itoa(physical_cluster), is_basic_int, 4);
       stmt_spawn = make_statement(
 				  entity_empty_label(),
-				  stnum,//STATEMENT_NUMBER_UNDEFINED,
-				  next_ordering++,//STATEMENT_ORDERING_UNDEFINED,
+				  STATEMENT_NUMBER_UNDEFINED,
+				  STATEMENT_ORDERING_UNDEFINED,
 				  empty_comments,
 				  ins_spawn,
 				  NIL, NULL, empty_extensions(), 
@@ -90,8 +85,8 @@ static statement cluster_stage_spire(persistant_statement_to_schedule stmt_to_sc
     else
       stmt_spawn = make_statement(
 				  entity_empty_label(),
-				  stnum,//STATEMENT_NUMBER_UNDEFINED,
-				  next_ordering++,//STATEMENT_ORDERING_UNDEFINED,
+				  STATEMENT_NUMBER_UNDEFINED,
+				  STATEMENT_ORDERING_UNDEFINED,
 				  empty_comments,
 				  ins_spawn,
 				  NIL, NULL, empty_extensions(), 
@@ -102,8 +97,8 @@ static statement cluster_stage_spire(persistant_statement_to_schedule stmt_to_sc
   instruction ins_finish = make_instruction_sequence(make_sequence(gen_nreverse(list_cl)));
   stmt_finish = make_statement(
 			       entity_empty_label(),
-			       stnum,//STATEMENT_NUMBER_UNDEFINED,
-			       next_ordering++,//STATEMENT_ORDERING_UNDEFINED,
+			       STATEMENT_NUMBER_UNDEFINED,
+			       STATEMENT_ORDERING_UNDEFINED,
 			       empty_comments,
 			       ins_finish,
 			       NIL, NULL, empty_extensions(), 
