@@ -3859,7 +3859,7 @@ void statement_remove_useless_label(statement s)
 bool belong_to_statement(statement stmt, statement s, bool found_p)
 {
   if(!found_p){
-    if(statement_equal_p(s, stmt))
+    if(statement_ordering(s) == statement_ordering(stmt))
       return true;
     else
       {
@@ -3901,6 +3901,8 @@ bool belong_to_statement(statement stmt, statement s, bool found_p)
 	}
 	case is_instruction_call:
 	  return found_p || false;
+	  break;
+	default:
 	  break;
 	}
       }
