@@ -314,3 +314,12 @@ bool print_parallelizedOMP_code(string mod_name)
 
     return print_parallelized_code_common(mod_name, "omp");
 }
+
+bool print_parallelizedOMPTASK_code(string mod_name)
+{
+  return print_parallelized_code_common(mod_name, "omptask");
+}
+bool print_parallelizedMPI_code(string mod_name)
+{
+  return print_parallelized_code_common(mod_name, "mpi");
+}

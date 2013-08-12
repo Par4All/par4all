@@ -1318,6 +1318,7 @@
 #define ENTITY_OMP_PARALLEL_P(e)         ENTITY_NAME_P(e,OMP_PARALLEL_FUNCTION_NAME)
 #define ENTITY_OMP_REDUCTION_P(e)        ENTITY_NAME_P(e,OMP_REDUCTION_FUNCTION_NAME)
 
+
 /*io functions: C library and system io.Amira Mensi*/
 
 /*#include<stdio.h> */
@@ -2238,3 +2239,14 @@ enum {
 };
 
 #define make_entity(n,t,s,i) make_entity(n,t,s,i,DEFAULT_ENTITY_KIND)
+
+/* SPIRE API */
+#define SEND_FUNCTION_NAME                        "send"  
+#define RECV_FUNCTION_NAME                          "recv" 
+#define SIGNAL_FUNCTION_NAME                        "signal"  
+#define WAIT_FUNCTION_NAME                          "wait"   
+
+/* intrinsic entity declarations */
+#define ENTITY_SEND_P(e)              ENTITY_NAME_P(e, "send")
+
+

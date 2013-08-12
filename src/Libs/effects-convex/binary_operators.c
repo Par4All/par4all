@@ -252,7 +252,6 @@ list RegionsIntersection(list l1, list l2,
     list l_res = NIL;
 
     debug(3, "RegionsIntersection", "begin\n");
-
     l_res = list_of_effects_generic_intersection_op(l1, l2,
 					   intersection_combinable_p,
 					   region_intersection);

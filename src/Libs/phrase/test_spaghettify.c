@@ -76,7 +76,7 @@ static control make_condition_from_test (test the_test,
 				       make_instruction (is_instruction_test,
 							 condition_test),
 				       NIL,NULL,
-				       statement_extensions(stat));
+				       statement_extensions(stat), make_synchronization_none());
   return make_control (condition_statement, NIL, NIL);
 }
 

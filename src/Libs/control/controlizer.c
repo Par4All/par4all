@@ -1205,7 +1205,7 @@ statement whileloop_test(statement sl)
 			STATEMENT_ORDERING_UNDEFINED,
 			cs,
 			make_instruction(is_instruction_test, t),NIL,NULL,
-			copy_extensions (statement_extensions(sl)));
+			copy_extensions (statement_extensions(sl)), make_synchronization_none());
 
     return ts;
 }
@@ -1260,7 +1260,7 @@ hash_table used_labels;
 						       new_l),
 				      gen_copy_seq(statement_declarations(st)),
 				      strdup(statement_decls_text(st)),
-				      copy_extensions(statement_extensions(st))),
+				      copy_extensions(statement_extensions(st)), make_synchronization_none()),
 		       ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		       CONS(CONTROL, succ, NIL));
 	controlized = false;
@@ -1323,7 +1323,7 @@ statement forloop_test(statement sl)
 				STATEMENT_ORDERING_UNDEFINED,
 				cs,
 				make_instruction(is_instruction_test, t),NIL,NULL,
-				copy_extensions(statement_extensions(sl)));
+				copy_extensions(statement_extensions(sl)), make_synchronization_none());
 
   ifdebug(8) {
     pips_debug(8, "Condition expression: ");
@@ -1431,7 +1431,7 @@ hash_table used_labels;
 				    ni,
 				    gen_copy_seq(statement_declarations(st)),
 				    strdup(statement_decls_text(st)),
-				    copy_extensions(statement_extensions(st)));
+				    copy_extensions(statement_extensions(st)), make_synchronization_none());
     ifdebug(1) {
       statement_consistent_p(st);
       statement_consistent_p(d_st);

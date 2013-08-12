@@ -143,7 +143,7 @@ make_statement_operator(entity oper,cons * args)
 					   make_call (oper, args)),
 			  NIL,
 			  NULL,
-			  empty_extensions ());
+			  empty_extensions (), make_synchronization_none());
 }
 
 

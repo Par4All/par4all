@@ -582,7 +582,7 @@ statement make_loop_step_stat(statement stat, entity newOuterInd)
 			    empty_comments,
 			    make_instruction(is_instruction_test, t),
 			    NIL,NULL,
-			    empty_extensions ());
+			    empty_extensions (), make_synchronization_none());
 
   return stepStat;
 }
@@ -826,7 +826,7 @@ statement make_transStat(statement stat, entity newOuterInd,
 			       empty_comments,
 			       make_instruction(is_instruction_test, t),
 			       NIL,NULL,
-			       empty_extensions ());
+			       empty_extensions (), make_synchronization_none());
     }
 
   /*statement stepStat = make_loop_step_stat(stat, newOuterInd);

@@ -567,7 +567,7 @@ make_global_common_and_initialize (entity main_module,
 			 make_instruction (is_instruction_sequence,
 					   new_sequence),
 			 NIL,NULL,
-			 empty_extensions ());
+			 empty_extensions (), make_synchronization_none());
  
 }
 	
@@ -869,7 +869,7 @@ static statement controlize_distribution (statement module_stat,
 						       make_call(send_param_module,
 								 gen_nreverse(call_params))),
 				      NIL,NULL,
-				      empty_extensions ());
+				      empty_extensions (), make_synchronization_none());
 
 	    l_stats = CONS (STATEMENT,
 			    new_stat,
@@ -893,7 +893,7 @@ static statement controlize_distribution (statement module_stat,
 							    make_call(start_ru_module,
 								      start_ru_call_params)),
 					   NIL,NULL,
-					   empty_extensions ()),
+					   empty_extensions (), make_synchronization_none()),
 			    l_stats);
 	  }
 
@@ -913,7 +913,7 @@ static statement controlize_distribution (statement module_stat,
 							    make_call(wait_ru_module,
 								      wait_ru_call_params)),
 					   NIL,NULL,
-					   empty_extensions ()),
+					   empty_extensions (), make_synchronization_none()),
 			    l_stats);
 	  }
 	 
@@ -973,7 +973,7 @@ static statement controlize_distribution (statement module_stat,
 						       make_call(receive_param_module,
 								 gen_nreverse(call_params))),
 				      NIL,NULL,
-				      empty_extensions ());
+				      empty_extensions (), make_synchronization_none());
 
 	    l_stats = CONS (STATEMENT,
 			    new_stat,

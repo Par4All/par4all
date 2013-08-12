@@ -4463,6 +4463,7 @@ text text_statement_enclosed(entity module,
 			     list pdl)
 {
   instruction i = statement_instruction(stmt);
+  synchronization sync  = statement_synchronization(stmt);
   text r= make_text(NIL);
   text temp;
   string i_comments = statement_comments(stmt);
@@ -4493,6 +4494,17 @@ text text_statement_enclosed(entity module,
       }
     }
 
+  if(get_bool_property("SPIRE_GENERATION")){
+    switch(synchronization_tag(sync)){
+    case is_synchronization_spawn:
+      ADD_SENTENCE_TO_TEXT(r,MAKE_ONE_WORD_SENTENCE(imargin, strdup(concatenate("spawn(",entity_local_name(synchronization_spawn(sync)),",",NULL))));
+      break;
+    case is_synchronization_barrier:
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(imargin, "barrier("));
+      break;
+    }
+  }
+ 
   /* Generate text for local declarations
    *
    * 31/07/2003 Nga Nguyen : This code is added for C, because a
@@ -4769,7 +4781,19 @@ text text_statement_enclosed(entity module,
   */
   r = insert_locals (r);
 
-  if (braces_added) {
+  if(get_bool_property("SPIRE_GENERATION")){
+    switch(synchronization_tag(sync)){
+    case is_synchronization_spawn:
+      ADD_SENTENCE_TO_TEXT(r,MAKE_ONE_WORD_SENTENCE(imargin, ")"));
+      break;
+    case is_synchronization_barrier:
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(imargin, ")"));
+      break;
+    }
+  }
+
+
+ if (braces_added) {
     ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(imargin, "}"));
   }
   attach_statement_information_to_text(r, stmt);

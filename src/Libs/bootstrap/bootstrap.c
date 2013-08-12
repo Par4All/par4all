@@ -5547,8 +5547,11 @@ CreateIntrinsics( set module_list )
         /* PIPS intrinsics to simulate various effects */
         {PIPS_MEMORY_BARRIER_OPERATOR_NAME, 0, void_to_void_type, 0, 0},
         {PIPS_IO_BARRIER_OPERATOR_NAME, 0, void_to_void_type, 0, 0},
-
-        {NULL, 0, 0, 0, 0}
+	/*SPIRE*/
+	{SEND_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+	{RECV_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+       
+	{NULL, 0, 0, 0, 0}
     };
     intrinsic_type_descriptor_mapping=hash_table_make(hash_string,sizeof(IntrinsicTypeDescriptorTable));
     for(IntrinsicDescriptor *p = &IntrinsicTypeDescriptorTable[0];p->name;++p) {

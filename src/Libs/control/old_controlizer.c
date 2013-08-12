@@ -496,7 +496,7 @@ statement loop_test(statement sl)
 		      STATEMENT_ORDERING_UNDEFINED,
 		      cs,
 		      make_instruction(is_instruction_test, t),NIL,NULL,
-		      copy_extensions (statement_extensions(sl)));
+		      copy_extensions (statement_extensions(sl)), make_synchronization_none());
   return ts;
 }
 
@@ -560,7 +560,7 @@ hash_table used_labels;
 				      make_instruction(is_instruction_loop, new_l),
 				      gen_copy_seq(statement_declarations(st)),
 				      strdup(statement_decls_text(st)),
-				      copy_extensions(statement_extensions(st))),
+				      copy_extensions(statement_extensions(st)), make_synchronization_none()),
 		       ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		       CONS(CONTROL, succ, NIL)) ;
 	controlized = false;
@@ -666,7 +666,7 @@ static statement whileloop_test(statement sl)
 			STATEMENT_ORDERING_UNDEFINED,
 			cs,
 			make_instruction(is_instruction_test, t),NIL,NULL,
-			copy_extensions (statement_extensions(sl)));
+			copy_extensions (statement_extensions(sl)), make_synchronization_none());
 
     return ts;
 }
@@ -720,7 +720,7 @@ hash_table used_labels;
 						       new_l),
 				      gen_copy_seq(statement_declarations(st)),
 				      strdup(statement_decls_text(st)),
-				      copy_extensions(statement_extensions(st))),
+				      copy_extensions(statement_extensions(st)), make_synchronization_none()),
 		       ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		       CONS(CONTROL, succ, NIL));
 	controlized = false;
@@ -783,7 +783,7 @@ statement forloop_test(statement sl)
 				STATEMENT_ORDERING_UNDEFINED,
 				cs,
 				make_instruction(is_instruction_test, t),NIL,NULL,
-				copy_extensions(statement_extensions(sl)));
+				copy_extensions(statement_extensions(sl)), make_synchronization_none());
 
   ifdebug(8) {
     pips_debug(8, "Condition expression: ");
@@ -892,7 +892,7 @@ hash_table used_labels;
 				    ni,
 				    gen_copy_seq(statement_declarations(st)),
 				    strdup(statement_decls_text(st)),
-				    copy_extensions(statement_extensions(st)));
+				    copy_extensions(statement_extensions(st)), make_synchronization_none());
     ifdebug(1) {
       statement_consistent_p(st);
       statement_consistent_p(d_st);
@@ -1149,7 +1149,7 @@ static control compact_list(list ctls,
 				   STATEMENT_ORDERING_UNDEFINED,
 				   string_undefined,
 				   i,NIL,NULL,
-				   empty_extensions ());
+				   empty_extensions (), make_synchronization_none());
 	    ;
 	  }
 	  else {
@@ -1167,7 +1167,7 @@ static control compact_list(list ctls,
 				   STATEMENT_ORDERING_UNDEFINED,
 				   string_undefined,
 				   i,NIL,NULL,
-				   empty_extensions ());
+				   empty_extensions (), make_synchronization_none());
 	    }
 	    if(instruction_block_p(succ_i=statement_instruction(succ_st))){
 		instruction_block(i) =
@@ -1517,7 +1517,7 @@ static bool controlize_list(statement st,
 				      i,
 				      gen_copy_seq(statement_declarations(st)),
 				      strdup(statement_decls_text(st)),
-				      copy_extensions(statement_extensions(st)));
+				      copy_extensions(statement_extensions(st)), make_synchronization_none());
 	    }
 	    else {
 	      statement us =
@@ -1528,7 +1528,7 @@ static bool controlize_list(statement st,
 			       i,
 			       NIL,
 			       strdup(""),
-			       empty_extensions());
+			       empty_extensions(), make_synchronization_none());
 	      new_st =
 		make_empty_statement_with_declarations_and_comments(
 								    gen_copy_seq(statement_declarations(st)),
@@ -1674,7 +1674,7 @@ hash_table used_labels;
 				  make_instruction(is_instruction_test, it),
 				  gen_copy_seq(statement_declarations(st)),
 				  strdup(statement_decls_text(st)),
-				  copy_extensions(statement_extensions(st))),
+				  copy_extensions(statement_extensions(st)), make_synchronization_none()),
 		   ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		   CONS(CONTROL, succ, NIL));
     control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, succ);

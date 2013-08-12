@@ -463,7 +463,7 @@ statement st;
 				make_instruction_block(NIL),
 				NIL, // No local declarations
 				NULL, // null or empty string...
-				empty_extensions ());
+				empty_extensions (), make_synchronization_none());
 	  lstat = CONS(STATEMENT, stat, NIL);
 
 	  statement_instruction(st) = make_instruction_block(lstat);

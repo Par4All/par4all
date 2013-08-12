@@ -149,7 +149,7 @@ statement make_state_variable_assignement_statement (statement stat,
 				      empty_comments,
 				      new_instruction,
 				      NIL,NULL,
-				      statement_extensions(stat));
+				      statement_extensions(stat), make_synchronization_none());
 
   return returned_statement;
 }
@@ -276,7 +276,7 @@ statement make_transition_statement(control current_node,
 					  statement_ordering(stat),
 					  empty_comments,
 					  transition_instruction,NIL,NULL,
-					  statement_extensions(stat));
+					  statement_extensions(stat), make_synchronization_none());
   }
   else if (successors_nb == 2) {
     /* This is a "test" node, ie with a TEST statement, just add
@@ -329,7 +329,7 @@ statement make_transition_statement(control current_node,
 						   empty_comments,
 						   transition_instruction_if_true,
 						   NIL,NULL,
-						   statement_extensions(stat));
+						   statement_extensions(stat), make_synchronization_none());
    
     test_true(current_test) = transition_statement_if_true;
 
@@ -357,7 +357,7 @@ statement make_transition_statement(control current_node,
        statement_ordering(stat),
        empty_comments,
        transition_instruction_if_false,NIL,NULL,
-       statement_extensions(stat));
+       statement_extensions(stat), make_synchronization_none());
 
     test_false(current_test) = transition_statement_if_false;
 
@@ -385,7 +385,7 @@ statement make_transition_statement(control current_node,
 				       statement_ordering(root_statement),
 				       empty_comments,
 				       test_instruction,NIL,NULL,
-				       statement_extensions(root_statement));
+				       statement_extensions(root_statement), make_synchronization_none());
 
   return returned_statement;
 
@@ -499,7 +499,7 @@ statement make_fsm_from_statement(statement stat,
 				  statement_ordering(stat),
 				  empty_comments,
 				  loop_instruction,NIL,NULL,
-				  statement_extensions(stat));
+				  statement_extensions(stat), make_synchronization_none());
  
  
   new_sequence
@@ -517,7 +517,7 @@ statement make_fsm_from_statement(statement stat,
 				      statement_ordering(stat),
 				      empty_comments,
 				      sequence_instruction,NIL,NULL,
-				      statement_extensions(stat));
+				      statement_extensions(stat), make_synchronization_none());
   /*statement_instruction(loop_body)
     = make_instruction_block(CONS(STATEMENT,returned_statement,NIL));
   */

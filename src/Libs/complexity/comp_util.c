@@ -168,7 +168,7 @@ complexity *pcomp;
 
     if ( !complexity_zero_p(*pcomp) ) 
 	free_complexity(*pcomp);
-    *pcomp = complexity_undefined;
+    *pcomp = make_zero_complexity();// complexity_undefined;
 }
 
 char *complexity_sprint(comp, print_stats_p, print_local_names_p)

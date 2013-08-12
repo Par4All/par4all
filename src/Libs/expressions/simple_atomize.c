@@ -163,7 +163,7 @@ statement s;
 						       statement_comments(cs),
 						       statement_instruction(cs),
 						       NIL, NULL,
-						       statement_extensions(cs)),
+						       statement_extensions(cs), make_synchronization_none()),
 					NIL)));
 	  statement_label(cs) = entity_empty_label();
 	  statement_number(cs) = STATEMENT_NUMBER_UNDEFINED;

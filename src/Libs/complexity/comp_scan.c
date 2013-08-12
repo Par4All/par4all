@@ -81,7 +81,7 @@ char *module_name;
 {
     bool success = true;
 
-    set_string_property("COMPLEXITY_COST_TABLE", "all_1");
+    //set_string_property("COMPLEXITY_COST_TABLE", "all_1");
     success = any_complexities(module_name);
 
     return success;
@@ -92,7 +92,7 @@ char *module_name;
 {
     bool success = true;
 
-    set_string_property("COMPLEXITY_COST_TABLE", "fp_1");
+    //set_string_property("COMPLEXITY_COST_TABLE", "fp_1");
     success = any_complexities(module_name);
 
     return success;
@@ -179,8 +179,8 @@ char *module_name;
 bool summary_complexity(module_name)
 char *module_name;
 {
-    complexity summary_comp = complexity_undefined;
-    complexity summary_comp_dup = complexity_undefined;
+  complexity summary_comp = make_zero_complexity();// complexity_undefined;
+  complexity summary_comp_dup = make_zero_complexity();// complexity_undefined;
 
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, module_name, true ) );
@@ -278,7 +278,7 @@ instruction instr;
 transformer precond;
 list effects_list;
 {
-    complexity comp = complexity_undefined;
+  complexity comp = make_zero_complexity();// complexity_undefined;
 
     trace_on("instruction");
 
@@ -692,11 +692,12 @@ complexity goto_to_complexity(statement st __attribute__ ((__unused__)),
 /* 5th element of instruction */
 complexity whileloop_to_complexity(whileloop while_instr, transformer precond, list effects_list)
 {
-
     basic b;
+    expression exp1, exp2,exp3;
+    expression exp = whileloop_condition(while_instr);
+    complexity range ;
     complexity cbody = statement_to_complexity(whileloop_body(while_instr), precond, effects_list),
-               ctest = expression_to_complexity(whileloop_condition(while_instr), &b,precond, effects_list);
-
+      ctest = expression_to_complexity(exp, &b,precond, effects_list);
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
         fprintf(stderr, "\n");
         fprintf(stderr, "YYY  body  complexity: ");
@@ -704,14 +705,26 @@ complexity whileloop_to_complexity(whileloop while_instr, transformer precond, l
         fprintf(stderr, "YYY  test complexity: ");
         complexity_fprint(stderr, ctest, false, true);
     }
-
-     complexity range = make_complexity_unknown(UNKNOWN_RANGE_NAME);
-     cbody = complexity_dup(cbody);
-     complexity_add(&cbody,ctest);
-     complexity_mult(&cbody,range);
-
+    
+    syntax		s 	 = expression_syntax( exp );
+    entity		fun  	 = call_function(syntax_call( s ));
+    if (ENTITY_LESS_THAN_P( fun )) {
+      exp1 = EXPRESSION(CAR( call_arguments(syntax_call(expression_syntax( exp )))));
+      exp2 = EXPRESSION(CAR(CDR( call_arguments(syntax_call(expression_syntax( exp ))))));
+      exp3 = make_op_exp( MINUS_OPERATOR_NAME,exp1,exp2);
+      range = expression_to_complexity_polynome(exp3,
+						precond, effects_list, 
+						KEEP_SYMBOLS, MINIMUM_VALUE);
+    }
+    else
+      {
+	range = make_complexity_unknown(UNKNOWN_RANGE_NAME);
+      }
+    complexity_add(&cbody,ctest);
+    complexity_mult(&cbody,range);
+    
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-        fprintf(stderr, "YYY  while total complexity: ");
+      fprintf(stderr, "YYY  while total complexity: ");
         complexity_fprint(stderr, cbody, true, true);
         fprintf(stderr, "\n");
     }
@@ -830,7 +843,7 @@ transformer precond;
 list effects_list;
 {
     syntax s = expression_syntax(expr);
-    complexity comp = complexity_undefined;
+    complexity comp = make_zero_complexity();// complexity_undefined;
 
     trace_on("expression");
 
@@ -872,7 +885,7 @@ basic *pbasic;
 transformer precond;
 list effects_list;
 {
-  complexity comp = complexity_undefined;
+  complexity comp = make_zero_complexity();// complexity_undefined;
 
   trace_on("syntax");
 
@@ -906,7 +919,7 @@ list effects_list;
       comp = expression_to_complexity(sizeofexpression_expression(se),
 				      pbasic, precond, effects_list);
     else {
-      /* Compiler generated constant: equivalent to a constant load... */
+      /* Compiler generated constant: equivalent to a constant load --> 0*/
       comp = make_zero_complexity();
     }
     break;

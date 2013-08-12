@@ -1969,7 +1969,7 @@ static void ProcessEntry(
 			   empty_comments,
 			   make_instruction(is_instruction_unstructured,
 					    control_graph(es)),
-			   NIL,NULL, empty_extensions ());
+			   NIL,NULL, empty_extensions (), make_synchronization_none());
     unspaghettify_statement(ces);
 
     /* Compute an external representation of entry statement es for entry e.

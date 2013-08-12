@@ -1,3 +1,5 @@
+
+
 %%
 %% $Id$
 %%
@@ -4638,6 +4640,44 @@ SEMANTICS_STDOUT FALSE
 Debug level for semantics used to be controlled by a property. A Shell
 variable, \verb/SEMANTICS_DEBUG_LEVEL/, is used instead.
 
+\subsection{Reachability Analysis: The Path Transformer} 
+A set of operations on array regions are defined in PIPS such as the function \texttt{regions\_intersection}. However, this is not sufficient because regions should be combined with what we call path transformers in order to propagate the memory stores used in them. Indeed, regions operations must be performed with respect to the abstraction of the same memory store. 
+
+A path transformer permits to compare array regions of statements originally defined in different memory stores.   
+
+ The path transformer between two statements computes the possible changes performed by a piece of code delimited by two statements $S_{begin}$ and $S_{end}$ enclosed within a statement $S$. A path transformer is represented by a convex polyhedron over program variables and its computation is based on transformers; thus, it is a system of linear inequalities.
+The goal of the following phase is to compute the path transformer
+between two statements labeled by sb and se.
+
+
+\begin{PipsMake}
+path_transformer                 > MODULE.path_transformer_file                    
+        < PROGRAM.entities                  
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.transformers
+        < MODULE.preconditions
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
+The next properties are used by Phase \texttt{path\_transformer} to
+label the two statements $S_{begin}$ and $S_{end}$.
+
+\begin{PipsProp}{PATH_TRANSFORMER_BEGIN}
+PATH_TRANSFORMER_BEGIN "sb"
+\end{PipsProp}
+
+\begin{PipsProp}{PATH_TRANSFORMER_END}
+PATH_TRANSFORMER_END "se"
+\end{PipsProp}
+
+The next property is used to allow an empty path or not which is necessary for the test
+of dependence. If its value is false, we return an empty transformer
+for an empty path. Otherwise, an identity transformer is returned.
+
+\begin{PipsProp}{IDENTITY_EMPTY_PATH_TRANSFORMER}
+IDENTITY_EMPTY_PATH_TRANSFORMER TRUE
+\end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONTINUATIONS
 
@@ -8702,6 +8742,253 @@ SCALOPES_KERNEL_TASK_PREFIX "P4A_sesam_task_"
 \begin{PipsProp}{SCALOPES_SERVER_TASK_PREFIX}
 SCALOPES_SERVER_TASK_PREFIX "P4A_sesam_server_"
 \end{PipsProp}
+
+\clearpage
+
+
+
+\section{Automatic Resource-Constrained Static Task Parallelization}
+\label{subsubsection-task-parallelization}
+
+
+
+\subsection{Sequence Dependence DAG (SDG)}
+A Sequence Dependence DAG $G$ is a data dependence DAG where task vertices $\tau$ are labeled with statements, while control dependences are encoded in the abstract syntax trees of statements. Any statement $S$ can label a DAG vertex, i.e. each vertex $\tau$  contains a statement $S$, which corresponds to the code it runs when scheduled.  An SDG is not built only on simple instructions, represented as $call$ statements; compound statements such as test statements (both true and false branches) and loop nests may constitute indivisible vertices of the SDG
+
+\begin{PipsPass}{hbdsc_parallelization}
+Phase \texttt{sequence\_dependence\_graph} generates the Sequence
+Dependence Graph (SDG) in the dg ressource and in a dot file.
+\end{PipsPass}
+
+\begin{PipsMake}
+sequence_dependence_graph                       > MODULE.dg                    
+        < PROGRAM.entities                  
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.dg
+        < MODULE.regions
+        < MODULE.in_regions
+        < MODULE.out_regions
+        < MODULE.transformers
+        < MODULE.preconditions
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
+\subsection{BDSC-Based Hierarchical  Task Parallelization (HBDSC)}
+The goal of the following phase is to generate the scheduled task
+graph using BDSC: A Ressource-Constrained Scheduling Algorithm for
+Shared and Distributed Memory Systems, in order
+to automate the task-based parallelization of sequential
+applications. 
+
+\begin{PipsPass}{hbdsc_parallelization}
+Phase \texttt{bdsc\_kdg\_parallelization} applies BDSC and generates
+the scheduled Clustered Dependence Graph (KDG) in the dg ressource and
+in a dot file.
+\end{PipsPass}
+
+\begin{PipsMake}
+hbdsc_parallelization                       > MODULE.dg                    
+        < PROGRAM.entities                  > MODULE.schedule
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.dg
+        < MODULE.regions
+        < MODULE.in_regions
+        < MODULE.out_regions
+        < MODULE.summary_complexity
+        < MODULE.transformers
+        < MODULE.preconditions
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
+The next properties are used by Phase \texttt{bdsc\_kdg\_parallelization} to
+permit the user defining the number of clusters and the memory size based
+on the properties of the target architecture, generating communications or not
+in SPIRE code.
+
+\begin{PipsProp}{BDSC_NB_CLUSTERS}
+BDSC_NB_CLUSTERS 4
+\end{PipsProp}
+
+\begin{PipsProp}{BDSC_MEMORY_SIZE}
+BDSC_MEMORY_SIZE -1
+\end{PipsProp}
+
+\begin{PipsProp}{BDSC_DISTRIBUTED_MEMORY}
+BDSC_DISTRIBUTED_MEMORY TRUE
+\end{PipsProp}
+
+If the value of this property is TRUE, the pretty printer phase,
+printed\_file, will output the code decorated with SPIRE directives.
+
+\begin{PipsProp}{SPIRE_GENERATION}
+SPIRE_GENERATION FALSE
+\end{PipsProp}
+
+In order to control the granularity of parallel tasks, we introduce
+this property. By default, we generate the maximum parallelism in a
+code. Otherwise, i.e. COSTLY\_TASKS\_ONLY value is TRUE, only loops and call
+functions are generated as parallel tasks. This is important in order
+to make a trade-off between the cost of thread creation and task execution.    
+\begin{PipsProp}{COSTLY_TASKS_ONLY}
+COSTLY_TASKS_ONLY FALSE
+\end{PipsProp}
+
+This property is used to evaluate BDSC scheduling robustness. Since
+our BDSC scheduling heuristic relies on the numerical approximations
+of the execution time and communication costs of tasks, one needs to
+assess its sensitivity over the accuracy of these estimations. Since a
+mathematical analysis of this issue is made difficult by the heuristic
+nature of BDSC and, in fact, of scheduling processes in general, we
+ran multiple versions of each application using various static
+execution and communication cost models using a biased BDSC cost
+model, where we modulated each execution time and communication cost
+value randomly by at most $\Delta$\%, that is our propertu BDSC\_SENSITIVITY (the default BDSC cost model would thus correspond to $\Delta = 0$).
+\begin{PipsProp}{BDSC_SENSITIVITY}
+BDSC_SENSITIVITY 0
+\end{PipsProp}
+
+\begin{PipsPass}{bdsc_code_instrumentation}
+We represent cost, data and time information of different tasks in
+terms of polynomials. We instrument using the phase \texttt{bdsc\_code\_instrumentation} the input sequential code and run
+it once in order to obtain the numerical values of the polynomials.
+The instrumented code contains the initial user code plus instructions
+that compute the values of the cost polynomials for each statement.
+\end{PipsPass}
+
+\begin{PipsMake}
+bdsc_code_instrumentation                    > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.chains
+        < MODULE.dg
+        < MODULE.regions
+        < MODULE.summary_complexity
+\end{PipsMake}
+
+The next property is used also by Phase \texttt{bdsc\_kdg\_parallelization}. It
+decides if cost, data and time information will be extracted from the
+result of the instrumentation which is a dynamic analysis: \texttt{BDSC\_INSTRUMENTED\_FILE} file or
+not, i.e, static analysis.
+\begin{PipsProp}{BDSC_INSTRUMENTED_FILE}
+BDSC_INSTRUMENTED_FILE ""
+\end{PipsProp}
+
+\begin{PipsPass}{dsc_code_parallelization}
+We add this pass since we use in our expriments, comparison between
+DSC and BDSC. In order to make this comparison automatic and simple,
+we apply Phase \texttt{dsc\_code\_parallelization} that performs DSC algorithm
+instead of BDSC algorithm and generates the parallel code SPIRE.
+\end{PipsPass}
+
+\begin{PipsMake}
+dsc_code_parallelization                    > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.dg
+        < MODULE.regions
+        < MODULE.in_regions
+        < MODULE.out_regions
+        < MODULE.summary_complexity
+        < MODULE.transformers
+        < MODULE.preconditions
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
+
+
+\subsection{SPIRE(PIPS) generation}
+The parallel code is represented using  SPIRE of PIPS: A Generic
+Sequential to Parallel Intermediate Representation Extension applied
+to PIPS.
+
+\begin{PipsPass}{spire_unstructured_to_structured}
+Phase \texttt{spire\_unstructured\_to\_structured} applies BDSC and generates the parallel code SPIRE.
+\end{PipsPass}
+
+\begin{PipsMake}
+spire_unstructured_to_structured                   > MODULE.code
+        < PROGRAM.entities                   > MODULE.schedule
+        < MODULE.code
+        < MODULE.dg
+        < MODULE.schedule
+\end{PipsMake}
+
+
+\begin{PipsPass}{hbdsc_gen_communications}
+Phase \texttt{hbdsc\_gen\_communications} generates send and recv primitives.
+\end{PipsPass}
+
+
+\begin{PipsMake}
+hbdsc_gen_communications                    > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        = MODULE.dg
+        = MODULE.schedule
+        = MODULE.cumulated_effects
+        = MODULE.summary_effects
+        = MODULE.transformers
+        = MODULE.preconditions
+        = MODULE.regions
+        = MODULE.in_regions
+        = MODULE.out_regions
+
+
+\end{PipsMake}
+
+\subsection{SPIRE-Based Parallel Code Generation}
+SPIRE is designed in such a way that it can facilitate the generation
+of code for different types of parallel systems. Different parallel
+languages can be mapped into SPIRE. The two following phases show how this intermediate representation simplifies the task of producing code for various languages such as OpenMP and MPI.
+
+\begin{PipsPass}{openmp_task_generation}
+Generate OpenMP task parallel code using SPIRE-based PIPS parallel
+intermediate representation.
+\end{PipsPass}
+
+\begin{PipsMake}
+openmp_task_generation                  > MODULE.parallelized_code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
+\begin{PipsPass}{print_parallelizedOMPTASK_code}
+Output the code decorated with OpenMP (omp task) directives.
+\end{PipsPass}
+
+\begin{PipsMake}
+print_parallelizedOMPTASK_code     > MODULE.parallelprinted_file
+        < PROGRAM.entities
+        < MODULE.parallelized_code
+\end{PipsMake}
+
+
+\begin{PipsPass}{mpi_task_generation}
+Generate MPI parallel code using SPIRE-based PIPS parallel
+intermediate representation.
+\end{PipsPass}
+
+\begin{PipsMake}
+mpi_task_generation                  > MODULE.parallelized_code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
+\begin{PipsPass}{print_parallelizedMPI_code}
+Output the code decorated with MPI instructions.
+\end{PipsPass}
+
+\begin{PipsMake}
+print_parallelizedMPI_code     > MODULE.parallelprinted_file
+        < PROGRAM.entities
+        < MODULE.parallelized_code
+\end{PipsMake}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRANSFORMATIONS
 
@@ -14658,6 +14945,8 @@ alias print_parallelizedHPF_code 'HPF directives'
 alias print_parallelizedOMP_code 'OMP directives'
 alias print_parallelized90_code 'Fortran 90'
 alias print_parallelizedcray_code 'Fortran Cray'
+alias print_parallelizedOMPTASK_code 'C OMP task directives'
+alias print_parallelizedMPI_code 'C MPI'
 \end{PipsMake}
 
 

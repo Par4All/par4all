@@ -165,7 +165,7 @@ entity make_start_ru_module (hash_table ht_params,
 				    make_instruction(is_instruction_call,
 						     make_call(called_module,call_params)),
 				    NIL,NULL,
-				    empty_extensions ());
+				    empty_extensions (), make_synchronization_none());
 
     test_condition
       = MakeBinaryCall (entity_intrinsic(EQUAL_OPERATOR_NAME),
@@ -182,7 +182,7 @@ entity make_start_ru_module (hash_table ht_params,
 				     STATEMENT_ORDERING_UNDEFINED,
 				     empty_comments,
 				     test_instruction,NIL,NULL,
-				     empty_extensions ());
+				     empty_extensions (), make_synchronization_none());
 
     stat_seq = CONS (STATEMENT, test_statement, stat_seq);
 
@@ -202,7 +202,7 @@ entity make_start_ru_module (hash_table ht_params,
 				     STATEMENT_ORDERING_UNDEFINED,
 				     empty_comments,
 				     sequence_instruction,NIL,NULL,
-				     empty_extensions ());
+				     empty_extensions (), make_synchronization_none());
  
   store_new_module (strdup(START_RU_MODULE_NAME), start_ru_module, *module_statement);
 
@@ -426,7 +426,7 @@ static entity make_scalar_communication_module (variable var,
 					STATEMENT_ORDERING_UNDEFINED,
 					empty_comments,
 					test_instruction2,NIL,NULL,
-					empty_extensions ());
+					empty_extensions (), make_synchronization_none());
    
       function_proc_l_stats = CONS (STATEMENT, test_statement2, function_proc_l_stats);
 
@@ -448,7 +448,7 @@ static entity make_scalar_communication_module (variable var,
 				      STATEMENT_ORDERING_UNDEFINED,
 				      empty_comments,
 				      sequence_instruction2,NIL,NULL,
-				      empty_extensions ());
+				      empty_extensions (), make_synchronization_none());
  
   test_condition
     = MakeBinaryCall (entity_intrinsic(EQUAL_OPERATOR_NAME),
@@ -465,7 +465,7 @@ static entity make_scalar_communication_module (variable var,
 				     STATEMENT_ORDERING_UNDEFINED,
 				     empty_comments,
 				     test_instruction,NIL,NULL,
-				     empty_extensions ());
+				     empty_extensions (), make_synchronization_none());
    
     stat_seq = CONS (STATEMENT, test_statement, stat_seq);
   }, ht_communications);
@@ -484,7 +484,7 @@ static entity make_scalar_communication_module (variable var,
 				     STATEMENT_ORDERING_UNDEFINED,
 				     empty_comments,
 				     sequence_instruction,NIL,NULL,
-				     empty_extensions ());
+				     empty_extensions (), make_synchronization_none());
  
   store_new_module (module_name, new_module, *module_statement);
  

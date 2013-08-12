@@ -185,7 +185,7 @@ statement C_MakeReturnStatement(list el, int ln, string c)
 		       inst,
 		       NIL,
 		       string_undefined,
-		       empty_extensions());
+		       empty_extensions(), make_synchronization_none());
   }
   else {
     statement as = make_statement(entity_empty_label(),
@@ -195,7 +195,7 @@ statement C_MakeReturnStatement(list el, int ln, string c)
 		     ainst,
 		     NIL,
 		     string_undefined,
-		     empty_extensions());
+		     empty_extensions(), make_synchronization_none());
     statement gs = instruction_to_statement(ginst);
     list sl = CONS(STATEMENT, as, CONS(STATEMENT, gs, NIL));
     last_return_value_assignment = as;

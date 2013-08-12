@@ -164,7 +164,7 @@ statement MakeBlock(list stmts)
 			       STATEMENT_ORDERING_UNDEFINED,
 			       empty_comments /* get_current_C_comment() */,
 			       make_instruction_sequence(make_sequence(stmts)),
-			       dl, string_undefined, empty_extensions ());
+			       dl, string_undefined, empty_extensions (), make_synchronization_none());
 
   discard_C_comment();
 
@@ -267,7 +267,7 @@ statement MakeGotoStatement(string label)
 		       STATEMENT_ORDERING_UNDEFINED,
 		       get_current_C_comment(),
 		       make_instruction(is_instruction_goto,s),NIL,NULL,
-		       empty_extensions ());
+		       empty_extensions (), make_synchronization_none());
 
   return gts;
 }
@@ -430,7 +430,7 @@ statement MakeForloop(expression e1,
 		       string_undefined,
 		       make_instruction_forloop(f),
 		       NIL, string_undefined,
-		       empty_extensions());
+		       empty_extensions(), make_synchronization_none());
 
   if (!statement_undefined_p(s2))
     /* This loop has a break statement which has been transformed to goto

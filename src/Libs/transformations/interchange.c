@@ -120,7 +120,7 @@ gener_DOSEQ(
 				statement_ordering(s_loop),
 				statement_comments(s_loop),
 				instr_lhyp,NIL,NULL,
-				statement_extensions(s_loop));
+				statement_extensions(s_loop), make_synchronization_none());
     return(state_lhyp);
 }
 
