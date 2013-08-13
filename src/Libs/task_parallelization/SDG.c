@@ -29,6 +29,7 @@
 #include "control.h"
 #include "conversion.h"
 #include "properties.h"
+#include "semantics.h"
 #include "transformations.h"
 
 #include "effects-convex.h"
@@ -516,7 +517,7 @@ void print_SDGs(statement stmt, graph tg, FILE *ftg, gen_array_t annotations) {
       fprintf( ftg, "subgraph cluster%d { color = blue; \n ",count );
       FOREACH(STATEMENT, s, stmts) {
 	list vertices = graph_vertices(tg);
-	annotation *anp;
+	annotation *anp = NULL;
 	FOREACH(VERTEX, pre, vertices) {
 	  statement parent = vertex_to_statement(pre);
 	  if(statement_equal_p(parent, s)){
