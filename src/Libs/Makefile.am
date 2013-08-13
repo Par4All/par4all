@@ -88,7 +88,7 @@ libpipslibs_la_LIBADD=\
 	static_controlize/libstatic_controlize.la \
 	paf-util/libpaf-util.la \
 	gnulib/libgnu.la \
-	pocc-interface/libpocc-interface.la
-	taskify/libtaskify.la
+	pocc-interface/libpocc-interface.la \
+	taskify/libtaskify.la \
 	task_parallelization/task_parallelization.la
 
