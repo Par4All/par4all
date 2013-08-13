@@ -90,5 +90,5 @@ libpipslibs_la_LIBADD=\
 	gnulib/libgnu.la \
 	pocc-interface/libpocc-interface.la \
 	taskify/libtaskify.la \
-	task_parallelization/task_parallelization.la
+	task_parallelization/libtask_parallelization.la
 
