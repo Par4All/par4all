@@ -1,0 +1,28 @@
+
+Source code with transformers
+
+
+//  T(main) {0<=main, main<=81}
+
+int main()
+{
+
+//  T(i,j) {}
+
+   int i, j;
+
+//  T(i,j) {0<=i, i<=9}
+
+
+   for(i = 0; i <= 9; i += 1)
+
+//  T(j) {0<=i, i<=9, j<=9i, 0<=j}
+
+      j = i*i;
+
+//  T(main) {i==10, j==main, 0<=j, j<=81}
+
+   
+   // j is exactly equal to 9*9=81 
+   return j;
+}
