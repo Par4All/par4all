@@ -1,0 +1,108 @@
+
+Transformers for multiply04
+
+
+//  T(multiply04) {1<=N, 10N+5i<=multiply04, 10N+2j<=multiply04,
+//    10N<=multiply04, 20N<=multiply04, 2<=i, i<=3, 5i+2j<=multiply04,
+//    5i<=multiply04, 10i<=multiply04, 5<=j, j<=10, 2j<=multiply04,
+//    4j<=multiply04, 0<=multiply04}
+
+int multiply04(int i, int j, int N)
+{
+
+//  T(k,l) {}
+
+   int k, l;
+
+//  T() {1<=N}
+
+   if (!(N>=1))
+
+//  T() {0==-1}
+
+      abort();
+
+//  T() {1<=N, 2<=i, i<=3}
+
+   if (!(2<=i&&i<=3))
+
+//  T() {0==-1}
+
+      abort();
+
+//  T() {1<=N, 2<=i, i<=3, 5<=j, j<=10}
+
+   if (!(5<=j&&j<=10))
+
+//  T() {0==-1}
+
+      abort();
+
+//  T(k) {1<=N, k<=30N, 10N<=k, 2<=i, i<=3, 5i<=k, 5<=j, j<=10, 2j<=k,
+//    0<=k}
+
+
+   k = i*N*j;
+
+//  T(l) {1<=N, k<=30N, 10N<=k, 10N<=l, 2<=i, i<=3, 5i<=k, 5i<=l,
+//    5<=j, j<=10, 2j<=k, 2j<=l, 0<=k, 0<=l}
+
+   l = i*N*j*N;
+
+//  T(multiply04) {k+l==multiply04, 1<=N, k<=30N, 10N<=k, 10N<=l,
+//    2<=i, i<=3, 5i<=k, 5i<=l, 5<=j, j<=10, 2j<=k, 2j<=l, 0<=k, 0<=l}
+
+   return k+l;
+}
+
+Preconditions for multiply04
+
+
+//  P() {}
+
+int multiply04(int i, int j, int N)
+{
+
+//  P() {}
+
+   int k, l;
+
+//  P(k,l) {}
+
+   if (!(N>=1))
+
+//  P(k,l) {N<=0}
+
+      abort();
+
+//  P(k,l) {1<=N}
+
+   if (!(2<=i&&i<=3))
+
+//  P(k,l) {1<=N}
+
+      abort();
+
+//  P(k,l) {1<=N, 2<=i, i<=3}
+
+   if (!(5<=j&&j<=10))
+
+//  P(k,l) {1<=N, 2<=i, i<=3}
+
+      abort();
+
+//  P(k,l) {1<=N, 2<=i, i<=3, 5<=j, j<=10}
+
+
+   k = i*N*j;
+
+//  P(k,l) {1<=N, k<=30N, 10N<=k, 2<=i, i<=3, 5i<=k, 5<=j, j<=10,
+//    2j<=k, 0<=k}
+
+   l = i*N*j*N;
+
+//  P(k,l) {1<=N, k<=30N, 10N<=k, 10N<=l, 2<=i, i<=3, 5i<=k, 5i<=l,
+//    5<=j, j<=10, 2j<=k, 2j<=l, 0<=k, 0<=l}
+
+   return k+l;
+}

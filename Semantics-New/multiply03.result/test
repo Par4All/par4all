@@ -1,0 +1,60 @@
+
+Transformers for multiply03
+
+
+//  T(multiply03) {6N==multiply03}
+
+int multiply03(int i, int j, int N)
+{
+
+//  T(k) {}
+
+   int k;
+
+//  T(i) {i==2}
+
+
+   i = 2;
+
+//  T(j) {i==2, j==3}
+
+   j = 3;
+
+//  T(k) {6N==k, i==2, j==3}
+
+   k = i*N*j;
+
+//  T(multiply03) {6N==k, 6N==multiply03, i==2, j==3}
+
+   return k;
+}
+
+Preconditions for multiply03
+
+
+//  P() {}
+
+int multiply03(int i, int j, int N)
+{
+
+//  P() {}
+
+   int k;
+
+//  P(k) {}
+
+
+   i = 2;
+
+//  P(i,k) {i==2}
+
+   j = 3;
+
+//  P(i,j,k) {i==2, j==3}
+
+   k = i*N*j;
+
+//  P(i,j,k) {6N==k, i==2, j==3}
+
+   return k;
+}
