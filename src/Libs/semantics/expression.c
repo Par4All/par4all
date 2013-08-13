@@ -1634,8 +1634,8 @@ static transformer integer_multiply_to_transformer(entity v,
     int ub1 = 0;
     int lb2 = 0;
     int ub2 = 0;
-    expression ev1 = entity_to_expression(v1);
-    expression ev2 = entity_to_expression(v2);
+    //expression ev1 = entity_to_expression(v1);
+    //expression ev2 = entity_to_expression(v2);
 
     /* FI: I had to switch the arguments to satisfy a reasonnable
        assert in image_intersection(), but the switch may be
@@ -1645,10 +1645,13 @@ static transformer integer_multiply_to_transformer(entity v,
     t1 = transformer_range(transformer_apply(pre, t1));
     t2 = transformer_range(transformer_apply(pre, t2));
 
-    expression_and_precondition_to_integer_interval(ev1, t1, &lb1, &ub1);
-    expression_and_precondition_to_integer_interval(ev2, t2, &lb2, &ub2);
-    free_expression(ev1);
-    free_expression(ev2);
+    // Nelson Lossing: in some cases, these calls are useless and
+    // return [MIN,MAX] because ev1 and ev2 are built with temporary values
+    // In his case, it works if ev1 and ev2 are replaced by e1 and e2
+    integer_expression_and_precondition_to_integer_interval(e1, t1, &lb1, &ub1);
+    integer_expression_and_precondition_to_integer_interval(e2, t2, &lb2, &ub2);
+    //free_expression(ev1);
+    //free_expression(ev2);
 
     if(lb1==ub1) {
       /* The numerical value of expression e1 is known: v = lb1*v2 */
@@ -1657,7 +1660,8 @@ static transformer integer_multiply_to_transformer(entity v,
       vect_add_elem(&veq, (Variable) v2, (Value) lb1);
       transformer_equality_add(t2, veq);
       tf = t2;
-      free_transformer(t1);
+      t2 = transformer_undefined;
+    //free_transformer(t1);
     }
     else if(lb2==ub2) {
       /* The numerical value of expression e2 is known: v = lb2*v1 */
@@ -1665,7 +1669,8 @@ static transformer integer_multiply_to_transformer(entity v,
 
       vect_add_elem(&veq, (Variable) v1, (Value) lb2);
       tf = transformer_equality_add(t1, veq);
-      free_transformer(t2);
+      t1 = transformer_undefined;
+      //free_transformer(t2);
     }
     else if(ub1<=0) { // e1 is negative
       if(ub2<=0) { // e2 is negative
@@ -1746,7 +1751,10 @@ static transformer integer_multiply_to_transformer(entity v,
 	}
       }
     }
-    else { // FI: This should now be obsolete...
+    else {
+      /* FI: This should now be obsolete... but it is not when the
+	 signs are unknown */
+
       /* Do we have range information? */
       long long p1 = ((long long) lb1 )*((long long) lb2 );
       long long p2 = ((long long) lb1 )*((long long) ub2 );
@@ -1761,8 +1769,8 @@ static transformer integer_multiply_to_transformer(entity v,
       ub = (p3>ub)? p3 : ub;
       ub = (p4>ub)? p4 : ub;
 
-      free_transformer(t1);
-      free_transformer(t2);
+      //free_transformer(t1);
+      //free_transformer(t2);
 
       if(lb > INT_MIN || ub < INT_MAX)
 	tf = transformer_identity();
@@ -1782,14 +1790,18 @@ static transformer integer_multiply_to_transformer(entity v,
     }
   }
   else if(!transformer_undefined_p(t1)) {
-    free_transformer(t1);
+    // free_transformer(t1);
   }
   else if(!transformer_undefined_p(t2)) {
-    free_transformer(t2);
+    //free_transformer(t2);
+    //t2 = transformer_undefined;
   }
 
   free_transformer(pre);
 
+  /* let's try to exploit some properties of squaring, but the
+     detection is poor. For instance 2*i*i won't be identified as a
+     square. */
   if(transformer_undefined_p(tf)) {
     /* let's assume no impact from side effects */
     if(expression_equal_p(e1, e2)) {
@@ -1801,10 +1813,37 @@ static transformer integer_multiply_to_transformer(entity v,
       // affine and when the programmer plays on the behavior of
       // square around 0
       // See cavern01.c
+
+      /* v is greater than v1 and -v1. This makes v>=0 redundant */
+      if(!transformer_undefined_p(t1)) {
+	tf = transformer_add_inequality(t1, v1, v, false);
+	tf = transformer_add_inequality_with_affine_term(tf, v,
+							 v1, VALUE_MONE, VALUE_ZERO,
+							 false);
+	/* Memory leak with tf... */
+	tf = transformer_intersection(tf, t1);
+      }
+      else {
+	/* The result is always positive: v>=0 */
+	Pvecteur vineq = vect_new((Variable) v, VALUE_MONE);
+	tf = transformer_identity();
+	tf = transformer_inequality_add(tf, vineq);
+      }
+    }
+  }
+  else {
+    if(expression_equal_p(e1, e2)) {
+      /* The result is always positive: v>=0 */
       Pvecteur vineq = vect_new((Variable) v, VALUE_MONE);
-      tf = transformer_identity();
       tf = transformer_inequality_add(tf, vineq);
     }
+  }
+
+  if(!transformer_undefined_p(t1)) {
+    free_transformer(t1);
+  }
+  if(!transformer_undefined_p(t2)) {
+    free_transformer(t2);
   }
 
   pips_debug(8, "End with tf=%p\n", tf);
