@@ -1,5 +1,5 @@
 
-C  <A(PHI1)-W-MAY-{0<=PHI1}>
+C  <A(PHI1)-W-MAY-{0<=PHI1+N, N<=PHI1}>
 C  <B(PHI1)-W-EXACT-{PHI1==5}>
 
       SUBROUTINE NOSUBS(A, B, N, M)
@@ -8,12 +8,12 @@ C  <B(PHI1)-W-EXACT-{PHI1==5}>
       I = N*N                                                           0004
       J = 4                                                             0005
 
-C  <A(PHI1)-W-EXACT-{PHI1==I, J==4, 0<=I}>
+C  <A(PHI1)-W-EXACT-{PHI1==I, J==4, 0<=I+N, N<=I}>
 
       A(I) = 0                                                          0006
       K = 5                                                             0007
 
-C  <B(PHI1)-W-EXACT-{PHI1==5, J==4, K==5, 0<=I}>
+C  <B(PHI1)-W-EXACT-{PHI1==5, J==4, K==5, 0<=I+N, N<=I}>
 
       B(K) = 0                                                          0008
 

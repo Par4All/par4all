@@ -18,7 +18,7 @@ void non_affine01(int A[500], int B[500], int C[500][500], int i, int k)
 
       B[i*i+4] = 12345;
 
-//  T(k) {2<=i, i<=9, k<=9i+4, 2i+4<=k}
+//  T(k) {2<=i, i<=9, k<=9i+4, 2i+4<=k, 4<=k}
 
       k = i*i+4;
    }
