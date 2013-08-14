@@ -180,11 +180,11 @@ int main()
 
    k = bar(i);
 
-//  T(l) {i==6, j==4, k==12}
+//  T(l) {i==6, j==4, k==12, l==144}
 
    l = foo(k)*bar(i);
 
-//  T() {i==6, j==4, k==12}
+//  T() {i==6, j==4, k==12, l==144}
 
    return;
 }
@@ -234,7 +234,7 @@ int main()
 
    l = foo(k)*bar(i);
 
-//  P(i,j,k,l) {i==6, j==4, k==12}
+//  P(i,j,k,l) {i==6, j==4, k==12, l==144}
 
    return;
 }

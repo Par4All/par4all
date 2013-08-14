@@ -3,7 +3,7 @@ C  T() {}
 
       PROGRAM NON_LINEAR11
 
-C  T(I1) {1<=I1}
+C  T(I1) {0<=I1+N, N+2<=I1}
 
 
 C     Check the linearization of integer products
@@ -12,7 +12,7 @@ C     Both subexpressions are affine and equal
 
       I1 = (N+1)*(N+1)+1                                                0007
 
-C  T(I1) {1<=I1#init}
+C  T(I1) {0<=I1#init+N, N+2<=I1#init}
 
       READ *, I1                                                        0008
 
@@ -397,7 +397,7 @@ C     Both subexpressions are affine and equal
 
       I1 = (N+1)*(N+1)+1                                                0007
 
-C  P(I1) {1<=I1}
+C  P(I1) {0<=I1+N, N+2<=I1}
 
       READ *, I1                                                        0008
 

@@ -18,7 +18,7 @@ C (0,2)
 
       READ *, N                                                         0007
 
-C  T(I) {2<=I, I<=M}
+C  T(I) {I<=M, 2<=I+N, N+2<=I}
 
 C (0,3)
       DO I = N*N+2, M                                                   0008
@@ -80,19 +80,19 @@ C  P(N) {1<=L}
 C (0,3)
       DO I = N*N+2, M                                                   0008
 
-C  P(I,N) {2<=I, I<=L, I<=M, 1<=L}
+C  P(I,N) {1<=I, I<=L, I<=M, 2<=I+N, N+2<=I, 1<=L}
 
 C (0,4)
          T(I) = 0.                                                      0009
       ENDDO
 
-C  P(I,N) {2<=I, 1<=L}
+C  P(I,N) {2<=I+N, N+2<=I, 1<=L}
 
 C (0,5)
 
       PRINT *, I                                                        0012
 
-C  P(I,N) {2<=I, 1<=L}
+C  P(I,N) {2<=I+N, N+2<=I, 1<=L}
 
 C (0,6)
 
