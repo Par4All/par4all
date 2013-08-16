@@ -14,8 +14,8 @@ se:      i--;
    }
    return i;
 }
-The path transformer between Sbegin and Send is
-arguments:relation: 
- { 
- 1  == -1 ,
- } 
+
+The path transformer between Sbegin and Send is:
+
+//  T() {0==-1}
+

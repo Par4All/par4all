@@ -1,4 +1,5 @@
 setenv WS=sb_loop_out_ctxt
+delete $WS
 setproperty ABORT_ON_USER_ERROR TRUE
 
 setenv PIPS_CPP_FLAGS " -D TIME "

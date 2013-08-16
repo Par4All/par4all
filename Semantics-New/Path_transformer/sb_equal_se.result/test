@@ -7,10 +7,11 @@ sb:   k2++;
    k3++;
    return i;
 }
-The path transformer between Sbegin and Send is
-arguments:relation: 
- { 
- } 
+
+The path transformer between Sbegin and Send is:
+
+//  T() {}
+
 When The transformer for the empty path is false:
 int main()
 {
@@ -20,8 +21,8 @@ sb:   k2++;
    k3++;
    return i;
 }
-The path transformer between Sbegin and Send is
-arguments:relation: 
- { 
- 1  == -1 ,
- } 
+
+The path transformer between Sbegin and Send is:
+
+//  T() {0==-1}
+

@@ -14,9 +14,8 @@ se:      i = i+4;
    }
    return i;
 }
-The path transformer between Sbegin and Send is
-arguments:relation:VAR k1#new, k1#init, i#new 
- { 
-  i#new  == 27 ,
-- k1#init + k1#new  == 1 ,
- } 
+
+The path transformer between Sbegin and Send is:
+
+//  T(i,k1) {i==27, k1==k1#init+1}
+

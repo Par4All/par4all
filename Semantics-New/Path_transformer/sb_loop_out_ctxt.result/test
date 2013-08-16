@@ -12,12 +12,9 @@ sbegin:      a[i] = a[i]+1;
 send:   b[i] = a[i]+a[i+1];
    return i;
 }
-The path transformer between Sbegin and Send is
-arguments:relation:VAR n#new, k1#init, k1#new, i#init, k2#new, k2#init, i#new, n#init 
- { 
-  n#init - i#new  <= 0 ,
-- i#new + i#init  <= -1 ,
-- i#new + i#init + k1#new - k1#init  == -1 ,
-- i#new + i#init + k2#new - k2#init  == 0 ,
-- n#init + n#new  == 1 ,
- } 
+
+The path transformer between Sbegin and Send is:
+
+//  T(i,k1,k2,n) {i+k1#init==i#init+k1+1, i+k2#init==i#init+k2,
+//    n==n#init+1, i#init+1<=i, n#init<=i}
+

@@ -5,7 +5,7 @@ delete sb_loop_se_loop
 setenv PIPS_CPP_FLAGS " -D TIME "
 
 create sb_loop_se_loop sb_loop_se_loop.c
-activate C_PARSER
+
 
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL
@@ -17,10 +17,16 @@ setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
 setproperty PATH_TRANSFORMER_BEGIN "sb"
 setproperty PATH_TRANSFORMER_END "se"
 apply PATH_TRANSFORMER[main]
+echo
+echo Path transformer out-of-context
+echo
 shell cat  sb_loop_se_loop.database/main/main.pt
 
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 apply PATH_TRANSFORMER[main]
+echo
+echo Path transformer out-of-context
+echo
 shell cat  sb_loop_se_loop.database/main/main.pt
 
 close
