@@ -112,20 +112,23 @@ static transformer do_loop_to_init_transformer(loop l, transformer pre __attribu
   return t_init;
 }
 
-static transformer do_loop_to_enter_condition_transformer(loop l, transformer pre  __attribute__ ((unused)))  
+static transformer do_loop_to_enter_condition_transformer(loop l, transformer pre)  
 {
   entity i = loop_index(l);
   expression e1 = entity_to_expression(i);
   expression e2 = copy_expression(range_upper(loop_range(l)));
   expression e3 = binary_intrinsic_expression(GREATER_THAN_OPERATOR_NAME, e1, e2);
   //transformer t_init = do_loop_to_init_transformer(l, transformer_undefined);
-  transformer t_enter = condition_to_transformer(e3, /*transformer_apply(t_init, pre)*/ transformer_undefined, false);
+  transformer t_enter_up = condition_to_transformer(e3, pre, false);
+  free_expression(e3);
   e1 = entity_to_expression(i);
   e2 = copy_expression(range_lower(loop_range(l)));
   e3 = binary_intrinsic_expression(GREATER_OR_EQUAL_OPERATOR_NAME, e1, e2);
-  transformer t_enter2 = condition_to_transformer(e3,  transformer_undefined, true);
+  transformer t_enter_low = condition_to_transformer(e3,  transformer_undefined, true);
   free_expression(e3);
-  return transformer_combine(t_enter, t_enter2);
+  transformer t_enter = transformer_combine(t_enter_up, t_enter_low);
+  free_transformer(t_enter_low);
+  return t_enter;
 }
 
 static transformer do_loop_to_exit_condition_transformer(loop l, transformer pre __attribute__ ((unused)))  
@@ -151,17 +154,21 @@ static transformer approximative(statement sb, statement s, path pbegin, path pe
   transformer pre = precondition_in_off(sb); 
   tb = path_transformer_on(sb, pbegin, pend, MODE_PERMANENT);
   transformer t_enter = do_loop_to_enter_condition_transformer(l, pre);
-  tb_complete = transformer_combine(t_enter, tb);
-  transformer t_inc = transformer_add_loop_index_incrementation(transformer_identity(), l, pre);// safe_expression_to_transformer(inc_e, transformer_undefined);
+  tb_complete = transformer_combine(copy_transformer(t_enter), tb);
+  transformer t_inc = transformer_add_loop_index_incrementation(transformer_identity(), l, pre);
+  // safe_expression_to_transformer(inc_e, transformer_undefined);
   tb_complete = transformer_combine(tb_complete, t_inc);
+  //tb_complete = transformer_combine(tb_complete, t_enter);
   t_star = transformer_derivative_fix_point(tb_complete);
+  //t_star = transformer_combine(t_star, t_enter);
+  //t_star = transformer_convex_hull(t_enter, t_star_plus
   if(belong_to_statement(s,sbegin, false)){
     t_star = transformer_combine(t_star, tb_complete);
   }
   free_transformer(t_enter);
   //free_transformer(tb); 
   //free_transformer(t_star);
-  //free_transformer(tb_complete); 
+  free_transformer(tb_complete); 
   //print_transformer(t);
   return t_star;
 }
@@ -434,7 +441,8 @@ bool path_transformer(char * module_name)
   statement sbegin = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),sbegin_label_name);
   statement send =  find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),send_label_name);
   path_initialize(module_stat,  sbegin, send, &pbegin, &pend);
-  transformer cumulated_transformer = compute_path_transformer(module_stat, pbegin, pend); 
+  transformer cumulated_transformer = compute_path_transformer(module_stat, pbegin, pend);
+  cumulated_transformer = transformer_normalize(cumulated_transformer,2);
   
   string local = db_build_file_resource_name(DBR_PATH_TRANSFORMER_FILE, module_name, ".pt");
   string dir = db_get_current_workspace_directory();
@@ -443,9 +451,13 @@ bool path_transformer(char * module_name)
   FILE * fp = safe_fopen(full,"w");
   text txt = make_text(NIL);
   MERGE_TEXTS(txt, text_module(module, module_stat));
-  ADD_SENTENCE_TO_TEXT(txt,MAKE_ONE_WORD_SENTENCE(0,"The path transformer between Sbegin and Send is"));
+  ADD_SENTENCE_TO_TEXT(txt,MAKE_ONE_WORD_SENTENCE(0,"\nThe path transformer between Sbegin and Send is:"));
+  //init_prettyprint(semantic_to_text);
+  set_prettyprint_transformer();
+  MERGE_TEXTS(txt, text_transformer(cumulated_transformer));
   print_text(fp,txt);
-  fprint_transformer(fp, transformer_normalize(cumulated_transformer,2), (get_variable_name_t)  external_value_name);
+  //fprint_transformer(fp, transformer_normalize(cumulated_transformer,2), (get_variable_name_t)  external_value_name);
+  //fprint_transformer(fp, cumulated_transformer, (get_variable_name_t)  external_value_name);
   free_text(txt);
   safe_fclose(fp,full);
   free(full);
@@ -462,5 +474,3 @@ bool path_transformer(char * module_name)
   free_value_mappings();
   return true;
 }
-
-
