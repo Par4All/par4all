@@ -95,14 +95,16 @@ static statement cluster_stage_spire(persistant_statement_to_schedule stmt_to_sc
     list_cl = CONS(STATEMENT, stmt_spawn, list_cl);
   }
   instruction ins_finish = make_instruction_sequence(make_sequence(gen_nreverse(list_cl)));
+  synchronization sync = make_synchronization_none();
+  (costly_p)? sync = make_synchronization_barrier() : make_synchronization_none();
   stmt_finish = make_statement(
-			       entity_empty_label(),
-			       STATEMENT_NUMBER_UNDEFINED,
-			       STATEMENT_ORDERING_UNDEFINED,
-			       empty_comments,
-			       ins_finish,
-			       NIL, NULL, empty_extensions(), 
-			       make_synchronization_barrier());
+				 entity_empty_label(),
+				 STATEMENT_NUMBER_UNDEFINED,
+				 STATEMENT_ORDERING_UNDEFINED,
+				 empty_comments,
+				 ins_finish,
+				 NIL, NULL, empty_extensions(), 
+				 sync);
   return stmt_finish; 
 }
 
@@ -115,7 +117,7 @@ void cluster_stage_spire_generation(persistant_statement_to_schedule stmt_to_sch
     instruction inst = statement_instruction(stmt);
     switch(instruction_tag(inst)){
     case is_instruction_block:{
-      list cluster_stages = /*gen_nreverse*/(topological_sort(stmt));
+      list cluster_stages = topological_sort(stmt);
       list list_cl = NIL;
       FOREACH(LIST, cluster_stage, cluster_stages) {
 	st_finish = cluster_stage_spire(stmt_to_schedule, tg, cluster_stage, P);
@@ -174,4 +176,3 @@ bool spire_unstructured_to_structured (char * module_name)
   reset_current_module_entity(); 
   return true;
 }
-

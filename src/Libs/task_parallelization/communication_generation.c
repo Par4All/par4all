@@ -81,9 +81,18 @@ static list list_communications(list l_communications, list args_com)
   expression size;
   FOREACH(REGION,reg,l_communications){
     if (!region_empty_p(reg) && region_entity(reg) != entity_undefined){
+      /*FOREACH(EXPRESSION,ex,reference_indices(region_any_reference(reg))) {
+        if(expression_reference_p(ex)) {
+	  reference ref = expression_reference(ex);
+	  entity var = reference_variable(ref);
+	  //expression ex2 =  region_reference_to_expression(reg);
+	  //args_com = CONS(EXPRESSION, ex, args_com);
+        }
+	}*/
+      reference rr = region_any_reference(reg);
+      expression exp_phi = region_reference_to_expression(rr);
       expression exp = make_entity_expression(region_entity(reg), NIL);
       if(count_data(exp, args_com) == 0){
-	args_com = CONS(EXPRESSION, exp, args_com);
 	/*basic b = basic_of_expression(exp);
 	if(basic_pointer_p(b)) 
 	search for the size of the malloc instruction*/
@@ -92,6 +101,10 @@ static list list_communications(list l_communications, list args_com)
 	  size = int_to_expression(-1);//this will print UNDEFINED_COST
 	else
 	  size = polynome_to_expression(reg_footprint);
+	if(expression_to_int(size) == 1)
+	  args_com = CONS(EXPRESSION, exp_phi, args_com);
+	else
+	  args_com = CONS(EXPRESSION, exp, args_com);
 	args_com = CONS(EXPRESSION, size, args_com);
       }
     }
@@ -258,32 +271,62 @@ void communications_construction(graph tg, statement stmt, persistant_statement_
   switch(instruction_tag(inst)){
   case is_instruction_block:{
     list vertices = graph_vertices(tg), coms_send = NIL, coms_recv = NIL, coms_st = NIL; 
+    list barrier = NIL;
     MAPL(stmt_ptr,
 	 {
-	   statement s = STATEMENT(CAR(stmt_ptr ));
-	   bool found_p = false;
-	   FOREACH(VERTEX, pre, vertices) {
-	     statement this = vertex_to_statement(pre);
-	     if(statement_equal_p(this,s) && bound_persistant_statement_to_schedule_p(stmt_to_schedule, s)) {
-	       found_p = true;
-	       break;
-	     }
-	   }
-	   if(found_p){
-	     int ki = apply_persistant_statement_to_schedule(stmt_to_schedule, s);
-	     list args_send =  gen_recv_communications(s, stmt_to_schedule, tg, kp);
-	     list args_recv =  gen_send_communications(s, statement_to_vertex(s,tg), stmt_to_schedule, tg, kp);
-	     if(gen_length(args_recv) > 0 && (kp != ki) )
-	       coms_recv = CONS(STATEMENT, com_call(PREDECESSORS, args_recv, ki), coms_recv);
-	     if(gen_length(args_send) > 0 && (kp != ki) )
-	       coms_send = CONS(STATEMENT, com_call(SUCCESSORS, args_send, ki), coms_send);
-	     communications_construction(tg, s, stmt_to_schedule,  ki);
+	   statement ss = STATEMENT(CAR(stmt_ptr ));
+	   if(statement_block_p(ss)){
+	     instruction sinst = statement_instruction(ss);
+	     MAPL(sb_ptr,
+		  {
+		    statement sb = STATEMENT(CAR(sb_ptr ));
+		    if(statement_block_p(sb)){
+		      instruction sbinst = statement_instruction(sb);
+		      MAPL(ss_ptr,
+			   {
+			     statement s = STATEMENT(CAR(ss_ptr ));
+			     barrier = CONS(STATEMENT,s,barrier);
+			   },
+			   instruction_block(sbinst));
+		    }
+		    else
+		      barrier = CONS(STATEMENT,sb,barrier);
+		  },
+		  instruction_block(sinst));
 	   }
 	   else
-	     communications_construction(tg, s, stmt_to_schedule, kp);
+	     barrier = CONS(STATEMENT,ss,barrier);
 	 },
 	 instruction_block(inst));
+    //MAPL(stmt_ptr,
+    FOREACH(STATEMENT, s, barrier)
+      {
+	//statement s = STATEMENT(CAR(stmt_ptr ));
+	bool found_p = false;
+	FOREACH(VERTEX, pre, vertices) {
+	  statement this = vertex_to_statement(pre);
+	  if(statement_equal_p(this,s) && bound_persistant_statement_to_schedule_p(stmt_to_schedule, s)) {
+	    found_p = true;
+	    break;
+	  }
+	}
+	if(found_p){
+	  int ki = apply_persistant_statement_to_schedule(stmt_to_schedule, s);
+	  list args_send =  gen_recv_communications(s, stmt_to_schedule, tg, kp);
+	  list args_recv =  gen_send_communications(s, statement_to_vertex(s,tg), stmt_to_schedule, tg, kp);
+	  if(gen_length(args_recv) > 0 && (kp != ki) )
+	    coms_recv = CONS(STATEMENT, com_call(PREDECESSORS, args_recv, ki), coms_recv);
+	  if(gen_length(args_send) > 0 && (kp != ki) )
+	    coms_send = CONS(STATEMENT, com_call(SUCCESSORS, args_send, ki), coms_send);
+	  communications_construction(tg, s, stmt_to_schedule,  ki);
+	}
+	else
+	  communications_construction(tg, s, stmt_to_schedule, kp);
+      }//,
+    //instruction_block(inst));
     if((gen_length(coms_send) > 0 || gen_length(coms_recv) > 0) && (hierarchy_level!=0)){
+      printf("this sequence apres hierarchy\n");
+      print_statement(stmt);
       statement new_s = make_statement(
 				       statement_label(stmt),
 				       STATEMENT_NUMBER_UNDEFINED,
@@ -296,12 +339,13 @@ void communications_construction(graph tg, statement stmt, persistant_statement_
 	  coms_st = CONS(STATEMENT, st, coms_st);
 	}
       }
-      coms_st = CONS(STATEMENT, new_s, coms_st);
+      //coms_st = CONS(STATEMENT, new_s, coms_st);
       if(gen_length(coms_send) > 0){
 	FOREACH(STATEMENT, st, coms_send){
 	  coms_st = CONS(STATEMENT, st, coms_st);
 	}
       }
+      coms_st = CONS(STATEMENT, new_s, coms_st);
       instruction seq = make_instruction_sequence(make_sequence((coms_st)));
       statement_instruction(stmt) = seq;
       statement_extensions(stmt) = empty_extensions();
@@ -360,6 +404,7 @@ bool hbdsc_gen_communications(char * module_name)
   persistant_statement_to_schedule stmt_to_schedule = (persistant_statement_to_schedule)db_get_memory_resource(DBR_SCHEDULE, module_name, true);
 
   NBCLUSTERS = get_int_property("BDSC_NB_CLUSTERS");
+  hierarchy_level = 0;
   communications_construction(kdg, module_stat, stmt_to_schedule, 0);
   /* Reorder the module, because new statements have been generated. */
   module_reorder(module_stat);

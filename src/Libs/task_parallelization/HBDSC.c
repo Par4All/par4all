@@ -436,22 +436,23 @@ bool hbdsc_parallelization(char * module_name)
   tg_name = strdup(concatenate(db_get_current_workspace_directory(),
 			       "/",module_name,"/",module_name, "_scheduled_sdg.dot", NULL));
   ftg = safe_fopen(tg_name, "w");
-  fprintf( ftg, "digraph {\n compound=true;ratio=fill; node[fontsize=24];nodesep=.05;\n" );
+  fprintf( ftg, "digraph {\n compound=true;ratio=fill; node[fontsize=24,fontname=\"Courier\",labelloc=\"t\"];nodesep=.05;\n" );
   print_SDGs(module_stat, kdg, ftg, annotations);
   fprintf( ftg, "\n}\n" );
   safe_fclose(ftg, tg_name);
   free(tg_name);
   
-  reset_ordering_to_statement();
+  //reset_ordering_to_statement();
   DB_PUT_MEMORY_RESOURCE(DBR_DG, module_name, (char*) kdg);
   DB_PUT_MEMORY_RESOURCE(DBR_SCHEDULE, module_name, stmt_to_schedule);
   reset_proper_rw_effects();
   reset_cumulated_rw_effects();
+  reset_ordering_to_statement();
   reset_rw_effects();
   reset_in_effects();
   reset_out_effects();
   reset_precondition_map();
-  reset_complexity_map();
+  //reset_complexity_map();
   reset_transformer_map();
   reset_current_module_statement();
   reset_current_module_entity();
@@ -516,6 +517,8 @@ bool dsc_code_parallelization(char * module_name)
   module_reorder(module_stat);
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
   reset_ordering_to_statement();
+  reset_current_module_statement();
+  reset_current_module_entity();
   reset_proper_rw_effects();
   reset_cumulated_rw_effects();
   reset_rw_effects();
@@ -524,8 +527,6 @@ bool dsc_code_parallelization(char * module_name)
   reset_precondition_map();
   reset_complexity_map();
   reset_transformer_map();
-  reset_current_module_statement();
-  reset_current_module_entity();
   gen_array_free(annotations);
   gen_array_free(clusters);
   generic_effects_reset_all_methods();

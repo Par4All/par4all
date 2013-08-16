@@ -53,7 +53,8 @@ bool costly_task(statement st){
   bool costly_p = false;
   instruction inst = statement_instruction(st);
   if (statement_contains_user_call_p(st))
-    return true;
+    if(user_call_p(statement_call(st)))
+       return true;
   else{
     switch(instruction_tag(inst)){
     case is_instruction_block:{
@@ -150,10 +151,11 @@ double edge_cost(statement s1, statement s2)
   FOREACH(REGION,reg,l_communications){
     Ppolynome reg_footprint = region_enumerate(reg); 
     //reg_footprint =  polynome_mult(reg_footprint, expression_to_polynome(int_to_expression(SizeOfElements(variable_basic(type_variable(entity_type(region_entity(reg))))))));
-    //reg_footprint =  polynome_mult(reg_footprint, expression_to_polynome(int_to_expression(2)));
+    //reg_footprint =
+    //polynome_mult(reg_footprint,expression_to_polynome(int_to_expression(2.5)));//\beta= 2.5 on Cmmcluster
     polynome_add(&transfer_time, reg_footprint);
   }
-  //polynome_add(&transfer_time, latency);
+  //polynome_add(&transfer_time, latency);// the latency \alpha = 15000 on Cmmcluster
   //polynome_fprint(stderr,transfer_time,entity_local_name,default_is_inferior_var);
   return polynomial_to_numerical(transfer_time);
 }
