@@ -1,0 +1,490 @@
+void main_PE0()
+{
+   //PIPS generated variable
+   void trigger_2(Cplfloat ValSteer[16][64]);
+   //PIPS generated variable
+   void trigger_1(int tab_index[5]);
+   //PIPS generated variable
+   int i1, i0;
+   barrier(
+   spawn(0,
+   /*CTR - mode: init rate: */
+   /* appelle fonction : AST_GEN_STIM */
+   GEN_STIM(64, 2000, 19, STIM, 30, 45, 20);
+   )
+   spawn(2,
+   
+   
+   trigger_1(tab_index);
+   /*sel - mode: init rate: */
+   trigger_2(ValSteer);
+   )
+   )
+   barrier(
+   spawn(0,
+
+   turn7(19, 2000, 64, STIM, X__out);
+   )
+   spawn(1,
+
+   turn4(19, 2000, 64, STIM, X_2_out);
+   )
+   )
+   barrier(
+   spawn(0,
+
+   for(i0 = 0; i0 <= 1999; i0 += 1)
+      MTI(19, 64, X__out[i0], mti_out[i0]);
+   )
+   spawn(1,
+   for(i0 = 0; i0 <= 18; i0 += 1)
+      for(i1 = 0; i1 <= 63; i1 += 1)
+         SEL(2000, X_2_out[i0][i1], tab_index, 40, sel_out[i0][i1]);
+   )
+   )
+   barrier(
+   spawn(0,
+
+   turn3(2000, 64, 18, mti_out, X_5_out);
+   )
+   spawn(1,
+   
+   
+   for(i0 = 0; i0 <= 18; i0 += 1)
+      COR(200, 64, sel_out[i0], CORR_out[i0]);
+   )
+   )
+   barrier(
+   spawn(1,
+
+   turn6(19, 64, 64, CORR_out, X_6_out);
+   )
+   )
+   barrier(
+   spawn(1,
+
+   for(i0 = 0; i0 <= 63; i0 += 1)
+      ADD_COR(64, 19, X_6_out[i0], ADD_CORR_out[i0]);
+   )
+   )
+   barrier(
+   spawn(1,
+
+   INV(64, ADD_CORR_out, INV_out);
+   )
+   )
+   barrier(
+   spawn(1,
+
+   Matmat(16, 64, 64, ValSteer, INV_out, CTR_out);
+   )
+   )
+   barrier(
+   spawn(1,
+   for(i0 = 0; i0 <= 17; i0 += 1)
+      for(i1 = 0; i1 <= 15; i1 += 1)
+         
+         
+         
+         Matmat_transp(1, 64, 2000, CTR_out[i1], X_5_out[i0], DBF_out[i0][i1]);
+   )
+   )
+   barrier(
+   spawn(1,
+
+   turn7(18, 16, 2000, DBF_out, X_4_out);
+   )
+   )
+   barrier(
+   spawn(1,
+
+   for(i0 = 0; i0 <= 15; i0 += 1)
+      DOP(18, 2000, X_4_out[i0], 32, DOP_out[i0]);
+   )
+   )
+   barrier(
+   spawn(1,
+
+   turn4(16, 2000, 32, DOP_out, X_3_out);
+   )
+   )
+   barrier(
+   spawn(1,
+
+   for(i0 = 0; i0 <= 15; i0 += 1)
+      MTI(1999, 32, X_3_out[i0], CI_out[i0]);
+   )
+   )
+}
+void main_PE0()
+{
+   //PIPS generated variable
+   void trigger_2(Cplfloat ValSteer[16][64]);
+   //PIPS generated variable
+   void trigger_1(int tab_index[5]);
+   //PIPS generated variable
+   int i1, i0;
+   barrier(
+   spawn(0,
+   /*CTR - mode: init rate: */
+   /* appelle fonction : AST_GEN_STIM */
+   GEN_STIM(64, 2000, 19, STIM, 30, 45, 20);
+   send(1, 2432000, STIM);
+   )
+   spawn(2,
+   
+   
+   trigger_1(tab_index);
+   send(1, 5, tab_index);
+   /*sel - mode: init rate: */
+   trigger_2(ValSteer);
+   send(1, 1024, ValSteer);
+   )
+   )
+   barrier(
+   spawn(0,
+
+   turn7(19, 2000, 64, STIM, X__out);
+   )
+   spawn(1,
+   recv(0, 2432000, STIM);
+
+   turn4(19, 2000, 64, STIM, X_2_out);
+   )
+   )
+   barrier(
+   spawn(0,
+
+   for(i0 = 0; i0 <= 1999; i0 += 1)
+      MTI(19, 64, X__out[i0], mti_out[i0]);
+   )
+   spawn(1,
+   recv(2, 5, tab_index);
+   for(i0 = 0; i0 <= 18; i0 += 1)
+      for(i1 = 0; i1 <= 63; i1 += 1)
+         SEL(2000, X_2_out[i0][i1], tab_index, 40, sel_out[i0][i1]);
+   )
+   )
+   barrier(
+   spawn(0,
+
+   turn3(2000, 64, 18, mti_out, X_5_out);
+   send(1, 2304000, X_5_out);
+   )
+   spawn(1,
+   
+   
+   for(i0 = 0; i0 <= 18; i0 += 1)
+      COR(200, 64, sel_out[i0], CORR_out[i0]);
+   )
+   )
+   barrier(
+   spawn(1,
+
+   turn6(19, 64, 64, CORR_out, X_6_out);
+   )
+   )
+   barrier(
+   spawn(1,
+
+   for(i0 = 0; i0 <= 63; i0 += 1)
+      ADD_COR(64, 19, X_6_out[i0], ADD_CORR_out[i0]);
+   )
+   )
+   barrier(
+   spawn(1,
+
+   INV(64, ADD_CORR_out, INV_out);
+   )
+   )
+   barrier(
+   spawn(1,
+   recv(2, 1024, ValSteer);
+
+   Matmat(16, 64, 64, ValSteer, INV_out, CTR_out);
+   )
+   )
+   barrier(
+   spawn(1,
+   recv(0, 2304000, X_5_out);
+   for(i0 = 0; i0 <= 17; i0 += 1)
+      for(i1 = 0; i1 <= 15; i1 += 1)
+         
+         
+         
+         Matmat_transp(1, 64, 2000, CTR_out[i1], X_5_out[i0], DBF_out[i0][i1]);
+   )
+   )
+   barrier(
+   spawn(1,
+
+   turn7(18, 16, 2000, DBF_out, X_4_out);
+   )
+   )
+   barrier(
+   spawn(1,
+
+   for(i0 = 0; i0 <= 15; i0 += 1)
+      DOP(18, 2000, X_4_out[i0], 32, DOP_out[i0]);
+   )
+   )
+   barrier(
+   spawn(1,
+
+   turn4(16, 2000, 32, DOP_out, X_3_out);
+   )
+   )
+   barrier(
+   spawn(1,
+
+   for(i0 = 0; i0 <= 15; i0 += 1)
+      MTI(1999, 32, X_3_out[i0], CI_out[i0]);
+   )
+   )
+}
+// MPI style
+void main_PE0()
+{
+   {
+      //PIPS generated variable
+      int rank0;
+      //PIPS generated variable
+      MPI_Status status0;
+      //PIPS generated variable
+      MPI_Request request0;
+      MPI_Init(&argc, &argv);
+      MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
+      //PIPS generated variable
+      void trigger_2(Cplfloat ValSteer[16][64]);
+      //PIPS generated variable
+      void trigger_1(int tab_index[5]);
+      //PIPS generated variable
+      int i1, i0;
+      if (rank0==0) {
+         /*CTR - mode: init rate: */
+         /* appelle fonction : AST_GEN_STIM */
+         GEN_STIM(64, 2000, 19, STIM, 30, 45, 20);
+         MPI_Isend(STIM, 2432000, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==2) {
+         
+         
+         trigger_1(tab_index);
+         MPI_Isend(tab_index, 5, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         /*sel - mode: init rate: */
+         trigger_2(ValSteer);
+         MPI_Isend(ValSteer, 1024, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==0)
+
+         turn7(19, 2000, 64, STIM, X__out);
+      if (rank0==1) {
+         MPI_Recv(STIM, 2432000, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+
+         turn4(19, 2000, 64, STIM, X_2_out);
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==0)
+
+         for(i0 = 0; i0 <= 1999; i0 += 1)
+            MTI(19, 64, X__out[i0], mti_out[i0]);
+      if (rank0==1) {
+         MPI_Recv(tab_index, 5, MPI_INT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(i0 = 0; i0 <= 18; i0 += 1)
+            for(i1 = 0; i1 <= 63; i1 += 1)
+               SEL(2000, X_2_out[i0][i1], tab_index, 40, sel_out[i0][i1]);
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==0) {
+
+         turn3(2000, 64, 18, mti_out, X_5_out);
+         MPI_Isend(X_5_out, 2304000, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==1)
+         
+         
+         for(i0 = 0; i0 <= 18; i0 += 1)
+            COR(200, 64, sel_out[i0], CORR_out[i0]);
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==1)
+
+         turn6(19, 64, 64, CORR_out, X_6_out);
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==1)
+
+         for(i0 = 0; i0 <= 63; i0 += 1)
+            ADD_COR(64, 19, X_6_out[i0], ADD_CORR_out[i0]);
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==1)
+
+         INV(64, ADD_CORR_out, INV_out);
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==1) {
+         MPI_Recv(ValSteer, 1024, MPI_FLOAT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+
+         Matmat(16, 64, 64, ValSteer, INV_out, CTR_out);
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==1) {
+         MPI_Recv(X_5_out, 2304000, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(i0 = 0; i0 <= 17; i0 += 1)
+            for(i1 = 0; i1 <= 15; i1 += 1)
+               
+               
+               
+               Matmat_transp(1, 64, 2000, CTR_out[i1], X_5_out[i0], DBF_out[i0][i1]);
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==1)
+
+         turn7(18, 16, 2000, DBF_out, X_4_out);
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==1)
+
+         for(i0 = 0; i0 <= 15; i0 += 1)
+            DOP(18, 2000, X_4_out[i0], 32, DOP_out[i0]);
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==1)
+
+         turn4(16, 2000, 32, DOP_out, X_3_out);
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==1)
+
+         for(i0 = 0; i0 <= 15; i0 += 1)
+            MTI(1999, 32, X_3_out[i0], CI_out[i0]);
+      MPI_Barrier(MPI_COMM_WORLD);
+   }
+   MPI_Finalize();
+}
+// OMP style
+void main_PE0()
+{
+   //PIPS generated variable
+   void trigger_2(Cplfloat ValSteer[16][64]);
+   //PIPS generated variable
+   void trigger_1(int tab_index[5]);
+   //PIPS generated variable
+   int i1, i0;
+#pragma omp parallel default(shared) 
+#pragma omp single
+   {
+#pragma omp task
+      {
+         /*CTR - mode: init rate: */
+         /* appelle fonction : AST_GEN_STIM */
+         GEN_STIM(64, 2000, 19, STIM, 30, 45, 20);
+
+      }
+#pragma omp task
+      {
+         
+         
+         trigger_1(tab_index);
+
+         /*sel - mode: init rate: */
+         trigger_2(ValSteer);
+
+      }
+   }
+#pragma omp single
+   {
+#pragma omp task
+      {
+
+         turn7(19, 2000, 64, STIM, X__out);
+      }
+#pragma omp task
+      {
+
+
+         turn4(19, 2000, 64, STIM, X_2_out);
+      }
+   }
+#pragma omp single
+   {
+#pragma omp task
+      {
+
+         for(i0 = 0; i0 <= 1999; i0 += 1)
+            MTI(19, 64, X__out[i0], mti_out[i0]);
+      }
+#pragma omp task
+      {
+
+         for(i0 = 0; i0 <= 18; i0 += 1)
+            for(i1 = 0; i1 <= 63; i1 += 1)
+               SEL(2000, X_2_out[i0][i1], tab_index, 40, sel_out[i0][i1]);
+      }
+   }
+#pragma omp single
+   {
+#pragma omp task
+      {
+
+         turn3(2000, 64, 18, mti_out, X_5_out);
+
+      }
+#pragma omp task
+      {
+         
+         
+         for(i0 = 0; i0 <= 18; i0 += 1)
+            COR(200, 64, sel_out[i0], CORR_out[i0]);
+      }
+   }
+#pragma omp single
+   {
+
+      turn6(19, 64, 64, CORR_out, X_6_out);
+   }
+#pragma omp single
+   {
+
+      for(i0 = 0; i0 <= 63; i0 += 1)
+         ADD_COR(64, 19, X_6_out[i0], ADD_CORR_out[i0]);
+   }
+#pragma omp single
+   {
+
+      INV(64, ADD_CORR_out, INV_out);
+   }
+#pragma omp single
+   {
+
+
+      Matmat(16, 64, 64, ValSteer, INV_out, CTR_out);
+   }
+#pragma omp single
+   {
+
+      for(i0 = 0; i0 <= 17; i0 += 1)
+         for(i1 = 0; i1 <= 15; i1 += 1)
+            
+            
+            
+            Matmat_transp(1, 64, 2000, CTR_out[i1], X_5_out[i0], DBF_out[i0][i1]);
+   }
+#pragma omp single
+   {
+
+      turn7(18, 16, 2000, DBF_out, X_4_out);
+   }
+#pragma omp single
+   {
+
+      for(i0 = 0; i0 <= 15; i0 += 1)
+         DOP(18, 2000, X_4_out[i0], 32, DOP_out[i0]);
+   }
+#pragma omp single
+   {
+
+      turn4(16, 2000, 32, DOP_out, X_3_out);
+   }
+#pragma omp single
+   {
+
+      for(i0 = 0; i0 <= 15; i0 += 1)
+         MTI(1999, 32, X_3_out[i0], CI_out[i0]);
+   }
+}
