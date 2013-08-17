@@ -1,0 +1,17 @@
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module main.
+
+Program received signal SIGSEGV, Segmentation fault.
+0x00000000006ce6ab in free_obj_in (obj=<value optimized out>, dr=<value optimized out>) at /home/dounia/PIPS/prod/newgen/src/genC/genClib.c:980
+980	    if (IS_TABULATED(bp))
+(gdb) where
+#0  0x00000000006ce6ab in free_obj_in (obj=<value optimized out>, dr=<value optimized out>) at /home/dounia/PIPS/prod/newgen/src/genC/genClib.c:980
+#1  0x00000000006d0870 in gen_trav_obj (obj=0x12ca1c0, dr=0x7fffffffbfa0) at /home/dounia/PIPS/prod/newgen/src/genC/genClib.c:582
+#2  0x00000000006d1650 in gen_free (obj=0x12ca1c0) at /home/dounia/PIPS/prod/newgen/src/genC/genClib.c:1013
+#3  0x00000000005f6519 in pipsdbm_free_statement_mapping (h=0x11c5770) at /home/dounia/PIPS/pips_dev/task_parallelization_08/src/Libs/pipsdbm/externals.c:202
+#4  0x00000000005f41e2 in db_save_and_free_resource (rname=0x743ae1 "COMPLEXITIES", oname=0xbcec50 "main", do_free=1)
+    at /home/dounia/PIPS/pips_dev/task_parallelization_08/src/Libs/pipsdbm/database.c:661
+#5  db_save_and_free_memory_resource_if_any (rname=0x743ae1 "COMPLEXITIES", oname=0xbcec50 "main", do_free=1)
+
