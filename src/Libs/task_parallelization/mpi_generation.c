@@ -118,14 +118,16 @@ static void gen_if_rank(statement stmt, synchronization sync){
   return;
 }
 
-
-static bool gen_mpi(statement stmt){
+/* nesting_level is used to generate only a flat MPI (nesting_level = 1)
+ * hierarchical mpi is not implemented yet (nesting_level = 2)*/
+static int gen_mpi(statement stmt, int nesting_level){
   synchronization sync  = statement_synchronization(stmt);
   entity name;
   instruction inst;
   statement st, new_s; list list_stmts = NIL, args = NIL;
   switch(synchronization_tag(sync)){
   case is_synchronization_spawn:
+    nesting_level = 1;
     gen_if_rank(stmt, sync);
     break;
   case is_synchronization_barrier:
@@ -153,10 +155,58 @@ static bool gen_mpi(statement stmt){
   default:
     break;
   }
-  if(com_instruction_p(statement_instruction(stmt))){
-    gen_mpi_send_recv(stmt);
-  }
-  return true;
+  return nesting_level;
+}
+
+static void gen_flat_mpi(statement stmt, int nesting_level)
+{
+  instruction inst = statement_instruction(stmt);
+  switch(instruction_tag(inst))
+    {
+    case is_instruction_block:
+      {
+	int nesting_level_sequence = nesting_level;
+	MAPL(stmt_ptr,
+	     {
+	       statement st = STATEMENT(CAR( stmt_ptr));
+	       if(nesting_level != 2){
+		 nesting_level_sequence  =  gen_mpi(st, nesting_level) ;
+	       }
+	       gen_flat_mpi(st, nesting_level_sequence);
+	     },
+	     instruction_block(inst));
+	break;
+      }
+    case is_instruction_test :
+      {
+	test t = instruction_test(inst);
+	bool nesting_level_t = gen_mpi(test_true(t),nesting_level);
+	bool nesting_level_f = gen_mpi(test_false(t),nesting_level);
+	gen_flat_mpi(test_true(t), nesting_level_t);
+	gen_flat_mpi(test_false(t), nesting_level_f);
+	break;
+      }
+    case is_instruction_loop :
+      {
+	loop l = statement_loop(stmt);
+	statement body = loop_body(l);
+	nesting_level =(nesting_level == 1)? 2:nesting_level;
+	gen_flat_mpi(body, nesting_level);
+	break;
+      }
+    case is_instruction_call:
+      if(com_instruction_p(statement_instruction(stmt))){
+	if(nesting_level == 2)
+	  statement_instruction(stmt) = make_continue_instruction();
+	else{
+	  gen_mpi_send_recv(stmt);
+	}
+      }
+      break;
+    default:
+      break;
+    }
+  return;
 }
 
 
@@ -223,8 +273,8 @@ static statement mpi_initialize(statement stmt, entity module){
 		      NIL, NULL, empty_extensions(), make_synchronization_none());
   statement new_s = make_statement(
 				   statement_label(stmt),
-				   statement_number(stmt),
-				   statement_ordering(stmt),
+				   statement_number(stmt),//STATEMENT_NUMBER_UNDEFINED,
+				   statement_ordering(stmt),//STATEMENT_ORDERING_UNDEFINED,
 				   statement_comments(stmt),
 				   statement_instruction(stmt),
 				   NIL, NULL, statement_extensions(stmt), statement_synchronization(stmt));
@@ -267,7 +317,7 @@ bool mpi_task_generation(char * module_name)
   if (get_bool_property("SPIRE_GENERATION")) 
     set_bool_property("SPIRE_GENERATION", false);
   init_stmt = mpi_initialize(module_stat, module);
-  gen_recurse(module_stat, statement_domain, gen_mpi, gen_null);
+  gen_flat_mpi(module_stat, 0);
   mpi_finalize(module_stat);
   gen_consistent_p((gen_chunk*)module_stat);
   module_reorder(module_stat);
