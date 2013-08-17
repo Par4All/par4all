@@ -165,7 +165,6 @@ static list hierarchical_com( statement s, list kdg_args_com, bool neighbor, int
 }
 
 
-static int hierarchy_level=0; 
 static list gen_send_communications(statement s, vertex tau, persistant_statement_to_schedule stmt_to_schedule, graph tg, int kp)
 {
   int i;
@@ -202,7 +201,7 @@ static list gen_send_communications(statement s, vertex tau, persistant_statemen
     statement_synchronization(s) = make_synchronization_none();
     statement_comments(s) = empty_comments;
   }
-  if(apply_persistant_statement_to_schedule(stmt_to_schedule, s) != kp && hierarchy_level!=0 )
+  if(apply_persistant_statement_to_schedule(stmt_to_schedule, s) != kp && (kp != -1))
     h_args_com = hierarchical_com(s,kdg_args_com,SUCCESSORS,kp);
   return h_args_com;
 }
@@ -258,7 +257,7 @@ static list gen_recv_communications(statement sv, persistant_statement_to_schedu
     statement_synchronization(sv) = make_synchronization_none();
     statement_comments(sv)=empty_comments;
   }
-  if(apply_persistant_statement_to_schedule(stmt_to_schedule, sv) != kp && hierarchy_level!=0)
+  if(apply_persistant_statement_to_schedule(stmt_to_schedule, sv) != kp && (kp != -1))
     h_args_com = hierarchical_com(sv,kdg_args_com,PREDECESSORS,kp);
   return  h_args_com;
 }
@@ -298,10 +297,8 @@ void communications_construction(graph tg, statement stmt, persistant_statement_
 	     barrier = CONS(STATEMENT,ss,barrier);
 	 },
 	 instruction_block(inst));
-    //MAPL(stmt_ptr,
     FOREACH(STATEMENT, s, barrier)
       {
-	//statement s = STATEMENT(CAR(stmt_ptr ));
 	bool found_p = false;
 	FOREACH(VERTEX, pre, vertices) {
 	  statement this = vertex_to_statement(pre);
@@ -322,11 +319,8 @@ void communications_construction(graph tg, statement stmt, persistant_statement_
 	}
 	else
 	  communications_construction(tg, s, stmt_to_schedule, kp);
-      }//,
-    //instruction_block(inst));
-    if((gen_length(coms_send) > 0 || gen_length(coms_recv) > 0) && (hierarchy_level!=0)){
-      printf("this sequence apres hierarchy\n");
-      print_statement(stmt);
+      }
+    if((gen_length(coms_send) > 0 || gen_length(coms_recv) > 0) && (kp != -1)){
       statement new_s = make_statement(
 				       statement_label(stmt),
 				       STATEMENT_NUMBER_UNDEFINED,
@@ -339,13 +333,12 @@ void communications_construction(graph tg, statement stmt, persistant_statement_
 	  coms_st = CONS(STATEMENT, st, coms_st);
 	}
       }
-      //coms_st = CONS(STATEMENT, new_s, coms_st);
+      coms_st = CONS(STATEMENT, new_s, coms_st);
       if(gen_length(coms_send) > 0){
 	FOREACH(STATEMENT, st, coms_send){
 	  coms_st = CONS(STATEMENT, st, coms_st);
 	}
       }
-      coms_st = CONS(STATEMENT, new_s, coms_st);
       instruction seq = make_instruction_sequence(make_sequence((coms_st)));
       statement_instruction(stmt) = seq;
       statement_extensions(stmt) = empty_extensions();
@@ -356,13 +349,11 @@ void communications_construction(graph tg, statement stmt, persistant_statement_
   }
   case is_instruction_test:{
     test t = instruction_test(inst);
-    hierarchy_level = 1;
     communications_construction(tg, test_true(t), stmt_to_schedule, kp);
     communications_construction(tg, test_false(t), stmt_to_schedule, kp);
     break;
   }
   case is_instruction_loop :{
-    hierarchy_level = 1;
     loop l = statement_loop(stmt);
     statement body = loop_body(l);
     communications_construction(tg, body, stmt_to_schedule, kp);
@@ -404,8 +395,7 @@ bool hbdsc_gen_communications(char * module_name)
   persistant_statement_to_schedule stmt_to_schedule = (persistant_statement_to_schedule)db_get_memory_resource(DBR_SCHEDULE, module_name, true);
 
   NBCLUSTERS = get_int_property("BDSC_NB_CLUSTERS");
-  hierarchy_level = 0;
-  communications_construction(kdg, module_stat, stmt_to_schedule, 0);
+  communications_construction(kdg, module_stat, stmt_to_schedule, -1);
   /* Reorder the module, because new statements have been generated. */
   module_reorder(module_stat);
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);

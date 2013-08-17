@@ -53,8 +53,7 @@ bool costly_task(statement st){
   bool costly_p = false;
   instruction inst = statement_instruction(st);
   if (statement_contains_user_call_p(st))
-    if(user_call_p(statement_call(st)))
-       return true;
+    return true;
   else{
     switch(instruction_tag(inst)){
     case is_instruction_block:{
@@ -81,6 +80,10 @@ bool costly_task(statement st){
     }
     case is_instruction_whileloop :{
       return true;
+    }
+    case is_instruction_call:{
+      if(user_call_p(statement_call(st)))
+	return true;
     }
     default:
       return false;

@@ -47,7 +47,7 @@ typedef dg_vertex_label vertex_label;
 #include "task_parallelization.h"
 
 static statement init_stmt = statement_undefined;
-static entity rank, mpi_status;
+static entity rank, mpi_status, mpi_request;
 
 static void gen_mpi_send_recv(statement stmt)
 {
@@ -57,8 +57,11 @@ static void gen_mpi_send_recv(statement stmt)
   statement st;
   int pair = 0; 
   entity name;
-  if(native_instruction_p(statement_instruction(stmt), SEND_FUNCTION_NAME))
-    name = make_constant_entity("MPI_Send",is_basic_string, 100);
+  if(native_instruction_p(statement_instruction(stmt), SEND_FUNCTION_NAME)){
+    name = make_constant_entity("MPI_Isend",is_basic_string, 100);
+    expression exp_req = make_entity_expression(mpi_request, NIL);
+    args = CONS(EXPRESSION, make_address_of_expression(exp_req), args);
+  }
   else{
     name = make_constant_entity("MPI_Recv",is_basic_string, 100);
     expression exp_st = make_entity_expression(mpi_status, NIL);
@@ -157,7 +160,10 @@ static bool gen_mpi(statement stmt){
 }
 
 
-/* Generating  
+/* Generate
+ * int rank0;
+ * MPI_Status status0; 
+ * MPI_Request *request0;
  * ierr = MPI_Init( &argc, &argv );
  * ierr = MPI_Comm_rank( MPI_COMM_WORLD, &rank );
  */
@@ -174,6 +180,17 @@ static statement mpi_initialize(statement stmt, entity module){
   type stat_t =MakeTypeVariable(make_basic_typedef(stat), NIL);
   mpi_status = make_new_scalar_variable_with_prefix("status", module,MakeBasic(is_basic_int) );
   entity_type(mpi_status) = stat_t;
+  
+  entity req =   FindOrCreateEntity("mpi_request_a", TYPEDEF_PREFIX "MPI_Request");
+  if(storage_undefined_p(entity_storage(req)))
+    {
+      entity_storage(req) = make_storage_rom();
+      put_new_typedef("MPI_Request");
+    }
+  type req_t =MakeTypeVariable(make_basic_typedef(req), NIL);
+  mpi_request = make_new_scalar_variable_with_prefix("request", module,MakeBasic(is_basic_int) );
+  entity_type(mpi_request) = req_t;
+  
   entity name = make_constant_entity("MPI_Init",is_basic_string, 100);
   args = CONS(EXPRESSION, make_address_of_expression(make_entity_expression(make_constant_entity("argc", is_basic_string, 100), NIL)),args);
   args = CONS(EXPRESSION, make_address_of_expression(make_entity_expression(make_constant_entity("argv", is_basic_string, 100), NIL)), args);
@@ -206,8 +223,8 @@ static statement mpi_initialize(statement stmt, entity module){
 		      NIL, NULL, empty_extensions(), make_synchronization_none());
   statement new_s = make_statement(
 				   statement_label(stmt),
-				   statement_number(stmt),//STATEMENT_NUMBER_UNDEFINED,
-				   statement_ordering(stmt),//STATEMENT_ORDERING_UNDEFINED,
+				   statement_number(stmt),
+				   statement_ordering(stmt),
 				   statement_comments(stmt),
 				   statement_instruction(stmt),
 				   NIL, NULL, statement_extensions(stmt), statement_synchronization(stmt));
@@ -219,6 +236,7 @@ static statement mpi_initialize(statement stmt, entity module){
   statement_synchronization(stmt) = make_synchronization_none();
   AddLocalEntityToDeclarations(rank, module, stmt);
   AddLocalEntityToDeclarations(mpi_status, module, stmt);
+  AddLocalEntityToDeclarations(mpi_request, module, stmt);
   return st;
 }
             
