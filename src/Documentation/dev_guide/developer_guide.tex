@@ -2166,7 +2166,7 @@ set env PIPS_MORE=cat
 \end{verbatim}
 
 
-\subsection{Debugging PIPS C source code for the compiler}
+\subsection{Debugging PIPS C Source Code for the Compiler}
 
 PIPS use a lot of macro processing to ease the programmer life with
 NewGen, but, in some cases, it may be difficult to understand what
@@ -2208,7 +2208,7 @@ or:
 pdb my.py to debug pyps parts
 \end{verbatim}
 
-\subsection{Debugging PIPS C source code dynamically}
+\subsection{Debugging PIPS C Source Code Dynamically}
 \label{sec:pips_dynamic_debug}
 
 We use environment variables \verb/xxxx_DEBUG_LEVEL/ to control
@@ -2301,6 +2301,10 @@ functionalities are useful when debugging:
   \begin{quote}
     \verb|p Domains[obj->_type_].name|
   \end{quote}
+  or, when facing a high stack due to a \verb|gen_recurse|, use argument \verb|obj| of calls to \verb|gen_trav_obj|
+  \begin{quote}
+    \verb|p Domains[obj->i].name|
+  \end{quote}
 \item To directly dig into a NewGen object, you can access an attribute
   \texttt{a} of an object \texttt{obj} of type \texttt{type} with its
   field name \verb|_type_a_|, thus such as \verb|obj->_type_a_|.
@@ -2339,6 +2343,15 @@ set is_fortran=0
 \begin{verbatim}
 call print_expression(e)
 \end{verbatim}
+\item To print some kind of Newgen object, e.g. statement or expression, use
+\begin{verbatim}
+call dprint(e)
+\end{verbatim}
+which uses the dynamic typing of Newgen to identify the related print
+function. It also works for lists of Newgen objects, as long as they
+are properly typed: all objects must be of the same type. Function
+\verb|dprint| is always ongoing work. It has to be extended to cope
+with new types. or types that have not been dealt with yet.
 \end{itemize}
 
 Note that NewGen cannot be simplified to use \texttt{stmt->label->name} in
@@ -2397,7 +2410,7 @@ binding, so you click on an interesting variable and then use
 \end{description}
 
 
-\subsection{Debugging memory issues}
+\subsection{Debugging Memory Issues}
 \label{sec:debugg-memory-issu}
 
 There are tools quite useful for tracking memory issues that may happen
