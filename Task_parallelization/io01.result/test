@@ -1,0 +1,26 @@
+int main()
+{
+   barrier(
+   spawn(0,
+   printf("Hello ");
+   )
+   )
+   barrier(
+   spawn(0,
+   printf("world!\n");
+   )
+   )
+}
+// OMP style
+int main()
+{
+#pragma omp parallel default(shared) 
+#pragma omp single
+   {
+      printf("Hello ");
+   }
+#pragma omp single
+   {
+      printf("world!\n");
+   }
+}

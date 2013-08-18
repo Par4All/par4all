@@ -1,0 +1,68 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+
+delete communications01
+
+setenv PIPS_CPP_FLAGS " -D TIME "
+
+create communications01 communications01.c
+activate C_PARSER
+activate REGION_CHAINS
+activate MUST_REGIONS
+
+activate TRANSFORMERS_INTER_FULL
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE
+setproperty SEMANTICS_FILTER_INITIAL_VALUES TRUE
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE 
+
+
+apply LOOP_NORMALIZE[%ALLFUNC]
+apply PRIVATIZE_MODULE[%ALLFUNC]
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
+
+setproperty PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS TRUE
+setproperty PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS FALSE
+setproperty PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES FALSE
+setproperty REGIONS_WITH_ARRAY_BOUNDS TRUE 
+
+
+apply SEQUENCE_DEPENDENCE_GRAPH[main]
+#shell dot -Tpng communications01.database/main/main_sdg.dot > communications01.database/main/main_sdg.png
+#shell gqview communications01.database/main/main_sdg.png
+
+
+setproperty BDSC_NB_CLUSTERS 6
+setproperty BDSC_DISTRIBUTED_MEMORY FALSE
+
+
+apply HBDSC_PARALLELIZATION[main]
+#shell dot -Tpng communications01.database/main/main_scheduled_sdg.dot > communications01.database/main/main_scheduled_sdg.png
+#shell gqview communications01.database/main/main_scheduled_sdg.png
+
+
+setproperty SPIRE_GENERATION TRUE
+apply SPIRE_UNSTRUCTURED_TO_STRUCTURED[main]
+display PRINTED_FILE[main]
+
+
+# error: one should replace A[PHI1] by A[i]. 
+apply HBDSC_GEN_COMMUNICATIONS[main]
+display PRINTED_FILE[main]
+
+#hierarchical MPI not implemented yet; this will generate a flat MPI 
+echo // MPI style
+activate MPI_TASK_GENERATION
+activate PRINT_PARALLELIZEDMPI_CODE
+display PARALLELPRINTED_FILE[main]
+	
+echo // OMP style
+activate OPENMP_TASK_GENERATION
+activate PRINT_PARALLELIZEDOMPTASK_CODE
+display PARALLELPRINTED_FILE[main]
+
+close
+delete communications01 
+quit
+
+
+
