@@ -2,6 +2,9 @@
     #include "pips_config.h"
 #endif
 
+// FI: to point out issues with the current code, and my suggested changes
+#define DOUNIA
+#define DOUNIA_1
 
 #include <stdio.h>
 #include <ctype.h>
@@ -182,11 +185,20 @@ static list gen_send_communications(statement s, vertex tau, persistant_statemen
     FOREACH(SUCCESSOR, su, vertex_successors(tau)) {
       vertex taus = successor_vertex(su);
       statement ss = vertex_to_statement(taus);
-      if(apply_persistant_statement_to_schedule(stmt_to_schedule, s) != apply_persistant_statement_to_schedule(stmt_to_schedule, ss) && apply_persistant_statement_to_schedule(stmt_to_schedule, ss) == i){
-	list com_regions = transfer_regions (vertex_to_statement(statement_to_vertex(s,tg)),vertex_to_statement(statement_to_vertex(ss,tg))); // transfer_regions (s,ss); 
-	kdg_args_com = CONS(LIST, com_regions, kdg_args_com);
-	args_send = list_communications(com_regions, args_send);
+#ifndef DOUNIA
+      if(bound_persistant_statement_to_schedule_p(stmt_to_schedule, ss)) {
+#endif
+	if(apply_persistant_statement_to_schedule(stmt_to_schedule, s)
+	   != apply_persistant_statement_to_schedule(stmt_to_schedule, ss)
+	   &&
+	   apply_persistant_statement_to_schedule(stmt_to_schedule, ss) == i) {
+	  list com_regions = transfer_regions (vertex_to_statement(statement_to_vertex(s,tg)),vertex_to_statement(statement_to_vertex(ss,tg))); // transfer_regions (s,ss); 
+	  kdg_args_com = CONS(LIST, com_regions, kdg_args_com);
+	  args_send = list_communications(com_regions, args_send);
+	}
+#ifndef DOUNIA
       }
+#endif
     }
     if(gen_length(args_send)>0){
       list_st = CONS(STATEMENT, com_call(SUCCESSORS, args_send, i),list_st);
@@ -238,12 +250,18 @@ static list gen_recv_communications(statement sv, persistant_statement_to_schedu
   for(i = 0;i < NBCLUSTERS; i++){
     args_recv = NIL;
     list preds = predecessors(sv, tg);
-    FOREACH(STATEMENT, parent, preds){ 
-      if(apply_persistant_statement_to_schedule(stmt_to_schedule, parent) != apply_persistant_statement_to_schedule(stmt_to_schedule, sv) && apply_persistant_statement_to_schedule(stmt_to_schedule, parent) == i){ 
-	list com_regions = transfer_regions (vertex_to_statement(statement_to_vertex(parent,tg)),vertex_to_statement(statement_to_vertex(sv,tg))); 
-	kdg_args_com = CONS(LIST, com_regions, kdg_args_com);
-	args_recv = list_communications(com_regions, args_recv);
+    FOREACH(STATEMENT, parent, preds){
+#ifndef DOUNIA
+      if(bound_persistant_statement_to_schedule_p(stmt_to_schedule, parent)) {
+#endif
+	if(apply_persistant_statement_to_schedule(stmt_to_schedule, parent) != apply_persistant_statement_to_schedule(stmt_to_schedule, sv) && apply_persistant_statement_to_schedule(stmt_to_schedule, parent) == i){ 
+	  list com_regions = transfer_regions (vertex_to_statement(statement_to_vertex(parent,tg)),vertex_to_statement(statement_to_vertex(sv,tg))); 
+	  kdg_args_com = CONS(LIST, com_regions, kdg_args_com);
+	  args_recv = list_communications(com_regions, args_recv);
+	}
+#ifndef DOUNIA
       }
+#endif
     }
     if(gen_length(args_recv) > 0){
       list_st = CONS(STATEMENT, com_call(PREDECESSORS, args_recv, i), list_st);
@@ -265,6 +283,10 @@ static list gen_recv_communications(statement sv, persistant_statement_to_schedu
 
 void communications_construction(graph tg, statement stmt, persistant_statement_to_schedule stmt_to_schedule, int kp)
 {
+  // FI: this is likely to be excessive...
+#ifndef DOUNIA_1
+  if(bound_persistant_statement_to_schedule_p(stmt_to_schedule, stmt)) {
+#endif
   gen_consistent_p((gen_chunk*)stmt);
   instruction inst = statement_instruction(stmt);
   switch(instruction_tag(inst)){
@@ -362,17 +384,23 @@ void communications_construction(graph tg, statement stmt, persistant_statement_
   default:
     break;
   }
+#ifndef DOUNIA_1
+  }
+#endif
   return;
 }
 
 bool hbdsc_gen_communications(char * module_name)
 { 
-  entity	module;
-  statement	module_stat;
+  // entity	module;
+  // statement	module_stat;
 
-  module = local_name_to_top_level_entity(module_name);
-  module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, true);
-  //set_ordering_to_statement(module_stat);
+  // module = local_name_to_top_level_entity(module_name);
+  statement module_stat = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
+  /* FI: It cannot be inherited from a previous pass */
+#ifndef DOUNIA
+  set_ordering_to_statement(module_stat);
+#endif
   set_current_module_entity(module_name_to_entity(module_name));
   set_current_module_statement(module_stat);
   set_precondition_map((statement_mapping)db_get_memory_resource(DBR_PRECONDITIONS, module_name, true));
@@ -399,6 +427,7 @@ bool hbdsc_gen_communications(char * module_name)
   /* Reorder the module, because new statements have been generated. */
   module_reorder(module_stat);
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
+  // FI: it has not been set in the same pass...
   reset_ordering_to_statement();
   reset_rw_effects();
   reset_in_effects();

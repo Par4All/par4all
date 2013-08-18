@@ -2,6 +2,8 @@
     #include "pips_config.h"
 #endif
 
+// To point out problems
+#define DOUNIA
 
 #include <stdio.h>
 #include <ctype.h>
@@ -52,7 +54,9 @@ static statement cluster_stage_spire(persistant_statement_to_schedule stmt_to_sc
   int i = -1;
   list list_cl = NIL;
   statement stmt_spawn = statement_undefined, stmt_finish = statement_undefined; 
-  int stage_mod = gen_length(cluster_stage);int physical_cluster, minus;
+  int stage_mod = gen_length(cluster_stage);
+  int physical_cluster;
+  // int minus; FI: minus is not really used...
   int Ps = p - stage_mod;// + 1;  // plus one if we use the current cluster
   bool costly_p = false;
   FOREACH(LIST, list_stmts, cluster_stage){
@@ -67,7 +71,8 @@ static statement cluster_stage_spire(persistant_statement_to_schedule stmt_to_sc
     }
     instruction ins_spawn = make_instruction_sequence(make_sequence(list_stmts));
     if(costly_p){
-      minus = (NBCLUSTERS==p)?0:1;
+      // FI: minus is not used
+      // minus = (NBCLUSTERS==p)?0:1;
       physical_cluster = NBCLUSTERS - p + i;// + 1 ;
       FOREACH(statement, st, list_stmts){
 	update_persistant_statement_to_schedule(stmt_to_schedule, st, physical_cluster);
@@ -153,10 +158,8 @@ void cluster_stage_spire_generation(persistant_statement_to_schedule stmt_to_sch
 
 bool spire_unstructured_to_structured (char * module_name)
 { 
-  entity	module;
-  statement	module_stat;
-  module = local_name_to_top_level_entity(module_name);
-  module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, true);
+  // entity module = local_name_to_top_level_entity(module_name);
+  statement module_stat = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
   set_ordering_to_statement(module_stat);
   set_current_module_entity(module_name_to_entity(module_name));
   set_current_module_statement(module_stat);
@@ -168,10 +171,20 @@ bool spire_unstructured_to_structured (char * module_name)
   MEMORY_SIZE = get_int_property("BDSC_MEMORY_SIZE");
   INSTRUMENTED_FILE = strdup(get_string_property("BDSC_INSTRUMENTED_FILE"));
   cluster_stage_spire_generation(stmt_to_schedule, kdg, module_stat, NBCLUSTERS);
-  //module_reorder(module_stat);
+  /* FI: next statement was commented out... It has to be executed by
+     any pass that generates new statement to maintain the consistency
+     of PIPS internal representation */
+#ifndef DOUNIA
+  module_reorder(module_stat);
+#endif
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
   DB_PUT_MEMORY_RESOURCE(DBR_SCHEDULE, module_name, stmt_to_schedule);
-  //reset_ordering_to_statement();
+  /* FI: next statement was commented out... It has to be executed by
+     any pass that uses ordering_to_statement to maintain the global
+     consistency of PIPS */
+#ifndef DOUNIA
+  reset_ordering_to_statement();
+#endif
   reset_current_module_statement();
   reset_current_module_entity(); 
   return true;
