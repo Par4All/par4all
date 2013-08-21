@@ -294,11 +294,11 @@ static bool test_dependence_using_regions(statement s1, statement s2)
   list dependence_rw = RegionsIntersection(regions_dup(l_read_1), regions_dup(l_write_2), r_w_combinable_p);
   list dependence_wr = RegionsIntersection(regions_dup(l_write_1), regions_dup(l_read_2), w_r_combinable_p);
   list dependence_ww = RegionsIntersection(regions_dup(l_write_1), regions_dup(l_write_2), w_w_combinable_p);
-  if(size_of_regions(dependence_rw)==0)
+  if(gen_length(dependence_rw)==0)
     {
-      if(size_of_regions(dependence_wr)==0)
+      if(gen_length(dependence_wr)==0)
 	{
-	  if(size_of_regions(dependence_ww)>0)
+	  if(gen_length(dependence_ww)>0)
 	    dependence_b=true;
 	}
       else
