@@ -27,4 +27,5 @@ int main()
     b[j] = 2*a[j];
   for(j=0; j<size; j++)
     printf("%d\n", b[j]);
+  return 0;
 }

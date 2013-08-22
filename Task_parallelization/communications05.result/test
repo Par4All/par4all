@@ -1,0 +1,82 @@
+int main()
+{
+   //PIPS generated variable
+   int bj, j, bi, i, b[size][size], a[size][size], size;
+   barrier(
+   spawn(0,
+   scanf("%d", &size);
+   )
+   spawn(5,
+
+   return 0;
+   )
+   )
+   barrier(
+   spawn(0,
+   scanf("%d", &bi);
+   )
+   )
+   barrier(
+   spawn(0,
+   scanf("%d", &bj);
+   )
+   )
+   barrier(
+   spawn(0,
+   0<=bi&&bi<size&&0<=bj&&bj<size?(void) 0:__assert_fail("0<=bi && bi<size && 0<=bj && bj<size", "./communications05.c", 23, (const char *) 0);
+   )
+   spawn(1,
+   
+   /* Initialization of a with four tasks */
+   for(i = 0; i <= bi-1; i += 1)
+      for(j = 0; j <= bj-1; j += 1)
+         a[i][j] = i*size+j;
+   )
+   spawn(2,
+   for(i = 0; i <= bi-1; i += 1)
+      for(j = bj; j <= size-1; j += 1)
+         a[i][j] = i*size+j;
+   )
+   spawn(4,
+   for(i = bi; i <= size-1; i += 1)
+      for(j = 0; j <= bj-1; j += 1)
+         a[i][j] = i*size+j;
+   for(i = bi; i <= size-1; i += 1)
+      for(j = bj; j <= size-1; j += 1)
+         a[i][j] = i*size+j;
+   )
+   )
+   barrier(
+   spawn(1,
+   
+   /* Computation of b with four tasks perfectly aligned on the
+        previous four ones */
+   for(i = 0; i <= bi-1; i += 1)
+      for(j = 0; j <= bj-1; j += 1)
+         b[i][j] = 2*a[i][j];
+   )
+   spawn(2,
+   for(i = bi; i <= size-1; i += 1)
+      for(j = bj; j <= size-1; j += 1)
+         b[i][j] = 2*a[i][j];
+   )
+   spawn(3,
+   for(i = 0; i <= bi-1; i += 1)
+      for(j = bj; j <= size-1; j += 1)
+         b[i][j] = 2*a[i][j];
+   )
+   spawn(5,
+   for(i = bi; i <= size-1; i += 1)
+      for(j = 0; j <= bj-1; j += 1)
+         b[i][j] = 2*a[i][j];
+   )
+   )
+   barrier(
+   spawn(0,
+
+   for(i = 0; i <= size-1; i += 1)
+      for(j = 0; j <= size-1; j += 1)
+         printf("%d\n", b[i][j]);
+   )
+   )
+}
