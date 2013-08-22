@@ -581,11 +581,11 @@ void print_SDGs(statement stmt, graph tg, FILE *ftg, gen_array_t annotations) {
 }
 bool sequence_dependence_graph(char * module_name)
 { 
-  entity	module;
+  //entity	module;
   statement	module_stat;
   string tg_name = NULL;
   FILE *ftg;
-  module = local_name_to_top_level_entity(module_name);
+  //module = local_name_to_top_level_entity(module_name);
   module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, true);
   set_ordering_to_statement(module_stat);
   set_current_module_entity(module_name_to_entity(module_name));
