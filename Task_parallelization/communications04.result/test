@@ -1,0 +1,238 @@
+int main()
+{
+   //PIPS generated variable
+   int bj, j, bi, i, b[100], a[100];
+   barrier(
+   spawn(0,
+   scanf("%d", &bi);
+   )
+   spawn(3,
+   return 0;
+   )
+   )
+   barrier(
+   spawn(0,
+   for(i = bi; i <= 99; i += 1)
+      a[i] = i;
+   )
+   spawn(1,
+   scanf("%d", &bj);
+   )
+   spawn(2,
+   for(i = 0; i <= bi-1; i += 1)
+      a[i] = i;
+   )
+   )
+   barrier(
+   spawn(1,
+   0<=bi&&bi<100&&0<=bj&&bj<100?(void) 0:__assert_fail("0<=bi && bi<100 && 0<=bj && bj<100", "./communications04.c", 24, (const char *) 0);
+   for(j = bj; j <= 99; j += 1)
+      b[j] = 2*a[j];
+   )
+   spawn(2,
+   for(j = 0; j <= bj-1; j += 1)
+      b[j] = 2*a[j];
+   )
+   )
+   barrier(
+   spawn(2,
+   for(j = 0; j <= 99; j += 1)
+      printf("%d\n", b[j]);
+   )
+   )
+}
+int main()
+{
+   //PIPS generated variable
+   int bj, j, bi, i, b[100], a[100];
+   barrier(
+   spawn(0,
+   scanf("%d", &bi);
+   send(1, 1, LUNS[PHI1], 1, stdin[PHI1], 1, bi);
+   send(2, 1, bi);
+   )
+   spawn(3,
+   return 0;
+   )
+   )
+   barrier(
+   spawn(0,
+   for(i = bi; i <= 99; i += 1)
+      a[i] = i;
+   send(1, -1, a);
+   send(2, -1, a);
+   )
+   spawn(1,
+   recv(0, 1, LUNS[PHI1], 1, stdin[PHI1]);
+   scanf("%d", &bj);
+   send(2, 1, bj);
+   )
+   spawn(2,
+   recv(0, 1, bi);
+   for(i = 0; i <= bi-1; i += 1)
+      a[i] = i;
+   send(1, -1, a);
+   )
+   )
+   barrier(
+   spawn(1,
+   recv(0, 1, bi);
+   0<=bi&&bi<100&&0<=bj&&bj<100?(void) 0:__assert_fail("0<=bi && bi<100 && 0<=bj && bj<100", "./communications04.c", 24, (const char *) 0);
+   recv(2, -1, a);
+   recv(0, -1, a);
+   for(j = bj; j <= 99; j += 1)
+      b[j] = 2*a[j];
+   send(2, -1, b);
+   )
+   spawn(2,
+   recv(1, 1, bj);
+   recv(0, -1, a);
+   for(j = 0; j <= bj-1; j += 1)
+      b[j] = 2*a[j];
+   )
+   )
+   barrier(
+   spawn(2,
+   recv(1, -1, b);
+   for(j = 0; j <= 99; j += 1)
+      printf("%d\n", b[j]);
+   )
+   )
+}
+// MPI style
+int main()
+{
+   {
+      //PIPS generated variable
+      int rank0;
+      //PIPS generated variable
+      MPI_Status status0;
+      //PIPS generated variable
+      MPI_Request request0;
+      MPI_Init(&argc, &argv);
+      MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
+      //PIPS generated variable
+      int bj, j, bi, i, b[100], a[100];
+      if (rank0==0) {
+         scanf("%d", &bi);
+         MPI_Isend(LUNS[PHI1], 1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         MPI_Isend(stdin[PHI1], 1, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         MPI_Isend(bi, 1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         MPI_Isend(bi, 1, MPI_INT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==3)
+         return 0;
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==0) {
+         for(i = bi; i <= 99; i += 1)
+            a[i] = i;
+         MPI_Isend(a, -1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         MPI_Isend(a, -1, MPI_INT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==1) {
+         MPI_Recv(LUNS[PHI1], 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         MPI_Recv(stdin[PHI1], 1, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         scanf("%d", &bj);
+         MPI_Isend(bj, 1, MPI_INT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==2) {
+         MPI_Recv(bi, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(i = 0; i <= bi-1; i += 1)
+            a[i] = i;
+         MPI_Isend(a, -1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==1) {
+         MPI_Recv(bi, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         0<=bi&&bi<100&&0<=bj&&bj<100?(void) 0:__assert_fail("0<=bi && bi<100 && 0<=bj && bj<100", "./communications04.c", 24, (const char *) 0);
+         MPI_Recv(a, -1, MPI_INT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         MPI_Recv(a, -1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(j = bj; j <= 99; j += 1)
+            b[j] = 2*a[j];
+         MPI_Isend(b, -1, MPI_INT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==2) {
+         MPI_Recv(bj, 1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         MPI_Recv(a, -1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(j = 0; j <= bj-1; j += 1)
+            b[j] = 2*a[j];
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==2) {
+         MPI_Recv(b, -1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(j = 0; j <= 99; j += 1)
+            printf("%d\n", b[j]);
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+   }
+   MPI_Finalize();
+}
+// OMP style
+int main()
+{
+   //PIPS generated variable
+   int bj, j, bi, i, b[100], a[100];
+#pragma omp parallel default(shared) 
+#pragma omp single
+   {
+#pragma omp task
+      {
+         scanf("%d", &bi);
+
+
+      }
+#pragma omp task
+      {
+         return 0;
+      }
+   }
+#pragma omp single
+   {
+#pragma omp task
+      {
+         for(i = bi; i <= 99; i += 1)
+            a[i] = i;
+
+
+      }
+#pragma omp task
+      {
+
+         scanf("%d", &bj);
+
+      }
+#pragma omp task
+      {
+
+         for(i = 0; i <= bi-1; i += 1)
+            a[i] = i;
+
+      }
+   }
+#pragma omp single
+   {
+#pragma omp task
+      {
+
+         0<=bi&&bi<100&&0<=bj&&bj<100?(void) 0:__assert_fail("0<=bi && bi<100 && 0<=bj && bj<100", "./communications04.c", 24, (const char *) 0);
+
+
+         for(j = bj; j <= 99; j += 1)
+            b[j] = 2*a[j];
+
+      }
+#pragma omp task
+      {
+
+
+         for(j = 0; j <= bj-1; j += 1)
+            b[j] = 2*a[j];
+      }
+   }
+#pragma omp single
+   {
+
+      for(j = 0; j <= 99; j += 1)
+         printf("%d\n", b[j]);
+   }
+}
