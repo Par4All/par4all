@@ -282,69 +282,69 @@ int main()
 
    printf("%i\n", *p);
 
-//  T(p) {&a[0]==a[i]#init, &a[0]+sizeof(long int *)==p, i==10,
-//    0<=a[i], a[i]<=81}
+//  T(p) {&a[0]==a[i]#init, &a[0]+sizeof(long int)==p, i==10, 0<=a[i],
+//    a[i]<=81}
 
    p++;
 
-//  T(stdout) {&a[0]+sizeof(long int *)==p, i==10, 0<=a[i], a[i]<=81}
+//  T(stdout) {&a[0]+sizeof(long int)==p, i==10, 0<=a[i], a[i]<=81}
 
    printf("%i\n", p);
 
-//  T(stdout) {&a[0]+sizeof(long int *)==p, i==10, 0<=a[i], a[i]<=81}
+//  T(stdout) {&a[0]+sizeof(long int)==p, i==10, 0<=a[i], a[i]<=81}
 
    printf("%i\n", *p);
 
-//  T(p) {&a[0]+sizeof(long int *)==a[i]#init,
-//    a[i]#init+sizeof(long int *)==p, i==10, 0<=a[i], a[i]<=81}
+//  T(p) {&a[0]+sizeof(long int)==a[i]#init,
+//    a[i]#init+sizeof(long int)==p, i==10, 0<=a[i], a[i]<=81}
 
    p += 1;
 
-//  T(stdout) {&a[0]+2sizeof(long int *)==p, i==10, 0<=a[i], a[i]<=81}
+//  T(stdout) {&a[0]+2sizeof(long int)==p, i==10, 0<=a[i], a[i]<=81}
 
    printf("%i\n", p);
 
-//  T(stdout) {&a[0]+2sizeof(long int *)==p, i==10, 0<=a[i], a[i]<=81}
+//  T(stdout) {&a[0]+2sizeof(long int)==p, i==10, 0<=a[i], a[i]<=81}
 
    printf("%i\n", *p);
 
-//  T(q) {&a[0]+2sizeof(long int *)==p, i==10, p+sizeof(long int *)
-//    ==q, 0<=a[i], a[i]<=81}
+//  T(q) {&a[0]+2sizeof(long int)==p, i==10, p+sizeof(long int)==q,
+//    0<=a[i], a[i]<=81}
 
    q = p+1;
 
-//  T(stdout) {&a[0]+2sizeof(long int *)==p, i==10,
-//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+//  T(stdout) {&a[0]+2sizeof(long int)==p, i==10, p+sizeof(long int)
+//    ==q, 0<=a[i], a[i]<=81}
 
    printf("p=%i\n", p);
 
-//  T(stdout) {&a[0]+2sizeof(long int *)==p, i==10,
-//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+//  T(stdout) {&a[0]+2sizeof(long int)==p, i==10, p+sizeof(long int)
+//    ==q, 0<=a[i], a[i]<=81}
 
    printf("*p=%i\n", *p);
 
-//  T(stdout) {&a[0]+2sizeof(long int *)==p, i==10,
-//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+//  T(stdout) {&a[0]+2sizeof(long int)==p, i==10, p+sizeof(long int)
+//    ==q, 0<=a[i], a[i]<=81}
 
    printf("q=%i\n", q);
 
-//  T(stdout) {&a[0]+2sizeof(long int *)==p, i==10,
-//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+//  T(stdout) {&a[0]+2sizeof(long int)==p, i==10, p+sizeof(long int)
+//    ==q, 0<=a[i], a[i]<=81}
 
    printf("*q=%i\n", *q);
 
-//  T(i) {&a[0]+2sizeof(long int *)==p, i+p==q, p+sizeof(long int *)
-//    ==q, p#init==10, 0<=a[i], a[i]<=81}
+//  T(i) {&a[0]+2sizeof(long int)==p, i+p==q, p+sizeof(long int)==q,
+//    p#init==10, 0<=a[i], a[i]<=81}
 
    i = q-p;
 
-//  T(stdout) {&a[0]+2sizeof(long int *)==p, i+p==q,
-//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+//  T(stdout) {&a[0]+2sizeof(long int)==p, i+p==q, p+sizeof(long int)
+//    ==q, 0<=a[i], a[i]<=81}
 
    printf("q-p=%i\n", i);
 
-//  T(main) {&a[0]+2sizeof(long int *)==p, i+p==q, main==0,
-//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+//  T(main) {&a[0]+2sizeof(long int)==p, i+p==q, main==0,
+//    p+sizeof(long int)==q, 0<=a[i], a[i]<=81}
 
    //   
    //   
@@ -404,68 +404,68 @@ int main()
 
    p++;
 
-//  P(a[i],i,p,q,stdout) {&a[0]+sizeof(long int *)==p, i==10, 0<=a[i],
+//  P(a[i],i,p,q,stdout) {&a[0]+sizeof(long int)==p, i==10, 0<=a[i],
 //    a[i]<=81}
 
    printf("%i\n", p);
 
-//  P(a[i],i,p,q,stdout) {&a[0]+sizeof(long int *)==p, i==10, 0<=a[i],
+//  P(a[i],i,p,q,stdout) {&a[0]+sizeof(long int)==p, i==10, 0<=a[i],
 //    a[i]<=81}
 
    printf("%i\n", *p);
 
-//  P(a[i],i,p,q,stdout) {&a[0]+sizeof(long int *)==p, i==10, 0<=a[i],
+//  P(a[i],i,p,q,stdout) {&a[0]+sizeof(long int)==p, i==10, 0<=a[i],
 //    a[i]<=81}
 
    p += 1;
 
-//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i==10,
-//    0<=a[i], a[i]<=81}
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int)==p, i==10, 0<=a[i],
+//    a[i]<=81}
 
    printf("%i\n", p);
 
-//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i==10,
-//    0<=a[i], a[i]<=81}
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int)==p, i==10, 0<=a[i],
+//    a[i]<=81}
 
    printf("%i\n", *p);
 
-//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i==10,
-//    0<=a[i], a[i]<=81}
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int)==p, i==10, 0<=a[i],
+//    a[i]<=81}
 
    q = p+1;
 
-//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i==10,
-//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int)==p, i==10,
+//    p+sizeof(long int)==q, 0<=a[i], a[i]<=81}
 
    printf("p=%i\n", p);
 
-//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i==10,
-//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int)==p, i==10,
+//    p+sizeof(long int)==q, 0<=a[i], a[i]<=81}
 
    printf("*p=%i\n", *p);
 
-//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i==10,
-//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int)==p, i==10,
+//    p+sizeof(long int)==q, 0<=a[i], a[i]<=81}
 
    printf("q=%i\n", q);
 
-//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i==10,
-//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int)==p, i==10,
+//    p+sizeof(long int)==q, 0<=a[i], a[i]<=81}
 
    printf("*q=%i\n", *q);
 
-//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i==10,
-//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int)==p, i==10,
+//    p+sizeof(long int)==q, 0<=a[i], a[i]<=81}
 
    i = q-p;
 
-//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i+p==q,
-//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int)==p, i+p==q,
+//    p+sizeof(long int)==q, 0<=a[i], a[i]<=81}
 
    printf("q-p=%i\n", i);
 
-//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int *)==p, i+p==q,
-//    p+sizeof(long int *)==q, 0<=a[i], a[i]<=81}
+//  P(a[i],i,p,q,stdout) {&a[0]+2sizeof(long int)==p, i+p==q,
+//    p+sizeof(long int)==q, 0<=a[i], a[i]<=81}
 
    //   
    //   
@@ -487,3 +487,18 @@ int main()
    
    return 0;
 }
+
+Warnings
+
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if p is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if p is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if p is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if p is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if p is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if p is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed

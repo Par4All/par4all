@@ -133,3 +133,7 @@ int inc01c()
 
    return i;
 }
+
+Warnings
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function "inc01c" has no side effect on its formal context via pointer variables.

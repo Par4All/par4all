@@ -72,11 +72,11 @@ int main()
 
    p = &i;
 
-//  T(i,j,p) {&i==p, i==0, j#init==-1, j==0}
+//  T(i,j,p) {&i==p#init, i#init==0, j#init==-1, 0<=j, j<=1}
 
    j = (*p = 0)?0:1;
 
-//  T(main) {&i==p, i==0, main==0, j==0}
+//  T(main) {j==main, 0<=j, j<=1}
 
 
    return j;
@@ -106,8 +106,14 @@ int main()
 
    j = (*p = 0)?0:1;
 
-//  P(i,j,p) {&i==p, i==0, j==0}
+//  P(i,j,p) {0<=j, j<=1}
 
 
    return j;
 }
+
+Warnings
+
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (any_scalar_assign_to_transformer_without_effect) Variable 0`j in lhs is uselessly updated by the rhs '(*p = 0)?0:1'
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (any_scalar_assign_to_transformer_without_effect) Variable 0`j in lhs is uselessly updated by the rhs '(*p = 0)?0:1'

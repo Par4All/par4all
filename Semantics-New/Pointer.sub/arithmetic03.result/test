@@ -135,22 +135,22 @@ int main()
 
    if (rand()) {
 
-//  T(p) {&a[5]+sizeof(int *)==p, &a[5]==p#init, &b[4]==q}
+//  T(p) {&a[5]+sizeof(int)==p, &a[5]==p#init, &b[4]==q}
 
       p++;
 
-//  T(q) {&a[5]+sizeof(int *)==p, q+sizeof(double *)==&b[4],
+//  T(q) {&a[5]+sizeof(int)==p, q+sizeof(double)==&b[4],
 //    &b[4]==q#init}
 
       q--;
    }
    else {
 
-//  T(p) {p+sizeof(int *)==&a[5], &a[5]==p#init, &b[4]==q}
+//  T(p) {p+sizeof(double)==&a[5], &a[5]==p#init, &b[4]==q}
 
       p--;
 
-//  T(q) {p+sizeof(int *)==&a[5], &b[4]+sizeof(int *)==q,
+//  T(q) {p+sizeof(double)==&a[5], &b[4]+sizeof(double)==q,
 //    &b[4]==q#init}
 
       q++;
@@ -195,7 +195,7 @@ int main()
 
       p++;
 
-//  P(p,q) {&a[5]+sizeof(int *)==p, &b[4]==q}
+//  P(p,q) {&a[5]+sizeof(int)==p, &b[4]==q}
 
       q--;
    }
@@ -205,13 +205,32 @@ int main()
 
       p--;
 
-//  P(p,q) {p+sizeof(double *)==&a[5], &b[4]==q}
+//  P(p,q) {p+sizeof(int)==&a[5], &b[4]==q}
 
       q++;
    }
 
-//  P(p,q) {&a[5]+&b[4]+sizeof(int *)==p+q+sizeof(double *)}
+//  P(p,q) {}
 
 
    return 0;
 }
+
+Warnings
+
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if p is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if q is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if p is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if q is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if p is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if q is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if p is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if q is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed

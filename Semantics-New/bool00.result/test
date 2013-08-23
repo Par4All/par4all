@@ -43,7 +43,7 @@ int main(void)
 
    pbla = &bla;
 
-//  T(bla) {bla==1}
+//  T(bla) {}
 
 
    *pbla = 1;
@@ -84,7 +84,7 @@ int main(void)
 
    *pbla = 1;
 
-//  P(b,bla) {b==1, bla==1}
+//  P(b,bla) {b==1}
 
 
    return 0;

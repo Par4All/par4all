@@ -70,3 +70,7 @@ void main()
 
       high_score = your_score;
 }
+
+Warnings
+
+C_PARSER[main] (c_parse) The "main" function should return an int value

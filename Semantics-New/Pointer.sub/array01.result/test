@@ -1,0 +1,148 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int a[5];
+
+// Points To: none
+
+
+   a[0] = 0;
+
+// Points To: none
+
+   a[1] = 1;
+
+// Points To: none
+
+   a[2] = 2;
+
+// Points To: none
+
+   a[3] = 3;
+
+// Points To: none
+
+   a[4] = 4;
+
+// Points To: none
+
+   
+   
+   return 0;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+   int a[5];
+//             <    is written>: a[0]
+
+   a[0] = 0;
+//             <    is written>: a[1]
+   a[1] = 1;
+//             <    is written>: a[2]
+   a[2] = 2;
+//             <    is written>: a[3]
+   a[3] = 3;
+//             <    is written>: a[4]
+   a[4] = 4;
+   
+   
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T() {}
+
+   int a[5];
+
+//  T(a[0]) {a[0]==0}
+
+
+   a[0] = 0;
+
+//  T(a[1]) {a[0]==0, a[1]==1}
+
+   a[1] = 1;
+
+//  T(a[2]) {a[0]==0, a[1]==1, a[2]==2}
+
+   a[2] = 2;
+
+//  T(a[3]) {a[0]==0, a[1]==1, a[2]==2, a[3]==3}
+
+   a[3] = 3;
+
+//  T(a[4]) {a[0]==0, a[1]==1, a[2]==2, a[3]==3, a[4]==4}
+
+   a[4] = 4;
+
+//  T(main) {a[0]==0, a[1]==1, a[2]==2, a[3]==3, a[4]==4, main==0}
+
+   
+   
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int a[5];
+
+//  P() {}
+
+
+   a[0] = 0;
+
+//  P(a[0]) {a[0]==0}
+
+   a[1] = 1;
+
+//  P(a[0],a[1]) {a[0]==0, a[1]==1}
+
+   a[2] = 2;
+
+//  P(a[0],a[1],a[2]) {a[0]==0, a[1]==1, a[2]==2}
+
+   a[3] = 3;
+
+//  P(a[0],a[1],a[2],a[3]) {a[0]==0, a[1]==1, a[2]==2, a[3]==3}
+
+   a[4] = 4;
+
+//  P(a[0],a[1],a[2],a[3],a[4]) {a[0]==0, a[1]==1, a[2]==2, a[3]==3,
+//    a[4]==4}
+
+   
+   
+   return 0;
+}
+
+Warnings
+

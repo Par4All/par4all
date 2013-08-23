@@ -45,5 +45,10 @@ display PRINTED_FILE[main]
 display PRINTED_FILE[foo]
 
 close
+echo
+echo Warnings
+echo
+shell cat $WSPACE.database/Warnings
+
 delete $WSPACE
 quit

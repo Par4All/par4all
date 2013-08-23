@@ -187,3 +187,8 @@ int main()
 
    return 0;
 }
+
+Warnings
+
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (intrinsic_to_transformer) Value returned by intrinsic "rand" is ignored.
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (intrinsic_to_transformer) Value returned by intrinsic "rand" is ignored.

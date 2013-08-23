@@ -99,3 +99,6 @@ int main()
 
    return *p;
 }
+
+Warnings
+

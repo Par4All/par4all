@@ -2,7 +2,7 @@ setenv WSPACE=error02
 delete $WSPACE
 create $WSPACE $WSPACE.c 
 
-setproperty ABORT_ON_USER_ERROR TRUE
+#setproperty ABORT_ON_USER_ERROR TRUE
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
@@ -35,6 +35,15 @@ activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[main]
 
+close
+echo
+echo Warnings
+echo
+shell cat $WSPACE.database/Warnings
+
+delete $WSPACE
+quit
+
 echo
 echo Preconditions with point-to
 echo
@@ -42,5 +51,10 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
 close
+echo
+echo Warnings
+echo
+shell cat $WSPACE.database/Warnings
+
 delete $WSPACE
 quit

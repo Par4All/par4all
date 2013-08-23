@@ -23,20 +23,20 @@ int main()
 
    q = a;
 
-//  T(p) {q+sizeof(BYTE *)==p}
+//  T(p) {q+sizeof(BYTE)==p}
 
    p = q+1;
 
-//  T() {q+sizeof(BYTE *)==p}
+//  T() {q+sizeof(BYTE)==p}
 
 
    *q = 0;
 
-//  T() {q+sizeof(BYTE *)==p}
+//  T() {q+sizeof(BYTE)==p}
 
    *p = 0;
 
-//  T(main) {main==0, q+sizeof(BYTE *)==p}
+//  T(main) {main==0, q+sizeof(BYTE)==p}
 
 
    return 0;
@@ -67,17 +67,28 @@ int main()
 
    p = q+1;
 
-//  P(p,q) {q+sizeof(BYTE *)==p}
+//  P(p,q) {q+sizeof(BYTE)==p}
 
 
    *q = 0;
 
-//  P(p,q) {q+sizeof(BYTE *)==p}
+//  P(p,q) {q+sizeof(BYTE)==p}
 
    *p = 0;
 
-//  P(p,q) {q+sizeof(BYTE *)==p}
+//  P(p,q) {q+sizeof(BYTE)==p}
 
 
    return 0;
 }
+
+Warnings
+
+TRANSFORMERS_INTER_FULL[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if q is indirectly NULL
+TRANSFORMERS_INTER_FULL[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL[main] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL[main] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if q is indirectly NULL
+TRANSFORMERS_INTER_FULL[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL[main] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL[main] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer

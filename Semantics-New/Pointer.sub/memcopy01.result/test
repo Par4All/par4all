@@ -2,23 +2,57 @@
 Points-to
 
 
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void memcopy01(int size, char src[size], char dst[size])
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   for(i = 0; i <= size-1; i += 1)
+
+// Points To: none
+
+      dst[i] = src[i];
+}
+
+PROPER  EFFECTS
+
+void memcopy01(int size, char src[size], char dst[size])
+{
+   int i;
+//             <    is read   >: size
+//             <    is written>: i
+   for(i = 0; i <= size-1; i += 1)
+//             <    is read   >: i size src[i]
+//             <    is written>: dst[i]
+      dst[i] = src[i];
+}
+
 Transformers with point-to
 
 
 //  T() {}
 
-void memcopy01(int size, char src[size], char dst[size])
+void memcopy01(int size, char src[size], char dst[i])
 {
 
 //  T(i) {}
 
    int i;
 
-//  T(i) {0<=i, i+1<=size}
+//  T(dst[i],i) {0<=i, i+1<=size}
 
    for(i = 0; i <= size-1; i += 1)
 
-//  T() {0<=i, i+1<=size}
+//  T(dst[i]) {0<=i, i+1<=size}
 
       dst[i] = src[i];
 }
@@ -28,7 +62,7 @@ Preconditions with point-to
 
 //  P() {}
 
-void memcopy01(int size, char src[size], char dst[size])
+void memcopy01(int size, char src[size], char dst[i])
 {
 
 //  P() {}
@@ -39,7 +73,13 @@ void memcopy01(int size, char src[size], char dst[size])
 
    for(i = 0; i <= size-1; i += 1)
 
-//  P(i) {0<=i, i+1<=size}
+//  P(dst[i],i) {0<=i, i+1<=size}
 
       dst[i] = src[i];
 }
+
+Warnings
+
+unknown[unknown] (activate_phase) Rule `PROPER_EFFECTS_WITH_POINTS_TO' already active
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning memcopy01 instead
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning memcopy01 instead

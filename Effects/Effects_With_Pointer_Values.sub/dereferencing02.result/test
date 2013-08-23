@@ -186,14 +186,14 @@ void dereferencing02()
    w = q;
 
 //  <i-W-EXACT-{}>
-//  <p[PHI1]-R-EXACT-{PHI1==2, i==0}>
+//  <p[PHI1]-R-EXACT-{PHI1==2}>
 //  <w-R-EXACT-{}>
 
    **(w+(i = 2)) = 4.;
 
-//  <p[PHI1]-R-EXACT-{PHI1==0, i==2}>
+//  <p[PHI1]-R-EXACT-{PHI1==0}>
 //  <q-R-EXACT-{}>
-//  <x[PHI1]-W-EXACT-{PHI1==0, i==2}>
+//  <x[PHI1]-W-EXACT-{PHI1==0}>
 
    x[0] = **q;
 
@@ -202,8 +202,8 @@ void dereferencing02()
 
    q++;
 
-//  <p[PHI1]-R-EXACT-{PHI1==1, i==2}>
-//  <p[PHI1]-W-EXACT-{PHI1==1, i==2}>
+//  <p[PHI1]-R-EXACT-{PHI1==1}>
+//  <p[PHI1]-W-EXACT-{PHI1==1}>
 //  <q-R-EXACT-{}>
 //  <q-W-EXACT-{}>
 
@@ -257,14 +257,14 @@ void dereferencing02()
    w = q;
 
 //  <i-W-EXACT-{}>
-//  <p[PHI1]-R-EXACT-{PHI1==2, i==0}>
+//  <p[PHI1]-R-EXACT-{PHI1==2}>
 //  <w-R-EXACT-{}>
 
    **(w+(i = 2)) = 4.;
 
-//  <p[PHI1]-R-EXACT-{PHI1==0, i==2}>
+//  <p[PHI1]-R-EXACT-{PHI1==0}>
 //  <q-R-EXACT-{}>
-//  <x[PHI1]-W-EXACT-{PHI1==0, i==2}>
+//  <x[PHI1]-W-EXACT-{PHI1==0}>
 
    x[0] = **q;
 
@@ -273,8 +273,8 @@ void dereferencing02()
 
    q++;
 
-//  <p[PHI1]-R-EXACT-{PHI1==1, i==2}>
-//  <p[PHI1]-W-EXACT-{PHI1==1, i==2}>
+//  <p[PHI1]-R-EXACT-{PHI1==1}>
+//  <p[PHI1]-W-EXACT-{PHI1==1}>
 //  <q-R-EXACT-{}>
 //  <q-W-EXACT-{}>
 

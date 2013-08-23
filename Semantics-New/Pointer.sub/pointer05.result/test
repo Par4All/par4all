@@ -161,3 +161,11 @@ void foo(int **tab)
 
    p = p;
 }
+
+Warnings
+
+C_PARSER[main] (c_parse) The "main" function should return an int value
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[foo] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[foo] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[foo] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[foo] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer

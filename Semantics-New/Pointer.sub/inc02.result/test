@@ -63,3 +63,7 @@ void inc02(int *p)
 
    return;
 }
+
+Warnings
+
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[inc02] (points_to_unary_operation_to_transformer) The pointer p can points to NULL

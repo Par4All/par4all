@@ -43,5 +43,10 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
 close
+echo
+echo Warnings
+echo
+shell cat $WSPACE.database/Warnings
+
 delete $WSPACE
 quit

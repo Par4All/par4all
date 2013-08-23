@@ -77,15 +77,15 @@ int main()
 
    p = (void *) 0;
 
-//  T(q) {NULL==p, NULL==q-1, j==0}
+//  T(q) {NULL==p, NULL+sizeof(int)==q, j==0}
 
    q = p+(1+j);
 
-//  T(i) {NULL==p, NULL==q-1, i==1, j==0}
+//  T(i) {NULL+i==q, NULL==p, NULL+sizeof(int)==q, j==0}
 
    i = q-p;
 
-//  T(main) {NULL==p, NULL==q-1, i==1, j==0, main==0}
+//  T(main) {NULL+i==q, NULL==p, NULL+sizeof(int)==q, j==0, main==0}
 
 
    return 0;
@@ -115,12 +115,24 @@ int main()
 
    q = p+(1+j);
 
-//  P(i,j,p,q) {NULL==p, NULL==q-1, j==0}
+//  P(i,j,p,q) {NULL==p, NULL+sizeof(int)==q, j==0}
 
    i = q-p;
 
-//  P(i,j,p,q) {NULL==p, NULL==q-1, i==1, j==0}
+//  P(i,j,p,q) {NULL+i==q, NULL==p, NULL+sizeof(int)==q, j==0}
 
 
    return 0;
 }
+
+Warnings
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_dereferencing_to_points_to) Null or undefined pointer may be dereferenced because of "p" at line 11.
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if p is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+ not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if p is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+ not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed

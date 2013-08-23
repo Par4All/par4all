@@ -100,3 +100,8 @@ int mainInt()
 
    return 0;
 }
+
+Warnings
+
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning mainInt instead
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning mainInt instead

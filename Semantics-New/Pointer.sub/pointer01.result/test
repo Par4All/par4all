@@ -96,20 +96,20 @@ int mainInt()
 
    q = &a[0];
 
-//  T(p) {&a[0]+sizeof(int *)==p, &a[0]==q}
+//  T(p) {&a[0]+sizeof(int)==p, &a[0]==q}
 
    p = q+1;
 
-//  T(a[0]) {&a[0]+sizeof(int *)==p, &a[0]==q, a[0]==0}
+//  T(a[0]) {&a[0]+sizeof(int)==p, &a[0]==q, a[0]==0}
 
 
    *q = 0;
 
-//  T(a[1]) {&a[0]+sizeof(int *)==p, &a[0]==q, a[0]==0, a[1]==0}
+//  T(a[1]) {&a[0]+sizeof(int)==p, &a[0]==q, a[0]==0, a[1]==0}
 
    *p = 0;
 
-//  T(mainInt) {&a[0]+sizeof(int *)==p, &a[0]==q, a[0]==0, a[1]==0,
+//  T(mainInt) {&a[0]+sizeof(int)==p, &a[0]==q, a[0]==0, a[1]==0,
 //    mainInt==0}
 
 
@@ -141,18 +141,27 @@ int mainInt()
 
    p = q+1;
 
-//  P(p,q) {&a[0]+sizeof(int *)==p, &a[0]==q}
+//  P(p,q) {&a[0]+sizeof(int)==p, &a[0]==q}
 
 
    *q = 0;
 
-//  P(a[0],p,q) {&a[0]+sizeof(int *)==p, &a[0]==q, a[0]==0}
+//  P(a[0],p,q) {&a[0]+sizeof(int)==p, &a[0]==q, a[0]==0}
 
    *p = 0;
 
-//  P(a[0],a[1],p,q) {&a[0]+sizeof(int *)==p, &a[0]==q, a[0]==0,
+//  P(a[0],a[1],p,q) {&a[0]+sizeof(int)==p, &a[0]==q, a[0]==0,
 //    a[1]==0}
 
 
    return 0;
 }
+
+Warnings
+
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning mainInt instead
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[mainInt] (have_null_value_in_pointer_expression_p) TODO : Need to check if q is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[mainInt] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning mainInt instead
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[mainInt] (have_null_value_in_pointer_expression_p) TODO : Need to check if q is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[mainInt] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed

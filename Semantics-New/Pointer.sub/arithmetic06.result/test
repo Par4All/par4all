@@ -77,11 +77,11 @@ int main()
 
    q = &a[0];
 
-//  T(p) {&a[0]+2sizeof(int *)==p, &a[0]==q, i==2}
+//  T(p) {&a[0]+2sizeof(int)==p, &a[0]==q, i==2}
 
    p = q+i;
 
-//  T(main) {&a[0]+2sizeof(int *)==p, &a[0]==q, i==2, main==0}
+//  T(main) {&a[0]+2sizeof(int)==p, &a[0]==q, i==2, main==0}
 
 
    return 0;
@@ -112,8 +112,15 @@ int main()
 
    p = q+i;
 
-//  P(i,p,q) {&a[0]+2sizeof(int *)==p, &a[0]==q, i==2}
+//  P(i,p,q) {&a[0]+2sizeof(int)==p, &a[0]==q, i==2}
 
 
    return 0;
 }
+
+Warnings
+
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if q is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if q is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed

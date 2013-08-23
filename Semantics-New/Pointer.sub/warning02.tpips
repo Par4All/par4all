@@ -41,11 +41,6 @@ echo
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
-echo
-echo Warnings
-echo
-shell cat $WSPACE.database/Warnings
-
 close
 echo
 echo Warnings

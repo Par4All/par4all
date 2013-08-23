@@ -42,12 +42,12 @@ C (0,4)
 
       DO I = INC(J), N                                                  0020
 
-C  T(J) {J==J#init+2, N==0, I<=0}
+C  T(J) {N==0, I<=0}
 
 C (0,5)
 C        BEGIN BLOCK
 
-C  T() {N==0, I<=0}
+C  T(J) {N==0, I<=0}
 
 C (0,6)
          T(I) = 0.                                                      0021

@@ -178,3 +178,7 @@ int main()
 
    return 0;
 }
+
+Warnings
+
+PROPER_EFFECTS_WITH_POINTS_TO[main] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
