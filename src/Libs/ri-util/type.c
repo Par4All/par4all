@@ -142,6 +142,12 @@ parameter MakeOverloadedParameter()
     return MakeAnyScalarParameter(is_basic_overloaded, 0);
 }
 
+//unuse
+parameter MakePointerParameter()
+{
+  return MakeAnyScalarParameter(is_basic_pointer, DEFAULT_POINTER_TYPE_SIZE);
+}
+
 parameter MakeIntegerParameter()
 {
   return MakeAnyScalarParameter(is_basic_int, DEFAULT_INTEGER_TYPE_SIZE);

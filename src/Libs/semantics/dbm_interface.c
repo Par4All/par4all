@@ -320,6 +320,26 @@ bool transformers_inter_full(char * module_name)
     return module_name_to_transformers(module_name);
 }
 
+bool transformers_inter_full_with_points_to(char * module_name)
+{
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, true);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, true);
+    set_bool_property(SEMANTICS_FIX_POINT, true);
+    select_fix_point_operator();
+    set_bool_property(SEMANTICS_STDOUT, false);
+    /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
+
+    init_current_statement_semantic_context();
+    set_pt_to_list( (statement_points_to)
+                               db_get_memory_resource(DBR_POINTS_TO, module_name, true) );
+    bool result = module_name_to_transformers(module_name);
+
+    free_current_statement_semantic_context();
+    reset_pt_to_list();
+
+    return result;
+}
+
 /* Transformer recomputation cannot be of real use unless an
    interprocedural analysis is performed. For intraprocedural analyses,
    using property SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT is

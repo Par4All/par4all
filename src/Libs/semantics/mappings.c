@@ -169,9 +169,10 @@ static void add_intraprocedural_value_entities_unconditionally(entity e)
   add_or_kill_equivalenced_variables(e, false);
 }
 
+/* Use to be static, but may be called from ri_to_transformer. */
 /* void add_intraprocedural_value_entities(entity e)
  */
-static void add_intraprocedural_value_entities(entity e)
+void add_intraprocedural_value_entities(entity e)
 {
   type ut = ultimate_type(entity_type(e));
 

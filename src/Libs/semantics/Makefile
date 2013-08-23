@@ -73,7 +73,7 @@ LIB_CFILES=	misc.c \
 		expression.c \
 		loop.c \
 		ri_to_total_preconditions.c \
-		ri_to_transformer_lists.c\
+		ri_to_transformer_lists.c \
 		path_transformer.c
 
 INC_TARGET =    $(TARGET).h

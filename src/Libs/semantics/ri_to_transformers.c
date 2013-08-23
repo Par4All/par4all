@@ -51,6 +51,8 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 
+#include "alias-classes.h"
+
 #include "misc.h"
 
 #include "properties.h"
@@ -66,61 +68,158 @@
 
 #include "semantics.h"
 
+#include "c_syntax.h"
+
+/*********
+ * Begin definition for the stack current_statement_semantic_context
+ */
+
+static stack current_statement_semantic_context = stack_undefined;
+
+void init_current_statement_semantic_context()
+{
+  pips_assert("current_statement_semantic_context is undefined",
+                stack_undefined_p(current_statement_semantic_context));
+  current_statement_semantic_context = stack_make(statement_domain, 0, 0);
+}
+
+static void push_current_statement_semantic_context(statement st)
+{
+  stack_push((void *) st, current_statement_semantic_context);
+}
+
+//static int get_current_statement_semantic_context_line_number()
+//{
+//  statement st = (statement) stack_head(current_statement_semantic_context);
+//  return statement_number(st);
+//}
+
+statement get_current_statement_semantic_context()
+{
+  statement st = (statement) stack_head(current_statement_semantic_context);
+  return st;
+}
+
+static statement pop_current_statement_semantic_context(void)
+{
+  statement st = (statement) stack_pop(current_statement_semantic_context);
+  return st;
+}
+
+void free_current_statement_semantic_context()
+{
+  stack_free(&current_statement_semantic_context);
+  current_statement_semantic_context = stack_undefined;
+}
+
+bool current_statement_semantic_context_defined_p()
+{
+  return !stack_undefined_p(current_statement_semantic_context);
+}
+
+/*********
+ * End definition for the stack current_statement_semantic_context
+ */
+
+// TODO : Need to redesign the functions apply_..._to_transformer to not make side effect on the transformer in parameter
+//        it will permit to make convex_hull for MAY_EFFECT
+
 /**
  * \details         Apply or add an "concrete" effect e on a transformer tf
  *                  we must verify that the effect e is a write effect and
  *                  the effect of e is on abstract variable
- * \param args      arguments for assign (*p=v), list_undefined if no args
  * \param tf        transformer
  * \param e         write effects
+ * \param rhs
  * \return          transformer with the effect
  */
-static transformer apply_concrete_effect_to_transformer(list args, transformer tf, effect e)
+static transformer apply_concrete_effect_to_transformer(transformer tf, effect e, expression rhs)
 {
   ifdebug(8) {
-    pips_debug(8, "Begin\n");
+    pips_debug(8, "-------------------Begin-----------------------------\n");
     (void) print_transformer(tf);
   }
-  entity v = reference_variable(effect_any_reference(e));
+  reference r = effect_any_reference(e);
+  entity v = reference_variable(r);
 
+  // Do we really need to make this distinction ?
   if (!approximation_may_p(effect_approximation(e))) // NL : a may effect don't permit to know anything
   {
-    expression rhs = EXPRESSION(CAR(CDR(args)));
-    pips_assert("2 args to assign", CDR(CDR(args))==NIL);
+    pips_debug(9, "!approximation_may_p(effect_approximation(e)\n");
+    // NL : we must have the points-to graph to analyze constant path so normally never have to make this test
+    //      Maybe make this test available if we decide that analyze CP orthogonal with transformer_with_points_to and not an extension
+    //        and then redesign the computation of the constant path for transformers
+    //if (analyzed_reference_p(r)) {
+    //  pips_debug(9, "analyzed_reference_p(r)\n");
+    //  ifdebug(9) {
+    //    (void) print_expression(rhs);
+    //  }
+    //
+    //  transformer post = any_scalar_assign_to_transformer_without_effect(v, rhs, tf);
+    //  if(!transformer_undefined_p(post))
+    //  {
+    //    free_transformer(tf);
+    //    tf = post;
+    //  }
+    //}
+    //else {
+      pips_debug(9, "!analyzed_reference_p(r)\n");
+      // NL : need to make a function to make transformer_cylinder_base_projection(tf, v)
+      //TODO : transformer_cylinder_base_projection(tf, v);
+      transformer_add_variable_update(tf, v);
 
-    ifdebug(8) {
-      (void) print_expression(rhs);
-    }
-
-    transformer post = any_scalar_assign_to_transformer_without_effect(v, rhs, tf);
-    if(!transformer_undefined_p(post))
-    {
-      free_transformer(tf);
-      tf = post;
-    }
+      //TODO : delete this part when transformer_cylinder_base_projection done
+      // NL : reset all the sc can be to much,
+      //      but don't see how to do otherwise without a projection function
+      {
+        Psysteme sc = predicate_system(transformer_relation(tf));
+        sc_egalites(sc) = contraintes_free(sc_egalites(sc));
+        sc_nbre_egalites(sc) = 0;
+        sc_inegalites(sc) = contraintes_free(sc_inegalites(sc));
+        sc_nbre_inegalites(sc) = 0;
+      }
+    //}
   }
   else {
+    pips_debug(9, "!!approximation_may_p(effect_approximation(e)\n");
     // NL : if we had a may effect, we make a projection for the variable
-    // NL : need to make a function to make transformer_cylinder_base_projection(tf, v)
-    //TODO : transformer_cylinder_base_projection(tf, v);
-    transformer_add_variable_update(tf, v);
-
-    //TODO : delete this part when transformer_cylinder_base_projection done
-    // NL : reset all the sc can be to much,
-    //      but don't see how to do otherwise without a projection function
+//    if (analyzed_reference_p(r)) {
+//      pips_debug(9, "analyzed_reference_p(r)\n");
+//      ifdebug(9) {
+//        (void) print_expression(rhs);
+//      }
+//
+//      transformer post = any_scalar_assign_to_transformer_without_effect(v, rhs, tf);
+//      if(!transformer_undefined_p(post))
+//      {
+//        free_transformer(tf);
+//        tf = post;
+//      }
+//    }
+//    else
     {
-    Psysteme sc = predicate_system(transformer_relation(tf));
-    sc_egalites(sc) = contraintes_free(sc_egalites(sc));
-    sc_nbre_egalites(sc) = 0;
-    sc_inegalites(sc) = contraintes_free(sc_inegalites(sc));
-    sc_nbre_inegalites(sc) = 0;
+      pips_debug(9, "!analyzed_reference_p(r)\n");
+      // NL : need to make a function to make transformer_cylinder_base_projection(tf, v)
+      //TODO : transformer_cylinder_base_projection(tf, v);
+      transformer_add_variable_update(tf, v);
+
+      //TODO : delete this part when transformer_cylinder_base_projection done
+      // NL : reset all the sc can be to much,
+      //      but don't see how to do otherwise without a projection function
+      {
+        Psysteme sc = predicate_system(transformer_relation(tf));
+        sc_egalites(sc) = contraintes_free(sc_egalites(sc));
+        sc_nbre_egalites(sc) = 0;
+        sc_inegalites(sc) = contraintes_free(sc_inegalites(sc));
+        sc_nbre_inegalites(sc) = 0;
+      }
     }
   }
 
 
   ifdebug(8) {
     (void) print_transformer(tf);
-    pips_debug(8, "Ends\n");
+    pips_debug(8, "-----------------------Ends------------------------\n");
   }
   return tf;
 }
@@ -206,38 +305,39 @@ static transformer apply_abstract_effect_to_transformer(transformer tf, effect e
 /**
  * \details         Apply or add an effect e on a transformer tf
  *                  only the write effects is compute
- * \param args      arguments for assign (*p=v), list_undefined if no args
  * \param tf        transformer
  * \param e         effect
  * \param apply_p   if we apply or add an effect, true if we apply
+ * \param rhs       redundant with apply_p
  * \return          transformer with the effect
  */
 //must be static because of the dependence (type effect only declare on effects.h)
-static transformer apply_effect_to_transformer(list args, transformer tf, effect e, bool apply_p)
+static transformer apply_effect_to_transformer(transformer tf, effect e, bool apply_p, expression rhs)
 {
-  ifdebug(8) {
-    pips_debug(8, "Begin\n");
+  ifdebug(9) {
+    pips_debug(9, "Begin\n");
     (void) print_transformer(tf);
   }
   entity v = reference_variable(effect_any_reference(e));
+  ifdebug(9) print_entity_variable(v);
 
   //action a = effect_action(e);
   //normally this test is already done by the caller function
   //if(action_write_p(a))
   {
     /* The check on static should be useless because already taken
-       into account when effects are computed. And it is harmful here
-       since most effects on static variables cannot be ignored. */
+     * into account when effects are computed. And it is harmful here
+     * since most effects on static variables cannot be ignored. */
     if(entity_has_values_p(v)
         && store_effect_p(e) // FI: we should have action_memory_write_p()
         //&& !variable_static_p(v)
     ) {
-      pips_debug(8, "\"concrete\" effect\n");
+      pips_debug(9, "\"concrete\" effect\n");
       if (apply_p
-          //&& !list_undefined_p(args) // NL : apply_p=false <-> args=list_undefined
+          //&& !expression_undefined_p(rhs) // NL : apply_p=false <-> rhs=expression_undefined
       ) {
         // NL : case *p=v
-        tf = apply_concrete_effect_to_transformer(args, tf, e);
+        tf = apply_concrete_effect_to_transformer(tf, e, rhs);
       }
       else {
         // NL : general case, don't understand what exactly we do in this case (what kind of case it is)
@@ -248,14 +348,14 @@ static transformer apply_effect_to_transformer(list args, transformer tf, effect
       }
     }
     else if(entity_abstract_location_p(v)) {
-      pips_debug(8, "abstract effect\n");
+      pips_debug(9, "abstract effect\n");
       tf = apply_abstract_effect_to_transformer(tf, e, apply_p);
     }
   }
 
-  ifdebug(8) {
+  ifdebug(9) {
     (void) print_transformer(tf);
-    pips_debug(8, "Ends\n");
+    pips_debug(9, "Ends\n");
   }
   return tf;
 }
@@ -273,20 +373,29 @@ static transformer apply_effect_to_transformer(list args, transformer tf, effect
  *
  * \brief           Apply or add a list of effect el on a transformer tf
  *                  only the write effects is compute
- * \param args      arguments for assign (*p=v), list_undefined if no args
- * \param tf        transformer
+ * \param tf        transformer (modify by side effect)
  * \param el        list of effects
  * \param apply_p   if we apply or add the list of effect, true if we apply
+ * \param rhs
  * \return          transformer with the effects
  */
-transformer apply_effects_to_transformer(list args, transformer tf, list el, bool apply_p)
+static transformer apply_effects_to_transformer(transformer tf, list el, bool apply_p, expression rhs)
 {
+  ifdebug(9) {
+    pips_debug(9, "Begin\n");
+    (void) print_transformer(tf);
+  }
+
   /* algorithm: keep only memory write effects on variables with values */
   FOREACH(EFFECT, e, el) {
     action a = effect_action(e);
 
     if(action_write_p(a))
-      tf = apply_effect_to_transformer(args, tf, e, apply_p);
+      tf = apply_effect_to_transformer(tf, e, apply_p, rhs);
+  }
+  ifdebug(9) {
+    (void) print_transformer(tf);
+    pips_debug(9, "Ends\n");
   }
   return tf;
 }
@@ -295,7 +404,7 @@ transformer apply_effects_to_transformer(list args, transformer tf, list el, boo
 transformer effects_to_transformer(list e) /* list of effects */
 {
   transformer tf = transformer_identity();
-  tf =  apply_effects_to_transformer(list_undefined, tf, e, false);
+  tf =  apply_effects_to_transformer(tf, e, false, expression_undefined);
   return tf;
 }
 
@@ -767,9 +876,9 @@ static transformer test_to_transformer(test t,
 }
 
 transformer intrinsic_to_transformer(entity e,
-				     list pc,
-				     transformer pre,
-				     list ef) /* effects of intrinsic call */
+    list pc,
+    transformer pre,
+    list ef) /* effects of intrinsic call */
 {
   transformer tf = transformer_undefined;
 
@@ -778,23 +887,23 @@ transformer intrinsic_to_transformer(entity e,
   if(ENTITY_ASSIGN_P(e)) {
     tf = any_assign_to_transformer(pc, ef, pre);
   }
- else if(ENTITY_PLUS_UPDATE_P(e) || ENTITY_MINUS_UPDATE_P(e)
-	 || ENTITY_MULTIPLY_UPDATE_P(e) || ENTITY_DIVIDE_UPDATE_P(e)
-	 || ENTITY_MODULO_UPDATE_P(e) || ENTITY_LEFT_SHIFT_UPDATE_P(e)
-	 || ENTITY_RIGHT_SHIFT_UPDATE_P(e) || ENTITY_BITWISE_AND_UPDATE_P(e)
-	 || ENTITY_BITWISE_XOR_UPDATE_P(e) || ENTITY_BITWISE_OR_UPDATE_P(e)) {
+  else if(ENTITY_PLUS_UPDATE_P(e) || ENTITY_MINUS_UPDATE_P(e)
+      || ENTITY_MULTIPLY_UPDATE_P(e) || ENTITY_DIVIDE_UPDATE_P(e)
+      || ENTITY_MODULO_UPDATE_P(e) || ENTITY_LEFT_SHIFT_UPDATE_P(e)
+      || ENTITY_RIGHT_SHIFT_UPDATE_P(e) || ENTITY_BITWISE_AND_UPDATE_P(e)
+      || ENTITY_BITWISE_XOR_UPDATE_P(e) || ENTITY_BITWISE_OR_UPDATE_P(e)) {
     //tf = update_addition_operation_to_transformer(pc, ef, pre);
-   tf = any_update_to_transformer(e, pc, ef, pre);
+    tf = any_update_to_transformer(e, pc, ef, pre);
   }
- else if(ENTITY_POST_INCREMENT_P(e) || ENTITY_POST_DECREMENT_P(e)
-	 || ENTITY_PRE_INCREMENT_P(e) || ENTITY_PRE_DECREMENT_P(e)) {
-   tf = any_basic_update_to_transformer(e, pc, ef, pre);
+  else if(ENTITY_POST_INCREMENT_P(e) || ENTITY_POST_DECREMENT_P(e)
+      || ENTITY_PRE_INCREMENT_P(e) || ENTITY_PRE_DECREMENT_P(e)) {
+    tf = any_basic_update_to_transformer(e, pc, ef, pre);
   }
- else if(ENTITY_C_RETURN_P(e)) {
-   tf = c_return_to_transformer(e, pc, ef, pre);
+  else if(ENTITY_C_RETURN_P(e)) {
+    tf = c_return_to_transformer(e, pc, ef, pre);
   }
   else if(ENTITY_STOP_P(e)||ENTITY_ABORT_SYSTEM_P(e)||ENTITY_EXIT_SYSTEM_P(e)
-	  || ENTITY_ASSERT_FAIL_SYSTEM_P(e))
+      || ENTITY_ASSERT_FAIL_SYSTEM_P(e))
     tf = transformer_empty();
   else if(ENTITY_COMMA_P(e)) {
     tf = expressions_to_transformer(pc, pre);
@@ -908,13 +1017,23 @@ transformer call_to_transformer(call c,
   cons *pc = call_arguments(c);
   tag tt;
 
-  pips_debug(8,"begin with precondition %p\n", pre);
+  ifdebug(9) {
+    pips_debug(9,"begin with precondition %p \n", pre);
+    print_transformer(pre);
+    print_entity_variable(e);
+    ifdebug(9) {
+      statement curstat =  statement_undefined;
+      if (current_statement_semantic_context_defined_p())
+        curstat =  get_current_statement_semantic_context();
+      if (!statement_undefined_p(curstat))
+        print_statement(curstat);
+    }
+  }
 
   switch (tt = value_tag(entity_initial(e))) {
   case is_value_code:
     /* call to an external function; preliminary version:
        rely on effects */
-    pips_debug(5, "external function \"%s\"\n", entity_name(e));
     if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
       type et = ultimate_type(entity_type(e));
       type rt = ultimate_type(functional_result(type_functional(et)));
@@ -967,7 +1086,6 @@ transformer call_to_transformer(call c,
     pips_internal_error("function %s has an unknown value", entity_name(e));
     break;
   case is_value_intrinsic:
-    pips_debug(5, "intrinsic function %s\n", entity_name(e));
     tf = intrinsic_to_transformer(e, pc, pre, ef);
     break;
   default:
@@ -976,9 +1094,9 @@ transformer call_to_transformer(call c,
   pips_assert("transformer tf is consistent",
 	      transformer_consistency_p(tf));
 
-  pips_debug(8,"Transformer before intersection with precondition, tf=%p\n",
-	     tf);
   ifdebug(8) {
+    pips_debug(8,"Transformer before intersection with precondition, tf=%p\n",
+                 tf);
     (void) print_transformer(tf);
   }
 
@@ -986,19 +1104,19 @@ transformer call_to_transformer(call c,
      use. Information about initial values, that is final values in pre,
      can also be used. */
   tf = transformer_safe_domain_intersection(tf, pre);
-  pips_debug(8,"After intersection and before normalization with tf=%p\n", tf);
   ifdebug(8) {
+    pips_debug(8,"After intersection and before normalization with tf=%p\n", tf);
     (void) print_transformer(tf);
   }
-  pips_debug(8,"with precondition pre=%p\n", pre);
   ifdebug(8) {
+    pips_debug(8,"with precondition pre=%p\n", pre);
     (void) print_transformer(pre);
   }
 /*   tf = transformer_normalize(tf, 4); */
   tf = transformer_normalize(tf, 2);
 
-  pips_debug(8,"end after normalization with tf=%p\n", tf);
   ifdebug(8) {
+    pips_debug(8,"end after normalization with tf=%p\n", tf);
     (void) print_transformer(tf);
   }
 
@@ -1780,7 +1898,7 @@ transformer user_call_to_transformer(entity f,
 {
   transformer t_caller = transformer_undefined;
 
-  pips_debug(8, "begin\n");
+  pips_debug(7, "begin\n");
   pips_assert("f is a module", entity_module_p(f));
 
   if(!get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
@@ -1792,6 +1910,7 @@ transformer user_call_to_transformer(entity f,
     else
       t_caller = fortran_user_call_to_transformer(f, pc, ef);
   }
+  pips_debug(7, "end\n");
   return t_caller;
 }
 
@@ -2033,8 +2152,10 @@ transformer any_scalar_assign_to_transformer_without_effect(entity v,
 
     if(!transformer_undefined_p(tf)) {
 
-      pips_debug(9, "A transformer has been obtained:\n");
-      ifdebug(9) dump_transformer(tf);
+      ifdebug(8) {
+        pips_debug(8, "A transformer has been obtained:\n");
+        dump_transformer(tf);
+      }
 
       if(entity_is_argument_p(v, transformer_arguments(tf))) {
           /* Is it standard compliant? The assigned variable is modified by the rhs. */
@@ -2056,21 +2177,23 @@ transformer any_scalar_assign_to_transformer_without_effect(entity v,
           /* tf = transformer_value_substitute(tf, v_new, v_old); */
           tf = transformer_value_substitute(tf, v_new, v_old);
 
-          pips_debug(9,"After substitution v_new=%s -> v_old=%s\n",
+          pips_debug(8,"After substitution v_new=%s -> v_old=%s\n",
                 entity_local_name(v_new), entity_local_name(v_old));
+          ifdebug(8) dump_transformer(tf);
 
           tf = transformer_value_substitute(tf, tmp, v_new);
 
-          pips_debug(9,"After substitution tmp=%s -> v_new=%s\n",
+          pips_debug(8,"After substitution tmp=%s -> v_new=%s\n",
                 entity_local_name(tmp), entity_local_name(v_new));
+          ifdebug(8) dump_transformer(tf);
 
           transformer_add_modified_variable(tf, v_repr);
       }
     }
     if(!transformer_undefined_p(tf)) {
       tf = transformer_temporary_value_projection(tf);
-      pips_debug(9, "After temporary value projection, tf=%p:\n", tf);
-      ifdebug(9) dump_transformer(tf);
+      pips_debug(8, "After temporary value projection, tf=%p:\n", tf);
+      ifdebug(8) dump_transformer(tf);
     }
     reset_temporary_value_counter();
   }
@@ -2091,42 +2214,212 @@ transformer any_scalar_assign_to_transformer(entity v,
   return tf;
 }
 
+/**
+ * \param cp        constant path to be assign (the caller need to verify that cp is really a constant path)
+ * \param rhs       expression to assign
+ * \param pre       precondition
+ * \param ef        effects of assign
+ * \return          transformer_undefined or transformer with the assign
+ */
+static transformer assign_rhs_to_cp_to_transformer (
+    reference cp,      // cp to be assign
+    expression rhs,    // expression to assign
+    transformer pre,   // precondition
+    list ef)           // effects of assign
+{
+  entity elhs = reference_variable(cp);
+  string cp_name =
+      strdup(concatenate(
+          get_current_module_name(), MODULE_SEP_STRING,
+          scope_to_block_scope(entity_name(elhs)),
+          reference_to_string(cp),
+          (char *) NULL));
+
+  // find or create an entity for the constant path
+  entity ecp = gen_find_entity(cp_name);
+  if (entity_undefined_p(ecp)) {
+    entity m = get_current_module_entity();
+
+    bool to_be_free = false;
+    type t = points_to_reference_to_type(cp, &to_be_free);
+
+    // cp = make_entity_copy_with_new_name(elhs, cp_name, false); //type not OK
+    ecp = make_entity(
+        strdup(cp_name),
+        copy_type(t),
+        copy_storage(entity_storage(elhs)),
+        //make_storage_ram(make_ram(
+        //    m,
+        //    FindOrCreateEntity(get_current_module_name(), STATIC_AREA_LOCAL_NAME),
+        //    UNKNOWN_RAM_OFFSET,
+        //    NIL)
+        //),
+        value_undefined);
+
+    if (to_be_free) {
+      free_type(t);
+    }
+
+    // Add cp in the declaration of the module
+    // WARNING : it seem that get_current_module_statement() call in AddEntityToCurrentModuleWithoutDeclaration
+    //           at this time
+    //           is not the good statement, so we may add the declaration in a bad scope (always in scope of the module)
+    // WARNING : code_declarations(value_code(entity_initial(m))) and get_current_module_declarations()
+    //           are no more the same list after this add
+    //           have some impact somewhere?
+    AddEntityToCurrentModuleWithoutDeclaration(ecp);
+
+    ifdebug(8) {
+      pips_debug(8, "after add (cp) in decl\n");
+      print_entities(code_declarations(value_code(entity_initial(m))));
+      // pips_debug(9, "get_current_module_declarations()\n");
+      // print_entities(get_current_module_declarations());
+      pips_debug(8, "get_current_module_statement()\n");
+      print_statement(get_current_module_statement());
+    }
+
+    // Add value for cp
+    // NL : I don't why but if we try to add_interprocedural_value_entities instead of add_intraprocedural_value_entities
+    //      We get a "pips error in variable_in_module_p 'both coherency' not verified"
+    //      try to find cp#init, don't why the suffix is present with add_interprocedural_value_entities but not with add_intraprocedural_value_entities
+    // add_interprocedural_value_entities(cp);
+    add_intraprocedural_value_entities(ecp);
+  }
+
+  free(cp_name);
+
+  return any_scalar_assign_to_transformer(ecp, rhs, ef, pre);
+}
+
+/**
+ * \param rlhs      reference to be assign
+ * \param rhs       expression to assign
+ * \param pre       precondition
+ * \param ef        effects of assign
+ * \return          transformer_undefined or transformer with the assign
+ */
+static transformer assign_rhs_to_reflhs_to_transformer (
+    reference rlhs,    // reference to be assign
+    expression rhs,    // expression to assign
+    transformer pre,   // precondition
+    list ef)           // effects of assign
+{
+  transformer tf = transformer_undefined;
+
+  if(ENDP(reference_indices(rlhs))) {
+    entity v = reference_variable(rlhs);
+    tf = any_scalar_assign_to_transformer(v, rhs, ef, pre);
+  }
+  else if (constant_path_analyzed_p()) {
+    // Check if the reference rlhs is a constant path or not
+    // TODO : can_be_constant_path_p(rlhs) return true when the ref is a constant path
+    // * !effect_reference_dereferencing_p(rlhs, &exact_p)            -> is too permissive
+    //     can return true when it's not a constant path like a[i]
+    //     can make a side effect for the declaration of variable in parameter (only?), don't know why
+    //     for instance with Semantics-New/Pointer.sub/memcopy01
+    //       void memcopy01([...], char dst[size])  -->  void memcopy01([...], char dst[i])
+    //     without this side effect !effect_reference_dereferencing_p seem to be better than store_independent_reference_p
+    // * store_independent_reference_p(rlhs)                          -> is too too much restrictive
+    //     can return false for some cp like a[0], can't permit to treat the array
+    //         return false for the structure too
+    //     it can't permit to treat anything interesting
+    if (can_be_constant_path_p(rlhs)) {
+      tf = assign_rhs_to_cp_to_transformer(rlhs, rhs, pre, ef);
+    }
+    else {
+      // TODO : reference_to_constant_path(ref)
+      //        function that convert any reference in a constant path
+      //        expression_to_points_to_sources() isn't good, doesn't work for some array for the moment
+      //        maybe reference_to_sinks() it's ok, not tested
+      //        we are in this case for the array I think
+      pips_user_warning("Want to analyse constant path, but don't have a constant path : %s\n", reference_to_string(rlhs));
+      // tf = assign_rhs_to_cp_to_transformer(  cp  , rhs, pre, ef);
+    }
+  }
+  else {
+    /* check scalar side effects in the subscript expressions and
+         in the rhs (specific to C) */
+    // FI: I assume that the value is never useful because of the
+    // above condition
+    transformer st // subscript transformer
+    = generic_reference_to_transformer(entity_undefined, rlhs, pre, false);
+    /* FI: not clear why this happens in Fortran and not in C */
+    if(!transformer_undefined_p(st)) {
+      transformer post = transformer_apply(st, pre);
+      transformer npre = transformer_range(post);
+      transformer rt = safe_expression_to_transformer(rhs, npre); // rhs
+      tf = transformer_combine(st, rt); // st is absorbed into tf
+      free_transformer(rt);
+      free_transformer(npre);
+      free_transformer(post);
+    }
+  }
+
+  return tf;
+}
+
 transformer any_assign_to_transformer(list args, /* arguments for assign */
-				      list ef, /* effects of assign */
-				      transformer pre) /* precondition */
+    list ef, /* effects of assign */
+    transformer pre) /* precondition */
 {
   transformer tf = transformer_undefined;
   expression lhs = EXPRESSION(CAR(args));
   expression rhs = EXPRESSION(CAR(CDR(args)));
-  syntax slhs = expression_syntax(lhs);
 
   pips_assert("2 args to assign", CDR(CDR(args))==NIL);
 
+  syntax slhs = expression_syntax(lhs);
   /* The lhs must be a scalar reference to perform an interesting
      analysis in Fortran. In C, the condition can be relaxed to take
      into account side effects in sub-expressions. */
   if(syntax_reference_p(slhs)) {
     reference rlhs = syntax_reference(slhs);
-    if(ENDP(reference_indices(rlhs))) {
-      entity v = reference_variable(rlhs);
-      tf = any_scalar_assign_to_transformer(v, rhs, ef, pre);
-    }
-    else {
-      /* check scalar side effects in the subscript expressions and
-	 in the rhs (specific to C) */
-      // FI: I assume that the value is never useful because of the
-      // above condition
-      transformer st // subscript transformer
-	= generic_reference_to_transformer(entity_undefined, rlhs, pre, false);
-      /* FI: not clear why this happens in Fortran and not in C */
-      if(!transformer_undefined_p(st)) {
-	transformer post = transformer_apply(st, pre);
-	transformer npre = transformer_range(post);
-	transformer rt = safe_expression_to_transformer(rhs, npre); // rhs
-	tf = transformer_combine(st, rt); // st is absorbed into tf
-	free_transformer(rt);
-	free_transformer(npre);
-	free_transformer(post);
+    tf = assign_rhs_to_reflhs_to_transformer(rlhs, rhs, pre, ef);
+  }
+  // case constant path in lhs (dereferencing, struct, array)
+  else if (syntax_call_p(slhs)) {
+    call clhs = syntax_call(slhs);
+    entity elhs = call_function(clhs);
+    //list exprlhs = call_arguments(clhs);
+
+    if (current_statement_semantic_context_defined_p()) {
+      statement curstat =  get_current_statement_semantic_context();
+      points_to_graph ptg = get_points_to_graph_from_statement(curstat);
+
+      list l = expression_to_points_to_sources(lhs, ptg);
+      FOREACH(CELL, cp, l) {
+        reference rlhs = cell_preference_p(cp)? preference_reference(cell_preference(cp)) : cell_reference(cp);
+
+        // example of case which is normally filter *p when p formal parameter, or dynamic allocation of p
+        if (analyzed_reference_p(rlhs)) {
+          entity source_lhs = reference_variable(rlhs);
+
+          ifdebug(7) {
+            pips_debug(7, "source reference : %s\n", reference_to_string(rlhs));
+          }
+
+          if (entity_null_locations_p(source_lhs)) {
+            if (gen_length(l) == 1)
+              pips_user_error("The pointer %s points to NULL\n", expression_to_string(lhs));
+            else
+              pips_user_warning("The pointer %s can points to NULL\n", expression_to_string(lhs));
+          } else if (entity_typed_nowhere_locations_p(source_lhs)) {
+            if (gen_length(l) == 1)
+              pips_user_error("The pointer %s points to undefined/indeterminate (%s)\n", expression_to_string(lhs), reference_to_string(rlhs));
+            else
+              pips_user_warning("The pointer %s can points to undefined/indeterminate (%s)\n", expression_to_string(lhs), reference_to_string(rlhs));
+          }
+          else {
+            transformer rt = assign_rhs_to_reflhs_to_transformer(rlhs, rhs, pre, ef/*ef ou NIL ?? */);
+            // NL : It must have be a better way to do that but I don't know how
+            if (transformer_undefined_p(tf))
+              tf = rt;
+            else {
+              tf = transformer_convex_hull(tf, rt);
+              free_transformer(rt);
+            }
+          }
+        }
       }
     }
   }
@@ -2139,12 +2432,90 @@ transformer any_assign_to_transformer(list args, /* arguments for assign */
     free_transformer(tf2); // tf1 is exported in tf
     // FI: previous solution, only based on effects, was much safer
     // and simpler !
-    tf = apply_effects_to_transformer(args, tf, ef, true);
+    tf = apply_effects_to_transformer(tf, ef, true, rhs);
   }
 
   pips_debug(6,"return tf=%p\n", tf);
   ifdebug(6) (void) print_transformer(tf);
-  pips_debug(8,"end\n");
+  pips_debug(6,"end\n");
+  return tf;
+}
+
+/**
+ * Not done yet
+ * see assign_rhs_to_cp_to_transformer and update_reflhs_with_rhs_to_transformer
+ * to make update_cp_with_rhs_to_transformer
+ * \param cp        constant path to be assign (the caller need to verify that cp is really a constant path)
+ * \param rhs       expression to assign
+ * \param pre       precondition
+ * \param ef        effects of assign
+ * \return          transformer_undefined or transformer with the assign
+ */
+static transformer update_cp_with_rhs_to_transformer (
+    reference cp,      // cp to be assign
+    expression rhs,    // expression to assign
+    transformer pre,   // precondition
+    list ef)           // effects of assign
+{
+  pips_user_warning("update_cp_with_rhs_to_transformer not done yet\n");
+  return transformer_undefined;
+}
+
+/**
+ * \param op        update operator
+ * \param rlhs      reference to be update
+ * \param rhs       expression to assign
+ * \param pre       precondition
+ * \param ef        effects of assign
+ * \return          transformer_undefined or transformer with the update
+ */
+static transformer update_reflhs_with_rhs_to_transformer (
+    entity op,         // update operator
+    reference rlhs,    // reference to be update
+    expression rhs,    // expression to assign
+    transformer pre,   // precondition
+    list ef)           // effects of assign
+{
+  transformer tf = transformer_undefined;
+
+  if(ENDP(reference_indices(rlhs))) {
+    entity v = reference_variable(rlhs);
+    expression ve = entity_to_expression(v);
+    entity sop = update_operator_to_regular_operator(op);
+    expression n_rhs = MakeBinaryCall(sop, ve, copy_expression(rhs));
+
+    tf = any_scalar_assign_to_transformer(v, n_rhs, ef, pre);
+    free_expression(n_rhs);
+  }
+  else if (constant_path_analyzed_p()) { // see assign_rhs_to_reflhs_to_transformer
+    // Check if the reference rlhs is a constant path or not
+    // TODO : can_be_constant_path_p(rlhs) return true when the ref is a constant path
+    // * !effect_reference_dereferencing_p(rlhs, &exact_p)            -> is too permissive
+    //     can return true when it's not a constant path like a[i]
+    //     can make a side effect for the declaration of variable in parameter (only?), don't know why
+    //     for instance with Semantics-New/Pointer.sub/memcopy01
+    //       void memcopy01([...], char dst[size])  -->  void memcopy01([...], char dst[i])
+    //     without this side effect !effect_reference_dereferencing_p seem to be better than store_independent_reference_p
+    // * store_independent_reference_p(rlhs)                          -> is too too much restrictive
+    //     can return false for some cp like a[0], can't permit to treat the array
+    //         return false for the structure too
+    //     it can't permit to treat anything interesting
+    if (can_be_constant_path_p(rlhs)) {
+      pips_user_warning("update_cp_with_rhs_to_transformer not done yet\n");
+      // see assign_rhs_to_cp_to_transformer to make update_cp_with_rhs_to_transformer
+      tf = update_cp_with_rhs_to_transformer(rlhs, rhs, pre, ef);
+    }
+    else {
+      // TODO : reference_to_constant_path(ref)
+      //        function that convert any reference in a constant path
+      //        expression_to_points_to_sources() isn't good, doesn't work for some array for the moment
+      //        maybe reference_to_sinks() it's ok, not tested
+      //        we are in this case for the array I think
+      pips_user_warning("Want to analyse constant path, but don't have a constant path : %s\n", reference_to_string(rlhs));
+      // tf = assign_rhs_to_cp_to_transformer(  cp  , rhs, pre, ef);
+    }
+  }
+
   return tf;
 }
 
@@ -2160,17 +2531,58 @@ transformer any_update_to_transformer(entity op,
 
   pips_assert("2 args for regular update", CDR(CDR(args))==NIL);
 
-  /* The lhs must be a scalar reference to perform an interesting analysis */
+  /* The lhs must be a scalar reference to perform an interesting analysis
+   * No more, lhs can also be dereferencing
+   */
   if(syntax_reference_p(slhs)) {
     reference rlhs = syntax_reference(slhs);
-    if(ENDP(reference_indices(rlhs))) {
-      entity v = reference_variable(rlhs);
-      expression ve = entity_to_expression(v);
-      entity sop = update_operator_to_regular_operator(op);
-      expression n_rhs = MakeBinaryCall(sop, ve, copy_expression(rhs));
+    tf = update_reflhs_with_rhs_to_transformer(op, rlhs, rhs, pre, ef);
+  }
+  // case constant path in lhs (dereferencing, struct, array)
+  else if (syntax_call_p(slhs)) {
+    call clhs = syntax_call(slhs);
+    entity elhs = call_function(clhs);
+    //list exprlhs = call_arguments(clhs);
 
-      tf = any_scalar_assign_to_transformer(v, n_rhs, ef, pre); 
-      free_expression(n_rhs);
+    if (current_statement_semantic_context_defined_p()) {
+      statement curstat =  get_current_statement_semantic_context();
+      points_to_graph ptg = get_points_to_graph_from_statement(curstat);
+
+      list l = expression_to_points_to_sources(lhs, ptg);
+      FOREACH(CELL, cp, l) {
+        reference rlhs = cell_preference_p(cp)? preference_reference(cell_preference(cp)) : cell_reference(cp);
+
+        // example of case which is normally filter *p when p formal parameter, or dynamic allocation of p
+        if (analyzed_reference_p(rlhs)) {
+          entity source_lhs = reference_variable(rlhs);
+
+          ifdebug(7) {
+            pips_debug(7, "source reference : %s\n", reference_to_string(rlhs));
+          }
+
+          if (entity_null_locations_p(source_lhs)) {
+            if (gen_length(l) == 1)
+              pips_user_error("The pointer %s points to NULL\n", expression_to_string(lhs));
+            else
+              pips_user_warning("The pointer %s can points to NULL\n", expression_to_string(lhs));
+          } else if (entity_typed_nowhere_locations_p(source_lhs)) {
+            if (gen_length(l) == 1)
+              pips_user_error("The pointer %s points to undefined/indeterminate (%s)\n", expression_to_string(lhs), reference_to_string(rlhs));
+            else
+              pips_user_warning("The pointer %s can points to undefined/indeterminate (%s)\n", expression_to_string(lhs), reference_to_string(rlhs));
+          }
+          else {
+            transformer rt = update_reflhs_with_rhs_to_transformer(op, rlhs, rhs, pre, ef/*ef ou NIL ?? */);
+            // NL : It must have be a better way to do that but I don't know how
+            if (transformer_undefined_p(tf))
+              tf = rt;
+            else {
+              tf = transformer_convex_hull(tf, rt);
+              free_transformer(rt);
+            }
+          }
+        }
+      }
     }
   }
 
@@ -2181,6 +2593,70 @@ transformer any_update_to_transformer(entity op,
   pips_debug(6,"return tf=%p\n", tf);
   ifdebug(6) (void) print_transformer(tf);
   pips_debug(8,"end\n");
+  return tf;
+}
+
+/**
+ * \param op        update operator
+ * \param rlhs      reference to be update
+ * \param rhs       expression to assign
+ * \param pre       precondition
+ * \param ef        effects of assign
+ * \return          transformer_undefined or transformer with the update
+ */
+static transformer basic_update_reflhs_with_rhs_to_transformer (
+    entity op,         // update operator
+    reference rlhs,    // reference to be update
+    expression rhs,    // expression to assign
+    transformer pre,   // precondition
+    list ef)           // effects of assign
+{
+  transformer tf = transformer_undefined;
+
+  expression ve = expression_undefined;
+  expression n_rhs = expression_undefined;
+  entity plus = entity_intrinsic(PLUS_C_OPERATOR_NAME);
+
+  if(ENTITY_POST_INCREMENT_P(op) || ENTITY_PRE_INCREMENT_P(op))
+      ve = int_to_expression(1);
+  else
+      ve = int_to_expression(-1);
+  n_rhs = MakeBinaryCall(plus, ve, copy_expression(rhs));
+
+
+  if(ENDP(reference_indices(rlhs))) {
+    entity v = reference_variable(rlhs);
+
+    tf = any_scalar_assign_to_transformer(v, n_rhs, ef, pre);
+  }
+  else if (constant_path_analyzed_p()) { // see assign_rhs_to_reflhs_to_transformer
+    // Check if the reference rlhs is a constant path or not
+    // TODO : can_be_constant_path_p(rlhs) return true when the ref is a constant path
+    // * !effect_reference_dereferencing_p(rlhs, &exact_p)            -> is too permissive
+    //     can return true when it's not a constant path like a[i]
+    //     can make a side effect for the declaration of variable in parameter (only?), don't know why
+    //     for instance with Semantics-New/Pointer.sub/memcopy01
+    //       void memcopy01([...], char dst[size])  -->  void memcopy01([...], char dst[i])
+    //     without this side effect !effect_reference_dereferencing_p seem to be better than store_independent_reference_p
+    // * store_independent_reference_p(rlhs)                          -> is too too much restrictive
+    //     can return false for some cp like a[0], can't permit to treat the array
+    //         return false for the structure too
+    //     it can't permit to treat anything interesting
+    if (can_be_constant_path_p(rlhs)) {
+      tf = assign_rhs_to_cp_to_transformer(rlhs, n_rhs, pre, ef);
+    }
+    else {
+      // TODO : reference_to_constant_path(ref)
+      //        function that convert any reference in a constant path
+      //        expression_to_points_to_sources() isn't good, doesn't work for some array for the moment
+      //        maybe reference_to_sinks() it's ok, not tested
+      //        we are in this case for the array I think
+      pips_user_warning("Want to analyse constant path, but don't have a constant path : %s\n", reference_to_string(rlhs));
+      // tf = assign_rhs_to_cp_to_transformer(  cp  , rhs, pre, ef);
+    }
+  }
+
+  free_expression(n_rhs);
   return tf;
 }
 
@@ -2195,24 +2671,63 @@ transformer any_basic_update_to_transformer(entity op,
 
   pips_assert("1 arg for basic_update", CDR(args)==NIL);
 
-  /* The lhs must be a scalar reference to perform an interesting analysis */
+  ifdebug(8) (void) print_expression(lhs);
+
+  /* The lhs must be a scalar reference to perform an interesting analysis
+   * No more, lhs can also be dereferencing
+   */
   if(syntax_reference_p(slhs)) {
     reference rlhs = syntax_reference(slhs);
-    if(ENDP(reference_indices(rlhs))) {
-      entity v = reference_variable(rlhs);
-      expression ve = expression_undefined;
-      expression n_rhs = expression_undefined;
-      entity plus = entity_intrinsic(PLUS_C_OPERATOR_NAME);
+    tf = basic_update_reflhs_with_rhs_to_transformer(op, rlhs, lhs, pre, ef);
+  }
+  // case constant path in lhs (dereferencing, struct, array)
+  else if (syntax_call_p(slhs)) {
+    call clhs = syntax_call(slhs);
+    entity elhs = call_function(clhs);
+    //list exprlhs = call_arguments(clhs);
 
-      if(ENTITY_POST_INCREMENT_P(op) || ENTITY_PRE_INCREMENT_P(op))
-	ve = int_to_expression(1);
-      else
-	ve = int_to_expression(-1);
+    if (current_statement_semantic_context_defined_p()) {
+      statement curstat =  get_current_statement_semantic_context();
+      points_to_graph ptg = get_points_to_graph_from_statement(curstat);
 
-      n_rhs = MakeBinaryCall(plus, ve, copy_expression(lhs));
+      list l = expression_to_points_to_sources(lhs, ptg);
+      FOREACH(CELL, cp, l) {
+        reference rlhs = cell_preference_p(cp)? preference_reference(cell_preference(cp)) : cell_reference(cp);
 
-      tf = any_scalar_assign_to_transformer(v, n_rhs, ef, pre);
-      free_expression(n_rhs);
+        // example of case which is normally filter *p when p formal parameter, or dynamic allocation of p
+        if (analyzed_reference_p(rlhs)) {
+          entity source_lhs = reference_variable(rlhs);
+
+          ifdebug(7) {
+            pips_debug(7, "source reference : %s\n", reference_to_string(rlhs));
+          }
+
+          if (entity_null_locations_p(source_lhs)) {
+            if (gen_length(l) == 1)
+              pips_user_error("The pointer %s points to NULL\n", expression_to_string(lhs));
+            else
+              pips_user_warning("The pointer %s can points to NULL\n", expression_to_string(lhs));
+          } else if (entity_typed_nowhere_locations_p(source_lhs)) {
+            if (gen_length(l) == 1)
+              pips_user_error("The pointer %s points to undefined/indeterminate (%s)\n", expression_to_string(lhs), reference_to_string(rlhs));
+            else
+              pips_user_warning("The pointer %s can points to undefined/indeterminate (%s)\n", expression_to_string(lhs), reference_to_string(rlhs));
+          }
+          else {
+            // can be improve with a specific function
+            // we will compute 2 times the path to find the cp
+            // see assign_rhs_to_cp_to_transformer or update_cp_with_rhs_to_transformer to make basic_update_cp_with_rhs_to_transformer
+            transformer rt = basic_update_reflhs_with_rhs_to_transformer(op, rlhs, lhs, pre, ef/*ef ou NIL ?? */);
+            // NL : It must have be a better way to do that but I don't know how
+            if (transformer_undefined_p(tf))
+              tf = rt;
+            else {
+              tf = transformer_convex_hull(tf, rt);
+              free_transformer(rt);
+            }
+          }
+        }
+      }
     }
   }
 
@@ -2409,6 +2924,9 @@ transformer statement_to_transformer(
 
   pips_assert("spre is a consistent precondition",
 	      transformer_consistent_p(spre));
+
+  if (current_statement_semantic_context_defined_p())
+    push_current_statement_semantic_context(s);
 
   if(get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) {
     pre = transformer_undefined_p(spre)? transformer_identity() :
@@ -2668,6 +3186,9 @@ transformer statement_to_transformer(
   pips_debug(8,"end for statement %03td (%td,%td) with t=%p, nt=%p and te=%p\n",
 	     statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
 	     ORDERING_STATEMENT(statement_ordering(s)), t, nt, te);
+
+  if (current_statement_semantic_context_defined_p())
+    pop_current_statement_semantic_context();
 
   return te;
 }

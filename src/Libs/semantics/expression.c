@@ -80,6 +80,8 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 
+#include "alias-classes.h"
+
 #include "misc.h"
 
 #include "properties.h"
@@ -96,6 +98,7 @@
 #include "transformer.h"
 
 #include "semantics.h"
+
 
 /* TYPE INDEPENDENT OPERATIONS */
 
@@ -1602,7 +1605,7 @@ static transformer integer_right_shift_to_transformer(entity e,
 
   return tf;
 }
-
+
 /* Assumes that e1 and e2 are integer expressions, i.e. explicit casting
    is supposed to be used */
 /* Better results might be obtained when e1 is an affine function of e2 or
@@ -1610,10 +1613,10 @@ static transformer integer_right_shift_to_transformer(entity e,
    variables. See non_linear11.f, 22L1=9L2+40, 1<=L1<=10. The smallest
    possible value is -2 and not -20. */
 static transformer integer_multiply_to_transformer(entity v,
-						   expression e1,
-						   expression e2,
-						   transformer prec,
-						   bool is_internal)
+    expression e1,
+    expression e2,
+    transformer prec,
+    bool is_internal)
 {
   transformer tf = transformer_undefined;
   entity v1 = make_local_temporary_value_entity(entity_type(v));
@@ -1634,6 +1637,12 @@ static transformer integer_multiply_to_transformer(entity v,
     int ub1 = 0;
     int lb2 = 0;
     int ub2 = 0;
+
+    /*
+     * v1 and v2 are temp value,
+     * so don't have normalize
+     * so expression_and_precondition_to_integer_interval can't say anything interesting
+     */
     //expression ev1 = entity_to_expression(v1);
     //expression ev2 = entity_to_expression(v2);
 
@@ -1648,6 +1657,8 @@ static transformer integer_multiply_to_transformer(entity v,
     // Nelson Lossing: in some cases, these calls are useless and
     // return [MIN,MAX] because ev1 and ev2 are built with temporary values
     // In his case, it works if ev1 and ev2 are replaced by e1 and e2
+    //expression_and_precondition_to_integer_interval(ev1, t1, &lb1, &ub1);
+    //expression_and_precondition_to_integer_interval(ev2, t2, &lb2, &ub2);
     integer_expression_and_precondition_to_integer_interval(e1, t1, &lb1, &ub1);
     integer_expression_and_precondition_to_integer_interval(e2, t2, &lb2, &ub2);
     //free_expression(ev1);
@@ -1661,7 +1672,7 @@ static transformer integer_multiply_to_transformer(entity v,
       transformer_equality_add(t2, veq);
       tf = t2;
       t2 = transformer_undefined;
-    //free_transformer(t1);
+      //free_transformer(t1);
     }
     else if(lb2==ub2) {
       /* The numerical value of expression e2 is known: v = lb2*v1 */
@@ -1674,81 +1685,81 @@ static transformer integer_multiply_to_transformer(entity v,
     }
     else if(ub1<=0) { // e1 is negative
       if(ub2<=0) { // e2 is negative
-	// v >= v1 * ub2, v >= ub1 * v2
-	// v <= v1 * lb2, v <= lb1 * v2 (if lb1 and lb2 exist)
-	tf = transformer_intersection(t1,t2); // FI: not good if side effects!
-	tf = transformer_normalize(tf, 2);
-	tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,false);
-	tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,false);
-	if(lb2>INT_MIN)
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,true);
-	if(lb1>INT_MIN)
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,true);
+          // v >= v1 * ub2, v >= ub1 * v2
+          // v <= v1 * lb2, v <= lb1 * v2 (if lb1 and lb2 exist)
+          tf = transformer_intersection(t1,t2); // FI: not good if side effects!
+          tf = transformer_normalize(tf, 2);
+          tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,false);
+          tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,false);
+          if(lb2>INT_MIN)
+            tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,true);
+          if(lb1>INT_MIN)
+            tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,true);
       }
       else if(lb2>=0) { // e2 is positive
-	// v <= v1 * lb2, v <= ub1 * v2
-	// v >= v1 * ub2, v >= lb1 * v2 (if lb1 and ub2 exist)
-	tf = transformer_intersection(t1,t2); // FI: not good if side effects!
-	tf = transformer_normalize(tf, 2);
-	tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,true);
-	tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,true);
-	if(ub2<INT_MAX)
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,false);
-	if(lb1>INT_MIN)
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,false);
+          // v <= v1 * lb2, v <= ub1 * v2
+          // v >= v1 * ub2, v >= lb1 * v2 (if lb1 and ub2 exist)
+          tf = transformer_intersection(t1,t2); // FI: not good if side effects!
+          tf = transformer_normalize(tf, 2);
+          tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,true);
+          tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,true);
+          if(ub2<INT_MAX)
+            tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,false);
+          if(lb1>INT_MIN)
+            tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,false);
       }
       else { // if lb2 and ub2 are known and their signs are different
-	if(lb2>INT_MIN && ub2<INT_MAX) {
-	  // v1 * ub2 <= v <= v1 * lb2
-	  tf = transformer_intersection(t1,t2); // FI: not good if side effects!
-	  tf = transformer_normalize(tf, 2);
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,false);
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,true);
-	  ;
-	}
-	else {
-	  tf = transformer_identity();
-	}
+          if(lb2>INT_MIN && ub2<INT_MAX) {
+            // v1 * ub2 <= v <= v1 * lb2
+            tf = transformer_intersection(t1,t2); // FI: not good if side effects!
+            tf = transformer_normalize(tf, 2);
+            tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,false);
+            tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,true);
+            ;
+          }
+          else {
+            tf = transformer_identity();
+          }
 
       }
     }
     else if(lb1>=0) {
       if(lb2>=0) {
-	// v >= lb1 * v2, v >= v1 * lb2
-	// v <= ub1 * v2, v <= v1 * ub2 (if ub1 and ub2 exist)
-	tf = transformer_intersection(t1,t2); // FI: not good if side effects!
-	tf = transformer_normalize(tf, 2);
-	tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,false);
-	tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,false);
-	if(ub1<INT_MAX)
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,true);
-	if(ub2<INT_MAX)
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,true);
+          // v >= lb1 * v2, v >= v1 * lb2
+          // v <= ub1 * v2, v <= v1 * ub2 (if ub1 and ub2 exist)
+          tf = transformer_intersection(t1,t2); // FI: not good if side effects!
+          tf = transformer_normalize(tf, 2);
+          tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,false);
+          tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,false);
+          if(ub1<INT_MAX)
+            tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,true);
+          if(ub2<INT_MAX)
+            tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,true);
       }
       else if(ub2<=0) {
-	// v <= v1 * ub2, v <= lb1 * v2
-	// v >= v1 * lb2, v >= ub1 * v2 (if ub1 and lb2 exist)
-	tf = transformer_intersection(t1,t2); // FI: not good if side effects!
-	tf = transformer_normalize(tf, 2);
-	tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,true);
-	tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,true);
-	if(lb2>INT_MIN)
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,false);
-	if(ub1>INT_MAX)
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,false);
-	;
+          // v <= v1 * ub2, v <= lb1 * v2
+          // v >= v1 * lb2, v >= ub1 * v2 (if ub1 and lb2 exist)
+          tf = transformer_intersection(t1,t2); // FI: not good if side effects!
+          tf = transformer_normalize(tf, 2);
+          tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,true);
+          tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,true);
+          if(lb2>INT_MIN)
+            tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,false);
+          if(ub1>INT_MAX)
+            tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,false);
+          ;
       }
       else {
-	if(lb2>INT_MIN && ub2<INT_MAX) { // FI: separated test needed
-	  // v1 * lb2 <= v <= v1 * ub2
-	  tf = transformer_intersection(t1,t2); // FI: not good if side effects!
-	  tf = transformer_normalize(tf, 2);
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,false);
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,true);
-	}
-	else {
-	  tf = transformer_identity();
-	}
+          if(lb2>INT_MIN && ub2<INT_MAX) { // FI: separated test needed
+            // v1 * lb2 <= v <= v1 * ub2
+            tf = transformer_intersection(t1,t2); // FI: not good if side effects!
+            tf = transformer_normalize(tf, 2);
+            tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,false);
+            tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,true);
+          }
+          else {
+            tf = transformer_identity();
+          }
       }
     }
     else {
@@ -1773,19 +1784,19 @@ static transformer integer_multiply_to_transformer(entity v,
       //free_transformer(t2);
 
       if(lb > INT_MIN || ub < INT_MAX)
-	tf = transformer_identity();
+          tf = transformer_identity();
 
       if(lb > INT_MIN) {
-	Pvecteur vineql = vect_new((Variable) v, VALUE_MONE);
+          Pvecteur vineql = vect_new((Variable) v, VALUE_MONE);
 
-	vect_add_elem(&vineql, TCST, lb);
-	tf = transformer_inequality_add(transformer_identity(), vineql);
+          vect_add_elem(&vineql, TCST, lb);
+          tf = transformer_inequality_add(transformer_identity(), vineql);
       }
       if(ub < INT_MAX) {
-	Pvecteur vinequ = vect_new((Variable) v, VALUE_ONE);
+          Pvecteur vinequ = vect_new((Variable) v, VALUE_ONE);
 
-	vect_add_elem(&vinequ, TCST, -ub);
-	tf = transformer_inequality_add(tf, vinequ);
+          vect_add_elem(&vinequ, TCST, -ub);
+          tf = transformer_inequality_add(tf, vinequ);
       }
     }
   }
@@ -1816,18 +1827,18 @@ static transformer integer_multiply_to_transformer(entity v,
 
       /* v is greater than v1 and -v1. This makes v>=0 redundant */
       if(!transformer_undefined_p(t1)) {
-	tf = transformer_add_inequality(t1, v1, v, false);
-	tf = transformer_add_inequality_with_affine_term(tf, v,
-							 v1, VALUE_MONE, VALUE_ZERO,
-							 false);
-	/* Memory leak with tf... */
-	tf = transformer_intersection(tf, t1);
+        tf = transformer_add_inequality(t1, v1, v, false);
+        tf = transformer_add_inequality_with_affine_term(tf, v,
+            v1, VALUE_MONE, VALUE_ZERO,
+            false);
+        /* Memory leak with tf... */
+        tf = transformer_intersection(tf, t1);
       }
       else {
-	/* The result is always positive: v>=0 */
-	Pvecteur vineq = vect_new((Variable) v, VALUE_MONE);
-	tf = transformer_identity();
-	tf = transformer_inequality_add(tf, vineq);
+        /* The result is always positive: v>=0 */
+        Pvecteur vineq = vect_new((Variable) v, VALUE_MONE);
+        tf = transformer_identity();
+        tf = transformer_inequality_add(tf, vineq);
       }
     }
   }
@@ -1845,6 +1856,136 @@ static transformer integer_multiply_to_transformer(entity v,
   if(!transformer_undefined_p(t2)) {
     free_transformer(t2);
   }
+
+  pips_debug(8, "End with tf=%p\n", tf);
+  ifdebug(8) (void) dump_transformer(tf);
+
+  return tf;
+}
+
+/* cut-and-pasted and adapted from multiply_to_transformer();  */
+// only take 1 arg as expression which will multiply by the sizeof
+// it's a version simplify of multiply_to_transformer because we know that sizeof>0.
+static transformer expression_multiply_sizeof_to_transformer(entity v,
+    expression e1,
+    transformer prec,
+    bool is_internal)
+{
+  type tv = entity_type(v);
+  type t = type_undefined;
+  if (type_variable_p(tv)) {
+    basic b = variable_basic(type_variable(tv));
+    if (basic_pointer_p(b))
+      t = basic_pointer(b);
+  }
+  if (type_undefined_p(t)) {
+    return transformer_empty();
+  }
+
+
+  // create an entity for sizeof(type)
+  add_sizeof_value(t);
+  // get the sizeof entity
+  entity val2 = type_to_sizeof_value(t);
+  // convert to expression for transformer
+  expression e2 = entity_to_expression(val2);
+
+  transformer tf = transformer_undefined;
+  entity v1 = make_local_temporary_value_entity(entity_type(v));
+  transformer ipre = transformer_undefined_p(prec)? transformer_identity() : transformer_range(prec);
+  transformer t1 = safe_integer_expression_to_transformer(v1, e1, ipre, is_internal);
+  entity v2 = make_local_temporary_value_entity(entity_type(v));
+  transformer npre = transformer_safe_apply(t1, ipre);
+  transformer t2 = safe_integer_expression_to_transformer(v2, e2, npre, is_internal);
+  transformer pre = transformer_undefined_p(ipre)? transformer_identity() :
+    ipre;
+
+  pips_debug(8, "Begin\n");
+
+  if(!transformer_undefined_p(t1) && !transformer_undefined_p(t2)) {
+    int lb1 = 0;
+    int ub1 = 0;
+    //e2 sizeof then positive
+
+    /* FI: I had to switch the arguments to satisfy a reasonnable
+       assert in image_intersection(), but the switch may be
+       detrimental to memory allocation. */
+    //t1 = transformer_safe_image_intersection(pre, t1);
+    t1 = transformer_normalize(t1, 2);
+    t1 = transformer_range(transformer_apply(pre, t1));
+
+    integer_expression_and_precondition_to_integer_interval(e1, t1, &lb1, &ub1);
+
+    if(lb1==ub1) {
+      /* The numerical value of expression e1 is known: v = lb1*v2 */
+      Pvecteur veq = vect_new((Variable) v, VALUE_MONE);
+
+      vect_add_elem(&veq, (Variable) v2, (Value) lb1);
+      transformer_equality_add(t2, veq);
+      tf = t2;
+      free_transformer(t1);
+    }
+    else if(ub1<=0) { // e1 is negative
+      // e2 is positive
+      // v <= v1 * lb2, v <= ub1 * v2
+      // v >= v1 * ub2, v >= lb1 * v2 (if lb1 and ub2 exist)
+      tf = transformer_intersection(t1,t2); // FI: not good if side effects!
+      tf = transformer_normalize(tf, 2);
+      tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,true);
+      if(lb1>INT_MIN)
+        tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,false);
+    }
+    else if(lb1>=0) {
+      // v >= lb1 * v2, v >= v1 * lb2
+      // v <= ub1 * v2, v <= v1 * ub2 (if ub1 and ub2 exist)
+      tf = transformer_intersection(t1,t2); // FI: not good if side effects!
+      tf = transformer_normalize(tf, 2);
+      tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,false);
+      if(ub1<INT_MAX)
+        tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,true);
+    }
+    else { // FI: This should now be obsolete...
+      if(lb1>INT_MIN && ub1<INT_MAX) { // FI: separated test needed
+        // v1 * lb2 <= v <= v1 * ub2
+        tf = transformer_intersection(t1,t2); // FI: not good if side effects!
+        tf = transformer_normalize(tf, 2);
+        tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,false);
+        tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,true);
+      }
+      else {
+        long long lb = lb1;
+        long long ub = ub1;
+
+        free_transformer(t1);
+        free_transformer(t2);
+
+        if(lb > INT_MIN || ub < INT_MAX)
+            tf = transformer_identity();
+
+        if(lb > INT_MIN) {
+            Pvecteur vineql = vect_new((Variable) v, VALUE_MONE);
+
+            vect_add_elem(&vineql, TCST, lb);
+            tf = transformer_inequality_add(transformer_identity(), vineql);
+        }
+        if(ub < INT_MAX) {
+            Pvecteur vinequ = vect_new((Variable) v, VALUE_ONE);
+
+            vect_add_elem(&vinequ, TCST, -ub);
+            tf = transformer_inequality_add(tf, vinequ);
+        }
+      }
+    }
+  }
+  else if(!transformer_undefined_p(t1)) {
+    free_transformer(t1);
+  }
+  else if(!transformer_undefined_p(t2)) {
+    free_transformer(t2);
+  }
+
+  free_transformer(pre);
+  free_expression(e2);
 
   pips_debug(8, "End with tf=%p\n", tf);
   ifdebug(8) (void) dump_transformer(tf);
@@ -2324,6 +2465,71 @@ transformer assign_operation_to_transformer(entity val, // assumed to be a value
 
 /* */
 
+static transformer points_to_unary_operation_to_transformer(entity e,
+    entity op,
+    expression e1,
+    transformer pre,
+    bool is_internal,
+    bool is_pointer)
+{
+  pips_debug(8, "begin \n");
+  transformer tf = transformer_undefined;
+
+  if (current_statement_semantic_context_defined_p()) {
+    statement curstat =  get_current_statement_semantic_context();
+    points_to_graph ptg = get_points_to_graph_from_statement(curstat);
+
+    list l = expression_to_points_to_sinks(e1, ptg);
+    // compute the assignment for each cell pointed with the convex hull
+    FOREACH(CELL, cp, l) {
+      reference rrhs = cell_preference_p(cp)? preference_reference(cell_preference(cp)) : cell_reference(cp) ;
+      entity rhs = reference_variable(rrhs);
+
+      if (!is_pointer && entity_null_locations_p(rhs)) {
+        if (gen_length(l) == 1) {
+          tf = transformer_empty();
+          pips_user_error("The pointer %s points to NULL\n", expression_to_string(e1));
+        }
+        else {
+          pips_user_warning("The pointer %s can points to NULL\n", expression_to_string(e1));
+        }
+      } else if (entity_typed_nowhere_locations_p(rhs)) {
+        if (gen_length(l) == 1) {
+          tf = transformer_empty();
+          pips_user_error("The pointer %s points to undefined/indeterminate (%s)\n", expression_to_string(e1), reference_to_string(rrhs));
+        }
+        else {
+          pips_user_warning("The pointer %s can points to undefined/indeterminate (%s)\n", expression_to_string(e1), reference_to_string(rrhs));
+        }
+      }
+      else {
+        // check if rrhs is a constant path and can be analyze or not
+        // (not really exact, see detail in analyzed_reference_p)
+        if (analyzed_reference_p(rrhs)) {
+          transformer rt = generic_reference_to_transformer(e, rrhs, pre, is_internal);
+          // NL : It must have be a better way to do that but I don't know how
+          if (transformer_undefined_p(tf))
+            tf = rt;
+          else {
+            tf = transformer_convex_hull(tf, rt);
+            free_transformer(rt);
+          }
+        }
+      }
+    }
+  }
+
+  if (transformer_undefined_p(tf)) {
+    if(ENTITY_DEREFERENCING_P(op) || ENTITY_FIELD_P(op) || ENTITY_POINT_TO_P(op)) {
+      pips_user_warning("activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer\n");
+    }
+  }
+
+  ifdebug (0) dump_transformer(tf);
+  pips_debug(0, "end \n");
+  return tf;
+}
+
 /* FI: this function is no longer useful (11 August 2013) */
 static transformer 
 integer_nullary_operation_to_transformer(
@@ -2365,6 +2571,10 @@ static transformer integer_unary_operation_to_transformer(entity e,
         || ENTITY_C_ABS_P(op) || ENTITY_LABS_P(op) || ENTITY_LLABS_P(op)) {
       tf = iabs_to_transformer(e, e1, pre, is_internal);
     }
+  }
+
+  if(transformer_undefined_p(tf)) {
+    tf = points_to_unary_operation_to_transformer(e, op, e1, pre, is_internal, false);
   }
 
   return tf;
@@ -2665,11 +2875,16 @@ static transformer logical_unary_operation_to_transformer(entity v,
     vect_add_elem(&eq, TCST , VALUE_MONE);
   }
   else {
-    pips_internal_error("Unknown logical constant %s",
-	       entity_name(op));
+//    pips_internal_error("Unknown logical constant %s",
+//	       entity_name(op));
   }
   tf = transformer_equality_add(tf, eq);
   tf = transformer_logical_inequalities_add(tf, v);
+
+  if(transformer_undefined_p(tf)) {
+    pips_user_warning("Not Tested for logical\n");
+    tf = points_to_unary_operation_to_transformer(v, op, arg, pre, is_internal, false);
+  }
 
   return tf;
 }
@@ -3098,6 +3313,10 @@ float_unary_operation_to_transformer(
 
   tf = generic_unary_operation_to_transformer(e, op, e1, pre, is_internal);
 
+  if(transformer_undefined_p(tf)) {
+    tf = points_to_unary_operation_to_transformer(e, op, e1, pre, is_internal, false);
+  }
+
   return tf;
 }
 
@@ -3219,11 +3438,136 @@ transformer float_expression_to_transformer(entity v,
 
 /* POINTER EXPRESSION */
 
+/**
+ * Maybe move in ri-util/expression.c or in effect-util/pointer_values.c
+ * \details         search in an arithmetic pointer expression
+ *                  if the pointer NULL is present
+ * \param expr      arithmetic expression to scan
+ * \return          true if expr contain NULL else false
+ */
+static bool have_null_value_in_pointer_expression_p(expression expr) {
+  syntax sexpr = expression_syntax(expr);
+
+  switch (syntax_tag(sexpr)) {
+    case is_syntax_reference:
+    {
+      reference rexpr = syntax_reference(sexpr);
+      entity var = reference_variable(rexpr);
+
+      type bctvar = compute_basic_concrete_type(entity_type(var));
+      basic b = variable_basic(type_variable(bctvar));
+
+      if (basic_pointer_p(b)) {
+        pips_user_warning("TODO : Need to check if %s is indirectly NULL\n", expression_to_string(expr));
+        // TODO : function that check if we have an expression/entity e=NULL in the transformer t
+        //        have to make projection of e and NULL (because can have  : e=e1, e1=NULL)
+        //        is_entity/expression_equal_null_in_transformer(var/expr, pre)
+        // Maybe we can use the info from points-to, we can want to analyze pointer without graph points-to, why?
+        if (null_pointer_value_entity_p(var) || expression_null_p(expr)) //this test can be not sufficient
+          return true;
+        else
+          return false;
+      }
+      else
+        return false;
+      break;
+    }
+    case is_syntax_call:
+    {
+      call cexpr = syntax_call(sexpr);
+      entity func = call_function(cexpr);
+
+      if (ENTITY_PLUS_P(func) || ENTITY_PLUS_C_P(func) ||
+          ENTITY_MINUS_P(func) || ENTITY_MINUS_C_P(func)) {
+        list args = call_arguments(cexpr);
+        expression e1 = EXPRESSION(CAR(args));
+        expression e2 = EXPRESSION(CAR(CDR(args)));
+        pips_assert("2 args for arithmetic", CDR(CDR(args))==NIL);
+
+        return have_null_value_in_pointer_expression_p(e1) || have_null_value_in_pointer_expression_p(e2);
+      }
+      else if (expression_constant_p(expr)) {
+        return false;
+      }
+      else if(ENTITY_MULTIPLY_P(func)) {
+        return false;
+      }
+      else {
+        //this case normally never happen
+        pips_internal_error("unexpected function call : %s\n", entity_name(func));
+      }
+      break;
+    }
+    default:
+      //this case normally never happen
+      pips_internal_error("unexpected syntaxe tag : %i\n", syntax_tag(sexpr));
+  }
+
+  //this case normally never happen
+  pips_internal_error("error with expression : %s, syntax_tag : %i \n", expression_to_string(expr), syntax_tag(sexpr));
+  return false;
+}
+
+/**
+ * Maybe move in ri-util/expression.c or in effect-util/pointer_values.c
+ * \details         search in an arithmetic pointer expression
+ *                  if the pointer NULL is present
+ * \param expr      arithmetic expression to scan
+ * \return          true if expr contain NULL else false
+ */
+static bool have_sizeof_value_in_multiply_pointer_expression_p(expression expr) {
+  syntax sexpr = expression_syntax(expr);
+
+  switch (syntax_tag(sexpr)) {
+    case is_syntax_reference:
+    {
+      reference rexpr = syntax_reference(sexpr);
+      entity var = reference_variable(rexpr);
+
+      if (sizeof_value_entity_p(var)) {
+        return true;
+      }
+      else
+        return false;
+      break;
+    }
+    case is_syntax_call:
+    {
+      call cexpr = syntax_call(sexpr);
+      entity func = call_function(cexpr);
+
+      if (ENTITY_MULTIPLY_P(func)) {
+        list args = call_arguments(cexpr);
+        expression e1 = EXPRESSION(CAR(args));
+        expression e2 = EXPRESSION(CAR(CDR(args)));
+        pips_assert("2 args for arithmetic", CDR(CDR(args))==NIL);
+
+        return have_sizeof_value_in_multiply_pointer_expression_p(e1) || have_sizeof_value_in_multiply_pointer_expression_p(e2);
+      }
+      break;
+    }
+    default:
+      return false;
+  }
+
+  //this case normally never happen
+  pips_internal_error("error with expression : %s, syntax_tag : %i \n", expression_to_string(expr), syntax_tag(sexpr));
+  return false;
+}
+
+static expression pointer_expression_to_pointer_expression_with_sizeof(expression exp) {
+  expression result;
+
+
+  return result;
+}
+
 static transformer pointer_unary_operation_to_transformer(
-    entity e,
-    entity op,
-    expression e1,
-    transformer pre,
+    entity e,       //entity to be affected (value not variable)
+    entity op,      //"Name" of the call function
+    expression e1,  //arg of the call function
+    transformer pre,/* Predicate on current store assumed not modified by
+                        expr's side effects */
     bool is_internal)
 {
   transformer tf = transformer_undefined;
@@ -3231,6 +3575,7 @@ static transformer pointer_unary_operation_to_transformer(
   //tf = generic_unary_operation_to_transformer(e, op, e1, pre, is_internal);
   // NL: can't call generic_unary_operation_to_transformer because of the case ABS
   //     it's a copy of generic_unary_operation_to_transformer without the case ABS
+  //     add the case ADDRESS_OF
   if(ENTITY_UNARY_MINUS_P(op)) {
     tf = unary_minus_operation_to_transformer(e, e1, pre, is_internal);
   }
@@ -3251,32 +3596,123 @@ static transformer pointer_unary_operation_to_transformer(
       }
     }
   }
+  else if (ENTITY_ADDRESS_OF_P(op)) {
+    syntax s1 = expression_syntax(e1);
+
+    if (syntax_reference_p(s1)) {
+      reference r1 = syntax_reference(s1);
+      // entity v1 = reference_variable(r1);
+
+      // create an entity for the address_of
+      add_address_of_value(r1, entity_type(e));
+      // get the address_of entity
+      entity a1 = reference_to_address_of_value(r1);
+
+      // make the transformer for the equality (take from generic_reference_to_transformer)
+      transformer tfr =  simple_equality_to_transformer(e, a1, false);
+      if(!transformer_undefined_p(pre)) {
+        // FI: assume pre is a range
+        tf = transformer_intersection(tfr, pre);
+      }
+      free_transformer(tfr);
+    }
+    else if (syntax_call_p(s1)) {
+      call c1 = syntax_call(s1);
+      entity f1 = call_function(c1);
+      // list args = call_arguments(c1);
+
+      if (ENTITY_FIELD_P(f1)||ENTITY_POINT_TO_P(f1)) {
+        pips_internal_error("ADDRESS_OF for Struct : Not Implemented yet\n");
+      }
+      else {
+      //Normally this case never appear
+        pips_internal_error("illegal expression_syntax, syntax_call_function\n syntax_tag : %i\n call_function : %s\n",
+            syntax_tag(s1), entity_name(f1));
+      }
+    }
+    else {
+    //Normally this case never appear
+      pips_internal_error("illegal expression_syntax, syntax_tag : %i",
+          syntax_tag(s1));
+    }
+  }
+
+  if(transformer_undefined_p(tf)) {
+    tf = points_to_unary_operation_to_transformer(e, op, e1, pre, is_internal, true);
+  }
 
   return tf;
 }
 
 static transformer pointer_binary_operation_to_transformer(
     entity e,
-    entity op,
-    expression e1,
-    expression e2,
+    expression expr,
     transformer pre,
     bool is_internal)
 {
+  syntax sexpr = expression_syntax(expr);
+  call c = syntax_call(sexpr);
+  entity op = call_function(c);
+  list args = call_arguments(c);
+  expression e1 = EXPRESSION(CAR(args));
+  expression e2 = EXPRESSION(CAR(CDR(args)));
   transformer tf = transformer_undefined;
 
   pips_debug(8, "Begin\n");
 
-  if(ENTITY_PLUS_P(op) || ENTITY_MINUS_P(op)
-     || ENTITY_PLUS_C_P(op) || ENTITY_MINUS_C_P(op)) {
+  if(ENTITY_PLUS_P(op) || ENTITY_MINUS_P(op)) {
+    // can occur for arithmetic for pointer
+    // e1+e2 or e1-e2, e1 and e2 not pointer
     tf = addition_operation_to_transformer(e, e1, e2, pre,
-                                                     ENTITY_PLUS_P(op) || ENTITY_PLUS_C_P(op),
-                                                     is_internal);
+        ENTITY_PLUS_P(op),
+        is_internal);
+  }
+  if(ENTITY_PLUS_C_P(op)) {
+    // can occur for arithmetic for pointer
+    // e1+e2, e1 or e2 pointer
+    if (have_null_value_in_pointer_expression_p(expr)) {
+      tf = transformer_empty();
+      pips_user_error("Try to make arithmetic with NULL pointer : %s\n", expression_to_string(expr));
+    }
+    else {
+      tf = addition_operation_to_transformer(e, e1, e2, pre,
+          ENTITY_PLUS_C_P(op),
+          is_internal);
+    }
+  }
+  if(ENTITY_MINUS_C_P(op)) {
+    // can occur for arithmetic for pointer
+    // e1+e2, e1 or/and e2 pointer
+    if (have_null_value_in_pointer_expression_p(expr)) {
+      tf = transformer_empty();
+      pips_user_error("Try to make arithmetic with NULL pointer : %s\n", expression_to_string(expr));
+    }
+    else {
+      tf = addition_operation_to_transformer(e, e1, e2, pre,
+          ENTITY_PLUS_C_P(op),
+          is_internal);
+    }
+  }
+  else if(ENTITY_MULTIPLY_P(op)) {
+    // can occur for arithmetic for pointer
+    // already multiply by the sizeof
+    pips_debug(9, "ENTITY_MULTIPLY_P\n");
+    if (have_sizeof_value_in_multiply_pointer_expression_p(expr)) {
+      tf = integer_multiply_to_transformer(e, e1, e2, pre, is_internal);
+      pips_user_error("can't compute when sizeof already present in arithmetic yet : %s\n", expression_to_string(expr));
+    }
+    else {
+      // compute the multiply with sizeof
+      tf = expression_multiply_sizeof_to_transformer(e, expr, pre, is_internal);
+    }
   }
   else if(ENTITY_PLUS_UPDATE_P(op) || ENTITY_MINUS_UPDATE_P(op)) {
-    tf = update_operation_to_transformer(e, op, e1, e2, pre, is_internal);
+    pips_user_error("UPDATE for rhs pointer not done yet : %s\n", expression_to_string(expr));
+    //tf = update_operation_to_transformer(e, op, e1, e2, pre, is_internal);
   }
   else if(ENTITY_ASSIGN_P(op)) {
+    pips_user_warning("ASSIGN for rhs pointer not tested : %s\n", expression_to_string(expr));
+    // Maybe need to be redesign like any_assign_to_transformer or assign_rhs_to_reflhs_to_transformer
     tf = assign_operation_to_transformer(e, e1, e2, pre);
   }
   else {
@@ -3289,7 +3725,7 @@ static transformer pointer_binary_operation_to_transformer(
 }
 
 static transformer pointer_call_expression_to_transformer(
-    entity e,
+    entity e,        // value of the expression
     expression expr, /* needed to compute effects for user calls */
     transformer pre, /* Predicate on current store assumed not modified by
                         expr's side effects */
@@ -3303,7 +3739,6 @@ static transformer pointer_call_expression_to_transformer(
   int arity = gen_length(args);
 
   pips_debug(8, "Begin with precondition %p\n", pre);
-
   /* tests are organized to trap 0-ary user-defined functions as well as
      binary min and max */
 
@@ -3325,27 +3760,6 @@ static transformer pointer_call_expression_to_transformer(
   else if(ENTITY_CONDITIONAL_P(f)) {
     tf = any_conditional_to_transformer(e, args, pre);
   }
-  /*else if(ENTITY_NOT_P(f)) {
-    // FI: should only happen for C code because int are often used
-    //   as bool since there was no other way before C99. Quite time
-    //   consuming here because it is applied to an int and not a
-    //   bool argument.
-    tf = logical_not_to_transformer(e, args, pre);
-  }*/
-  /*else if(ENTITY_BITWISE_XOR_P(f)) {
-  // FI: it might be useful to handle here the bit wise XOR as in
-  //   logical_binary_operation_to_transformer().
-    tf = bitwise_xor_to_transformer(e, args, pre);
-  }*/
-  /*else if(ENTITY_RAND_P(f)) {
-    tf = transformer_identity();
-    tf = transformer_add_inequality_with_integer_constraint(tf, e, VALUE_ZERO, false);
-  }*/
-  /*else if(ENTITY_MODULO_P(f) || ENTITY_C_MODULO_P(f)) {
-    expression arg1 = EXPRESSION(CAR(args));
-    expression arg2 = EXPRESSION(CAR(CDR(args)));
-    tf = modulo_to_transformer(e, arg1, arg2, pre, false);
-  }*/
   else if(value_code_p(entity_initial(f)) &&
           get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
       tf = user_function_call_to_transformer(e, expr, pre);
@@ -3353,10 +3767,16 @@ static transformer pointer_call_expression_to_transformer(
   else {
     switch(arity) {
     case 0:
-      // tf = constant_to_transformer(e, call_function(syntax_call(srhs)));
-      // Normally already detected like integer constant?
-      tf = constant_to_transformer(e, expr);
+    {
+      // expr is a constant
+      //tf = constant_to_transformer(e, expr);
+      // occur for arithmetic for pointer
+      // multiply the constant with he sizeof lhs
+      // compute the multiply with sizeof
+      tf = expression_multiply_sizeof_to_transformer(e, expr, pre, is_internal);
+
       break;
+    }
     case 1:
     {
       expression e1 = EXPRESSION(CAR(args));
@@ -3365,9 +3785,9 @@ static transformer pointer_call_expression_to_transformer(
     }
     case 2:
     {
-      expression e1 = EXPRESSION(CAR(args));
-      expression e2 = EXPRESSION(CAR(CDR(args)));
-      tf = pointer_binary_operation_to_transformer(e, f, e1, e2, pre, is_internal);
+      //expression e1 = EXPRESSION(CAR(args));
+      //expression e2 = EXPRESSION(CAR(CDR(args)));
+      tf = pointer_binary_operation_to_transformer(e, expr, pre, is_internal);
       break;
     }
     default:
@@ -3386,8 +3806,8 @@ static transformer pointer_call_expression_to_transformer(
  *                  cf any_expression_to_transformer which call it
  * \param v         value of the expression
  * \param expr      pointer expression
- * \param pre       transformer without the pointer expression, no side effect
- * \param is_internal ??
+ * \param pre       transformer, no side effect
+ * \param is_internal ?? use in generic_reference_to_transformer
  * \return          transformer with the pointer expression
  *                  or transformer_undefined if failed
  */
@@ -3397,53 +3817,86 @@ transformer pointer_expression_to_transformer(entity v,  // value of the express
                                             bool is_internal)
 {
   transformer tf = transformer_undefined;
-  normalized n = NORMALIZE_EXPRESSION(expr);
   syntax sexpr = expression_syntax(expr);
 
-  pips_debug(8, "begin with precondition %p for expression: ", pre);
-  ifdebug(8) print_expression(expr);
-
-  /* Assume: e is a value */
-  if(normalized_linear_p(n))
-  {
-    // Is it really useful to keep using this function which does not
-    //   take the precondition into acount?
-    if(transformer_undefined_p(pre)) {
-      tf = simple_affine_to_transformer(v, (Pvecteur) normalized_linear(n), is_internal);
-    }
-    else {
-      transformer tfl = simple_affine_to_transformer(v, (Pvecteur) normalized_linear(n), is_internal);
-      if(transformer_undefined_p(tfl)) {
-        tfl = expression_effects_to_transformer(expr);
-      }
-
-      tf = transformer_combine(copy_transformer(pre), tfl);
-      free_transformer(tfl);
-    }
+  ifdebug(8) {
+    pips_debug(8, "begin with precondition %p for expression: ", pre);
+    print_expression(expr);
   }
-  else
+
+  /* Assume: v is a value */
+//  normalized n = NORMALIZE_EXPRESSION(expr);
+//  if(normalized_linear_p(n))
+//  {
+//    ifdebug(8) print_syntax(sexpr);
+//    pips_debug(8, "\nsyntaxe type : %i \n", syntax_tag(sexpr));
+//    //print_transformer(pre);
+//    if (have_null_value_in_pointer_expression_p(expr)) {
+//      pips_user_error("Try to make arithmetic with NULL pointer : %s", expression_to_string(expr));
+//    }
+//    // Is it really useful to keep using this function which does not
+//    //   take the precondition into acount?
+//    else if(transformer_undefined_p(pre)) {
+//      tf = simple_affine_to_transformer(v, (Pvecteur) normalized_linear(n), is_internal);
+//    }
+//    else {
+//      transformer tfl = simple_affine_to_transformer(v, (Pvecteur) normalized_linear(n), is_internal);
+//      if(transformer_undefined_p(tfl)) {
+//        tfl = expression_effects_to_transformer(expr);
+//      }
+//
+//      tf = transformer_combine(copy_transformer(pre), tfl);
+//      free_transformer(tfl);
+//    }
+//  }
+//  else
   {
     switch (syntax_tag(sexpr)) {
     case is_syntax_call:
     {
-      //pips_user_warning("No call for pointer analysis");
       tf = transformer_undefined;
       tf = pointer_call_expression_to_transformer(v, expr, pre, is_internal);
       break;
     }
     case is_syntax_reference:
     {
-      reference r = syntax_reference(sexpr);
-      tf = generic_reference_to_transformer(v, r, pre, is_internal);
+      // pips_user_warning("reference for pointer analysis not be tested\n");
+      // can occur for arithmetic for pointer
+      reference rexpr = syntax_reference(sexpr);
+
+      entity rvexpr = reference_variable(rexpr);
+      type texpr = entity_type(rvexpr);
+      type bctexpr = compute_basic_concrete_type(texpr);
+      if(type_variable_p(bctexpr)) {
+        variable vexpr = type_variable(bctexpr);
+        if (!volatile_variable_p(vexpr)
+            && ENDP(variable_dimensions(vexpr))
+            && !basic_pointer_p(variable_basic(vexpr))) {
+          // compute the multiply with sizeof
+          tf = expression_multiply_sizeof_to_transformer(v, expr, pre, is_internal);
+        }
+        else
+          tf = generic_reference_to_transformer(v, rexpr, pre, is_internal);
+      }
       break;
     }
     case is_syntax_cast:
     {
+      pips_user_warning("cast for pointer analysis not be tested (except for NULL pointer)\n");
       cast c = syntax_cast(sexpr);
       type ct = cast_type(c);
       expression cexp = cast_expression(c);
       type cexpt = expression_to_type(cexp);
-      if (type_equal_p(ct, cexpt))
+
+      if (expression_null_p(expr)) {
+        // make the transformer for the equality (take from generic_reference_to_transformer)
+        transformer tfr =  simple_equality_to_transformer(v, null_pointer_value_entity(), false);
+        if(!transformer_undefined_p(pre)) {
+          // FI: assume pre is a range
+          tf = transformer_intersection(tfr, pre);
+        }
+        free_transformer(tfr);
+      } else if (type_equal_p(ct, cexpt))
         tf = pointer_expression_to_transformer(v, cexp, pre, is_internal);
       else
         tf = transformer_undefined;
@@ -3524,6 +3977,8 @@ transformer transformer_add_any_relation_information(
       /* PIPS does not represent complex constants: call to CMPLX */
     case is_basic_string:
       /* Only constant string are processed */
+    case is_basic_pointer:
+      /* Pointer analysis */
     case is_basic_int:
       {
 	/* This is not correct if side effects occur in e1 or e2 */
@@ -3609,11 +4064,11 @@ transformer transformer_add_any_relation_information(
 	pips_user_warning("bit type not analyzed for operator %s\n",
 			  entity_name(op));
       break;
-    case is_basic_pointer:
-      if(veracity)
-	pips_user_warning("pointer type not analyzed for operator %s\n",
-			  entity_name(op));
-      break;
+//    case is_basic_pointer:
+//      if(veracity)
+//	pips_user_warning("pointer type not analyzed for operator %s\n",
+//			  entity_name(op));
+//      break;
     case is_basic_derived:
       /* Nothing to be done with struct and union */
       break;
@@ -3705,7 +4160,8 @@ transformer any_expression_to_transformer(
       || (basic_derived_p(bv) && basic_int_p(be))
       || (basic_derived_p(be) && basic_int_p(bv))
       || (basic_logical_p(bv) && basic_int_p(be))
-      || (basic_logical_p(be) && basic_int_p(bv))) {
+      || (basic_logical_p(be) && basic_int_p(bv))
+      || (basic_pointer_p(bv) && basic_int_p(be))) {
     switch(basic_tag(be)) {
     case is_basic_int:
       if(integer_analyzed_p()) {
@@ -3716,9 +4172,15 @@ transformer any_expression_to_transformer(
 	  /* If we are here, it should be an enum type... */
 	  tf = integer_expression_to_transformer(v, expr, pre, is_internal);
 	}
-	else if(basic_logical_p(bv)) {
-	  tf = logical_expression_to_transformer(v, expr, pre, is_internal);
-	}
+          else if(basic_logical_p(bv)) {
+            tf = logical_expression_to_transformer(v, expr, pre, is_internal);
+          }
+          else if(basic_pointer_p(bv)) {
+            //tf = integer_expression_to_transformer(v, expr, pre, is_internal);
+            // arithmetic for pointer
+            if(pointer_analyzed_p())
+              tf = pointer_expression_to_transformer(v, expr, pre, is_internal);
+          }
 	else {
 	  pips_user_warning("Integer expression assigned to float value\n"
 			    "Apply PIPS type checker for better results\n");
@@ -3860,6 +4322,7 @@ transformer expression_to_transformer(
 	entity tmpv = make_local_temporary_value_entity(cet);
 
 	/* FI: I do not remember the meaning of the last parameter */
+	// it's use in generic_reference_to_transformer
 	tf = any_expression_to_transformer(tmpv, sub_exp, pre, false);
       }
       free_type(cet);
@@ -3879,6 +4342,7 @@ transformer expression_to_transformer(
   else if(analyzable_type_p(et)) {
     entity tmpv = make_local_temporary_value_entity(et);
     /* FI: I do not remember the meaning of the last parameter */
+    // it's use in generic_reference_to_transformer
     tf = any_expression_to_transformer(tmpv, exp, pre, false);
   }
   else {

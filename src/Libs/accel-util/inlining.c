@@ -157,7 +157,7 @@ bool find_write_effect_on_entity(statement s, entity e)
 		{
 		  if( !entity_pointer_p(e) && (entity_scalar_p(e) || derived_entity_p(e)) ) {
 			  ifdebug(6) {
-			    pips_debug(0,"Found conflict on %s with effect : ",entity_name(e));
+			    pips_debug(6,"Found conflict on %s with effect : ",entity_name(e));
 			    void print_effect(effect e);
 	        print_effect(eff);
 			  }

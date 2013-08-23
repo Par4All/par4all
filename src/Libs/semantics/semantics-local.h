@@ -34,8 +34,8 @@
 
 extern bool refine_transformers_p;
 
-
 typedef struct{
   gen_array_t indices;
   statement statement;
 }path;
+

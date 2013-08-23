@@ -409,9 +409,9 @@ interval_exit_nodes(vertex interval, control exit_node)
     }, interval_vertex_label_controls(vertex_vertex_label(interval)));
 
     ifdebug(6) {
-	pips_debug(0, "Interval exit node list: ");
+	pips_debug(6, "Interval exit node list: ");
 	display_address_of_control_nodes(exit_controls);
-	pips_debug(0, "\n");
+	pips_debug(6, "\n");
     }
 
     return exit_controls;
@@ -444,12 +444,12 @@ hierarchize_control_list(vertex interval,
 	instruction_to_statement(make_instruction(is_instruction_unstructured,
 					    new_unstructured));
     ifdebug(6) {
-	pips_debug(0, "List of controls: ");
+	pips_debug(6, "List of controls: ");
 	display_address_of_control_nodes(controls);
 	if (exit_node != control_undefined) {
-            pips_debug(0, "\nExit node %p\n", exit_node);
+            pips_debug(6, "\nExit node %p\n", exit_node);
         }
-	pips_debug(0, "New unstructured %p: new_entry_node = %p, new_exit_node = %p\n",
+	pips_debug(6, "New unstructured %p: new_entry_node = %p, new_exit_node = %p\n",
 		   new_unstructured, new_entry_node, new_exit_node);
     }
     /* Now the hard work: replace carefully the old control nodes by
@@ -470,7 +470,7 @@ hierarchize_control_list(vertex interval,
 	new_controls = CONS(CONTROL, new_exit_node, new_controls);
     }
     ifdebug(6) {
-	pips_debug(0, "new_controls list: ");
+	pips_debug(6, "new_controls list: ");
 	display_address_of_control_nodes(new_controls);
 	}
 
@@ -525,15 +525,15 @@ hierarchize_control_list(vertex interval,
     gen_free_list(new_controls);
 
     ifdebug(5) {
-	pips_debug(0, "Nodes from entry_node: ");
+	pips_debug(6, "Nodes from entry_node: ");
 	display_linked_control_nodes(entry_node);
 	if (exit_node != control_undefined) {
-	    pips_debug(0, "\nNodes from exit_node: ");
+	    pips_debug(6, "\nNodes from exit_node: ");
 	    display_linked_control_nodes(exit_node);
 	}
-	pips_debug(0, "\nNodes from new_entry_node: ");
+	pips_debug(6, "\nNodes from new_entry_node: ");
 	display_linked_control_nodes(new_entry_node);
-	pips_debug(0, "\nNodes from new_exit_node: ");
+	pips_debug(6, "\nNodes from new_exit_node: ");
 	display_linked_control_nodes(new_exit_node);
     }
     ifdebug(1) {
@@ -582,9 +582,9 @@ control_graph_recursive_decomposition(unstructured u)
     pips_debug(3, "Entering with unstructured %p (%p, %p)\n",
 	       u, entry_node, exit_node);
     ifdebug(5) {
-	pips_debug(0, "Nodes from entry_node: ");
+	pips_debug(5, "Nodes from entry_node: ");
 	display_linked_control_nodes(entry_node);
-	pips_debug(0, "\nNodes from exit_node: ");
+	pips_debug(5, "\nNodes from exit_node: ");
 	display_linked_control_nodes(exit_node);
     }
     ifdebug(6)
@@ -644,9 +644,9 @@ control_graph_recursive_decomposition(unstructured u)
 
     pips_debug(3, "Exiting.\n");
     ifdebug(5) {
-	pips_debug(0, "Nodes from entry_node: ");
+	pips_debug(5, "Nodes from entry_node: ");
 	display_linked_control_nodes(entry_node);
-	pips_debug(0, "\nNodes from exit_node: ");
+	pips_debug(5, "\nNodes from exit_node: ");
 	display_linked_control_nodes(exit_node);
     }
     ifdebug(1)

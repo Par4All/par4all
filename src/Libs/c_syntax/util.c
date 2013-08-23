@@ -2749,7 +2749,7 @@ list TakeDerivedEntities(list le)
     pips_debug(8, "Begin\n");
 
     ifdebug(8) {
-      pips_debug(0, "Input entity list: ");
+      pips_debug(8, "Input entity list: ");
       print_entities(le);
       fprintf(stderr, "\n");
     }
@@ -2800,7 +2800,7 @@ list TakeDerivedEntities(list le)
     pips_assert ("an acyclic list is generated", !gen_list_cyclic_p (lres));
 
     ifdebug(8) {
-      pips_debug(0, "Output entity list: ");
+      pips_debug(8, "Output entity list: ");
       if(ENDP(lres)) {
 	fprintf(stderr, "NIL\n");
       }

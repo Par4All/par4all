@@ -1209,6 +1209,7 @@
 #define ENTITY_C_MODULO_P(e) entity_an_operator_p(e, C_MODULO)
 #define ENTITY_POWER_P(e) entity_an_operator_p(e, POWER)
 #define ENTITY_DIVIDE_P(e) entity_an_operator_p(e, DIVIDE)
+
 #define ENTITY_MIN_P(e) entity_an_operator_p(e, MIN)
 #define ENTITY_C_MIN_P(e) entity_an_operator_p(e,PIPS_C_MIN)
 #define ENTITY_MAX_P(e) entity_an_operator_p(e, MAX)
@@ -1219,6 +1220,7 @@
 #define ENTITY_DMIN1_P(e) entity_an_operator_p(e, DMIN1)
 #define ENTITY_DMAX1_P(e) entity_an_operator_p(e, DMAX1)
 #define ENTITY_MIN_OR_MAX_P(e) (ENTITY_MIN_P(e) || ENTITY_MAX_P(e) )
+
 #define ENTITY_ABS_P(e) entity_an_operator_p(e, ABS)
 #define ENTITY_IABS_P(e) entity_an_operator_p(e, IABS)
 #define ENTITY_DABS_P(e) entity_an_operator_p(e, DABS)
@@ -1250,6 +1252,8 @@
 #define ENTITY_NON_EQUIV_P(e) entity_an_operator_p(e, NON_EQUIV)
 #define ENTITY_LEFT_SHIFT_P(e) entity_an_operator_p(e, LEFT_SHIFT)
 #define ENTITY_RIGHT_SHIFT_P(e) entity_an_operator_p(e, RIGHT_SHIFT)
+
+#define ENTITY_ADDRESS_OF_P(e) entity_an_operator_p(e, ADDRESS_OF)
 
 /* Attention :
    This definition is different with the Fortran Standard where the logical

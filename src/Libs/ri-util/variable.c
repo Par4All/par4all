@@ -268,6 +268,17 @@ AddEntityToCurrentModule(entity e) {
   AddLocalEntityToDeclarations(e, module_e, module_s);
 }
 
+/* Add a variable entity to the current module declarations. */
+void
+AddEntityToCurrentModuleWithoutDeclaration(entity e) {
+  entity module_e = get_current_module_entity();
+  /* There is no declaration local to a statement in Fortran: */
+  statement module_s = c_module_p(module_e) ? get_current_module_statement()
+    : statement_undefined;
+
+  AddLocalEntityToDeclarationsOnly(e, module_e, module_s);
+}
+
 
 entity make_global_entity_from_local(entity local) {
     const char* seed = entity_local_name(local);

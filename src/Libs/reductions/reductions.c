@@ -326,7 +326,7 @@ static bool pr_call_flt(call c)
 	    gen_nconc(translate_reductions(c), reductions_list(reds));
     } else {
       ifdebug(4) {
-        pips_debug(0,"Reductions for statement are:\n");
+        pips_debug(4,"Reductions for statement are:\n");
         FOREACH(REDUCTION, r,reductions_list(reds)) {
           DEBUG_REDUCTION(0, "considering\n", r);
         }

@@ -3630,6 +3630,7 @@ according to some parameter value.} :
 \PipsPropRef{SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES}
 \PipsPropRef{SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES}
 \PipsPropRef{SEMANTICS_ANALYZE_SCALAR_POINTER_VARIABLES}
+\PipsPropRef{SEMANTICS_ANALYZE_CONSTANT_PATH}
 
 Transformers can be computed intraprocedurally by looking at each
 function independently or they can be computed interprocedurally
@@ -3704,6 +3705,7 @@ alias transformers_intra_fast 'Quick Intra-Procedural Computation'
 alias transformers_inter_fast 'Quick Inter-Procedural Computation'
 alias transformers_intra_full 'Full Intra-Procedural Computation'
 alias transformers_inter_full 'Full Inter-Procedural Computation'
+alias transformers_inter_full_with_points_to 'Full Inter-Procedural with points-to Computation'
 alias refine_transformers 'Refine Transformers'
 \end{PipsMake}
 
@@ -3772,7 +3774,25 @@ transformers_inter_full         > MODULE.transformers
         < PROGRAM.program_precondition
 \end{PipsMake}
 
-\subsubsection{Full Interprocedural Transformers}
+\subsubsection{Full Interprocedural Transformers with points-to}
+
+\begin{PipsPass}{transformers_inter_full_with_points_to}
+Build the improved interprocedural transformers with points-to informations
+\end{PipsPass}
+
+\begin{PipsMake}
+transformers_inter_full_with_points_to         > MODULE.transformers
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.points_to
+        < MODULE.cumulated_effects
+        < MODULE.summary_effects
+        < CALLEES.summary_transformer
+        < MODULE.proper_effects
+        < PROGRAM.program_precondition
+\end{PipsMake}
+
+\subsubsection{Refine Full Interprocedural Transformers}
 
 \begin{PipsPass}{refine_transformers}
 Rebuild the interprocedural transformers using interprocedural
@@ -4242,6 +4262,7 @@ program_postcondition     > PROGRAM.program_postcondition
 \index{SEMANTICS\_ANALYZE\_SCALAR\_FLOAT\_VARIABLES}
 \index{SEMANTICS\_ANALYZE\_SCALAR\_COMPLEX\_VARIABLES}
 \index{SEMANTICS\_ANALYZE\_SCALAR\_POINTER\_VARIABLES}
+\index{SEMANTICS\_ANALYZE\_CONSTANT\_PATH}
 
 By default, the semantic analysis is restricted to scalar integer
 variables as they are key variables to understand scientific code
@@ -4262,6 +4283,11 @@ during the analysis.
 
 For the pointer analysis, it's strongly recommended to activate
 \PipsPassRef{proper_effects_with_points_to} before performing this analysis.
+
+In interprocedural analysis, or in presence of formal parameter, to performe 
+the pointer analysis, it's strongly recommended to set  
+\PipsPropRef{SEMANTICS_ANALYZE_CONSTANT_PATH} at TRUE.
+\PipsPropRef{SEMANTICS_ANALYZE_CONSTANT_PATH} can also serve to analyse the structures?
 
 \begin{PipsProp}{SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES}
 SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE
@@ -4285,6 +4311,10 @@ SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES FALSE
 
 \begin{PipsProp}{SEMANTICS_ANALYZE_SCALAR_POINTER_VARIABLES}
 SEMANTICS_ANALYZE_SCALAR_POINTER_VARIABLES FALSE
+\end{PipsProp}
+
+\begin{PipsProp}{SEMANTICS_ANALYZE_CONSTANT_PATH}
+SEMANTICS_ANALYZE_CONSTANT_PATH FALSE
 \end{PipsProp}
 
 

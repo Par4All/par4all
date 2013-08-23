@@ -321,7 +321,7 @@ static hash_table union_used_labels(hash_table l1,
 static bool covers_labels_p(statement st,
 			    hash_table used_labels) {
   if( get_debug_level() >= 5 ) {
-    pips_debug(0, "Statement %td (%p): \n ", statement_number(st), st);
+    pips_debug(5, "Statement %td (%p): \n ", statement_number(st), st);
     print_statement(st);
   }
   /* For all the labels in used_labels: */
@@ -1060,7 +1060,7 @@ static control compact_list(list ctls,
     control c_last = c_end ;
 
     ifdebug(5) {
-	pips_debug(0, "Begin with list c_end %p, ctls:", c_end);
+	pips_debug(5, "Begin with list c_end %p, ctls:", c_end);
 	display_address_of_control_nodes(ctls);
 	fprintf(stderr, "\n");
     }
@@ -1244,7 +1244,7 @@ list controlize_list_1(list sts,
     bool unreachable;
 
     ifdebug(5) {
-      pips_debug(0, "Nodes linked with pred %p:\n", pred);
+      pips_debug(5, "Nodes linked with pred %p:\n", pred);
       display_linked_control_nodes(pred);
     }
 
@@ -1266,7 +1266,7 @@ list controlize_list_1(list sts,
       /* Keep track globally of the unreachable code: */
       Unreachable = CONS(STATEMENT, st, Unreachable);
       ifdebug(2) {
-	pips_debug(0, "There is a new unreachable statement:\n");
+	pips_debug(2, "There is a new unreachable statement:\n");
 	print_statement(st);
       }
     }
@@ -1426,9 +1426,9 @@ static bool controlize_list(statement st,
     //c_last = c_end;
     gen_free_list(ctls);
     ifdebug(5) {
-	pips_debug(0, "Nodes from c_block %p\n", c_block);
+	pips_debug(5, "Nodes from c_block %p\n", c_block);
 	display_linked_control_nodes(c_block);
-	pips_debug(0, "Nodes from c_last %p\n", c_last);
+	pips_debug(5, "Nodes from c_last %p\n", c_last);
 	display_linked_control_nodes(c_last);
     }
     /*    pips_assert("declarations are preserved in list",
@@ -1814,7 +1814,7 @@ simplified_unstructured(control top,
     instruction i;
 
     ifdebug(4) {
-	pips_debug(0, "Accessible nodes from top:\n");
+	pips_debug(4, "Accessible nodes from top:\n");
 	display_linked_control_nodes(top);
 	check_control_coherency(top);
 	pips_debug(1, "Accessible nodes from bottom:\n");
@@ -2195,9 +2195,9 @@ statement st;
     if(!ENDP(Unreachable)) {
 	pips_user_warning("Some statements are unreachable\n");
 	ifdebug(2) {
-	    pips_debug(0, "Unreachable statements:\n");
+	    pips_debug(2, "Unreachable statements:\n");
 	    MAP(STATEMENT, s, {
-		pips_debug(0, "Statement %p:\n", s);
+		pips_debug(2, "Statement %p:\n", s);
 		print_statement(s);
 	    }, Unreachable);
 	}

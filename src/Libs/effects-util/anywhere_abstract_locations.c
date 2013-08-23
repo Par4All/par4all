@@ -564,7 +564,7 @@ bool entity_all_dynamic_locations_p(entity e)
   return entity_all_xxx_locations_p(e, DYNAMIC_AREA_LOCAL_NAME);
 }
 
-/* test if an entity is a stub sink for a formal pramater
+/* test if an entity is a stub sink for a formal parameter
    e.g. f->_f_1, EXACT
 */
 bool entity_stub_sink_p(entity e)

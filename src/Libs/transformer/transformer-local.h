@@ -44,3 +44,7 @@
 #define NEW_VALUE_SUFFIX "#new"
 #define OLD_VALUE_SUFFIX "#init"
 #define INTERMEDIATE_VALUE_SUFFIX "#int"
+
+#define ADDRESS_OF_SUFFIX "#addressof"
+
+#define SIZEOF_SUFFIX "#sizeof"

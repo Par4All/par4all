@@ -293,7 +293,7 @@ static hash_table union_used_labels(hash_table l1,
 static bool covers_labels_p(statement st,
 			    hash_table used_labels) {
   ifdebug(5) {
-    pips_debug(0, "Statement %td (%p): \n ", statement_number(st), st);
+    pips_debug(5, "Statement %td (%p): \n ", statement_number(st), st);
     print_statement(st);
   }
   /* For all the labels in used_labels: */
@@ -1921,7 +1921,7 @@ static bool controlize_sequence(control c_res,
   pips_assert("st it a statement sequence", statement_sequence_p(st));
 
   ifdebug(5) {
-    pips_debug(0, "Entering with nodes linked with c_res %p:\n", c_res);
+    pips_debug(5, "Entering with nodes linked with c_res %p:\n", c_res);
     display_linked_control_nodes(c_res);
   }
   ifdebug(1) {
@@ -2382,10 +2382,10 @@ static bool controlize_goto(control c_res,
   control n_succ = get_label_control(name);
 
   ifdebug(5) {
-    pips_debug(0, "After freeing the goto, from c_res = %p:\n", c_res);
+    pips_debug(5, "After freeing the goto, from c_res = %p:\n", c_res);
     display_linked_control_nodes(c_res);
     check_control_coherency(c_res);
-    pips_debug(0, "From n_succ = %p:\n", n_succ);
+    pips_debug(5, "From n_succ = %p:\n", n_succ);
     display_linked_control_nodes(n_succ);
     check_control_coherency(n_succ);
   }
@@ -2421,10 +2421,10 @@ static bool controlize_goto(control c_res,
     update_used_labels(used_labels, name, st);
 
     ifdebug(5) {
-      pips_debug(0, "After freeing the goto, from c_res = %p:\n", c_res);
+      pips_debug(5, "After freeing the goto, from c_res = %p:\n", c_res);
       display_linked_control_nodes(c_res);
       check_control_coherency(c_res);
-      pips_debug(0, "From n_succ = %p:\n", succ);
+      pips_debug(5, "From n_succ = %p:\n", succ);
       display_linked_control_nodes(succ);
       check_control_coherency(succ);
     }

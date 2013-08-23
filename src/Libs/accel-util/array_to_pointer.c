@@ -90,7 +90,7 @@ size_t type_dereferencement_depth(type t) {
   t = ultimate_type(t);
   if(type_variable_p(t)) {
     ifdebug(8) {
-      pips_debug(0,"Type is : ");
+      pips_debug(8,"Type is : ");
       print_type(t);
     }
     variable v = type_variable(t);

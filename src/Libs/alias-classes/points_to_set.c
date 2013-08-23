@@ -1752,7 +1752,7 @@ list points_to_source_to_translations(cell source, pt_map ptm, bool fresh_p)
     translations = points_to_reference_to_translation(n_r, sl, ptm, fresh_p);
   }
 
-  ifdebug(0) {
+  ifdebug(8) {
     bool to_be_freed;
     type source_t = points_to_cell_to_type(source, &to_be_freed);
     type source_et = compute_basic_concrete_type(source_t);
@@ -3387,4 +3387,25 @@ bool arc_in_points_to_set_p(points_to spt, set pts)
     }
   }
   return in_p;
+}
+
+pt_map get_points_to_graph_from_statement(statement st) {
+  points_to_graph pt_in = points_to_graph_undefined;
+
+  if (!statement_unstructured_p(st)) {
+    points_to_list ptl_in = load_pt_to_list(st);
+    pt_in = new_pt_map();
+    if(!points_to_list_bottom(ptl_in)) {
+      pt_in = graph_assign_list(pt_in, points_to_list_list(ptl_in));
+
+      ifdebug(7) {
+        pips_debug(7, "\n print_points_to_graph \n");
+        ifdebug(7) print_points_to_graph(pt_in);
+        pips_debug(7, "in statement : ");
+        ifdebug(7) print_statement(st);
+      }
+    }
+  }
+
+  return pt_in;
 }

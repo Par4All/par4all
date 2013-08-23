@@ -412,7 +412,7 @@ static bool __attribute__ ((__unused__)) constant_region_in_context_p(effect pr,
     descriptor d = effect_descriptor(pr);
     if (descriptor_convex_p(d)) {
       ifdebug(2) {
-        pips_debug(0,"Considering regions : ");
+        pips_debug(2,"Considering regions : ");
         print_region(pr);
       }
 
@@ -835,7 +835,7 @@ static bool loop_scalarization(loop l, struct scalarization_ctx *ctx)
         !entity_is_argument_p(pv, ctx->scalarized_variables)
         && !vect_coeff(pv,var_already_seen)) {
       ifdebug(2) {
-        pips_debug(0,"Considering regions : ");
+        pips_debug(2,"Considering regions : ");
         print_region(pr);
       }
       vect_add_elem(&var_already_seen,pv,1);
@@ -846,7 +846,7 @@ static bool loop_scalarization(loop l, struct scalarization_ctx *ctx)
       if (!effect_undefined_p(pru)) {
 
         ifdebug(2) {
-          pips_debug(0,"pru not undefined: ");
+          pips_debug(2,"pru not undefined: ");
           print_region(pru);
         }
 
@@ -868,7 +868,7 @@ static bool loop_scalarization(loop l, struct scalarization_ctx *ctx)
 
         if (nvo != neo) {
           ifdebug(2) {
-            pips_debug(0,
+            pips_debug(2,
                        "Legality criterion not met: %d!=%d (nvo!=neo)\n",
                        nvo, neo);
           }
@@ -905,7 +905,7 @@ static bool loop_scalarization(loop l, struct scalarization_ctx *ctx)
                   )
               ) {
             ifdebug(2) {
-              pips_debug(0,"Profitability criterion not met: (nd) %d>0 (scalar) "
+              pips_debug(2,"Profitability criterion not met: (nd) %d>0 (scalar) "
                          "or not one of the following: (%d&&%d&&%d) "
                          "(neo) %d <= 2 and "
                          "((neo) %d <= 1 || %d read_and_written_pv) and "
@@ -1183,7 +1183,7 @@ static bool statement_scalarization(statement s,
       descriptor d = effect_descriptor(pr);
       if (descriptor_convex_p(d)) {
         ifdebug(2) {
-          pips_debug(0,"Considering regions : ");
+          pips_debug(2,"Considering regions : ");
           print_region(pr);
         }
         vect_add_elem(&var_already_seen,pv,1);
@@ -1210,7 +1210,7 @@ static bool statement_scalarization(statement s,
 
           if (nvo != neo) {
             ifdebug(2) {
-              pips_debug(0,
+              pips_debug(2,
                          "Legality criterion not met : %d!=%d (nvo!=neo)\n",
                          nvo, neo);
             }
@@ -1253,7 +1253,7 @@ static bool statement_scalarization(statement s,
                    )
                ) {
               ifdebug(2) {
-                pips_debug(0,"Profitability criterion not met: (nd) %d>0 (scalar) "
+                pips_debug(2,"Profitability criterion not met: (nd) %d>0 (scalar) "
                            "or not one of the following : (%d&&%d&&%d) "
                            "(neo) %d <= 2 and "
                            "((neo) %d <= 1 || %d read_and_written_pv) and "

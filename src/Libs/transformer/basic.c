@@ -307,10 +307,10 @@ transformer transformer_add_variable_update(transformer t, entity v)
 //  pips_assert("before value substitution\n", transformer_consistency_p(t));
 ////  t = transformer_value_substitute(t, v_new, v_old);
 //
-//  pips_debug(0, "before tes\nt");
+//  pips_debug(9, "before tes\nt");
 //  if(base_contains_variable_p(psyst->base, (Variable) v_new)) {
 //    if(!base_contains_variable_p(psyst->base, (Variable) v_old)) {
-//      pips_debug(0, "rename variable\n");
+//      pips_debug(9, "rename variable\n");
 //      (void) sc_variable_rename(psyst,(Variable) v_new, (Variable)v_old);
 //    }
 //  }

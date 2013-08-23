@@ -227,7 +227,7 @@ static bool replace_reductions_in_statement( statement s, struct replace_ctx *ct
   } else {
     if(rs && reductions_list(rs) && statement_call_p(s)) {
       ifdebug(4) {
-        pips_debug(0,"Statement has a reduction ");
+        pips_debug(4,"Statement has a reduction ");
         print_statement(s);
       }
       if(gen_length(reductions_list(rs)) > 1) {
@@ -240,7 +240,7 @@ static bool replace_reductions_in_statement( statement s, struct replace_ctx *ct
       atomic_operation op = reduction_to_atomic_operation(r);
       if(!supported_atomic_operator_p(op, ctx->profile)) {
         ifdebug(1) {
-          pips_debug(0,"Unsupported reduction by atomic operation profile : ");
+          pips_debug(1,"Unsupported reduction by atomic operation profile : ");
           print_reduction(r);
           fprintf(stderr, "\n");
         }
@@ -249,7 +249,7 @@ static bool replace_reductions_in_statement( statement s, struct replace_ctx *ct
             get_complement_expression(s, reduction_reference(r));
         if(expression_undefined_p(atomic_param)) {
           ifdebug(1) {
-            pips_debug(0,"Didn't manage to get complement expression :(\n");
+            pips_debug(1,"Didn't manage to get complement expression :(\n");
           }
         } else {
           entity atomic_fun = atomic_function_of_operation(op);
@@ -266,7 +266,7 @@ static bool replace_reductions_in_statement( statement s, struct replace_ctx *ct
                                   NULL));
             statement_instruction(s) = make_call_instruction(atomic_fun, args);
             ifdebug(4) {
-              pips_debug(0,"Atomized statement : ");
+              pips_debug(4,"Atomized statement : ");
               print_statement(s);
             }
           }

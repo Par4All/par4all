@@ -256,9 +256,9 @@ list outliner_statements_referenced_entities(list statements)
         }
 
         ifdebug(7) {
-          pips_debug(0,"Statement :");
+          pips_debug(7,"Statement :");
           print_statement(s);
-          pips_debug(0,"referenced entities :");
+          pips_debug(7,"referenced entities :");
           print_entities(set_to_list(tmp));
           fprintf(stderr,"\n");
         }
@@ -545,7 +545,7 @@ list outliner_scan(entity new_fun, list statements_to_outline, statement new_bod
     list referenced_entities = outliner_statements_referenced_entities(statements_to_outline);
 
     ifdebug(5) {
-      pips_debug(0,"Referenced entities :\n");
+      pips_debug(5,"Referenced entities :\n");
       print_entities(referenced_entities);
     }
 
@@ -728,9 +728,9 @@ void outliner_parameters(entity new_fun,  statement new_body, list referenced_en
     hash_table_free(entity_to_effective_parameter);
 
     ifdebug(5) {
-      pips_debug(0,"Formals : \n");
+      pips_debug(5,"Formals : \n");
       print_parameters(*formal_parameters_);
-      pips_debug(0,"Effectives : \n");
+      pips_debug(5,"Effectives : \n");
       print_expressions(*effective_parameters_);
      }
 }
@@ -776,7 +776,7 @@ void outliner_patch_parameters(list statements_to_outline, list referenced_entit
                 bool write_p = find_write_effect_on_entity(stmt,ex);
                 ifdebug(5) {
                     if(write_p) {
-                        pips_debug(0,"Entity %s written by statement (%d) : \n",entity_name(ex),the_current_debug_level);
+                        pips_debug(5,"Entity %s written by statement (%d) : \n",entity_name(ex),the_current_debug_level);
                         print_statement(stmt);
                     }
                 }

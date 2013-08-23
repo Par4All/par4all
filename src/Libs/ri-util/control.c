@@ -641,7 +641,7 @@ void display_linked_control_nodes(control c)
     fprintf(stderr, "), ");
     ifdebug(8) {
       fprintf(stderr, "\n");
-      pips_debug(0, "Statement %p of control %p:\n", control_statement(ctl), ctl);
+      pips_debug(8, "Statement %p of control %p:\n", control_statement(ctl), ctl);
       safe_print_statement(control_statement(ctl));
     }
     if(set_belong_p(stmts, control_statement(ctl))) {

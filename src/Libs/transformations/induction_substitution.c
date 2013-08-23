@@ -368,7 +368,7 @@ static bool expression_subtitution_on_call( expression substitute,
                                             call c,
                                             instruction root_instruction) {
   ifdebug( 1 ) {
-      pips_debug(0, "Induction substitution : %s => ", //
+      pips_debug(1, "Induction substitution : %s => ", //
               entity_local_name( induction_variable_candidate ) );
       print_syntax( expression_syntax( substitute ) );
       fprintf(stderr, " on call : " );
@@ -535,34 +535,34 @@ static bool subtitute_induction_statement_in( statement s ) {
 
         ifdebug(4) {
           if ( found_loop_index ) {
-            pips_debug(0,"Loop index found !\n");
+            pips_debug(4,"Loop index found !\n");
           } else {
-            pips_debug(0,"No loop index found !\n");
+            pips_debug(4,"No loop index found !\n");
           }
           if ( !entity_undefined_p( induction_variable_candidate )) {
-            pips_debug(0,"Induction variable candidate found : %s\n",
+            pips_debug(4,"Induction variable candidate found : %s\n",
                        entity_local_name(induction_variable_candidate));
           } else {
-            pips_debug(0,"No Induction variable candidate found !\n");
+            pips_debug(4,"No Induction variable candidate found !\n");
           }
           if ( induction_variable_candidate_coeff != 0) {
-            pips_debug(0,"Variable is active !\n");
+            pips_debug(4,"Variable is active !\n");
           } else {
-            pips_debug(0,"Variable is not active !\n");
+            pips_debug(4,"Variable is not active !\n");
           }
           if ( !expression_undefined_p( substitute )) {
-            pips_debug(0,"The substitute expression is ");
+            pips_debug(4,"The substitute expression is ");
             print_syntax( expression_syntax( substitute ) );
             fprintf( stderr, "\n" );
           } else {
-            pips_debug(0,"The substitute expression is undefined.\n");
+            pips_debug(4,"The substitute expression is undefined.\n");
           }
           if( is_modified_entity_in_transformer(
               load_statement_transformer( s ), //
               induction_variable_candidate ) ) {
-            pips_debug(0,"Variable is modified by this statement\n");
+            pips_debug(4,"Variable is modified by this statement\n");
           } else {
-            pips_debug(0,"Variable is not modified by this statement\n");
+            pips_debug(4,"Variable is not modified by this statement\n");
           }
         }
 

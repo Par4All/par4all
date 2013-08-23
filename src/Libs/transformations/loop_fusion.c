@@ -325,9 +325,9 @@ void replace_entity_effects_walker(statement s, void *_thecouple ) {
   struct entity_pair *thecouple = _thecouple;
   list effs = load_proper_rw_effects_list( s );
   ifdebug(7) {
-    pips_debug(0,"Handling statement :");
+    pips_debug(7,"Handling statement :");
     print_statement(s);
-    pips_debug(0,"Effects :");
+    pips_debug(7,"Effects :");
     print_effects(effs);
     fprintf(stderr,"\n");
   }
@@ -336,7 +336,7 @@ void replace_entity_effects_walker(statement s, void *_thecouple ) {
     replace_entity(eff, thecouple->old, thecouple->new);
   }
   ifdebug(7) {
-    pips_debug(0,"Effects after :");
+    pips_debug(7,"Effects after :");
     print_effects(effs);
     fprintf(stderr,"\n");
   }
@@ -696,7 +696,7 @@ static bool coarse_fusion_loops(statement sloop1,
     }
 
     ifdebug(3) {
-      pips_debug(0,"Before fusion : ");
+      pips_debug(3,"Before fusion : ");
       print_statement(sloop1);
       print_statement(sloop2);
     }
@@ -734,7 +734,7 @@ static bool coarse_fusion_loops(statement sloop1,
 
 
     ifdebug(3) {
-      pips_debug(0,"After fusion : ");
+      pips_debug(3,"After fusion : ");
       print_statement(sloop1);
     }
   }
@@ -846,7 +846,7 @@ static bool fine_fusion_loops(statement sloop1,
   //debug_off();
 
   ifdebug(5) {
-    pips_debug(0, "Candidate CHAINS :\n");
+    pips_debug(5, "Candidate CHAINS :\n");
     print_graph(candidate_dg);
   }
 
@@ -861,9 +861,9 @@ static bool fine_fusion_loops(statement sloop1,
   reset_enclosing_loops_map();
 
   ifdebug(5) {
-    pips_debug(0, "Candidate DG :\n");
+    pips_debug(5, "Candidate DG :\n");
     print_graph(candidate_dg);
-    pips_debug(0, "Candidate fused loop :\n");
+    pips_debug(5, "Candidate fused loop :\n");
     print_statement(sloop1);
   }
 
@@ -918,7 +918,7 @@ static bool fine_fusion_loops(statement sloop1,
                   // Hum seems bad... This a loop carried dependence !
                   success = false;
                   ifdebug(2) {
-                    pips_debug(0,"This loop carried dependence is breaking parallism !\n");
+                    pips_debug(2,"This loop carried dependence is breaking parallism !\n");
                     fprintf(stderr, "From : ");
                     print_effect(e_source);
                     fprintf(stderr, "to : ");
@@ -953,11 +953,11 @@ static bool fine_fusion_loops(statement sloop1,
             effect e_sink = conflict_sink(c);
             effect e_source = conflict_source(c);
             ifdebug(6) {
-              pips_debug(0,
+              pips_debug(6,
                          "Considering arc : from statement %d :",
                          statement_ordering);
               print_effect(conflict_source(c));
-              pips_debug(0, " to statement %d :", statement_ordering2);
+              pips_debug(6, " to statement %d :", statement_ordering2);
               print_effect(conflict_sink(c));
             }
             if((effect_write_p(e_source) && store_effect_p(e_source))
@@ -976,11 +976,11 @@ static bool fine_fusion_loops(statement sloop1,
               }
 
               ifdebug(6) {
-                pips_debug(0,
+                pips_debug(6,
                            "Arc preventing fusion : from statement %d :",
                            statement_ordering);
                 print_effect(conflict_source(c));
-                pips_debug(0, " to statement %d :", statement_ordering2);
+                pips_debug(6, " to statement %d :", statement_ordering2);
                 print_effect(conflict_sink(c));
               }
               success = false;
@@ -988,11 +988,11 @@ static bool fine_fusion_loops(statement sloop1,
           }
         } else {
           ifdebug(6) {
-            pips_debug(0,
+            pips_debug(6,
                        "Arc ignored (%d,%d) : from statement %d :",
                        (int)statement_ordering(sloop2), (int)statement_ordering(sloop1), statement_ordering);
             print_statement(ordering_to_statement(statement_ordering));
-            pips_debug(0, " to statement %d :", statement_ordering2);
+            pips_debug(6, " to statement %d :", statement_ordering2);
             print_statement(ordering_to_statement(statement_ordering2));
           }
         }
@@ -1748,7 +1748,7 @@ restart_loop: ;
       list new_stmts = NIL;
 
       ifdebug(3) {
-        pips_debug(0,"Before regeneration\n");
+        pips_debug(3,"Before regeneration\n");
         print_blocks(block_list);
       }
 

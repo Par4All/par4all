@@ -4197,6 +4197,21 @@ MakeVoidParameter()
                         make_dummy_unknown());
 }
 
+//unuse
+type
+pointer_to_overloaded_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeOverloadedResult());
+  t = make_type(is_type_functional, ft);
+
+  functional_parameters(ft) =
+    make_parameter_list(n, MakePointerParameter);
+  return t;
+}
+
 type
 integer_to_overloaded_type(int n)
 {
@@ -4722,6 +4737,8 @@ CreateIntrinsics( set module_list )
         {PRE_INCREMENT_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
         {PRE_DECREMENT_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
         /* ISO 6.5.3.2 address and indirection operators, add pointer type */
+        // this definition must be more precise but cause a type issue
+        // {ADDRESS_OF_OPERATOR_NAME, 1, pointer_to_overloaded_type, 0, 0},
         {ADDRESS_OF_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
         {DEREFERENCING_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
         /* ISO 6.5.3.3 unary arithmetic operators */
@@ -5542,7 +5559,8 @@ CreateIntrinsics( set module_list )
             typing_function_int_to_int, 0},
 
         /* assembly function */
-        { ASM_FUNCTION_NAME, 1, overloaded_to_void_type },
+        { ASM_FUNCTION_NAME, 1, overloaded_to_void_type , 0 , 0},
+        // The 2 last arg don't know for what
 
         /* PIPS intrinsics to simulate various effects */
         {PIPS_MEMORY_BARRIER_OPERATOR_NAME, 0, void_to_void_type, 0, 0},

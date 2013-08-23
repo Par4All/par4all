@@ -1,5 +1,5 @@
 
-/* This files containes all th eoperators defining  constant paths :
+/* This file contains all the operators defining  constant paths :
 
 CP = Mdodule * Name * Type *Vref.
 To calculate the lattice PC operators we define these operators first
@@ -1931,4 +1931,123 @@ bool equal_must_vreference(cell c1, cell c2)
   }
 
   return (i==0? true: false);
+}
+
+/*
+ * want to test if r can only be a constant path and nothing else
+ * WARNING : not totally tested
+ * for instance
+ *        a[0], a[1], a[i], i, j, ... have to return false
+ *        a[*], var points by formal parameter (_p_0, ...), element of strut (s.id, ...), heap element have to return true
+ *  * !effect_reference_dereferencing_p(r, &exact_p)
+ *      can return true when it's not a constant path like a[i] (a[i] and not a[*])
+ *      can make a side effect for the declaration of variable in parameter (only?), don't know why
+ *      for instance with Semantics-New/Pointer.sub/memcopy01
+ *        void memcopy01([...], char dst[size])  -->  void memcopy01([...], char dst[i])
+ *  * store_independent_reference_p(r)
+ *      can return false for some cp like a[0], can't permit to treat the array
+ *          return false for the structure too, can't permit to treat the struct
+ *      can return true for i, j, ... that can be a constant path but not strictly a constant path
+ * param r          reference to analyze to see if it's a constant path
+ * return           true if r is exactly a constant path
+ */
+bool strict_constant_path_p(reference r)
+{
+  bool constant_path = false;
+  entity v = reference_variable(r);
+  list l_ind = reference_indices(r);
+
+  // Test the different top and bottom area
+  if (entity_all_locations_p(v)
+      || entity_anywhere_locations_p(v) || entity_typed_anywhere_locations_p(v)
+      || entity_nowhere_locations_p(v) || entity_typed_nowhere_locations_p(v)
+      || entity_all_module_locations_p(v)
+      ) {
+    constant_path = true;
+  }
+  else if (entity_all_module_heap_locations_p(v)
+      || entity_all_heap_locations_p(v)
+      ) {
+    constant_path = true;
+  }
+  else if (entity_all_module_stack_locations_p(v)
+      || entity_all_stack_locations_p(v)
+      ) {
+    constant_path = true;
+  }
+  else if (entity_all_module_static_locations_p(v)
+      || entity_all_static_locations_p(v)
+      ) {
+    constant_path = true;
+  }
+  else if (entity_all_module_dynamic_locations_p(v)
+      || entity_all_dynamic_locations_p(v)
+      ) {
+    constant_path = true;
+  }
+  else if (entity_abstract_location_p(v)) { // Maybe this test permit to eliminate the 4 test just before?
+    constant_path = true;
+  }
+  // Test if it's the constant NULL
+  else if (entity_null_locations_p(v)) {
+    constant_path = true;
+  }
+  // Test if it's a formal parameter
+  else if (entity_stub_sink_p(v)) {
+    constant_path = true;
+  }
+  // Test if it's a heap element
+  else if (heap_area_p(v)) {
+    constant_path = true;
+  }
+  // Maybe not efficient enough, for array of struct or struct of array?
+  // Test if it's a structure
+  else if (struct_type_p(entity_type(v)) && !ENDP(l_ind)) {
+    constant_path = true;
+  }
+  // Test if it's a array with only *
+  else if (!ENDP(l_ind)) {
+    // see reference_unbounded_indices_p
+    constant_path = reference_unbounded_indices_p(r);
+  }
+
+  return constant_path;
+}
+
+/* TODO
+ * most of the time return same result that !effect_reference_dereferencing_p for the moment
+ * want to test if r can be a constant path
+ * for instance
+ *        a[i] have to return false (something else?)
+ *        a[0], a[1], i, j, a[*], var points by formal parameter (_p_0, ...), element of strut (s.id, ...), heap element
+ *                  have to return true
+ *  * !effect_reference_dereferencing_p(r, &exact_p)
+ *      can return true when it's not a constant path like a[i] (a[i] and not a[*])
+ *      can make a side effect for the declaration of variable in parameter (only?), don't know why
+ *      for instance with Semantics-New/Pointer.sub/memcopy01
+ *        void memcopy01([...], char dst[size])  -->  void memcopy01([...], char dst[i])
+ *  * store_independent_reference_p(r)
+ *      can return false for some cp like a[0], can't permit to treat the array
+ *          return false for the structure too, can't permit to treat the struct
+ *      can return true for i, j, ... that can be a constant path but not strictly a constant path
+ * param r          reference to analyze to see if it's a constant path
+ * return           true if r can be constant path
+ */
+bool can_be_constant_path_p(reference r)
+{
+  bool constant_path = true;
+
+  if (strict_constant_path_p(r))
+    constant_path = true;
+  else {
+    bool exact_p = true;
+    if (!effect_reference_dereferencing_p(r, &exact_p)) {
+      constant_path = true;
+    }
+    else {
+      constant_path = false;
+    }
+  }
+
+  return constant_path;
 }
