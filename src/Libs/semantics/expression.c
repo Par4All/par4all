@@ -2567,6 +2567,19 @@ integer_expression_to_transformer(
     free_type(cexpt);
 
   }
+  else if(syntax_sizeofexpression_p(sexpr)) {
+    if(get_bool_property("EVAL_SIZEOF")) {
+      sizeofexpression soe = syntax_sizeofexpression(sexpr);
+      value val = EvalSizeofexpression(soe);
+      if(value_constant_p(val) && constant_int_p(value_constant(val))) {
+	long long int i = constant_int(value_constant(val));
+	tf = transformer_identity();
+	tf = transformer_add_equality_with_integer_constant(tf, v, i);
+      }
+    }
+    else
+      tf = transformer_undefined;
+  }
   else {
     /* vect_rm(ve); */
     tf = transformer_undefined;

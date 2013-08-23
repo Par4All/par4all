@@ -4427,7 +4427,7 @@ SEMANTICS_INTERPROCEDURAL FALSE
 
 This property is used internally and is not user selectable.
 
-\subsubsection{Fix Point Operators}
+\subsubsection{Fix Point and Transitive Closure Operators}
 \index{Fix Point}
 \index{SEMANTICS\_FIX\_POINT}
 \index{SEMANTICS\_FIX\_POINT\_OPERATOR}
@@ -4589,7 +4589,7 @@ SEMANTICS_KEEP_DO_LOOP_EXIT_CONDITION TRUE
 SEMANTICS_FILTER_INITIAL_VALUES TRUE
 \end{PipsProp}
 
-\subsubsection{Normalization level}
+\subsubsection{Normalization Level}
 \index{SEMANTICS\_NORMALIZATION\_LEVEL\_BEFORE\_STORAGE}
 
 Normalizing transformer and preconditions systems is a delicate issue
@@ -4613,6 +4613,13 @@ performances. With any other value, the normalization level is equel to 2.
 \begin{PipsProp}{SEMANTICS_NORMALIZATION_LEVEL_BEFORE_STORAGE}
 SEMANTICS_NORMALIZATION_LEVEL_BEFORE_STORAGE 4
 \end{PipsProp}
+
+\subsubsection{Evaluation of sizeof}
+
+Property \PipsPropRef{EVAL_SIZEOF} can be set to true to force the
+static evaluation of size of. Potentially, the computed transformers
+and preconditions are only valid for the target architecture defined
+in \verb/ri-util-local.h/.
 
 \subsubsection{Prettyprint}
 \index{SEMANTICS\_FILTERED\_PRECONDITIONS}
@@ -10771,10 +10778,18 @@ to TRUE in order to force distribution, even when it does not seem profitable
 PARTIAL_EVAL_ALWAYS_SIMPLIFY FALSE
 \end{PipsProp}
 
-Likewise, one can turn following property to true if he wants to use hard-coded value for size of types
+Likewise, one can turn following property to true if he wants to use
+hard-coded value for size of types. The C standard is broken down into
+two parts, one is target independent, and one is target
+dependent. Currently, there is no way to specify different
+architecture models such as 32/32, 32/64 or 64/64, as the architecture
+model is hardwired in ri-util-local.h.
 \begin{PipsProp}{EVAL_SIZEOF}
 EVAL_SIZEOF FALSE
 \end{PipsProp}
+Regardless of the modelization, the C source code generated when this
+property is set to true is potentially no longer portable to other
+targets. This property is also used by the semantics analysis.
 
 This function was implemented initially by Bruno \textsc{Baron}.
 
