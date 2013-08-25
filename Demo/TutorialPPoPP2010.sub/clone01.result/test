@@ -158,7 +158,8 @@ int main()
 int clone01_1(int n, int s)
 {
    // PIPS: s is assumed a constant reaching value
-   ;
+   if (1!=1)
+      exit(0);
    return 1;
 }
 int clone01_1(int n, int s)
