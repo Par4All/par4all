@@ -1,0 +1,37 @@
+setenv WS=use_def_elim08
+delete $WS
+create $WS $WS.c
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+echo
+echo Source code for "COUNT" after dead-code elimination 
+apply DEAD_CODE_ELIMINATION[COUNT]
+display PRINTED_FILE[COUNT]
+
+echo
+echo Source code for "LOST_COUNT" after dead-code elimination 
+apply DEAD_CODE_ELIMINATION[LOST_COUNT]
+display PRINTED_FILE[LOST_COUNT]
+
+echo
+echo Source code for "LOST_COUNT_2" after dead-code elimination 
+apply DEAD_CODE_ELIMINATION[LOST_COUNT_2]
+display PRINTED_FILE[LOST_COUNT_2]
+
+quit
+
+echo
+echo Source code for "main" after control simplification
+apply SIMPLIFY_CONTROL[main]
+display PRINTED_FILE
+
+echo
+echo Source code for "main" after a second dead-code elimination 
+apply DEAD_CODE_ELIMINATION[main]
+display PRINTED_FILE
+
+close
+quit
+
