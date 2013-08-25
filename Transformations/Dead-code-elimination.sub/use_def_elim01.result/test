@@ -45,6 +45,7 @@ int main()
    int i;
    use_def_elim01(&i);
    printf("i = %d\n", i);
+   exit(i);
 }
 #
 # Code after dead_code_elimination for module use_def_elim01
