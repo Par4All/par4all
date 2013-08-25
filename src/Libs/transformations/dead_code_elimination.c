@@ -386,12 +386,23 @@ static bool statement_call_a_keep_function_p( statement s ) {
   return user_function_found;
 }
 
-
+/* FI: not only if it is useful, but if it is legal... */
 static void use_def_deal_if_useful(statement s) {
    bool this_statement_has_an_io_effect;
+   /* When a call by reference is used... */
    bool this_statement_writes_a_procedure_argument;
    bool this_statement_is_a_format;
    bool this_statement_is_an_unstructured_test = false;
+   /* FI: any statement that does not have a must/exact continuation
+    * should be preserved. For the time being, only exact
+    * non-continuing calls are checked: return, exit and abort. Since
+    * exceptions are not taken into account, the semantics of the code
+    * may be changed.
+    *
+    * Exact non-continuation can be checked with the statement
+    * transformer. beatrice Creusillet has also developped a
+    * continuation analysis.
+    */
    bool this_statement_is_a_c_return;
    bool outside_effect_p = false;
    bool this_statement_call_a_user_function;
@@ -436,7 +447,11 @@ static void use_def_deal_if_useful(statement s) {
 	   this_statement_is_an_unstructured_test = true;
    }
 
-   this_statement_is_a_c_return = return_statement_p(s);
+   /* All statements with control effects such as exit() or abort()
+      should be preserved. Continuations should be checked for
+      user-defined functions. Exceptions are also a problem. */
+   this_statement_is_a_c_return = return_statement_p(s) 
+     || exit_statement_p(s) || abort_statement_p(s);
 
    /* Check if this statement write some other things than a local variable */
    list effects_list = load_proper_rw_effects_list(s);
@@ -444,7 +459,13 @@ static void use_def_deal_if_useful(statement s) {
    FOREACH(EFFECT, eff,effects_list) {
     reference a_reference = effect_any_reference(eff);
     entity touched = reference_variable(a_reference);
-    if(effect_write_p(eff) && !entity_local_variable_p(touched,current_func)) {
+    if(effect_write_p(eff)
+       && (!entity_local_variable_p(touched,current_func)
+	   /* FI: we should also check that the static effect is
+	      leaked by the function but this is hard to check and is
+	      usually not intended by the programmer. See
+	      Transformations/Dead_code_elimination.sub/use_def_elim07/08. */
+	   || entity_static_variable_p(touched))) {
       outside_effect_p = true;
       pips_debug(7, "Statement %p, outside effect on %s (module %s)\n",
           s,
@@ -610,7 +631,7 @@ dead_code_elimination_on_a_statement(statement s)
 }
 
 
-bool dead_code_elimination_on_module(char * module_name)
+bool dead_code_elimination_on_module(char * module_name, bool use_out_regions)
 {
    statement module_statement;
    entity module = module_name_to_entity(module_name);
@@ -650,8 +671,11 @@ bool dead_code_elimination_on_module(char * module_name)
    set_proper_rw_effects((statement_effects)
 			 db_get_memory_resource(DBR_PROPER_EFFECTS,
 						module_name,
-						true)); 
-
+						true));
+   if(use_out_regions) {
+       set_out_effects((statement_effects)
+                  db_get_memory_resource(DBR_OUT_REGIONS, module_name, true));
+   }
 
    set_current_module_statement(module_statement);
    set_current_module_entity(module);
@@ -667,7 +691,12 @@ bool dead_code_elimination_on_module(char * module_name)
    keeped_functions = strsplit(get_string_property("DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS")," ");
    keeped_functions_prefix = strsplit(get_string_property("DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS_PREFIX")," ");
 
-   dead_code_elimination_on_a_statement(module_statement);
+   if(use_out_regions) {
+     //dead_code_elimination_on_a_statement_with_out_regions(module_statement);
+     ;
+   }
+   else
+     dead_code_elimination_on_a_statement(module_statement);
 
    gen_map(free,keeped_functions);gen_free_list(keeped_functions);
    keeped_functions = 0;
@@ -707,6 +736,9 @@ bool dead_code_elimination_on_module(char * module_name)
 
    reset_proper_rw_effects();
    reset_cumulated_rw_effects();
+   if(use_out_regions) {
+       reset_out_effects();
+   }
    reset_current_module_statement();
    reset_current_module_entity();
    reset_ordering_to_statement();
@@ -718,19 +750,26 @@ bool dead_code_elimination_on_module(char * module_name)
 bool dead_code_elimination(char * module_name)
 {
   debug_on("DEAD_CODE_ELIMINATION_DEBUG_LEVEL");
-  return dead_code_elimination_on_module(module_name);
+  return dead_code_elimination_on_module(module_name, false);
+  debug_off();
+}
+
+bool dead_code_elimination_with_out_regions(char * module_name)
+{
+  debug_on("DEAD_CODE_ELIMINATION_DEBUG_LEVEL");
+  return dead_code_elimination_on_module(module_name, true);
   debug_off();
 }
 
 
-/* Obsolete name: it should be called dead_code_eliminiation()
+/* Obsolete name: it should be called dead_code_elimination()
  *
  * Maintained for backward compatibility.
  */
 bool use_def_elimination(char * module_name)
 {
   debug_on("USE_DEF_ELIMINATION_DEBUG_LEVEL");
-  return dead_code_elimination_on_module(module_name);
+  return dead_code_elimination_on_module(module_name, false);
   debug_off();
 }
 

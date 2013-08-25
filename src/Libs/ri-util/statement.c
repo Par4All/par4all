@@ -171,6 +171,16 @@ bool return_statement_p(statement s) {
   return return_instruction_p(i);
 }
 
+bool exit_statement_p(statement s) {
+  instruction i = statement_instruction(s);
+  return exit_instruction_p(i);
+}
+
+bool abort_statement_p(statement s) {
+  instruction i = statement_instruction(s);
+  return abort_instruction_p(i);
+}
+
 /* Test if a statement is a Fortran "return" */
 bool fortran_return_statement_p(statement s) {
   instruction i = statement_instruction(s);
