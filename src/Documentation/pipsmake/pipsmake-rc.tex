@@ -9954,7 +9954,7 @@ the set of live statements without fix-point. An initial set of live
 statements is extended with new statements reached thru use-def chains,
 control dependences and....
 
-The initial set of live statements contains IO statements, RETURN, STOP,...
+The initial set of live statements contains IO statements, RETURN, STOP, return, exit, abort...
 
 Note that use-def chains are computed intraproceduraly and not
 interproceduraly. Hence some statements may be preserved because they
@@ -9970,25 +9970,13 @@ required.
 This pass was extended to C by Mehdi \textsc{Amini} in 2009-2010, but
 it is not yet stabilized. For C code, this pass requires that effects
 are calculated with property \verb/MEMORY_EFFECTS_ONLY/ set to
-\verb/FALSE/ because we need that the DG includes arcs for declarations as these
-latter are separate statements now.
+\verb/FALSE/ because we need that the DG includes arcs for
+declarations as these latter are separate statements now.
 
-\PipsPassRef{clean_declarations} is automatically done at the end, this is why
-cumulated effects are needed.
+\PipsPassRef{clean_declarations} is automatically performed at the
+end, this is why cumulated effects are needed.
 
-Comments from Nga \textsc{Nguyen}: According to~\cite{ASU86} p. 595,
-and~\cite{Muc97} p. 592, a variable is {\it dead} if it is not used
-on any path from the location in the code where it is defined to the
-exit point of the routine in the question; an instruction is {\it
-  dead} if it computes only values that are not used on any executable
-path leading from the instruction. The transformation that identifies
-and removes such dead code is called dead code elimination. So in
-fact, the {\em Use-def elimination} pass in PIPS is a {\em Dead code
-  elimination} pass and the {\em Suppress dead code} pass (see
-Section~\ref{sec:dead-code-elimination}) does not have a standard
-name. It could be the {\em control simplification} pass.
-
-The following properties are intended to force some functions to be kept by the
+The following properties are intended to force some function calls to be preserved by the
 algorithm, \PipsPropRef{DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS} expect a space
 separated list of function names while
 \PipsPropRef{DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS} expect a space separated list
@@ -10016,6 +10004,20 @@ dead_code_elimination          > MODULE.code
         < MODULE.chains
 \end{PipsMake}
 
+Historical comments from Nga \textsc{Nguyen}: According
+to~\cite{ASU86} p. 595, and~\cite{Muc97} p. 592, a variable is {\it
+  dead} if it is not used on any path from the location in the code
+where it is defined to the exit point of the routine in the question;
+an instruction is {\it dead} if it computes only values that are not
+used on any executable path leading from the instruction. The
+transformation that identifies and removes such dead code is called
+dead code elimination. So in fact, the {\em Use-def elimination} pass
+in PIPS is a {\em Dead code elimination} pass and the {\em Suppress
+  dead code} pass (see Section~\ref{sec:dead-code-elimination}) does
+not have a standard name. It could be the {\em control simplification}
+pass. The wrong initial naming has been fixed, but it shows in PIPS
+source code, in tpips scripts and in validation test cases.
+
 For backward compatibility, the next pass name is preserved.
 
 \begin{PipsMake}
@@ -10026,6 +10028,26 @@ use_def_elimination          > MODULE.code
         < MODULE.proper_effects
         < MODULE.cumulated_effects
         < MODULE.chains
+\end{PipsMake}
+
+\begin{PipsPass}{dead_code_elimination_with_out_regions}
+OUT regions are harder to compute than a simple data dependence graph,
+but they provide two advantages over a standard dead-code
+elimination. They are computed interprocedurally. And they can be used
+to reduce the iteration sets (this is not implemented).
+
+This pass is an experimental pass.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias dead_code_elimination_with_out_regions 'Dead Code Elimination with OUT Regions'
+dead_code_elimination_with_out_regions          > MODULE.code
+                                               > MODULE.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.out_regions
 \end{PipsMake}
 
 \subsection{Control Restructurers}

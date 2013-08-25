@@ -630,6 +630,87 @@ dead_code_elimination_on_a_statement(statement s)
    set_free(the_useful_statements);
 }
 
+static bool non_empty_out_regions_p(statement s)
+{
+  list l_out = load_statement_out_regions(s);
+  list l_out_global = load_statement_out_regions(get_current_module_statement());
+  bool main_p = entity_main_module_p(get_current_module_entity());
+  bool go_down = true;
+  if(s==get_current_module_statement()) {
+    if(entity_main_module_p(get_current_module_entity())) {
+    // FI: IO's have no impact on the out regions of a main...
+    // The OUT regions of a main function are always empty
+      set_add_element(the_useful_statements, the_useful_statements, (char *) s);
+    }
+    else {
+      /* We can remove all statements but must preserve at least one
+       * return statement, although it is useless, so as not to
+       * generate inconsistent C or Fortran code. So, this cannot be
+       * done directly...
+       */
+      set_add_element(the_useful_statements, the_useful_statements, (char *) s);
+    }
+  }
+  else if(declaration_statement_p(s)) {
+    // FI: the OUT regions do not take into account all effects
+    // all declaration statements are preserved to be conservative
+    // Other passes might be able to deal witht them, maybe after a
+    // split_initializations pass
+    set_add_element(the_useful_statements, the_useful_statements, (char *) s);
+  }
+  else if(ENDP(l_out)) {
+    go_down = false;
+  }
+  else if((ENDP(l_out_global) && !main_p)) {
+    /* FI: this does not work because OUT regions do not let
+       distinguish between functions whose returned value is used and
+       functions whose returned value is not used; somehow, the return
+       value should be taken into account by the region analysis. */
+    //go_down = false;
+    set_add_element(the_useful_statements, the_useful_statements, (char *) s);
+  }
+  else {
+    /* Mark statement as useful */
+    set_add_element(the_useful_statements, the_useful_statements, (char *) s);
+  }
+  return go_down;
+}
+
+/**
+ * Caution : callees may be changed and should be updated for the module
+ * owning this statement !
+ */
+static void
+dead_code_elimination_on_a_statement_with_out_regions(statement s)
+{
+   the_useful_statements = set_make(set_pointer);
+   init_control_father();
+   init_statement_father();
+   
+   //ordering_to_dg_mapping = compute_ordering_to_dg_mapping(dependence_graph);
+
+   build_statement_to_statement_father_mapping(s);
+   //build_statement_to_statement_dependence_mapping(dependence_graph);
+
+   /* Mark as useful the seed statements: */
+   gen_recurse(s, statement_domain,
+	       gen_true,
+	       use_def_deal_if_useful);
+
+   /* Propagate the usefulness through all the predecessor graph: */
+   // propagate_the_usefulness_through_the_predecessor_graph();
+   // all statements with a non empty out region are useful
+   gen_recurse(s, statement_domain, non_empty_out_regions_p, gen_null);
+
+   remove_all_the_non_marked_statements(s);
+
+   //hash_table_free(ordering_to_dg_mapping);
+   //free_statement_to_statement_dependence_mapping();
+   close_statement_father();
+   close_control_father();
+   set_free(the_useful_statements);
+}
+
 
 bool dead_code_elimination_on_module(char * module_name, bool use_out_regions)
 {
@@ -642,8 +723,8 @@ bool dead_code_elimination_on_module(char * module_name, bool use_out_regions)
     * arcs for declarations as these latter are separate statements now.
     */
    bool memory_effects_only_p = get_bool_property("MEMORY_EFFECTS_ONLY");
-   if(c_module_p(module) && memory_effects_only_p) {
-     pips_user_warning("Rice parallelization should be run with property "
+   if(c_module_p(module) && memory_effects_only_p && !use_out_regions) {
+     pips_user_error("Rice parallelization should be run with property "
                        "MEMORY_EFFECTS_ONLY set to FALSE.\n");
      return false; // return to pass manager with a failure code
    }
@@ -664,8 +745,9 @@ bool dead_code_elimination_on_module(char * module_name, bool use_out_regions)
       (graph) db_get_memory_resource(DBR_DG, module_name, true);
       */
 
-   dependence_graph =
-      (graph) db_get_memory_resource(DBR_CHAINS, module_name, true);
+   if(!use_out_regions)
+     dependence_graph =
+       (graph) db_get_memory_resource(DBR_CHAINS, module_name, true);
 
    /* The proper effect to detect the I/O operations: */
    set_proper_rw_effects((statement_effects)
@@ -692,8 +774,7 @@ bool dead_code_elimination_on_module(char * module_name, bool use_out_regions)
    keeped_functions_prefix = strsplit(get_string_property("DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS_PREFIX")," ");
 
    if(use_out_regions) {
-     //dead_code_elimination_on_a_statement_with_out_regions(module_statement);
-     ;
+     dead_code_elimination_on_a_statement_with_out_regions(module_statement);
    }
    else
      dead_code_elimination_on_a_statement(module_statement);
@@ -750,15 +831,17 @@ bool dead_code_elimination_on_module(char * module_name, bool use_out_regions)
 bool dead_code_elimination(char * module_name)
 {
   debug_on("DEAD_CODE_ELIMINATION_DEBUG_LEVEL");
-  return dead_code_elimination_on_module(module_name, false);
+  bool success = dead_code_elimination_on_module(module_name, false);
   debug_off();
+  return success;
 }
 
 bool dead_code_elimination_with_out_regions(char * module_name)
 {
   debug_on("DEAD_CODE_ELIMINATION_DEBUG_LEVEL");
-  return dead_code_elimination_on_module(module_name, true);
+  bool success = dead_code_elimination_on_module(module_name, true);
   debug_off();
+  return success;
 }
 
 
@@ -769,8 +852,9 @@ bool dead_code_elimination_with_out_regions(char * module_name)
 bool use_def_elimination(char * module_name)
 {
   debug_on("USE_DEF_ELIMINATION_DEBUG_LEVEL");
-  return dead_code_elimination_on_module(module_name, false);
+  bool success = dead_code_elimination_on_module(module_name, false);
   debug_off();
+  return success;
 }
 
 /* moved from ri-util/statements.c */
