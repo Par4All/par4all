@@ -1,0 +1,14 @@
+int main()
+{
+   int A[500];
+   int i = 0;
+   int condition;
+
+   for(i = 0; i <= 499; i += 1) {
+      condition = 2*i+i*i;
+      if (condition-500==0)
+         A[i] = 40;
+   }
+
+   return A[0];
+}

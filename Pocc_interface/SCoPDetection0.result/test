@@ -1,0 +1,16 @@
+int main()
+{
+   int A[500];
+   int i = 0;
+   {
+      int i;
+
+#pragma scop
+      for(i = 0; i <= 499; i += 1)
+         A[i] = 230;
+#pragma endscop
+
+   }
+
+   return A[0];
+}

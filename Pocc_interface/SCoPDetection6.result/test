@@ -1,0 +1,16 @@
+int main()
+{
+   int A[500];
+   int i = 0;
+   int condition = 0;
+#pragma scop
+   if (condition)
+      for(i = 0; i <= 499; i += 1)
+         A[i] = 405;
+   else
+      for(i = 0; i <= 499; i += 1)
+         A[i] = 456;
+#pragma endscop
+
+   return 0;
+}
