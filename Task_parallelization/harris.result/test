@@ -1,108 +1,63 @@
+// OMP style
 void main(int argc, char *argv[])
 {
-   barrier(
-   spawn(0,
-   InitHarris(in);
-   )
-   )
-   barrier(
-   spawn(0,
-   /* Now we run the Harris procedure */
-   //Sobel
-   SobelX(Gx, in);
-   )
-   spawn(1,
-   SobelY(Gy, in);
-   )
-   )
-   barrier(
-   spawn(0,
-   //Multiply
-   MultiplY(Ixx, Gx, Gx);
-   )
-   spawn(1,
-   MultiplY(Iyy, Gy, Gy);
-   )
-   spawn(2,
-   MultiplY(Ixy, Gx, Gy);
-   )
-   )
-   barrier(
-   spawn(0,
-   //Gauss
-   Gauss(Sxx, Ixx);
-   )
-   spawn(1,
-   Gauss(Syy, Iyy);
-   )
-   spawn(2,
-   Gauss(Sxy, Ixy);
-   )
-   )
-   barrier(
-   spawn(0,
-   //Coarsity
-   CoarsitY(out, Sxx, Syy, Sxy);
-   )
-   )
-}
-void main(int argc, char *argv[])
-{
-   barrier(
-   spawn(0,
-   InitHarris(in);
-   send(1, 1048576, in);
-   )
-   )
-   barrier(
-   spawn(0,
-   /* Now we run the Harris procedure */
-   //Sobel
-   SobelX(Gx, in);
-   send(2, 1046526, Gx);
-   )
-   spawn(1,
-   recv(0, 1048576, in);
-   SobelY(Gy, in);
-   send(2, 1046526, Gy);
-   )
-   )
-   barrier(
-   spawn(0,
-   //Multiply
-   MultiplY(Ixx, Gx, Gx);
-   )
-   spawn(1,
-   MultiplY(Iyy, Gy, Gy);
-   )
-   spawn(2,
-   recv(1, 1046526, Gy);
-   recv(0, 1046526, Gx);
-   MultiplY(Ixy, Gx, Gy);
-   )
-   )
-   barrier(
-   spawn(0,
-   //Gauss
-   Gauss(Sxx, Ixx);
-   )
-   spawn(1,
-   Gauss(Syy, Iyy);
-   send(0, 1046526, Syy);
-   )
-   spawn(2,
-   Gauss(Sxy, Ixy);
-   send(0, 1046526, Sxy);
-   )
-   )
-   barrier(
-   spawn(0,
-   recv(2, 1046526, Sxy);
-   recv(1, 1046526, Syy);
-   //Coarsity
-   CoarsitY(out, Sxx, Syy, Sxy);
-   )
-   )
+#pragma omp parallel default(shared) 
+   {
+#pragma omp single
+      {
+         InitHarris(in);
+      }
+#pragma omp single
+      {
+#pragma omp task
+         {
+            /* Now we run the Harris procedure */
+            //Sobel
+            SobelX(Gx, in);
+         }
+#pragma omp task
+         {
+            SobelY(Gy, in);
+         }
+      }
+#pragma omp single
+      {
+#pragma omp task
+         {
+            //Multiply
+            MultiplY(Ixx, Gx, Gx);
+         }
+#pragma omp task
+         {
+            MultiplY(Iyy, Gy, Gy);
+         }
+#pragma omp task
+         {
+            MultiplY(Ixy, Gx, Gy);
+         }
+      }
+#pragma omp single
+      {
+#pragma omp task
+         {
+            //Gauss
+            Gauss(Sxx, Ixx);
+         }
+#pragma omp task
+         {
+            Gauss(Syy, Iyy);
+         }
+#pragma omp task
+         {
+            Gauss(Sxy, Ixy);
+         }
+      }
+#pragma omp single
+      {
+         //Coarsity
+         CoarsitY(out, Sxx, Syy, Sxy);
+      }
+   }
 }
 // MPI style
 void main(int argc, char *argv[])
@@ -165,73 +120,4 @@ void main(int argc, char *argv[])
       MPI_Barrier(MPI_COMM_WORLD);
    }
    MPI_Finalize();
-}
-// OMP style
-void main(int argc, char *argv[])
-{
-#pragma omp parallel default(shared) 
-#pragma omp single
-   {
-      InitHarris(in);
-
-   }
-#pragma omp single
-   {
-#pragma omp task
-      {
-         /* Now we run the Harris procedure */
-         //Sobel
-         SobelX(Gx, in);
-
-      }
-#pragma omp task
-      {
-
-         SobelY(Gy, in);
-
-      }
-   }
-#pragma omp single
-   {
-#pragma omp task
-      {
-         //Multiply
-         MultiplY(Ixx, Gx, Gx);
-      }
-#pragma omp task
-      {
-         MultiplY(Iyy, Gy, Gy);
-      }
-#pragma omp task
-      {
-
-
-         MultiplY(Ixy, Gx, Gy);
-      }
-   }
-#pragma omp single
-   {
-#pragma omp task
-      {
-         //Gauss
-         Gauss(Sxx, Ixx);
-      }
-#pragma omp task
-      {
-         Gauss(Syy, Iyy);
-
-      }
-#pragma omp task
-      {
-         Gauss(Sxy, Ixy);
-
-      }
-   }
-#pragma omp single
-   {
-
-
-      //Coarsity
-      CoarsitY(out, Sxx, Syy, Sxy);
-   }
 }

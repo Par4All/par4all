@@ -1,62 +1,35 @@
+// OMP style
 void main(int argc, char *argv[])
 {
    //PIPS generated variable
-   double b, a, C[10], B[10], A[10];
+   double C[10], B[10], A[10];
    //PIPS generated variable
    unsigned int N, i;
-   barrier(
-   spawn(0,
-   N = 10;
-   )
-   )
-   barrier(
-   spawn(0,
-   for(i = 0; i < N; i += 1)
-      A[i] = 5;
-   )
-   spawn(1,
-   for(i = 0; i < N; i += 1)
-      B[i] = 3;
-   )
-   )
-   barrier(
-   spawn(0,
-   for(i = 0; i < N; i += 1)
-      C[i] += A[i]+B[i];
-   )
-   )
-}
-void main(int argc, char *argv[])
-{
-   //PIPS generated variable
-   double b, a, C[10], B[10], A[10];
-   //PIPS generated variable
-   unsigned int N, i;
-   barrier(
-   spawn(0,
-   N = 10;
-   send(1, 1, N);
-   )
-   )
-   barrier(
-   spawn(0,
-   for(i = 0; i < N; i += 1)
-      A[i] = 5;
-   )
-   spawn(1,
-   recv(0, 1, N);
-   for(i = 0; i < N; i += 1)
-      B[i] = 3;
-   send(0, 10, B);
-   )
-   )
-   barrier(
-   spawn(0,
-   recv(1, 10, B);
-   for(i = 0; i < N; i += 1)
-      C[i] += A[i]+B[i];
-   )
-   )
+#pragma omp parallel default(shared) 
+   {
+#pragma omp single
+      {
+         N = 10;
+      }
+#pragma omp single
+      {
+#pragma omp task
+         {
+            for(i = 0; i < N; i += 1)
+               A[i] = 5;
+         }
+#pragma omp task
+         {
+            for(i = 0; i < N; i += 1)
+               B[i] = 3;
+         }
+      }
+#pragma omp single
+      {
+         for(i = 0; i < N; i += 1)
+            C[i] += A[i]+B[i];
+      }
+   }
 }
 void main(int argc, char *argv[])
 {
@@ -70,7 +43,7 @@ void main(int argc, char *argv[])
       MPI_Init(&argc, &argv);
       MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
       //PIPS generated variable
-      double b, a, C[10], B[10], A[10];
+      double C[10], B[10], A[10];
       //PIPS generated variable
       unsigned int N, i;
       if (rank0==0) {
@@ -96,39 +69,4 @@ void main(int argc, char *argv[])
       MPI_Barrier(MPI_COMM_WORLD);
    }
    MPI_Finalize();
-}
-// OMP style
-void main(int argc, char *argv[])
-{
-   //PIPS generated variable
-   double b, a, C[10], B[10], A[10];
-   //PIPS generated variable
-   unsigned int N, i;
-#pragma omp parallel default(shared) 
-#pragma omp single
-   {
-      N = 10;
-
-   }
-#pragma omp single
-   {
-#pragma omp task
-      {
-         for(i = 0; i < N; i += 1)
-            A[i] = 5;
-      }
-#pragma omp task
-      {
-
-         for(i = 0; i < N; i += 1)
-            B[i] = 3;
-
-      }
-   }
-#pragma omp single
-   {
-
-      for(i = 0; i < N; i += 1)
-         C[i] += A[i]+B[i];
-   }
 }
