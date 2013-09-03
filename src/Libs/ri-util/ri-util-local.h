@@ -2250,6 +2250,18 @@ enum {
 #define SIGNAL_FUNCTION_NAME                        "signal"  
 #define WAIT_FUNCTION_NAME                          "wait"   
 
+
+/*MPI calls*/
+#define MPI_INIT "MPI_Init"
+#define MPI_FINALIZE "MPI_Finalize"
+#define MPI_ISEND "MPI_Isend"
+#define MPI_RECV "MPI_Recv"
+#define MPI_BARRIER "MPI_Barrier"
+
+/*MPI types*/
+#define MPI_STATUS "MPI_Status"
+#define MPI_REQUEST "MPI_Request"
+
 /* intrinsic entity declarations */
 #define ENTITY_SEND_P(e)              ENTITY_NAME_P(e, "send")
 

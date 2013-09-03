@@ -1271,6 +1271,14 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {SEND_FUNCTION_NAME,                  c_io_effects},
   {RECV_FUNCTION_NAME,                  c_io_effects},
 
+  /* MPI intrinsics */
+  {MPI_INIT, no_write_effects},
+  {MPI_FINALIZE, no_write_effects}, 
+  {MPI_ISEND, no_write_effects},
+  {MPI_RECV, no_write_effects}, 
+  {MPI_BARRIER, no_write_effects},
+
+
   /* {int mblen(const char *, size_t, 0, 0},
      {size_t mbstowcs(wchar_t *, const char *, size_t, 0, 0},
      {int mbtowc(wchar_t *, const char *, size_t, 0, 0},

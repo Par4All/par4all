@@ -604,10 +604,11 @@ bool sequence_dependence_graph(char * module_name)
   set_methods_for_convex_effects();
   init_convex_rw_prettyprint(module_name);
  
-  sdg = (graph) db_get_memory_resource (DBR_DG, module_name, true );
+  ddg = (graph) db_get_memory_resource (DBR_DG, module_name, true );
   /*ddg contains the original dependences before clustering and  scheduling, it
-    is used to construct the SDG*/
-  ddg = copy_graph(sdg);
+    is saved to not make a side effect on the original dg when
+    constructing the SDG*/
+  sdg = copy_graph(ddg);
   sdg = partitioning_sdg(module_stat);
   tg_name = strdup(concatenate(db_get_current_workspace_directory(),
 			       "/",module_name,"/",module_name, "_sdg.dot", NULL));
@@ -619,7 +620,7 @@ bool sequence_dependence_graph(char * module_name)
   free(tg_name);
   
   reset_ordering_to_statement();
-  DB_PUT_MEMORY_RESOURCE(DBR_DG, module_name, (char*) sdg);
+  DB_PUT_MEMORY_RESOURCE(DBR_SDG, module_name, (char*) sdg);
   
   reset_proper_rw_effects();
   reset_cumulated_rw_effects();

@@ -5568,7 +5568,14 @@ CreateIntrinsics( set module_list )
 	/*SPIRE*/
 	{SEND_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
 	{RECV_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-       
+ 
+        /*MPI necessary calls*/
+	{MPI_INIT, (INT_MAX), overloaded_to_integer_type, 0, 0},
+	{MPI_FINALIZE, (INT_MAX), overloaded_to_integer_type, 0, 0}, 
+	{MPI_ISEND, (INT_MAX), overloaded_to_integer_type, 0, 0},
+	{MPI_RECV, (INT_MAX), overloaded_to_integer_type, 0, 0}, 
+	{MPI_BARRIER, (INT_MAX), overloaded_to_integer_type, 0, 0},
+
 	{NULL, 0, 0, 0, 0}
     };
     intrinsic_type_descriptor_mapping=hash_table_make(hash_string,sizeof(IntrinsicTypeDescriptorTable));

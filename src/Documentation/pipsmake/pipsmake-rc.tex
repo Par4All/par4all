@@ -8792,13 +8792,13 @@ SCALOPES_SERVER_TASK_PREFIX "P4A_sesam_server_"
 \subsection{Sequence Dependence DAG (SDG)}
 A Sequence Dependence DAG $G$ is a data dependence DAG where task vertices $\tau$ are labeled with statements, while control dependences are encoded in the abstract syntax trees of statements. Any statement $S$ can label a DAG vertex, i.e. each vertex $\tau$  contains a statement $S$, which corresponds to the code it runs when scheduled.  An SDG is not built only on simple instructions, represented as $call$ statements; compound statements such as test statements (both true and false branches) and loop nests may constitute indivisible vertices of the SDG
 
-\begin{PipsPass}{hbdsc_parallelization}
+\begin{PipsPass}{sequence_dependence_graph}
 Phase \texttt{sequence\_dependence\_graph} generates the Sequence
 Dependence Graph (SDG) in the dg ressource and in a dot file.
 \end{PipsPass}
 
 \begin{PipsMake}
-sequence_dependence_graph                       > MODULE.dg                    
+sequence_dependence_graph                       > MODULE.sdg                    
         < PROGRAM.entities                  
         < MODULE.code
         < MODULE.proper_effects
@@ -8825,11 +8825,11 @@ in a dot file.
 \end{PipsPass}
 
 \begin{PipsMake}
-hbdsc_parallelization                       > MODULE.dg                    
+hbdsc_parallelization                       > MODULE.sdg                    
         < PROGRAM.entities                  > MODULE.schedule
         < MODULE.code
         < MODULE.proper_effects
-        < MODULE.dg
+        < MODULE.sdg
         < MODULE.regions
         < MODULE.in_regions
         < MODULE.out_regions
@@ -8942,40 +8942,39 @@ The parallel code is represented using  SPIRE of PIPS: A Generic
 Sequential to Parallel Intermediate Representation Extension applied
 to PIPS.
 
-\begin{PipsPass}{spire_unstructured_to_structured}
-Phase \texttt{spire\_unstructured\_to\_structured} applies BDSC and generates the parallel code SPIRE.
+\begin{PipsPass}{spire_shared_unstructured_to_structured}
+Phase \texttt{spire\_shared\_unstructured\_to\_structured} applies BDSC and generates the parallel code SPIRE.
 \end{PipsPass}
 
 \begin{PipsMake}
-spire_unstructured_to_structured                   > MODULE.code
-        < PROGRAM.entities                   > MODULE.schedule
+spire_shared_unstructured_to_structured                   > MODULE.shared_spire_code
+        < PROGRAM.entities                                > MODULE.code
         < MODULE.code
-        < MODULE.dg
+        < MODULE.sdg
         < MODULE.schedule
 \end{PipsMake}
 
-
-\begin{PipsPass}{hbdsc_gen_communications}
-Phase \texttt{hbdsc\_gen\_communications} generates send and recv primitives.
+\begin{PipsPass}{spire_distributed_unstructured_to_structured}
+Phase \texttt{spire\_distributed\_unstructured\_to\_structured}
+applies BDSC, generates the parallel code SPIRE (spawn and barrier
+constructs) and inserts send and recv primitives.
 \end{PipsPass}
 
-
 \begin{PipsMake}
-hbdsc_gen_communications                    > MODULE.code
-        < PROGRAM.entities
+spire_distributed_unstructured_to_structured                   > MODULE.distributed_spire_code
+        < PROGRAM.entities                                     > MODULE.code
         < MODULE.code
-        = MODULE.dg
-        = MODULE.schedule
-        = MODULE.cumulated_effects
-        = MODULE.summary_effects
-        = MODULE.transformers
-        = MODULE.preconditions
-        = MODULE.regions
-        = MODULE.in_regions
-        = MODULE.out_regions
-
-
+        < MODULE.schedule
+        < MODULE.sdg
+        < MODULE.regions
+        < MODULE.in_regions
+        < MODULE.out_regions
+        < MODULE.transformers
+        < MODULE.preconditions
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
 \end{PipsMake}
+
 
 \subsection{SPIRE-Based Parallel Code Generation}
 SPIRE is designed in such a way that it can facilitate the generation
@@ -8990,18 +8989,11 @@ intermediate representation.
 \begin{PipsMake}
 openmp_task_generation                  > MODULE.parallelized_code
         < PROGRAM.entities
-        < MODULE.code
+        < MODULE.shared_spire_code
 \end{PipsMake}
 
-\begin{PipsPass}{print_parallelizedOMPTASK_code}
-Output the code decorated with OpenMP (omp task) directives.
-\end{PipsPass}
-
-\begin{PipsMake}
-print_parallelizedOMPTASK_code     > MODULE.parallelprinted_file
-        < PROGRAM.entities
-        < MODULE.parallelized_code
-\end{PipsMake}
+And to output the code decorated with OpenMP (omp task)
+directives, we use the existing pass print\_parallelizedOMP\_code
 
 
 \begin{PipsPass}{mpi_task_generation}
@@ -9012,7 +9004,7 @@ intermediate representation.
 \begin{PipsMake}
 mpi_task_generation                  > MODULE.parallelized_code
         < PROGRAM.entities
-        < MODULE.code
+        < MODULE.distributed_spire_code
 \end{PipsMake}
 
 \begin{PipsPass}{print_parallelizedMPI_code}
@@ -15012,7 +15004,6 @@ alias print_parallelizedHPF_code 'HPF directives'
 alias print_parallelizedOMP_code 'OMP directives'
 alias print_parallelized90_code 'Fortran 90'
 alias print_parallelizedcray_code 'Fortran Cray'
-alias print_parallelizedOMPTASK_code 'C OMP task directives'
 alias print_parallelizedMPI_code 'C MPI'
 \end{PipsMake}
 

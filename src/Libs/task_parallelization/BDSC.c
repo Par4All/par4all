@@ -103,7 +103,10 @@ void allocate_task_to_cluster(statement ready_st, int cl_p, int order){
   an->scheduled = true;
   an->order_sched = order;
   an->cluster = cl_p;
-  extend_persistant_statement_to_schedule(stmt_to_schedule, ready_st, cl_p);
+  if(!bound_persistant_statement_to_cluster_p(stmt_to_cluster, statement_ordering(ready_st)))
+    extend_persistant_statement_to_cluster(stmt_to_cluster, statement_ordering(ready_st), cl_p);
+  else
+    update_persistant_statement_to_cluster(stmt_to_cluster, statement_ordering(ready_st), cl_p);
   //delete ready_st from successors(tasks(cl_p))
   FOREACH(VERTEX, pre, vertices) {
     statement parent = vertex_to_statement(pre);
@@ -144,7 +147,7 @@ static void move_task_to_cluster(statement ready_st, int cl_p){
   cl->time = time -  an->task_time;
   gen_array_addto(clusters, an->cluster, cl); 
   an->cluster = cl_p;
-  extend_persistant_statement_to_schedule(stmt_to_schedule, ready_st, cl_p);
+  extend_persistant_statement_to_cluster(stmt_to_cluster, statement_ordering(ready_st), cl_p);
   cl = gen_array_item(clusters, cl_p);
   time = cl->time;
   cl->time = time > an->tlevel + an->task_time? time : an->tlevel + an->task_time;
@@ -475,8 +478,8 @@ static void cancel_schedule(gen_array_t annotations_s, list stmts)
     annotation *item = gen_array_item(annotations,(int)statement_ordering(s));
     item->scheduled = vs->scheduled;
     item->cluster = vs->cluster;
-    if(bound_persistant_statement_to_schedule_p(stmt_to_schedule, s))
-      update_persistant_statement_to_schedule(stmt_to_schedule, s, item->cluster);
+    if(bound_persistant_statement_to_cluster_p(stmt_to_cluster, statement_ordering(s)))
+      update_persistant_statement_to_cluster(stmt_to_cluster, statement_ordering(s), item->cluster);
     item->edge_cost = vs->edge_cost;
     gen_array_addto(annotations, (int)statement_ordering(s), item);
   }

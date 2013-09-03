@@ -45,7 +45,7 @@ typedef dg_vertex_label vertex_label;
 #include "chains.h"
 #include "task_parallelization.h"
 
-static int nb_omp_parallel = 0;
+static bool omp_parallel = false;
 
 static void gen_omp_taskwait(statement stmt)
 {
@@ -59,9 +59,29 @@ static void gen_omp_taskwait(statement stmt)
 }
 static void gen_omp_parallel(statement stmt){
   string data = strdup(concatenate( "omp parallel default(shared) ",NULL));
-  add_pragma_str_to_statement (stmt, data, true);
+  if(statement_sequence_p(stmt)){
+    list stmts = sequence_statements(statement_sequence(stmt)), body = NIL, decls = NIL;
+    statement st_body = statement_undefined;
+    FOREACH(STATEMENT, st, stmts){
+      if(declaration_statement_p(st))
+	decls =  CONS(STATEMENT, st, decls);
+      else
+	body = CONS(STATEMENT, st, body);
+    }
+    if(gen_length(body)>0){
+      st_body = make_block_statement(gen_nreverse(body));
+      add_pragma_str_to_statement (st_body, data, true);
+      decls =  CONS(STATEMENT, st_body, decls);
+    }
+    if(gen_length(decls)>0){
+      statement_instruction(stmt) = make_instruction_sequence(make_sequence(gen_nreverse(decls)));
+    }
+  }      
+  else
+    add_pragma_str_to_statement (stmt, data, true);
   return;
 }
+
 static bool gen_synchronization(statement stmt, bool nested_p, int length)
 {
  synchronization sync  = statement_synchronization(stmt);
@@ -69,10 +89,8 @@ static bool gen_synchronization(statement stmt, bool nested_p, int length)
   case is_synchronization_spawn:
     if(length>1){
       add_pragma_str_to_statement(stmt, "omp task", true);
-      if(nb_omp_parallel == 0){
-	gen_omp_parallel(stmt);
-	nb_omp_parallel = 1;
-      }
+      if(!omp_parallel)
+	omp_parallel = true;
     }
     break;
   case is_synchronization_barrier:
@@ -85,10 +103,8 @@ static bool gen_synchronization(statement stmt, bool nested_p, int length)
 	if(gen_length(sequence_statements(statement_sequence(stmt)))>1)
 	  gen_omp_taskwait(stmt);
       }
-    if(nb_omp_parallel == 0){
-      gen_omp_parallel(stmt);
-      nb_omp_parallel = 1;
-    }
+    if(!omp_parallel)
+      omp_parallel = true;
     break;
   default:
     break;
@@ -141,16 +157,16 @@ static bool gen_openmp(statement stmt, bool nested_p){
 /* OpenMP generation pass */
 bool openmp_task_generation(char * module_name)
 { 
-  entity	module;
-  statement	module_stat;
-  module = local_name_to_top_level_entity(module_name);
-  module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, false);
+  statement module_stat_i = (statement)db_get_memory_resource(DBR_SHARED_SPIRE_CODE, module_name, true);
+  statement module_stat = copy_statement(module_stat_i);
   set_ordering_to_statement(module_stat);
   set_current_module_entity(module_name_to_entity(module_name));
   set_current_module_statement(module_stat);
   if (get_bool_property("SPIRE_GENERATION")) 
     set_bool_property("SPIRE_GENERATION", false);
   gen_openmp(module_stat, false);
+  if(omp_parallel)
+    gen_omp_parallel(module_stat);
   module_reorder(module_stat);
   DB_PUT_MEMORY_RESOURCE(DBR_PARALLELIZED_CODE, module_name, module_stat);
   reset_current_module_statement();

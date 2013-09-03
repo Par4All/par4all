@@ -34,6 +34,7 @@
 
 #include "effects-convex.h"
 #include "genC.h"
+#include "syntax.h"
 
 #include "complexity_ri.h"
 #include "dg.h"
@@ -54,7 +55,6 @@ static void gen_mpi_send_recv(statement stmt)
   list args = NIL, list_stmts = NIL;
   list lexpr = call_arguments(instruction_call(statement_instruction(stmt)));
   expression dest = EXPRESSION(CAR(lexpr)); expression size; 
-  statement st;
   int pair = 0; 
   entity name;
   if(native_instruction_p(statement_instruction(stmt), SEND_FUNCTION_NAME)){
@@ -82,12 +82,13 @@ static void gen_mpi_send_recv(statement stmt)
 	args = CONS(EXPRESSION, make_entity_expression(make_constant_entity("MPI_FLOAT", is_basic_string, 100), NIL), args);
       args = CONS(EXPRESSION, size, args);
       args = CONS(EXPRESSION, expr, args);
-      st = make_statement(
-			  statement_label(stmt),
+      instruction com_call = make_instruction(is_instruction_call, make_call(name, (args)));
+      statement st = make_statement(
+			  entity_empty_label(),
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED,
 			  empty_comments,
-			  make_instruction(is_instruction_call, make_call(name, (args))),
+			  com_call,
 			  NIL, NULL, empty_extensions(), make_synchronization_none());
       list_stmts = CONS(STATEMENT, st, list_stmts);
     }
@@ -95,6 +96,9 @@ static void gen_mpi_send_recv(statement stmt)
       size = expr;
   }
   statement_instruction(stmt) = make_instruction_sequence(make_sequence(gen_nreverse(list_stmts)));  
+  statement_extensions(stmt) = statement_extensions(stmt);
+  statement_comments(stmt) = empty_comments;
+  statement_synchronization(stmt) = make_synchronization_none();
   return;
 }
 
@@ -111,10 +115,12 @@ static void gen_if_rank(statement stmt, synchronization sync){
 		      NIL, NULL, empty_extensions(), make_synchronization_none());
   test new_test = make_test( test_condition,
 			st,
-			make_continue_statement(entity_undefined));
+			     make_empty_statement());
   instruction inst = make_instruction(is_instruction_test, new_test);
-  free_instruction(statement_instruction(stmt));
   statement_instruction(stmt) = inst;
+  statement_extensions(stmt) = statement_extensions(stmt);
+  statement_comments(stmt) = empty_comments;
+  statement_synchronization(stmt) = make_synchronization_none();
   return;
 }
 
@@ -122,30 +128,22 @@ static void gen_if_rank(statement stmt, synchronization sync){
  * hierarchical mpi is not implemented yet (nesting_level = 2)*/
 static int gen_mpi(statement stmt, int nesting_level){
   synchronization sync  = statement_synchronization(stmt);
-  entity name;
   instruction inst;
-  statement st, new_s; list list_stmts = NIL, args = NIL;
+  statement new_s; list list_stmts = NIL, args = NIL;
   switch(synchronization_tag(sync)){
   case is_synchronization_spawn:
     nesting_level = 1;
     gen_if_rank(stmt, sync);
     break;
   case is_synchronization_barrier:
-    name = make_constant_entity("MPI_Barrier",is_basic_string, 100);
     args = CONS(EXPRESSION, make_entity_expression(make_constant_entity("MPI_COMM_WORLD", is_basic_string, 100), NIL), NIL); 
-    st = make_statement(
-			statement_label(stmt),
-			STATEMENT_NUMBER_UNDEFINED,
-			STATEMENT_ORDERING_UNDEFINED,
-			empty_comments,
-			make_instruction(is_instruction_call, make_call(name, gen_nreverse(args))),
-			NIL, NULL, empty_extensions(), make_synchronization_none());
+    statement st = make_call_statement(MPI_BARRIER, args, entity_undefined, string_undefined);
     new_s = make_statement(
 			   statement_label(stmt),
 			   STATEMENT_NUMBER_UNDEFINED,
 			   STATEMENT_ORDERING_UNDEFINED,
 			   statement_comments(stmt),
-			   statement_instruction(stmt),
+			   copy_instruction(statement_instruction(stmt)),
 			   NIL, NULL, statement_extensions(stmt), make_synchronization_none());
     list_stmts = CONS(STATEMENT, new_s, CONS(STATEMENT, st, NIL));
     inst = make_instruction_sequence(make_sequence(list_stmts));
@@ -197,10 +195,9 @@ static void gen_flat_mpi(statement stmt, int nesting_level)
     case is_instruction_call:
       if(com_instruction_p(statement_instruction(stmt))){
 	if(nesting_level == 2)
-	  statement_instruction(stmt) = make_continue_instruction();
-	else{
+	  update_statement_instruction(stmt, make_continue_instruction());
+	else
 	  gen_mpi_send_recv(stmt);
-	}
       }
       break;
     default:
@@ -221,25 +218,32 @@ static statement mpi_initialize(statement stmt, entity module){
   list args = NIL, list_stmts = NIL;
   statement st = statement_undefined;
   rank = make_new_scalar_variable_with_prefix("rank", module, MakeBasic(is_basic_int));
-  entity stat =   FindOrCreateEntity("mpi_status_a", TYPEDEF_PREFIX "MPI_Status");
+  entity stat =   FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, MPI_STATUS);//TYPEDEF_PREFIX "MPI_Status");
   if(storage_undefined_p(entity_storage(stat)))
     {
       entity_storage(stat) = make_storage_rom();
-      put_new_typedef("MPI_Status");
+      put_new_typedef(MPI_STATUS);
     }
   type stat_t =MakeTypeVariable(make_basic_typedef(stat), NIL);
+  if(type_undefined_p(entity_type(stat))) {
+    entity_type(stat) = ImplicitType(stat);
+  }
   mpi_status = make_new_scalar_variable_with_prefix("status", module,MakeBasic(is_basic_int) );
   entity_type(mpi_status) = stat_t;
   
-  entity req =   FindOrCreateEntity("mpi_request_a", TYPEDEF_PREFIX "MPI_Request");
+  entity req =   FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, MPI_REQUEST);//TYPEDEF_PREFIX "MPI_Request");
   if(storage_undefined_p(entity_storage(req)))
     {
       entity_storage(req) = make_storage_rom();
-      put_new_typedef("MPI_Request");
+      put_new_typedef(MPI_REQUEST);
     }
   type req_t =MakeTypeVariable(make_basic_typedef(req), NIL);
+  if(type_undefined_p(entity_type(req))) {
+    entity_type(req) = ImplicitType(req);
+  }
   mpi_request = make_new_scalar_variable_with_prefix("request", module,MakeBasic(is_basic_int) );
   entity_type(mpi_request) = req_t;
+  gen_consistent_p((gen_chunk*)mpi_request);
   
   entity name = make_constant_entity("MPI_Init",is_basic_string, 100);
   args = CONS(EXPRESSION, make_address_of_expression(make_entity_expression(make_constant_entity("argc", is_basic_string, 100), NIL)),args);
@@ -273,15 +277,14 @@ static statement mpi_initialize(statement stmt, entity module){
 		      NIL, NULL, empty_extensions(), make_synchronization_none());
   statement new_s = make_statement(
 				   statement_label(stmt),
-				   statement_number(stmt),//STATEMENT_NUMBER_UNDEFINED,
-				   statement_ordering(stmt),//STATEMENT_ORDERING_UNDEFINED,
+				   STATEMENT_NUMBER_UNDEFINED,
+				   STATEMENT_ORDERING_UNDEFINED,
 				   statement_comments(stmt),
-				   statement_instruction(stmt),
+				   copy_instruction(statement_instruction(stmt)),
 				   NIL, NULL, statement_extensions(stmt), statement_synchronization(stmt));
   list_stmts = CONS(STATEMENT, new_s, CONS(STATEMENT, st, NIL));
   statement_instruction(stmt) = make_instruction_sequence(make_sequence(gen_nreverse(list_stmts)));
-  //free_extensions(statement_extensions(stmt));
-  statement_extensions(stmt) = statement_extensions(stmt);// empty_extensions();
+  statement_extensions(stmt) = statement_extensions(stmt);
   statement_comments(stmt) = empty_comments;
   statement_synchronization(stmt) = make_synchronization_none();
   AddLocalEntityToDeclarations(rank, module, stmt);
@@ -291,26 +294,21 @@ static statement mpi_initialize(statement stmt, entity module){
 }
             
 static void mpi_finalize(statement stmt){
-  entity name = make_constant_entity("MPI_Finalize",is_basic_string, 100);
   list args = CONS(EXPRESSION, make_entity_expression(make_constant_entity("", is_basic_string, 100), NIL), NIL); 
-  statement st = make_statement(
-		      statement_label(stmt),
-		      STATEMENT_NUMBER_UNDEFINED,
-		      STATEMENT_ORDERING_UNDEFINED,
-		      empty_comments,
-		      make_instruction(is_instruction_call, make_call(name, args)),
-		      NIL, NULL, empty_extensions(), make_synchronization_none());
+  statement st = make_call_statement(MPI_FINALIZE, args, entity_undefined, string_undefined);
   list list_stmts = CONS(STATEMENT, st, CONS(STATEMENT, copy_statement(stmt), NIL));
   statement_instruction(stmt) = make_instruction_sequence(make_sequence(gen_nreverse(list_stmts)));  
+  statement_extensions(stmt) = statement_extensions(stmt);
+  statement_comments(stmt) = empty_comments;
+  statement_synchronization(stmt) = make_synchronization_none();
   return;
 }
 
 bool mpi_task_generation(char * module_name)
 { 
-  entity	module;
-  statement	module_stat;
-  module = local_name_to_top_level_entity(module_name);
-  module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, false);
+  entity    module = local_name_to_top_level_entity(module_name);
+  statement module_stat_i = (statement)db_get_memory_resource(DBR_DISTRIBUTED_SPIRE_CODE, module_name, true);
+  statement module_stat = copy_statement(module_stat_i);
   set_ordering_to_statement(module_stat);
   set_current_module_entity(module_name_to_entity(module_name));
   set_current_module_statement(module_stat);
@@ -319,9 +317,9 @@ bool mpi_task_generation(char * module_name)
   init_stmt = mpi_initialize(module_stat, module);
   gen_flat_mpi(module_stat, 0);
   mpi_finalize(module_stat);
-  gen_consistent_p((gen_chunk*)module_stat);
   module_reorder(module_stat);
-  DB_PUT_MEMORY_RESOURCE(DBR_PARALLELIZED_CODE, strdup(module_name), (char*)module_stat);
+  gen_consistent_p((gen_chunk*)module_stat);
+  DB_PUT_MEMORY_RESOURCE(DBR_PARALLELIZED_CODE, module_name, module_stat);
   reset_current_module_statement();
   reset_current_module_entity();
   reset_ordering_to_statement();

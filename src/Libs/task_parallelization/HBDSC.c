@@ -53,7 +53,7 @@ graph kdg, ddg;
 
 #define MAX_ITER 1
 
-persistant_statement_to_schedule stmt_to_schedule = persistant_statement_to_schedule_undefined;
+persistant_statement_to_cluster stmt_to_cluster;// = persistant_statement_to_cluster_undefined;
 
 
 static gen_array_t schedule_failsafe(){
@@ -83,8 +83,8 @@ static void cancel_schedule(gen_array_t annotations_s, list stmts)
     annotation *item = gen_array_item(annotations,(int)statement_ordering(s));
     item->scheduled = vs->scheduled;
     item->cluster = vs->cluster;
-    if(bound_persistant_statement_to_schedule_p(stmt_to_schedule, s))
-      update_persistant_statement_to_schedule(stmt_to_schedule, s, item->cluster);
+    if(bound_persistant_statement_to_cluster_p(stmt_to_cluster, statement_ordering(s)))
+      update_persistant_statement_to_cluster(stmt_to_cluster, statement_ordering(s), item->cluster);
     item->edge_cost = vs->edge_cost;
     gen_array_addto(annotations, (int)statement_ordering(s), item);
   }
@@ -152,8 +152,8 @@ static list rebuild_topological_sort(list stages){
       list list_stmts = NIL;
       FOREACH(STATEMENT, st, stage) {
 	if(!declaration_statement_p(st)) {
-	  if(bound_persistant_statement_to_schedule_p(stmt_to_schedule,st)){
-	    if(apply_persistant_statement_to_schedule(stmt_to_schedule, st) == i)
+	  if(bound_persistant_statement_to_cluster_p(stmt_to_cluster,statement_ordering(st))){
+	    if(apply_persistant_statement_to_cluster(stmt_to_cluster, statement_ordering(st)) == i)
 	      list_stmts = CONS(STATEMENT, st, list_stmts);
 	  }
 	}
@@ -165,8 +165,8 @@ static list rebuild_topological_sort(list stages){
       list list_stmts = NIL;
       FOREACH(STATEMENT, st, stage) {
 	if(!declaration_statement_p(st)) {
-	  if(bound_persistant_statement_to_schedule_p(stmt_to_schedule,st)){
-	    if(apply_persistant_statement_to_schedule(stmt_to_schedule, st) == -1) 
+	  if(bound_persistant_statement_to_cluster_p(stmt_to_cluster,statement_ordering(st))){
+	    if(apply_persistant_statement_to_cluster(stmt_to_cluster, statement_ordering(st)) == -1) 
 	      list_stmts = CONS(STATEMENT, st, list_stmts);
 	  }
 	  else
@@ -413,7 +413,7 @@ bool hbdsc_parallelization(char * module_name)
   set_out_effects((statement_effects) db_get_memory_resource(DBR_OUT_REGIONS, module_name, true));
   set_methods_for_convex_effects();
   init_convex_rw_prettyprint(module_name);
-  kdg = (graph) db_get_memory_resource (DBR_DG, module_name, true );
+  kdg = (graph) db_get_memory_resource (DBR_SDG, module_name, true );
   /*Complexities (task processing time)*/
   set_complexity_map( (statement_mapping) db_get_memory_resource(DBR_COMPLEXITIES, module_name, true));
   /*Properties to set the parameters of BDSC*/
@@ -429,9 +429,7 @@ bool hbdsc_parallelization(char * module_name)
     initialization(kdg, annotations);
   else
     parse_instrumented_file(INSTRUMENTED_FILE, kdg, annotations);
-
- 
-  stmt_to_schedule = make_persistant_statement_to_schedule();
+  stmt_to_cluster = make_persistant_statement_to_cluster();
   hierarchical_schedule(module_stat, 0, NBCLUSTERS, MEMORY_SIZE, false);
   tg_name = strdup(concatenate(db_get_current_workspace_directory(),
 			       "/",module_name,"/",module_name, "_scheduled_sdg.dot", NULL));
@@ -442,9 +440,9 @@ bool hbdsc_parallelization(char * module_name)
   safe_fclose(ftg, tg_name);
   free(tg_name);
   
-  //reset_ordering_to_statement();
-  DB_PUT_MEMORY_RESOURCE(DBR_DG, module_name, (char*) kdg);
-  DB_PUT_MEMORY_RESOURCE(DBR_SCHEDULE, module_name, stmt_to_schedule);
+  DB_PUT_MEMORY_RESOURCE(DBR_SDG, module_name, (char*) kdg);
+  gen_consistent_p((gen_chunk*)stmt_to_cluster);
+  DB_PUT_MEMORY_RESOURCE(DBR_SCHEDULE, module_name, (char*) stmt_to_cluster);
   reset_proper_rw_effects();
   reset_cumulated_rw_effects();
   reset_ordering_to_statement();
@@ -452,7 +450,7 @@ bool hbdsc_parallelization(char * module_name)
   reset_in_effects();
   reset_out_effects();
   reset_precondition_map();
-  //reset_complexity_map();
+  reset_complexity_map();
   reset_transformer_map();
   reset_current_module_statement();
   reset_current_module_entity();
@@ -510,7 +508,7 @@ bool dsc_code_parallelization(char * module_name)
   else
     parse_instrumented_file(INSTRUMENTED_FILE, kdg, annotations);
 
-  stmt_to_schedule = make_persistant_statement_to_schedule();
+  stmt_to_cluster = make_persistant_statement_to_cluster();
   /*DSC-based top-down hierarchical scheduling*/
   hierarchical_schedule(module_stat, 0, NBCLUSTERS, MEMORY_SIZE, true);
   /* Reorder the module, because new statements have been generated. */

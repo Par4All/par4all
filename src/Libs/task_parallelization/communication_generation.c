@@ -2,10 +2,6 @@
     #include "pips_config.h"
 #endif
 
-// FI: to point out issues with the current code, and my suggested changes
-#define DOUNIA
-#define DOUNIA_1
-
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
@@ -61,7 +57,6 @@ bool com_instruction_p(instruction i)
     || native_instruction_p(i, RECV_FUNCTION_NAME);
 }
 
-//insert send and recv primitives for communications
 static int count_data(expression exp, list args)
 {
   int count = 0;
@@ -74,8 +69,8 @@ static int count_data(expression exp, list args)
 
 static list transfer_regions(statement parent, statement child)
 {
-  list l_write = regions_dup(load_statement_out_regions(parent));//regions_dup(regions_write_regions(load_statement_local_regions(parent)));
-  list l_read = regions_dup(load_statement_in_regions(child));//regions_dup(regions_read_regions(load_statement_local_regions(child)));  
+  list l_write = regions_dup(load_statement_out_regions(parent));
+  list l_read = regions_dup(load_statement_in_regions(child));  
   return RegionsIntersection(regions_dup(l_write), regions_dup(l_read), w_r_combinable_p);
 }
 
@@ -84,14 +79,6 @@ static list list_communications(list l_communications, list args_com)
   expression size;
   FOREACH(REGION,reg,l_communications){
     if (!region_empty_p(reg) && region_entity(reg) != entity_undefined){
-      /*FOREACH(EXPRESSION,ex,reference_indices(region_any_reference(reg))) {
-        if(expression_reference_p(ex)) {
-	  reference ref = expression_reference(ex);
-	  entity var = reference_variable(ref);
-	  //expression ex2 =  region_reference_to_expression(reg);
-	  //args_com = CONS(EXPRESSION, ex, args_com);
-        }
-	}*/
       reference rr = region_any_reference(reg);
       expression exp_phi = region_reference_to_expression(rr);
       expression exp = make_entity_expression(region_entity(reg), NIL);
@@ -168,7 +155,7 @@ static list hierarchical_com( statement s, list kdg_args_com, bool neighbor, int
 }
 
 
-static list gen_send_communications(statement s, vertex tau, persistant_statement_to_schedule stmt_to_schedule, graph tg, int kp)
+static list gen_send_communications(statement s, vertex tau, persistant_statement_to_cluster st_to_cluster, graph tg, int kp)
 {
   int i;
   list args_send, list_st = NIL, kdg_args_com = NIL, h_args_com = NIL;
@@ -185,20 +172,16 @@ static list gen_send_communications(statement s, vertex tau, persistant_statemen
     FOREACH(SUCCESSOR, su, vertex_successors(tau)) {
       vertex taus = successor_vertex(su);
       statement ss = vertex_to_statement(taus);
-#ifndef DOUNIA
-      if(bound_persistant_statement_to_schedule_p(stmt_to_schedule, ss)) {
-#endif
-	if(apply_persistant_statement_to_schedule(stmt_to_schedule, s)
-	   != apply_persistant_statement_to_schedule(stmt_to_schedule, ss)
+      if(bound_persistant_statement_to_cluster_p(st_to_cluster, statement_ordering(ss))) {
+	if(apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(s))
+	   != apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(ss))
 	   &&
-	   apply_persistant_statement_to_schedule(stmt_to_schedule, ss) == i) {
+	   apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(ss)) == i) {
 	  list com_regions = transfer_regions (vertex_to_statement(statement_to_vertex(s,tg)),vertex_to_statement(statement_to_vertex(ss,tg))); // transfer_regions (s,ss); 
 	  kdg_args_com = CONS(LIST, com_regions, kdg_args_com);
 	  args_send = list_communications(com_regions, args_send);
 	}
-#ifndef DOUNIA
       }
-#endif
     }
     if(gen_length(args_send)>0){
       list_st = CONS(STATEMENT, com_call(SUCCESSORS, args_send, i),list_st);
@@ -213,8 +196,8 @@ static list gen_send_communications(statement s, vertex tau, persistant_statemen
     statement_synchronization(s) = make_synchronization_none();
     statement_comments(s) = empty_comments;
   }
-  if(apply_persistant_statement_to_schedule(stmt_to_schedule, s) != kp && (kp != -1))
-    h_args_com = hierarchical_com(s,kdg_args_com,SUCCESSORS,kp);
+  if(apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(s)) != kp && (kp != -1))
+    h_args_com = hierarchical_com(s, kdg_args_com, SUCCESSORS, kp);
   return h_args_com;
 }
 
@@ -224,7 +207,6 @@ static list predecessors(statement st, graph tg)
   list preds = NIL;
   FOREACH(VERTEX, v, vertices) {
     statement parent = vertex_to_statement(v);
-    //annotation *item_parent = gen_array_item(annotations, statement_ordering(parent));
     FOREACH(SUCCESSOR, su, (vertex_successors(v))) {
       vertex s = successor_vertex(su);
       statement child = vertex_to_statement(s);
@@ -235,7 +217,7 @@ static list predecessors(statement st, graph tg)
   return preds;
 }
 
-static list gen_recv_communications(statement sv, persistant_statement_to_schedule stmt_to_schedule, graph tg, int kp)
+static list gen_recv_communications(statement sv, persistant_statement_to_cluster st_to_cluster, graph tg, int kp)
 {
   int i;
   list args_recv, list_st = NIL,  kdg_args_com = NIL, h_args_com = NIL;
@@ -251,17 +233,13 @@ static list gen_recv_communications(statement sv, persistant_statement_to_schedu
     args_recv = NIL;
     list preds = predecessors(sv, tg);
     FOREACH(STATEMENT, parent, preds){
-#ifndef DOUNIA
-      if(bound_persistant_statement_to_schedule_p(stmt_to_schedule, parent)) {
-#endif
-	if(apply_persistant_statement_to_schedule(stmt_to_schedule, parent) != apply_persistant_statement_to_schedule(stmt_to_schedule, sv) && apply_persistant_statement_to_schedule(stmt_to_schedule, parent) == i){ 
+      if(bound_persistant_statement_to_cluster_p(st_to_cluster, statement_ordering(parent))) {
+	if(apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(parent)) != apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(sv)) && apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(parent)) == i){ 
 	  list com_regions = transfer_regions (vertex_to_statement(statement_to_vertex(parent,tg)),vertex_to_statement(statement_to_vertex(sv,tg))); 
 	  kdg_args_com = CONS(LIST, com_regions, kdg_args_com);
 	  args_recv = list_communications(com_regions, args_recv);
 	}
-#ifndef DOUNIA
       }
-#endif
     }
     if(gen_length(args_recv) > 0){
       list_st = CONS(STATEMENT, com_call(PREDECESSORS, args_recv, i), list_st);
@@ -275,73 +253,70 @@ static list gen_recv_communications(statement sv, persistant_statement_to_schedu
     statement_synchronization(sv) = make_synchronization_none();
     statement_comments(sv)=empty_comments;
   }
-  if(apply_persistant_statement_to_schedule(stmt_to_schedule, sv) != kp && (kp != -1))
+  if(apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(sv)) != kp && (kp != -1))
     h_args_com = hierarchical_com(sv,kdg_args_com,PREDECESSORS,kp);
   return  h_args_com;
 }
 
 
-void communications_construction(graph tg, statement stmt, persistant_statement_to_schedule stmt_to_schedule, int kp)
+void communications_construction(graph tg, statement stmt, persistant_statement_to_cluster st_to_cluster, int kp)
 {
-  // FI: this is likely to be excessive...
-#ifndef DOUNIA_1
-  if(bound_persistant_statement_to_schedule_p(stmt_to_schedule, stmt)) {
-#endif
-  gen_consistent_p((gen_chunk*)stmt);
-  instruction inst = statement_instruction(stmt);
-  switch(instruction_tag(inst)){
-  case is_instruction_block:{
-    list vertices = graph_vertices(tg), coms_send = NIL, coms_recv = NIL, coms_st = NIL; 
-    list barrier = NIL;
-    MAPL(stmt_ptr,
-	 {
-	   statement ss = STATEMENT(CAR(stmt_ptr ));
-	   if(statement_block_p(ss)){
-	     instruction sinst = statement_instruction(ss);
-	     MAPL(sb_ptr,
-		  {
-		    statement sb = STATEMENT(CAR(sb_ptr ));
-		    if(statement_block_p(sb)){
-		      instruction sbinst = statement_instruction(sb);
-		      MAPL(ss_ptr,
-			   {
-			     statement s = STATEMENT(CAR(ss_ptr ));
-			     barrier = CONS(STATEMENT,s,barrier);
-			   },
-			   instruction_block(sbinst));
-		    }
+  if(bound_persistant_statement_to_cluster_p(st_to_cluster, statement_ordering(stmt))) {
+    gen_consistent_p((gen_chunk*)stmt);
+    instruction inst = statement_instruction(stmt);
+    switch(instruction_tag(inst)){
+    case is_instruction_block:{
+      list vertices = graph_vertices(tg), coms_send = NIL, coms_recv = NIL, coms_st = NIL; 
+      list barrier = NIL;
+      MAPL(stmt_ptr,
+	   {
+	     statement ss = STATEMENT(CAR(stmt_ptr ));
+	     if(statement_block_p(ss)){
+	       instruction sinst = statement_instruction(ss);
+	       MAPL(sb_ptr,
+		    {
+		      statement sb = STATEMENT(CAR(sb_ptr ));
+		      if(statement_block_p(sb)){
+			instruction sbinst = statement_instruction(sb);
+			MAPL(ss_ptr,
+			     {
+			       statement s = STATEMENT(CAR(ss_ptr ));
+			       barrier = CONS(STATEMENT,s,barrier);
+			     },
+			     instruction_block(sbinst));
+		      }
 		    else
 		      barrier = CONS(STATEMENT,sb,barrier);
-		  },
-		  instruction_block(sinst));
-	   }
-	   else
-	     barrier = CONS(STATEMENT,ss,barrier);
-	 },
+		    },
+		    instruction_block(sinst));
+	     }
+	     else
+	       barrier = CONS(STATEMENT,ss,barrier);
+	   },
 	 instruction_block(inst));
-    FOREACH(STATEMENT, s, barrier)
-      {
-	bool found_p = false;
-	FOREACH(VERTEX, pre, vertices) {
-	  statement this = vertex_to_statement(pre);
-	  if(statement_equal_p(this,s) && bound_persistant_statement_to_schedule_p(stmt_to_schedule, s)) {
-	    found_p = true;
-	    break;
+      FOREACH(STATEMENT, s, barrier)
+	{
+	  bool found_p = false;
+	  FOREACH(VERTEX, pre, vertices) {
+	    statement this = vertex_to_statement(pre);
+	    if(statement_equal_p(this,s) && bound_persistant_statement_to_cluster_p(st_to_cluster, statement_ordering(s))) {
+	      found_p = true;
+	      break;
+	    }
 	  }
-	}
-	if(found_p){
-	  int ki = apply_persistant_statement_to_schedule(stmt_to_schedule, s);
-	  list args_send =  gen_recv_communications(s, stmt_to_schedule, tg, kp);
-	  list args_recv =  gen_send_communications(s, statement_to_vertex(s,tg), stmt_to_schedule, tg, kp);
+	  if(found_p){
+	    int ki = apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(s));
+	  list args_send =  gen_recv_communications(s, st_to_cluster, tg, kp);
+	  list args_recv =  gen_send_communications(s, statement_to_vertex(s,tg), st_to_cluster, tg, kp);
 	  if(gen_length(args_recv) > 0 && (kp != ki) )
 	    coms_recv = CONS(STATEMENT, com_call(PREDECESSORS, args_recv, ki), coms_recv);
 	  if(gen_length(args_send) > 0 && (kp != ki) )
 	    coms_send = CONS(STATEMENT, com_call(SUCCESSORS, args_send, ki), coms_send);
-	  communications_construction(tg, s, stmt_to_schedule,  ki);
+	  communications_construction(tg, s, st_to_cluster,  ki);
+	  }
+	  else
+	    communications_construction(tg, s, st_to_cluster, kp);
 	}
-	else
-	  communications_construction(tg, s, stmt_to_schedule, kp);
-      }
     if((gen_length(coms_send) > 0 || gen_length(coms_recv) > 0) && (kp != -1)){
       statement new_s = make_statement(
 				       statement_label(stmt),
@@ -368,72 +343,23 @@ void communications_construction(graph tg, statement stmt, persistant_statement_
       statement_comments(stmt) = empty_comments;
     }
     break;
-  }
-  case is_instruction_test:{
-    test t = instruction_test(inst);
-    communications_construction(tg, test_true(t), stmt_to_schedule, kp);
-    communications_construction(tg, test_false(t), stmt_to_schedule, kp);
+    }
+    case is_instruction_test:{
+      test t = instruction_test(inst);
+      communications_construction(tg, test_true(t), st_to_cluster, kp);
+      communications_construction(tg, test_false(t), st_to_cluster, kp);
     break;
-  }
+    }
   case is_instruction_loop :{
     loop l = statement_loop(stmt);
     statement body = loop_body(l);
-    communications_construction(tg, body, stmt_to_schedule, kp);
+    communications_construction(tg, body, st_to_cluster, kp);
     break;
   }
-  default:
+    default:
     break;
+    }
   }
-#ifndef DOUNIA_1
-  }
-#endif
   return;
-}
-
-bool hbdsc_gen_communications(char * module_name)
-{ 
-  // entity	module;
-  // statement	module_stat;
-
-  // module = local_name_to_top_level_entity(module_name);
-  statement module_stat = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
-  /* FI: It cannot be inherited from a previous pass */
-#ifndef DOUNIA
-  set_ordering_to_statement(module_stat);
-#endif
-  set_current_module_entity(module_name_to_entity(module_name));
-  set_current_module_statement(module_stat);
-  set_precondition_map((statement_mapping)db_get_memory_resource(DBR_PRECONDITIONS, module_name, true));
-  set_transformer_map((statement_mapping)
-		      db_get_memory_resource(DBR_TRANSFORMERS, module_name, true));
-  /* The proper effect to detect the I/O operations: */
-  set_proper_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, true));
-  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
-  module_to_value_mappings(get_current_module_entity());
-  set_rw_effects((statement_effects) 
-		 db_get_memory_resource(DBR_REGIONS, module_name, true));
-  set_in_effects((statement_effects) 
-		 db_get_memory_resource(DBR_IN_REGIONS, module_name, true));
-  set_out_effects((statement_effects) 
-		  db_get_memory_resource(DBR_OUT_REGIONS, module_name, true));
-  set_methods_for_convex_effects();
-  init_convex_rw_prettyprint(module_name);
- 
-  kdg = (graph) db_get_memory_resource (DBR_DG, module_name, true );
-  persistant_statement_to_schedule stmt_to_schedule = (persistant_statement_to_schedule)db_get_memory_resource(DBR_SCHEDULE, module_name, true);
-
-  NBCLUSTERS = get_int_property("BDSC_NB_CLUSTERS");
-  communications_construction(kdg, module_stat, stmt_to_schedule, -1);
-  /* Reorder the module, because new statements have been generated. */
-  module_reorder(module_stat);
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
-  // FI: it has not been set in the same pass...
-  reset_ordering_to_statement();
-  reset_rw_effects();
-  reset_in_effects();
-  reset_out_effects();
-  reset_current_module_statement();
-  reset_current_module_entity();
-  return true;
 }
 

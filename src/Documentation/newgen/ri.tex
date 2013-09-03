@@ -1184,12 +1184,12 @@ associate line number to a statement.
 
 \subsubsection{Mappings from statement (task)  to its schedule}
 
-\domain{persistant\_statement\_to\_schedule = persistant statement -> schedule:int}
+\domain{persistant\_statement\_to\_cluster = statement:int -> number:int}
 {}
 
-Type \texttt{persistant\_statement\_to\_schedule} is used in bdsc
-communication generation to store the cluster where a statement is
+Type \texttt{persistant\_statement\_to\_cluster} is used in HBDSC to store the cluster where a statement is
 scheduled. It corresponds to sigma defined in~\cite{bdsc2012}  
+
 
 \subsection{Instruction}
 \label{subsection-instruction}
