@@ -2,19 +2,12 @@
 int main()
 {
    //PIPS generated variable
-   int bj, j, bi, i, b[100], a[100];
+   int a[100], b[100], i, bi, j, bj;
 #pragma omp parallel default(shared) 
    {
 #pragma omp single
       {
-#pragma omp task
-         {
-            scanf("%d", &bi);
-         }
-#pragma omp task
-         {
-            return 0;
-         }
+         scanf("%d", &bi);
       }
 #pragma omp single
       {
@@ -53,6 +46,7 @@ int main()
             printf("%d\n", b[j]);
       }
    }
+   return 0;
 }
 // MPI style
 int main()
@@ -64,10 +58,10 @@ int main()
       MPI_Status status0;
       //PIPS generated variable
       MPI_Request request0;
+      //PIPS generated variable
+      int a[100], b[100], i, bi, j, bj;
       MPI_Init(&argc, &argv);
       MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
-      //PIPS generated variable
-      int bj, j, bi, i, b[100], a[100];
       if (rank0==0) {
          scanf("%d", &bi);
          MPI_Isend(LUNS[PHI1], 1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
@@ -75,8 +69,6 @@ int main()
          MPI_Isend(bi, 1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
          MPI_Isend(bi, 1, MPI_INT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
       }
-      if (rank0==3)
-         return 0;
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0) {
          for(i = bi; i <= 99; i += 1)
@@ -121,4 +113,5 @@ int main()
       MPI_Barrier(MPI_COMM_WORLD);
    }
    MPI_Finalize();
+   return 0;
 }
