@@ -132,7 +132,7 @@ void cluster_stage_spire_generation(persistant_statement_to_cluster stmt_to_clus
       }
       instruction ins_seq = make_instruction_sequence(make_sequence(gen_nreverse(list_cl)));
       statement_instruction(stmt) = ins_seq;
-      FOREACH(ENTITY, decl, statement_declarations(stmt)) 
+      FOREACH(ENTITY, decl, gen_nreverse(statement_declarations(stmt))) 
 	add_declaration_statement_at_beginning(stmt, decl);
       gen_free_list(cluster_stages);
       break;
@@ -173,6 +173,8 @@ bool spire_shared_unstructured_to_structured (char * module_name)
   NBCLUSTERS = get_int_property("BDSC_NB_CLUSTERS");
   MEMORY_SIZE = get_int_property("BDSC_MEMORY_SIZE");
   cluster_stage_spire_generation(stmt_to_cluster, kdg, module_stat, NBCLUSTERS);
+  if(!statement_undefined_p(return_st))
+    insert_statement(module_stat, return_st, false);
   module_reorder(module_stat);
   gen_consistent_p((gen_chunk*)module_stat);
   DB_PUT_MEMORY_RESOURCE(DBR_SHARED_SPIRE_CODE, strdup(module_name), module_stat);
@@ -215,6 +217,8 @@ bool spire_distributed_unstructured_to_structured (char * module_name)
   MEMORY_SIZE = get_int_property("BDSC_MEMORY_SIZE");
   cluster_stage_spire_generation(stmt_to_cluster, kdg, module_stat, NBCLUSTERS);
   communications_construction(kdg, module_stat, stmt_to_cluster, -1);
+  if(!statement_undefined_p(return_st))
+    insert_statement(module_stat, return_st, false);
   /* Reorder the module, because new statements have been generated. */
   module_reorder(module_stat);
   DB_PUT_MEMORY_RESOURCE(DBR_DISTRIBUTED_SPIRE_CODE, strdup(module_name), module_stat);

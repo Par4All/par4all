@@ -217,8 +217,9 @@ static void gen_flat_mpi(statement stmt, int nesting_level)
 static statement mpi_initialize(statement stmt, entity module){
   list args = NIL, list_stmts = NIL;
   statement st = statement_undefined;
+  statement st_body = statement_undefined, st_decls = statement_undefined;
   rank = make_new_scalar_variable_with_prefix("rank", module, MakeBasic(is_basic_int));
-  entity stat =   FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, MPI_STATUS);//TYPEDEF_PREFIX "MPI_Status");
+  entity stat =   FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, MPI_STATUS);
   if(storage_undefined_p(entity_storage(stat)))
     {
       entity_storage(stat) = make_storage_rom();
@@ -231,7 +232,7 @@ static statement mpi_initialize(statement stmt, entity module){
   mpi_status = make_new_scalar_variable_with_prefix("status", module,MakeBasic(is_basic_int) );
   entity_type(mpi_status) = stat_t;
   
-  entity req =   FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, MPI_REQUEST);//TYPEDEF_PREFIX "MPI_Request");
+  entity req =   FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, MPI_REQUEST);
   if(storage_undefined_p(entity_storage(req)))
     {
       entity_storage(req) = make_storage_rom();
@@ -244,7 +245,26 @@ static statement mpi_initialize(statement stmt, entity module){
   mpi_request = make_new_scalar_variable_with_prefix("request", module,MakeBasic(is_basic_int) );
   entity_type(mpi_request) = req_t;
   gen_consistent_p((gen_chunk*)mpi_request);
-  
+
+  if(statement_sequence_p(stmt)){
+    list stmts = sequence_statements(statement_sequence(stmt)), body = NIL, decls = NIL;
+    FOREACH(STATEMENT, s, stmts){
+      if(declaration_statement_p(s))
+	decls =  CONS(STATEMENT, s, decls);
+      else
+	if(!return_statement_p(s))
+	  body = CONS(STATEMENT, s, body);
+	else
+	  return_st = s;
+    }
+    if(gen_length(body)>0)
+      st_body = make_block_statement(gen_nreverse(body));
+    if(gen_length(decls)>0){
+      st_decls = make_block_statement(gen_nreverse(decls));
+    }
+  }
+  else
+    st_body = stmt;
   entity name = make_constant_entity("MPI_Init",is_basic_string, 100);
   args = CONS(EXPRESSION, make_address_of_expression(make_entity_expression(make_constant_entity("argc", is_basic_string, 100), NIL)),args);
   args = CONS(EXPRESSION, make_address_of_expression(make_entity_expression(make_constant_entity("argv", is_basic_string, 100), NIL)), args);
@@ -280,9 +300,13 @@ static statement mpi_initialize(statement stmt, entity module){
 				   STATEMENT_NUMBER_UNDEFINED,
 				   STATEMENT_ORDERING_UNDEFINED,
 				   statement_comments(stmt),
-				   copy_instruction(statement_instruction(stmt)),
+				   copy_instruction(statement_instruction(st_body)),
 				   NIL, NULL, statement_extensions(stmt), statement_synchronization(stmt));
-  list_stmts = CONS(STATEMENT, new_s, CONS(STATEMENT, st, NIL));
+  list_stmts = NIL;
+  if(!statement_undefined_p(st_decls))
+    list_stmts = CONS(STATEMENT, st_decls, list_stmts);
+  list_stmts = CONS(STATEMENT, new_s, CONS(STATEMENT, st, list_stmts));
+  
   statement_instruction(stmt) = make_instruction_sequence(make_sequence(gen_nreverse(list_stmts)));
   statement_extensions(stmt) = statement_extensions(stmt);
   statement_comments(stmt) = empty_comments;
@@ -297,6 +321,8 @@ static void mpi_finalize(statement stmt){
   list args = CONS(EXPRESSION, make_entity_expression(make_constant_entity("", is_basic_string, 100), NIL), NIL); 
   statement st = make_call_statement(MPI_FINALIZE, args, entity_undefined, string_undefined);
   list list_stmts = CONS(STATEMENT, st, CONS(STATEMENT, copy_statement(stmt), NIL));
+  if(!statement_undefined_p(return_st)) 
+    list_stmts = CONS(STATEMENT, return_st, list_stmts);
   statement_instruction(stmt) = make_instruction_sequence(make_sequence(gen_nreverse(list_stmts)));  
   statement_extensions(stmt) = statement_extensions(stmt);
   statement_comments(stmt) = empty_comments;
@@ -312,8 +338,6 @@ bool mpi_task_generation(char * module_name)
   set_ordering_to_statement(module_stat);
   set_current_module_entity(module_name_to_entity(module_name));
   set_current_module_statement(module_stat);
-  if (get_bool_property("SPIRE_GENERATION")) 
-    set_bool_property("SPIRE_GENERATION", false);
   init_stmt = mpi_initialize(module_stat, module);
   gen_flat_mpi(module_stat, 0);
   mpi_finalize(module_stat);

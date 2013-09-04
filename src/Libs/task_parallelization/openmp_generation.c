@@ -47,6 +47,7 @@ typedef dg_vertex_label vertex_label;
 
 static bool omp_parallel = false;
 
+
 static void gen_omp_taskwait(statement stmt)
 {
   statement st = make_continue_statement(entity_empty_label());
@@ -66,7 +67,10 @@ static void gen_omp_parallel(statement stmt){
       if(declaration_statement_p(st))
 	decls =  CONS(STATEMENT, st, decls);
       else
-	body = CONS(STATEMENT, st, body);
+	if(!return_statement_p(st))
+	  body = CONS(STATEMENT, st, body);
+	else
+	  return_st = st;
     }
     if(gen_length(body)>0){
       st_body = make_block_statement(gen_nreverse(body));
@@ -162,11 +166,11 @@ bool openmp_task_generation(char * module_name)
   set_ordering_to_statement(module_stat);
   set_current_module_entity(module_name_to_entity(module_name));
   set_current_module_statement(module_stat);
-  if (get_bool_property("SPIRE_GENERATION")) 
-    set_bool_property("SPIRE_GENERATION", false);
   gen_openmp(module_stat, false);
   if(omp_parallel)
     gen_omp_parallel(module_stat);
+  if(!statement_undefined_p(return_st)) 
+    insert_statement(module_stat, return_st, false);
   module_reorder(module_stat);
   DB_PUT_MEMORY_RESOURCE(DBR_PARALLELIZED_CODE, module_name, module_stat);
   reset_current_module_statement();

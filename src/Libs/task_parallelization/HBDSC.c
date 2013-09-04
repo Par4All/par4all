@@ -50,7 +50,7 @@ typedef dg_vertex_label vertex_label;
 /* Global variables */
  
 graph kdg, ddg;
-
+statement return_st = statement_undefined;
 #define MAX_ITER 1
 
 persistant_statement_to_cluster stmt_to_cluster;// = persistant_statement_to_cluster_undefined;
@@ -151,12 +151,16 @@ static list rebuild_topological_sort(list stages){
     for(i = 0; i < NBCLUSTERS; i++){
       list list_stmts = NIL;
       FOREACH(STATEMENT, st, stage) {
-	if(!declaration_statement_p(st)) {
+	if(!declaration_statement_p(st) && !return_statement_p(st)) {
 	  if(bound_persistant_statement_to_cluster_p(stmt_to_cluster,statement_ordering(st))){
 	    if(apply_persistant_statement_to_cluster(stmt_to_cluster, statement_ordering(st)) == i)
 	      list_stmts = CONS(STATEMENT, st, list_stmts);
 	  }
 	}
+	/* we suppose that we have only one return statement at the
+	  end of the module :( */
+	if(return_statement_p(st))
+	  return_st = st;
       }
       if(list_stmts != NIL)
 	K = CONS(LIST, list_stmts, K);
@@ -164,7 +168,7 @@ static list rebuild_topological_sort(list stages){
     if(K == NIL){
       list list_stmts = NIL;
       FOREACH(STATEMENT, st, stage) {
-	if(!declaration_statement_p(st)) {
+	if(!declaration_statement_p(st) && !return_statement_p(st)) {
 	  if(bound_persistant_statement_to_cluster_p(stmt_to_cluster,statement_ordering(st))){
 	    if(apply_persistant_statement_to_cluster(stmt_to_cluster, statement_ordering(st)) == -1) 
 	      list_stmts = CONS(STATEMENT, st, list_stmts);
@@ -172,6 +176,8 @@ static list rebuild_topological_sort(list stages){
 	  else
 	    list_stmts = CONS(STATEMENT, st, list_stmts);
 	}
+	if(return_statement_p(st))
+	  return_st = st;
       }
       if(list_stmts != NIL){
 	K =  CONS(LIST, list_stmts, K);

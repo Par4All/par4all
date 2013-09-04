@@ -49,8 +49,6 @@ typedef dg_vertex_label vertex_label;
 #define SUCCESSORS true
 #define PREDECESSORS false
 
-
-
 bool com_instruction_p(instruction i)
 {
   return native_instruction_p(i, SEND_FUNCTION_NAME)
@@ -91,8 +89,11 @@ static list list_communications(list l_communications, list args_com)
 	  size = int_to_expression(-1);//this will print UNDEFINED_COST
 	else
 	  size = polynome_to_expression(reg_footprint);
-	if(expression_to_int(size) == 1)
-	  args_com = CONS(EXPRESSION, exp_phi, args_com);
+	if(expression_constant_p(size)) 
+	  if(expression_to_int(size) == 1)
+	    args_com = CONS(EXPRESSION, exp_phi, args_com);
+	  else
+	    args_com = CONS(EXPRESSION, exp, args_com);
 	else
 	  args_com = CONS(EXPRESSION, exp, args_com);
 	args_com = CONS(EXPRESSION, size, args_com);
@@ -125,8 +126,8 @@ static list hierarchical_com( statement s, list kdg_args_com, bool neighbor, int
       com_regions = CONS(REGION, reg, com_regions);
     }
   }
-  list all_regions = (neighbor)?regions_dup(load_statement_out_regions(s)):regions_dup(load_statement_in_regions(s));
-  list h_regions_com = (kdg_args_com = NIL) ? all_regions:RegionsEntitiesInfDifference(all_regions, com_regions,r_w_combinable_p);
+  list h_regions_com = (neighbor)?regions_dup(load_statement_out_regions(s)):regions_dup(load_statement_in_regions(s));
+  //list h_regions_com = (kdg_args_com = NIL) ? all_regions:RegionsEntitiesInfDifference(all_regions, com_regions,r_w_combinable_p);
   if(gen_length(h_regions_com)>0){
     statement new_s = make_statement(
 				     statement_label(s),
