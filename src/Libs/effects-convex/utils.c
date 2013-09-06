@@ -1973,7 +1973,16 @@ bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
 	 The approximation will become MAY (although in some cases, it is MUST) */
 
       entity phi = make_phi_entity(dim);
-      transformer prec = effects_private_current_context_head();
+
+      transformer prec = transformer_undefined;
+      if (!effects_private_current_context_stack_initialized_p()
+	  || effects_private_current_context_empty_p())
+	prec = transformer_identity();
+      else
+	{
+	  prec = effects_private_current_context_head();
+	}
+
       // transformer trans = any_expression_to_transformer(phi,expr,transformer_identity(),true);
       transformer trans = any_expression_to_transformer(phi,expr,prec,true);
 
