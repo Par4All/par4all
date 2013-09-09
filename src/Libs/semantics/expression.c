@@ -3554,14 +3554,14 @@ static bool have_sizeof_value_in_multiply_pointer_expression_p(expression expr) 
   pips_internal_error("error with expression : %s, syntax_tag : %i \n", expression_to_string(expr), syntax_tag(sexpr));
   return false;
 }
-
+/*
 static expression pointer_expression_to_pointer_expression_with_sizeof(expression exp) {
   expression result;
 
 
   return result;
 }
-
+*/
 static transformer pointer_unary_operation_to_transformer(
     entity e,       //entity to be affected (value not variable)
     entity op,      //"Name" of the call function

@@ -45,7 +45,8 @@ FWD_DIRS	= \
 	chains rice hyperplane transformations accel-util hwac expressions \
 	locality instrumentation hpfc atomizer safescale sac phrase wp65 \
 	preprocessor pipsmake step to_begin_with gpu pipslibs scalopes \
-	static_controlize paf-util pocc-interface taskify task_parallelization
+	static_controlize paf-util pocc-interface taskify rstream_interface \
+	regions_to_loops task_parallelization
 
 # janusvalue
 

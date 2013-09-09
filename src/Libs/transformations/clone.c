@@ -113,16 +113,29 @@ static entity build_a_clone_for(entity cloned,
   bool saved_b1, saved_b2;
   text t;
   language l = module_language(cloned);
+  
+  const char* suffix = get_string_property("RSTREAM_CLONE_SUFFIX");
+  int size = 0;
 
   pips_debug(2, "building a version of %s with arg %d val=%d\n",
 	     name, argn, val);
 
   /* builds some kind of module / statement for the clone.
    */
-  const char *clone_name = get_string_property("CLONE_NAME");
-  new_name = empty_string_p(clone_name) ?
-    build_new_top_level_module_name(name,false) :
-    strdup(clone_name);
+  if (empty_string_p(suffix)) {
+    const char *clone_name = get_string_property("CLONE_NAME");
+    new_name = empty_string_p(clone_name) ?
+      build_new_top_level_module_name(name,false) :
+      strdup(clone_name);
+  }
+  else {
+    size = strlen(name) + strlen(suffix) + 1;
+    new_name = (char*)malloc(sizeof(char)*size);
+    new_name[0] = '\0';
+    new_name = strcat(new_name, name);
+    new_name = strcat(new_name, "_");
+    new_name = strcat(new_name, suffix);
+  }
 
   new_fun = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,new_name);
   entity_type(new_fun) = copy_type(entity_type(cloned));
@@ -712,6 +725,7 @@ clone_current_entity()
 /* similar to previous clone and clone_substitute
  * but does not try to make any substitution
  */
+#include "preprocessor.h"
 bool
 clone_only(string mod_name)
 {
@@ -719,10 +733,15 @@ clone_only(string mod_name)
     statement mod_stmt = (statement)db_get_memory_resource(DBR_CODE, mod_name, true);
     set_current_module_statement(mod_stmt);
     set_current_module_entity(module_name_to_entity(mod_name));
-
+    
     entity cloned_entity = clone_current_entity();
-
+    
+    // Used to add the cloned function declaration
+    AddEntityToModuleCompilationUnit(cloned_entity, get_current_module_entity());
+    
     /* update/release resources */
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name,mod_stmt);
+    
     reset_current_module_statement();
     reset_current_module_entity();
 

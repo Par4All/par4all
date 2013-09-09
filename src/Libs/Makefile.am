@@ -9,7 +9,7 @@ PIPS_SUBDIRS=\
 	chains rice hyperplane transformations accel-util hwac expressions \
 	locality instrumentation hpfc atomizer safescale sac phrase wp65 \
 	preprocessor pipsmake step to_begin_with gpu scalopes static_controlize paf-util \
-	pocc-interface taskify task_parallelization
+	pocc-interface taskify rstream_interface regions_to_loops task_parallelization
 
 SUBDIRS=gnulib $(PIPS_SUBDIRS)
 
@@ -90,5 +90,7 @@ libpipslibs_la_LIBADD=\
 	gnulib/libgnu.la \
 	pocc-interface/libpocc-interface.la \
 	taskify/libtaskify.la \
+	rstream_interface/librstream_interface.la \
+	regions_to_loops/libregions_to_loops.la \
 	task_parallelization/libtask_parallelization.la
 

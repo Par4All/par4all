@@ -54,6 +54,7 @@
 #include "effects-util.h" 
 #include "effects-generic.h"
 #include "effects-convex.h"
+#include "properties.h"
 
 #include "conversion.h"
 
@@ -483,12 +484,25 @@ constraints_to_loop_bound(
 
   /* final operation: MAX or MIN if more than one bound
    */
+  // Added an option to automatically take the constant value over the other expressions
+  // Should not affect the function unless the property is set to True (False by default)
   len = gen_length(le);  message_assert("some expressions", len!=0);
 
   if (len==1)
   {
       result = EXPRESSION(CAR(le));
       gen_free_list(le);
+  }
+  else if (get_bool_property("PSYSTEME_TO_LOOPNEST_FOR_RSTREAM")) {
+    int nb_constant = 0;
+    FOREACH(expression, exp, le) {
+      if (expression_constant_p(exp)) {
+	result = exp;
+	nb_constant++;
+      }
+    }
+    gen_free_list(le);
+    pips_assert("More than one constant expression in loop bounds", nb_constant == 1);
   }
   else
   {

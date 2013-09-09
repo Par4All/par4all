@@ -1,5 +1,3 @@
-
-
 %%
 %% $Id$
 %%
@@ -2254,6 +2252,11 @@ pragma_outliner      >     MODULE.code
     < PROGRAM.entities
     < MODULE.code
     < MODULE.cumulated_effects
+    < MODULE.regions
+    < CALLEES.summary_regions
+    < MODULE.summary_regions
+    < MODULE.transformers
+    < MODULE.preconditions
 \end{PipsMake}
 
 \begin{PipsProp}{PRAGMA_OUTLINER_BEGIN}
@@ -2710,7 +2713,7 @@ turned off by setting
 \PipsPropRef{TRUST_CONSTANT_PATH_EFFECTS_IN_CONFLICTS} to {\tt
   FALSE}. This must be used with care and only when there is no aliasing.
 \begin{PipsProp}{TRUST_CONSTANT_PATH_EFFECTS_IN_CONFLICTS }
-TRUST_CONSTANT_PATH_EFFECTS_IN_CONFLICTS FALSE
+  TRUST_CONSTANT_PATH_EFFECTS_IN_CONFLICTS FALSE
 \end{PipsProp}
 
 
@@ -11949,6 +11952,13 @@ are declared into this new compilation unit\marginpar{Serge: Consistency
 new compilation unit through the sub-callgraph are declared static and
 prefixed with \PipsPropRef{OUTLINE_CALLEES_PREFIX}.
 
+Added two properties for R-Stream compatibility.
+If \PipsPropRef{OUTLINE_REMOVE_VARIABLE_RSTREAM_IMAGE} is set to True, instead of outlining
+loop indexes and written scalar variables the outliner declares them as local variables inside the
+outlined function. Therefore they are not added to the effective or formal parameters.
+
+The behavior of \PipsPropRef{OUTLINE_REMOVE_VARIABLE_RSTREAM_SCOP} is the same as above. Except that this property
+only excludes loop indexes from being outlined. 
 
 \begin{PipsProp}{OUTLINE_MODULE_NAME}
 OUTLINE_MODULE_NAME ""
@@ -11976,6 +11986,12 @@ OUTLINE_WRITTEN_SCALAR_BY_REFERENCE TRUE
 \end{PipsProp}
 \begin{PipsProp}{OUTLINE_CALLEES_PREFIX}
 OUTLINE_CALLEES_PREFIX ""
+\end{PipsProp}
+\begin{PipsProp}{OUTLINE_REMOVE_VARIABLE_RSTREAM_IMAGE}
+OUTLINE_REMOVE_VARIABLE_RSTREAM_IMAGE FALSE
+\end{PipsProp}
+\begin{PipsProp}{OUTLINE_REMOVE_VARIABLE_RSTREAM_SCOP}
+OUTLINE_REMOVE_VARIABLE_RSTREAM_SCOP FALSE
 \end{PipsProp}
 
 
@@ -12067,8 +12083,15 @@ TRANSFORMATION_CLONE_ON_ARGUMENT 0
 
 Clone name can be given using the \lstinline|CLONE_NAME| properties
 Otherwise, a new one is generated
+
+\PipsPropRef{RSTREAM_CLONE_SUFFIX} is the suffix appended to cloned function for R-Stream pre-compilation.
+
 \begin{PipsProp}{CLONE_NAME}
 CLONE_NAME ""
+\end{PipsProp}
+
+\begin{PipsProp}{RSTREAM_CLONE_SUFFIX}
+RSTREAM_CLONE_SUFFIX ""
 \end{PipsProp}
 
 
@@ -16379,6 +16402,44 @@ STATIC_CONTROLIZE_ACROSS_USER_CALLS TRUE
 %POCC_COMPATIBILITY FALSE
 %\end{PipsProp}
 
+\subsection{rstream_interface}
+
+\begin{PipsPass}{rstream_interface}
+Detect non-SCoP of the code. Based on R-Stream constraints.
+Must be preceded by the pocc_prettyprinter phase.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias rstream_interface 'rstream_interface'
+
+rstream_interface > MODULE.code
+    < PROGRAM.entities
+    < MODULE.code 
+    < MODULE.static_control
+\end{PipsMake}
+
+\subsection{regions_to_loops}
+
+\begin{PipsPass}{regions_to_loops}
+This phase is designed to replace the body of a function by simple assignments. 
+The new body is representative of the regions described by the old body. 
+When \PipsPropRef{PSYSTEME_TO_LOOPNEST_FOR_RSTREAM} is set to True, the function
+in charge of computing loop nests from systems chooses the constant values rather 
+than the symbolic values for loop ranges. 
+\end{PipsPass}
+
+\begin{PipsMake}
+alias regions_to_loops 'regions_to_loops'
+
+regions_to_loops > MODULE.code
+< PROGRAM.entities
+< MODULE.code
+< MODULE.summary_regions
+\end{PipsMake}
+
+\begin{PipsProp}{PSYSTEME_TO_LOOPNEST_FOR_RSTREAM}
+PSYSTEME_TO_LOOPNEST_FOR_RSTREAM FALSE
+\end{PipsProp}
 
 \section{Prettyprinter for CLAIRE}
 \label{subsection-prettyprinter-claire}

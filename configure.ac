@@ -290,6 +290,8 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Libs/paf-util/Makefile
 				 src/Libs/wp65/Makefile
 				 src/Libs/gnulib/Makefile
+				 src/Libs/rstream_interface/Makefile
+				 src/Libs/regions_to_loops/Makefile
 
 				 src/Passes/Makefile
 				 src/Passes/fortran95/Makefile

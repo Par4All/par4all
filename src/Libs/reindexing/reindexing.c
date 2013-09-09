@@ -85,7 +85,7 @@
 #include "resources.h"
 #include "static_controlize.h"
 #include "paf-util.h"
-#include "pip.h"
+#include "pips.h"
 #include "array_dfg.h"
 #include "prgm_mapping.h"
 #include "conversion.h"
@@ -99,11 +99,7 @@
 #define STRING_TAU "q"
 #define STRING_FLAG "flag"
 
-#define MAKE_STATEMENT(ins) \
-          (make_statement(entity_empty_label(), \
-			  STATEMENT_NUMBER_UNDEFINED, \
-			  STATEMENT_ORDERING_UNDEFINED, \
-			  string_undefined, ins))
+#define MAKE_STATEMENT(ins) (make_statement(entity_empty_label(),STATEMENT_NUMBER_UNDEFINED,STATEMENT_ORDERING_UNDEFINED,string_undefined,ins))
 
 /* Internal variables 	*/
 

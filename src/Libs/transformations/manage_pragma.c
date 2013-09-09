@@ -444,17 +444,24 @@ typedef struct {
 /*
  * compute iteratively SCoPs to outline --> lists_to_outline and then
  * call the outliner
+ * Also what is called by pragma_outliner()
  */
 bool outline_stmts_between_pragmas_in_sequence(sequence s, void *_ctx) {
+  // Cast of the void pointer
   context *ctx = (context *) _ctx;
+  // Are we in a SCoP of the code ?
   bool in_scop = false;
+  // A list of the statements contained in the sequence
   list stmts = sequence_statements(s);
   list stmts_to_outline = NIL;
 
   FOREACH(statement, stmt, stmts) {
     // Flag that check if we are at the end of a list of stmts to outline
     bool has_to_outline_p = false;
-
+    // If we are not already in a SCoP of the code and if the statement is preceded
+    // by pragma_start
+    // Else if we are already in a SCoP of the code and if the statement is followed
+    //by pragma_end 
     if(!in_scop && statement_has_this_pragma_string_p(stmt,ctx->pragma_begin)) {
       in_scop = true;
       clear_pragma_on_statement(stmt);
@@ -464,12 +471,13 @@ bool outline_stmts_between_pragmas_in_sequence(sequence s, void *_ctx) {
       has_to_outline_p = true;
       clear_pragma_on_statement(stmt);
     }
-
+    // If we are in a SCoP : create an one-element statement list (cons) containing stmt 
     if(in_scop) {
       stmts_to_outline = CONS(STATEMENT, stmt, stmts_to_outline );
     }
-
+    // ENDP : true if list is empty, false if is a cons
     if(has_to_outline_p && !ENDP(stmts_to_outline)) {
+      // Reverse the order of the list
       stmts_to_outline = gen_nreverse(stmts_to_outline);
       string func_name = build_new_top_level_module_name(ctx->prefix, false);
       // Here we call the outliner on the collected statements
@@ -494,7 +502,10 @@ bool outline_stmts_between_pragmas_in_sequence(sequence s, void *_ctx) {
  * This phase outline a sequence of statements contained between two
  * pragmas
  */
+#include "semantics.h"
+#include "effects-convex.h"
 bool pragma_outliner(char * module_name) {
+  // Standard procedure for phases
   set_current_module_entity(local_name_to_top_level_entity(module_name));
 
   set_current_module_statement((statement) db_get_memory_resource(DBR_CODE,
@@ -506,8 +517,17 @@ bool pragma_outliner(char * module_name) {
   set_cumulated_rw_effects((statement_effects) db_get_memory_resource(DBR_CUMULATED_EFFECTS,
                                                                       module_name,
                                                                       true));
+  // Needed for outliner using option OUTLINE_SMART_REFERENCE_COMPUTATION TRUE
+  set_rw_effects((statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, true));
+  // Needed for induction variable removal
+  module_to_value_mappings(get_current_module_entity());
+  set_transformer_map((statement_mapping)db_get_memory_resource(DBR_TRANSFORMERS, module_name, true));
+  set_precondition_map((statement_mapping)db_get_memory_resource(DBR_PRECONDITIONS, module_name, true));
+  
+  set_methods_for_convex_effects();
 
   // Recursion context
+  // Getting the parameters of the pragmas in order to be able to parse them later
   context ctx;
   ctx.pragma_begin = (string) get_string_property("PRAGMA_OUTLINER_BEGIN");
   ctx.pragma_end = (string) get_string_property("PRAGMA_OUTLINER_END");
@@ -519,7 +539,7 @@ bool pragma_outliner(char * module_name) {
                       sequence_domain,
                       outline_stmts_between_pragmas_in_sequence,
                       gen_null);
-
+  // If a substitution has been done correctly, we put the new resources
   if(ctx.outline_done) {
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES,
                            module_name,
@@ -527,9 +547,14 @@ bool pragma_outliner(char * module_name) {
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
   }
-
+  // Standard procedure for reseting after a phase
+  reset_rw_effects();
+  generic_effects_reset_all_methods();
   reset_cumulated_rw_effects();
   reset_current_module_entity();
   reset_current_module_statement();
+  reset_precondition_map();
+  reset_transformer_map();
+  free_value_mappings();
   return true;
 }

@@ -196,13 +196,19 @@ static_control static_controlize_whileloop(whileloop wl)
   return( sc );
 }
 
-
 /*==================================================================*/
 /* static_control static_controlize_statement((statement) s)	AL 05/93
  * Computes s's static_control
  */
+
+// Global variables added in order to avoid changing the definition of several functions
+list assigned_var = NIL;
+
 static_control static_controlize_statement(statement s)
 {
+  // Update of the list containing the variables assigned directly or indirectly by an array
+  get_reference_assignments(s, &assigned_var);
+  
   bool		is_static = true, static_test = false;
   instruction	inst = statement_instruction(s);
   static_control  sc, sc1, sc2;
@@ -228,9 +234,10 @@ static_control static_controlize_statement(statement s)
 	test t = instruction_test(inst);
 	forward_substitute_in_exp( &test_condition( t ),
 				   Gforward_substitute_table);
+	
 	/* We put condition under a normal disjunctive form */
 	if ((exp = sc_conditional(test_condition(t), &Genclosing_loops)) !=
-	    expression_undefined) {
+	    expression_undefined || sp_feautrier_expression_p(test_condition(t))) {
 	  //DK, don't change the structure of conditions
 	  //test_condition( t ) = exp ;
 	  static_test = true;
@@ -541,7 +548,7 @@ bool static_controlize(string mod_name)
 	/* mod_inst is an unstructured --11th Dec 1995, DB */
 
 	/***
-	   D.K desactivate  the normalization of loops to guard the
+	   D.K desactivate  the normalization of loops to preserve the
 	   original code
 	*/
 
@@ -587,6 +594,9 @@ bool static_controlize(string mod_name)
 	reset_current_module_entity();
 
 	debug_off();
+	// Reset of the assigned_var list after the phase is complete
+	gen_free_list(assigned_var);
+	assigned_var = NIL;
 
 	return(true);
 }

@@ -55,16 +55,6 @@
 #include "transformer.h"
 #include "accel-util.h"
 
-/**
- *
- */
-bool user_call_p(call c) {
-  entity f = call_function(c);
-  value v = entity_initial(f);
-  return value_code_p(v);
-}
-
-
 /** Make a sizeof expression
  *
  */

@@ -392,14 +392,13 @@ static int min_start_time_cluster(int nbclusters){
 /*used to compute the parallel task time of a task*/
 static double max_start_time_cluster(int nbclusters){
   double max = -1;
-  int max_cluster = -1, cl;
+  int cl;
   for(cl = 0; cl < nbclusters; cl++)
     {
       cluster *cl_s = gen_array_item(clusters, cl);
       double time = cl_s->time;
       if(time >= max || max == -1)
        {
-	 max_cluster = cl;
 	 max = time;
        }
     }
@@ -412,12 +411,10 @@ static bool DSRW(statement ready_st, statement unready_st, int order, int M){
   if(r_min_pred != statement_undefined)
     {
       min_start_time u_min_pred_s = tlevel_decrease(unready_st,M);
-      statement u_min_pred = u_min_pred_s.min_tau;
       double ptlevel_before = u_min_pred_s.min_tlevel; 
       annotation *anp = gen_array_item(annotations, (int)statement_ordering(r_min_pred));
       cl_p = anp->cluster;
       u_min_pred_s = tlevel_decrease(unready_st,M);
-      u_min_pred = u_min_pred_s.min_tau;
       double ptlevel_after = u_min_pred_s.min_tlevel; 
       if(ptlevel_after > ptlevel_before){
 	DSRW_p = true;

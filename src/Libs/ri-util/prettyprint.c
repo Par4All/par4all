@@ -4463,7 +4463,7 @@ text text_statement_enclosed(entity module,
 			     list pdl)
 {
   instruction i = statement_instruction(stmt);
-  synchronization sync  = statement_synchronization(stmt);
+  //synchronization sync  = statement_synchronization(stmt);
   text r= make_text(NIL);
   text temp;
   string i_comments = statement_comments(stmt);

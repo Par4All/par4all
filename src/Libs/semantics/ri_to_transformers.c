@@ -2378,8 +2378,8 @@ transformer any_assign_to_transformer(list args, /* arguments for assign */
   }
   // case constant path in lhs (dereferencing, struct, array)
   else if (syntax_call_p(slhs)) {
-    call clhs = syntax_call(slhs);
-    entity elhs = call_function(clhs);
+    //call clhs = syntax_call(slhs);
+    //entity elhs = call_function(clhs);
     //list exprlhs = call_arguments(clhs);
 
     if (current_statement_semantic_context_defined_p()) {
@@ -2540,8 +2540,8 @@ transformer any_update_to_transformer(entity op,
   }
   // case constant path in lhs (dereferencing, struct, array)
   else if (syntax_call_p(slhs)) {
-    call clhs = syntax_call(slhs);
-    entity elhs = call_function(clhs);
+    //call clhs = syntax_call(slhs);
+    //entity elhs = call_function(clhs);
     //list exprlhs = call_arguments(clhs);
 
     if (current_statement_semantic_context_defined_p()) {
@@ -2682,8 +2682,8 @@ transformer any_basic_update_to_transformer(entity op,
   }
   // case constant path in lhs (dereferencing, struct, array)
   else if (syntax_call_p(slhs)) {
-    call clhs = syntax_call(slhs);
-    entity elhs = call_function(clhs);
+    //call clhs = syntax_call(slhs);
+    //entity elhs = call_function(clhs);
     //list exprlhs = call_arguments(clhs);
 
     if (current_statement_semantic_context_defined_p()) {

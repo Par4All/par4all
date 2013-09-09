@@ -539,3 +539,13 @@ string string_fuse_final_linefeeds(string s)
 
   return s;
 }
+
+/**
+ * Test if a call is a user call
+ */
+bool user_call_p(call c) {
+  entity f = call_function(c);
+  value v = entity_initial(f);
+  return value_code_p(v);
+}
+
