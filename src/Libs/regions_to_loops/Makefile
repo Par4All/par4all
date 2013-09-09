@@ -21,7 +21,7 @@
 
 TARGET=regions_to_loops
 
-LIB_CFILES=regions_to_loops
+LIB_CFILES=regions_to_loops.c
 
 INC_TARGET=$(TARGET).h
 
