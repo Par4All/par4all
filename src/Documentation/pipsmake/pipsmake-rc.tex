@@ -16384,6 +16384,10 @@ be used during the generation:
 SCOP_PREFIX "SCoP"
 \end{PipsProp}
 
+\begin{PipsProp}{STATIC_CONTROLIZE_ACROSS_USER_CALLS}
+  STATIC_CONTROLIZE_ACROSS_USER_CALLS TRUE
+\end{PipsProp}
+
 Because user function calls are not allowed in PoCC static control
 parts, whereas they are generally accepted in PIPS (see Arnauld
 Leservot's PhD), we introduce a property to control the impact of user
@@ -16394,19 +16398,17 @@ are the only current issue\footnote{The PLUTO compiler does not
   collection.} So the property is called
 \PipsPropRef{STATIC_CONTROLIZE_ACROSS_USER_CALLS} and its default
 value is TRUE.
-\begin{PipsProp}{STATIC_CONTROLIZE_ACROSS_USER_CALLS}
-STATIC_CONTROLIZE_ACROSS_USER_CALLS TRUE
-\end{PipsProp}
+
 
 %\begin{PipsProp}{POCC_COMPATIBILITY}
 %POCC_COMPATIBILITY FALSE
 %\end{PipsProp}
 
-\subsection{rstream_interface}
+\subsection{Rstream interface}
 
 \begin{PipsPass}{rstream_interface}
 Detect non-SCoP of the code. Based on R-Stream constraints.
-Must be preceded by the pocc_prettyprinter phase.
+Must be preceded by the pocc\_prettyprinter phase.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -16418,7 +16420,7 @@ rstream_interface > MODULE.code
     < MODULE.static_control
 \end{PipsMake}
 
-\subsection{regions_to_loops}
+\section{Regions to loops}
 
 \begin{PipsPass}{regions_to_loops}
 This phase is designed to replace the body of a function by simple assignments. 
