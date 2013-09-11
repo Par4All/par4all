@@ -283,7 +283,7 @@ static void hierarchical_schedule_step(statement stmt, int P, int M, bool dsc_p)
       nbclustersL = 0;
       FOREACH(statement, st, L){
 	if(Ps <= 0){
-	  pips_user_warning("NBCLUSTERS is not sufficient to handle nested parts in statement_ordering = \n", statement_ordering(st));
+	  pips_user_warning("NBCLUSTERS is not sufficient to handle nested parts in statement_ordering = %d\n", statement_ordering(st));
 	}
 	else{
 	if(!get_bool_property("COSTLY_TASKS_ONLY") | costly_task(st)){

@@ -52,8 +52,6 @@ typedef dg_vertex_label vertex_label;
 #define SUCCESSORS true
 #define PREDECESSORS false
 
-list com_declarations_to_add = NIL;
-
 statement make_com_loopbody(entity v, bool neighbor, list vl, int k) {
   entity new_ent = make_constant_entity(itoa(k), is_basic_int, 4);
   expression exp = make_entity_expression(new_ent, NIL);
@@ -119,7 +117,7 @@ static void replace_indices_region_com(region r, list* dadd, int indNum, entity 
   list l_var_new = NIL;
   list li = NIL;
   // Default name given to indices
-  char* s = "autogen";
+  char* s = "_rtl";
   char s2[128];
   int indIntern = 0;
   list l_var_temp = gen_nreverse(gen_copy_seq(l_var));
@@ -176,10 +174,10 @@ static statement com_call(bool neighbor, list args_com, int k)
       replace_indices_region_com(reg, &phi, indNum, get_current_module_entity());
       statement s = region_to_com_nest(reg, neighbor, k);
       sl = CONS(STATEMENT, s, sl);
-      if(statement_loop_p(s)){
+      //if(statement_loop_p(s)){
 	indNum++;
 	declarations = gen_nconc(declarations, phi);
-      }
+	//}
     }
     com_declarations_to_add = gen_nconc(com_declarations_to_add, declarations);
     s_com =  make_block_statement(sl);

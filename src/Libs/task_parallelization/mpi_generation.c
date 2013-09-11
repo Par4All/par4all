@@ -35,6 +35,7 @@
 #include "effects-convex.h"
 #include "genC.h"
 #include "syntax.h"
+#include "bootstrap.h"
 
 #include "complexity_ri.h"
 #include "dg.h"
@@ -84,10 +85,18 @@ static void gen_mpi_send_recv(statement stmt)
   args = CONS(EXPRESSION, make_entity_expression(make_constant_entity("MPI_ANY_TAG", is_basic_string, 100), NIL), args);
   args = CONS(EXPRESSION, dest, args);
   expression expr =  EXPRESSION(CAR(CDR(lexpr))); 
-  if (basic_int_p(variable_basic(type_variable(entity_type(expression_to_entity(expr))))))
+  basic bas = variable_basic(type_variable(entity_type(expression_to_entity(expr))));
+  switch(basic_tag(bas)){
+  case is_basic_int:
     args = CONS(EXPRESSION, make_entity_expression(make_constant_entity("MPI_INT", is_basic_string, 100), NIL), args);
-  else
+    break;
+  case is_basic_float:
     args = CONS(EXPRESSION, make_entity_expression(make_constant_entity("MPI_FLOAT", is_basic_string, 100), NIL), args);
+    break;
+  default:
+    pips_user_warning("type not handled yet in MPI\n");
+    break;
+  }
   args = CONS(EXPRESSION, size, args);
   args = CONS(EXPRESSION, make_address_of_expression(expr), args);
   instruction com_call = make_instruction(is_instruction_call, make_call(name, (args)));

@@ -46,6 +46,8 @@ typedef dg_vertex_label vertex_label;
 #include "chains.h"
 #include "task_parallelization.h"
 
+list com_declarations_to_add;
+
 /* 
  *return SPIRE for a cluster stage
  */
@@ -215,11 +217,18 @@ bool spire_distributed_unstructured_to_structured (char * module_name)
 
   NBCLUSTERS = get_int_property("BDSC_NB_CLUSTERS");
   MEMORY_SIZE = get_int_property("BDSC_MEMORY_SIZE");
+  list entities = gen_filter_tabulated(gen_true, entity_domain);
+  char *rtl_prefix = "_rtl";
+  FOREACH(entity, e, entities) {
+    if (strncmp(entity_local_name(e), rtl_prefix, strlen(rtl_prefix)) == 0){
+      gen_clear_tabulated_element((gen_chunkp)e);
+    }
+  }
+  com_declarations_to_add = NIL;
   cluster_stage_spire_generation(stmt_to_cluster, kdg, module_stat, NBCLUSTERS);
   communications_construction(kdg, module_stat, stmt_to_cluster, -1);
-  FOREACH(entity, e, com_declarations_to_add) {
+  FOREACH(entity, e, com_declarations_to_add) 
     module_stat = add_declaration_statement(module_stat, e);
-  }
   if(!statement_undefined_p(return_st))
     insert_statement(module_stat, return_st, false);
   /* Reorder the module, because new statements have been generated. */
