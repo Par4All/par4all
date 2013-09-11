@@ -113,8 +113,6 @@ static bool gen_synchronization(statement stmt, bool nested_p, int length)
   default:
     break;
   }
-  if(com_instruction_p(statement_instruction(stmt)))
-      statement_instruction(stmt) = make_continue_instruction();
   return nested_p;
 }
 

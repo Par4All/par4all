@@ -50,12 +50,25 @@ typedef dg_vertex_label vertex_label;
 static statement init_stmt = statement_undefined;
 static entity rank, mpi_status, mpi_request;
 
+static bool com_statement_p(statement s)
+{
+  if(statement_loop_p(s)){
+    statement body = loop_body(statement_loop(s));
+    return com_statement_p(body);
+  }
+  else{
+    instruction i = statement_instruction(s);  
+    return native_instruction_p(i, SEND_FUNCTION_NAME)
+      || native_instruction_p(i, RECV_FUNCTION_NAME);
+  }
+}
+
 static void gen_mpi_send_recv(statement stmt)
 {
   list args = NIL, list_stmts = NIL;
   list lexpr = call_arguments(instruction_call(statement_instruction(stmt)));
-  expression dest = EXPRESSION(CAR(lexpr)); expression size; 
-  int pair = 0; 
+  expression dest = EXPRESSION(CAR(lexpr)); 
+  expression size = int_to_expression(1); 
   entity name;
   if(native_instruction_p(statement_instruction(stmt), SEND_FUNCTION_NAME)){
     name = make_constant_entity("MPI_Isend",is_basic_string, 100);
@@ -70,31 +83,22 @@ static void gen_mpi_send_recv(statement stmt)
   args = CONS(EXPRESSION, make_entity_expression(make_constant_entity("MPI_COMM_WORLD", is_basic_string, 100), NIL), args);
   args = CONS(EXPRESSION, make_entity_expression(make_constant_entity("MPI_ANY_TAG", is_basic_string, 100), NIL), args);
   args = CONS(EXPRESSION, dest, args);
-  list args_init = args;
-  FOREACH(EXPRESSION, expr, CDR(lexpr)){
-    pair++;
-    if(pair == 2) {
-      pair = 0;
-      args = args_init;
-      if (basic_int_p(variable_basic(type_variable(entity_type(expression_to_entity(expr))))))
-	args = CONS(EXPRESSION, make_entity_expression(make_constant_entity("MPI_INT", is_basic_string, 100), NIL), args);
-      else
-	args = CONS(EXPRESSION, make_entity_expression(make_constant_entity("MPI_FLOAT", is_basic_string, 100), NIL), args);
-      args = CONS(EXPRESSION, size, args);
-      args = CONS(EXPRESSION, expr, args);
-      instruction com_call = make_instruction(is_instruction_call, make_call(name, (args)));
-      statement st = make_statement(
+  expression expr =  EXPRESSION(CAR(CDR(lexpr))); 
+  if (basic_int_p(variable_basic(type_variable(entity_type(expression_to_entity(expr))))))
+    args = CONS(EXPRESSION, make_entity_expression(make_constant_entity("MPI_INT", is_basic_string, 100), NIL), args);
+  else
+    args = CONS(EXPRESSION, make_entity_expression(make_constant_entity("MPI_FLOAT", is_basic_string, 100), NIL), args);
+  args = CONS(EXPRESSION, size, args);
+  args = CONS(EXPRESSION, make_address_of_expression(expr), args);
+  instruction com_call = make_instruction(is_instruction_call, make_call(name, (args)));
+  statement st = make_statement(
 			  entity_empty_label(),
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED,
 			  empty_comments,
 			  com_call,
 			  NIL, NULL, empty_extensions(), make_synchronization_none());
-      list_stmts = CONS(STATEMENT, st, list_stmts);
-    }
-    else
-      size = expr;
-  }
+  list_stmts = CONS(STATEMENT, st, list_stmts);
   statement_instruction(stmt) = make_instruction_sequence(make_sequence(gen_nreverse(list_stmts)));  
   statement_extensions(stmt) = statement_extensions(stmt);
   statement_comments(stmt) = empty_comments;
@@ -132,7 +136,7 @@ static int gen_mpi(statement stmt, int nesting_level){
   statement new_s; list list_stmts = NIL, args = NIL;
   switch(synchronization_tag(sync)){
   case is_synchronization_spawn:
-    nesting_level = 1;
+    nesting_level = (nesting_level == 0)? 1 : ((nesting_level == 1) ? 2 : nesting_level);
     gen_if_rank(stmt, sync);
     break;
   case is_synchronization_barrier:
@@ -178,8 +182,8 @@ static void gen_flat_mpi(statement stmt, int nesting_level)
     case is_instruction_test :
       {
 	test t = instruction_test(inst);
-	bool nesting_level_t = gen_mpi(test_true(t),nesting_level);
-	bool nesting_level_f = gen_mpi(test_false(t),nesting_level);
+	int nesting_level_t = gen_mpi(test_true(t), nesting_level);
+	int nesting_level_f = gen_mpi(test_false(t), nesting_level);
 	gen_flat_mpi(test_true(t), nesting_level_t);
 	gen_flat_mpi(test_false(t), nesting_level_f);
 	break;
@@ -188,12 +192,13 @@ static void gen_flat_mpi(statement stmt, int nesting_level)
       {
 	loop l = statement_loop(stmt);
 	statement body = loop_body(l);
-	nesting_level =(nesting_level == 1)? 2:nesting_level;
+	if(!com_statement_p(body))
+	  nesting_level =(nesting_level == 1)? 2:nesting_level;
 	gen_flat_mpi(body, nesting_level);
 	break;
       }
     case is_instruction_call:
-      if(com_instruction_p(statement_instruction(stmt))){
+      if(com_statement_p(stmt)){
 	if(nesting_level == 2)
 	  update_statement_instruction(stmt, make_continue_instruction());
 	else
@@ -249,8 +254,10 @@ static statement mpi_initialize(statement stmt, entity module){
   if(statement_sequence_p(stmt)){
     list stmts = sequence_statements(statement_sequence(stmt)), body = NIL, decls = NIL;
     FOREACH(STATEMENT, s, stmts){
-      if(declaration_statement_p(s))
+      if(declaration_statement_p(s)){
 	decls =  CONS(STATEMENT, s, decls);
+	print_statement(s);
+      }
       else
 	if(!return_statement_p(s))
 	  body = CONS(STATEMENT, s, body);

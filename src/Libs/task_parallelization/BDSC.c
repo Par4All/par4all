@@ -548,12 +548,14 @@ int BDSC(sequence seq, int P, int M, int ordering) {
   bottom_level(kdg, annotations);
   priorities(annotations);
   FOREACH(statement, st, stmts){
-    unscheduled_tasks = CONS(STATEMENT, st, unscheduled_tasks);
-    if(ready_node(st))
-      ready_tasks = CONS(STATEMENT, st, ready_tasks);
-    else
-      unready_tasks = CONS(STATEMENT, st, unready_tasks);
+    if(!declaration_statement_p(st)) {
+      unscheduled_tasks = CONS(STATEMENT, st, unscheduled_tasks);
+      if(ready_node(st))
+	ready_tasks = CONS(STATEMENT, st, ready_tasks);
+      else
+	unready_tasks = CONS(STATEMENT, st, unready_tasks);
     }
+  }
   while(gen_length(unscheduled_tasks) > 0 ){
     ready_task = select_task_with_highest_priority(ready_tasks, statement_undefined);
     unready_task = select_task_with_highest_priority(unready_tasks, ready_task);

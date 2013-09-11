@@ -217,6 +217,9 @@ bool spire_distributed_unstructured_to_structured (char * module_name)
   MEMORY_SIZE = get_int_property("BDSC_MEMORY_SIZE");
   cluster_stage_spire_generation(stmt_to_cluster, kdg, module_stat, NBCLUSTERS);
   communications_construction(kdg, module_stat, stmt_to_cluster, -1);
+  FOREACH(entity, e, com_declarations_to_add) {
+    module_stat = add_declaration_statement(module_stat, e);
+  }
   if(!statement_undefined_p(return_st))
     insert_statement(module_stat, return_st, false);
   /* Reorder the module, because new statements have been generated. */

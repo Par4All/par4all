@@ -32,6 +32,8 @@
 #include "semantics.h"
 #include "transformations.h"
 
+#include "c_syntax.h"
+#include "syntax.h"
 #include "effects-convex.h"
 #include "genC.h"
 #include "complexity_ri.h"
@@ -44,25 +46,147 @@ typedef dg_vertex_label vertex_label;
 #include "graph.h"
 #include "ricedg.h"
 #include "chains.h"
+#include "regions_to_loops.h"
 #include "task_parallelization.h"
 
 #define SUCCESSORS true
 #define PREDECESSORS false
 
-bool com_instruction_p(instruction i)
-{
-  return native_instruction_p(i, SEND_FUNCTION_NAME)
-    || native_instruction_p(i, RECV_FUNCTION_NAME);
+list com_declarations_to_add = NIL;
+
+statement make_com_loopbody(entity v, bool neighbor, list vl, int k) {
+  entity new_ent = make_constant_entity(itoa(k), is_basic_int, 4);
+  expression exp = make_entity_expression(new_ent, NIL);
+  expression e = reference_to_expression(make_reference(v, gen_full_copy_list(vl)));
+  list args_com = CONS(EXPRESSION, e, CONS(EXPRESSION, exp, NIL));
+  string com = (neighbor) ? SEND_FUNCTION_NAME : RECV_FUNCTION_NAME;
+  statement s = make_call_statement(com,
+				    gen_nreverse(args_com),
+				    entity_undefined,
+				    empty_comments);
+  pips_assert("com body is not properly generated", statement_consistent_p(s));
+  return s;
 }
 
-static int count_data(expression exp, list args)
-{
-  int count = 0;
-  FOREACH(EXPRESSION, e, args){
-    if(reference_variable(syntax_reference(expression_syntax(e))) == reference_variable(syntax_reference(expression_syntax(exp))))
-       count ++;
+static statement Psysteme_to_loop_nest(entity v,list vl, Pbase b, Psysteme p, bool neighbor, list l_var, int k) {
+  Psysteme condition, enumeration;
+  statement body = make_com_loopbody(v, neighbor, l_var, k);;
+  algorithm_row_echelon_generic(p, b, &condition, &enumeration, true);
+  statement s = systeme_to_loop_nest(enumeration, vl, body, entity_intrinsic(DIVIDE_OPERATOR_NAME));
+  pips_assert("s is not properly generated (systeme_to_loop_nest)", statement_consistent_p(s));
+  return s;
+}
+
+/* Returns the entity corresponding to the global name */
+static entity global_name_to_entity( const char* package, const char* name ) {
+  return gen_find_tabulated(concatenate(package, MODULE_SEP_STRING, name, NULL), entity_domain);
+}
+
+
+statement region_to_com_nest (region r, bool isRead, int k) {
+  reference ref = effect_any_reference(r);
+  entity v = reference_variable(ref);
+  type t = entity_type(v);
+  statement s = statement_undefined; 
+  if (type_variable_p(t)) {
+    Psysteme p = region_system(r);
+    Pbase base = BASE_NULLE;
+    // Build the base
+    FOREACH(expression, e, reference_indices(ref)) {
+      entity phi = reference_variable(syntax_reference(expression_syntax(e)));
+      base = base_add_variable(base, (Variable)phi);
+    }
+    s = Psysteme_to_loop_nest(v, base_to_list(base), base, p, isRead, reference_indices(ref), k);
   }
-  return count;
+  else {
+    pips_internal_error("unexpected type \n");
+  }
+  pips_assert("s is properly generated", statement_consistent_p(s));
+  return s;
+  
+}
+
+
+/* This function is in charge of replacing the PHI entity of the region by generated indices.
+   PHI values has no correspondance in the code. Therefore we have to create actual indices and
+   replace them in the region in order for the rest to be build using the right entities.
+*/
+static void replace_indices_region_com(region r, list* dadd, int indNum, entity module) {
+  Psysteme ps = region_system(r);
+  reference ref = effect_any_reference(r);
+  list ref_indices = reference_indices(ref);
+  list l_var = base_to_list(sc_base(ps));
+  list l_var_new = NIL;
+  list li = NIL;
+  // Default name given to indices
+  char* s = "autogen";
+  char s2[128];
+  int indIntern = 0;
+  list l_var_temp = gen_nreverse(gen_copy_seq(l_var));
+  bool modified = false;
+  // The objective here is to explore the indices and the variable list we got from the base in order to compare and
+  // treat only the relevant cases
+  FOREACH(entity, e, l_var_temp) {
+    if (!ENDP(ref_indices)) {
+      FOREACH(expression, exp, ref_indices) {
+	entity phi = reference_variable(syntax_reference(expression_syntax(exp)));
+	if (!strcmp(entity_name(phi), entity_name(e))) {
+	  // If the names match, we generate a new name for the variable
+	  sprintf(s2, "%s:%s_%d_%d", module_local_name(module),s, indNum, indIntern);
+	  indIntern++;
+	  // We make a copy of the entity with a new name
+	  entity ec = make_entity_copy_with_new_name(e, s2, false);
+	  // However the new variable still has a rom type of storage, therefore we create a new ram object
+	  entity dynamic_area = global_name_to_entity(module_local_name(module), DYNAMIC_AREA_LOCAL_NAME);
+	  ram r =  make_ram(module, dynamic_area, CurrentOffsetOfArea(dynamic_area, e), NIL);
+	  entity_storage(ec) = make_storage_ram(r);
+	  s2[0] = '\0';
+	  // We build the list we are going to use to rename the variables of our system
+	  l_var_new = CONS(ENTITY, ec, l_var_new);
+	  // We build the list which will replace the list of indices of the region's reference
+	  li = CONS(EXPRESSION, entity_to_expression(ec), li);
+	  // We build the list which will be used to build the declaration statement 
+	  *dadd = CONS(ENTITY, ec, *dadd);
+	  modified = true;
+	}
+      }
+      if (!modified) {
+	gen_remove_once(&l_var, e);
+      }
+    }
+    modified = false;
+  }
+  pips_assert("different length \n", gen_length(l_var) == gen_length(l_var_new));
+  // Renaming the variables of the system and replacing the indice list of the region's reference
+  ps = sc_list_variables_rename(ps, l_var, l_var_new);
+  reference_indices(ref) = gen_nreverse(gen_full_copy_list(li));
+  pips_assert("region is not consistent", region_consistent_p(r));
+}
+
+
+static statement com_call(bool neighbor, list args_com, int k)
+{
+  list declarations = NIL;
+  list sl = NIL;
+  int indNum = 0;
+  statement s_com;
+  if(gen_length(args_com)>0){
+    FOREACH(effect, reg, args_com){
+      list phi = NIL;
+      replace_indices_region_com(reg, &phi, indNum, get_current_module_entity());
+      statement s = region_to_com_nest(reg, neighbor, k);
+      sl = CONS(STATEMENT, s, sl);
+      if(statement_loop_p(s)){
+	indNum++;
+	declarations = gen_nconc(declarations, phi);
+      }
+    }
+    com_declarations_to_add = gen_nconc(com_declarations_to_add, declarations);
+    s_com =  make_block_statement(sl);
+    return s_com;
+  }
+  else
+    return make_continue_statement(entity_empty_label());
 }
 
 static list transfer_regions(statement parent, statement child)
@@ -72,62 +196,11 @@ static list transfer_regions(statement parent, statement child)
   return RegionsIntersection(regions_dup(l_write), regions_dup(l_read), w_r_combinable_p);
 }
 
-static list list_communications(list l_communications, list args_com)
-{
-  expression size;
-  FOREACH(REGION,reg,l_communications){
-    if (!region_empty_p(reg) && region_entity(reg) != entity_undefined){
-      reference rr = region_any_reference(reg);
-      expression exp_phi = region_reference_to_expression(rr);
-      expression exp = make_entity_expression(region_entity(reg), NIL);
-      if(count_data(exp, args_com) == 0){
-	/*basic b = basic_of_expression(exp);
-	if(basic_pointer_p(b)) 
-	search for the size of the malloc instruction*/
-	Ppolynome reg_footprint = region_enumerate(reg);
-	if(POLYNOME_UNDEFINED_P(reg_footprint))
-	  size = int_to_expression(-1);//this will print UNDEFINED_COST
-	else
-	  size = polynome_to_expression(reg_footprint);
-	if(expression_constant_p(size)) 
-	  if(expression_to_int(size) == 1)
-	    args_com = CONS(EXPRESSION, exp_phi, args_com);
-	  else
-	    args_com = CONS(EXPRESSION, exp, args_com);
-	else
-	  args_com = CONS(EXPRESSION, exp, args_com);
-	args_com = CONS(EXPRESSION, size, args_com);
-      }
-    }
-  }
-  return args_com;
-}
 
-static statement com_call(bool neighbor, list args_com, int k)
+static list hierarchical_com(statement s, bool neighbor, int kp)
 {
-  if(gen_length(args_com)>0){
-    entity new_ent = make_constant_entity(itoa(k), is_basic_int, 4);
-    expression exp = make_entity_expression(new_ent, NIL);
-    args_com = CONS(EXPRESSION, exp, args_com);
-    string com = (neighbor) ? SEND_FUNCTION_NAME : RECV_FUNCTION_NAME;
-    return make_call_statement(com,
-			       args_com,
-			       entity_undefined,
-			       empty_comments);
-  }
-  return statement_undefined;
-}
-
-static list hierarchical_com( statement s, list kdg_args_com, bool neighbor, int kp)
-{
-  list h_sequence = NIL, com_regions = NIL, h_args_com = NIL;
-  FOREACH(LIST, l, kdg_args_com){
-    FOREACH(REGION, reg, l){
-      com_regions = CONS(REGION, reg, com_regions);
-    }
-  }
+  list h_sequence = NIL;
   list h_regions_com = (neighbor)?regions_dup(load_statement_out_regions(s)):regions_dup(load_statement_in_regions(s));
-  //list h_regions_com = (kdg_args_com = NIL) ? all_regions:RegionsEntitiesInfDifference(all_regions, com_regions,r_w_combinable_p);
   if(gen_length(h_regions_com)>0){
     statement new_s = make_statement(
 				     statement_label(s),
@@ -136,8 +209,7 @@ static list hierarchical_com( statement s, list kdg_args_com, bool neighbor, int
 				     statement_comments(s),
 				     statement_instruction(s),
 				     NIL, NULL, statement_extensions(s), statement_synchronization(s));
-    h_args_com = list_communications(h_regions_com, h_args_com);
-    statement com = com_call(neighbor, h_args_com, kp);
+    statement com = com_call(neighbor, h_regions_com, kp);
     if(!neighbor)
       h_sequence = CONS(STATEMENT,com,h_sequence);
     h_sequence = CONS(STATEMENT,new_s,h_sequence);
@@ -152,14 +224,14 @@ static list hierarchical_com( statement s, list kdg_args_com, bool neighbor, int
       statement_synchronization(s) = make_synchronization_none();
     }
   }
-  return gen_full_copy_list(h_args_com);
+  return h_regions_com;
 }
 
 
 static list gen_send_communications(statement s, vertex tau, persistant_statement_to_cluster st_to_cluster, graph tg, int kp)
 {
   int i;
-  list args_send, list_st = NIL, kdg_args_com = NIL, h_args_com = NIL;
+  list args_send, list_st = NIL, h_args_com = NIL;
   statement new_s = make_statement(
 				   statement_label(s),
 				   STATEMENT_NUMBER_UNDEFINED,
@@ -178,14 +250,12 @@ static list gen_send_communications(statement s, vertex tau, persistant_statemen
 	   != apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(ss))
 	   &&
 	   apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(ss)) == i) {
-	  list com_regions = transfer_regions (vertex_to_statement(statement_to_vertex(s,tg)),vertex_to_statement(statement_to_vertex(ss,tg))); // transfer_regions (s,ss); 
-	  kdg_args_com = CONS(LIST, com_regions, kdg_args_com);
-	  args_send = list_communications(com_regions, args_send);
+	  list com_regions = transfer_regions (vertex_to_statement(statement_to_vertex(s,tg)),vertex_to_statement(statement_to_vertex(ss,tg))); 
+	  if(gen_length(com_regions)>0)
+	    list_st = CONS(STATEMENT, com_call(SUCCESSORS, com_regions, i),list_st);
+	  break;
 	}
       }
-    }
-    if(gen_length(args_send)>0){
-      list_st = CONS(STATEMENT, com_call(SUCCESSORS, args_send, i),list_st);
     }
   }
   if(gen_length(list_st) > 1){ 
@@ -198,7 +268,7 @@ static list gen_send_communications(statement s, vertex tau, persistant_statemen
     statement_comments(s) = empty_comments;
   }
   if(apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(s)) != kp && (kp != -1))
-    h_args_com = hierarchical_com(s, kdg_args_com, SUCCESSORS, kp);
+    h_args_com = hierarchical_com(s, SUCCESSORS, kp);
   return h_args_com;
 }
 
@@ -221,7 +291,7 @@ static list predecessors(statement st, graph tg)
 static list gen_recv_communications(statement sv, persistant_statement_to_cluster st_to_cluster, graph tg, int kp)
 {
   int i;
-  list args_recv, list_st = NIL,  kdg_args_com = NIL, h_args_com = NIL;
+  list args_recv, list_st = NIL,  h_args_com = NIL;
   statement new_s = make_statement(
 				   statement_label(sv),
 				   STATEMENT_NUMBER_UNDEFINED,
@@ -237,13 +307,10 @@ static list gen_recv_communications(statement sv, persistant_statement_to_cluste
       if(bound_persistant_statement_to_cluster_p(st_to_cluster, statement_ordering(parent))) {
 	if(apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(parent)) != apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(sv)) && apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(parent)) == i){ 
 	  list com_regions = transfer_regions (vertex_to_statement(statement_to_vertex(parent,tg)),vertex_to_statement(statement_to_vertex(sv,tg))); 
-	  kdg_args_com = CONS(LIST, com_regions, kdg_args_com);
-	  args_recv = list_communications(com_regions, args_recv);
+	  list_st = CONS(STATEMENT, com_call(PREDECESSORS, com_regions, i), list_st);
+	  break;
 	}
       }
-    }
-    if(gen_length(args_recv) > 0){
-      list_st = CONS(STATEMENT, com_call(PREDECESSORS, args_recv, i), list_st);
     }
   }
   if(gen_length(list_st) > 1){
@@ -255,7 +322,7 @@ static list gen_recv_communications(statement sv, persistant_statement_to_cluste
     statement_comments(sv)=empty_comments;
   }
   if(apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(sv)) != kp && (kp != -1))
-    h_args_com = hierarchical_com(sv,kdg_args_com,PREDECESSORS,kp);
+    h_args_com = hierarchical_com(sv, PREDECESSORS, kp);
   return  h_args_com;
 }
 

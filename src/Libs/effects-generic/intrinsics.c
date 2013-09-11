@@ -1267,7 +1267,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {PIPS_MEMORY_BARRIER_OPERATOR_NAME,       make_anywhere_read_write_memory_effects},
   {PIPS_IO_BARRIER_OPERATOR_NAME,           make_io_read_write_memory_effects},
 
-  /*SPIRE intrinsics */
+  /* SPIRE intrinsics */
   {SEND_FUNCTION_NAME,                  c_io_effects},
   {RECV_FUNCTION_NAME,                  c_io_effects},
 
