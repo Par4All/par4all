@@ -69,23 +69,29 @@ void main(int argc, char *argv[])
       MPI_Status status0;
       //PIPS generated variable
       MPI_Request request0;
+      //PIPS generated variable
+      int autogen_0_0, autogen_0_0_0, autogen_0_0_1, autogen_0_0_2, autogen_0_0_3, autogen_0_0_4, autogen_0_0_5, autogen_0_0_6, autogen_0_0_7, autogen_0_0_8, autogen_0_0_9, autogen_0_0_10, autogen_0_0_11, autogen_0_0_12, autogen_0_0_13, autogen_0_0_14, autogen_0_0_15, autogen_0_0_16, autogen_0_0_17, autogen_0_0_18;
       MPI_Init(&argc, &argv);
       MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
       if (rank0==0) {
          InitHarris(in);
-         MPI_Isend(in, 1048576, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         for(autogen_0_0_18 = 0; autogen_0_0_18 <= 1048575; autogen_0_0_18 += 1)
+            MPI_Isend(&in[autogen_0_0_18], 1, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
       }
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0) {
          /* Now we run the Harris procedure */
          //Sobel
          SobelX(Gx, in);
-         MPI_Isend(Gx, 1046526, MPI_FLOAT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         for(autogen_0_0_17 = 1025; autogen_0_0_17 <= 1047550; autogen_0_0_17 += 1)
+            MPI_Isend(&Gx[autogen_0_0_17], 1, MPI_FLOAT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
       }
       if (rank0==1) {
-         MPI_Recv(in, 1048576, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(autogen_0_0_15 = 0; autogen_0_0_15 <= 1048575; autogen_0_0_15 += 1)
+            MPI_Recv(&in[autogen_0_0_15], 1, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
          SobelY(Gy, in);
-         MPI_Isend(Gy, 1046526, MPI_FLOAT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         for(autogen_0_0_16 = 1025; autogen_0_0_16 <= 1047550; autogen_0_0_16 += 1)
+            MPI_Isend(&Gy[autogen_0_0_16], 1, MPI_FLOAT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
       }
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0)
@@ -94,8 +100,10 @@ void main(int argc, char *argv[])
       if (rank0==1)
          MultiplY(Iyy, Gy, Gy);
       if (rank0==2) {
-         MPI_Recv(Gy, 1046526, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
-         MPI_Recv(Gx, 1046526, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(autogen_0_0_14 = 1025; autogen_0_0_14 <= 1047550; autogen_0_0_14 += 1)
+            MPI_Recv(&Gy[autogen_0_0_14], 1, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(autogen_0_0_13 = 1025; autogen_0_0_13 <= 1047550; autogen_0_0_13 += 1)
+            MPI_Recv(&Gx[autogen_0_0_13], 1, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
          MultiplY(Ixy, Gx, Gy);
       }
       MPI_Barrier(MPI_COMM_WORLD);
@@ -104,16 +112,20 @@ void main(int argc, char *argv[])
          Gauss(Sxx, Ixx);
       if (rank0==1) {
          Gauss(Syy, Iyy);
-         MPI_Isend(Syy, 1046526, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         for(autogen_0_0_12 = 1025; autogen_0_0_12 <= 1047550; autogen_0_0_12 += 1)
+            MPI_Isend(&Syy[autogen_0_0_12], 1, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
       }
       if (rank0==2) {
          Gauss(Sxy, Ixy);
-         MPI_Isend(Sxy, 1046526, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         for(autogen_0_0_11 = 1025; autogen_0_0_11 <= 1047550; autogen_0_0_11 += 1)
+            MPI_Isend(&Sxy[autogen_0_0_11], 1, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
       }
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0) {
-         MPI_Recv(Sxy, 1046526, MPI_FLOAT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
-         MPI_Recv(Syy, 1046526, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(autogen_0_0_10 = 1025; autogen_0_0_10 <= 1047550; autogen_0_0_10 += 1)
+            MPI_Recv(&Sxy[autogen_0_0_10], 1, MPI_FLOAT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(autogen_0_0_9 = 1025; autogen_0_0_9 <= 1047550; autogen_0_0_9 += 1)
+            MPI_Recv(&Syy[autogen_0_0_9], 1, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
          //Coarsity
          CoarsitY(out, Sxx, Syy, Sxy);
       }

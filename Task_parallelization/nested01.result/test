@@ -16,11 +16,13 @@ void main(int argc, char *argv[])
       int N;
       //PIPS generated variable
       double a, b;
+      //PIPS generated variable
+      int autogen_0_0, autogen_0_0_0, autogen_0_0_5, autogen_0_0_6;
       MPI_Init(&argc, &argv);
       MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
       if (rank0==0) {
          N = 100;
-         MPI_Isend(N, 1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&N, 1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
       }
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0)
@@ -28,23 +30,33 @@ void main(int argc, char *argv[])
 
 
 
+
+
+
             B[i] = 3;
+            autogen_0_0_9 = i;
+
 
 
             A[i] = 5;
+            autogen_0_0_7 = i;
 
+            autogen_0_0_8 = i;
 
+            autogen_0_0_10 = i;
 
          }
       if (rank0==1) {
-         MPI_Recv(N, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         MPI_Recv(&N, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
          for(i = 0; i <= N-1; i += 1)
             C[i] = 5;
-         MPI_Isend(C, 100, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         for(autogen_0_0_6 = 0; autogen_0_0_6 <= 99; autogen_0_0_6 += 1)
+            MPI_Isend(&C[autogen_0_0_6], 1, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
       }
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0) {
-         MPI_Recv(C, 100, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(autogen_0_0_5 = 0; autogen_0_0_5 <= 99; autogen_0_0_5 += 1)
+            MPI_Recv(&C[autogen_0_0_5], 1, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
          for(i = 0; i <= N-1; i += 1)
             D[i] = A[i]+B[i]+C[i];
       }

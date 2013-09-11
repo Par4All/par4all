@@ -41,8 +41,6 @@ apply HBDSC_PARALLELIZATION[main]
 #shell gqview communications01.database/main/main_scheduled_sdg.png
 
 apply SPIRE_DISTRIBUTED_UNSTRUCTURED_TO_STRUCTURED[main]
-# error: one should replace A[PHI1] by A[i]. 
-#hierarchical MPI not implemented yet; this will generate a flat MPI 
 echo // MPI style
 activate MPI_TASK_GENERATION
 activate PRINT_PARALLELIZEDMPI_CODE

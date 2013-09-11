@@ -22,6 +22,7 @@ void main(int argc, char *argv[]){
     B[i]= B[i] * b; 
   for(i = 0 ; i < N ; i++)
     C[i]+= A[i] +  B[i]; 
+  return;
 }
      
       

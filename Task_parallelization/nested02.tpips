@@ -41,7 +41,6 @@ apply HBDSC_PARALLELIZATION[main]
 
 
 apply SPIRE_DISTRIBUTED_UNSTRUCTURED_TO_STRUCTURED[main]
-# error: one should replace A[PHI1] by A[i]. 
 echo hierarchical MPI not implemented yet; this will generate a flat MPI
 #echo // MPI style
 activate MPI_TASK_GENERATION

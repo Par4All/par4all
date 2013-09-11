@@ -12,11 +12,13 @@ void main(int argc, char *argv[])
       unsigned int i, N;
       //PIPS generated variable
       double A[10], B[10], C[10], a, b;
+      //PIPS generated variable
+      int autogen_0_0, autogen_0_0_0, autogen_0_0_7, autogen_0_0_8, autogen_0_0_9, autogen_0_0_16;
       MPI_Init(&argc, &argv);
       MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
       if (rank0==0) {
          N = 10;
-         MPI_Isend(N, 1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&N, 1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
       }
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0) {
@@ -24,7 +26,8 @@ void main(int argc, char *argv[])
             B[i] = 3;
             A[i] = 5;
          }
-         MPI_Isend(B, 10, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         for(autogen_0_0_16 = 0; autogen_0_0_16 <= 9; autogen_0_0_16 += 1)
+            MPI_Isend(&B[autogen_0_0_16], 1, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
       }
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0)
@@ -32,30 +35,46 @@ void main(int argc, char *argv[])
 
 
 
+            autogen_0_0_15 = i;
+
+
+
+
+            autogen_0_0_12 = i;
+
+
+
             A[i] = A[i]*a;
+            autogen_0_0_13 = i;
+
 
 
             C[i] = 0;
+            autogen_0_0_10 = i;
 
+            autogen_0_0_11 = i;
 
+            autogen_0_0_14 = i;
 
          }
       if (rank0==1) {
-         MPI_Recv(B, 10, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
-         MPI_Recv(N, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         MPI_Recv(&N, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
          for(i = 0; i < N; i += 1)
             B[i] = B[i]*b;
-         MPI_Isend(B, 10, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         for(autogen_0_0_9 = 0; autogen_0_0_9 <= 9; autogen_0_0_9 += 1)
+            MPI_Isend(&B[autogen_0_0_9], 1, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
       }
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0) {
-         MPI_Recv(B, 10, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(autogen_0_0_8 = 0; autogen_0_0_8 <= 9; autogen_0_0_8 += 1)
+            MPI_Recv(&B[autogen_0_0_8], 1, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
          for(i = 0; i < N; i += 1)
             C[i] += A[i]+B[i];
       }
       MPI_Barrier(MPI_COMM_WORLD);
    }
    MPI_Finalize();
+   return;
 }
 // OMP style
 void main(int argc, char *argv[])
@@ -114,4 +133,5 @@ void main(int argc, char *argv[])
             C[i] += A[i]+B[i];
       }
    }
+   return;
 }
