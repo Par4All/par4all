@@ -50,7 +50,7 @@ void main(int argc, char *argv[])
       MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
       if (rank0==0) {
          N = 10;
-         MPI_Isend(&N, 1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&N, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
       }
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0)
@@ -61,7 +61,7 @@ void main(int argc, char *argv[])
          for(i = 0; i < N; i += 1)
             B[i] = 3;
          for(_rtl_0_0_0 = 0; _rtl_0_0_0 <= 9; _rtl_0_0_0 += 1)
-            MPI_Isend(&B[_rtl_0_0_0], 1, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+            MPI_Isend(&B[_rtl_0_0_0], 1, MPI_FLOAT, 0, 0, MPI_COMM_WORLD, &request0);
       }
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0) {

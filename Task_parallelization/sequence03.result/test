@@ -47,7 +47,7 @@ void main(int argc, char *argv[])
       MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
       if (rank0==0) {
          i = 4;
-         MPI_Isend(&i, 1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&i, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
       }
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0)
@@ -56,7 +56,7 @@ void main(int argc, char *argv[])
          MPI_Recv(&i, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
          B[i] = 24;
          _rtl_0_0_0 = 4;
-         MPI_Isend(&B[_rtl_0_0_0], 1, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&B[_rtl_0_0_0], 1, MPI_FLOAT, 0, 0, MPI_COMM_WORLD, &request0);
       }
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0) {

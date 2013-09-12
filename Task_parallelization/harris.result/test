@@ -76,7 +76,7 @@ void main(int argc, char *argv[])
       if (rank0==0) {
          InitHarris(in);
          for(_rtl_0_0_8 = 0; _rtl_0_0_8 <= 1048575; _rtl_0_0_8 += 1)
-            MPI_Isend(&in[_rtl_0_0_8], 1, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+            MPI_Isend(&in[_rtl_0_0_8], 1, MPI_FLOAT, 1, 1, MPI_COMM_WORLD, &request0);
       }
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0) {
@@ -84,14 +84,14 @@ void main(int argc, char *argv[])
          //Sobel
          SobelX(Gx, in);
          for(_rtl_0_0_7 = 1025; _rtl_0_0_7 <= 1047550; _rtl_0_0_7 += 1)
-            MPI_Isend(&Gx[_rtl_0_0_7], 1, MPI_FLOAT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+            MPI_Isend(&Gx[_rtl_0_0_7], 1, MPI_FLOAT, 2, 2, MPI_COMM_WORLD, &request0);
       }
       if (rank0==1) {
          for(_rtl_0_0_5 = 0; _rtl_0_0_5 <= 1048575; _rtl_0_0_5 += 1)
             MPI_Recv(&in[_rtl_0_0_5], 1, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
          SobelY(Gy, in);
          for(_rtl_0_0_6 = 1025; _rtl_0_0_6 <= 1047550; _rtl_0_0_6 += 1)
-            MPI_Isend(&Gy[_rtl_0_0_6], 1, MPI_FLOAT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+            MPI_Isend(&Gy[_rtl_0_0_6], 1, MPI_FLOAT, 2, 2, MPI_COMM_WORLD, &request0);
       }
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0)
@@ -113,12 +113,12 @@ void main(int argc, char *argv[])
       if (rank0==1) {
          Gauss(Syy, Iyy);
          for(_rtl_0_0_2 = 1025; _rtl_0_0_2 <= 1047550; _rtl_0_0_2 += 1)
-            MPI_Isend(&Syy[_rtl_0_0_2], 1, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+            MPI_Isend(&Syy[_rtl_0_0_2], 1, MPI_FLOAT, 0, 0, MPI_COMM_WORLD, &request0);
       }
       if (rank0==2) {
          Gauss(Sxy, Ixy);
          for(_rtl_0_0_1 = 1025; _rtl_0_0_1 <= 1047550; _rtl_0_0_1 += 1)
-            MPI_Isend(&Sxy[_rtl_0_0_1], 1, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &request0);
+            MPI_Isend(&Sxy[_rtl_0_0_1], 1, MPI_FLOAT, 0, 0, MPI_COMM_WORLD, &request0);
       }
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0) {
