@@ -79,6 +79,7 @@ def process(input):
                 opencl = input.opencl,
                 openmp=input.openmp,
                 spear=input.spear,
+                astrad=input.astrad,
                 com_optimization = input.com_optimization,
                 cuda_cc = input.cuda_cc,
                 fftw3 = input.fftw3,

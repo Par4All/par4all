@@ -571,6 +571,7 @@ def main():
             input.fftw3 = options.fftw3
             input.openmp = options.openmp
             input.scmp = options.scmp
+            input.astrad = True
             input.spear = options.spear_xml
             input.fine_grain = options.fine_grain
             input.atomic = options.atomic
