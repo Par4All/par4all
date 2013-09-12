@@ -167,24 +167,24 @@ static statement com_call(bool neighbor, list args_com, int k)
   list declarations = NIL;
   list sl = NIL;
   int indNum = 0;
-  statement s_com;
+  statement s_com = make_continue_statement(entity_empty_label());
   if(gen_length(args_com)>0){
     FOREACH(effect, reg, args_com){
-      list phi = NIL;
-      replace_indices_region_com(reg, &phi, indNum, get_current_module_entity());
-      statement s = region_to_com_nest(reg, neighbor, k);
-      sl = CONS(STATEMENT, s, sl);
-      //if(statement_loop_p(s)){
+      entity e = region_entity(reg);
+      if(!io_entity_p(e) && !stdin_entity_p(e)){
+	list phi = NIL;
+	replace_indices_region_com(reg, &phi, indNum, get_current_module_entity());
+	statement s = region_to_com_nest(reg, neighbor, k);
+	sl = CONS(STATEMENT, s, sl);
 	indNum++;
 	declarations = gen_nconc(declarations, phi);
-	//}
+      }
     }
     com_declarations_to_add = gen_nconc(com_declarations_to_add, declarations);
-    s_com =  make_block_statement(sl);
-    return s_com;
+    if(gen_length(sl) > 0)
+      s_com =  make_block_statement(sl);
   }
-  else
-    return make_continue_statement(entity_empty_label());
+  return s_com;
 }
 
 static list transfer_regions(statement parent, statement child)

@@ -70,19 +70,22 @@ static void gen_mpi_send_recv(statement stmt)
   list lexpr = call_arguments(instruction_call(statement_instruction(stmt)));
   expression dest = EXPRESSION(CAR(lexpr)); 
   expression size = int_to_expression(1); 
+  expression tag;
   entity name;
   if(native_instruction_p(statement_instruction(stmt), SEND_FUNCTION_NAME)){
     name = make_constant_entity("MPI_Isend",is_basic_string, 100);
     expression exp_req = make_entity_expression(mpi_request, NIL);
     args = CONS(EXPRESSION, make_address_of_expression(exp_req), args);
+    tag = copy_expression(dest);
   }
   else{
     name = make_constant_entity("MPI_Recv",is_basic_string, 100);
     expression exp_st = make_entity_expression(mpi_status, NIL);
     args = CONS(EXPRESSION, make_address_of_expression(exp_st), args);
+    tag = make_entity_expression(make_constant_entity("MPI_ANY_TAG", is_basic_string, 100), NIL);
   }
   args = CONS(EXPRESSION, make_entity_expression(make_constant_entity("MPI_COMM_WORLD", is_basic_string, 100), NIL), args);
-  args = CONS(EXPRESSION, make_entity_expression(make_constant_entity("MPI_ANY_TAG", is_basic_string, 100), NIL), args);
+  args = CONS(EXPRESSION, tag, args);
   args = CONS(EXPRESSION, dest, args);
   expression expr =  EXPRESSION(CAR(CDR(lexpr))); 
   basic bas = variable_basic(type_variable(entity_type(expression_to_entity(expr))));
