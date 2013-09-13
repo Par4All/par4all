@@ -47,11 +47,11 @@ class p4a_astrad_postprocessor(object):
         print("saving in dir: " + self.saveDir + "\n")
 
 
-    def set_source_name(self, file):
+    def set_source_name(self, name):
         if(self.sourceName):
             p4a_util.die("ASTRAD post processor ERROR: there are more than one input modules:\n")
         else:
-            self.sourceName = file
+            self.sourceName = os.path.split(name)[1];
 
     def set_error_code(self, err):
         self.errorCode = err
