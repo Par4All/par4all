@@ -66,7 +66,7 @@ class p4a_astrad_postprocessor(object):
         first = True
         for name in files:
             if not first:
-                self.generatedKernelFiles += " ,"
+                self.generatedKernelFiles += ", "
             else:
                 first = False
             self.generatedKernelFiles += os.path.split(name)[1];
