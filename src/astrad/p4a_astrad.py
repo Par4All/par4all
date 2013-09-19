@@ -58,7 +58,7 @@ class p4a_astrad_postprocessor(object):
         self.errorCode = err
 
     def set_output_file_name(self, name):
-        self.outputFileName = os.path.split(name)[1]
+        self.outputFileName = name
 
     def set_main_function_name(self, name):
         self.mainFunctionName = name
