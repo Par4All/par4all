@@ -205,6 +205,7 @@ class p4a_processor(object):
     wrapper_return_type = "P4A_accel_kernel_wrapper"
 
     astrad_postproc = None
+    astrad_main_function_name = None
 
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
@@ -619,6 +620,13 @@ class p4a_processor(object):
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
         
+        if (self.astrad):
+            # find top function name
+            for m in all_modules:
+                if not m.callers:
+                    self.astrad_main_function_name = m.name
+                    print("ASTRAD: method_name" + m.name)
+                    break
 
         if fine_grain:
             # Set to False (mandatory) for A&K algorithm on C source file
@@ -1271,7 +1279,7 @@ class p4a_processor(object):
 
         if self.astrad:
 
-
+            # find output dialect and initialize astrad postprocessor
             if self.cuda:
                 dialect = "cuda"
             elif self.opencl:
@@ -1281,6 +1289,7 @@ class p4a_processor(object):
             else:
                 p4a_util.die("ASTRAD post processor ERROR: unexpected output dialect")
             self.astrad_postproc = p4a_astrad.p4a_astrad_postprocessor(dialect, dest_dir)
+            self.astrad_postproc.set_main_function_name(self.astrad_main_function_name)
 
         output_files = []
 

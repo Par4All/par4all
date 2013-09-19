@@ -27,6 +27,7 @@ class p4a_astrad_postprocessor(object):
     errorCode = "ok"
     outputDialect = None
     outputFileName = None
+    mainFunctionName = None
     outputDirectory = None
     generatedHeaderFile = "p4a_new_files_include.h"
     generatedKernelFiles = ""
@@ -51,13 +52,16 @@ class p4a_astrad_postprocessor(object):
         if(self.sourceName):
             p4a_util.die("ASTRAD post processor ERROR: there are more than one input modules:\n")
         else:
-            self.sourceName = os.path.split(name)[1];
+            self.sourceName = os.path.split(name)[1]
 
     def set_error_code(self, err):
         self.errorCode = err
 
     def set_output_file_name(self, name):
-        self.outputFileName = os.path.split(name)[1];
+        self.outputFileName = os.path.split(name)[1]
+
+    def set_main_function_name(self, name):
+        self.mainFunctionName = name
 
     def set_output_directory(self, dir):
          self.outputDirectory = dir
@@ -69,7 +73,7 @@ class p4a_astrad_postprocessor(object):
                 self.generatedKernelFiles += ", "
             else:
                 first = False
-            self.generatedKernelFiles += os.path.split(name)[1];
+            self.generatedKernelFiles += os.path.split(name)[1]
 
     def save_dsl_file(self):
         global astrad_dialect_names
@@ -82,16 +86,17 @@ class p4a_astrad_postprocessor(object):
 
         content = "optimizeResult request_optimize\n"
         content +="{\n"
-        content += "sourceName = " + self.sourceName + ";\n"
+        content += "sourceName = " + self.outputFileName + ";\n"
+        content += "methodName = " + self.mainFunctionName + ";\n"
         content += "errorCode = " + self.errorCode + ";\n"
+        content += "kernelFileName = " + ";\n"
         content += "type = " + self.outputDialect + ";\n"
-        content += "outputDirectory = " + self.outputDirectory + ";\n"
-        content += "outputFileName = " + self.outputFileName + ";\n"
-        if (self.outputDialect != astrad_dialect_names['openmp']):
-            content += "generatedKernelFiles = "
-            content += self.generatedKernelFiles
-            content += ";\n"
-            content += "generatedHeaderFile = " + self.generatedHeaderFile + ";\n"
+
+        #if (self.outputDialect != astrad_dialect_names['openmp']):
+        #    content += "generatedKernelFiles = "
+        #    content += self.generatedKernelFiles
+        #    content += ";\n"
+        #    content += "generatedHeaderFile = " + self.generatedHeaderFile + ";\n"
 
         content += "Par4All (\"" + self.p4aVersion + "\")\n"
         content += "{\n" + "date = "
