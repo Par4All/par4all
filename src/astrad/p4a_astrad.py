@@ -58,7 +58,7 @@ class p4a_astrad_postprocessor(object):
         self.errorCode = err
 
     def set_output_file_name(self, name):
-        self.outputFileName = name
+        self.outputFileName = os.path.split(name)[1]
 
     def set_main_function_name(self, name):
         self.mainFunctionName = name
@@ -84,7 +84,9 @@ class p4a_astrad_postprocessor(object):
 
         f = open(dsl_file_name, 'w')
 
-        content = "optimizeResult request_optimize\n"
+        content = "optimizeResult request_optimize_"
+        content += time.strftime('%y_%m_%d',time.localtime())
+        content +="\n"
         content +="{\n"
         content += "sourceName = " + self.outputFileName + ";\n"
         content += "methodName = " + self.mainFunctionName + ";\n"
@@ -100,7 +102,7 @@ class p4a_astrad_postprocessor(object):
 
         content += "Par4All (\"" + self.p4aVersion + "\")\n"
         content += "{\n" + "date = "
-        content += time.strftime('%d/%m/%y %H:%M',time.localtime())
+        content += time.strftime('%d/%m/%y',time.localtime())
         content += ";\n}\n"
         content += "}\n"
 
