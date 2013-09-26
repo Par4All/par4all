@@ -41,15 +41,12 @@ class p4a_astrad_postprocessor(object):
         self.outputDialect = astrad_dialect_names[dialect]
         print("output dialect : " + self.outputDialect +"\n")
         self.p4aVersion = p4a_version.VERSION()
-        if save_dir:
-            self.saveDir = save_dir
-        else:
-            self.saveDir = os.getcwd()
+        self.saveDir = save_dir or os.getcwd()
         print("saving in dir: " + self.saveDir + "\n")
 
 
     def set_source_name(self, name):
-        if(self.sourceName):
+        if self.sourceName:
             p4a_util.die("ASTRAD post processor ERROR: there are more than one input modules:\n")
         else:
             self.sourceName = os.path.split(name)[1]
@@ -94,6 +91,7 @@ class p4a_astrad_postprocessor(object):
         content += "kernelFileName = " + ";\n"
         content += "type = " + self.outputDialect + ";\n"
 
+        # not compliant with dsl specification. To be discussed
         #if (self.outputDialect != astrad_dialect_names['openmp']):
         #    content += "generatedKernelFiles = "
         #    content += self.generatedKernelFiles
