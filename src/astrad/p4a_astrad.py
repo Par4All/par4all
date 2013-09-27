@@ -36,13 +36,13 @@ class p4a_astrad_postprocessor(object):
     def __init__(self, dialect="openmp", save_dir=None):
         import p4a_version
 
-        print("ASTRAD: call to initialization \n")
+        #print("ASTRAD: call to initialization \n")
         global astrad_dialect_names
         self.outputDialect = astrad_dialect_names[dialect]
-        print("output dialect : " + self.outputDialect +"\n")
+        #print("output dialect : " + self.outputDialect +"\n")
         self.p4aVersion = p4a_version.VERSION()
         self.saveDir = save_dir or os.getcwd()
-        print("saving in dir: " + self.saveDir + "\n")
+        #print("saving in dir: " + self.saveDir + "\n")
 
 
     def set_source_name(self, name):
@@ -75,9 +75,9 @@ class p4a_astrad_postprocessor(object):
     def save_dsl_file(self):
         global astrad_dialect_names
 
-        print("ASTRAD: call to save_dsl_file \n")
+        #print("ASTRAD: call to save_dsl_file \n")
         dsl_file_name = os.path.join(self.saveDir, p4a_util.change_file_ext(self.sourceName, '.dsl'))
-        print("file name :" + dsl_file_name + "\n")
+        #print("file name :" + dsl_file_name + "\n")
 
         f = open(dsl_file_name, 'w')
 
