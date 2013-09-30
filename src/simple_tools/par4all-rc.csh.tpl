@@ -24,7 +24,7 @@ setenv P4A_ACCEL_DIR $$P4A_DIST/$accel
 setenv P4A_SCMP_DIR $$P4A_DIST/$scmp
 
 # Location of the Par4All_astrad files.
-setenv P4A_SCMP_DIR $$P4A_DIST/$astrad
+setenv P4A_ASTRAD_DIR $$P4A_DIST/$astrad
 
 # Location of the Par4All configuration files.
 setenv P4A_ETC $$P4A_DIST/etc
