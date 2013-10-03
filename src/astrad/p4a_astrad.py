@@ -88,7 +88,7 @@ class p4a_astrad_postprocessor(object):
         content += "sourceName = " + self.outputFileName + ";\n"
         content += "methodName = " + self.mainFunctionName + ";\n"
         content += "errorCode = " + self.errorCode + ";\n"
-        content += "kernelFileName = " + ";\n"
+        content += "kernelFileName = kernel.dsl;\n"
         content += "type = " + self.outputDialect + ";\n"
 
         # not compliant with dsl specification. To be discussed
