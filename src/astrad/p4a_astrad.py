@@ -45,11 +45,13 @@ class p4a_astrad_postprocessor(object):
         #print("saving in dir: " + self.saveDir + "\n")
 
 
-    def set_source_name(self, name):
+    def add_source_name(self, name):
+
         if self.sourceName:
-            p4a_util.die("ASTRAD post processor ERROR: there are more than one input modules:\n")
+            self.sourceName += ", "
         else:
-            self.sourceName = os.path.split(name)[1]
+            self.sourceName = ""
+        self.sourceName += os.path.split(name)[1]
 
     def set_error_code(self, err):
         self.errorCode = err
@@ -75,9 +77,9 @@ class p4a_astrad_postprocessor(object):
     def save_dsl_file(self):
         global astrad_dialect_names
 
-        #print("ASTRAD: call to save_dsl_file \n")
-        dsl_file_name = os.path.join(self.saveDir, p4a_util.change_file_ext(self.sourceName, '.dsl'))
-        #print("file name :" + dsl_file_name + "\n")
+        print("ASTRAD: call to save_dsl_file \n")
+        dsl_file_name = os.path.join(self.saveDir, self.mainFunctionName + '.dsl')
+        print("file name :" + dsl_file_name + "\n")
 
         f = open(dsl_file_name, 'w')
 

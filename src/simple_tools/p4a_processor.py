@@ -1216,7 +1216,7 @@ class p4a_processor(object):
                 #os.remove(file)
                 continue
             if (self.astrad and not self.spear):
-                self.astrad_postproc.set_source_name(file)
+                self.astrad_postproc.add_source_name(file)
             (dir, name) = os.path.split(file)
             # Where the file does well in the .database workspace:
             pips_file = os.path.join(self.workspace.dirname, "Src", name)
