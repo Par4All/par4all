@@ -131,17 +131,24 @@ class p4a_astrad_postprocessor(object):
         dsl_text = "kernel {\n"
 
         # types used
+        data_types = {}
+        for array in tree.getroot().find("FormalArrays").findall("Array"):
+            data_type = array.find('DataType').attrib['Type']
+            if not (data_type in data_types):
+                data_types[data_type] = array.find('DataType').attrib['Size']
+        for t, s in data_types.iteritems():
+            dsl_text += t +"(" + str(s) + ")\n"
 
         # module function description
         dsl_text += self.moduleName + "_kernel(openLastDim=false"
-        for parameter in tree.getroot().find("Call").find("AssignParameters").findall("AssignParameter"):
+        for parameter in tree.getroot().find("TaskParameters").findall("TaskParameter"):
             dsl_text += "," + parameter.attrib['Name']
         dsl_text += ") {\n"
 
         # parameters
         dsl_text += "parameters("
         first = True
-        for parameter in tree.getroot().find("Call").find("AssignParameters").findall("AssignParameter"):
+        for parameter in tree.getroot().find("TaskParameters").findall("TaskParameter"):
             if parameter.attrib['ArrayP'] == "FALSE":
                 if not first:
                     dsl_text += ","
@@ -152,7 +159,7 @@ class p4a_astrad_postprocessor(object):
         dsl_text += ");\n"
 
         # I/Os
-        for parameter in tree.getroot().find("Call").find("AssignParameters").findall("AssignParameter"):
+        for parameter in tree.getroot().find("TaskParameters").findall("TaskParameter"):
             if parameter.attrib['ArrayP'] == "TRUE":
                 if parameter.attrib['AccessMode'] == "USE":
                     dsl_text += "In "
