@@ -205,7 +205,7 @@ class p4a_processor(object):
     wrapper_return_type = "P4A_accel_kernel_wrapper"
 
     astrad_postproc = None
-    astrad_main_function_name = None
+    astrad_module_name = None
 
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
@@ -625,7 +625,7 @@ class p4a_processor(object):
             # find top function name
             for m in all_modules:
                 if not m.callers:
-                    self.astrad_main_function_name = m.name
+                    self.astrad_module_name = m.name
                     #print("ASTRAD: method_name" + m.name)
                     break
 
@@ -1217,6 +1217,7 @@ class p4a_processor(object):
                 continue
             if (self.astrad and not self.spear):
                 self.astrad_postproc.add_source_name(file)
+
             (dir, name) = os.path.split(file)
             # Where the file does well in the .database workspace:
             pips_file = os.path.join(self.workspace.dirname, "Src", name)
@@ -1240,7 +1241,7 @@ class p4a_processor(object):
             # The final destination
             output_file = os.path.join(dir, output_name)
             if (self.astrad and not self.spear):
-                self.astrad_postproc.set_output_file_name(output_file)
+                self.astrad_postproc.add_output_file_name(output_file)
 
             if self.accel and p4a_util.c_file_p(file):
                 # We generate code for P4A Accel, so first post process
@@ -1290,7 +1291,7 @@ class p4a_processor(object):
             else:
                 p4a_util.die("ASTRAD post processor ERROR: unexpected output dialect")
             self.astrad_postproc = p4a_astrad.p4a_astrad_postprocessor(dialect, dest_dir)
-            self.astrad_postproc.set_main_function_name(self.astrad_main_function_name)
+            self.astrad_postproc.set_module_name(self.astrad_module_name)
 
         output_files = []
 
@@ -1349,6 +1350,13 @@ class p4a_processor(object):
 
         # save the user files
         output_files.extend (self.save_user_file (dest_dir, prefix, suffix))
+
+        # astrad: generate kernel.dsl file from Pips xml output
+        if (self.astrad and not self.spear):
+            fun=self.workspace[self.astrad_module_name+"_kernel"]
+            fun.print_xml_application()
+            xml_file = os.path.join(self.workspace.dirname,fun.show("XML_PRINTED_FILE"))
+            self.astrad_postproc.save_kernel_dsl_file(xml_file)
 
         if self.opencl:
             # HACK inside : we expect the wrapper and the kernel to be in the

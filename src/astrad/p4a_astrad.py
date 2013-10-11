@@ -27,7 +27,7 @@ class p4a_astrad_postprocessor(object):
     errorCode = "ok"
     outputDialect = None
     outputFileName = None
-    mainFunctionName = None
+    moduleName = None
     outputDirectory = None
     generatedHeaderFile = "p4a_new_files_include.h"
     generatedKernelFiles = ""
@@ -56,11 +56,15 @@ class p4a_astrad_postprocessor(object):
     def set_error_code(self, err):
         self.errorCode = err
 
-    def set_output_file_name(self, name):
-        self.outputFileName = os.path.split(name)[1]
+    def add_output_file_name(self, name):
+        if self.outputFileName:
+            self.outputFileName += ", "
+        else:
+            self.outputFileName = ""
+        self.outputFileName += os.path.split(name)[1]
 
-    def set_main_function_name(self, name):
-        self.mainFunctionName = name
+    def set_module_name(self, name):
+        self.moduleName = name
 
     def set_output_directory(self, dir):
          self.outputDirectory = dir
@@ -78,7 +82,7 @@ class p4a_astrad_postprocessor(object):
         global astrad_dialect_names
 
         print("ASTRAD: call to save_dsl_file \n")
-        dsl_file_name = os.path.join(self.saveDir, self.mainFunctionName + '.dsl')
+        dsl_file_name = os.path.join(self.saveDir, self.moduleName + '.dsl')
         print("file name :" + dsl_file_name + "\n")
 
         f = open(dsl_file_name, 'w')
@@ -88,7 +92,7 @@ class p4a_astrad_postprocessor(object):
         content +="\n"
         content +="{\n"
         content += "sourceName = " + self.outputFileName + ";\n"
-        content += "methodName = " + self.mainFunctionName + ";\n"
+        content += "methodName = " + self.moduleName + ";\n"
         content += "errorCode = " + self.errorCode + ";\n"
         content += "kernelFileName = kernel.dsl;\n"
         content += "type = " + self.outputDialect + ";\n"
@@ -108,3 +112,66 @@ class p4a_astrad_postprocessor(object):
 
         f.write(content)
         f.close()
+
+    def save_kernel_dsl_file(self, xml_file):
+
+        # get xml file content as tree
+        try:
+            import xml.etree.cElementTree as ET
+        except ImportError:
+            import xml.etree.ElementTree as ET
+
+        tree = ET.ElementTree(file=xml_file)
+
+        # save xml file for debugging
+        xml_text = read_file(xml_file)
+        write_file(os.path.join(self.saveDir, "kernel.xml"), xml_text)
+
+        # generate dsl text
+        dsl_text = "kernel {\n"
+
+        # types used
+
+        # module function description
+        dsl_text += self.moduleName + "_kernel(openLastDim=false"
+        for parameter in tree.getroot().find("Call").find("AssignParameters").findall("AssignParameter"):
+            dsl_text += "," + parameter.attrib['Name']
+        dsl_text += ") {\n"
+
+        # parameters
+        dsl_text += "parameters("
+        first = True
+        for parameter in tree.getroot().find("Call").find("AssignParameters").findall("AssignParameter"):
+            if parameter.attrib['ArrayP'] == "FALSE":
+                if not first:
+                    dsl_text += ","
+                else:
+                    first = False
+                dsl_text += parameter.attrib['Name']
+                dsl_text += "(" + parameter.attrib['DataType'] + ')'
+        dsl_text += ");\n"
+
+        # I/Os
+        for parameter in tree.getroot().find("Call").find("AssignParameters").findall("AssignParameter"):
+            if parameter.attrib['ArrayP'] == "TRUE":
+                if parameter.attrib['AccessMode'] == "USE":
+                    dsl_text += "In "
+                else:
+                    dsl_text += "Out "
+                dsl_text += parameter.attrib['Name'] + " (datatype="
+                dsl_text += parameter.attrib['DataType'] + ", nbdimensions="
+                # look for number of dimensions
+                for array in tree.getroot().find("FormalArrays").findall("Array"):
+                    if array.attrib['Name'] == parameter.attrib['Name']:
+                        nb_dim = len(array.find('Dimensions').findall('Dimension'))
+                        dsl_text += str(nb_dim) + ")\n"
+                        break
+                dsl_text += "{\nconsume("
+                
+                dsl_text += ")\n}\n"
+
+        dsl_text += "}\n"
+        dsl_text += "}\n"
+
+        # save dsl file
+        write_file(os.path.join(self.saveDir, "kernel.dsl"), dsl_text)
