@@ -218,6 +218,9 @@ class p4a_astrad_postprocessor(object):
 
                 dsl_text += "}\n"
 
+        # timing: fake information, not used but necessary
+        dsl_text += "timing (prolog=0,core=-1,epilog=0)\n"
+
         dsl_text += "}\n"
         dsl_text += "}\n"
 
