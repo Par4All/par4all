@@ -122,6 +122,10 @@ class p4a_astrad_postprocessor(object):
             import xml.etree.ElementTree as ET
 
         tree = ET.ElementTree(file=xml_file)
+        root = tree.getroot()
+        formal_arrays = root.find("FormalArrays").findall("Array")
+        task_parameters = root.find("TaskParameters").findall("TaskParameter")
+        loops = root.find('Loops').findall('Loop')
 
         # save xml file for debugging
         xml_text = read_file(xml_file)
@@ -132,7 +136,7 @@ class p4a_astrad_postprocessor(object):
 
         # types used
         data_types = {}
-        for array in tree.getroot().find("FormalArrays").findall("Array"):
+        for array in formal_arrays:
             data_type = array.find('DataType').attrib['Type']
             if not (data_type in data_types):
                 data_types[data_type] = array.find('DataType').attrib['Size']
@@ -141,14 +145,14 @@ class p4a_astrad_postprocessor(object):
 
         # module function description
         dsl_text += self.moduleName + "_kernel(openLastDim=false"
-        for parameter in tree.getroot().find("TaskParameters").findall("TaskParameter"):
+        for parameter in task_parameters:
             dsl_text += "," + parameter.attrib['Name']
         dsl_text += ") {\n"
 
         # parameters
         dsl_text += "parameters("
         first = True
-        for parameter in tree.getroot().find("TaskParameters").findall("TaskParameter"):
+        for parameter in task_parameters:
             if parameter.attrib['ArrayP'] == "FALSE":
                 if not first:
                     dsl_text += ","
@@ -159,23 +163,60 @@ class p4a_astrad_postprocessor(object):
         dsl_text += ");\n"
 
         # I/Os
-        for parameter in tree.getroot().find("TaskParameters").findall("TaskParameter"):
+        for parameter in task_parameters:
             if parameter.attrib['ArrayP'] == "TRUE":
-                if parameter.attrib['AccessMode'] == "USE":
+                access_mode = parameter.attrib['AccessMode']
+                if access_mode == "USE":
                     dsl_text += "In "
-                else:
+                elif access_mode == "DEF":
                     dsl_text += "Out "
+                else:
+                    p4a_util.die("ASTRAD post processor ERROR: invalid USE_DEF array:\n")
+
                 dsl_text += parameter.attrib['Name'] + " (datatype="
                 dsl_text += parameter.attrib['DataType'] + ", nbdimensions="
+
                 # look for number of dimensions
-                for array in tree.getroot().find("FormalArrays").findall("Array"):
+                for array in formal_arrays:
                     if array.attrib['Name'] == parameter.attrib['Name']:
                         nb_dim = len(array.find('Dimensions').findall('Dimension'))
                         dsl_text += str(nb_dim) + ")\n"
                         break
-                dsl_text += "{\nconsume("
-                
-                dsl_text += ")\n}\n"
+
+                # loop consumption
+                dim = 0
+                dsl_text += "{\n"
+                for dim_pavage in parameter.find('Pavage').findall('DimPavage'):
+                    dim += 1
+                    loop_index_name = dim_pavage.find('RefLoopIndex').attrib['Name']
+                    loop_inc = dim_pavage.find('RefLoopIndex').attrib['Inc']
+
+                    # look for loop bounds and stride
+                    for loop in loops:
+                        if (loop.attrib['Index'] == loop_index_name):
+                            loop_stride = loop.find('Stride').find('Symbolic').text
+                            loop_lower_bound = loop.find('LowerBound').find('Symbolic').text
+                            loop_upper_bound = loop.find('UpperBound').find('Symbolic').text
+                            break
+
+                    # format length
+                    if loop_lower_bound == "0":
+                        length_text = str(loop_upper_bound)
+                    else:
+                        length_text = str(loop_upper_bound) + "-" + str(loop_lower_bound)
+                    # format amplitude
+                    if loop_inc == "1":
+                        amplitude_text = str(loop_stride)
+                    elif loop_stride == "1":
+                        amplitude_text = str(loop_inc)
+                    else:
+                        amplitude_text = str(loop_stride) + '*' + str(loop_inc)
+
+                    dsl_text += "consume(dimension = " + str(dim) + ", "
+                    dsl_text += "length = " + length_text  + ", "
+                    dsl_text += "amplitude = " + amplitude_text + ")\n"
+
+                dsl_text += "}\n"
 
         dsl_text += "}\n"
         dsl_text += "}\n"
