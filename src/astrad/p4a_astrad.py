@@ -159,7 +159,7 @@ class p4a_astrad_postprocessor(object):
                 else:
                     first = False
                 dsl_text += parameter.attrib['Name']
-                dsl_text += "(" + parameter.attrib['DataType'] + ')'
+                dsl_text += "(dataType=" + parameter.attrib['DataType'] + ')'
         dsl_text += ");\n"
 
         # I/Os
