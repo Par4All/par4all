@@ -1353,9 +1353,27 @@ class p4a_processor(object):
 
         # astrad: generate kernel.dsl file from Pips xml output
         if (self.astrad and not self.spear):
-            fun=self.workspace[self.astrad_module_name+"_kernel"]
-            fun.print_xml_application()
-            xml_file = os.path.join(self.workspace.dirname,fun.show("XML_PRINTED_FILE"))
+            # find out C99 inner function knowing that its name
+            # is the name of the top-level module plus the _kernel suffix
+            # beware of compilation units
+            kernel_name = self.astrad_module_name + "_kernel"
+            if kernel_name in self.workspace:
+                kernel = self.workspace[kernel_name]
+            else:
+                kernel_filter_re = re.compile(".*!" + kernel_name)
+                possible_kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
+                if len(possible_kernels) ==0:
+                    p4a_util.die("ASTRAD post processor ERROR: no C99 kernel found")
+                elif len(possible_kernels) > 1:
+                    p4a_util.die("ASTRAD post processor ERROR: several possible C99 kernels found")
+                else: # there is a single module
+                    # dirty.. look for another way to do it...
+                    for k in possible_kernels:
+                        kernel = k
+                        break
+
+            kernel.print_xml_application()
+            xml_file = os.path.join(self.workspace.dirname, kernel.show("XML_PRINTED_FILE"))
             self.astrad_postproc.save_kernel_dsl_file(xml_file)
 
         if self.opencl:
