@@ -1844,7 +1844,8 @@ bool print_xml_code(const char* module_name)
 
   reset_current_module_statement();
   reset_current_module_entity();
-
+  reset_complexity_map();
+  reset_rw_effects();
   return true;
 }
 
@@ -4138,7 +4139,7 @@ bool print_xml_application(const char* module_name)
 
   reset_current_module_statement();
   reset_current_module_entity();
-  //  reset_complexity_map();
+  reset_complexity_map();
   reset_precondition_map();
   reset_rw_effects();
   reset_proper_rw_effects();
