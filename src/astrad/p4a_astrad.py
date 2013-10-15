@@ -147,20 +147,14 @@ class p4a_astrad_postprocessor(object):
         dsl_text += self.moduleName + "_kernel(openLastDim=false"
         for parameter in task_parameters:
             dsl_text += "," + parameter.attrib['Name']
-        dsl_text += ") {\n"
+        dsl_text += ") {\n\n"
 
         # parameters
-        dsl_text += "parameters("
-        first = True
         for parameter in task_parameters:
             if parameter.attrib['ArrayP'] == "FALSE":
-                if not first:
-                    dsl_text += ","
-                else:
-                    first = False
                 dsl_text += parameter.attrib['Name']
-                dsl_text += "(dataType=" + parameter.attrib['DataType'] + ')'
-        dsl_text += ");\n"
+                dsl_text += "(dataType=" + parameter.attrib['DataType'] + ')\n'
+        dsl_text += "\n"
 
         # I/Os
         for parameter in task_parameters:
@@ -176,19 +170,22 @@ class p4a_astrad_postprocessor(object):
                 dsl_text += parameter.attrib['Name'] + " (datatype="
                 dsl_text += parameter.attrib['DataType'] + ", nbdimensions="
 
-                # look for number of dimensions
+                # look for number of array dimensions
                 for array in formal_arrays:
                     if array.attrib['Name'] == parameter.attrib['Name']:
                         nb_dim = len(array.find('Dimensions').findall('Dimension'))
                         dsl_text += str(nb_dim) + ")\n"
                         break
 
+
                 # loop consumption
                 dim = nb_dim
                 dsl_text += "{\n"
                 for dim_pavage in parameter.find('Pavage').findall('DimPavage'):
                     dim -= 1 # array dimensions are in reversed order in dsl file
-                    if dim_pavage.find('RefLoopIndex'): # sometimes dimPavage exists but is empty
+                    # dimPavage may be empty
+                    if dim_pavage.find('RefLoopIndex') is not None:
+                        print "found\n"
                         loop_index_name = dim_pavage.find('RefLoopIndex').attrib['Name']
                         loop_inc = dim_pavage.find('RefLoopIndex').attrib['Inc']
 
@@ -213,9 +210,9 @@ class p4a_astrad_postprocessor(object):
                         else:
                             amplitude_text = str(loop_stride) + '*' + str(loop_inc)
 
-                            dsl_text += "consume(dimension = " + str(dim) + ", "
-                            dsl_text += "length = " + length_text  + ", "
-                            dsl_text += "amplitude = " + amplitude_text + ")\n"
+                        dsl_text += "consume(dimension = " + str(dim) + ", "
+                        dsl_text += "length = " + length_text  + ", "
+                        dsl_text += "amplitude = " + amplitude_text + ")\n"
 
                 dsl_text += "}\n"
 
