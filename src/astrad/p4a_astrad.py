@@ -196,26 +196,28 @@ class p4a_astrad_postprocessor(object):
                     dsl_text += "length = " + length_text  + ", "
                     dsl_text += "amplitude = " + amplitude_text + ");\n"
 
-                # paving - scanning array dims in reverse order
-                dim = nb_dim
-                opened_oniter = 0
-                for dim_pavage in parameter.find('Pavage').findall('DimPavage'):
-                    dim -= 1 # array dimensions are in reversed order in dsl file
-                    # dimPavage may be empty
-                    if dim_pavage.find('RefLoopIndex') is not None:
+                # paving - scan loops in order
+                for index, loop in enumerate(loops):
+                    loop_index_name = loop.attrib['Index']
+                    loop_stride = loop.find('Stride').find('Symbolic').text
+                    loop_lower_bound = loop.find('LowerBound').find('Symbolic').text
+                    loop_upper_bound = loop.find('UpperBound').find('Symbolic').text
 
-                        loop_index_name = dim_pavage.find('RefLoopIndex').attrib['Name']
-                        loop_inc = dim_pavage.find('RefLoopIndex').attrib['Inc']
-
-                        # look for loop bounds and stride
-                        for loop in loops:
-                            if (loop.attrib['Index'] == loop_index_name):
-                                loop_stride = loop.find('Stride').find('Symbolic').text
-                                loop_lower_bound = loop.find('LowerBound').find('Symbolic').text
-                                loop_upper_bound = loop.find('UpperBound').find('Symbolic').text
+                    # scan array paving dimensions
+                    dim = nb_dim
+                    found = False
+                    for dim_pavage in parameter.find('Pavage').findall('DimPavage'):
+                        dim -= 1 # array dimensions are in reversed order in dsl file
+                        # dimPavage may be empty
+                        if dim_pavage.find('RefLoopIndex') is not None:
+                            ref_loop_index_name = dim_pavage.find('RefLoopIndex').attrib['Name']
+                            loop_inc = dim_pavage.find('RefLoopIndex').attrib['Inc']
+                            if ref_loop_index_name == loop_index_name:
+                                found = True
                                 break
 
-                        # format length
+                    if found:
+                    # format length
                         if loop_lower_bound == "0":
                             length_text = str(loop_upper_bound) + "+1"
                         else:
@@ -227,15 +229,18 @@ class p4a_astrad_postprocessor(object):
                             amplitude_text = str(loop_inc)
                         else:
                             amplitude_text = str(loop_stride) + '*' + str(loop_inc)
+                    else:
+                        length_text = "0"
+                        amplitude_text = "0"
 
-                        dsl_text += ("\t" * opened_oniter) + "OnIter(consume(dimension = " + str(dim) + ", "
-                        dsl_text += "length = " + length_text  + ", "
-                        dsl_text += "amplitude = " + amplitude_text + ")"
-                        if dim >0:
-                            dsl_text += "\n"
-                        opened_oniter += 1
+                    dsl_text += ("\t" * index) + "OnIter(consume(dimension = " + str(dim) + ", "
+                    dsl_text += "length = " + length_text  + ", "
+                    dsl_text += "amplitude = " + amplitude_text + ")"
 
-                dsl_text += (")" * opened_oniter) + ";\n"
+                    if index < len(loops)-1:
+                        dsl_text += "\n"
+
+                dsl_text += (")" * len(loops)) + ";\n"
                 dsl_text += "}\n"
 
         # timing: fake information, not used but necessary
