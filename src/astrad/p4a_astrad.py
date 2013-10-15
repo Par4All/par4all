@@ -177,15 +177,33 @@ class p4a_astrad_postprocessor(object):
                         dsl_text += str(nb_dim) + ")\n"
                         break
 
-
-                # loop consumption
-                dim = nb_dim
                 dsl_text += "{\n"
+
+                # fitting
+                dim = nb_dim
+                for dim_pattern in parameter.find('Pattern'):
+                    dim -= 1 # array dimensions are in reversed order in dsl file
+                    if dim_pattern.tag == 'DimUnitPattern':
+                        length_text = "1"
+                        amplitude_text = "1"
+                    elif dim_pattern.tag == 'DimPattern':
+                        length_text = dim_pattern.find('Length').find('Symbolic').text
+                        amplitude_text = dim_pattern.find('Stride').find('Symbolic').text
+                    else:
+                        p4a_util.die("ASTRAD PostProcessor: unexpected DimPattern tag")
+
+                    dsl_text += "consume(dimension = " + str(dim) + ", "
+                    dsl_text += "length = " + length_text  + ", "
+                    dsl_text += "amplitude = " + amplitude_text + ");\n"
+
+                # paving - scanning array dims in reverse order
+                dim = nb_dim
+                opened_oniter = 0
                 for dim_pavage in parameter.find('Pavage').findall('DimPavage'):
                     dim -= 1 # array dimensions are in reversed order in dsl file
                     # dimPavage may be empty
                     if dim_pavage.find('RefLoopIndex') is not None:
-                        print "found\n"
+
                         loop_index_name = dim_pavage.find('RefLoopIndex').attrib['Name']
                         loop_inc = dim_pavage.find('RefLoopIndex').attrib['Inc']
 
@@ -199,9 +217,9 @@ class p4a_astrad_postprocessor(object):
 
                         # format length
                         if loop_lower_bound == "0":
-                            length_text = str(loop_upper_bound)
+                            length_text = str(loop_upper_bound) + "+1"
                         else:
-                            length_text = str(loop_upper_bound) + "-" + str(loop_lower_bound)
+                            length_text = str(loop_upper_bound) + "-" + str(loop_lower_bound) + "+1"
                         # format amplitude
                         if loop_inc == "1":
                             amplitude_text = str(loop_stride)
@@ -210,10 +228,14 @@ class p4a_astrad_postprocessor(object):
                         else:
                             amplitude_text = str(loop_stride) + '*' + str(loop_inc)
 
-                        dsl_text += "consume(dimension = " + str(dim) + ", "
+                        dsl_text += ("\t" * opened_oniter) + "OnIter(consume(dimension = " + str(dim) + ", "
                         dsl_text += "length = " + length_text  + ", "
-                        dsl_text += "amplitude = " + amplitude_text + ")\n"
+                        dsl_text += "amplitude = " + amplitude_text + ")"
+                        if dim >0:
+                            dsl_text += "\n"
+                        opened_oniter += 1
 
+                dsl_text += (")" * opened_oniter) + ";\n"
                 dsl_text += "}\n"
 
         # timing: fake information, not used but necessary
