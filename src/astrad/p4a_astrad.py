@@ -184,37 +184,38 @@ class p4a_astrad_postprocessor(object):
                         break
 
                 # loop consumption
-                dim = 0
+                dim = nb_dim
                 dsl_text += "{\n"
                 for dim_pavage in parameter.find('Pavage').findall('DimPavage'):
-                    dim += 1
-                    loop_index_name = dim_pavage.find('RefLoopIndex').attrib['Name']
-                    loop_inc = dim_pavage.find('RefLoopIndex').attrib['Inc']
+                    dim -= 1 # array dimensions are in reversed order in dsl file
+                    if dim_pavage.find('RefLoopIndex'): # sometimes dimPavage exists but is empty
+                        loop_index_name = dim_pavage.find('RefLoopIndex').attrib['Name']
+                        loop_inc = dim_pavage.find('RefLoopIndex').attrib['Inc']
 
-                    # look for loop bounds and stride
-                    for loop in loops:
-                        if (loop.attrib['Index'] == loop_index_name):
-                            loop_stride = loop.find('Stride').find('Symbolic').text
-                            loop_lower_bound = loop.find('LowerBound').find('Symbolic').text
-                            loop_upper_bound = loop.find('UpperBound').find('Symbolic').text
-                            break
+                        # look for loop bounds and stride
+                        for loop in loops:
+                            if (loop.attrib['Index'] == loop_index_name):
+                                loop_stride = loop.find('Stride').find('Symbolic').text
+                                loop_lower_bound = loop.find('LowerBound').find('Symbolic').text
+                                loop_upper_bound = loop.find('UpperBound').find('Symbolic').text
+                                break
 
-                    # format length
-                    if loop_lower_bound == "0":
-                        length_text = str(loop_upper_bound)
-                    else:
-                        length_text = str(loop_upper_bound) + "-" + str(loop_lower_bound)
-                    # format amplitude
-                    if loop_inc == "1":
-                        amplitude_text = str(loop_stride)
-                    elif loop_stride == "1":
-                        amplitude_text = str(loop_inc)
-                    else:
-                        amplitude_text = str(loop_stride) + '*' + str(loop_inc)
+                        # format length
+                        if loop_lower_bound == "0":
+                            length_text = str(loop_upper_bound)
+                        else:
+                            length_text = str(loop_upper_bound) + "-" + str(loop_lower_bound)
+                        # format amplitude
+                        if loop_inc == "1":
+                            amplitude_text = str(loop_stride)
+                        elif loop_stride == "1":
+                            amplitude_text = str(loop_inc)
+                        else:
+                            amplitude_text = str(loop_stride) + '*' + str(loop_inc)
 
-                    dsl_text += "consume(dimension = " + str(dim) + ", "
-                    dsl_text += "length = " + length_text  + ", "
-                    dsl_text += "amplitude = " + amplitude_text + ")\n"
+                            dsl_text += "consume(dimension = " + str(dim) + ", "
+                            dsl_text += "length = " + length_text  + ", "
+                            dsl_text += "amplitude = " + amplitude_text + ")\n"
 
                 dsl_text += "}\n"
 
