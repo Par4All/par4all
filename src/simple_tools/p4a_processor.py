@@ -1368,9 +1368,7 @@ class p4a_processor(object):
                     p4a_util.die("ASTRAD post processor ERROR: several possible C99 kernels found")
                 else: # there is a single module
                     # dirty.. look for another way to do it...
-                    for k in possible_kernels:
-                        kernel = k
-                        break
+                    [kernel] = tuple(possible_kernels)
 
             kernel.print_xml_application()
             xml_file = os.path.join(self.workspace.dirname, kernel.show("XML_PRINTED_FILE"))
