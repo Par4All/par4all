@@ -157,6 +157,19 @@ class p4a_astrad_postprocessor(object):
         dsl_text += "\n"
 
         # I/Os
+
+        ## first scan task_parameters to check if there are input arrays
+        ## if there is no input array, length fields must be systematically
+        ## used instead of ALL for paving.
+        input_arrays = False
+        for parameter in task_parameters:
+            access_mode = parameter.attrib['AccessMode']
+            if parameter.attrib['ArrayP'] == "TRUE":
+                if access_mode == "USE":
+                    input_arrays = True
+                    break
+
+        ## then generate consumption information
         for parameter in task_parameters:
             if parameter.attrib['ArrayP'] == "TRUE":
                 access_mode = parameter.attrib['AccessMode']
@@ -193,8 +206,8 @@ class p4a_astrad_postprocessor(object):
                         p4a_util.die("ASTRAD PostProcessor: unexpected DimPattern tag")
 
                     dsl_text += "consume(dimension = " + str(dim) + ", "
-                    dsl_text += "length = " + length_text  + ", "
-                    dsl_text += "amplitude = " + amplitude_text + ");\n"
+                    dsl_text += "length=" + length_text  + ", "
+                    dsl_text += "amplitude=" + amplitude_text + ");\n"
 
                 # paving - scan loops in order
                 for index, loop in enumerate(loops):
@@ -217,11 +230,17 @@ class p4a_astrad_postprocessor(object):
                                 break
 
                     if found:
-                    # format length
-                        if loop_lower_bound == "0":
-                            length_text = str(loop_upper_bound) + "+1"
-                        else:
-                            length_text = str(loop_upper_bound) + "-" + str(loop_lower_bound) + "+1"
+
+                        # format length
+                        ## ALL if there are input arrays and loop upper bound is not numeric
+                        ## upper_bound - lower_bound + 1 otherwise
+                        all_length = input_arrays and not loop.find('UpperBound').find('Numeric')
+                        if (not all_length) :
+                            if loop_lower_bound == "0":
+                                length_text = str(loop_upper_bound) + "+1"
+                            else:
+                                length_text = str(loop_upper_bound) + "-" + str(loop_lower_bound) + "+1"
+
                         # format amplitude
                         if loop_inc == "1":
                             amplitude_text = str(loop_stride)
@@ -230,12 +249,15 @@ class p4a_astrad_postprocessor(object):
                         else:
                             amplitude_text = str(loop_stride) + '*' + str(loop_inc)
                     else:
-                        length_text = "0"
+                        length_text = "All"
                         amplitude_text = "0"
 
                     dsl_text += ("\t" * index) + "OnIter(consume(dimension = " + str(dim) + ", "
-                    dsl_text += "length = " + length_text  + ", "
-                    dsl_text += "amplitude = " + amplitude_text + ")"
+                    if all_length:
+                        dsl_text += 'All, '
+                    else:
+                        dsl_text += "length=" + length_text  + ", "
+                    dsl_text += "amplitude=" + amplitude_text + ")"
 
                     if index < len(loops)-1:
                         dsl_text += "\n"
