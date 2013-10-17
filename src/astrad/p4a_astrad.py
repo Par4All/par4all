@@ -209,6 +209,22 @@ class p4a_astrad_postprocessor(object):
 
                 dsl_text += "{\n"
 
+                # origin
+                dim = nb_dim
+                for dim_pattern in parameter.find('Pattern'):
+                    dim -= 1 # array dimensions are in reversed order in dsl file
+                    if dim_pattern.tag == 'DimUnitPattern':
+                        length_text = "1"
+                        amplitude_text = "0"
+                    elif dim_pattern.tag == 'DimPattern':
+                        length_text = dim_pattern.find('Length').find('Symbolic').text
+                        amplitude_text = dim_pattern.find('Offset').find('Symbolic').text
+                    else:
+                        p4a_util.die("ASTRAD PostProcessor: unexpected DimPattern tag")
+
+                    dsl_text += "origin(dimension=" + str(dim) + ", "
+                    dsl_text += "amplitude=" + amplitude_text + ");\n"
+
                 # fitting
                 dim = nb_dim
                 for dim_pattern in parameter.find('Pattern'):
@@ -222,7 +238,7 @@ class p4a_astrad_postprocessor(object):
                     else:
                         p4a_util.die("ASTRAD PostProcessor: unexpected DimPattern tag")
 
-                    dsl_text += "consume(dimension = " + str(dim) + ", "
+                    dsl_text += "consume(dimension=" + str(dim) + ", "
                     dsl_text += "length=" + length_text  + ", "
                     dsl_text += "amplitude=" + amplitude_text + ");\n"
 
