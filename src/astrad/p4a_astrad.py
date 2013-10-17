@@ -152,8 +152,25 @@ class p4a_astrad_postprocessor(object):
         # parameters
         for parameter in task_parameters:
             if parameter.attrib['ArrayP'] == "FALSE":
-                dsl_text += parameter.attrib['Name']
-                dsl_text += "(dataType=" + parameter.attrib['DataType'] + ')\n'
+                parameter_name = parameter.attrib['Name']
+                dsl_text += parameter_name
+                dsl_text += "(dataType=" + parameter.attrib['DataType']
+
+                for usage in parameter.findall('TaskParameterUsedFor'):
+                    # if the parameter is used in the array pattern, then don't generate array info
+                    array_name = usage.attrib['ArrayName']
+                    found = False
+                    for other_parameter in task_parameters:
+                        if other_parameter.attrib['ArrayP'] == "TRUE" and other_parameter.attrib['Name'] == array_name:
+                            for dim_pattern in other_parameter.find('Pattern'):
+                                if (dim_pattern.tag == 'DimPattern') and (parameter_name in dim_pattern.find('Length').find('Symbolic').text):
+                                    found = True
+                                    break
+                        if found:
+                            break
+                    if not found:
+                        dsl_text += ', arraySizeName=' + array_name + ', arraySizeDim=' + str(int(usage.attrib['Dim']) -1)
+                dsl_text += ')\n'
         dsl_text += "\n"
 
         # I/Os
