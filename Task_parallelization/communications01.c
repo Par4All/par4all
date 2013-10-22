@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-int main()
+int main(int argc, char *argv[])
 {
   int size;
   scanf("%d", &size);
@@ -16,7 +16,7 @@ int main()
   int i, bi, j, bj;
   scanf("%d", &bi);
   scanf("%d", &bj);
-  assert(0<=bi && bi<size && 0<=bj && bj<size);
+  //assert(0<=bi && bi<size && 0<=bj && bj<size);
   for(i=0; i<bi; i++)
     a[i] = i;
   for(i=bi; i<size; i++)

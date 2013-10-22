@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-int main()
+int main(int argc, char *argv[])
 {
   int size;
   size = 100;

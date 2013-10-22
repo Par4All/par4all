@@ -11,7 +11,7 @@
 #include <assert.h>
 
 
-int main()
+int main(int argc, char *argv[])
 {
 #define size 100  
   //int size;

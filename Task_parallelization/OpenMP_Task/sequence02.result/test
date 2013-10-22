@@ -1,0 +1,13 @@
+// OMP style
+void main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   unsigned int N;
+#pragma omp parallel default(shared) 
+   {
+#pragma omp single
+      {
+         N = 10;
+      }
+   }
+}

@@ -1,0 +1,150 @@
+// MPI style
+int main()
+{
+   {
+      //PIPS generated variable
+      int rank0;
+      //PIPS generated variable
+      MPI_Status status0;
+      //PIPS generated variable
+      MPI_Request request0;
+      //PIPS generated variable
+      int size, a[size][size], b[size][size], i, bi, j, bj, _rtl_0_1, _rtl_0_0, _rtl_0_1_0, _rtl_0_0_0, _rtl_0_1_1, _rtl_0_0_1, _rtl_0_1_2, _rtl_0_0_2, _rtl_0_1_3, _rtl_0_0_3, _rtl_0_1_4, _rtl_0_0_4, _rtl_0_1_5, _rtl_0_0_5, _rtl_0_1_6, _rtl_0_0_6, _rtl_0_1_7, _rtl_0_0_7, _rtl_0_1_8, _rtl_0_0_8, _rtl_0_1_9, _rtl_0_0_9, _rtl_0_1_10, _rtl_0_0_10, _rtl_0_1_11, _rtl_0_0_11, _rtl_0_1_12, _rtl_0_0_12;
+      MPI_Init(&argc, &argv);
+      MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
+      if (rank0==0) {
+         scanf("%d", &size);
+         MPI_Isend(&size, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&size, 1, MPI_INT, 2, 2, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&size, 1, MPI_INT, 3, 3, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&size, 1, MPI_INT, 4, 4, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&size, 1, MPI_INT, 5, 5, MPI_COMM_WORLD, &request0);
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==0) {
+         scanf("%d", &bi);
+         MPI_Isend(&bi, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&bi, 1, MPI_INT, 2, 2, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&bi, 1, MPI_INT, 3, 3, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&bi, 1, MPI_INT, 4, 4, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&bi, 1, MPI_INT, 5, 5, MPI_COMM_WORLD, &request0);
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==0) {
+         scanf("%d", &bj);
+         MPI_Isend(&bj, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&bj, 1, MPI_INT, 2, 2, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&bj, 1, MPI_INT, 3, 3, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&bj, 1, MPI_INT, 4, 4, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&bj, 1, MPI_INT, 5, 5, MPI_COMM_WORLD, &request0);
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==0)
+         0<=bi&&bi<size&&0<=bj&&bj<size?(void) 0:__assert_fail("0<=bi && bi<size && 0<=bj && bj<size", "../communications05.c", 23, (const char *) 0);
+      if (rank0==1) {
+         MPI_Recv(&size, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         
+         /* Initialization of a with four tasks */
+         for(i = 0; i <= bi-1; i += 1)
+            for(j = 0; j <= bj-1; j += 1)
+               a[i][j] = i*size+j;
+      }
+      if (rank0==2) {
+         MPI_Recv(&size, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(i = 0; i <= bi-1; i += 1)
+            for(j = bj; j <= size-1; j += 1)
+               a[i][j] = i*size+j;
+         for(_rtl_0_0_12 = 0; _rtl_0_0_12 <= bi-1; _rtl_0_0_12 += 1)
+            for(_rtl_0_1_12 = bj; _rtl_0_1_12 <= size-1; _rtl_0_1_12 += 1)
+               MPI_Isend(&a[_rtl_0_0_12][_rtl_0_1_12], 1, MPI_INT, 3, 3, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==4) {
+         MPI_Recv(&size, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(i = bi; i <= size-1; i += 1)
+            for(j = 0; j <= bj-1; j += 1)
+               a[i][j] = i*size+j;
+         for(_rtl_0_0_11 = bi; _rtl_0_0_11 <= size-1; _rtl_0_0_11 += 1)
+            for(_rtl_0_1_11 = 0; _rtl_0_1_11 <= bj-1; _rtl_0_1_11 += 1)
+               MPI_Isend(&a[_rtl_0_0_11][_rtl_0_1_11], 1, MPI_INT, 5, 5, MPI_COMM_WORLD, &request0);
+         MPI_Recv(&size, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(i = bi; i <= size-1; i += 1)
+            for(j = bj; j <= size-1; j += 1)
+               a[i][j] = i*size+j;
+         for(_rtl_0_0_10 = bi; _rtl_0_0_10 <= size-1; _rtl_0_0_10 += 1)
+            for(_rtl_0_1_10 = bj; _rtl_0_1_10 <= size-1; _rtl_0_1_10 += 1)
+               MPI_Isend(&a[_rtl_0_0_10][_rtl_0_1_10], 1, MPI_INT, 2, 2, MPI_COMM_WORLD, &request0);
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==1) {
+         MPI_Recv(&bi, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         
+         /* Computation of b with four tasks perfectly aligned on the
+              previous four ones */
+         for(i = 0; i <= bi-1; i += 1)
+            for(j = 0; j <= bj-1; j += 1)
+               b[i][j] = 2*a[i][j];
+         for(_rtl_0_0_9 = 0; _rtl_0_0_9 <= bi-1; _rtl_0_0_9 += 1)
+            for(_rtl_0_1_9 = 0; _rtl_0_1_9 <= bj-1; _rtl_0_1_9 += 1)
+               MPI_Isend(&b[_rtl_0_0_9][_rtl_0_1_9], 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==2) {
+         for(_rtl_0_0_7 = bi; _rtl_0_0_7 <= size-1; _rtl_0_0_7 += 1)
+            for(_rtl_0_1_7 = bj; _rtl_0_1_7 <= size-1; _rtl_0_1_7 += 1)
+               MPI_Recv(&a[_rtl_0_0_7][_rtl_0_1_7], 1, MPI_INT, 4, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         MPI_Recv(&size, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(i = bi; i <= size-1; i += 1)
+            for(j = bj; j <= size-1; j += 1)
+               b[i][j] = 2*a[i][j];
+         for(_rtl_0_0_8 = bi; _rtl_0_0_8 <= size-1; _rtl_0_0_8 += 1)
+            for(_rtl_0_1_8 = bj; _rtl_0_1_8 <= size-1; _rtl_0_1_8 += 1)
+               MPI_Isend(&b[_rtl_0_0_8][_rtl_0_1_8], 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==3) {
+         for(_rtl_0_0_5 = 0; _rtl_0_0_5 <= bi-1; _rtl_0_0_5 += 1)
+            for(_rtl_0_1_5 = bj; _rtl_0_1_5 <= size-1; _rtl_0_1_5 += 1)
+               MPI_Recv(&a[_rtl_0_0_5][_rtl_0_1_5], 1, MPI_INT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         MPI_Recv(&size, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(i = 0; i <= bi-1; i += 1)
+            for(j = bj; j <= size-1; j += 1)
+               b[i][j] = 2*a[i][j];
+         for(_rtl_0_0_6 = 0; _rtl_0_0_6 <= bi-1; _rtl_0_0_6 += 1)
+            for(_rtl_0_1_6 = bj; _rtl_0_1_6 <= size-1; _rtl_0_1_6 += 1)
+               MPI_Isend(&b[_rtl_0_0_6][_rtl_0_1_6], 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==5) {
+         for(_rtl_0_0_3 = bi; _rtl_0_0_3 <= size-1; _rtl_0_0_3 += 1)
+            for(_rtl_0_1_3 = 0; _rtl_0_1_3 <= bj-1; _rtl_0_1_3 += 1)
+               MPI_Recv(&a[_rtl_0_0_3][_rtl_0_1_3], 1, MPI_INT, 4, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         MPI_Recv(&size, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(i = bi; i <= size-1; i += 1)
+            for(j = 0; j <= bj-1; j += 1)
+               b[i][j] = 2*a[i][j];
+         for(_rtl_0_0_4 = bi; _rtl_0_0_4 <= size-1; _rtl_0_0_4 += 1)
+            for(_rtl_0_1_4 = 0; _rtl_0_1_4 <= bj-1; _rtl_0_1_4 += 1)
+               MPI_Isend(&b[_rtl_0_0_4][_rtl_0_1_4], 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &request0);
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (rank0==0) {
+         for(_rtl_0_0_2 = bi; _rtl_0_0_2 <= size-1; _rtl_0_0_2 += 1)
+            for(_rtl_0_1_2 = 0; _rtl_0_1_2 <= bj-1; _rtl_0_1_2 += 1)
+               MPI_Recv(&b[_rtl_0_0_2][_rtl_0_1_2], 1, MPI_INT, 5, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(_rtl_0_0_1 = 0; _rtl_0_0_1 <= bi-1; _rtl_0_0_1 += 1)
+            for(_rtl_0_1_1 = bj; _rtl_0_1_1 <= size-1; _rtl_0_1_1 += 1)
+               MPI_Recv(&b[_rtl_0_0_1][_rtl_0_1_1], 1, MPI_INT, 3, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(_rtl_0_0_0 = bi; _rtl_0_0_0 <= size-1; _rtl_0_0_0 += 1)
+            for(_rtl_0_1_0 = bj; _rtl_0_1_0 <= size-1; _rtl_0_1_0 += 1)
+               MPI_Recv(&b[_rtl_0_0_0][_rtl_0_1_0], 1, MPI_INT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(_rtl_0_0 = 0; _rtl_0_0 <= bi-1; _rtl_0_0 += 1)
+            for(_rtl_0_1 = 0; _rtl_0_1 <= bj-1; _rtl_0_1 += 1)
+               MPI_Recv(&b[_rtl_0_0][_rtl_0_1], 1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+
+         for(i = 0; i <= size-1; i += 1)
+            for(j = 0; j <= size-1; j += 1)
+               printf("%d\n", b[i][j]);
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+   }
+   MPI_Finalize();
+
+   return 0;
+}

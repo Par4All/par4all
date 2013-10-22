@@ -1,0 +1,54 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+
+delete sequence01
+
+setenv PIPS_CPP_FLAGS " -D TIME "
+
+create sequence01 ../sequence01.c
+activate C_PARSER
+activate REGION_CHAINS
+activate MUST_REGIONS
+
+activate TRANSFORMERS_INTER_FULL
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE
+setproperty SEMANTICS_FILTER_INITIAL_VALUES TRUE
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE 
+
+
+apply LOOP_NORMALIZE[%ALLFUNC]
+apply PRIVATIZE_MODULE[%ALLFUNC]
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
+
+setproperty PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS TRUE
+setproperty PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS FALSE
+setproperty PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES FALSE
+setproperty REGIONS_WITH_ARRAY_BOUNDS TRUE 
+
+
+apply SEQUENCE_DEPENDENCE_GRAPH[main]
+#shell dot -Tpng sequence01.database/main/main_sdg.dot > sequence01.database/main/main_sdg.png
+#shell gqview sequence01.database/main/main_sdg.png
+
+
+setproperty BDSC_NB_CLUSTERS 6
+setproperty BDSC_DISTRIBUTED_MEMORY FALSE
+
+
+apply HBDSC_PARALLELIZATION[main]
+#shell dot -Tpng sequence01.database/main/main_scheduled_sdg.dot > sequence01.database/main/main_scheduled_sdg.png
+#shell gqview sequence01.database/main/main_scheduled_sdg.png
+
+apply SPIRE_SHARED_UNSTRUCTURED_TO_STRUCTURED[main]
+echo // OMP style
+activate OPENMP_TASK_GENERATION
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[main]
+
+close
+delete sequence01 
+quit
+
+
+
+
