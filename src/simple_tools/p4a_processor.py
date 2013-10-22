@@ -416,13 +416,12 @@ class p4a_processor(object):
             filter_exclude_re = re.compile(filter_exclude)
 
         filter_astrad_re = None
-        if (self.astrad):
-            filter_exclude_astrad_re = re.compile('com_is2t*')
 
         filter = (lambda module: self.main_filter(module)
             and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
             and (filter_select_re == None or filter_select_re.match(module.name))
             and other_filter(module.name))
+
         # Select the interesting modules:
         return self.workspace.filter(filter)
 
