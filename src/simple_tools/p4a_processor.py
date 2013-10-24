@@ -415,8 +415,6 @@ class p4a_processor(object):
         if filter_exclude:
             filter_exclude_re = re.compile(filter_exclude)
 
-        filter_astrad_re = None
-
         filter = (lambda module: self.main_filter(module)
             and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
             and (filter_select_re == None or filter_select_re.match(module.name))
@@ -1351,7 +1349,7 @@ class p4a_processor(object):
         output_files.extend (self.save_user_file (dest_dir, prefix, suffix))
 
         # astrad: generate kernel.dsl file from Pips xml output
-        if (self.astrad and not self.spear):
+        if (self.astrad and self.openmp and not self.spear):
             # find out C99 inner function knowing that its name
             # is the name of the top-level module plus the _kernel suffix
             # beware of compilation units
