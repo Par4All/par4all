@@ -81,9 +81,9 @@ class p4a_astrad_postprocessor(object):
     def save_dsl_file(self):
         global astrad_dialect_names
 
-        print("ASTRAD: call to save_dsl_file \n")
+        #print("ASTRAD: call to save_dsl_file \n")
         dsl_file_name = os.path.join(self.saveDir, self.moduleName + '.dsl')
-        print("file name :" + dsl_file_name + "\n")
+        #print("file name :" + dsl_file_name + "\n")
 
         f = open(dsl_file_name, 'w')
 
@@ -96,13 +96,6 @@ class p4a_astrad_postprocessor(object):
         content += "errorCode = " + self.errorCode + ";\n"
         content += "kernelFileName = kernel.dsl;\n"
         content += "type = " + self.outputDialect + ";\n"
-
-        # not compliant with dsl specification. To be discussed
-        #if (self.outputDialect != astrad_dialect_names['openmp']):
-        #    content += "generatedKernelFiles = "
-        #    content += self.generatedKernelFiles
-        #    content += ";\n"
-        #    content += "generatedHeaderFile = " + self.generatedHeaderFile + ";\n"
 
         content += "Par4All (\"" + self.p4aVersion + "\")\n"
         content += "{\n" + "date = "
@@ -157,17 +150,20 @@ class p4a_astrad_postprocessor(object):
                 dsl_text += "(dataType=" + parameter.attrib['DataType']
 
                 for usage in parameter.findall('TaskParameterUsedFor'):
-                    # if the parameter is used in the array pattern, then don't generate array info
+                    # if the parameter is used in the array pattern,
+                    # then don't generate array info
+                    # (commented out at Thales request 2013/10/24
+                    # not removed in case it may change again)
                     array_name = usage.attrib['ArrayName']
                     found = False
-                    for other_parameter in task_parameters:
-                        if other_parameter.attrib['ArrayP'] == "TRUE" and other_parameter.attrib['Name'] == array_name:
-                            for dim_pattern in other_parameter.find('Pattern'):
-                                if (dim_pattern.tag == 'DimPattern') and (parameter_name in dim_pattern.find('Length').find('Symbolic').text):
-                                    found = True
-                                    break
-                        if found:
-                            break
+                    # for other_parameter in task_parameters:
+                    #     if other_parameter.attrib['ArrayP'] == "TRUE" and other_parameter.attrib['Name'] == array_name:
+                    #         for dim_pattern in other_parameter.find('Pattern'):
+                    #             if (dim_pattern.tag == 'DimPattern') and (parameter_name in dim_pattern.find('Length').find('Symbolic').text):
+                    #                 found = True
+                    #                 break
+                    #     if found:
+                    #         break
                     if not found:
                         dsl_text += ', arraySizeName=' + array_name + ', arraySizeDim=' + str(int(usage.attrib['Dim']) -1)
                 dsl_text += ')\n'
