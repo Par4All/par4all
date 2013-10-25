@@ -13,12 +13,9 @@ int main(int argc, char *argv[])
       {
 #pragma omp task
          {
+            scanf("%d", &bj);
             for(i = bi; i <= 99; i += 1)
                a[i] = i;
-         }
-#pragma omp task
-         {
-            scanf("%d", &bj);
          }
 #pragma omp task
          {
@@ -31,12 +28,12 @@ int main(int argc, char *argv[])
 #pragma omp task
          {
             0<=bi&&bi<100&&0<=bj&&bj<100?(void) 0:__assert_fail("0<=bi && bi<100 && 0<=bj && bj<100", "../communications04.c", 24, (const char *) 0);
-            for(j = bj; j <= 99; j += 1)
+            for(j = 0; j <= bj-1; j += 1)
                b[j] = 2*a[j];
          }
 #pragma omp task
          {
-            for(j = 0; j <= bj-1; j += 1)
+            for(j = bj; j <= 99; j += 1)
                b[j] = 2*a[j];
          }
       }
