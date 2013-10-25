@@ -203,6 +203,8 @@ bool spire_distributed_unstructured_to_structured (char * module_name)
   set_proper_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, true));
   set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
   module_to_value_mappings(get_current_module_entity());
+  set_rw_effects((statement_effects) 
+		 db_get_memory_resource(DBR_REGIONS, module_name, true));
   set_in_effects((statement_effects) 
 		 db_get_memory_resource(DBR_IN_REGIONS, module_name, true));
   set_out_effects((statement_effects) 
@@ -238,6 +240,7 @@ bool spire_distributed_unstructured_to_structured (char * module_name)
   reset_ordering_to_statement();
   reset_proper_rw_effects();
   reset_cumulated_rw_effects();
+  reset_rw_effects();
   reset_in_effects();
   reset_out_effects();
   reset_current_module_statement();

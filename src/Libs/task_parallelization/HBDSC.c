@@ -429,7 +429,7 @@ bool hbdsc_parallelization(char * module_name)
   annotations = gen_array_make(0);
   clusters = gen_array_make(0);
   initialization_clusters(true);
-  if(sizeof(INSTRUMENTED_FILE) == 8)
+  if(strlen(INSTRUMENTED_FILE) == 0)
     initialization(kdg, annotations);
   else
     parse_instrumented_file(INSTRUMENTED_FILE, kdg, annotations);

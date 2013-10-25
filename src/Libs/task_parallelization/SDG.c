@@ -341,7 +341,8 @@ static bool sequence_dg(statement stmt)
 	      if(statement_ordering(st_g)<statement_ordering(enclosing_stmt)){
 		vertex new_v = statement_to_vertex(enclosing_stmt, sdg);
 		successor_vertex(su) = new_v;
-		ls = CONS(SUCCESSOR, su, ls);
+		if(gen_occurences(su, ls) == 0)
+		  ls = CONS(SUCCESSOR, su, ls);
 	      }
 	    }
 	  }
@@ -431,7 +432,8 @@ static graph clean_sdg(statement module_stmt, graph tg)
 	  if(count == 0 && statement_ordering(s)<statement_ordering(child))
 	    {
 	      ls = CONS(STATEMENT, child,ls);
-	      lv = CONS(SUCCESSOR,su,lv);
+	      if(gen_occurences(su, lv) == 0)
+		lv = CONS(SUCCESSOR,su,lv);
 	    }
 	}
 	vertex_successors(pre) = lv; 

@@ -8895,14 +8895,15 @@ that compute the values of the cost polynomials for each statement.
 
 \begin{PipsMake}
 bdsc_code_instrumentation                    > MODULE.code
-        < PROGRAM.entities
+        < PROGRAM.entities                   
         < MODULE.code
         < MODULE.proper_effects
         < MODULE.chains
-        < MODULE.dg
+        < MODULE.sdg
         < MODULE.regions
         < MODULE.complexities
 \end{PipsMake}
+
 
 The next property is used also by Phase \texttt{bdsc\_kdg\_parallelization}. It
 decides if cost, data and time information will be extracted from the

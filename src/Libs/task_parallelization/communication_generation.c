@@ -62,7 +62,7 @@ statement make_com_loopbody(entity v, bool neighbor, list vl, int k) {
 				    gen_nreverse(args_com),
 				    entity_undefined,
 				    empty_comments);
-  pips_assert("com body is not properly generated", statement_consistent_p(s));
+  pips_assert("communication body is not properly generated", statement_consistent_p(s));
   return s;
 }
 
@@ -101,7 +101,6 @@ statement region_to_com_nest (region r, bool isRead, int k) {
   }
   pips_assert("s is properly generated", statement_consistent_p(s));
   return s;
-  
 }
 
 
@@ -175,9 +174,11 @@ static statement com_call(bool neighbor, list args_com, int k)
 	list phi = NIL;
 	replace_indices_region_com(reg, &phi, indNum, get_current_module_entity());
 	statement s = region_to_com_nest(reg, neighbor, k);
-	sl = CONS(STATEMENT, s, sl);
-	indNum++;
-	declarations = gen_nconc(declarations, phi);
+	if(!statement_undefined_p(s)){
+	  sl = CONS(STATEMENT, s, sl);
+	  indNum++;
+	  declarations = gen_nconc(declarations, phi);
+	}
       }
     }
     com_declarations_to_add = gen_nconc(com_declarations_to_add, declarations);
@@ -189,9 +190,9 @@ static statement com_call(bool neighbor, list args_com, int k)
 
 static list transfer_regions(statement parent, statement child)
 {
-  list l_write = regions_dup(load_statement_out_regions(parent));
-  list l_read = regions_dup(load_statement_in_regions(child));  
-  return RegionsIntersection(regions_dup(l_write), regions_dup(l_read), w_r_combinable_p);
+  list l_out = regions_dup(load_statement_out_regions(parent));
+  list l_in = regions_dup(load_statement_in_regions(child));  
+  return RegionsIntersection(regions_dup(l_out), regions_dup(l_in), w_r_combinable_p);
 }
 
 
@@ -216,7 +217,6 @@ static list hierarchical_com(statement s, bool neighbor, int kp)
     if(gen_length(h_sequence) > 1){ 
       instruction ins_seq = make_instruction_sequence(make_sequence(gen_nreverse(h_sequence)));
       statement_instruction(s) = ins_seq;
-      //free_extensions(statement_extensions(s));
       statement_extensions(s) = empty_extensions();
       statement_comments(s) = empty_comments;
       statement_synchronization(s) = make_synchronization_none();
@@ -226,7 +226,18 @@ static list hierarchical_com(statement s, bool neighbor, int kp)
 }
 
 
-static list gen_send_communications(statement s, vertex tau, persistant_statement_to_cluster st_to_cluster, graph tg, int kp)
+static list successors(list l)
+{
+  list succs = NIL;
+  FOREACH(SUCCESSOR, su, l) {
+    vertex s = successor_vertex(su);
+    statement child = vertex_to_statement(s);
+    if(gen_occurences(child, succs) == 0)
+      succs = CONS(STATEMENT, child, succs);
+  }
+  return succs;
+}
+static list gen_send_communications(statement s, vertex tau, persistant_statement_to_cluster st_to_cluster, int kp)
 {
   int i;
   list args_send, list_st = NIL, h_args_com = NIL;
@@ -240,27 +251,23 @@ static list gen_send_communications(statement s, vertex tau, persistant_statemen
   list_st = CONS(STATEMENT, new_s, NIL);
   for(i = 0; i < NBCLUSTERS; i++){
     args_send = NIL;
-    FOREACH(SUCCESSOR, su, vertex_successors(tau)) {
-      vertex taus = successor_vertex(su);
-      statement ss = vertex_to_statement(taus);
+    FOREACH(STATEMENT, ss, successors(vertex_successors(tau))) {
       if(bound_persistant_statement_to_cluster_p(st_to_cluster, statement_ordering(ss))) {
 	if(apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(s))
 	   != apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(ss))
 	   &&
 	   apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(ss)) == i) {
-	  list com_regions = transfer_regions (vertex_to_statement(statement_to_vertex(s,tg)),vertex_to_statement(statement_to_vertex(ss,tg))); 
-	  if(gen_length(com_regions)>0)
+	  list com_regions = transfer_regions(s, ss); 
+	  if(gen_length(com_regions)>0){
 	    list_st = CONS(STATEMENT, com_call(SUCCESSORS, com_regions, i),list_st);
-	  break;
+	  }
 	}
       }
     }
   }
   if(gen_length(list_st) > 1){ 
     instruction ins_seq = make_instruction_sequence(make_sequence(gen_nreverse(list_st)));
-    //free_instruction(statement_instruction(parent)); 
     statement_instruction(s) = ins_seq;
-    //free_extensions(statement_extensions(s));
     statement_extensions(s) = empty_extensions();
     statement_synchronization(s) = make_synchronization_none();
     statement_comments(s) = empty_comments;
@@ -279,7 +286,7 @@ static list predecessors(statement st, graph tg)
     FOREACH(SUCCESSOR, su, (vertex_successors(v))) {
       vertex s = successor_vertex(su);
       statement child = vertex_to_statement(s);
-      if(statement_equal_p(child, st))
+      if(statement_equal_p(child, st) && gen_occurences(parent, preds) == 0)
 	preds = CONS(STATEMENT, parent, preds);
     }
   }
@@ -298,15 +305,16 @@ static list gen_recv_communications(statement sv, persistant_statement_to_cluste
 				   statement_instruction(sv),
 				   NIL, NULL, statement_extensions(sv), statement_synchronization(sv));
   list_st = CONS(STATEMENT, new_s, NIL);
-  for(i = 0;i < NBCLUSTERS; i++){
+  for(i = 0; i < NBCLUSTERS; i++){
     args_recv = NIL;
     list preds = predecessors(sv, tg);
     FOREACH(STATEMENT, parent, preds){
       if(bound_persistant_statement_to_cluster_p(st_to_cluster, statement_ordering(parent))) {
 	if(apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(parent)) != apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(sv)) && apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(parent)) == i){ 
-	  list com_regions = transfer_regions (vertex_to_statement(statement_to_vertex(parent,tg)),vertex_to_statement(statement_to_vertex(sv,tg))); 
-	  list_st = CONS(STATEMENT, com_call(PREDECESSORS, com_regions, i), list_st);
-	  break;
+	  list com_regions = transfer_regions(parent, sv);
+	  if(gen_length(com_regions)>0){
+	    list_st = CONS(STATEMENT, com_call(PREDECESSORS, com_regions, i), list_st);
+	  }
 	}
       }
     }
@@ -314,7 +322,6 @@ static list gen_recv_communications(statement sv, persistant_statement_to_cluste
   if(gen_length(list_st) > 1){
     instruction ins_seq = make_instruction_sequence(make_sequence((list_st)));//make_statement_list(new_s, st_send)));
     statement_instruction(sv) = ins_seq;
-    //free_extensions(statement_extensions(sv));
     statement_extensions(sv) = empty_extensions();
     statement_synchronization(sv) = make_synchronization_none();
     statement_comments(sv)=empty_comments;
@@ -373,7 +380,7 @@ void communications_construction(graph tg, statement stmt, persistant_statement_
 	  if(found_p){
 	    int ki = apply_persistant_statement_to_cluster(st_to_cluster, statement_ordering(s));
 	  list args_send =  gen_recv_communications(s, st_to_cluster, tg, kp);
-	  list args_recv =  gen_send_communications(s, statement_to_vertex(s,tg), st_to_cluster, tg, kp);
+	  list args_recv =  gen_send_communications(s, statement_to_vertex(s,tg), st_to_cluster, kp);
 	  if(gen_length(args_recv) > 0 && (kp != ki) )
 	    coms_recv = CONS(STATEMENT, com_call(PREDECESSORS, args_recv, ki), coms_recv);
 	  if(gen_length(args_send) > 0 && (kp != ki) )

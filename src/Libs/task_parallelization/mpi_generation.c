@@ -144,27 +144,14 @@ static void gen_if_rank(statement stmt, synchronization sync){
  * hierarchical mpi is not implemented yet (nesting_level = 2)*/
 static int gen_mpi(statement stmt, int nesting_level){
   synchronization sync  = statement_synchronization(stmt);
-  instruction inst;
-  statement new_s; list list_stmts = NIL, args = NIL;
   switch(synchronization_tag(sync)){
   case is_synchronization_spawn:
     nesting_level = (nesting_level == 0)? 1 : ((nesting_level == 1) ? 2 : nesting_level);
     gen_if_rank(stmt, sync);
     break;
   case is_synchronization_barrier:
-    args = CONS(EXPRESSION, make_entity_expression(make_constant_entity("MPI_COMM_WORLD", is_basic_string, 100), NIL), NIL); 
-    statement st = make_call_statement(MPI_BARRIER, args, entity_undefined, string_undefined);
-    new_s = make_statement(
-			   statement_label(stmt),
-			   STATEMENT_NUMBER_UNDEFINED,
-			   STATEMENT_ORDERING_UNDEFINED,
-			   statement_comments(stmt),
-			   copy_instruction(statement_instruction(stmt)),
-			   NIL, NULL, statement_extensions(stmt), make_synchronization_none());
-    list_stmts = CONS(STATEMENT, new_s, CONS(STATEMENT, st, NIL));
-    inst = make_instruction_sequence(make_sequence(list_stmts));
-    statement_instruction(stmt) = inst;
-    statement_comments(stmt) = empty_comments;
+    //MPI_Isend, MPI_recv instructions are sufficient --> no need to
+    //generate MPI_barrier instructions
     break;
   default:
     break;

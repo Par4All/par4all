@@ -542,7 +542,7 @@ int BDSC(sequence seq, int P, int M, int ordering) {
   list stmts = sequence_statements(seq);
   statement ready_task = statement_undefined, unready_task = statement_undefined;
   gen_array_t annotations_s = schedule_failsafe();
-  bool other_rules_p = false; 
+  bool other_rules_p = false, scanf_p = false; 
   initialization_clusters(false);
   top_level(kdg, annotations);
   bottom_level(kdg, annotations);
@@ -559,18 +559,31 @@ int BDSC(sequence seq, int P, int M, int ordering) {
   while(gen_length(unscheduled_tasks) > 0 ){
     ready_task = select_task_with_highest_priority(ready_tasks, statement_undefined);
     unready_task = select_task_with_highest_priority(unready_tasks, ready_task);
-    other_rules_p = false; 
-    if(statement_undefined_p(unready_task)){
-      cl_p = -1;
-      statement min_pred = ready_task;
-      bool zeroing_p = true;
-      /*if(get_bool_property("BDSC_DISTRIBUTED_MEMORY")) 
-	zeroing_p = zeroing_multiple_edges(ready_task, order,M);
-	//function Not validated
-	else*/
+    other_rules_p = false, scanf_p = false; 
+    if(statement_call_p(ready_task)){
+      entity f = call_function(statement_call(ready_task));
+      if(ENTITY_SCANF_P(f) || ENTITY_FSCANF_P(f) || ENTITY_SSCANF_P(f) 
+	 || ENTITY_ISOC99_FSCANF_P(f)|| ENTITY_ISOC99_SSCANF_P(f) || ENTITY_ISOC99_SCANF_P(f)) 
+	scanf_p = true;
+    }
+    if(scanf_p){
+      /*scanf instruction should be scheduled in the master cluster
+	(by convention 0)*/
+    allocate_task_to_cluster(ready_task, 0, order);
+      if(nbclusters == 0) 
+	nbclusters ++;
+    }
+    else{
+      if(statement_undefined_p(unready_task)){
+	cl_p = -1;
+	statement min_pred = ready_task;
+	bool zeroing_p = true;
+	/*if(get_bool_property("BDSC_DISTRIBUTED_MEMORY")) 
+	  zeroing_p = zeroing_multiple_edges(ready_task, order,M);
+	  //function Not validated
+	  else*/
 	{
 	  min_start_time min_pred_s =  tlevel_decrease(ready_task,M);
-	  
 	  min_pred =  min_pred_s.min_tau; 
 	  if(min_pred != statement_undefined)
 	    {
@@ -579,16 +592,17 @@ int BDSC(sequence seq, int P, int M, int ordering) {
 	      allocate_task_to_cluster(ready_task,cl_p, order);
 	    }
 	}
-      if(min_pred == statement_undefined || !zeroing_p)
-	other_rules_p = true;
+	if(min_pred == statement_undefined || !zeroing_p)
+	  other_rules_p = true;
+      }
+      else {
+	other_rules_p = DSRW(ready_task, unready_task,order,M);
+      }
+      if(other_rules_p)
+	nbclusters = find_cluster(ready_task, nbclusters, P, M, order, stmts, annotations_s);
+      if(nbclusters == -1)//not enough memorry
+	return -1;
     }
-    else {
-      other_rules_p = DSRW(ready_task, unready_task,order,M);
-    }
-    if(other_rules_p)
-      nbclusters = find_cluster(ready_task, nbclusters, P, M, order, stmts, annotations_s);
-    if(nbclusters == -1)//not enough memorry
-      return -1;
     gen_remove_once(&unscheduled_tasks, ready_task);
     FOREACH(statement, st, unready_tasks){
       if(ready_node(st))

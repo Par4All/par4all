@@ -64,7 +64,7 @@ static void task_time_polynome(statement s)
       r = words_to_string(pc);
     }
     else 
-      r = i2a(1);
+      r = strdup("Undefined value");
     string new_name3 = "finstrumented";
     entity new_ent3 = make_constant_entity(new_name3, is_basic_string, 100);
     expression exp3 = make_entity_expression(new_ent3, NIL);
@@ -72,8 +72,11 @@ static void task_time_polynome(statement s)
     entity new_ent = make_constant_entity(new_name, is_basic_string, 1000);
     expression exp = make_entity_expression(new_ent, NIL);
     entity new_ent2 = make_constant_entity(r, is_basic_string, 100);
+    type t = copy_type(MakeTypeVariable(make_basic(is_basic_float, UUINT(4)), NIL));
     expression exp2 = make_entity_expression(new_ent2, NIL);
-    list args = CONS(EXPRESSION, exp3, CONS(EXPRESSION,exp,CONS(EXPRESSION,exp2,NIL)));
+    expression exp4 = make_expression(make_syntax_cast(make_cast(t,exp2)), normalized_undefined);
+    gen_consistent_p((gen_chunk*)exp4);
+    list args = CONS(EXPRESSION, exp3, CONS(EXPRESSION, exp,CONS(EXPRESSION, exp4, NIL)));
     st_poly = make_call_statement(FPRINTF_FUNCTION_NAME,
 					    args,
 					    entity_undefined,
@@ -116,8 +119,11 @@ static void edge_cost_polynome(statement s1, statement s2)
   entity new_ent = make_constant_entity(new_name, is_basic_string, 1000);
   expression exp = make_entity_expression(new_ent, NIL);
   entity new_ent2 = make_constant_entity(r, is_basic_string, 100);
+  type t = copy_type(MakeTypeVariable(make_basic(is_basic_float, UUINT(4)), NIL));
   expression exp2 = make_entity_expression(new_ent2, NIL);
-  list args = CONS(EXPRESSION, exp3, CONS(EXPRESSION,exp,CONS(EXPRESSION,exp2,NIL)));
+  expression exp4 = make_expression(make_syntax_cast(make_cast(t,exp2)), normalized_undefined);
+  //expression exp2 = make_entity_expression(new_ent2, NIL);
+  list args = CONS(EXPRESSION, exp3, CONS(EXPRESSION,exp,CONS(EXPRESSION,exp4,NIL)));
   statement st_poly = make_call_statement(FPRINTF_FUNCTION_NAME,
 				args,
 				entity_undefined,
@@ -134,8 +140,7 @@ static void edge_cost_polynome(statement s1, statement s2)
 
 bool bdsc_code_instrumentation(char * module_name)
 { 
-  statement	module_stat;
-  module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, true);
+  statement module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, true);
   set_ordering_to_statement(module_stat);
   set_current_module_entity(module_name_to_entity(module_name));
   set_current_module_statement(module_stat);
@@ -148,41 +153,42 @@ bool bdsc_code_instrumentation(char * module_name)
   module_to_value_mappings(get_current_module_entity());
   set_rw_effects((statement_effects) 
 		 db_get_memory_resource(DBR_REGIONS, module_name, true));
-  //set_in_effects((statement_effects) db_get_memory_resource(DBR_IN_REGIONS, module_name, true));
-  //set_out_effects((statement_effects) db_get_memory_resource(DBR_OUT_REGIONS, module_name, true));
   set_methods_for_convex_effects();
   init_convex_rw_prettyprint(module_name);
  
-  kdg = (graph) db_get_memory_resource (DBR_DG, module_name, true );
+  kdg = (graph) db_get_memory_resource (DBR_SDG, module_name, true );
   
   /*Complexities (task processing time)*/
   set_complexity_map( (statement_mapping) db_get_memory_resource(DBR_COMPLEXITIES, module_name, true));
 
- 
   /*first step is to cumulate dependences hierarchically (between
     sequences) on granularities : loop, test and simple instruction*/
   list vertices = graph_vertices(kdg);
   FOREACH(VERTEX, v, vertices){
     statement stmt = vertex_to_statement(v);
-    task_time_polynome(stmt);
-    FOREACH(SUCCESSOR, su, (vertex_successors(statement_to_vertex(stmt, kdg)))) {
-      vertex s = successor_vertex(su);
-      statement child = vertex_to_statement(s);
-      edge_cost_polynome(stmt,child);
+    if(!declaration_statement_p(stmt)) {
+      task_time_polynome(stmt);
+      FOREACH(SUCCESSOR, su, (vertex_successors(statement_to_vertex(stmt, kdg)))) {
+	vertex s = successor_vertex(su);
+	statement child = vertex_to_statement(s);
+	edge_cost_polynome(stmt,child);
+      }
     }
   }
   /* Reorder the module, because new statements have been generated. */
   module_reorder(module_stat);
-  
+  gen_consistent_p((gen_chunk*)module_stat);
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
   reset_proper_rw_effects();
   reset_cumulated_rw_effects();
   reset_rw_effects();
   reset_precondition_map();
+  reset_transformer_map();
   reset_current_module_statement();
   reset_current_module_entity();
   reset_ordering_to_statement();
   reset_complexity_map();
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
+  free_value_mappings();
   return true;
 }
 
