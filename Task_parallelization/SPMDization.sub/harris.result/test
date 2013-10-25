@@ -17,7 +17,6 @@ void main(int argc, char *argv[])
          for(_rtl_0_0_8 = 0; _rtl_0_0_8 <= 1048575; _rtl_0_0_8 += 1)
             MPI_Isend(&in[_rtl_0_0_8], 1, MPI_FLOAT, 1, 1, MPI_COMM_WORLD, &request0);
       }
-      MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0) {
          /* Now we run the Harris procedure */
          //Sobel
@@ -32,7 +31,6 @@ void main(int argc, char *argv[])
          for(_rtl_0_0_6 = 1025; _rtl_0_0_6 <= 1047550; _rtl_0_0_6 += 1)
             MPI_Isend(&Gy[_rtl_0_0_6], 1, MPI_FLOAT, 2, 2, MPI_COMM_WORLD, &request0);
       }
-      MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0)
          //Multiply
          MultiplY(Ixx, Gx, Gx);
@@ -45,7 +43,6 @@ void main(int argc, char *argv[])
             MPI_Recv(&Gx[_rtl_0_0_3], 1, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
          MultiplY(Ixy, Gx, Gy);
       }
-      MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0)
          //Gauss
          Gauss(Sxx, Ixx);
@@ -59,7 +56,6 @@ void main(int argc, char *argv[])
          for(_rtl_0_0_1 = 1025; _rtl_0_0_1 <= 1047550; _rtl_0_0_1 += 1)
             MPI_Isend(&Sxy[_rtl_0_0_1], 1, MPI_FLOAT, 0, 0, MPI_COMM_WORLD, &request0);
       }
-      MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0) {
          for(_rtl_0_0_0 = 1025; _rtl_0_0_0 <= 1047550; _rtl_0_0_0 += 1)
             MPI_Recv(&Sxy[_rtl_0_0_0], 1, MPI_FLOAT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
@@ -68,7 +64,6 @@ void main(int argc, char *argv[])
          //Coarsity
          CoarsitY(out, Sxx, Syy, Sxy);
       }
-      MPI_Barrier(MPI_COMM_WORLD);
    }
    MPI_Finalize();
 }

@@ -12,10 +12,8 @@ int main()
       MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
       if (rank0==0)
          printf("Hello ");
-      MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0)
          printf("world!\n");
-      MPI_Barrier(MPI_COMM_WORLD);
    }
    MPI_Finalize();
 }

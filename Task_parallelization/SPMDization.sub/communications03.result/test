@@ -15,13 +15,13 @@ int main(int argc, char *argv[])
       if (rank0==0) {
          scanf("%d", &bi);
          MPI_Isend(&bi, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&bi, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
          MPI_Isend(&bi, 1, MPI_INT, 2, 2, MPI_COMM_WORLD, &request0);
       }
       if (rank0==2) {
          size = 100;
          MPI_Isend(&size, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
       }
-      MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0) {
          scanf("%d", &bj);
          MPI_Isend(&bj, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
@@ -43,7 +43,6 @@ int main(int argc, char *argv[])
          for(_rtl_0_0_4 = bi; _rtl_0_0_4 <= bj-1; _rtl_0_0_4 += 1)
             MPI_Isend(&a[_rtl_0_0_4], 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &request0);
       }
-      MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0) {
          for(_rtl_0_0_2 = bi; _rtl_0_0_2 <= bj-1; _rtl_0_0_2 += 1)
             MPI_Recv(&a[_rtl_0_0_2], 1, MPI_INT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
@@ -56,6 +55,7 @@ int main(int argc, char *argv[])
       }
       if (rank0==1) {
          MPI_Recv(&size, 1, MPI_INT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         MPI_Recv(&bj, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
          MPI_Recv(&bi, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
          0<=bi&&bi<size&&0<=bj&&bj<size?(void) 0:__assert_fail("0<=bi && bi<size && 0<=bj && bj<size", "../communications03.c", 22, (const char *) 0);
       }
@@ -66,14 +66,12 @@ int main(int argc, char *argv[])
          for(j = bj; j <= size-1; j += 1)
             b[j] = 2*a[j];
       }
-      MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==2) {
          for(_rtl_0_0 = 0; _rtl_0_0 <= bj-1; _rtl_0_0 += 1)
             MPI_Recv(&b[_rtl_0_0], 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
          for(j = 0; j <= size-1; j += 1)
             printf("%d\n", b[j]);
       }
-      MPI_Barrier(MPI_COMM_WORLD);
    }
    MPI_Finalize();
 }

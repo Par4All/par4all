@@ -19,7 +19,6 @@ void main(int argc, char *argv[])
          i = 4;
          MPI_Isend(&i, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
       }
-      MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0)
          A[i] = 42;
       if (rank0==1) {
@@ -28,13 +27,11 @@ void main(int argc, char *argv[])
          _rtl_0_0_0 = 4;
          MPI_Isend(&B[_rtl_0_0_0], 1, MPI_FLOAT, 0, 0, MPI_COMM_WORLD, &request0);
       }
-      MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0) {
          _rtl_0_0 = 4;
          MPI_Recv(&B[_rtl_0_0], 1, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
          C[i] += A[i]+B[i];
       }
-      MPI_Barrier(MPI_COMM_WORLD);
    }
    MPI_Finalize();
 }

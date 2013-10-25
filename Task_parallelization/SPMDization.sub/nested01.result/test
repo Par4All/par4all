@@ -24,7 +24,6 @@ void main(int argc, char *argv[])
          N = 100;
          MPI_Isend(&N, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
       }
-      MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0)
          for(i = 0; i <= N-1; i += 1) {
 
@@ -53,14 +52,12 @@ void main(int argc, char *argv[])
          for(_rtl_0_0_0 = 0; _rtl_0_0_0 <= 99; _rtl_0_0_0 += 1)
             MPI_Isend(&C[_rtl_0_0_0], 1, MPI_FLOAT, 0, 0, MPI_COMM_WORLD, &request0);
       }
-      MPI_Barrier(MPI_COMM_WORLD);
       if (rank0==0) {
          for(_rtl_0_0 = 0; _rtl_0_0 <= 99; _rtl_0_0 += 1)
             MPI_Recv(&C[_rtl_0_0], 1, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
          for(i = 0; i <= N-1; i += 1)
             D[i] = A[i]+B[i]+C[i];
       }
-      MPI_Barrier(MPI_COMM_WORLD);
    }
    MPI_Finalize();
 }
