@@ -32,50 +32,50 @@ echo // BDSC Instrumentation
 apply BDSC_CODE_INSTRUMENTATION[main]
 display PRINTED_FILE[main]
 
-#apply UNSPLIT[main]
-#shell cd sequence01.database/Src ; gcc  sequence01_inst.c -o sequence01_inst
-#shell ./sequence01.database/Src/sequence01_inst
+apply UNSPLIT[main]
+shell cd sequence01.database/Src ; gcc  sequence01.c -o sequence01
+shell ./sequence01.database/Src/sequence01
 
 close
 delete sequence01
 
-#create sequence01 sequence01.c
+create sequence01 sequence01.c
 
-#activate C_PARSER
-#activate REGION_CHAINS
-#activate MUST_REGIONS
+activate C_PARSER
+activate REGION_CHAINS
+activate MUST_REGIONS
 
-#activate TRANSFORMERS_INTER_FULL
-#setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE
-#setproperty SEMANTICS_FILTER_INITIAL_VALUES TRUE
-#setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE 
-
-
-#apply LOOP_NORMALIZE[%ALLFUNC]
-#apply PRIVATIZE_MODULE[%ALLFUNC]
-#setproperty CONSTANT_PATH_EFFECTS FALSE
-
-#setproperty PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS TRUE
-#setproperty PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS FALSE
-#setproperty PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES FALSE
-#setproperty REGIONS_WITH_ARRAY_BOUNDS TRUE 
+activate TRANSFORMERS_INTER_FULL
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE
+setproperty SEMANTICS_FILTER_INITIAL_VALUES TRUE
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE 
 
 
-#setproperty BDSC_NB_CLUSTERS 3
-#setproperty BDSC_INSTRUMENTED_FILE "instrumented_main.in"
+apply LOOP_NORMALIZE[%ALLFUNC]
+apply PRIVATIZE_MODULE[%ALLFUNC]
+setproperty CONSTANT_PATH_EFFECTS FALSE
 
-#apply HBDSC_PARALLELIZATION[main]
+setproperty PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS TRUE
+setproperty PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS FALSE
+setproperty PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES FALSE
+setproperty REGIONS_WITH_ARRAY_BOUNDS TRUE 
 
-#apply SPIRE_SHARED_UNSTRUCTURED_TO_STRUCTURED[main]
-#echo // OMP style
-#activate OPENMP_TASK_GENERATION
-#activate PRINT_PARALLELIZEDOMP_CODE
-#display PARALLELPRINTED_FILE[main]
 
-#shell rm instrumented_main.in
+setproperty BDSC_NB_CLUSTERS 3
+setproperty BDSC_INSTRUMENTED_FILE "instrumented_main.in"
 
-#close
-#delete sequence01 
+apply HBDSC_PARALLELIZATION[main]
+
+apply SPIRE_SHARED_UNSTRUCTURED_TO_STRUCTURED[main]
+echo // OMP style
+activate OPENMP_TASK_GENERATION
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[main]
+
+shell rm instrumented_main.in
+
+close
+delete sequence01 
 quit
 
 
