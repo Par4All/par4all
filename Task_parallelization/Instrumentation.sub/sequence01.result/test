@@ -1,0 +1,35 @@
+// BDSC Instrumentation
+void main(int argc, char *argv[])
+{
+   FILE *finstrumented;
+   char *file_name = "./instrumented_main.in";
+   finstrumented = fopen(file_name,"w");
+;
+   {
+
+      unsigned int i, N;
+      double A[10], B[10], C[10];
+      fprintf(finstrumented, "4->-1 = %lf \n", (float) 3);
+      scanf("N = %d\n", &N);
+      fprintf(finstrumented, "4->5 = %lf \n", (float) 4);
+      fprintf(finstrumented, "5->-1 = %lf \n", (float) 3*N + 3);
+      for(i = 0; i < N; i += 1) {
+         fprintf(finstrumented, "6->-1 = %lf \n", (float) 3);
+         A[i] = 5;
+      }
+      fprintf(finstrumented, "4->7 = %lf \n", (float) 4);
+      fprintf(finstrumented, "7->-1 = %lf \n", (float) 3*N + 3);
+      for(i = 0; i < N; i += 1) {
+         fprintf(finstrumented, "8->-1 = %lf \n", (float) 3);
+         B[i] = 3;
+      }
+      fprintf(finstrumented, "4->9 = %lf \n", (float) 4);
+      fprintf(finstrumented, "5->9 = %lf \n", (float) 0);
+      fprintf(finstrumented, "7->9 = %lf \n", (float) 0);
+      fprintf(finstrumented, "9->-1 = %lf \n", (float) 9*N + 3);
+      for(i = 0; i < N; i += 1) {
+         fprintf(finstrumented, "10->-1 = %lf \n", (float) 9);
+         C[i] += A[i]+B[i];
+      }
+   }
+}
