@@ -1238,7 +1238,7 @@ list c_convex_effects_on_actual_parameter_forward_translation
 			    pips_debug(5,"array element or sub-array case\n");
 			    general_case = false;
 			    /* we build the constraint PHI_nb_phi_real >= last index of eff_real */
-			    exp_nb_phi_real = EXPRESSION(CAR(l_inds_real));
+			    exp_nb_phi_real = copy_expression(EXPRESSION(CAR(l_inds_real))); // copy necessary because eff_real is freed afterwards
 			    sc_nb_phi_real = sc_new();
 			    (void) sc_add_phi_equation(&sc_nb_phi_real,
 						       copy_expression(exp_nb_phi_real),
@@ -1438,6 +1438,8 @@ list c_convex_effects_on_actual_parameter_forward_translation
 
 		      } /* FOREACH */
 
+		    if (!expression_undefined_p(exp_nb_phi_real))
+		      free_expression(exp_nb_phi_real);
 		    break;
 		  }
 		else
