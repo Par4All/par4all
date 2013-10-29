@@ -29,7 +29,7 @@ class p4a_spear_processor(p4a_processor):
         filter_select=self.load_spear_xml(spear)
        
         # Init parent
-        p4a_processor.__init__(self, filter_select=filter_select, *sources, **kwargs)
+        p4a_processor.__init__(self, spear = True, filter_select=filter_select, *sources, **kwargs)
     
     def load_spear_xml(self,xml_file):
         tree = ET.ElementTree(file=xml_file)
