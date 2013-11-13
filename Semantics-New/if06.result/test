@@ -1,0 +1,268 @@
+
+Transformers for if06
+
+
+//  T() {}
+
+void if06()
+{
+
+//  T(i,j) {i==0, j==-1}
+
+   int i = 0, j = -1;
+
+//  T(j) {i==0, j#init==-1, 0<=j, j<=1}
+
+
+   if (i==0)
+
+//  T(j) {i==0, j==0, j#init==-1}
+
+      // Should be reached
+      j = 0;
+   else
+
+//  T(j) {i==0, j==1, j#init==-1}
+
+      // Should not be reached
+      j = 1;
+
+//  T(j) {i==0, j==-1, 0<=j#init, j#init<=1}
+
+
+   j = -1;
+
+//  T(j) {i==0, j#init==-1, 0<=j, j<=1}
+
+   if (i!=0)
+
+//  T(j) {i==0, j==1, j#init==-1}
+
+      // Should not be reached
+      j = 1;
+   else
+
+//  T(j) {i==0, j==0, j#init==-1}
+
+      // Should be reached
+      j = 0;
+
+//  T(j) {i==0, j==-1, 0<=j#init, j#init<=1}
+
+
+   j = -1;
+
+//  T(j) {i==0, j==0, j#init==-1}
+
+   if (i<=0)
+
+//  T(j) {i==0, j==0, j#init==-1}
+
+      // Should be reached
+      j = 0;
+   else
+
+//  T() {0==-1}
+
+      // Should not be reached
+      j = 1;
+
+//  T(j) {i==0, j==-1, j#init==0}
+
+
+   j = -1;
+
+//  T(j) {i==0, j==0, j#init==-1}
+
+   if (i>=0)
+
+//  T(j) {i==0, j==0, j#init==-1}
+
+      // Should be reached
+      j = 0;
+   else
+
+//  T() {0==-1}
+
+      // Should not be reached
+      j = 1;
+
+//  T(j) {i==0, j==-1, j#init==0}
+
+
+   j = -1;
+
+//  T(j) {i==0, j==0, j#init==-1}
+
+   if (i<0)
+
+//  T() {0==-1}
+
+      // Should not be reached
+      j = 1;
+   else
+
+//  T(j) {i==0, j==0, j#init==-1}
+
+      // Should be reached
+      j = 0;
+
+//  T(j) {i==0, j==-1, j#init==0}
+
+
+   j = -1;
+
+//  T(j) {i==0, j==0, j#init==-1}
+
+   if (i>0)
+
+//  T() {0==-1}
+
+      // Should not be reached
+      j = 1;
+   else
+
+//  T(j) {i==0, j==0, j#init==-1}
+
+      // Should be reached
+      j = 0;
+
+//  T() {i==0, j==0}
+
+
+   return;
+}
+
+Preconditions for if06
+
+
+//  P() {}
+
+void if06()
+{
+
+//  P() {}
+
+   int i = 0, j = -1;
+
+//  P(i,j) {i==0, j==-1}
+
+
+   if (i==0)
+
+//  P(i,j) {i==0, j==-1}
+
+      // Should be reached
+      j = 0;
+   else
+
+//  P(i,j) {i==0, j==-1}
+
+      // Should not be reached
+      j = 1;
+
+//  P(i,j) {i==0, 0<=j, j<=1}
+
+
+   j = -1;
+
+//  P(i,j) {i==0, j==-1}
+
+   if (i!=0)
+
+//  P(i,j) {i==0, j==-1}
+
+      // Should not be reached
+      j = 1;
+   else
+
+//  P(i,j) {i==0, j==-1}
+
+      // Should be reached
+      j = 0;
+
+//  P(i,j) {i==0, 0<=j, j<=1}
+
+
+   j = -1;
+
+//  P(i,j) {i==0, j==-1}
+
+   if (i<=0)
+
+//  P(i,j) {i==0, j==-1}
+
+      // Should be reached
+      j = 0;
+   else
+
+//  P() {0==-1}
+
+      // Should not be reached
+      j = 1;
+
+//  P(i,j) {i==0, j==0}
+
+
+   j = -1;
+
+//  P(i,j) {i==0, j==-1}
+
+   if (i>=0)
+
+//  P(i,j) {i==0, j==-1}
+
+      // Should be reached
+      j = 0;
+   else
+
+//  P() {0==-1}
+
+      // Should not be reached
+      j = 1;
+
+//  P(i,j) {i==0, j==0}
+
+
+   j = -1;
+
+//  P(i,j) {i==0, j==-1}
+
+   if (i<0)
+
+//  P() {0==-1}
+
+      // Should not be reached
+      j = 1;
+   else
+
+//  P(i,j) {i==0, j==-1}
+
+      // Should be reached
+      j = 0;
+
+//  P(i,j) {i==0, j==0}
+
+
+   j = -1;
+
+//  P(i,j) {i==0, j==-1}
+
+   if (i>0)
+
+//  P() {0==-1}
+
+      // Should not be reached
+      j = 1;
+   else
+
+//  P(i,j) {i==0, j==-1}
+
+      // Should be reached
+      j = 0;
+
+//  P(i,j) {i==0, j==0}
+
+
+   return;
+}
