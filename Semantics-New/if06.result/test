@@ -11,7 +11,7 @@ void if06()
 
    int i = 0, j = -1;
 
-//  T(j) {i==0, j#init==-1, 0<=j, j<=1}
+//  T(j) {i==0, j==0, j#init==-1}
 
 
    if (i==0)
@@ -22,21 +22,21 @@ void if06()
       j = 0;
    else
 
-//  T(j) {i==0, j==1, j#init==-1}
+//  T() {0==-1}
 
       // Should not be reached
       j = 1;
 
-//  T(j) {i==0, j==-1, 0<=j#init, j#init<=1}
+//  T(j) {i==0, j==-1, j#init==0}
 
 
    j = -1;
 
-//  T(j) {i==0, j#init==-1, 0<=j, j<=1}
+//  T(j) {i==0, j==0, j#init==-1}
 
    if (i!=0)
 
-//  T(j) {i==0, j==1, j#init==-1}
+//  T() {0==-1}
 
       // Should not be reached
       j = 1;
@@ -47,7 +47,7 @@ void if06()
       // Should be reached
       j = 0;
 
-//  T(j) {i==0, j==-1, 0<=j#init, j#init<=1}
+//  T(j) {i==0, j==-1, j#init==0}
 
 
    j = -1;
@@ -156,12 +156,12 @@ void if06()
       j = 0;
    else
 
-//  P(i,j) {i==0, j==-1}
+//  P() {0==-1}
 
       // Should not be reached
       j = 1;
 
-//  P(i,j) {i==0, 0<=j, j<=1}
+//  P(i,j) {i==0, j==0}
 
 
    j = -1;
@@ -170,7 +170,7 @@ void if06()
 
    if (i!=0)
 
-//  P(i,j) {i==0, j==-1}
+//  P() {0==-1}
 
       // Should not be reached
       j = 1;
@@ -181,7 +181,7 @@ void if06()
       // Should be reached
       j = 0;
 
-//  P(i,j) {i==0, 0<=j, j<=1}
+//  P(i,j) {i==0, j==0}
 
 
    j = -1;
