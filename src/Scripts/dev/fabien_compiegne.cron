@@ -15,5 +15,4 @@
 # private validation
 7 3 * * * /home/fabien/PRIVE/pips_check_compile --force --report --source /home/fabien/PRIVE/pipsrc.sh pips-private@cri.ensmp.fr /home/fabien/PRIVE/prod /home/fabien/PRIVE/private
 # debian wheezy with execution
-# TODO: rename DEB60 DEBIAN? wheezy is 7.0
-7 6 * * * /home/fabien/DEB60/pips_check_compile --force --report --source /home/fabien/DEB60/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/DEB60/prod /home/fabien/DEB60/validation
+7 6 * * * /home/fabien/DEBIAN/pips_check_compile --force --report --source /home/fabien/DEBIAN/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/DEBIAN/prod /home/fabien/DEBIAN/validation
