@@ -1,6 +1,6 @@
 # $Id$
 #
-# Debian Squeeze x86_64
+# Debian Wheezy x86_64
 #
 # check on commit runs on every minute
 * * * * * /home/fabien/CHECK/pips_check_compile --source /home/fabien/CHECK/pipsrc.sh --keepfail --validation-option DO_SLOW= pips-validation@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
@@ -14,5 +14,6 @@
 7 2 * * * /home/fabien/CROSS/pips_check_compile --force --report --source=/home/fabien/CROSS/pipsrc.sh pips-validation@cri.ensmp.fr /home/fabien/CROSS/prod
 # private validation
 7 3 * * * /home/fabien/PRIVE/pips_check_compile --force --report --source /home/fabien/PRIVE/pipsrc.sh pips-private@cri.ensmp.fr /home/fabien/PRIVE/prod /home/fabien/PRIVE/private
-# debian squeeze with execution
+# debian wheezy with execution
+# TODO: rename DEB60 DEBIAN? wheezy is 7.0
 7 6 * * * /home/fabien/DEB60/pips_check_compile --force --report --source /home/fabien/DEB60/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/DEB60/prod /home/fabien/DEB60/validation
