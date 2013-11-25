@@ -143,8 +143,14 @@ class p4a_astrad_postprocessor(object):
         dsl_text += ") {\n\n"
 
         # parameters
+        first_parameter = True
+        dsl_text += 'parameters(\n'
         for parameter in task_parameters:
             if parameter.attrib['ArrayP'] == "FALSE":
+                if first_parameter:
+                    first_parameter = False
+                else:
+                    dsl_text += ',\n'
                 parameter_name = parameter.attrib['Name']
                 dsl_text += parameter_name
                 dsl_text += "(dataType=" + parameter.attrib['DataType']
@@ -165,9 +171,9 @@ class p4a_astrad_postprocessor(object):
                     #     if found:
                     #         break
                     if not found:
-                        dsl_text += ', arraySizeName=' + array_name + ', arraySizeDim=' + str(int(usage.attrib['Dim']) -1)
-                dsl_text += ')\n'
-        dsl_text += "\n"
+                        dsl_text += ', as_dimension(' + array_name + ',' + str(int(usage.attrib['Dim']) -1) +')'
+                dsl_text += ')'
+        dsl_text += ");\n"
 
         # I/Os
 
