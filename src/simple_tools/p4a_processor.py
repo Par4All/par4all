@@ -1396,6 +1396,7 @@ class p4a_processor(object):
 
         if self.astrad and not self.spear:
             self.astrad_postproc.save_dsl_file()
+            self.astrad_postproc.rename_module()
 
         return output_files
 

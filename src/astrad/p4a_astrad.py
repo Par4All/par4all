@@ -91,7 +91,7 @@ class p4a_astrad_postprocessor(object):
         content += time.strftime('%y_%m_%d',time.localtime())
         content +="\n"
         content +="{\n"
-        content += "sourceName = " + self.outputFileName + ";\n"
+        content += "sourceName = " + self.outputFileName + "_" + self.outputDialect +";\n"
         content += "methodName = " + self.moduleName + ";\n"
         content += "errorCode = " + self.errorCode + ";\n"
         content += "kernelFileName = kernel.dsl;\n"
@@ -308,3 +308,21 @@ class p4a_astrad_postprocessor(object):
 
         # save dsl file
         write_file(os.path.join(self.saveDir, "kernel.dsl"), dsl_text)
+
+    def rename_module(self):
+        old_file =  os.path.join(self.saveDir, self.outputFileName )
+        # file name is *.p4a.c: split it twice to recover base name
+        (base, ext1) = os.path.splitext(self.outputFileName)
+        (base, ext2) = os.path.splitext(base)
+        new_file = os.path.join(self.saveDir, base  + '_' + self.outputDialect + ext2 + ext1)
+        new_module_name = self.moduleName + '_' + self.outputDialect
+
+        print self.outputFileName + "\n"
+        print new_file + "\n"
+        print new_module_name + "\n"
+
+        os.rename(old_file, new_file)
+        content = read_file(new_file)
+        content = content.replace (self.moduleName + '(', new_module_name + '(')
+
+        write_file(new_file, content)
