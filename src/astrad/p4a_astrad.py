@@ -316,13 +316,12 @@ class p4a_astrad_postprocessor(object):
         (base, ext2) = os.path.splitext(base)
         new_file = os.path.join(self.saveDir, base  + '_' + self.outputDialect + ext2 + ext1)
         new_module_name = self.moduleName + '_' + self.outputDialect
-
-        print self.outputFileName + "\n"
-        print new_file + "\n"
-        print new_module_name + "\n"
+        old_module_kernel_name = self.moduleName + '_kernel'
+        new_module_kernel_name = self.moduleName + '_' + self.outputDialect + '_kernel'
 
         os.rename(old_file, new_file)
         content = read_file(new_file)
         content = content.replace (self.moduleName + '(', new_module_name + '(')
+        content = content.replace (old_module_kernel_name + '(', new_module_kernel_name + '(')
 
         write_file(new_file, content)
