@@ -1,5 +1,5 @@
-# gnulib-common.m4 serial 29
-dnl Copyright (C) 2007-2011 Free Software Foundation, Inc.
+# gnulib-common.m4 serial 33
+dnl Copyright (C) 2007-2013 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -13,12 +13,13 @@ AC_DEFUN([gl_COMMON], [
 ])
 AC_DEFUN([gl_COMMON_BODY], [
   AH_VERBATIM([_Noreturn],
-[/* The _Noreturn keyword of draft C1X.  */
-#ifndef _Noreturn
+[/* The _Noreturn keyword of C11.  */
+#if ! (defined _Noreturn \
+       || (defined __STDC_VERSION__ && 201112 <= __STDC_VERSION__))
 # if (3 <= __GNUC__ || (__GNUC__ == 2 && 8 <= __GNUC_MINOR__) \
       || 0x5110 <= __SUNPRO_C)
 #  define _Noreturn __attribute__ ((__noreturn__))
-# elif 1200 <= _MSC_VER
+# elif defined _MSC_VER && 1200 <= _MSC_VER
 #  define _Noreturn __declspec (noreturn)
 # else
 #  define _Noreturn
@@ -29,7 +30,7 @@ AC_DEFUN([gl_COMMON_BODY], [
 [/* Work around a bug in Apple GCC 4.0.1 build 5465: In C99 mode, it supports
    the ISO C 99 semantics of 'extern inline' (unlike the GNU C semantics of
    earlier versions), but does not display it by setting __GNUC_STDC_INLINE__.
-   __APPLE__ && __MACH__ test for MacOS X.
+   __APPLE__ && __MACH__ test for Mac OS X.
    __APPLE_CC__ tests for the Apple compiler and its version.
    __STDC_VERSION__ tests for the C99 mode.  */
 #if defined __APPLE__ && defined __MACH__ && __APPLE_CC__ >= 5465 && !defined __cplusplus && __STDC_VERSION__ >= 199901L && !defined __GNUC_STDC_INLINE__
@@ -211,8 +212,33 @@ m4_ifndef([AS_VAR_IF],
 [m4_define([AS_VAR_IF],
 [AS_IF([test x"AS_VAR_GET([$1])" = x""$2], [$3], [$4])])])
 
+# gl_PROG_CC_C99
+# Modifies the value of the shell variable CC in an attempt to make $CC
+# understand ISO C99 source code.
+# This is like AC_PROG_CC_C99, except that
+# - AC_PROG_CC_C99 did not exist in Autoconf versions < 2.60,
+# - AC_PROG_CC_C99 does not mix well with AC_PROG_CC_STDC
+#   <http://lists.gnu.org/archive/html/bug-gnulib/2011-09/msg00367.html>,
+#   but many more packages use AC_PROG_CC_STDC than AC_PROG_CC_C99
+#   <http://lists.gnu.org/archive/html/bug-gnulib/2011-09/msg00441.html>.
+# Remaining problems:
+# - When AC_PROG_CC_STDC is invoked twice, it adds the C99 enabling options
+#   to CC twice
+#   <http://lists.gnu.org/archive/html/bug-gnulib/2011-09/msg00431.html>.
+# - AC_PROG_CC_STDC is likely to change now that C11 is an ISO standard.
+AC_DEFUN([gl_PROG_CC_C99],
+[
+  dnl Change that version number to the minimum Autoconf version that supports
+  dnl mixing AC_PROG_CC_C99 calls with AC_PROG_CC_STDC calls.
+  m4_version_prereq([9.0],
+    [AC_REQUIRE([AC_PROG_CC_C99])],
+    [AC_REQUIRE([AC_PROG_CC_STDC])])
+])
+
 # gl_PROG_AR_RANLIB
 # Determines the values for AR, ARFLAGS, RANLIB that fit with the compiler.
+# The user can set the variables AR, ARFLAGS, RANLIB if he wants to override
+# the values.
 AC_DEFUN([gl_PROG_AR_RANLIB],
 [
   dnl Minix 3 comes with two toolchains: The Amsterdam Compiler Kit compiler
@@ -220,24 +246,47 @@ AC_DEFUN([gl_PROG_AR_RANLIB],
   dnl library formats. In particular, the GNU binutils programs ar, ranlib
   dnl produce libraries that work only with gcc, not with cc.
   AC_REQUIRE([AC_PROG_CC])
-  AC_EGREP_CPP([Amsterdam],
+  AC_CACHE_CHECK([for Minix Amsterdam compiler], [gl_cv_c_amsterdam_compiler],
     [
+      AC_EGREP_CPP([Amsterdam],
+        [
 #ifdef __ACK__
 Amsterdam
 #endif
-    ],
-    [AR='cc -c.a'
-     ARFLAGS='-o'
-     RANLIB=':'
-    ],
-    [dnl Use the Automake-documented default values for AR and ARFLAGS.
-     AR='ar'
-     ARFLAGS='cru'
-     dnl Use the ranlib program if it is available.
-     AC_PROG_RANLIB
+        ],
+        [gl_cv_c_amsterdam_compiler=yes],
+        [gl_cv_c_amsterdam_compiler=no])
     ])
+  if test -z "$AR"; then
+    if test $gl_cv_c_amsterdam_compiler = yes; then
+      AR='cc -c.a'
+      if test -z "$ARFLAGS"; then
+        ARFLAGS='-o'
+      fi
+    else
+      dnl Use the Automake-documented default values for AR and ARFLAGS,
+      dnl but prefer ${host}-ar over ar (useful for cross-compiling).
+      AC_CHECK_TOOL([AR], [ar], [ar])
+      if test -z "$ARFLAGS"; then
+        ARFLAGS='cru'
+      fi
+    fi
+  else
+    if test -z "$ARFLAGS"; then
+      ARFLAGS='cru'
+    fi
+  fi
   AC_SUBST([AR])
   AC_SUBST([ARFLAGS])
+  if test -z "$RANLIB"; then
+    if test $gl_cv_c_amsterdam_compiler = yes; then
+      RANLIB=':'
+    else
+      dnl Use the ranlib program if it is available.
+      AC_PROG_RANLIB
+    fi
+  fi
+  AC_SUBST([RANLIB])
 ])
 
 # AC_PROG_MKDIR_P
@@ -245,6 +294,8 @@ Amsterdam
 # for interoperability with automake-1.9.6 from autoconf-2.62.
 # Remove this macro when we can assume autoconf >= 2.62 or
 # autoconf >= 2.60 && automake >= 1.10.
+# AC_AUTOCONF_VERSION was introduced in 2.62, so use that as the witness.
+m4_ifndef([AC_AUTOCONF_VERSION],[
 m4_ifdef([AC_PROG_MKDIR_P], [
   dnl For automake-1.9.6 && autoconf < 2.62: Ensure MKDIR_P is AC_SUBSTed.
   m4_define([AC_PROG_MKDIR_P],
@@ -255,13 +306,15 @@ m4_ifdef([AC_PROG_MKDIR_P], [
     [AC_REQUIRE([AM_PROG_MKDIR_P])dnl defined by automake
      MKDIR_P='$(mkdir_p)'
      AC_SUBST([MKDIR_P])])])
+])
 
 # AC_C_RESTRICT
 # This definition overrides the AC_C_RESTRICT macro from autoconf 2.60..2.61,
 # so that mixed use of GNU C and GNU C++ and mixed use of Sun C and Sun C++
 # works.
 # This definition can be removed once autoconf >= 2.62 can be assumed.
-m4_if(m4_version_compare(m4_defn([m4_PACKAGE_VERSION]),[2.62]),[-1],[
+# AC_AUTOCONF_VERSION was introduced in 2.62, so use that as the witness.
+m4_ifndef([AC_AUTOCONF_VERSION],[
 AC_DEFUN([AC_C_RESTRICT],
 [AC_CACHE_CHECK([for C/C++ restrict keyword], [ac_cv_c_restrict],
   [ac_cv_c_restrict=no
