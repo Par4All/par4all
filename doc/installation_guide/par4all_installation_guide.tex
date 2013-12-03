@@ -39,7 +39,7 @@
 
 \title{\protect\Apfa Installation Guide\\
   ---\\
-  HPC Project}
+  SILKAN}
 
 \author{\Apfa \textsc{team}}
 
@@ -83,19 +83,17 @@ distribution, especially Debian, Ubuntu and Fedora.
 % To ease copy/paste:
 % libncurses5 libreadline5 python python-ply gfortran
 
-To run \Apfa with Debian or Ubuntu, the following packages are needed~\footnote
-{Starting with Ubuntu 12.04, you have to select libpython2.7 instead of 
-libpython}:
+To run \Apfa with Debian or Ubuntu, the following packages are needed:
 \begin{quote}
   \texttt{cproto} \texttt{gfortran} \texttt{gnuplot} \texttt{ipython}
-  \texttt{libmpfr-dev} \texttt{libncurses5} \texttt{libpython}  
+  \texttt{libmpfr-dev} \texttt{libncurses5} \texttt{libpython2.7}
   \texttt{libreadline5} \texttt{python} \texttt{python-ply}
 \end{quote}
 
 Some examples shipped with \Apfa needs other packages such as:
 
 \begin{quote}
-  \texttt{libgtk2.0-dev} \texttt{libfftw3-dev} \texttt{freeglut3-dev} 
+  \texttt{freeglut3-dev} \texttt{libfftw3-dev} \texttt{libgtk2.0-dev}
 \end{quote}
 
 
@@ -106,7 +104,7 @@ To run \Apfa with Fedora Core 15, 14 or 13, the following packages are needed:
 \begin{quote}
   \texttt{cproto} \texttt{gnuplot} \texttt{ncurses-5}
   \texttt{readline} \texttt{python} \texttt{python-ply}
-  \texttt{python3} \texttt{gcc-gfortran} \texttt{ipython} 
+  \texttt{python3} \texttt{gcc-gfortran} \texttt{ipython}
   \texttt{libncurses5-dev}
 \end{quote}
 
@@ -120,12 +118,12 @@ from the sources.
 To compile \Apfa with Debian or Ubuntu, the following additional
 packages are needed:
 \begin{quote}
-  \texttt{cproto}, \texttt{indent}, \texttt{flex}, \texttt{bison},
-  \texttt{automake}, \texttt{libtool}, \texttt{autoconf},
-  \texttt{libreadline6-dev}, \texttt{python-dev}, \texttt{swig},
-  \texttt{python-ply}, \texttt{libgmp3-dev},
-  \texttt{libmpfr-dev}, \texttt{gfortran}, \texttt{subversion},
-  \texttt{git}, \texttt{wget}
+  \texttt{autoconf} \texttt{automake} \texttt{bison} \texttt{cproto}
+  \texttt{gfortran} \texttt{indent} \texttt{flex} \texttt{git}
+  \texttt{gnulib} \texttt{libgmp3-dev} \texttt{libmpfr-dev}
+  \texttt{libncurses5-dev} \texttt{libreadline6-dev} \texttt{libtool}
+  \texttt{python-dev} \texttt{python-ply} \texttt{subversion}
+  \texttt{swig} \texttt{wget}
 \end{quote}
 In Ubuntu 11.10 there is a bug in the \texttt{libtinfo-dev} and
 \texttt{libtinfo5} packages that prevents \texttt{tpips} from being
@@ -148,12 +146,12 @@ the bug report.
 To compile \Apfa with Fedora Core 15, 14 or 13, the following additional
 packages are needed:
 \begin{quote}
-  \texttt{cproto}, \texttt{indent}, \texttt{flex}, \texttt{bison},
-  \texttt{automake}, \texttt{libtool}, \texttt{autoconf},
-  \texttt{readline-devel}, \texttt{python-devel}, \texttt{swig},
-  \texttt{python-ply}, \texttt{gmp-devel},
-  \texttt{mpfr-devel}, \texttt{gcc-gfortran}, \texttt{subversion},
-  \texttt{git}, \texttt{wget}
+  \texttt{cproto} \texttt{indent} \texttt{flex} \texttt{bison}
+  \texttt{automake} \texttt{libtool} \texttt{autoconf}
+  \texttt{readline-devel} \texttt{python-devel} \texttt{swig}
+  \texttt{python-ply} \texttt{gmp-devel}
+  \texttt{mpfr-devel} \texttt{gcc-gfortran} \texttt{subversion}
+  \texttt{git} \texttt{wget}
 \end{quote}
 On OpenSuse it looks like you need roughly the same packages, such as
 \texttt{mpfr-devel}.
@@ -161,13 +159,13 @@ On OpenSuse it looks like you need roughly the same packages, such as
 To compile the documentation with Debian or Ubuntu, the following
 additional packages are needed:
 \begin{quote}
-  \texttt{python-docutils}, \texttt{texlive-full}, \texttt{tex4ht}
+  \texttt{python-docutils} \texttt{tex4ht} \texttt{texlive-full}
 \end{quote}
 
 To compile the documentation with Fedora Core 15, 14 or 13, the following
 additional packages are needed:
 \begin{quote}
-  \texttt{texlive}, \texttt{tex4ht}
+  \texttt{texlive} \texttt{tex4ht}
 \end{quote}
 
 
@@ -348,7 +346,7 @@ decompress it with a \texttt{tar zxvf}.
 
 \subsubsection{Get a source snapshot from the git repository}
 
-On \url{https://git.hpc-project.com/cgit/par4all} you can find the
+On \url{https://git.par4all.org/cgit/par4all} you can find the
 snapshots in the Download section in \texttt{.zip}, \texttt{.tar.gz} or
 \texttt{.tar.bz2}.
 
@@ -356,7 +354,7 @@ By tweaking the URL of a tag snapshot you can even get a snapshot from any
 branch or commit, not only tag. For example the last snapshot of the
 \texttt{p4a} integrated branch is in:
 
-\url{https://git.hpc-project.com/cgit/par4all/snapshot/p4a.tar.bz2}
+\url{https://git.par4all.org/cgit/par4all/snapshot/p4a.tar.bz2}
 
 
 \subsubsection{Installing from the sources}
@@ -374,7 +372,7 @@ by running \verb|src/simple_tools/p4a_setup.py|. See
 To download and compile \Apfa from the \Agit, do the following:
 \begin{alltt}
 # Get a working copy of the Par4All public read-only git repository:
-git clone --branch p4a git://git.hpc-project.com/git/par4all.git
+git clone --branch p4a git://git.par4all.org/git/par4all.git
 # Go into the working copy:
 cd par4all
 # Build everything using 8 processes to speed up things:
@@ -406,8 +404,7 @@ because some system files such as \texttt{/usr/include/assert.h} may be
 overwritten and havoc may happen...
 
 To see more installation options (including specifying the locations for
-other packages), run \verb|p4a_setup.py -h| or see
-section~\ref{sec:installation_options}.
+other packages), run \verb|p4a_setup.py -h| or see the \Apfa developer guide}.
 
 To pull a new version, do:
 \begin{verbatim}
