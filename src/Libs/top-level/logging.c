@@ -152,6 +152,6 @@ pips_thanks(string name, string path)
   if (isatty(fileno(stdout)))
   {
     fprintf(stdout, PIPS_THANKS_STRING(STRINGIFY(SOFT_ARCH)), name, path);
-    ffluxsh(stdout);
+    fflush(stdout);
   }
 }
