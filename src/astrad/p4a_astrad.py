@@ -85,13 +85,18 @@ class p4a_astrad_postprocessor(object):
         dsl_file_name = os.path.join(self.saveDir, self.moduleName + '.dsl')
         #print("file name :" + dsl_file_name + "\n")
 
+        # file name is *.p4a.c: split it twice to recover base name
+        (base, ext1) = os.path.splitext(self.outputFileName)
+        (base, ext2) = os.path.splitext(base)
+        new_file = base  + '_' + self.outputDialect + ext2 + ext1
+
         f = open(dsl_file_name, 'w')
 
         content = "optimizeResult request_optimize_"
         content += time.strftime('%y_%m_%d',time.localtime())
         content +="\n"
         content +="{\n"
-        content += "sourceName = " + self.outputFileName + "_" + self.outputDialect +";\n"
+        content += "sourceName = " + new_file +";\n"
         content += "methodName = " + self.moduleName + ";\n"
         content += "errorCode = " + self.errorCode + ";\n"
         content += "kernelFileName = kernel.dsl;\n"
