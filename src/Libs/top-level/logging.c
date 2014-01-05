@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2012 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -131,7 +131,7 @@ void smart_log_handler(const char *fmt, va_list args)
 #define PIPS_THANKS_STRING(arch)                                        \
   "%s (ARCH=" arch ")\n  running as %s\n"                               \
   "\n"                                                                  \
-  "  (c) 1988-2013 Centre de Recherche en Informatique,\n"              \
+  "  (c) 1988-2014 Centre de Recherche en Informatique,\n"              \
   "                Unite de Recherche Mathematiques et Systemes,\n"     \
   "                MINES ParisTech, France.\n"                          \
   "\n"                                                                  \
