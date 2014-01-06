@@ -97,7 +97,7 @@ class p4a_astrad_postprocessor(object):
         content +="\n"
         content +="{\n"
         content += "sourceName = " + new_file +";\n"
-        content += "methodName = " + self.moduleName + ";\n"
+        content += "methodName = " + self.moduleName + '_' + self.outputDialect + ";\n"
         content += "errorCode = " + self.errorCode + ";\n"
         content += "kernelFileName = kernel.dsl;\n"
         content += "type = " + self.outputDialect + ";\n"
@@ -139,10 +139,10 @@ class p4a_astrad_postprocessor(object):
             if not (data_type in data_types):
                 data_types[data_type] = array.find('DataType').attrib['Size']
         for t, s in data_types.iteritems():
-            dsl_text += t +"(" + str(s) + ")\n"
+            dsl_text += t +"(" + str(s) + ");\n"
 
         # module function description
-        dsl_text += self.moduleName + "_kernel(openLastDim=false"
+        dsl_text += self.moduleName + "_" + self.outputDialect + "_kernel(openLastDim=false"
         for parameter in task_parameters:
             dsl_text += "," + parameter.attrib['Name']
         dsl_text += ") {\n\n"
@@ -158,7 +158,7 @@ class p4a_astrad_postprocessor(object):
                     dsl_text += ',\n'
                 parameter_name = parameter.attrib['Name']
                 dsl_text += parameter_name
-                dsl_text += "(dataType=" + parameter.attrib['DataType']
+                dsl_text += "(datatype=" + parameter.attrib['DataType']
 
                 for usage in parameter.findall('TaskParameterUsedFor'):
                     # if the parameter is used in the array pattern,
@@ -176,7 +176,7 @@ class p4a_astrad_postprocessor(object):
                     #     if found:
                     #         break
                     if not found:
-                        dsl_text += ', as_dimension(' + array_name + ',' + str(int(usage.attrib['Dim']) -1) +')'
+                        dsl_text += ', as_dimensions(' + array_name + ',' + str(int(usage.attrib['Dim']) -1) +')'
                 dsl_text += ')'
         dsl_text += ");\n"
 
@@ -205,7 +205,7 @@ class p4a_astrad_postprocessor(object):
                     p4a_util.die("ASTRAD post processor ERROR: invalid USE_DEF array:\n")
 
                 dsl_text += parameter.attrib['Name'] + " (datatype="
-                dsl_text += parameter.attrib['DataType'] + ", nbdimensions="
+                dsl_text += parameter.attrib['DataType'] + ", nbDimensions="
 
                 # look for number of array dimensions
                 for array in formal_arrays:
@@ -229,7 +229,7 @@ class p4a_astrad_postprocessor(object):
                     else:
                         p4a_util.die("ASTRAD PostProcessor: unexpected DimPattern tag")
 
-                    dsl_text += "origin(dimension=" + str(dim) + ", "
+                    dsl_text += "origin(stride=" + str(dim) + ","
                     dsl_text += "amplitude=" + amplitude_text + ");\n"
 
                 # fitting
@@ -245,8 +245,9 @@ class p4a_astrad_postprocessor(object):
                     else:
                         p4a_util.die("ASTRAD PostProcessor: unexpected DimPattern tag")
 
-                    dsl_text += "consume(dimension=" + str(dim) + ", "
-                    dsl_text += "length=" + length_text  + ", "
+                    dsl_text += "consume(length=" + length_text  + ","
+                    dsl_text += "op=Times,"
+                    dsl_text += "stride=" + str(dim) + ","
                     dsl_text += "amplitude=" + amplitude_text + ");\n"
 
                 # paving - scan loops in order
@@ -292,11 +293,13 @@ class p4a_astrad_postprocessor(object):
                         length_text = "All"
                         amplitude_text = "0"
 
-                    dsl_text += ("\t" * index) + "OnIter(consume(dimension = " + str(dim) + ", "
+                    dsl_text += ("\t" * index) + "OnIter(consume("
                     if all_length:
-                        dsl_text += 'All, '
+                        dsl_text += 'op=All,'
                     else:
-                        dsl_text += "length=" + length_text  + ", "
+                        dsl_text += "length=" + length_text  + ","
+                    dsl_text += "loop=" + str(index)+ ","
+                    dsl_text += "stride=" + str(dim) + ","
                     dsl_text += "amplitude=" + amplitude_text + ")"
 
                     if index < len(loops)-1:
@@ -306,7 +309,7 @@ class p4a_astrad_postprocessor(object):
                 dsl_text += "}\n"
 
         # timing: fake information, not used but necessary
-        dsl_text += "timing (prolog=0,core=-1,epilog=0)\n"
+        dsl_text +='timing(prolog=0,core="-1",epilog=0);\n'
 
         dsl_text += "}\n"
         dsl_text += "}\n"
