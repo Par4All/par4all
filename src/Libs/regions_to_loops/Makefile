@@ -1,6 +1,6 @@
 # $Id: Makefile 20843 2011-12-31 08:40:08Z coelho $
 #
-# Copyright 1989-2010 MINES ParisTech
+# Copyright 1989-2014 MINES ParisTech
 #
 # This file is part of PIPS.
 #

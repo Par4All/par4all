@@ -1,7 +1,7 @@
 /*
   $Id$
 
-  Copyright 1989-2011 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
   Copyright 2011 HPC Project
 
   This file is part of PIPS.

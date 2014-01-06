@@ -2,7 +2,7 @@
 
  $Id $
 
- Copyright 1989-2012 MINES ParisTech
+ Copyright 1989-2014 MINES ParisTech
  Copyright 2012 Silkan
 
  This file is part of PIPS.
