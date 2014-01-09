@@ -38,7 +38,11 @@ properties.h: properties.c
 
 properties.c: properties.l
 	$(SCAN) `pwd`/$< | \
-	sed -e '/^FILE \*yyin/s/=[^,;]*//g;s/YY/PROP_/g;s/yy/prop_/g;s/\(void *\*prop_alloc\)/static \1/;s/\(void *\*prop_realloc\)/static \1/;' \
+	sed -e '/^FILE \*yyin/s/=[^,;]*//g;' \
+	    -e 's/YY/PROP_/g;s/yy/prop_/g;' \
+	    -e 's/\(void *\*prop_alloc\)/static \1/;' \
+	    -e 's/\(void *\*prop_realloc\)/static \1/;' \
+	    -e 's/^\(prop__size_t prop_get_\)/static \1/;' \
 		 > $@
 
 clean: local-clean
