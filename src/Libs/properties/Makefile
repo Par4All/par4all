@@ -43,6 +43,7 @@ properties.c: properties.l
 	    -e 's/\(void *\*prop_alloc\)/static \1/;' \
 	    -e 's/\(void *\*prop_realloc\)/static \1/;' \
 	    -e 's/^\(prop__size_t prop_get_\)/static \1/;' \
+	    -e 's/^\(prop__size_t prop_leng\)/static \1/;' \
 		 > $@
 
 clean: local-clean
