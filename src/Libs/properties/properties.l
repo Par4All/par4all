@@ -77,19 +77,19 @@ static char * string_to_parse = (char*) 0; /* shared pointer! */
 
 #define YY_INPUT(buffer, result, max_size)		\
 {							\
-    int i=0;						\
-    if (string_to_parse) /* we're parsing a string */	\
-    {							\
-	while(i<max_size && *string_to_parse)		\
-	    buffer[i++]=*string_to_parse++;		\
-    }							\
-    else /* it's a file */				\
-    {							\
-	int c;						\
-	while (i<max_size && (c=getc(yyin))!=EOF)	\
-	    buffer[i++]=(char) c;			\
-    }							\
-    result = i==0? YY_NULL: i;				\
+  unsigned int i = 0;					\
+  if (string_to_parse) /* we're parsing a string */	\
+  {							\
+    while (i<max_size && *string_to_parse)		\
+      buffer[i++] = *string_to_parse++;			\
+  }							\
+  else /* it's a file */				\
+  {							\
+    int c;						\
+    while (i<max_size && (c=getc(yyin))!=EOF)		\
+      buffer[i++] = (char) c;				\
+  }							\
+  result = i==0? YY_NULL: i;				\
 }
 
 static void parse_properties(void);
@@ -286,7 +286,8 @@ static void read_properties(void)
     pfn = strdup(concatenate(sdn, "/", OLD_PROPERTIES_RC, NULL));
     if ((old_prop = fopen(pfn, "r")) != NULL) {
       char opfn[100];
-      (void) fscanf(old_prop, "%s", opfn);
+      int stat = fscanf(old_prop, "%s", opfn);
+      assert(stat != EOF);
 
       if ((prop_in = fopen_config(opfn, NULL, NULL)) != NULL) {
         parse_properties_file(prop_in);
@@ -534,7 +535,8 @@ void fprint_properties(FILE * fd)
 static string get_property_file_name(void)
 {
     string dir_name = db_get_meta_data_directory(),name;
-    asprintf(&name,"%s/properties",dir_name);
+    int stat = asprintf(&name,"%s/properties",dir_name);
+    assert(stat != -1);
     free(dir_name); return name;
 }
 
