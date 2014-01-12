@@ -30,8 +30,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "assert.h"
+#include <assert.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -47,7 +46,7 @@ void matrix_fprint(FILE * f, Pmatrix	a)
   int	i, j;
   int m = MATRIX_NB_LINES(a);
   int n = MATRIX_NB_COLUMNS(a);
-  assert(MATRIX_DENOMINATOR(a)!=0);
+  assert(MATRIX_DENOMINATOR(a) != VALUE_ZERO);
 
   (void) fprintf(f, "%d %d\n", m, n);
   (void) fprint_Value(f, MATRIX_DENOMINATOR(a));
