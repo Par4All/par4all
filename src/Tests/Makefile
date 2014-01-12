@@ -10,7 +10,7 @@ all: smith
 CC		= gcc
 CFLAGS		= -O2 -Wall
 CPPFLAGS	= -I $(LC3.inc)
-LDFLAGS		= -L $(LC3.lib) -lmatrix -larithmetique
+LDFLAGS		= -L $(LC3.lib)
 
 %: %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) $< $(LDFLAGS) -o $@
@@ -18,6 +18,14 @@ LDFLAGS		= -L $(LC3.lib) -lmatrix -larithmetique
 F.c	= $(wildcard *.c)
 F.o	= $(F.c:%.c=%.o)
 F.exe	= $(F.c:%.c=%)
+
+MX.lib	= -lmatrix -larithmetique
+SC.lib	= -lsc -lcontrainte -lvecteur -larithmetique
+PO.lib	= -lpolyedre -lsg
+
+smith: LDFLAGS += $(MX.lib)
+feasability: LDFLAGS += $(SC.lib)
+#sc_env: LDFLAGS += $(PO.lib) $(SC.lib) $(MX.lib)
 
 clean:
 	$(RM) *~ $(F.o) $(F.exe)

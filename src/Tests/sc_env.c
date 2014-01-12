@@ -37,20 +37,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-extern int fprintf();
-extern int printf();
-extern char * strdup();
+#include <string.h>
+#include <assert.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
-#include"assert.h"
+#include "matrix.h"
 #include "vecteur.h"
 #include "contrainte.h"
 #include "ray_dte.h"
 #include "sommet.h"
 #include "sc.h"
 #include "sg.h"
-#include "types.h"
 #include "polyedre.h"
 
 
