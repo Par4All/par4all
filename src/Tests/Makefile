@@ -7,9 +7,9 @@ LC3.lib = ../../lib/LINUX_x86_64_LL
 all: smith
 
 # testing...
-CC		= gcc
+CC		= gcc -std=c99
 CFLAGS		= -O2 -Wall
-CPPFLAGS	= -I $(LC3.inc)
+CPPFLAGS	= -I $(LC3.inc) -DLINEAR_VALUE_IS_LONGLONG
 LDFLAGS		= -L $(LC3.lib)
 
 %: %.c
