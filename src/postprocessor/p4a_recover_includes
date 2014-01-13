@@ -452,12 +452,12 @@ def init_headers():
                 # Just in case it already exists...
                 pass
             # And then the file:
-            
+
             proxy = open(pn, mode = 'w')
             #python 2.X
             print >>proxy, '/* This file includes ' + n + ' for PIPS */'
             print >>proxy, '#include "' + os.path.join('/usr/include', n ) + '"'
-            
+
             #python3.1
             #print('/* This file includes ' + n + ' for PIPS */',
             #      file = proxy)
@@ -557,7 +557,7 @@ def recover_header(file_name, output_file_name):
         # in content:
         (line, content) = re.split(r'\n', content, 1)
         # Output the line to the destination file:
-        print >>f, line 
+        print >>f, line
 
     # Then write the recoverd includes:
     for h in found_headers:
@@ -917,15 +917,15 @@ def preprocess(args):
     inclusion.
 
     This is an optparse-callback to be able to get trailing arguments"""
-                
+
     # Pick the default values from
     # pips/src/Libs/preprocessor/preprocessor-local.h:
     cpp_args = shlex.split(" -C  -D__PIPS__ -D__HPFC__ -U__GNUC__ ")
-    
+
     # Add other options from the PIPS_CPP_FLAGS environment variable if defined:
     if 'PIPS_CPP_FLAGS' in os.environ:
         cpp_args += shlex.split(os.environ['PIPS_CPP_FLAGS'] + " ")
-    
+
     # Addded the trailing arguments of this program as options or files to
     # preprocess, if any:
     cpp_args += args
