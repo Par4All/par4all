@@ -1,6 +1,6 @@
 # $Id$
 #
-# Copyright 1989-2012 MINES ParisTech
+# Copyright 1989-2014 MINES ParisTech
 #
 # This file is part of Linear/C3 Library.
 #
