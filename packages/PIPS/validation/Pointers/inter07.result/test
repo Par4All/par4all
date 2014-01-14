@@ -2,10 +2,14 @@
 POINTS TO for inter07
 
 
-// Points To IN: none
+// Points To IN:
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
 
 void display(towns t, double xmin, double ymin, double xmax, double ymax, double step)
 {
@@ -22,16 +26,31 @@ void display(towns t, double xmin, double ymin, double xmax, double ymax, double
 
    for(i = 0; i < rangex; i += 1) {
 
-// Points To: none
+// Points To:
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
 
       for(j = 0; j < rangey; j += 1)
 
-// Points To: none
+// Points To:
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
 
+         
+         
+         
          printf("%lf %lf %lf\n", ((t.data)[i*rangey+j])[0], ((t.data)[i*rangey+j])[1], ((t.data)[i*rangey+j])[2]);
 
-// Points To: none
+// Points To:
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
 
       printf("\n");
    }
+
+// Points To:
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+
+   return;
 }

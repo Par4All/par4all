@@ -6,8 +6,8 @@ POINTS TO for "recurrence05"
 
 
 // Points To OUT:
-// *ANY_MODULE*:*HEAP**ANYWHERE* -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// *ANY_MODULE*:*HEAP**ANYWHERE* -> *NULL_POINTER* , MAY
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> undefined , MAY
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *NULL* , MAY
 // recurrence05 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 
 list recurrence05(void)
@@ -33,7 +33,7 @@ list recurrence05(void)
    l->next = (void *) 0;
 
 // Points To:
-// *ANY_MODULE*:*HEAP**ANYWHERE* -> *NULL_POINTER* , MAY
+// *ANY_MODULE*:*HEAP**ANYWHERE* -> *NULL* , MAY
 // *ANY_MODULE*:*HEAP**ANYWHERE* -> i , MAY
 // l -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
 

@@ -1,0 +1,17 @@
+delete r2l6
+create r2l6 r2l6.c
+setproperty ABORT_ON_USER_ERROR TRUE
+activate C_PARSER
+
+setproperty  REGIONS_WITH_ARRAY_BOUNDS TRUE
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[function_test]
+
+capply REGIONS_TO_LOOPS[function_test]
+activate PRINT_CODE
+display PRINTED_FILE[function_test]
+
+close
+delete r2l6
+quit
+

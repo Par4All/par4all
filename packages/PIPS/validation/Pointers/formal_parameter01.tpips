@@ -33,5 +33,12 @@ display PRINTED_FILE[main]
 
 
 close
+
+echo
+echo Warnings and errors
+echo
+
+shell cat $WS.database/Warnings
+
 delete $WS
 quit

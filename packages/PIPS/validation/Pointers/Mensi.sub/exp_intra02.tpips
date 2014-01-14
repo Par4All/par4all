@@ -2,7 +2,10 @@ setenv WS=exp_intra02
 delete $WS
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
+# Not compatible with the current points-to implementation and CP lattice
+# setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 create $WS $WS.c
 
@@ -13,30 +16,30 @@ echo
 echo PROPER  EFFECTS 
 echo
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[main]
 
 
 echo 
 echo POINTS-TO
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[main]
 
 
 echo 
-echo PROPER  EFFECTS WITH POINTS TO
+echo proper effects with points-to
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[main]
 
 
 echo 
-echo CUMULATED  EFFECTS WITH POINTS TO
+echo cumulated effects with points-to
 echo
 activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[main]
 
 
 

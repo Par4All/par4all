@@ -1,0 +1,26 @@
+
+POINTS TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   float a = 1.0;
+
+// Points To: none
+
+   unsigned char *src = (unsigned char *) &a;
+
+// Points To:
+// src -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+
+   return 0;
+}

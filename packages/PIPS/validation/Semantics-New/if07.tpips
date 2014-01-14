@@ -1,0 +1,32 @@
+setenv WSPACE=if07
+delete $WSPACE
+setenv FILE=$WSPACE.c
+create $WSPACE $FILE
+
+#setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+#activate PRECONDITIONS_INTER_FULL
+#activate TRANSFORMERS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+#setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+#setproperty SEMANTICS_USE_LIST_PROJECTION FALSE
+
+echo
+echo Transformers for "$WSPACE"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[$WSPACE]
+
+echo
+echo Preconditions for "$WSPACE"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[$WSPACE]
+
+close
+delete $WSPACE
+quit

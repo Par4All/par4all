@@ -1,0 +1,23 @@
+setenv WSPACE=malloc19
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE
+
+close
+
+echo
+echo Warnings and errors: Check that the two memory leaks are detected
+echo
+
+shell cat $WSPACE.database/Warnings
+delete $WSPACE
+quit

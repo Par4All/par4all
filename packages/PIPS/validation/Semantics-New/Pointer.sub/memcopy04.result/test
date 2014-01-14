@@ -1,0 +1,98 @@
+
+Points-to
+
+
+Transformers with point-to
+
+
+//  T() {}
+
+void memcopy04(int size, char *src, char *dst)
+{
+
+//  T(i) {}
+
+   int i;
+
+//  T(i) {}
+
+   if (src!=(void *) 0&&dst!=(void *) 0) {
+
+//  T(s) {s==src}
+
+      char *s = (char *) src;
+
+//  T(d) {d==dst, s==src}
+
+      char *d = (char *) dst;
+
+//  T(d,i,s) {d#init==dst, s#init==src, 0<=i, i+1<=size}
+
+      for(i = 0; i <= size-1; i += 1)
+
+//  T(d,s) {0<=i, i+1<=size}
+
+         *d++ = *s++;
+   }
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+void memcopy04(int size, char *src, char *dst)
+{
+
+//  P() {}
+
+   int i;
+
+//  P(i) {}
+
+   if (src!=(void *) 0&&dst!=(void *) 0) {
+
+//  P(i) {}
+
+      char *s = (char *) src;
+
+//  P(i,s) {s==src}
+
+      char *d = (char *) dst;
+
+//  P(d,i,s) {d==dst, s==src}
+
+      for(i = 0; i <= size-1; i += 1)
+
+//  P(d,i,s) {0<=i, i+1<=size}
+
+         *d++ = *s++;
+   }
+}
+
+Warnings
+
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning memcopy04 instead
+TRANSFORMERS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy04] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL[memcopy04] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning memcopy04 instead
+TRANSFORMERS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy04] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL[memcopy04] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+PRECONDITIONS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+PRECONDITIONS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+PRECONDITIONS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+PRECONDITIONS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+PRECONDITIONS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+PRECONDITIONS_INTER_FULL[memcopy04] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)

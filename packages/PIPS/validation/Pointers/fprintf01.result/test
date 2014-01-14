@@ -15,49 +15,70 @@ int main()
    FILE *pFile;
 
 // Points To:
-// pFile -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pFile -> undefined , EXACT
 
    int n;
 
 // Points To:
-// pFile -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pFile -> undefined , EXACT
 
    char name[100];
 
 // Points To:
-// pFile -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pFile -> undefined , EXACT
 
 
    pFile = fopen("myfile.txt", "w");
 
 // Points To:
-// pFile -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// pFile -> *NULL* , MAY
+// pFile -> __IO_EFFECTS:IO_FILES[*] , MAY
 
-   for(n = 0; n <= 2; n += 1) {
+   n = 0;
 
 // Points To:
-// pFile -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// pFile -> *NULL* , MAY
+// pFile -> __IO_EFFECTS:IO_FILES[*] , MAY
+
+   while (n<3) {
+
+// Points To:
+// pFile -> *NULL* , MAY
+// pFile -> __IO_EFFECTS:IO_FILES[*] , MAY
 
       puts("please, enter a name: ");
 
 // Points To:
-// pFile -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// pFile -> *NULL* , MAY
+// pFile -> __IO_EFFECTS:IO_FILES[*] , MAY
 
       gets(name);
 
 // Points To:
-// pFile -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// pFile -> *NULL* , MAY
+// pFile -> __IO_EFFECTS:IO_FILES[*] , MAY
 
       fprintf(pFile, "Name %d %s\n", n, name);
+
+// Points To:
+// pFile -> __IO_EFFECTS:IO_FILES[*] , MAY
+
+      n = n;
+
+// Points To:
+// pFile -> __IO_EFFECTS:IO_FILES[*] , MAY
+
+      n++;
    }
 
 // Points To:
-// pFile -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// pFile -> *NULL* , MAY
+// pFile -> __IO_EFFECTS:IO_FILES[*] , MAY
 
    fclose(pFile);
 
 // Points To:
-// pFile -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pFile -> undefined , EXACT
 
    return 0;
 }

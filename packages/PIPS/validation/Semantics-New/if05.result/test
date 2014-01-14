@@ -1,0 +1,36 @@
+
+TRANSFORMERS
+
+
+//  T(if05) {}
+
+int if05()
+{
+
+//  T(i,j,k) {}
+
+   int i, j, k;
+
+//  T(j,k) {j<=j#init, j#init<=j+2}
+
+
+   if (0<=j&&j<=2)
+
+//  T(j,k) {j==0, k==4, 0<=j#init, j#init<=2}
+
+      if (j = 0)
+
+//  T() {0==-1}
+
+         k = 0;
+      else
+
+//  T(k) {j==0, k==4}
+
+         k = 4;
+
+//  T(if05) {if05==k}
+
+
+   return k;
+}

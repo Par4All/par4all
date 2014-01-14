@@ -1,0 +1,97 @@
+setenv WSPACE=structure01
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo Code after unrolling
+echo
+
+apply UNROLL[main]
+loop1
+3
+display PRINTED_FILE[main]
+
+#apply UNROLL[main]
+#loop2
+#3
+#display PRINTED_FILE[main]
+
+echo
+echo Code after control simplification
+echo
+
+apply SIMPLIFY_CONTROL[main]
+display PRINTED_FILE[main]
+
+echo
+echo Code after constant propagation
+echo
+
+apply PARTIAL_EVAL[main]
+display PRINTED_FILE[main]
+
+echo
+echo Code after dead code elimination
+echo
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+apply DEAD_CODE_ELIMINATION[main]
+display PRINTED_FILE[main]
+
+quit
+
+echo
+echo Unsplit resulting code
+echo
+apply UNSPLIT
+
+shell pips_validation_exe.sh -c -g c_unroll1
+
+
+
+setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo TRANSFORMERS 
+echo
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+
+echo
+echo PRECONDITIONS 
+echo
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+
+
+
+
+
+
+
+
+close
+echo
+echo Warnings
+echo
+shell cat $WSPACE.database/Warnings
+
+#delete $WSPACE
+quit
+

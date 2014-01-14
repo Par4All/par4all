@@ -1,0 +1,14 @@
+delete SCoPDetection12
+create SCoPDetection12 SCoPDetection12.c
+setproperty ABORT_ON_USER_ERROR TRUE
+activate C_PARSER
+
+setproperty STATIC_CONTROLIZE_ACROSS_USER_CALLS FALSE
+capply POCC_PRETTYPRINTER[main]
+activate PRINT_CODE
+display PRINTED_FILE[main]
+
+close
+delete SCoPDetection12
+quit
+

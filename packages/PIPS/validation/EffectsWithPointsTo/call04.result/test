@@ -19,6 +19,7 @@ int main()
    int d1 = 10;
 //             <    is written>: d2
    int d2 = 10;
+//             <    is read   >: d1 d2
    int y[d1][d2];
 //             <may be written>: y[*][*]
 //             <    is read   >: d1 d2
@@ -28,8 +29,12 @@ int main()
 
  *********************** Use-Def Chains *********************
 
+	14 --> 16 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
 	14 --> 18 with conflicts
 		from <d1-W-EXACT> to <d1-R-EXACT>
+	15 --> 16 with conflicts
+		from <d2-W-EXACT> to <d2-R-EXACT>
 	15 --> 18 with conflicts
 		from <d2-W-EXACT> to <d2-R-EXACT>
 

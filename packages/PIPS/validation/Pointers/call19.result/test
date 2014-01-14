@@ -54,17 +54,18 @@ POINTS-TO
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_1[0] , EXACT
 
 int bla(int *p)
 {
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
    *p = 13;
@@ -76,11 +77,12 @@ int bla(int *p)
 }
 
 // Points To IN:
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// q -> _q_1[0] , EXACT
 
 int call19(int *q)
 {
@@ -94,15 +96,14 @@ int call19(int *q)
    something st;
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_1[0] , MAY
 
    // bla(int *)
    i = bla(q);
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
-// q -> _q_1[0] , MAY
+// q -> _q_1[0] , EXACT
 
    i += *q;
 

@@ -1,0 +1,56 @@
+
+Transformers for "userfunction"
+
+
+//  T() {}
+
+void userfunction(int a, int _c, int d)
+{
+}
+
+Transformers for "main"
+
+
+//  T() {}
+
+int main(int argc, char *argv[])
+{
+
+//  T() {}
+
+
+   userfunction(1, 2, 1);
+
+//  T() {}
+
+
+   userfunction(2, 3, 0);
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main(int argc, char *argv[])
+{
+
+//  P() {}
+
+
+   userfunction(1, 2, 1);
+
+//  P() {}
+
+
+   userfunction(2, 3, 0);
+}
+
+Preconditions for "userfunction"
+
+
+//  P() {_c==a+1, _c+d==3, 2<=_c, _c<=3}
+
+void userfunction(int a, int _c, int d)
+{
+}

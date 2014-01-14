@@ -1,4 +1,7 @@
 
+PRINT_CODE_SIMPLE_POINTER_VALUES
+
+
 // IN Pointer values:
 // argv == &_argv_1[0] (exact);
 // argv[*] == &_argv_2[*][0] (may);
@@ -374,6 +377,9 @@ int main(int argc, char **argv)
 
    return 0;
 }
+
+PROPER_EFFECTS_WITH_POINTER_VALUES
+
 int main(int argc, char **argv)
 {
    int i;
@@ -457,6 +463,9 @@ int main(int argc, char **argv)
 
    return 0;
 }
+
+MUST_REGIONS_WITH_POINTER_VALUES
+
 int main(int argc, char **argv)
 {
    int i;
@@ -613,6 +622,9 @@ int main(int argc, char **argv)
 
    return 0;
 }
+
+PRINT_CODE_REGIONS
+
 
 //  <N-R-EXACT-{}>
 //  <N-W-MAY-{}>

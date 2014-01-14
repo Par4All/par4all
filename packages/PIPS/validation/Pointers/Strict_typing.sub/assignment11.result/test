@@ -28,6 +28,7 @@ int assignment11()
 
 // Points To:
 // q -> s.a[5][0] , EXACT
+// s.a[5] -> s.a[5][0] , EXACT
 
 
    return *q;

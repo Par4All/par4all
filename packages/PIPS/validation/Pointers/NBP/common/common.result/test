@@ -1,0 +1,151 @@
+void c_print_results(char *name, char class, int n1, int n2, int n3, int niter, double t, double mops, char *optype, int passed_verification, char *npbversion, char *compiletime, char *cc, char *clink, char *c_lib, char *c_inc, char *cflags, char *clinkflags)
+{
+   printf("\n\n %s Benchmark Completed\n", name);
+
+   printf(" Class           =                        %c\n", class);
+
+   if (n3==0) {
+      long int nn = n1;
+      if (n2!=0)
+         nn *= n2;
+      printf(" Size            =             %12ld\n", nn);
+   }
+   else
+      printf(" Size            =             %4dx%4dx%4d\n", n1, n2, n3);
+
+   printf(" Iterations      =             %12d\n", niter);
+
+   printf(" Time in seconds =             %12.2f\n", t);
+
+   printf(" Mop/s total     =             %12.2f\n", mops);
+
+   printf(" Operation type  = %24s\n", optype);
+
+   if (passed_verification<0)
+      printf(" Verification    =            NOT PERFORMED\n");
+   else if (passed_verification)
+      printf(" Verification    =               SUCCESSFUL\n");
+   else
+      printf(" Verification    =             UNSUCCESSFUL\n");
+
+   printf(" Version         =             %12s\n", npbversion);
+
+   printf(" Compile date    =             %12s\n", compiletime);
+
+   printf("\n Compile options:\n");
+
+   printf("    CC           = %s\n", cc);
+
+   printf("    CLINK        = %s\n", clink);
+
+   printf("    C_LIB        = %s\n", c_lib);
+
+   printf("    C_INC        = %s\n", c_inc);
+
+   printf("    CFLAGS       = %s\n", cflags);
+
+   printf("    CLINKFLAGS   = %s\n", clinkflags);
+   
+   
+   
+   
+   
+   printf("\n--------------------------------------\n");
+   printf(" Please send all errors/feedbacks to:\n");
+   printf(" Center for Manycore Programming\n");
+   printf(" cmp@aces.snu.ac.kr\n");
+   printf(" http://aces.snu.ac.kr\n");
+   printf("--------------------------------------\n");
+}
+static double elapsed_time(void)
+{
+   double t;
+
+   wtime_(&t);
+   return t;
+}
+void print_results(char *name, char class, int n1, int n2, int n3, int niter, double t, double mops, char *optype, logical verified, char *npbversion, char *compiletime, char *cs1, char *cs2, char *cs3, char *cs4, char *cs5, char *cs6, char *cs7)
+{
+   char size[16];
+   int j;
+
+   printf("\n\n %s Benchmark Completed.\n", name);
+   printf(" Class           =             %12c\n", class);
+   if (n2==0&&n3==0)
+      if (name[0]=='E'&&name[1]=='P') {
+         sprintf(size, "%15.0lf", pow(2.0, n1));
+         j = 14;
+         
+         // If this is not a grid-based problem (EP, FT, CG), then
+         // we only print n1, which contains some measure of the
+         // problem size. In that case, n2 and n3 are both zero.
+         // Otherwise, we print the grid size n1xn2xn3
+         
+         if (size[j]=='.') {
+            size[j] = ' ';
+            j--;
+         }
+         size[j+1] = '\0';
+         printf(" Size            =          %15s\n", size);
+      }
+      else
+         printf(" Size            =             %12d\n", n1);
+   else
+      printf(" Size            =           %4dx%4dx%4d\n", n1, n2, n3);
+
+   printf(" Iterations      =             %12d\n", niter);
+   printf(" Time in seconds =             %12.2lf\n", t);
+   printf(" Mop/s total     =          %15.2lf\n", mops);
+   printf(" Operation type  = %24s\n", optype);
+   if (verified)
+      printf(" Verification    =             %12s\n", "SUCCESSFUL");
+   else
+      printf(" Verification    =             %12s\n", "UNSUCCESSFUL");
+   printf(" Version         =             %12s\n", npbversion);
+   printf(" Compile date    =             %12s\n", compiletime);
+   
+   
+   printf("\n Compile options:\n""    CC           = %s\n", cs1);
+   printf("    CLINK        = %s\n", cs2);
+   printf("    C_LIB        = %s\n", cs3);
+   printf("    C_INC        = %s\n", cs4);
+   printf("    CFLAGS       = %s\n", cs5);
+   printf("    CLINKFLAGS   = %s\n", cs6);
+   printf("    RAND         = %s\n", cs7);
+   
+   
+   
+   
+   
+   
+   printf("\n--------------------------------------\n"" Please send all errors/feedbacks to:\n"" Center for Manycore Programming\n"" cmp@aces.snu.ac.kr\n"" http://aces.snu.ac.kr\n""--------------------------------------\n\n");
+}
+void timer_clear(int n)
+{
+   elapsed[n] = 0.0;
+}
+double timer_read(int n)
+{
+   return elapsed[n];
+}
+void timer_start(int n)
+{
+   start[n] = elapsed_time();
+}
+void timer_stop(int n)
+{
+   double t, now;
+
+   now = elapsed_time();
+   t = now-start[n];
+   elapsed[n] += t;
+}
+void wtime_(double *t)
+{
+   static int sec = -1;
+   struct timeval tv;
+   gettimeofday(&tv, (void *) 0);
+   if (sec<0)
+      sec = tv.tv_sec;
+   *t = tv.tv_sec-sec+1.0e-6*tv.tv_usec;
+}

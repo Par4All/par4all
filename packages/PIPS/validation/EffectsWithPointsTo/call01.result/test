@@ -3,19 +3,21 @@ Points-to for "call01"
 
 
 // Points To IN:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_2[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// pi -> _pi_1[1] , EXACT
+// q -> _q_2[0] , EXACT
 
 void call01(int *pi, tf_t *q)
 {
 
 // Points To:
-// pi -> *NULL_POINTER* , MAY
+// pi -> *NULL* , MAY
 // pi -> _pi_1[0] , MAY
 
    *pi = 1;
@@ -29,7 +31,7 @@ void call01(int *pi, tf_t *q)
 
 // Points To:
 // pi -> _pi_1[1] , EXACT
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_2[0] , MAY
 
    q->one = 1;
@@ -132,3 +134,6 @@ int main()
 //             <    is read   >: i[1]
    return i[1];
 }
+
+Warnings and errors:
+

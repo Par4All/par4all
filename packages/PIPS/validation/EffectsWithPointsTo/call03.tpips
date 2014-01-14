@@ -5,26 +5,55 @@ create $WSPACE $WSPACE.c
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
-#setenv POINTER_VALUES_DEBUG_LEVEL 2
 
 # This property is not compatible with the source code
 # set POINTS_TO_STRICT_POINTER_TYPES TRUE
 
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+
 echo 
-echo POINTS-TO
+echo Points-to for "call03"
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE [%ALLFUNC]
+display PRINTED_FILE [call03]
 
 echo 
-echo PROPER  EFFECTS WITH POINTS TO
+echo Proper effects with points-to for "call03"
 echo
-activate PROPER_EFFECTS_WITH_POINTS_TO
+
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE [%ALLFUNC]
+display PRINTED_FILE [call03]
+
+echo 
+echo Cumulated effects with points-to for "call03"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE [call03]
+
+echo 
+echo Points-to for "main"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE [main]
+
+echo 
+echo Proper effects with points-to for "main"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE [main]
+
+echo 
+echo Cumulated effects with points-to for "main"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE [main]
 
 activate PRINT_CHAINS_GRAPH
-display DG_FILE 
+display DG_FILE[call03] 
 
 close
 delete $WSPACE

@@ -45,37 +45,37 @@ int main()
    int *x, x1, **y, *y1, y2;
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// y1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
+// y1 -> undefined , EXACT
 
 
    x1 = 0;
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// y1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
+// y1 -> undefined , EXACT
 
    y2 = 1;
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// y1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
+// y1 -> undefined , EXACT
 
    x = &x1;
 
 // Points To:
 // x -> x1 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// y1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> undefined , EXACT
+// y1 -> undefined , EXACT
 
    y1 = &y2;
 
 // Points To:
 // x -> x1 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// y -> undefined , EXACT
 // y1 -> y2 , EXACT
 
    y = &y1;

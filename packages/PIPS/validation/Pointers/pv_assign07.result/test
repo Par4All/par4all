@@ -52,50 +52,50 @@ int main()
    mystruct s1, s2, *s1p, *s2p;
 
 // Points To:
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s1.a -> undefined , EXACT
+// s1p -> undefined , EXACT
+// s2.a -> undefined , EXACT
+// s2p -> undefined , EXACT
 
    int i = 1;
 
 // Points To:
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s1.a -> undefined , EXACT
+// s1p -> undefined , EXACT
+// s2.a -> undefined , EXACT
+// s2p -> undefined , EXACT
 
    int j = 2;
 
 // Points To:
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s1.a -> undefined , EXACT
+// s1p -> undefined , EXACT
+// s2.a -> undefined , EXACT
+// s2p -> undefined , EXACT
 
    int k = 3;
 
 // Points To:
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s1.a -> undefined , EXACT
+// s1p -> undefined , EXACT
+// s2.a -> undefined , EXACT
+// s2p -> undefined , EXACT
 
 
    s1p = &s1;
 
 // Points To:
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.a -> undefined , EXACT
 // s1p -> s1 , EXACT
-// s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2p -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s2.a -> undefined , EXACT
+// s2p -> undefined , EXACT
 
    s2p = &s1;
 
 // Points To:
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.a -> undefined , EXACT
 // s1p -> s1 , EXACT
-// s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s2.a -> undefined , EXACT
 // s2p -> s1 , EXACT
 
 
@@ -104,7 +104,7 @@ int main()
 // Points To:
 // s1.a -> i , EXACT
 // s1p -> s1 , EXACT
-// s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s2.a -> undefined , EXACT
 // s2p -> s1 , EXACT
 
    s2.a = &j;

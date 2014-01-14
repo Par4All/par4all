@@ -1,8 +1,8 @@
-/* Check detection of memory leaks */
+/* Check the non detection of dnagling pointers */
 
 #include <malloc.h>
 
-int main(int argc, char *argv[])
+int malloc07(int argc, char *argv[])
 {
   int * pi;
   int * qi;

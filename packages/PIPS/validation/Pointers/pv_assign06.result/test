@@ -37,57 +37,56 @@ int main()
    mystruct s1, *s2;
 
 // Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s2 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// s1.b[*] -> undefined , EXACT
+// s1.a -> undefined , EXACT
+// s1.c -> undefined , EXACT
+// s2 -> undefined , EXACT
 
    int i = 1;
 
 // Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s2 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// s1.b[*] -> undefined , EXACT
+// s1.a -> undefined , EXACT
+// s1.c -> undefined , EXACT
+// s2 -> undefined , EXACT
 
    int j = 2;
 
 // Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s2 -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// s1.b[*] -> undefined , EXACT
+// s1.a -> undefined , EXACT
+// s1.c -> undefined , EXACT
+// s2 -> undefined , EXACT
 
    s2 = &s1;
 
 // Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s1.b[*] -> undefined , EXACT
+// s1.a -> undefined , EXACT
+// s1.c -> undefined , EXACT
 // s2 -> s1 , EXACT
 
    s2->a = &i;
 
 // Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s1.b[*] -> undefined , EXACT
+// s1.c -> undefined , EXACT
 // s1.a -> i , EXACT
 // s2 -> s1 , EXACT
 
    s1.a = &j;
 
 // Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s1.b[*] -> undefined , EXACT
+// s1.c -> undefined , EXACT
 // s1.a -> j , EXACT
 // s2 -> s1 , EXACT
 
    (s2->b)[0] = &i;
 
 // Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s1.b[*] -> i , MAY
+// s1.b[*] -> undefined , MAY
+// s1.c -> undefined , EXACT
 // s1.b[0] -> i , EXACT
 // s1.a -> j , EXACT
 // s2 -> s1 , EXACT

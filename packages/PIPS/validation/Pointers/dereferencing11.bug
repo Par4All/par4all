@@ -1,0 +1,2 @@
+pips error in points_to_translation_mapping_is_typed_p: (/home/francois/MYPIPS/prod/pips/src/Libs/alias-classes/interprocedural.c:974) Badly typed points-to translation mapping.
+Aborted (core dumped)

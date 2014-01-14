@@ -1,0 +1,46 @@
+
+Transformers
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(a) {}
+
+   int a;
+
+//  T(a) {5<=a}
+
+
+   a = abs(-5);
+
+//  T(main) {main==0, 5<=a}
+
+
+   return 0;
+}
+
+Preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int a;
+
+//  P(a) {}
+
+
+   a = abs(-5);
+
+//  P(a) {5<=a}
+
+
+   return 0;
+}

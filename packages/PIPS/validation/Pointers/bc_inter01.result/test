@@ -1,66 +1,107 @@
 
-POINTS TO for "main"
+Points-to for "foo"
 
 
 // Points To IN:
-// a1 -> *NULL_POINTER* , MAY
+// a1 -> *NULL* , MAY
 // a1 -> _a1_1[0] , MAY
-// b2 -> *NULL_POINTER* , MAY
+// b2 -> *NULL* , MAY
 // b2 -> _b2_3[0] , MAY
-// pa2 -> *NULL_POINTER* , MAY
+// pa2 -> *NULL* , MAY
 // pa2 -> _pa2_2[0] , MAY
 
 
 // Points To OUT:
-// _a1_1[*].q -> *NULL_POINTER* , MAY
-// _a1_1[0].q -> *NULL_POINTER* , MAY
-// _a1_1[*].q -> _b2_3[0] , MAY
+// _a1_1[0].q -> *NULL* , MAY
 // _a1_1[0].q -> _b2_3[0] , MAY
-// _pa2_2[*] -> *NULL_POINTER* , MAY
-// _pa2_2[*] -> _a1_1[0] , MAY
-// _pa2_2[0] -> _a1_1[0] , MAY
+// _pa2_2[0] -> _a1_1[0] , EXACT
+// a1 -> _a1_1[0] , EXACT
+// b2 -> *NULL* , MAY
+// b2 -> _b2_3[0] , MAY
+// pa2 -> _pa2_2[0] , EXACT
 
 void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
 {
 
 // Points To:
-// a1 -> *NULL_POINTER* , MAY
+// a1 -> *NULL* , MAY
 // a1 -> _a1_1[0] , MAY
-// pa2 -> *NULL_POINTER* , MAY
+// pa2 -> *NULL* , MAY
 // pa2 -> _pa2_2[0] , MAY
 
 
    *pa2 = a1;
 
 // Points To:
-// _pa2_2[*] -> *NULL_POINTER* , MAY
-// _pa2_2[0] -> *NULL_POINTER* , MAY
-// _pa2_2[*] -> _a1_1[0] , MAY
+// _pa2_2[0] -> *NULL* , MAY
 // _pa2_2[0] -> _a1_1[0] , MAY
-// a1 -> *NULL_POINTER* , MAY
+// a1 -> *NULL* , MAY
 // a1 -> _a1_1[0] , MAY
-// b2 -> *NULL_POINTER* , MAY
+// b2 -> *NULL* , MAY
 // b2 -> _b2_3[0] , MAY
 // pa2 -> _pa2_2[0] , EXACT
 
    (*pa2)->q = b2;
 
 // Points To:
-// _a1_1[*].q -> *NULL_POINTER* , MAY
-// _a1_1[0].q -> *NULL_POINTER* , MAY
-// _a1_1[*].q -> _b2_3[0] , MAY
+// _a1_1[0].q -> *NULL* , MAY
 // _a1_1[0].q -> _b2_3[0] , MAY
-// _pa2_2[*] -> *NULL_POINTER* , MAY
-// _pa2_2[*] -> _a1_1[0] , MAY
+// _pa2_2[0] -> *NULL* , MAY
 // _pa2_2[0] -> _a1_1[0] , MAY
-// a1 -> *NULL_POINTER* , MAY
-// a1 -> _a1_1[0] , MAY
-// b2 -> *NULL_POINTER* , MAY
+// a1 -> _a1_1[0] , EXACT
+// b2 -> *NULL* , MAY
 // b2 -> _b2_3[0] , MAY
 // pa2 -> _pa2_2[0] , EXACT
 
    printf("adress of (*pa2)->q = %p", (*pa2)->q);
 }
+
+Proper effects for "foo"
+
+void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
+{
+//             <    is read   >: a1 pa2
+//             <    is written>: _pa2_2[0]
+
+   *pa2 = a1;
+//             <    is read   >: _pa2_2[0] b2 pa2
+//             <    is written>: _a1_1[0].q
+   (*pa2)->q = b2;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: _a1_1[0].q _pa2_2[0] pa2 stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("adress of (*pa2)->q = %p", (*pa2)->q);
+}
+
+Cumulated effects for "foo"
+
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: _a1_1[0].q _pa2_2[0] a1 b2 pa2 stdout
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: _a1_1[0].q _pa2_2[0] 
+//                               __IO_EFFECTS:LUNS[1]
+void foo(struct2 *a1, struct2 **pa2, struct1 *b2)
+{
+//             <    is read   >: a1 pa2
+//             <    is written>: _pa2_2[0]
+
+   *pa2 = a1;
+//             <    is read   >: _pa2_2[0] b2 pa2
+//             <    is written>: _a1_1[0].q
+   (*pa2)->q = b2;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: _a1_1[0].q _pa2_2[0] pa2 stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("adress of (*pa2)->q = %p", (*pa2)->q);
+}
+
+POINTS TO for "main"
+
 
 // Points To IN: none
 
@@ -75,31 +116,31 @@ int main()
    struct2 *p1, *p2;
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
 
    struct1 *q1, *q2;
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
+// q1 -> undefined , EXACT
+// q2 -> undefined , EXACT
 
 
    q1 = (struct1 *) malloc(sizeof(struct1));
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
 // q1 -> *HEAP*_l_23 , MAY
-// q2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q2 -> undefined , EXACT
 
    q2 = (struct1 *) malloc(sizeof(struct1));
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
 // q1 -> *HEAP*_l_23 , MAY
 // q2 -> *HEAP*_l_24 , MAY
 
@@ -107,16 +148,16 @@ int main()
    q1->r = 10;
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
 // q1 -> *HEAP*_l_23 , MAY
 // q2 -> *HEAP*_l_24 , MAY
 
    q2->r = 20;
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
 // q1 -> *HEAP*_l_23 , MAY
 // q2 -> *HEAP*_l_24 , MAY
 
@@ -124,8 +165,9 @@ int main()
    p1 = (struct2 *) malloc(sizeof(struct2));
 
 // Points To:
+// *HEAP*_l_29.q -> undefined , EXACT
 // p1 -> *HEAP*_l_29 , MAY
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p2 -> undefined , EXACT
 // q1 -> *HEAP*_l_23 , MAY
 // q2 -> *HEAP*_l_24 , MAY
 
@@ -135,7 +177,7 @@ int main()
 // Points To:
 // *HEAP*_l_29.q -> *HEAP*_l_23 , MAY
 // p1 -> *HEAP*_l_29 , MAY
-// p2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p2 -> undefined , EXACT
 // q1 -> *HEAP*_l_23 , MAY
 // q2 -> *HEAP*_l_24 , MAY
 
@@ -144,6 +186,8 @@ int main()
 
 // Points To:
 // *HEAP*_l_29.q -> *HEAP*_l_23 , MAY
+// *HEAP*_l_29.q -> *HEAP*_l_24 , MAY
+// *HEAP*_l_29.q -> *NULL* , MAY
 // p1 -> *HEAP*_l_29 , MAY
 // p2 -> *HEAP*_l_29 , MAY
 // q1 -> *HEAP*_l_23 , MAY
@@ -154,6 +198,8 @@ int main()
 
 // Points To:
 // *HEAP*_l_29.q -> *HEAP*_l_23 , MAY
+// *HEAP*_l_29.q -> *HEAP*_l_24 , MAY
+// *HEAP*_l_29.q -> *NULL* , MAY
 // p1 -> *HEAP*_l_29 , MAY
 // p2 -> *HEAP*_l_29 , MAY
 // q1 -> *HEAP*_l_23 , MAY

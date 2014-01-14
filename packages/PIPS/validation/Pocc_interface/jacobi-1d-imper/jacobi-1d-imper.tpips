@@ -1,0 +1,39 @@
+delete jacobi-1d-imper
+create jacobi-1d-imper jacobi-1d-imper.c
+activate C_PARSER
+
+setproperty  FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+apply LOOP_NORMALIZE[main]
+apply PRIVATIZE_MODULE[main]
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
+
+echo
+#echo Compute SCoPs and encapsulate them with pragmas
+echo
+
+capply POCC_PRETTYPRINTER [main]
+display PRINTED_FILE[main]
+
+echo
+#echo Outline SCoPs
+echo
+
+setproperty PRETTYPRINT_FINAL_RETURN TRUE
+setproperty PRAGMA_OUTLINER_BEGIN "scop"
+setproperty PRAGMA_OUTLINER_END "endscop"
+setproperty PRAGMA_OUTLINER_PREFIX "SCoP"
+capply PRAGMA_OUTLINER[main]
+display PRINTED_FILE[main]
+
+echo
+#echo Print the pragmas in the generated SCoP file in order to be ready for PoCC
+echo
+
+capply POCC_PRETTYPRINTER [SCoP_0]
+display PRINTED_FILE[SCoP_0]
+
+close
+delete jacobi-1d-imper
+quit
+

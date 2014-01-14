@@ -9,7 +9,7 @@ int main(char *fmt1, ...)
   char buf1[200];
   char *buf2 = malloc(200 * sizeof(char));
   char * fmt2;
-  char * i_name;
+  char * i_name = "i=";
   int i, r, c, max;
   fpos_t * fp_pos, pos;
   long int fp_pos_indic;

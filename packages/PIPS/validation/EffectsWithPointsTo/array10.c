@@ -1,6 +1,11 @@
-/* FI looking for recursive calls */
-#include <stdio.h>
+/* FI looking for recursive calls: check subscript expressions
+ *
+ * For debugging, this test case has been broken into array10a, 10b
+ * and 10c.
+ */
+
 double a[100];
+
 int foo(int *p) {
   int b[100];
   p = &b[0];

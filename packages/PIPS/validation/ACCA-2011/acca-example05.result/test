@@ -23,7 +23,7 @@ int main()
 //  P() {n==100, 1<=p}
 void compute(int p, int n, float a[n][n])
 {
-//  P() {}
+//  P() {n==100}
    int t[n];
 //  P() {n==100}
    int k = n, i, s;

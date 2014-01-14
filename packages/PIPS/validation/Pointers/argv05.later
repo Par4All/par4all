@@ -1,0 +1,1 @@
+The previous result seems better to me. argv is incremented before s0. I do not see why _argv_2_2[0][1] is added.

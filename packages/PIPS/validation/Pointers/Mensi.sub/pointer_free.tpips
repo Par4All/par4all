@@ -2,39 +2,54 @@ setenv WS=pointer_free
 delete $WS
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
+# Not compatible with the current points-to implementation and CP lattice
+# setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 create $WS $WS.c
 
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+#activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
 
 echo
-echo POINTS TO for "$WS"
+echo Points-to for "alloc_pointer"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[alloc_pointer]
+
+
+echo
+echo Points-to for "pointer_free"
 echo
 #activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
-activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALL]
+#activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[pointer_free]
+
+echo
+echo Points-to for "main"
+echo
+
+# activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
 
 echo 
-echo PROPER  EFFECTS WITH POINTS TO
+echo Proper effects with points-to for "main"
 echo
-activate PROPER_EFFECTS_WITH_POINTS_TO
+
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[main]
 
 
 echo 
-echo CUMULATED  EFFECTS WITH POINTS TO
+echo CUMULATED EFFECTS WITH POINTS TO
 echo
-activate CUMULATED_EFFECTS_WITH_POINTS_TO
-activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[%ALL]
 
-echo
-echo POINTS TO for "$WS"
-echo
-activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
-activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALL]
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
 
 close
 shell cat $WS.database/Warnings

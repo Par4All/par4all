@@ -15,46 +15,46 @@ int struct12()
    struct foo s1;
 
 // Points To:
-// s1.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.three -> undefined , EXACT
+// s1.two -> undefined , EXACT
 
    my_struct s2, s3, s4;
 
 // Points To:
-// s1.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.three -> undefined , EXACT
+// s1.two -> undefined , EXACT
+// s2.three -> undefined , EXACT
+// s2.two -> undefined , EXACT
+// s3.three -> undefined , EXACT
+// s3.two -> undefined , EXACT
+// s4.three -> undefined , EXACT
+// s4.two -> undefined , EXACT
 
    my_struct *p = &s1;
 
 // Points To:
 // p -> s1 , EXACT
-// s1.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.three -> undefined , EXACT
+// s1.two -> undefined , EXACT
+// s2.three -> undefined , EXACT
+// s2.two -> undefined , EXACT
+// s3.three -> undefined , EXACT
+// s3.two -> undefined , EXACT
+// s4.three -> undefined , EXACT
+// s4.two -> undefined , EXACT
 
    s1.two = &s3;
 
 // Points To:
 // p -> s1 , EXACT
-// s1.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.three -> undefined , EXACT
 // s1.two -> s3 , EXACT
-// s2.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s2.three -> undefined , EXACT
+// s2.two -> undefined , EXACT
+// s3.three -> undefined , EXACT
+// s3.two -> undefined , EXACT
+// s4.three -> undefined , EXACT
+// s4.two -> undefined , EXACT
 
    s1.three = &s4;
 
@@ -62,12 +62,12 @@ int struct12()
 // p -> s1 , EXACT
 // s1.two -> s3 , EXACT
 // s1.three -> s4 , EXACT
-// s2.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s2.three -> undefined , EXACT
+// s2.two -> undefined , EXACT
+// s3.three -> undefined , EXACT
+// s3.two -> undefined , EXACT
+// s4.three -> undefined , EXACT
+// s4.two -> undefined , EXACT
 
    s2 = *p;
 
@@ -77,10 +77,10 @@ int struct12()
 // s1.three -> s4 , EXACT
 // s2.two -> s3 , EXACT
 // s2.three -> s4 , EXACT
-// s3.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4.three -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s4.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s3.three -> undefined , EXACT
+// s3.two -> undefined , EXACT
+// s4.three -> undefined , EXACT
+// s4.two -> undefined , EXACT
 
 
    return 0;

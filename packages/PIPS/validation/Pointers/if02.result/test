@@ -15,54 +15,54 @@ int main()
    int ***p;                                                            /*0005*/
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 
    int a, b, *aa, *bb, **aaa, **bbb;                                    /*0006*/
 
 // Points To:
-// aa -> *ANY_MODULE*:*NOWHERE* , EXACT
-// aaa -> *ANY_MODULE*:*NOWHERE* , EXACT
-// bb -> *ANY_MODULE*:*NOWHERE* , EXACT
-// bbb -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// aa -> undefined , EXACT
+// aaa -> undefined , EXACT
+// bb -> undefined , EXACT
+// bbb -> undefined , EXACT
+// p -> undefined , EXACT
 
 
    a = 1;                                                               /*0008*/
 
 // Points To:
-// aa -> *ANY_MODULE*:*NOWHERE* , EXACT
-// aaa -> *ANY_MODULE*:*NOWHERE* , EXACT
-// bb -> *ANY_MODULE*:*NOWHERE* , EXACT
-// bbb -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// aa -> undefined , EXACT
+// aaa -> undefined , EXACT
+// bb -> undefined , EXACT
+// bbb -> undefined , EXACT
+// p -> undefined , EXACT
 
    b = 2;                                                               /*0009*/
 
 // Points To:
-// aa -> *ANY_MODULE*:*NOWHERE* , EXACT
-// aaa -> *ANY_MODULE*:*NOWHERE* , EXACT
-// bb -> *ANY_MODULE*:*NOWHERE* , EXACT
-// bbb -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// aa -> undefined , EXACT
+// aaa -> undefined , EXACT
+// bb -> undefined , EXACT
+// bbb -> undefined , EXACT
+// p -> undefined , EXACT
 
 
    aa = &a;                                                             /*0011*/
 
 // Points To:
 // aa -> a , EXACT
-// aaa -> *ANY_MODULE*:*NOWHERE* , EXACT
-// bb -> *ANY_MODULE*:*NOWHERE* , EXACT
-// bbb -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// aaa -> undefined , EXACT
+// bb -> undefined , EXACT
+// bbb -> undefined , EXACT
+// p -> undefined , EXACT
 
    bb = &b;                                                             /*0012*/
 
 // Points To:
 // aa -> a , EXACT
-// aaa -> *ANY_MODULE*:*NOWHERE* , EXACT
+// aaa -> undefined , EXACT
 // bb -> b , EXACT
-// bbb -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// bbb -> undefined , EXACT
+// p -> undefined , EXACT
 
 
    aaa = &aa;                                                           /*0014*/
@@ -71,8 +71,8 @@ int main()
 // aa -> a , EXACT
 // aaa -> aa , EXACT
 // bb -> b , EXACT
-// bbb -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// bbb -> undefined , EXACT
+// p -> undefined , EXACT
 
    bbb = &bb;                                                           /*0015*/
 
@@ -81,7 +81,7 @@ int main()
 // aaa -> aa , EXACT
 // bb -> b , EXACT
 // bbb -> bb , EXACT
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 
 
    p = &bbb;                                                            /*0017*/

@@ -1,4 +1,10 @@
-/* Check naming of stubs according to fields used: extension of struct15.c */
+/* Check naming of stubs according to fields used: extension of struct15.c
+ *
+ * FI: this code is all bugged since it uses indeterminate
+ * pointers. It segfault at execution. However, the current analysis
+ * is performed with the formal context and not with the actual
+ * context for main, and it should not detect the issue.
+ */
 
 #include <stdio.h>
 

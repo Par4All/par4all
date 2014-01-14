@@ -16,6 +16,7 @@ void call02(int i, int j, int y[10], int * q[10], tf_t *p)
   p->one = 1;
   p->two[j] = 2.;
   *q[i]=3;
+  return;
 }
 
 int main()

@@ -1,0 +1,65 @@
+
+SCoP Detection
+
+int main()
+{
+//		< is static > FALSE
+//		< parameter > 0`ind, 0`j, 0`i, 
+//		<   loops   >
+//		<   tests   >
+   int A[500];
+//		< is static > FALSE
+//		< parameter > 0`ind, 0`j, 0`i, 
+//		<   loops   >
+//		<   tests   >
+   int B[500];
+//		< is static > FALSE
+//		< parameter > 0`ind, 0`j, 0`i, 
+//		<   loops   >
+//		<   tests   >
+   int i = 0;
+//		< is static > FALSE
+//		< parameter > 0`ind, 0`j, 0`i, 
+//		<   loops   >
+//		<   tests   >
+   int j = 0;
+//		< is static > FALSE
+//		< parameter > 0`ind, 0`j, 0`i, 
+//		<   loops   >
+//		<   tests   >
+   int ind;
+//		< is static > TRUE
+//		< parameter > 0`ind, 0`j, 0`i, 
+//		<   loops   >
+//		<   tests   >
+   
+   // Testing access to an array using a variable defined using an expression based on an array
+   for(j = 0; j <= 499; j += 1)
+//		< is static > TRUE
+//		< parameter > 0`ind, 0`j, 0`i, 
+//		<   loops   > 0 <= 0`j <= 499
+//		<   tests   >
+      B[j] = j;
+//		< is static > FALSE
+//		< parameter > 0`ind, 0`j, 0`i, 
+//		<   loops   >
+//		<   tests   >
+   for(i = 0; i <= 499; i += 1) {
+//		< is static > TRUE
+//		< parameter > 0`ind, 0`j, 0`i, 
+//		<   loops   > 0 <= 0`i <= 499
+//		<   tests   >
+      ind = 4+B[i];
+//		< is static > FALSE
+//		< parameter > 0`ind, 0`j, 0`i, 
+//		<   loops   > 0 <= 0`i <= 499
+//		<   tests   >
+      A[ind] = 123;
+   }
+//		< is static > TRUE
+//		< parameter > 0`ind, 0`j, 0`i, 
+//		<   loops   >
+//		<   tests   >
+
+   return A[0];
+}

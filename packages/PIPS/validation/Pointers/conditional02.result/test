@@ -26,7 +26,7 @@ void conditional02()
    int i, j, *p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    p = i>j?&i:&j;
 

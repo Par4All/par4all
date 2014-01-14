@@ -39,47 +39,47 @@ int main()
    float *p[10];
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , EXACT
 
    float a[10], t;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , EXACT
 
    int i;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , EXACT
 
 
    t = 1.0;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , EXACT
 
    while (t<2.0) {
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a[*] , MAY
 
       for(i = 0; i <= 9; i += 1)
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a[*] , MAY
 
          p[i] = &a[i];
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a[*] , MAY
 
       t += 0, 01;
    }
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a[*] , MAY
 
    return 0;

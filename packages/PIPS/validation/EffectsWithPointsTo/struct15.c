@@ -1,5 +1,12 @@
 /* Excerpt from struct12.c, init3() only is preserved.
  *
+ * FI: I do not know what was the intent of the person who wrote this
+ * piece of code but init3(), unfortunately, is only a memory
+ * leaker. Pointers like other scalars are passed by copy. Their
+ * modifications are ignored by the callee.
+ *
+ * This piece of code is only useful to check that memory leak
+ * detection is working.
  */
 
 #include <stdlib.h>

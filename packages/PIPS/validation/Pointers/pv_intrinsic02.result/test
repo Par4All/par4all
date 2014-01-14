@@ -27,18 +27,18 @@ int main()
    char *end;
 
 // Points To:
-// end -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// end -> undefined , EXACT
 
    long int li;
 
 // Points To:
-// end -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// end -> undefined , EXACT
 
 
    li = strtol("32445667 is a number", &end, 0);
 
 // Points To:
-// end -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// end -> undefined , EXACT
 
    return 0;
 }

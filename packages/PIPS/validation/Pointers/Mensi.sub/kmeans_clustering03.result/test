@@ -1,0 +1,308 @@
+
+POINTS-TO
+
+
+// Points To IN:
+// _feature_1[*] -> _feature_1_1[*][0] , MAY
+// feature -> _feature_1[0] , EXACT
+
+
+// Points To OUT:
+// *HEAP*_l_93[*] -> *HEAP*_l_94[*] , MAY
+// *HEAP*_l_93[0] -> *HEAP*_l_94[0] , MAY
+// *HEAP*_l_93[*] -> undefined , MAY
+// _feature_1[*] -> _feature_1_1[*][0] , MAY
+// feature -> _feature_1[0] , EXACT
+// kmeans_clustering -> *HEAP*_l_93[0] , MAY
+
+float * * kmeans_clustering(float **feature, int nfeatures, int npoints, int nclusters, float threshold, int *membership)
+{
+
+// Points To: none
+
+   // BEGIN BLOCK
+
+
+// Points To: none
+
+   int i, j, n = 0;
+
+// Points To: none
+
+   float **clusters;
+
+// Points To:
+// clusters -> undefined , EXACT
+
+   /* out: [nclusters][nfeatures] */
+   
+   
+   
+   /* allocate space for returning variable clusters[] */
+   clusters = (float **) malloc(nclusters*sizeof(float *));
+
+// Points To:
+// *HEAP*_l_93[*] -> undefined , EXACT
+// clusters -> *HEAP*_l_93[0] , MAY
+
+   clusters[0] = (float *) malloc(nclusters*nfeatures*sizeof(float));
+
+// Points To:
+// *HEAP*_l_93[0] -> *HEAP*_l_94[0] , MAY
+// *HEAP*_l_93[*] -> undefined , MAY
+// clusters -> *HEAP*_l_93[0] , MAY
+
+   for(i = 1; i <= nclusters-1; i += 1)
+
+// Points To:
+// *HEAP*_l_93[*] -> *HEAP*_l_94[*] , MAY
+// *HEAP*_l_93[0] -> *HEAP*_l_94[0] , MAY
+// *HEAP*_l_93[*] -> undefined , MAY
+// clusters -> *HEAP*_l_93[0] , MAY
+
+      clusters[i] = clusters[i-1]+nfeatures;
+
+// Points To:
+// *HEAP*_l_93[*] -> *HEAP*_l_94[*] , MAY
+// *HEAP*_l_93[0] -> *HEAP*_l_94[0] , MAY
+// *HEAP*_l_93[*] -> undefined , MAY
+// clusters -> *HEAP*_l_93[0] , MAY
+
+   
+   /* randomly pick cluster centers */
+   for(i = 0; i <= nclusters-1; i += 1) {
+
+// Points To:
+// *HEAP*_l_93[*] -> *HEAP*_l_94[*] , MAY
+// *HEAP*_l_93[0] -> *HEAP*_l_94[0] , MAY
+// *HEAP*_l_93[*] -> undefined , MAY
+// _feature_1[*] -> _feature_1_1[*][0] , MAY
+// clusters -> *HEAP*_l_93[0] , MAY
+// feature -> _feature_1[0] , MAY
+
+      // BEGIN BLOCK
+
+// Points To:
+// *HEAP*_l_93[*] -> *HEAP*_l_94[*] , MAY
+// *HEAP*_l_93[0] -> *HEAP*_l_94[0] , MAY
+// *HEAP*_l_93[*] -> undefined , MAY
+// _feature_1[*] -> _feature_1_1[*][0] , MAY
+// clusters -> *HEAP*_l_93[0] , MAY
+// feature -> _feature_1[0] , MAY
+
+      //n = (int)rand() % npoints;
+      for(j = 0; j <= nfeatures-1; j += 1) {
+
+// Points To:
+// *HEAP*_l_93[*] -> *HEAP*_l_94[*] , MAY
+// *HEAP*_l_93[0] -> *HEAP*_l_94[0] , MAY
+// *HEAP*_l_93[*] -> undefined , MAY
+// _feature_1[*] -> _feature_1_1[*][0] , MAY
+// clusters -> *HEAP*_l_93[0] , MAY
+// feature -> _feature_1[0] , MAY
+
+         // BEGIN BLOCK
+
+// Points To:
+// *HEAP*_l_93[*] -> *HEAP*_l_94[*] , MAY
+// *HEAP*_l_93[0] -> *HEAP*_l_94[0] , MAY
+// *HEAP*_l_93[*] -> undefined , MAY
+// _feature_1[*] -> _feature_1_1[*][0] , MAY
+// clusters -> *HEAP*_l_93[0] , MAY
+// feature -> _feature_1[0] , EXACT
+
+         float *tmp = feature[n];
+
+// Points To:
+// *HEAP*_l_93[*] -> *HEAP*_l_94[*] , MAY
+// *HEAP*_l_93[0] -> *HEAP*_l_94[0] , MAY
+// *HEAP*_l_93[*] -> undefined , MAY
+// _feature_1[*] -> _feature_1_1[*][0] , MAY
+// clusters -> *HEAP*_l_93[0] , MAY
+// feature -> _feature_1[0] , EXACT
+// tmp -> _feature_1_1[*][0] , MAY
+
+         clusters[i][j] = tmp[j];
+         // END BLOCK
+      }
+
+// Points To:
+// *HEAP*_l_93[*] -> *HEAP*_l_94[*] , MAY
+// *HEAP*_l_93[0] -> *HEAP*_l_94[0] , MAY
+// *HEAP*_l_93[*] -> undefined , MAY
+// _feature_1[*] -> _feature_1_1[*][0] , MAY
+// clusters -> *HEAP*_l_93[0] , MAY
+// feature -> _feature_1[0] , EXACT
+
+      n++;
+      // END BLOCK
+   }
+
+// Points To:
+// *HEAP*_l_93[*] -> *HEAP*_l_94[*] , MAY
+// *HEAP*_l_93[0] -> *HEAP*_l_94[0] , MAY
+// *HEAP*_l_93[*] -> undefined , MAY
+// _feature_1[*] -> _feature_1_1[*][0] , MAY
+// clusters -> *HEAP*_l_93[0] , MAY
+// feature -> _feature_1[0] , EXACT
+
+   
+   
+   return clusters;
+   // END BLOCK
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+float * * kmeans_clustering(float **feature, int nfeatures, int npoints, int nclusters, float threshold, int *membership)
+{
+   // BEGIN BLOCK
+
+//             <    is written>: n
+   int i, j, n = 0;
+   float **clusters;
+//             <    is read   >: nclusters _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: clusters _MALLOC_EFFECTS:_MALLOC_
+   /* out: [nclusters][nfeatures] */
+   
+   
+   
+   /* allocate space for returning variable clusters[] */
+   clusters = (float **) malloc(nclusters*sizeof(float *));
+//             <may be written>: *HEAP*_l_93[0]
+//             <    is read   >: clusters nclusters nfeatures 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   clusters[0] = (float *) malloc(nclusters*nfeatures*sizeof(float));
+//             <    is read   >: nclusters
+//             <    is written>: i
+   for(i = 1; i <= nclusters-1; i += 1)
+//             <may be read   >: *HEAP*_l_93[i-1]
+//             <may be written>: *HEAP*_l_93[i]
+//             <    is read   >: clusters i nclusters nfeatures
+      clusters[i] = clusters[i-1]+nfeatures;
+//             <    is read   >: nclusters
+//             <    is written>: i
+   
+   /* randomly pick cluster centers */
+   for(i = 0; i <= nclusters-1; i += 1) {
+      // BEGIN BLOCK
+//             <    is read   >: nclusters nfeatures
+//             <    is written>: j
+      //n = (int)rand() % npoints;
+      for(j = 0; j <= nfeatures-1; j += 1) {
+         // BEGIN BLOCK
+//             <    is read   >: _feature_1[n] feature n
+//             <    is written>: tmp
+         float *tmp = feature[n];
+//             <may be read   >: *HEAP*_l_93[i] _feature_1_1[*][j]
+//             <may be written>: *HEAP*_l_93[i][j]
+//             <    is read   >: clusters i j nclusters nfeatures tmp
+         clusters[i][j] = tmp[j];
+         // END BLOCK
+      }
+//             <    is read   >: n nclusters
+//             <    is written>: n
+      n++;
+      // END BLOCK
+   }
+//             <    is read   >: clusters
+   
+   
+   return clusters;
+   // END BLOCK
+}
+
+CUMULATED EFFECTS WITH POINTS TO
+
+//             <may be read   >: _feature_1[*] _feature_1_1[*][*] 
+//                               feature
+//             <    is read   >: nclusters nfeatures 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+float * * kmeans_clustering(float **feature, int nfeatures, int npoints, int nclusters, float threshold, int *membership)
+{
+//             <may be read   >: *HEAP*_l_93[*] _feature_1[*] 
+//                               _feature_1_1[*][*] feature
+//             <may be written>: *HEAP*_l_93 *HEAP*_l_93[*]
+//             <    is read   >: nclusters nfeatures 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   // BEGIN BLOCK
+
+//             <    is written>: n
+   int i, j, n = 0;
+   float **clusters;
+//             <    is read   >: nclusters _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: clusters _MALLOC_EFFECTS:_MALLOC_
+   /* out: [nclusters][nfeatures] */
+   
+   
+   
+   /* allocate space for returning variable clusters[] */
+   clusters = (float **) malloc(nclusters*sizeof(float *));
+//             <may be written>: *HEAP*_l_93[0]
+//             <    is read   >: clusters nclusters nfeatures 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   clusters[0] = (float *) malloc(nclusters*nfeatures*sizeof(float));
+//             <may be read   >: *HEAP*_l_93[*] clusters i nfeatures
+//             <may be written>: *HEAP*_l_93[*]
+//             <    is read   >: nclusters
+//             <    is written>: i
+   for(i = 1; i <= nclusters-1; i += 1)
+//             <may be read   >: *HEAP*_l_93[*]
+//             <may be written>: *HEAP*_l_93[*]
+//             <    is read   >: clusters i nclusters nfeatures
+      clusters[i] = clusters[i-1]+nfeatures;
+//             <may be read   >: *HEAP*_l_93[*] _feature_1[*] 
+//                               _feature_1_1[*][*] clusters feature i
+//                               j n nfeatures
+//             <may be written>: *HEAP*_l_93 j n
+//             <    is read   >: nclusters
+//             <    is written>: i
+   
+   /* randomly pick cluster centers */
+   for(i = 0; i <= nclusters-1; i += 1) {
+//             <may be read   >: *HEAP*_l_93[*] _feature_1[*] 
+//                               _feature_1_1[*][*] clusters feature i
+//                               j
+//             <may be written>: *HEAP*_l_93
+//             <    is read   >: n nclusters nfeatures
+//             <    is written>: j n
+      // BEGIN BLOCK
+//             <may be read   >: *HEAP*_l_93[*] _feature_1[*] 
+//                               _feature_1_1[*][*] clusters feature i
+//                               j n
+//             <may be written>: *HEAP*_l_93
+//             <    is read   >: nclusters nfeatures
+//             <    is written>: j
+      //n = (int)rand() % npoints;
+      for(j = 0; j <= nfeatures-1; j += 1) {
+//             <may be read   >: *HEAP*_l_93[*] _feature_1[*] 
+//                               _feature_1_1[*][*]
+//             <may be written>: *HEAP*_l_93
+//             <    is read   >: clusters feature i j n nclusters 
+//                               nfeatures
+         // BEGIN BLOCK
+//             <may be read   >: _feature_1[*]
+//             <    is read   >: feature n
+//             <    is written>: tmp
+         float *tmp = feature[n];
+//             <may be read   >: *HEAP*_l_93[*] _feature_1_1[*][*]
+//             <may be written>: *HEAP*_l_93[*][*]
+//             <    is read   >: clusters i j nclusters nfeatures tmp
+         clusters[i][j] = tmp[j];
+         // END BLOCK
+      }
+//             <    is read   >: n nclusters
+//             <    is written>: n
+      n++;
+      // END BLOCK
+   }
+//             <    is read   >: clusters
+   
+   
+   return clusters;
+   // END BLOCK
+}

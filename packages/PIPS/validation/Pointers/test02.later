@@ -1,3 +1,0 @@
-The condition is not exploited to detect dead code.
-
-Impact on preconditions... Should be indirect via dead code elimination...

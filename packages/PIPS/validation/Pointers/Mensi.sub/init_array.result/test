@@ -1,0 +1,60 @@
+
+POINTS TO for "init_array"
+
+
+// Points To IN:
+// _pa_1.data -> *NULL* , MAY
+// _pa_1.data -> _pa_1_2__1 , MAY
+// pa -> *NULL* , MAY
+// pa -> _pa_1 , MAY
+
+
+// Points To OUT:
+// _pa_1.data -> *NULL* , MAY
+// _pa_1.data -> _pa_1_2__1 , MAY
+// pa -> _pa_1 , EXACT
+
+void init_array(parray_t pa)
+{
+
+// Points To: none
+
+   int i;
+
+// Points To:
+// pa -> *NULL* , MAY
+// pa -> _pa_1 , MAY
+
+   for(i = 0; i <= pa->dim-1; i += 1)
+
+// Points To:
+// _pa_1.data -> *NULL* , MAY
+// _pa_1.data -> _pa_1_2__1 , MAY
+// pa -> _pa_1 , EXACT
+
+      (pa->data)[i] = (float) i;
+
+// Points To:
+// _pa_1.data -> *NULL* , MAY
+// _pa_1.data -> _pa_1_2__1 , MAY
+// pa -> _pa_1 , EXACT
+
+
+   return;
+}
+
+Proper effects with points-to for "init_array"
+
+void init_array(parray_t pa)
+{
+   int i;
+//             <    is read   >: _pa_1.dim pa
+//             <    is written>: i
+   for(i = 0; i <= pa->dim-1; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _pa_1.data _pa_1.dim i pa
+      (pa->data)[i] = (float) i;
+
+   return;
+}
+PROPER_EFFECTS_WITH_POINTS_TO[init_array] (simple_cell_reference_with_address_of_cell_reference_translation) potential memory overflow due to effect -> returning anywhere

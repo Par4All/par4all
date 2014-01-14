@@ -1,0 +1,124 @@
+
+Initial code
+
+int main()
+{
+   int i, k, a[3];
+   //   int dim=2;
+   TNUMBER structure[3];
+
+loop1:
+   for(i = 0; i <= 2; i += 1) {
+      structure[i].index = 2*i;
+      structure[i].re = i;
+      structure[i].im = i*i;
+   }
+
+   return 0;
+}
+
+Code after unrolling
+
+int main()
+{
+   int i, k, a[3];
+   //   int dim=2;
+   TNUMBER structure[3];
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+
+
+loop1:   LU_NUB0 = 3;
+   LU_IB0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+      structure[LU_IND0*1+0].index = 2*(LU_IND0*1+0);
+      structure[LU_IND0*1+0].re = LU_IND0*1+0;
+      structure[LU_IND0*1+0].im = (LU_IND0*1+0)*(LU_IND0*1+0);
+l99999:      ;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 3) {
+      structure[(LU_IND0+0)*1+0].index = 2*((LU_IND0+0)*1+0);
+      structure[(LU_IND0+0)*1+0].re = (LU_IND0+0)*1+0;
+      structure[(LU_IND0+0)*1+0].im = ((LU_IND0+0)*1+0)*((LU_IND0+0)*1+0);
+      structure[(LU_IND0+1)*1+0].index = 2*((LU_IND0+1)*1+0);
+      structure[(LU_IND0+1)*1+0].re = (LU_IND0+1)*1+0;
+      structure[(LU_IND0+1)*1+0].im = ((LU_IND0+1)*1+0)*((LU_IND0+1)*1+0);
+      structure[(LU_IND0+2)*1+0].index = 2*((LU_IND0+2)*1+0);
+      structure[(LU_IND0+2)*1+0].re = (LU_IND0+2)*1+0;
+      structure[(LU_IND0+2)*1+0].im = ((LU_IND0+2)*1+0)*((LU_IND0+2)*1+0);
+l99998:      ;
+   }
+   i = 0+MAX0(LU_NUB0, 0)*1;
+
+   return 0;
+}
+
+Code after control simplification
+
+int main()
+{
+   int i, k, a[3];
+   //   int dim=2;
+   TNUMBER structure[3];
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+
+   LU_NUB0 = 3;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+   structure[(LU_IB0+0)*1+0].index = 2*((LU_IB0+0)*1+0);
+   structure[(LU_IB0+0)*1+0].re = (LU_IB0+0)*1+0;
+   structure[(LU_IB0+0)*1+0].im = ((LU_IB0+0)*1+0)*((LU_IB0+0)*1+0);
+   structure[(LU_IB0+1)*1+0].index = 2*((LU_IB0+1)*1+0);
+   structure[(LU_IB0+1)*1+0].re = (LU_IB0+1)*1+0;
+   structure[(LU_IB0+1)*1+0].im = ((LU_IB0+1)*1+0)*((LU_IB0+1)*1+0);
+   structure[(LU_IB0+2)*1+0].index = 2*((LU_IB0+2)*1+0);
+   structure[(LU_IB0+2)*1+0].re = (LU_IB0+2)*1+0;
+   structure[(LU_IB0+2)*1+0].im = ((LU_IB0+2)*1+0)*((LU_IB0+2)*1+0);
+   LU_IND0 = LU_IB0+3;
+   i = 0+MAX0(LU_NUB0, 0)*1;
+
+   return 0;
+}
+
+Code after constant propagation
+
+int main()
+{
+   int i, k, a[3];
+   //   int dim=2;
+   TNUMBER structure[3];
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+
+   LU_NUB0 = 3;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+   structure[0].index = 0;
+   structure[0].re = 0;
+   structure[0].im = 0;
+   structure[1].index = 2;
+   structure[1].re = 1;
+   structure[1].im = 1;
+   structure[2].index = 4;
+   structure[2].re = 2;
+   structure[2].im = 4;
+   LU_IND0 = 3;
+   i = 3;
+
+   return 0;
+}
+
+Code after dead code elimination
+
+int main()
+{
+   //   int dim=2;
+   ;
+   //PIPS generated variable
+   ;
+
+
+
+   return 0;
+}

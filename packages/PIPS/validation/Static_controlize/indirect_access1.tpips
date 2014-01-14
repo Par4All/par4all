@@ -1,0 +1,17 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete indirect_access1
+create indirect_access1 indirect_access1.c
+
+activate C_PARSER
+
+echo
+echo SCoP Detection
+echo
+
+activate PRINT_CODE_STATIC_CONTROL
+display PRINTED_FILE[main]
+
+close
+delete indirect_access1
+quit
+

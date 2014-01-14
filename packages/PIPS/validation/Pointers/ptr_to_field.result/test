@@ -1,49 +1,11 @@
 
-PROPER  EFFECTS
-
-int ptr_to_field()
-{
-   typedef struct {
-      int *q;
-      int *p;
-   } my_str;
-
-   my_str *m, *n;
-//             <    is written>: i j
-   int i = 0, j = 1;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: m _MALLOC_EFFECTS:_MALLOC_
-   m = (my_str *) malloc(sizeof(my_str));
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: n _MALLOC_EFFECTS:_MALLOC_
-   n = (my_str *) malloc(sizeof(my_str));
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: m
-   m->q = &i;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: m
-   m->p = &j;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   n->q = m->p;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   n->p = m->q;
-
-   return 0;
-}
-
 POINTS-TO
 
 
 // Points To IN: none
 
 
-// Points To OUT:
-// *HEAP*_l_13.p -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
-// *HEAP*_l_13.q -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
-// *HEAP*_l_14.p -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
-// *HEAP*_l_14.q -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// Points To OUT: none
 
 int ptr_to_field()
 {
@@ -61,31 +23,40 @@ int ptr_to_field()
    my_str *m, *n;
 
 // Points To:
-// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// m -> undefined , EXACT
+// n -> undefined , EXACT
 
    int i = 0, j = 1;
 
 // Points To:
-// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// m -> undefined , EXACT
+// n -> undefined , EXACT
 
    m = (my_str *) malloc(sizeof(my_str));
 
 // Points To:
+// *HEAP*_l_13.p -> undefined , EXACT
+// *HEAP*_l_13.q -> undefined , EXACT
 // m -> *HEAP*_l_13 , MAY
-// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// n -> undefined , EXACT
 
    n = (my_str *) malloc(sizeof(my_str));
 
 // Points To:
+// *HEAP*_l_13.p -> undefined , EXACT
+// *HEAP*_l_13.q -> undefined , EXACT
+// *HEAP*_l_14.p -> undefined , EXACT
+// *HEAP*_l_14.q -> undefined , EXACT
 // m -> *HEAP*_l_13 , MAY
 // n -> *HEAP*_l_14 , MAY
 
    m->q = &i;
 
 // Points To:
+// *HEAP*_l_13.p -> undefined , EXACT
 // *HEAP*_l_13.q -> i , MAY
+// *HEAP*_l_14.p -> undefined , EXACT
+// *HEAP*_l_14.q -> undefined , EXACT
 // m -> *HEAP*_l_13 , MAY
 // n -> *HEAP*_l_14 , MAY
 
@@ -94,6 +65,8 @@ int ptr_to_field()
 // Points To:
 // *HEAP*_l_13.q -> i , MAY
 // *HEAP*_l_13.p -> j , MAY
+// *HEAP*_l_14.p -> undefined , EXACT
+// *HEAP*_l_14.q -> undefined , EXACT
 // m -> *HEAP*_l_13 , MAY
 // n -> *HEAP*_l_14 , MAY
 
@@ -102,6 +75,7 @@ int ptr_to_field()
 // Points To:
 // *HEAP*_l_13.q -> i , MAY
 // *HEAP*_l_13.p -> j , MAY
+// *HEAP*_l_14.p -> undefined , EXACT
 // *HEAP*_l_14.q -> j , MAY
 // m -> *HEAP*_l_13 , MAY
 // n -> *HEAP*_l_14 , MAY
@@ -119,3 +93,8 @@ int ptr_to_field()
 
    return 0;
 }
+
+Warnings and errors: two memory leaks
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[ptr_to_field] (points_to_set_block_projection) Memory leak for bucket "ptr_to_field:*HEAP*_l_14".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[ptr_to_field] (points_to_set_block_projection) Memory leak for bucket "ptr_to_field:*HEAP*_l_13".

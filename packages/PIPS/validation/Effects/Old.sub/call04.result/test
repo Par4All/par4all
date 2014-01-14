@@ -69,6 +69,7 @@ int main()
    int d1 = 10;
 //             <    is written>: d2
    int d2 = 10;
+//             <    is read   >: d1 d2
    int y[d1][d2];
 //             <may be written>: y[*][*]
 //             <    is read   >: d1 d2
@@ -84,6 +85,7 @@ int main()
    int d1 = 10;
 //             <    is written>: d2
    int d2 = 10;
+//             <    is read   >: d1 d2
    int y[d1][d2];
 //             <may be written>: y[*][*]
 //             <    is read   >: d1 d2
@@ -147,6 +149,10 @@ int main()
 //  <d2-W-EXACT-{}>
 
    int d2 = 10;
+
+//  <d1-R-EXACT-{}>
+//  <d2-R-EXACT-{}>
+
    int y[d1][d2];
 
 //  <d1-R-EXACT-{}>

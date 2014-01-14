@@ -1,0 +1,154 @@
+
+INLINING "pointer_free"
+
+int main(void)
+{
+   pointer p1, p2;
+   //PIPS generated variable
+   pointer _return0;
+   p1 = malloc(sizeof(int));
+   free(p1);
+   _return0 = p1;
+   p2 = _return0;
+
+   return;
+}
+
+POINTS TO for pointer_free04
+
+
+// Points To IN:
+// fp -> *NULL* , MAY
+// fp -> _fp_1 , MAY
+
+
+// Points To OUT:
+// fp -> undefined , EXACT
+// pointer_free -> undefined , EXACT
+
+pointer pointer_free(pointer fp)
+{
+
+// Points To:
+// fp -> *NULL* , MAY
+// fp -> _fp_1 , MAY
+
+   free(fp);
+
+// Points To:
+// fp -> undefined , EXACT
+
+   return fp;
+}
+
+POINTS TO for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   pointer p1, p2;
+   //PIPS generated variable
+
+// Points To:
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
+
+   pointer _return0;
+
+// Points To:
+// _return0 -> undefined , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
+
+   p1 = malloc(sizeof(int));
+
+// Points To:
+// _return0 -> undefined , EXACT
+// p1 -> *HEAP*_l_6 , MAY
+// p2 -> undefined , EXACT
+
+   free(p1);
+
+// Points To:
+// _return0 -> undefined , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
+
+   _return0 = p1;
+
+// Points To:
+// _return0 -> undefined , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
+
+   p2 = _return0;
+
+// Points To:
+// _return0 -> undefined , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
+
+
+   return;
+}
+
+PROPER EFFECTS WITH POINTS TO
+
+int main(void)
+{
+   pointer p1, p2;
+   //PIPS generated variable
+   pointer _return0;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
+   p1 = malloc(sizeof(int));
+//             <    is read   >: p1 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(p1);
+//             <    is read   >: p1
+//             <    is written>: _return0
+   _return0 = p1;
+//             <    is read   >: _return0
+//             <    is written>: p2
+   p2 = _return0;
+
+   return;
+}
+
+CUMULATED EFFECTS WITH POINTS TO
+
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+int main(void)
+{
+   pointer p1, p2;
+   //PIPS generated variable
+   pointer _return0;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
+   p1 = malloc(sizeof(int));
+//             <    is read   >: p1 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(p1);
+//             <    is read   >: p1
+//             <    is written>: _return0
+   _return0 = p1;
+//             <    is read   >: _return0
+//             <    is written>: p2
+   p2 = _return0;
+
+   return;
+}
+unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer_free] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "pointer_free" at line 12.
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "_return0" at line 8.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "p2" at line 11.

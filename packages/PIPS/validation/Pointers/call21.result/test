@@ -113,7 +113,9 @@ pointer alloc_pointer(int v)
    return p;
 }
 
-// Points To IN: none
+// Points To IN:
+// stdout -> *NULL* , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
 
 
 // Points To OUT: none
@@ -130,24 +132,24 @@ int main(void)
    pointer p1, p2, p3;
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
+// p3 -> undefined , EXACT
 
 
    p1 = &i1;
 
 // Points To:
 // p1 -> i1 , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p2 -> undefined , EXACT
+// p3 -> undefined , EXACT
 
    p2 = &i2;
 
 // Points To:
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
-// p3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p3 -> undefined , EXACT
 
    p3 = &i3;
 
@@ -164,6 +166,8 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
+// stdout -> *NULL* , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
 
    // 36 17 19
    // no pointer assigned
@@ -173,6 +177,7 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
    
    // no pointer assigned! can keep all points-to
@@ -182,6 +187,7 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
    
    // no pointer assigned! can keep all points-to
@@ -191,6 +197,7 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
    
    // 36 17 53
@@ -201,30 +208,34 @@ int main(void)
 // p1 -> i1 , EXACT
 // p2 -> i2 , EXACT
 // p3 -> i3 , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
    return 0;
 }
 
 // Points To IN:
-// q1 -> *NULL_POINTER* , MAY
+// q1 -> *NULL* , MAY
 // q1 -> _q1_1[0] , MAY
-// q2 -> *NULL_POINTER* , MAY
+// q2 -> *NULL* , MAY
 // q2 -> _q2_2[0] , MAY
-// q3 -> *NULL_POINTER* , MAY
+// q3 -> *NULL* , MAY
 // q3 -> _q3_3[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// q1 -> _q1_1[0] , EXACT
+// q2 -> _q2_2[0] , EXACT
+// q3 -> _q3_3[0] , EXACT
 
 void pointer_add(pointer q1, const pointer q2, const pointer q3)
 {
 
 // Points To:
-// q1 -> *NULL_POINTER* , MAY
+// q1 -> *NULL* , MAY
 // q1 -> _q1_1[0] , MAY
-// q2 -> *NULL_POINTER* , MAY
+// q2 -> *NULL* , MAY
 // q2 -> _q2_2[0] , MAY
-// q3 -> *NULL_POINTER* , MAY
+// q3 -> *NULL* , MAY
 // q3 -> _q3_3[0] , MAY
 
    *q1 = *q2+*q3;
@@ -238,40 +249,41 @@ void pointer_add(pointer q1, const pointer q2, const pointer q3)
 }
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
 
 // Points To OUT:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
 void pointer_free(pointer p)
 {
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
    free(p);
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    return;
 }
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_1[0] , EXACT
 
 int pointer_get(const pointer p)
 {
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
    int i = *p;
@@ -283,17 +295,18 @@ int pointer_get(const pointer p)
 }
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _p_1[0] , EXACT
 
 void pointer_set(pointer p, int v)
 {
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0] , MAY
 
    *p = v;

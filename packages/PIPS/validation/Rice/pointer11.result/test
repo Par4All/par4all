@@ -3,21 +3,23 @@ POINTS TO
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_2[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_3[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _q_3[0] , EXACT
+// q -> _q_3[0] , EXACT
 
 void pointer11(int n, float *p, float *q)
 {
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_2[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_3[0] , MAY
 
    p!=(void *) 0&&q!=(void *) 0?(void) 0:__assert_fail("p!=((void *)0) && q!=((void *)0)", "./pointer11.c", 8, (const char *) 0);
@@ -60,21 +62,23 @@ Proper effects with points-to
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_2[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_3[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> _q_3[0] , EXACT
+// q -> _q_3[0] , EXACT
 
 void pointer11(int n, float *p, float *q)
 {
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_2[0] , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_3[0] , MAY
 
    p!=(void *) 0&&q!=(void *) 0?(void) 0:__assert_fail("p!=((void *)0) && q!=((void *)0)", "./pointer11.c", 8, (const char *) 0);

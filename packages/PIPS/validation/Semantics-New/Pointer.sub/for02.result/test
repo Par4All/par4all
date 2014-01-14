@@ -1,0 +1,122 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i, a[10], *p;
+
+// Points To:
+// p -> undefined , EXACT
+
+
+   p = &a[0];
+
+// Points To:
+// p -> a[0] , EXACT
+
+   for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// p -> a[0] , EXACT
+
+      p[i] = i;
+
+// Points To:
+// p -> a[0] , EXACT
+
+
+   return 0;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+   int i, a[10], *p;
+//             <    is written>: p
+
+   p = &a[0];
+//             <    is written>: i
+   for(i = 0; i <= 9; i += 1)
+//             <    is read   >: i p
+//             <    is written>: a[i]
+      p[i] = i;
+
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i,p) {}
+
+   int i, a[10], *p;
+
+//  T(p) {&a[0]==p}
+
+
+   p = &a[0];
+
+//  T(i) {&a[0]==p, 0<=i, i<=9}
+
+   for(i = 0; i <= 9; i += 1)
+
+//  T() {&a[0]==p, 0<=i, i<=9}
+
+      p[i] = i;
+
+//  T(main) {&a[0]==p, i==10, main==0}
+
+
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i, a[10], *p;
+
+//  P(i,p) {}
+
+
+   p = &a[0];
+
+//  P(i,p) {&a[0]==p}
+
+   for(i = 0; i <= 9; i += 1)
+
+//  P(i,p) {&a[0]==p, 0<=i, i<=9}
+
+      p[i] = i;
+
+//  P(i,p) {&a[0]==p, i==10}
+
+
+   return 0;
+}
+
+Warnings
+
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (assign_rhs_to_reflhs_to_transformer) Want to analyse constant path, but don't have a constant path : p[i]
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (assign_rhs_to_reflhs_to_transformer) Want to analyse constant path, but don't have a constant path : p[i]

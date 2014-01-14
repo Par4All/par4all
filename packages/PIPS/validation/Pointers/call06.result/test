@@ -3,11 +3,12 @@ POINTS TO for call06
 
 
 // Points To IN:
-// x -> *NULL_POINTER* , MAY
+// x -> *NULL* , MAY
 // x -> _x_3[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// x -> _x_3[0] , EXACT
 
 void call06(int r, int m, int *x)
 {
@@ -22,7 +23,7 @@ void call06(int r, int m, int *x)
    for(j = 0; j <= m-1; j += 1)
 
 // Points To:
-// x -> *NULL_POINTER* , MAY
+// x -> *NULL* , MAY
 // x -> _x_3[0] , MAY
 
       x[j] = 10*r+j;

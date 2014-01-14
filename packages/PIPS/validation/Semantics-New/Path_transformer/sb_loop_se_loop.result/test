@@ -1,0 +1,51 @@
+
+Path transformer out-of-context
+
+int main(int x)
+{
+   int a[20], b[20];
+
+   int i = 0, j = 0, k1 = 0, k2 = 0, n;
+   for(i = 0; i <= n-1; i += 1) {
+sb:      a[i] = a[i]+1;
+      k1++;
+   }
+   n++;
+   for(j = 0; j <= n-1; j += 1) {
+      k2++;
+se:      b[j] = a[j]+a[j+1];
+   }
+   return n;
+}
+
+The path transformer between Sbegin and Send is:
+
+//  T(i,j,k1,k2,n) {i+k1#init==i#init+k1, j+k2#init==k2-1,
+//    n==n#init+1, i#init+1<=i, n#init<=i, k2#init+1<=k2,
+//    k2<=k2#init+n}
+
+
+Path transformer out-of-context
+
+int main(int x)
+{
+   int a[20], b[20];
+
+   int i = 0, j = 0, k1 = 0, k2 = 0, n;
+   for(i = 0; i <= n-1; i += 1) {
+sb:      a[i] = a[i]+1;
+      k1++;
+   }
+   n++;
+   for(j = 0; j <= n-1; j += 1) {
+      k2++;
+se:      b[j] = a[j]+a[j+1];
+   }
+   return n;
+}
+
+The path transformer between Sbegin and Send is:
+
+//  T(i,j,k1,k2,n) {i+k1#init==i#init+k1, i==k1, j==k2-1, k2#init==0,
+//    n==n#init+1, i#init+1<=i, n#init<=i, 1<=k2, k2<=n}
+

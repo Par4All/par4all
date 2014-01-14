@@ -30,6 +30,7 @@ void init4(mys *p[N])
     p[i]->tab1[0] = 21;
     p[i]->tab2[0]= p[i]->tab1[0];
   } 
+  return;
 }
 
 int main() 

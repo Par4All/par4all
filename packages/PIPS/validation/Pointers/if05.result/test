@@ -15,21 +15,21 @@ int main()
    int *p = (void *) 0, *q = (void *) 0, i, j;
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
-// q -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
+// q -> *NULL* , EXACT
 
 
    if (!p&&!q) {
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
-// q -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
+// q -> *NULL* , EXACT
 
       p = &i;
 
 // Points To:
 // p -> i , EXACT
-// q -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
 
       q = &j;
    }

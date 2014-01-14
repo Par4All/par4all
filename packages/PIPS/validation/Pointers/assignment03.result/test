@@ -1,22 +1,5 @@
 
-PROPER  EFFECTS
-
-void assignment03()
-{
-   int i;
-   int *p;
-   int *q;
-//             <    is written>: p
-
-   p = &i;
-//             <    is read   >: q
-//             <    is written>: p
-   p = q;
-
-   return;
-}
-
-POINTS-TO
+Points-to for "assignment03"
 
 
 // Points To IN: none
@@ -24,7 +7,7 @@ POINTS-TO
 
 // Points To OUT: unreachable
 
-void assignment03()
+int assignment03()
 {
 
 // Points To: none
@@ -36,25 +19,29 @@ void assignment03()
    int *p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    int *q;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
 
    p = &i;
 
 // Points To:
 // p -> i , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
+   // Copy of an undefined/indeterminate pointer allowed by C standard
    p = q;
 
-// Points To: unreachable
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
-
-   return;
+   
+   // Not OK with C standard; this shows in points-to OUT
+   return *p;
 }

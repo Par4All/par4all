@@ -19,7 +19,7 @@ void update01()
    int *p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
 
    p = &i[0];

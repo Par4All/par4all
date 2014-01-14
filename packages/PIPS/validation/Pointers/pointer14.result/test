@@ -1,30 +1,85 @@
 
-POINTS TO for "foo"
+Points-to for "foo"
 
 
 // Points To IN:
-// t[2][3] -> *NULL_POINTER* , MAY
+// _t_1[2][3][0][0][0][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][0][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][2][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][2][3] -> *NULL* , MAY
+// _t_1[2][3][0][0][0][0] -> _t_1_1[2][3][0][0][0][0][0] , MAY
+// _t_1[2][3][0][1][0][0] -> _t_1_1[2][3][0][1][0][0][0] , MAY
+// _t_1[2][3][0][1][2][0] -> _t_1_1[2][3][0][1][2][0][0] , MAY
+// _t_1[2][3][0][1][2][3] -> _t_1_1[2][3][0][1][2][3][0] , MAY
+// t[2][3] -> *NULL* , MAY
 // t[2][3] -> _t_1[2][3][0][0][0][0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// _t_1[2][3][0][0][0][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][0][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][2][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][2][3] -> *NULL* , MAY
+// _t_1[2][3][0][0][0][0] -> _t_1_1[2][3][0][0][0][0][0] , MAY
+// _t_1[2][3][0][1][0][0] -> _t_1_1[2][3][0][1][0][0][0] , MAY
+// _t_1[2][3][0][1][2][0] -> _t_1_1[2][3][0][1][2][0][0] , MAY
+// _t_1[2][3][0][1][2][3] -> _t_1_1[2][3][0][1][2][3][0] , MAY
+// t[2][3] -> _t_1[2][3][0][0][0][0] , EXACT
 
 void foo(double *(*t[3][4])[5][6][7])
 {
 
 // Points To:
-// t[2][3] -> *NULL_POINTER* , MAY
+// _t_1[2][3][0][0][0][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][0][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][2][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][2][3] -> *NULL* , MAY
+// _t_1[2][3][0][0][0][0] -> _t_1_1[2][3][0][0][0][0][0] , MAY
+// _t_1[2][3][0][1][0][0] -> _t_1_1[2][3][0][1][0][0][0] , MAY
+// _t_1[2][3][0][1][2][0] -> _t_1_1[2][3][0][1][2][0][0] , MAY
+// _t_1[2][3][0][1][2][3] -> _t_1_1[2][3][0][1][2][3][0] , MAY
+// t[2][3] -> *NULL* , MAY
 // t[2][3] -> _t_1[2][3][0][0][0][0] , MAY
 
    *(((*t[2][3])[1])[2])[3] = 2.5;
 
 // Points To:
+// _t_1[2][3][0][0][0][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][0][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][2][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][2][3] -> *NULL* , MAY
+// _t_1[2][3][0][0][0][0] -> _t_1_1[2][3][0][0][0][0][0] , MAY
+// _t_1[2][3][0][1][0][0] -> _t_1_1[2][3][0][1][0][0][0] , MAY
+// _t_1[2][3][0][1][2][0] -> _t_1_1[2][3][0][1][2][0][0] , MAY
+// _t_1[2][3][0][1][2][3] -> _t_1_1[2][3][0][1][2][3][0] , MAY
 // t[2][3] -> _t_1[2][3][0][0][0][0] , EXACT
 
    return;
 }
 
-POINTS TO for pointer14
+Proper effects with points-to for "foo"
+
+void foo(double *(*t[3][4])[5][6][7])
+{
+//             <    is read   >: _t_1[2][3][0][1][2][3] t[2][3]
+//             <    is written>: _t_1_1[2][3][0][1][2][3][0]
+   *(((*t[2][3])[1])[2])[3] = 2.5;
+   return;
+}
+
+Cumulated effects for "foo"
+
+//             <    is read   >: _t_1[2][3][0][1][2][3] t[2][3]
+//             <    is written>: _t_1_1[2][3][0][1][2][3][0]
+void foo(double *(*t[3][4])[5][6][7])
+{
+//             <    is read   >: _t_1[2][3][0][1][2][3] t[2][3]
+//             <    is written>: _t_1_1[2][3][0][1][2][3][0]
+   *(((*t[2][3])[1])[2])[3] = 2.5;
+   return;
+}
+
+Points-to for pointer14
 
 
 // Points To IN: none
@@ -40,47 +95,56 @@ void pointer14()
    double *(*t[3][4])[5][6][7];
 
 // Points To:
-// t[*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// t[*][*] -> undefined , EXACT
 
    double *a[5][6][7];
 
 // Points To:
-// a[*][*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
-// t[*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a[*][*][*] -> undefined , EXACT
+// t[*][*] -> undefined , EXACT
 
    double z;
 
 // Points To:
-// a[*][*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
-// t[*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
+// a[*][*][*] -> undefined , EXACT
+// t[*][*] -> undefined , EXACT
 
    t[1][2] = &a;
 
 // Points To:
-// a[*][*][*] -> *ANY_MODULE*:*NOWHERE* , EXACT
-// t[*][*] -> *ANY_MODULE*:*NOWHERE* , MAY
-// t[*][*] -> a , MAY
+// a[*][*][*] -> undefined , EXACT
+// t[*][*] -> undefined , MAY
 // t[1][2] -> a , EXACT
 
    a[1][2][3] = &z;
 
 // Points To:
-// a[*][*][*] -> *ANY_MODULE*:*NOWHERE* , MAY
-// a[*][*][*] -> z , MAY
+// a[*][*][*] -> undefined , MAY
 // a[1][2][3] -> z , EXACT
-// t[*][*] -> *ANY_MODULE*:*NOWHERE* , MAY
-// t[*][*] -> a , MAY
+// t[*][*] -> undefined , MAY
 // t[1][2] -> a , EXACT
 
    foo(t);
 
 // Points To:
-// a[*][*][*] -> *ANY_MODULE*:*NOWHERE* , MAY
-// a[*][*][*] -> z , MAY
+// a[*][*][*] -> undefined , MAY
 // a[1][2][3] -> z , EXACT
-// t[*][*] -> *ANY_MODULE*:*NOWHERE* , MAY
-// t[*][*] -> a , MAY
+// t[*][*] -> undefined , MAY
+// t[2][3] -> a[0][0][0] , EXACT
 // t[1][2] -> a , EXACT
 
    return;
 }
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 5 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 5 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 5 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 5 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 5 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 5 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 5 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 5 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 5 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 5 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 5 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer14] (compute_points_to_gen_set) Points-to sink cell sk1="_t_1_1[2][3][0][0][0][0][0]" could not be translated but has to be.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer14] (user_call_to_points_to_interprocedural) Incompatibility between call site and callee's output.

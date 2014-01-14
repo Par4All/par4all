@@ -1,0 +1,27 @@
+setenv WSPACE=call26
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+
+echo 
+echo Points-to for "call26"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[call26]
+
+echo 
+echo Points-to for "main"
+echo
+
+# Intraprocedural analysis
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+close
+delete $WSPACE
+quit

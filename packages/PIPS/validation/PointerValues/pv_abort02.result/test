@@ -22,7 +22,7 @@ int main()
    a = (int **) 0;
 
 // Pointer values:
-// a == *NULL_POINTER* (exact);
+// a == *NULL* (exact);
 
    a[0] = &b;
 

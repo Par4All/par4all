@@ -1,0 +1,64 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   struct s {
+      int *first;
+      int *second;
+   };
+
+// Points To: none
+
+   typedef struct s s_t;
+
+// Points To: none
+
+   s_t *ps = (s_t *) malloc(10*sizeof(s_t));
+
+// Points To:
+// *HEAP*_l_21[*].first -> undefined , EXACT
+// *HEAP*_l_21[*].second -> undefined , EXACT
+// ps -> *HEAP*_l_21[0] , MAY
+
+
+   ps->first = (int *) malloc(10*sizeof(int));
+
+// Points To:
+// *HEAP*_l_21[0].first -> *HEAP*_l_23[0] , MAY
+// *HEAP*_l_21[*].first -> undefined , MAY
+// *HEAP*_l_21[*].second -> undefined , EXACT
+// ps -> *HEAP*_l_21[0] , MAY
+
+   ps->second = (int *) malloc(10*sizeof(int));
+
+// Points To:
+// *HEAP*_l_21[0].first -> *HEAP*_l_23[0] , MAY
+// *HEAP*_l_21[0].second -> *HEAP*_l_24[0] , MAY
+// *HEAP*_l_21[*].first -> undefined , MAY
+// *HEAP*_l_21[*].second -> undefined , MAY
+// ps -> *HEAP*_l_21[0] , MAY
+
+
+   free(ps);
+
+// Points To:
+// ps -> undefined , EXACT
+
+
+   return 0;
+}
+
+Warnings and errors: Check that the two memory leaks are detected
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_list_to_points_to) Memory leak for bucket "main:*HEAP*_l_24".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_list_to_points_to) Memory leak for bucket "main:*HEAP*_l_23".

@@ -1,0 +1,33 @@
+// OMP style
+void main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   unsigned int i, N;
+   //PIPS generated variable
+   double A[10], B[10], C[10];
+#pragma omp parallel default(shared) 
+   {
+#pragma omp single
+      {
+         N = 10;
+      }
+#pragma omp single
+      {
+#pragma omp task
+         {
+            for(i = 0; i < N; i += 1)
+               A[i] = 5;
+         }
+#pragma omp task
+         {
+            for(i = 0; i < N; i += 1)
+               B[i] = 3;
+         }
+      }
+#pragma omp single
+      {
+         for(i = 0; i < N; i += 1)
+            C[i] += A[i]+B[i];
+      }
+   }
+}

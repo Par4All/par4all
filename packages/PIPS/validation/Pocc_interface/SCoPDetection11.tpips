@@ -1,0 +1,14 @@
+delete SCoPDetection11
+create SCoPDetection11 SCoPDetection11.c
+setproperty ABORT_ON_USER_ERROR TRUE
+activate C_PARSER
+
+setproperty STATIC_CONTROLIZE_ACROSS_USER_CALLS TRUE
+capply POCC_PRETTYPRINTER[main]
+activate PRINT_CODE
+display PRINTED_FILE[main]
+
+close
+delete SCoPDetection11
+quit
+

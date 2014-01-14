@@ -1,0 +1,59 @@
+// OMP style
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int size, a[size], b[size], i, bi, j, bj;
+#pragma omp parallel default(shared) 
+   {
+#pragma omp single
+      {
+#pragma omp task
+         {
+            scanf("%d", &bi);
+         }
+#pragma omp task
+         {
+            size = 100;
+         }
+      }
+#pragma omp single
+      {
+#pragma omp task
+         {
+            scanf("%d", &bj);
+         }
+#pragma omp task
+         {
+            for(i = 0; i <= bi-1; i += 1)
+               a[i] = i;
+         }
+#pragma omp task
+         {
+            for(i = bi; i <= size-1; i += 1)
+               a[i] = i;
+         }
+      }
+#pragma omp single
+      {
+#pragma omp task
+         {
+            for(j = 0; j <= bj-1; j += 1)
+               b[j] = 2*a[j];
+         }
+#pragma omp task
+         {
+            0<=bi&&bi<size&&0<=bj&&bj<size?(void) 0:__assert_fail("0<=bi && bi<size && 0<=bj && bj<size", "../communications03.c", 22, (const char *) 0);
+         }
+#pragma omp task
+         {
+            for(j = bj; j <= size-1; j += 1)
+               b[j] = 2*a[j];
+         }
+      }
+#pragma omp single
+      {
+         for(j = 0; j <= size-1; j += 1)
+            printf("%d\n", b[j]);
+      }
+   }
+}

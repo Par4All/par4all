@@ -1,0 +1,106 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   int i, j, k, l;
+//             <    is read   >: i k l
+
+   if (k<=i&&i<=l) {
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      if (rand())
+//             <    is written>: i
+         i = 0;
+      else
+//             <    is written>: j
+         j = 0;
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      rand();
+   }
+
+   return 0;
+}
+
+Transformers
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i,j,k,l) {}
+
+   int i, j, k, l;
+
+//  T(i,j) {}
+
+
+   if (k<=i&&i<=l) {
+
+//  T(i,j) {k<=i#init, i#init<=l}
+
+      if (rand())
+
+//  T(i) {i==0, k<=i#init, i#init<=l}
+
+         i = 0;
+      else
+
+//  T(j) {j==0, k<=i, i<=l}
+
+         j = 0;
+
+//  T() {k<=l}
+
+      rand();
+   }
+
+//  T(main) {main==0}
+
+
+   return 0;
+}
+
+Preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i, j, k, l;
+
+//  P(i,j,k,l) {}
+
+
+   if (k<=i&&i<=l) {
+
+//  P(i,j,k,l) {k<=i, i<=l}
+
+      if (rand())
+
+//  P(i,j,k,l) {k<=i, i<=l}
+
+         i = 0;
+      else
+
+//  P(i,j,k,l) {k<=i, i<=l}
+
+         j = 0;
+
+//  P(i,j,k,l) {k<=l}
+
+      rand();
+   }
+
+//  P(i,j,k,l) {}
+
+
+   return 0;
+}

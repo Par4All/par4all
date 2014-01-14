@@ -1,0 +1,44 @@
+
+SCoP Detection
+
+int main()
+{
+//		< is static > FALSE
+//		< parameter > 0`ind, 0`i, 
+//		<   loops   >
+//		<   tests   >
+   int A[500];
+//		< is static > FALSE
+//		< parameter > 0`ind, 0`i, 
+//		<   loops   >
+//		<   tests   >
+   int i = 0;
+//		< is static > FALSE
+//		< parameter > 0`ind, 0`i, 
+//		<   loops   >
+//		<   tests   >
+   int ind;
+//		< is static > TRUE
+//		< parameter > 0`ind, 0`i, 
+//		<   loops   >
+//		<   tests   >
+   // Compared to test 1, allows to check if we did not prevent access using a loop-bound affine dependent variable
+   for(i = 0; i <= 246; i += 1) {
+//		< is static > TRUE
+//		< parameter > 0`ind, 0`i, 
+//		<   loops   > 0 <= 0`i <= 246
+//		<   tests   >
+      ind = 2*i+3;
+//		< is static > TRUE
+//		< parameter > 0`ind, 0`i, 
+//		<   loops   > 0 <= 0`i <= 246
+//		<   tests   >
+      A[ind] = 1234;
+   }
+//		< is static > TRUE
+//		< parameter > 0`ind, 0`i, 
+//		<   loops   >
+//		<   tests   >
+
+   return A[0];
+}

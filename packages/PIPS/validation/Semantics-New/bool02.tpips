@@ -1,8 +1,7 @@
 setproperty ABORT_ON_USER_ERROR TRUE
 setenv NAME bool02
-# ATTENTION, réutilise le fichier bool00.c
-setenv FILE bool00.c
-# même test mais avec "register"
+setenv FILE bool02.c
+# même test que bool00 mais avec "register"
 
 delete $NAME
 create $NAME $FILE

@@ -1,0 +1,106 @@
+setenv WSPACE=inc01c
+delete $WSPACE
+create $WSPACE $WSPACE.c 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty ALIASING_ACROSS_TYPES FALSE
+
+# Atention : just to analyse *p as scalar
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+
+#setenv SEMANTICS_DEBUG_LEVEL 1
+
+echo 
+echo Points-to $WSPACE
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[$WSPACE]
+
+#setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES FALSE
+setproperty SEMANTICS_ANALYZE_SCALAR_POINTER_VARIABLES TRUE
+
+
+echo 
+echo PROPER  EFFECTS $WSPACE
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[$WSPACE]
+
+echo 
+echo CUMULATED EFFECTS $WSPACE
+echo
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[$WSPACE]
+
+
+echo
+echo Transformers with point-to $WSPACE
+echo
+#activate PROPER_EFFECTS_WITH_POINTS_TO
+activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[$WSPACE]
+
+
+echo
+echo Preconditions with point-to $WSPACE
+echo
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[$WSPACE]
+
+close
+echo
+echo Warnings
+echo
+shell cat $WSPACE.database/Warnings
+
+delete $WSPACE
+quit
+
+
+
+echo 
+echo Points-to 
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+#setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES FALSE
+setproperty SEMANTICS_ANALYZE_SCALAR_POINTER_VARIABLES TRUE
+
+
+echo 
+echo PROPER  EFFECTS
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Transformers with point-to
+echo
+#activate PROPER_EFFECTS_WITH_POINTS_TO
+activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+
+echo
+echo Preconditions with point-to
+echo
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+close
+echo
+echo Warnings
+echo
+shell cat $WSPACE.database/Warnings
+
+delete $WSPACE
+quit

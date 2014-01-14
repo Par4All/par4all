@@ -1,0 +1,76 @@
+
+Transformers
+
+
+//  T() {}
+
+void main()
+{
+
+//  T(high_score) {}
+
+   points high_score;
+
+//  T(your_score) {}
+
+   points your_score;
+
+//  T(high_score) {high_score==100}
+
+
+   high_score = 100;
+
+//  T(your_score) {high_score==100, your_score==110}
+
+   your_score = 110;
+
+//  T(high_score) {high_score==110, high_score#init==100,
+//    your_score==110}
+
+
+   if (your_score>high_score)
+
+//  T(high_score) {high_score==110, high_score#init==100,
+//    your_score==110}
+
+      high_score = your_score;
+}
+
+Preconditions
+
+
+//  P() {}
+
+void main()
+{
+
+//  P() {}
+
+   points high_score;
+
+//  P(high_score) {}
+
+   points your_score;
+
+//  P(high_score,your_score) {}
+
+
+   high_score = 100;
+
+//  P(high_score,your_score) {high_score==100}
+
+   your_score = 110;
+
+//  P(high_score,your_score) {high_score==100, your_score==110}
+
+
+   if (your_score>high_score)
+
+//  P(high_score,your_score) {high_score==100, your_score==110}
+
+      high_score = your_score;
+}
+
+Warnings
+
+C_PARSER[main] (c_parse) The "main" function should return an int value

@@ -6,8 +6,14 @@ int main()
 //             <    is read   >: s1.a
 //             <    is written>: s2.a
    s2.a = s1.a;
+//             <    is read   >: s1.b[0]
+//             <    is written>: s2.b[0]
    (s2.b)[0] = (s1.b)[0];
+//             <    is read   >: s1.a
+//             <    is written>: tab_s[0].a
    tab_s[0].a = s1.a;
+//             <    is read   >: s1.b[0]
+//             <    is written>: tab_s[0].b[0]
    (tab_s[0].b)[0] = (s1.b)[0];
    return 0;
 }

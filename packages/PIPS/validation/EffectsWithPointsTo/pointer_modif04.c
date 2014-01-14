@@ -1,7 +1,12 @@
-// Struct passed by value...
-
-// Function init_s does not work because s is passed by copy. The
-// initializations are lots on return.
+/* Struct variable are passed by value...
+ *
+ * Function init_s does not work because s is passed by copy. The
+ * initializations are lost on return.
+ *
+ * Several bugs shown here linked to the field and subscript
+ * operations. This piece of code should core dump in fprintf() and in
+ * the call to compute_s() because s.tab is not initialized.
+ */
 
 #include <stdio.h>
 #include <malloc.h>
@@ -14,6 +19,7 @@ void init_s(s_t s, int max)
   s.tab = (float *) malloc(max * sizeof(float));
   s.max = max;
   fprintf(stderr, "In init_s, s.tab=%p\n", s.tab);
+  return;
 }
 
 void compute_s(s_t s, int max)
@@ -23,8 +29,8 @@ void compute_s(s_t s, int max)
   for (i=0; i<max; i++)
     s.tab[i] = i*2.0;
   
+  return;
 }
-
 
 int main()
 {
@@ -35,7 +41,6 @@ int main()
   fprintf(stderr, "In main, s.tab=%p\n", s.tab);
   
   compute_s(s, 10);
-  
 
   return 0;
 }

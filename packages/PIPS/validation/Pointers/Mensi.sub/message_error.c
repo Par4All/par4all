@@ -9,8 +9,8 @@ void msg_error(char* msg)
 int main()
 {
   char *msg1 = "hello";
-  char *msg2 = msg1 ;
-  msg_error( msg2);
+  char *msg2 = msg1;
+  msg_error(msg2);
 
   return 0;
 }

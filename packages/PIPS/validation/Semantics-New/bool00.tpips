@@ -13,21 +13,21 @@ activate CUMULATED_POINTER_EFFECTS_WITH_POINTS_TO
 activate PROPER_EFFECTS_WITH_POINTS_TO
 
 echo
-echo Source code with cumulated effects
+echo Source code with cumulated effects with point-to
 echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[main]
 
 echo
-echo Source code with transformers
+echo Source code with transformers with point-to
 echo
 
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[main]
 
 echo
-echo Source code with preconditions
+echo Source code with preconditions with point-to
 echo
 
 activate PRINT_CODE_PRECONDITIONS

@@ -1,0 +1,424 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i, j, k, l1, l2, m, n, *p, *q;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+   i = 0;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+   l1 = i;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+   j = 1;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+   l2 = j;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+   m = 10;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+   n = 11;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+
+   if (rand()) {
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+      q = &m;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> m , EXACT
+
+      k = m;
+   }
+   else {
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+      q = &n;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> n , EXACT
+
+      k = n;
+   }
+
+// Points To:
+// p -> undefined , EXACT
+// q -> m , MAY
+// q -> n , MAY
+
+   
+   
+   
+   if (rand()) {
+
+// Points To:
+// p -> undefined , EXACT
+// q -> m , MAY
+// q -> n , MAY
+
+      p = &i;
+
+// Points To:
+// p -> i , EXACT
+// q -> m , MAY
+// q -> n , MAY
+
+      l1 = k;
+   }
+   else {
+
+// Points To:
+// p -> undefined , EXACT
+// q -> m , MAY
+// q -> n , MAY
+
+      p = &j;
+
+// Points To:
+// p -> j , EXACT
+// q -> m , MAY
+// q -> n , MAY
+
+      l2 = k;
+   }
+
+// Points To:
+// p -> i , MAY
+// p -> j , MAY
+// q -> m , MAY
+// q -> n , MAY
+
+
+   *p = *q;
+
+// Points To:
+// p -> i , MAY
+// p -> j , MAY
+// q -> m , MAY
+// q -> n , MAY
+
+
+   return 0;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+   int i, j, k, l1, l2, m, n, *p, *q;
+//             <    is written>: i
+   i = 0;
+//             <    is read   >: i
+//             <    is written>: l1
+   l1 = i;
+//             <    is written>: j
+   j = 1;
+//             <    is read   >: j
+//             <    is written>: l2
+   l2 = j;
+//             <    is written>: m
+   m = 10;
+//             <    is written>: n
+   n = 11;
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+
+   if (rand()) {
+//             <    is written>: q
+      q = &m;
+//             <    is read   >: m
+//             <    is written>: k
+      k = m;
+   }
+   else {
+//             <    is written>: q
+      q = &n;
+//             <    is read   >: n
+//             <    is written>: k
+      k = n;
+   }
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   
+   
+   
+   if (rand()) {
+//             <    is written>: p
+      p = &i;
+//             <    is read   >: k
+//             <    is written>: l1
+      l1 = k;
+   }
+   else {
+//             <    is written>: p
+      p = &j;
+//             <    is read   >: k
+//             <    is written>: l2
+      l2 = k;
+   }
+//             <may be read   >: m n
+//             <may be written>: i j
+//             <    is read   >: p q
+
+   *p = *q;
+
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i,j,k,l1,l2,m,n,p,q) {}
+
+   int i, j, k, l1, l2, m, n, *p, *q;
+
+//  T(i) {i==0}
+
+   i = 0;
+
+//  T(l1) {i==0, l1==0}
+
+   l1 = i;
+
+//  T(j) {i==0, j==1, l1==0}
+
+   j = 1;
+
+//  T(l2) {i==0, j==1, l1==0, l2==1}
+
+   l2 = j;
+
+//  T(m) {i==0, j==1, l1==0, l2==1, m==10}
+
+   m = 10;
+
+//  T(n) {i==0, j==1, l1==0, l2==1, m==10, n==11}
+
+   n = 11;
+
+//  T(k,q) {i==0, j==1, l1==0, l2==1, m==10, n==11, 10<=k, k<=11}
+
+
+   if (rand()) {
+
+//  T(q) {&m==q, i==0, j==1, l1==0, l2==1, m==10, n==11}
+
+      q = &m;
+
+//  T(k) {&m==q, i==0, j==1, k==10, l1==0, l2==1, m==10, n==11}
+
+      k = m;
+   }
+   else {
+
+//  T(q) {&n==q, i==0, j==1, l1==0, l2==1, m==10, n==11}
+
+      q = &n;
+
+//  T(k) {&n==q, i==0, j==1, k==11, l1==0, l2==1, m==10, n==11}
+
+      k = n;
+   }
+
+//  T(l1,l2,p) {i==0, j==1, l1#init==0, l2#init==1, m==10, n==11,
+//    9l1+10l2<=10k, 11k<=10l1+11l2, 10l1+11l2<=10k+11,
+//    9k+10<=9l1+10l2}
+
+   
+   
+   
+   if (rand()) {
+
+//  T(p) {&i==p, i==0, j==1, l1==0, l2==1, m==10, n==11, 10<=k, k<=11}
+
+      p = &i;
+
+//  T(l1) {&i==p, i==0, j==1, k==l1, l1#init==0, l2==1, m==10, n==11,
+//    10<=k, k<=11}
+
+      l1 = k;
+   }
+   else {
+
+//  T(p) {&j==p, i==0, j==1, l1==0, l2==1, m==10, n==11, 10<=k, k<=11}
+
+      p = &j;
+
+//  T(l2) {&j==p, i==0, j==1, k==l2, l1==0, l2#init==1, m==10, n==11,
+//    10<=k, k<=11}
+
+      l2 = k;
+   }
+
+//  T(i,j) {i#init==0, j#init==1, m==10, n==11, 0<=i, 100<=9i+10j,
+//    10i+11j<=121, 1<=j, 10<=k, k<=11, 9l1+10l2<=10k, 11k<=10l1+11l2,
+//    10l1+11l2<=10k+11, 9k+10<=9l1+10l2}
+
+
+   *p = *q;
+
+//  T(main) {m==10, main==0, n==11, 0<=i, 100<=9i+10j, 10i+11j<=121,
+//    1<=j, 10<=k, k<=11, 9l1+10l2<=10k, 11k<=10l1+11l2,
+//    10l1+11l2<=10k+11, 9k+10<=9l1+10l2}
+
+
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i, j, k, l1, l2, m, n, *p, *q;
+
+//  P(i,j,k,l1,l2,m,n,p,q) {}
+
+   i = 0;
+
+//  P(i,j,k,l1,l2,m,n,p,q) {i==0}
+
+   l1 = i;
+
+//  P(i,j,k,l1,l2,m,n,p,q) {i==0, l1==0}
+
+   j = 1;
+
+//  P(i,j,k,l1,l2,m,n,p,q) {i==0, j==1, l1==0}
+
+   l2 = j;
+
+//  P(i,j,k,l1,l2,m,n,p,q) {i==0, j==1, l1==0, l2==1}
+
+   m = 10;
+
+//  P(i,j,k,l1,l2,m,n,p,q) {i==0, j==1, l1==0, l2==1, m==10}
+
+   n = 11;
+
+//  P(i,j,k,l1,l2,m,n,p,q) {i==0, j==1, l1==0, l2==1, m==10, n==11}
+
+
+   if (rand()) {
+
+//  P(i,j,k,l1,l2,m,n,p,q) {i==0, j==1, l1==0, l2==1, m==10, n==11}
+
+      q = &m;
+
+//  P(i,j,k,l1,l2,m,n,p,q) {&m==q, i==0, j==1, l1==0, l2==1, m==10,
+//    n==11}
+
+      k = m;
+   }
+   else {
+
+//  P(i,j,k,l1,l2,m,n,p,q) {i==0, j==1, l1==0, l2==1, m==10, n==11}
+
+      q = &n;
+
+//  P(i,j,k,l1,l2,m,n,p,q) {&n==q, i==0, j==1, l1==0, l2==1, m==10,
+//    n==11}
+
+      k = n;
+   }
+
+//  P(i,j,k,l1,l2,m,n,p,q) {i==0, j==1, l1==0, l2==1, m==10, n==11,
+//    10<=k, k<=11}
+
+   
+   
+   
+   if (rand()) {
+
+//  P(i,j,k,l1,l2,m,n,p,q) {i==0, j==1, l1==0, l2==1, m==10, n==11,
+//    10<=k, k<=11}
+
+      p = &i;
+
+//  P(i,j,k,l1,l2,m,n,p,q) {&i==p, i==0, j==1, l1==0, l2==1, m==10,
+//    n==11, 10<=k, k<=11}
+
+      l1 = k;
+   }
+   else {
+
+//  P(i,j,k,l1,l2,m,n,p,q) {i==0, j==1, l1==0, l2==1, m==10, n==11,
+//    10<=k, k<=11}
+
+      p = &j;
+
+//  P(i,j,k,l1,l2,m,n,p,q) {&j==p, i==0, j==1, l1==0, l2==1, m==10,
+//    n==11, 10<=k, k<=11}
+
+      l2 = k;
+   }
+
+//  P(i,j,k,l1,l2,m,n,p,q) {i==0, j==1, m==10, n==11, 9l1+10l2<=10k,
+//    11k<=10l1+11l2, 10l1+11l2<=10k+11, 9k+10<=9l1+10l2}
+
+
+   *p = *q;
+
+//  P(i,j,k,l1,l2,m,n,p,q) {m==10, n==11, 0<=i, 100<=9i+10j,
+//    10i+11j<=121, 1<=j, 10<=k, k<=11, 9l1+10l2<=10k, 11k<=10l1+11l2,
+//    10l1+11l2<=10k+11, 9k+10<=9l1+10l2}
+
+
+   return 0;
+}
+
+Warnings
+

@@ -1,0 +1,88 @@
+
+Transformers for multiply05
+
+
+//  T(multiply05) {}
+
+int multiply05(int i, int j, int N)
+{
+
+//  T(k,l,m,n) {}
+
+   int k, l, m, n;
+
+//  T(i) {i==2}
+
+
+   i = 2;
+
+//  T(j) {i==2, j==3}
+
+   j = 3;
+
+//  T(k) {i==2, j==3}
+
+   k = i*N*j*N;
+
+//  T(l) {i==2, j==3, 0<=6N+l, 6N<=l}
+
+   l = i*N*N*j;
+
+//  T(m) {i==2, j==3, 0<=6N+l, 6N<=l, 0<=6N+m, 6N<=m}
+
+   m = i*j*N*N;
+
+//  T(n) {i==2, j==3, 0<=6N+l, 6N<=l, 0<=6N+m, 6N<=m, 0<=N+n, N<=n}
+
+   n = N*N;
+
+//  T(multiply05) {i==2, j==3, k+l+m+n==multiply05, 0<=6N+l, 6N<=l,
+//    0<=6N+m, 6N<=m, 0<=N+n, N<=n}
+
+
+   return k+l+m+n;
+}
+
+Preconditions for multiply05
+
+
+//  P() {}
+
+int multiply05(int i, int j, int N)
+{
+
+//  P() {}
+
+   int k, l, m, n;
+
+//  P(k,l,m,n) {}
+
+
+   i = 2;
+
+//  P(i,k,l,m,n) {i==2}
+
+   j = 3;
+
+//  P(i,j,k,l,m,n) {i==2, j==3}
+
+   k = i*N*j*N;
+
+//  P(i,j,k,l,m,n) {i==2, j==3}
+
+   l = i*N*N*j;
+
+//  P(i,j,k,l,m,n) {i==2, j==3, 0<=6N+l, 6N<=l}
+
+   m = i*j*N*N;
+
+//  P(i,j,k,l,m,n) {i==2, j==3, 0<=6N+l, 6N<=l, 0<=6N+m, 6N<=m}
+
+   n = N*N;
+
+//  P(i,j,k,l,m,n) {i==2, j==3, 0<=6N+l, 6N<=l, 0<=6N+m, 6N<=m,
+//    0<=N+n, N<=n}
+
+
+   return k+l+m+n;
+}

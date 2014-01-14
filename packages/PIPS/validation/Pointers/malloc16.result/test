@@ -1,0 +1,32 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p = (int *) malloc(10*sizeof(int)), i;
+
+// Points To:
+// p -> *HEAP*_l_7[0] , MAY
+
+
+   p = &i;
+
+// Points To:
+// p -> i , EXACT
+
+
+   return 0;
+}
+
+Warnings and errors: Check that the memory leak is detected
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (list_assignment_to_points_to) Heap bucket "*HEAP*_l_7[0]" leaked at line 9.

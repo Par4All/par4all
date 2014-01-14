@@ -1,0 +1,31 @@
+setenv WS=use_def_elim11
+delete $WS
+create $WS $WS.c
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+activate MUST_REGIONS
+
+echo
+echo Source code for "$WS" after dead-code elimination
+echo
+apply DEAD_CODE_ELIMINATION[$WS]
+display PRINTED_FILE[$WS]
+
+echo
+echo OUT regions for "$WS"
+echo
+activate PRINT_CODE_OUT_REGIONS
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+display PRINTED_FILE[$WS]
+
+echo
+echo Source code for "$WS" after dead-code elimination with OUT regions
+echo
+apply DEAD_CODE_ELIMINATION_WITH_OUT_REGIONS[$WS]
+activate PRINT_CODE
+display PRINTED_FILE[$WS]
+
+close
+quit

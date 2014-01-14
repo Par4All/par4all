@@ -1,0 +1,33 @@
+
+OUT regions for "use_def_elim10"
+
+int use_def_elim10(int i)
+{
+   int j;
+   int k;
+
+//  <j-OUT-EXACT-{}>
+
+
+   j = i+1;
+   i = 2;
+   k = 3;
+   return j;
+}
+
+Source code for "use_def_elim10" after dead-code elimination with OUT regions
+
+int use_def_elim10(int i)
+{
+   int j;
+
+   j = i+1;
+   return j;
+}
+
+Source code for "main" after dead-code elimination with OUT regions
+
+int main()
+{
+   return use_def_elim10(2);
+}

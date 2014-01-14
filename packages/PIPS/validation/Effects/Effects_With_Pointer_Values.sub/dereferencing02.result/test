@@ -1,4 +1,7 @@
 
+PRINT_CODE_SIMPLE_POINTER_VALUES
+
+
 // IN Pointer values: none
 
 
@@ -98,6 +101,9 @@ int main()
 
    return 1;
 }
+
+PROPER_EFFECTS_WITH_POINTER_VALUES
+
 void dereferencing02()
 {
 //             <may be written>: x[*]
@@ -138,6 +144,9 @@ int main()
    dereferencing02();
    return 1;
 }
+
+MUST_REGIONS_WITH_POINTER_VALUES
+
 void dereferencing02()
 {
 
@@ -177,14 +186,14 @@ void dereferencing02()
    w = q;
 
 //  <i-W-EXACT-{}>
-//  <p[PHI1]-R-EXACT-{PHI1==2, i==0}>
+//  <p[PHI1]-R-EXACT-{PHI1==2}>
 //  <w-R-EXACT-{}>
 
    **(w+(i = 2)) = 4.;
 
-//  <p[PHI1]-R-EXACT-{PHI1==0, i==2}>
+//  <p[PHI1]-R-EXACT-{PHI1==0}>
 //  <q-R-EXACT-{}>
-//  <x[PHI1]-W-EXACT-{PHI1==0, i==2}>
+//  <x[PHI1]-W-EXACT-{PHI1==0}>
 
    x[0] = **q;
 
@@ -193,8 +202,8 @@ void dereferencing02()
 
    q++;
 
-//  <p[PHI1]-R-EXACT-{PHI1==1, i==2}>
-//  <p[PHI1]-W-EXACT-{PHI1==1, i==2}>
+//  <p[PHI1]-R-EXACT-{PHI1==1}>
+//  <p[PHI1]-W-EXACT-{PHI1==1}>
 //  <q-R-EXACT-{}>
 //  <q-W-EXACT-{}>
 
@@ -206,6 +215,9 @@ int main()
    dereferencing02();
    return 1;
 }
+
+PRINT_CODE_REGIONS
+
 void dereferencing02()
 {
 
@@ -245,14 +257,14 @@ void dereferencing02()
    w = q;
 
 //  <i-W-EXACT-{}>
-//  <p[PHI1]-R-EXACT-{PHI1==2, i==0}>
+//  <p[PHI1]-R-EXACT-{PHI1==2}>
 //  <w-R-EXACT-{}>
 
    **(w+(i = 2)) = 4.;
 
-//  <p[PHI1]-R-EXACT-{PHI1==0, i==2}>
+//  <p[PHI1]-R-EXACT-{PHI1==0}>
 //  <q-R-EXACT-{}>
-//  <x[PHI1]-W-EXACT-{PHI1==0, i==2}>
+//  <x[PHI1]-W-EXACT-{PHI1==0}>
 
    x[0] = **q;
 
@@ -261,8 +273,8 @@ void dereferencing02()
 
    q++;
 
-//  <p[PHI1]-R-EXACT-{PHI1==1, i==2}>
-//  <p[PHI1]-W-EXACT-{PHI1==1, i==2}>
+//  <p[PHI1]-R-EXACT-{PHI1==1}>
+//  <p[PHI1]-W-EXACT-{PHI1==1}>
 //  <q-R-EXACT-{}>
 //  <q-W-EXACT-{}>
 

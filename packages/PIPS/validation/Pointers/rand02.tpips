@@ -1,0 +1,25 @@
+setenv WSPACE=rand02
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE
+
+close
+
+# Check message about dangling pointers
+
+# They are useless in this case, with dependencies on pointer values,
+# till the interprocedural stuff is developed
+
+# shell cat rand04.database/Warnings
+
+delete $WSPACE
+quit

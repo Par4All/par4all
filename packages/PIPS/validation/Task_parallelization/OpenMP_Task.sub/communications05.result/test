@@ -1,0 +1,90 @@
+// OMP style
+int main()
+{
+   //PIPS generated variable
+   int size, a[size][size], b[size][size], i, bi, j, bj;
+#pragma omp parallel default(shared) 
+   {
+#pragma omp single
+      {
+         scanf("%d", &size);
+      }
+#pragma omp single
+      {
+         scanf("%d", &bi);
+      }
+#pragma omp single
+      {
+         scanf("%d", &bj);
+      }
+#pragma omp single
+      {
+#pragma omp task
+         {
+            0<=bi&&bi<size&&0<=bj&&bj<size?(void) 0:__assert_fail("0<=bi && bi<size && 0<=bj && bj<size", "../communications05.c", 23, (const char *) 0);
+         }
+#pragma omp task
+         {
+            
+            /* Initialization of a with four tasks */
+            for(i = 0; i <= bi-1; i += 1)
+               for(j = 0; j <= bj-1; j += 1)
+                  a[i][j] = i*size+j;
+         }
+#pragma omp task
+         {
+            for(i = 0; i <= bi-1; i += 1)
+               for(j = bj; j <= size-1; j += 1)
+                  a[i][j] = i*size+j;
+         }
+#pragma omp task
+         {
+            for(i = bi; i <= size-1; i += 1)
+               for(j = 0; j <= bj-1; j += 1)
+                  a[i][j] = i*size+j;
+            for(i = bi; i <= size-1; i += 1)
+               for(j = bj; j <= size-1; j += 1)
+                  a[i][j] = i*size+j;
+         }
+      }
+#pragma omp single
+      {
+#pragma omp task
+         {
+            
+            /* Computation of b with four tasks perfectly aligned on the
+                 previous four ones */
+            for(i = 0; i <= bi-1; i += 1)
+               for(j = 0; j <= bj-1; j += 1)
+                  b[i][j] = 2*a[i][j];
+         }
+#pragma omp task
+         {
+            for(i = bi; i <= size-1; i += 1)
+               for(j = bj; j <= size-1; j += 1)
+                  b[i][j] = 2*a[i][j];
+         }
+#pragma omp task
+         {
+            for(i = 0; i <= bi-1; i += 1)
+               for(j = bj; j <= size-1; j += 1)
+                  b[i][j] = 2*a[i][j];
+         }
+#pragma omp task
+         {
+            for(i = bi; i <= size-1; i += 1)
+               for(j = 0; j <= bj-1; j += 1)
+                  b[i][j] = 2*a[i][j];
+         }
+      }
+#pragma omp single
+      {
+
+         for(i = 0; i <= size-1; i += 1)
+            for(j = 0; j <= size-1; j += 1)
+               printf("%d\n", b[i][j]);
+      }
+   }
+
+   return 0;
+}

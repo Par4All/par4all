@@ -1,3 +1,14 @@
+/* The pointer assignment is not translated fully acurately in the
+ * main function. When "assignment" is analyzed, the value assigned
+ * can be either a defined value or a NULL pointer.
+ *
+ * When the call site is analyzed, it is clear that "(**t2).ip2" is
+ * not NULL.
+ *
+ * However, the alias analysis is not performed and there is no way to
+ * induce that, hence, (**t1).ip1 is also different from NULL.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 

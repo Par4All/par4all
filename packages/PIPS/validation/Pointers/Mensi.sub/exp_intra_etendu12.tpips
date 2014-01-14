@@ -1,0 +1,23 @@
+delete exp_intra_etendu12
+create exp_intra_etendu12 exp_intra_etendu12.c 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[initialize]
+
+echo 
+echo PROPER EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[initialize]
+
+close
+delete exp_intra_etendu12
+quit

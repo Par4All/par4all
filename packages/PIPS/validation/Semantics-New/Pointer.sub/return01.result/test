@@ -1,0 +1,104 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i = 0;
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> undefined , EXACT
+
+
+   p = &i;
+
+// Points To:
+// p -> i , EXACT
+
+
+   return *p;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: i
+   int i = 0;
+   int *p;
+//             <    is written>: p
+
+   p = &i;
+//             <    is read   >: i p
+
+   return *p;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T(p) {i==0}
+
+   int *p;
+
+//  T(p) {&i==p, i==0}
+
+
+   p = &i;
+
+//  T(main) {&i==p, i==0, main==0}
+
+
+   return *p;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   int *p;
+
+//  P(i,p) {i==0}
+
+
+   p = &i;
+
+//  P(i,p) {&i==p, i==0}
+
+
+   return *p;
+}
+
+Warnings
+

@@ -1,0 +1,20 @@
+int main()
+{
+   int a[20], b[20];
+
+   int i = 0, j = 0, k1 = 0, k2 = 0, n = 20;
+sb:   b[i] = a[i]+a[i+1];
+   n++;
+   for(i = 0; i <= n-1; i += 1) {
+      k1++;
+se:      a[i] = a[i]+1;
+      k2++;
+   }
+   return i;
+}
+
+The path transformer between Sbegin and Send is:
+
+//  T(i,k1,k2,n) {i+k1#init==k1-1, k1+k2#init==k1#init+k2+1,
+//    n==n#init+1, k1#init+1<=k1, k1<=k1#init+n}
+

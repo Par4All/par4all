@@ -3,13 +3,17 @@ POINTS-TO
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// _p_1[0][0] -> *NULL* , MAY
+// _p_1[0][0] -> _p_1_1[0][0][0] , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0][0] , MAY
 
 
 // Points To OUT:
-// _p_1[*][*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// _p_1[0][3] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// _p_1[0][3] -> undefined , EXACT
+// _p_1[0][0] -> *NULL* , MAY
+// _p_1[0][0] -> _p_1_1[0][0][0] , MAY
+// p -> _p_1[0][0] , EXACT
 
 int ptr_to_array01(int *(*p)[10])
 {
@@ -19,13 +23,16 @@ int ptr_to_array01(int *(*p)[10])
    int a;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// _p_1[0][0] -> *NULL* , MAY
+// _p_1[0][0] -> _p_1_1[0][0][0] , MAY
+// p -> *NULL* , MAY
 // p -> _p_1[0][0] , MAY
 
    (*p)[3] = &a;
 
 // Points To:
-// _p_1[*][*] -> a , MAY
+// _p_1[0][0] -> *NULL* , MAY
+// _p_1[0][0] -> _p_1_1[0][0][0] , MAY
 // _p_1[0][3] -> a , EXACT
 // p -> _p_1[0][0] , EXACT
 

@@ -1,0 +1,59 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: i
+   int i = 0;
+//             <    is written>: i x
+   float x = (i = 1)*2.;
+
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T() {i==0}
+
+   float x = (i = 1)*2.;
+
+//  T(main) {i==0, main==0}
+
+
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   float x = (i = 1)*2.;
+
+//  P(i) {i==0}
+
+
+   return 0;
+}
+
+Warnings
+

@@ -1,0 +1,104 @@
+
+Points-to
+
+
+Transformers with point-to
+
+
+//  T() {}
+
+void memcopy05a(int size, void *src, void *dst)
+{
+
+//  T() {}
+
+   if (src!=(void *) 0&&dst!=(void *) 0) {
+
+//  T(s) {}
+
+      char *s = (char *) src;
+
+//  T(d) {}
+
+      char *d = (char *) dst;
+
+//  T(ls) {}
+
+      char *ls = s+size;
+
+//  T(d,s) {s+1<=ls, s#init+1<=ls}
+
+      while (s<ls)
+
+//  T(d,s) {s#init+1<=ls}
+
+         *d++ = *s++;
+   }
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+void memcopy05a(int size, void *src, void *dst)
+{
+
+//  P() {}
+
+   if (src!=(void *) 0&&dst!=(void *) 0) {
+
+//  P() {}
+
+      char *s = (char *) src;
+
+//  P(s) {}
+
+      char *d = (char *) dst;
+
+//  P(d,s) {}
+
+      char *ls = s+size;
+
+//  P(d,ls,s) {}
+
+      while (s<ls)
+
+//  P(d,ls,s) {s+1<=ls}
+
+         *d++ = *s++;
+   }
+}
+
+Warnings
+
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning memcopy05a instead
+TRANSFORMERS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy05a] (have_null_value_in_pointer_expression_p) TODO : Need to check if s is indirectly NULL
+TRANSFORMERS_INTER_FULL[memcopy05a] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL[memcopy05a] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL[memcopy05a] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning memcopy05a instead
+TRANSFORMERS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+TRANSFORMERS_INTER_FULL[memcopy05a] (have_null_value_in_pointer_expression_p) TODO : Need to check if s is indirectly NULL
+TRANSFORMERS_INTER_FULL[memcopy05a] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL[memcopy05a] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL[memcopy05a] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+PRECONDITIONS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+PRECONDITIONS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+PRECONDITIONS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+PRECONDITIONS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+PRECONDITIONS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+PRECONDITIONS_INTER_FULL[memcopy05a] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
+PRECONDITIONS_INTER_FULL[memcopy05a] (have_null_value_in_pointer_expression_p) TODO : Need to check if s is indirectly NULL
+PRECONDITIONS_INTER_FULL[memcopy05a] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed

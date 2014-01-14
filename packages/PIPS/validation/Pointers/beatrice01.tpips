@@ -7,10 +7,12 @@ setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
 activate PRINT_CODE_POINTS_TO_LIST
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 
 echo
 echo POINTS TO for "main"
 echo
+
 display PRINTED_FILE[main]
 
 close

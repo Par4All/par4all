@@ -1,4 +1,40 @@
 
+Points-to for "f2"
+
+
+// Points To IN:
+// array[*] -> *NULL_POINTER* , MAY
+// array[*] -> _array_2[*] , MAY
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_ , MAY
+
+
+// Points To OUT:
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_ , MAY
+
+void f2(int n_ptrs, char *array[31])
+{
+
+// Points To: none
+
+   int ptr_no;
+
+// Points To: none
+
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+
+// Points To:
+// array[*] -> *NULL_POINTER* , MAY
+// array[*] -> _array_2[*] , MAY
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_ , MAY
+
+      fprintf(stderr, "%s\n", array[ptr_no]);
+}
+
+Proper effects with points-to for "f2"
+
 void f2(int n_ptrs, char *array[31])
 {
    int ptr_no;
@@ -12,6 +48,198 @@ void f2(int n_ptrs, char *array[31])
 //             <    is written>: __IO_EFFECTS:LUNS[2]
       fprintf(stderr, "%s\n", array[ptr_no]);
 }
+
+Cumulated effects with points-to for "f2"
+
+void f2(int n_ptrs, char *array[31])
+{
+   int ptr_no;
+//             <    is read   >: n_ptrs
+//             <    is written>: ptr_no
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+//             <may be read   >: _array_2[*] stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: array[ptr_no] n_ptrs ptr_no stderr 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+      fprintf(stderr, "%s\n", array[ptr_no]);
+}
+
+Points-to for "f4"
+
+
+// Points To IN:
+// array[*] -> *NULL_POINTER* , MAY
+// array[*] -> _array_2[*] , MAY
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_ , MAY
+
+
+// Points To OUT:
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_ , MAY
+
+void f4(int n_ptrs, char *array[31])
+{
+
+// Points To: none
+
+   int ptr_no;
+
+// Points To: none
+
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+
+// Points To:
+// array[*] -> *NULL_POINTER* , MAY
+// array[*] -> _array_2[*] , MAY
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_ , MAY
+
+      fprintf(stdout, "%s\n", array[ptr_no]);
+}
+
+Proper effects with points-to for "f4"
+
+void f4(int n_ptrs, char *array[31])
+{
+   int ptr_no;
+//             <    is read   >: n_ptrs
+//             <    is written>: ptr_no
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+//             <may be read   >: _array_2[*] stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: array[ptr_no] n_ptrs ptr_no stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      fprintf(stdout, "%s\n", array[ptr_no]);
+}
+
+Cumulated effects with points-to for "f4"
+
+void f4(int n_ptrs, char *array[31])
+{
+   int ptr_no;
+//             <    is read   >: n_ptrs
+//             <    is written>: ptr_no
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+//             <may be read   >: _array_2[*] stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: array[ptr_no] n_ptrs ptr_no stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      fprintf(stdout, "%s\n", array[ptr_no]);
+}
+
+Points-to for "f3"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void f3(int n_ptrs, int f4_after, ...)
+{
+
+// Points To: none
+
+   va_list ap, ap_save;
+
+// Points To: none
+
+   char *array[31];
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int ptr_no = 0;
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   if (n_ptrs>31)
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      n_ptrs = 31;
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   va_start(ap, f4_after);
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1) {
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+      array[ptr_no] = va_arg(ap, char *);
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+      if (ptr_no==f4_after)
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+         va_copy(ap_save, ap);
+   }
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+   va_end(ap);
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+   f2(n_ptrs, array);
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+   // Now process the saved copy.
+   n_ptrs -= f4_after;
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+      array[ptr_no] = va_arg(ap_save, char *);
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+   va_end(ap_save);
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+   f4(n_ptrs, array);
+}
+
+Proper effects with points-to for "f3"
+
 void f3(int n_ptrs, int f4_after, ...)
 {
    va_list ap, ap_save;
@@ -41,6 +269,7 @@ void f3(int n_ptrs, int f4_after, ...)
 //             <    is read   >: ap
    va_end(ap);
 //             <may be read   >: array[*] stderr stderr[0] 
+//                               *ANY_MODULE*:*ANYWHERE*_b0 
 //                               __IO_EFFECTS:LUNS[2]
 //             <may be written>: stderr[0] __IO_EFFECTS:LUNS[2]
 //             <    is read   >: n_ptrs
@@ -59,39 +288,127 @@ void f3(int n_ptrs, int f4_after, ...)
 //             <    is read   >: ap_save
    va_end(ap_save);
 //             <may be read   >: array[*] stdout stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE*_b0 
 //                               __IO_EFFECTS:LUNS[1]
 //             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
 //             <    is read   >: n_ptrs
    f4(n_ptrs, array);
 }
-void f4(int n_ptrs, char *array[31])
+
+Cumulated effects with points-to for "f3"
+
+void f3(int n_ptrs, int f4_after, ...)
 {
-   int ptr_no;
+   va_list ap, ap_save;
+   char *array[31];
+//             <    is written>: ptr_no
+   int ptr_no = 0;
+//             <    is read   >: n_ptrs
+   if (n_ptrs>31)
+//             <    is written>: n_ptrs
+      n_ptrs = 31;
+//             <    is read   >: ap
+//             <    is written>: ap
+   va_start(ap, f4_after);
+//             <    is read   >: n_ptrs
+//             <    is written>: ptr_no
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1) {
+//             <    is read   >: ap n_ptrs ptr_no
+//             <    is written>: ap array[ptr_no]
+      array[ptr_no] = va_arg(ap, char *);
+//             <    is read   >: f4_after n_ptrs ptr_no
+      if (ptr_no==f4_after)
+//             <    is read   >: ap ap_save n_ptrs
+//             <    is written>: ap_save
+         va_copy(ap_save, ap);
+   }
+//             <may be written>: ap
+//             <    is read   >: ap
+   va_end(ap);
+//             <may be read   >: array[*] stderr stderr[0] 
+//                               *ANY_MODULE*:*ANYWHERE*_b0 
+//                               __IO_EFFECTS:LUNS[2]
+//             <may be written>: stderr[0] __IO_EFFECTS:LUNS[2]
+//             <    is read   >: n_ptrs
+   f2(n_ptrs, array);
+//             <    is read   >: f4_after n_ptrs
+//             <    is written>: n_ptrs
+   // Now process the saved copy.
+   n_ptrs -= f4_after;
 //             <    is read   >: n_ptrs
 //             <    is written>: ptr_no
    for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
-//             <may be read   >: _array_2[*] stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: array[ptr_no] n_ptrs ptr_no stdout 
+//             <    is read   >: ap_save n_ptrs ptr_no
+//             <    is written>: ap_save array[ptr_no]
+      array[ptr_no] = va_arg(ap_save, char *);
+//             <may be written>: ap_save
+//             <    is read   >: ap_save
+   va_end(ap_save);
+//             <may be read   >: array[*] stdout stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE*_b0 
 //                               __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-      fprintf(stdout, "%s\n", array[ptr_no]);
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: n_ptrs
+   f4(n_ptrs, array);
 }
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   f3(6, 4, "ch1", "ch2", "ch3", "ch4", "ch5", "ch6");
+
+// Points To: none
+
+   return 0;
+}
+
+Proper effects with points-to for "main"
+
 int main()
 {
 //             <may be read   >: stderr stderr[0] stdout stdout[0] 
 //                               *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[1] 
-//                               __IO_EFFECTS:LUNS[2]
+//                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: stderr[0] stdout[0] 
 //                               *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[1] 
-//                               __IO_EFFECTS:LUNS[2]
+//                               __IO_EFFECTS:LUNS[*]
    f3(6, 4, "ch1", "ch2", "ch3", "ch4", "ch5", "ch6");
    return 0;
 }
 
- *********************** Use-Def Chains *********************
+Cumulated effects with points-to for "main"
 
+int main()
+{
+//             <may be read   >: stderr stderr[0] stdout stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: stderr[0] stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   f3(6, 4, "ch1", "ch2", "ch3", "ch4", "ch5", "ch6");
+   return 0;
+}
 
-****************** End of Dependence Graph ******************
+Warnings and errors
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[f2] (CSafeSizeOfArray) Varying size for array "varargs04!:_IO_FILE^_unused2"
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[f2] (CSafeSizeOfArray) Not yet supported properly by PIPS
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_PROPER_EFFECTS' already active
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[f4] (CSafeSizeOfArray) Varying size for array "varargs04!:_IO_FILE^_unused2"
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[f4] (CSafeSizeOfArray) Not yet supported properly by PIPS
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_PROPER_EFFECTS' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_PROPER_EFFECTS' already active
+CUMULATED_EFFECTS_WITH_POINTS_TO[f3] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function "f3" has no side effect on its formal context via pointer variables.
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_PROPER_EFFECTS' already active

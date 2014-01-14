@@ -1,0 +1,10 @@
+int main()
+{
+   int A[500];
+   int i = 0;
+   int k = 3;
+   for(i = 1; i <= 249; i += 1)
+      A[k*i] = 400;
+
+   return A[0];
+}

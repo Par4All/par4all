@@ -1,1 +1,1 @@
-Issue either with the points-to analysis or with the coupling between the points-to analysis and the effects-with-points-to analysis... To be investigated when the points-to analysis is more stable. Likely origin of the problem: no more initial points-to analysis for formal parameters.
+seems to be a translation issue for effects_with_points_to(). See comments in C file.

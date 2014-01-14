@@ -1,0 +1,33 @@
+
+Source code for use_def_elim11 after dead-code elimination
+
+int use_def_elim11(int i)
+{
+   int j;
+
+   j = i+1;
+   return j;
+}
+
+OUT regions for use_def_elim11
+
+int use_def_elim11(int i)
+{
+   int j;
+
+//  <j-OUT-EXACT-{}>
+
+
+   j = i+1;
+   return j;
+}
+
+Source code for use_def_elim11 after dead-code elimination with OUT regions
+
+int use_def_elim11(int i)
+{
+   int j;
+
+   j = i+1;
+   return j;
+}

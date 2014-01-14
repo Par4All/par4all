@@ -1,0 +1,72 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: j
+   int j = 0;
+   int a[10];
+//             <    is read   >: j
+//             <    is written>: a[0] j
+
+   a[0] = j++;
+
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(j) {j==0}
+
+   int j = 0;
+
+//  T() {j==0}
+
+   int a[10];
+
+//  T(a[0],j) {a[0]==0, a[0]#init==0, j==1}
+
+
+   a[0] = j++;
+
+//  T(main) {a[0]==0, j==1, main==0}
+
+
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int j = 0;
+
+//  P(j) {j==0}
+
+   int a[10];
+
+//  P(j) {j==0}
+
+
+   a[0] = j++;
+
+//  P(a[0],j) {a[0]==0, j==1}
+
+
+   return 0;
+}
+
+Warnings
+

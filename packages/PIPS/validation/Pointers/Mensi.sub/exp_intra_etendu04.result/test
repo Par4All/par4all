@@ -30,16 +30,22 @@ POINTS-TO
 
 
 // Points To IN:
-// _p_1.next -> _p_1_2__1 , EXACT
+// _p_1.next -> *NULL* , MAY
+// _p_1.next -> _p_1_2__1 , MAY
+// _p_1_2__1.next -> *NULL* , MAY
 // _p_1_2__1.next -> _p_1_2__1 , MAY
-// p -> _p_1 , EXACT
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
 
 
 // Points To OUT:
-// _p_1.val -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// _p_1.val -> undefined , MAY
+// _p_1.next -> *NULL* , MAY
 // _p_1.next -> _p_1_2__1 , MAY
-// _p_1_2__1.val -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// _p_1_2__1.val -> undefined , MAY
+// _p_1_2__1.next -> *NULL* , MAY
 // _p_1_2__1.next -> _p_1_2__1 , MAY
+// p -> *NULL* , EXACT
 
 int count(liste *p)
 {
@@ -57,13 +63,16 @@ int count(liste *p)
       tab[j] = j;
 
 // Points To:
-// p -> _p_1 , EXACT
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
 
    while (p!=(void *) 0) {
 
 // Points To:
+// _p_1.next -> *NULL* , MAY
 // _p_1.next -> _p_1_2__1 , MAY
 // _p_1.val -> tab[*] , MAY
+// _p_1_2__1.next -> *NULL* , MAY
 // _p_1_2__1.next -> _p_1_2__1 , MAY
 // _p_1_2__1.val -> tab[*] , MAY
 // p -> _p_1 , MAY
@@ -72,8 +81,10 @@ int count(liste *p)
       p->val = &tab[i];
 
 // Points To:
+// _p_1.next -> *NULL* , MAY
 // _p_1.next -> _p_1_2__1 , MAY
 // _p_1.val -> tab[*] , MAY
+// _p_1_2__1.next -> *NULL* , MAY
 // _p_1_2__1.next -> _p_1_2__1 , MAY
 // _p_1_2__1.val -> tab[*] , MAY
 // p -> _p_1 , MAY
@@ -82,26 +93,31 @@ int count(liste *p)
       p = p->next;
 
 // Points To:
+// _p_1.next -> *NULL* , MAY
 // _p_1.next -> _p_1_2__1 , MAY
 // _p_1.val -> tab[*] , MAY
+// _p_1_2__1.next -> *NULL* , MAY
 // _p_1_2__1.next -> _p_1_2__1 , MAY
 // _p_1_2__1.val -> tab[*] , MAY
-// p -> _p_1_2__1 , EXACT
+// p -> *NULL* , MAY
+// p -> _p_1_2__1 , MAY
 
       i++;
    }
 
 // Points To:
+// _p_1.next -> *NULL* , MAY
 // _p_1.next -> _p_1_2__1 , MAY
 // _p_1.val -> tab[*] , MAY
+// _p_1_2__1.next -> *NULL* , MAY
 // _p_1_2__1.next -> _p_1_2__1 , MAY
 // _p_1_2__1.val -> tab[*] , MAY
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 
    return i;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 int count(liste *p)
 {

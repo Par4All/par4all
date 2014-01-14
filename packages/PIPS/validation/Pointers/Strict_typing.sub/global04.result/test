@@ -43,7 +43,7 @@ POINTS TO
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_0 , MAY
 
 
@@ -61,26 +61,26 @@ int main()
 
 
 // Points To:
-// q -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
 
    int i;
 
 // Points To:
-// q -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
 
    i = 1;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_0 , MAY
-// q -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
 
    *p = &i;
 
 // Points To:
 // _p_0 -> i , EXACT
 // p -> _p_0 , EXACT
-// q -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
 
 
    return 0;

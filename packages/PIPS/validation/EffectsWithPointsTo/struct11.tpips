@@ -1,37 +1,62 @@
-delete struct11
-create struct11 struct11.c 
+setenv WSPACE=struct11
+delete $WSPACE
+create $WSPACE $WSPACE.c
 
-setproperty ABORT_ON_USER_ERROR TRUE
+# Do not abort on a user error, because the source code contains a user error
+# setproperty ABORT_ON_USER_ERROR TRUE
+
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
-#setenv POINTER_VALUES_DEBUG_LEVEL 2
 
-#echo 
-#echo PROPER  EFFECTS 
-#echo
-#activate PRINT_CODE_PROPER_EFFECTS
-#display PRINTED_FILE[%ALLFUNC]
-
-
-#module main
-echo 
-echo POINTS-TO
 echo
+echo Points-to for "init2" 
+echo
+
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[init2]
 
 echo 
-echo PROPER  EFFECTS WITH POINTS TO
+echo Proper effects with points-to for "init2"
 echo
-activate PROPER_EFFECTS_WITH_POINTS_TO
+
+#activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[init2]
+
+echo 
+echo Cumulated effects with points-to for "init2"
+echo
+
+#activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[init2]
+
+echo 
+echo Points-to for "main"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE [main]
+
+echo 
+echo Proper effects with points-to for "main"
+echo
+
+#activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE [main]
 
 
-activate PRINT_CHAINS_GRAPH
-display DG_FILE 
+# activate PRINT_CHAINS_GRAPH
+# display DG_FILE 
 
 
 close
-delete struct11
+
+echo
+echo Warnings and errors
+echo
+shell cat $WSPACE.database/Warnings
+
+delete $WSPACE
 quit

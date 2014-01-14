@@ -29,14 +29,14 @@ int main()
    int i = 0, *p, *q;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
    p = &i;
 
 // Points To:
 // p -> i , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> undefined , EXACT
 
    q = p;
 
@@ -47,7 +47,7 @@ int main()
    return 0;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+proper effects with points-to
 
 int main()
 {
@@ -61,7 +61,7 @@ int main()
    return 0;
 }
 
-CUMULATED  EFFECTS WITH POINTS TO
+cumulated effects with points-to
 
 int main()
 {

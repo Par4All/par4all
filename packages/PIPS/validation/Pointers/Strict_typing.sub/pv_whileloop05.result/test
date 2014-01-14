@@ -1,38 +1,4 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-//             <    is written>: i
-   int i = 0;
-   int *p, *q;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-
-   p = (int *) malloc(10*sizeof(int));
-//             <    is read   >: p
-//             <    is written>: q
-   q = p;
-//             <    is read   >: i
-
-   while (i<5) {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: i q
-      *q = i;
-//             <    is read   >: q
-//             <    is written>: q
-      q++;
-//             <    is read   >: i
-//             <    is written>: i
-      i++;
-   }
-//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-
-   free(p);
-   return 0;
-}
-
 POINTS-TO
 
 
@@ -53,15 +19,15 @@ int main()
    int *p, *q;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
 
    p = (int *) malloc(10*sizeof(int));
 
 // Points To:
 // p -> *HEAP*_l_8[0] , MAY
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
    q = p;
 
@@ -146,8 +112,9 @@ int main()
    free(p);
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 // q -> *HEAP*_l_8[*] , MAY
+// q -> *HEAP*_l_8[0] , MAY
 // q -> *HEAP*_l_8[1] , MAY
 // q -> *HEAP*_l_8[2] , MAY
 // q -> *HEAP*_l_8[3] , MAY
@@ -159,7 +126,7 @@ int main()
 // q -> *HEAP*_l_8[9] , MAY
 // q -> *HEAP*_l_8[10] , MAY
 // q -> *HEAP*_l_8[11] , MAY
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// q -> undefined , MAY
 
    return 0;
 }

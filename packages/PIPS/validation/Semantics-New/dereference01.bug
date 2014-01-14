@@ -1,0 +1,9 @@
+lorsque l'on modifie une variable par referencement,
+on detecte bien qu'on a la connaissance sur l'ancienne valeur de la variable seulement.
+mais on ne considere pas que l'on perd la connaissance de cette valeur par la suite.
+cad on considere que la valeur est inchange
+
+   a = 1;
+//  T(a,...) {a#init==1, ...}
+   *p = 0;
+//  T(...) {a==1, ...}

@@ -37,7 +37,7 @@ make CALLEES[flgr2d_raster_slide_window_fgUINT16]
 close
 
 # CALLEES are not very readable but they fill the test file
-shell cat dereference.database/flgr2d_raster_slide_window_fgUINT16/CALLEES
+shell cat dereference.database/flgr2d_raster_slide_window_fgUINT16/CALLEES | sed 's/T[0-9]* //'
 
 quit
 

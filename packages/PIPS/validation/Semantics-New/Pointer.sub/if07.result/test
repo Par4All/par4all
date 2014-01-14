@@ -1,0 +1,194 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i, j, k, l;
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> undefined , EXACT
+
+
+   if (k<=i&&i<=l) {
+
+// Points To:
+// p -> undefined , EXACT
+
+      if (rand())
+
+// Points To:
+// p -> undefined , EXACT
+
+         p = &i;
+      else
+
+// Points To:
+// p -> undefined , EXACT
+
+         p = &j;
+
+// Points To:
+// p -> i , MAY
+// p -> j , MAY
+
+      *p = 0;
+
+// Points To:
+// p -> i , MAY
+// p -> j , MAY
+
+      rand();
+   }
+
+// Points To:
+// p -> undefined , MAY
+// p -> i , MAY
+// p -> j , MAY
+
+
+   return 0;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+   int i, j, k, l;
+   int *p;
+//             <    is read   >: i k l
+
+   if (k<=i&&i<=l) {
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      if (rand())
+//             <    is written>: p
+         p = &i;
+      else
+//             <    is written>: p
+         p = &j;
+//             <may be written>: i j
+//             <    is read   >: p
+      *p = 0;
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+      rand();
+   }
+
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i,j,k,l) {}
+
+   int i, j, k, l;
+
+//  T(p) {}
+
+   int *p;
+
+//  T(i,j,p) {}
+
+
+   if (k<=i&&i<=l) {
+
+//  T(p) {k<=i, i<=l}
+
+      if (rand())
+
+//  T(p) {&i==p, k<=i, i<=l}
+
+         p = &i;
+      else
+
+//  T(p) {&j==p, k<=i, i<=l}
+
+         p = &j;
+
+//  T(i,j) {k<=i#init, i#init<=l}
+
+      *p = 0;
+
+//  T() {k<=l}
+
+      rand();
+   }
+
+//  T(main) {main==0}
+
+
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i, j, k, l;
+
+//  P(i,j,k,l) {}
+
+   int *p;
+
+//  P(i,j,k,l,p) {}
+
+
+   if (k<=i&&i<=l) {
+
+//  P(i,j,k,l,p) {k<=i, i<=l}
+
+      if (rand())
+
+//  P(i,j,k,l,p) {k<=i, i<=l}
+
+         p = &i;
+      else
+
+//  P(i,j,k,l,p) {k<=i, i<=l}
+
+         p = &j;
+
+//  P(i,j,k,l,p) {k<=i, i<=l}
+
+      *p = 0;
+
+//  P(i,j,k,l,p) {k<=l}
+
+      rand();
+   }
+
+//  P(i,j,k,l,p) {}
+
+
+   return 0;
+}
+
+Warnings
+
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (intrinsic_to_transformer) Value returned by intrinsic "rand" is ignored.
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (intrinsic_to_transformer) Value returned by intrinsic "rand" is ignored.

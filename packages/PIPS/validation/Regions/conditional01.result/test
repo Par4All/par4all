@@ -1,0 +1,14 @@
+
+//  <B[PHI1]-W-MAY-{29<=PHI1, PHI1<=499}>
+
+void conditional01(int A[500], int B[500], int C[500][500], int i, int k)
+{
+
+//  <B[PHI1]-W-MAY-{29<=PHI1, PHI1<=499}>
+
+   for(i = 30; i <= 499; i += 1)
+
+//  <B[PHI1]-W-MAY-{PHI1<=i, i<=PHI1+1, 30<=i, i<=499}>
+
+      B[i%2==0?i:i-1] = 12345;
+}

@@ -71,24 +71,26 @@ void main()
 
    int i, j;
 
-//  <h_A[PHI1]-W-MAY-{loops==10, n==10000}>
-//  <h_C[PHI1]-W-MAY-{loops==10, n==10000}>
+//  <h_A[PHI1]-W-MAY-{0<=PHI1, PHI1<=99999999, loops==10, n==10000}>
+//  <h_C[PHI1]-W-MAY-{0<=PHI1, PHI1<=99999999, loops==10, n==10000}>
 
 
    for(i = 0; i <= n-1; i += 1)
 
-//  <h_A[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999}>
-//  <h_C[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999}>
+//  <h_A[PHI1]-W-MAY-{10000i<=PHI1, PHI1<=10000i+9999, loops==10,
+//    n==10000, 0<=i, i<=9999}>
+//  <h_C[PHI1]-W-MAY-{10000i<=PHI1, PHI1<=10000i+9999, loops==10,
+//    n==10000, 0<=i, i<=9999}>
 
       for(j = 0; j <= n-1; j += 1) {
 
-//  <h_A[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999, 0<=j,
-//    j<=9999}>
+//  <h_A[PHI1]-W-MAY-{10000i+j==PHI1, loops==10, n==10000, 0<=i,
+//    i<=9999, 0<=j, j<=9999}>
 
          h_A[i*n+j] = 1;
 
-//  <h_C[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999, 0<=j,
-//    j<=9999}>
+//  <h_C[PHI1]-W-MAY-{10000i+j==PHI1, loops==10, n==10000, 0<=i,
+//    i<=9999, 0<=j, j<=9999}>
 
          h_C[i*n+j] = 0;
       }
@@ -106,24 +108,26 @@ void main()
 
    int i, j;
 
-//  <h_A[PHI1]-W-MAY-{loops==10, n==10000}>
-//  <h_C[PHI1]-W-MAY-{loops==10, n==10000}>
+//  <h_A[PHI1]-W-MAY-{0<=PHI1, PHI1<=99999999, loops==10, n==10000}>
+//  <h_C[PHI1]-W-MAY-{0<=PHI1, PHI1<=99999999, loops==10, n==10000}>
 
 
    for(i = 0; i <= n-1; i += 1)
 
-//  <h_A[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999}>
-//  <h_C[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999}>
+//  <h_A[PHI1]-W-MAY-{10000i<=PHI1, PHI1<=10000i+9999, loops==10,
+//    n==10000, 0<=i, i<=9999}>
+//  <h_C[PHI1]-W-MAY-{10000i<=PHI1, PHI1<=10000i+9999, loops==10,
+//    n==10000, 0<=i, i<=9999}>
 
       for(j = 0; j <= n-1; j += 1) {
 
-//  <h_A[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999, 0<=j,
-//    j<=9999}>
+//  <h_A[PHI1]-W-MAY-{10000i+j==PHI1, loops==10, n==10000, 0<=i,
+//    i<=9999, 0<=j, j<=9999}>
 
          h_A[i*n+j] = 1;
 
-//  <h_C[PHI1]-W-MAY-{loops==10, n==10000, 0<=i, i<=9999, 0<=j,
-//    j<=9999}>
+//  <h_C[PHI1]-W-MAY-{10000i+j==PHI1, loops==10, n==10000, 0<=i,
+//    i<=9999, 0<=j, j<=9999}>
 
          h_C[i*n+j] = 0;
       }
@@ -157,10 +161,14 @@ void main()
 
    int i, j;
 
+#pragma omp parallel for private(j)
    for(i = 0; i <= n-1; i += 1)
+#pragma omp parallel for 
       for(j = 0; j <= n-1; j += 1)
          h_A[i*n+j] = 1;
+#pragma omp parallel for private(j)
    for(i = 0; i <= n-1; i += 1)
+#pragma omp parallel for 
       for(j = 0; j <= n-1; j += 1)
          h_C[i*n+j] = 0;
 }

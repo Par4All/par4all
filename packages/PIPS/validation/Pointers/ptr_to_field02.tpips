@@ -5,21 +5,6 @@ create $WSPACE $WSPACE.c
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
-#setenv POINTER_VALUES_DEBUG_LEVEL 2
-
-# Key property for this test case
-# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-
-#module main
-
-
-echo 
-echo PROPER  EFFECTS
-echo
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE
-
-
 
 echo 
 echo POINTS-TO
@@ -28,5 +13,12 @@ activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE
 
 close
+
+echo
+echo Warnings and errors: two memory leaks
+echo
+
+shell cat $WSPACE.database/Warnings
+
 delete $WSPACE
 quit

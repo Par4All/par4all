@@ -1,0 +1,70 @@
+
+POINTS TO for pt_kill_3_01
+
+
+// Points To IN:
+// p -> _p_1 , EXACT
+
+
+// Points To OUT:
+// _p_1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+
+void my_malloc(int **p)
+{
+
+// Points To:
+// p -> _p_1 , EXACT
+
+   *p = (int *) malloc(sizeof(int));
+
+// Points To:
+// _p_1 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// p -> _p_1 , EXACT
+
+   return;
+}
+
+POINTS TO for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i = 1, j = 2, *pi = &i, *pj = &j, **pp;
+
+// Points To:
+// pi -> i , EXACT
+// pj -> j , EXACT
+// pp -> undefined , EXACT
+
+   pp = i>j?&pi:&pj;
+
+// Points To:
+// pi -> i , EXACT
+// pj -> j , EXACT
+// pp -> pi , MAY
+// pp -> pj , MAY
+
+   my_malloc(pp);
+
+// Points To:
+// pi -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// pj -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// pp -> pi , MAY
+// pp -> pj , MAY
+
+
+   return 0;
+}
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active
+C_PARSER[main] (simplify_C_expression) Variable "i" is probably used before it is defined
+C_PARSER[main] (simplify_C_expression) Variable "j" is probably used before it is defined

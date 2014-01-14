@@ -1,0 +1,25 @@
+
+Source code for "COUNT" after dead-code elimination 
+int COUNT(int J)
+{
+   static int C = 0;
+   J = J+C;
+   C = C+1;
+   return J;
+}
+
+Source code for "LOST_COUNT" after dead-code elimination 
+int LOST_COUNT(int J)
+{
+   static int C = 0;
+   C = C+1;
+   return J;
+}
+
+Source code for "LOST_COUNT_2" after dead-code elimination 
+int LOST_COUNT_2(int J)
+{
+   static int C = 0;
+   C = C+1;
+   return 0;
+}

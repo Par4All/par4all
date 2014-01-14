@@ -30,7 +30,7 @@ int main()
    int a = 2, b = 1, **x, *y = &a, *x1 = &b;
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
 // x1 -> b , EXACT
 // y -> a , EXACT
 

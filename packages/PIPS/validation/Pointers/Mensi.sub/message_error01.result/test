@@ -14,6 +14,60 @@ int main()
 POINTS TO for message_error01
 
 
+// Points To IN:
+// msg -> *NULL* , MAY
+// msg -> _msg_1 , MAY
+
+
+// Points To OUT: unreachable
+
+void msg_error(char *msg)
+{
+
+// Points To:
+// msg -> *NULL* , MAY
+// msg -> _msg_1 , MAY
+
+   printf("%s", msg);
+
+// Points To:
+// msg -> *NULL* , MAY
+// msg -> _msg_1 , MAY
+
+   exit(1);
+}
+
+PROPER EFFECTS WITH POINTS TO
+
+void msg_error(char *msg)
+{
+//             <may be read   >: _msg_1 stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: msg stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%s", msg);
+   exit(1);
+}
+
+CUMULATED EFFECTS WITH POINTS TO
+
+//             <may be read   >: _msg_1 stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: msg stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+void msg_error(char *msg)
+{
+//             <may be read   >: _msg_1 stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: msg stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%s", msg);
+   exit(1);
+}
+
+POINTS TO for "main"
+
+
 // Points To IN: none
 
 
@@ -48,87 +102,4 @@ int main()
 
    return 0;
 }
-
-// Points To IN: none
-
-
-// Points To OUT: unreachable
-
-void msg_error(char *msg)
-{
-
-// Points To: none
-
-   printf("%s", msg);
-
-// Points To: none
-
-   exit(1);
-}
-
-PROPER  EFFECTS WITH POINTS TO
-
-int main()
-{
-//             <    is written>: msg1
-   char *msg1 = "hello";
-//             <    is read   >: msg1
-//             <    is written>: msg2
-   char *msg2 = msg1;
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   printf("%s", msg2);
-   exit(1);
-
-   return 0;
-}
-void msg_error(char *msg)
-{
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: msg stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   printf("%s", msg);
-   exit(1);
-}
-
-CUMULATED  EFFECTS WITH POINTS TO
-
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-int main()
-{
-//             <    is written>: msg1
-   char *msg1 = "hello";
-//             <    is read   >: msg1
-//             <    is written>: msg2
-   char *msg2 = msg1;
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   printf("%s", msg2);
-   exit(1);
-
-   return 0;
-}
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: msg stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-void msg_error(char *msg)
-{
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: msg stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   printf("%s", msg);
-   exit(1);
-}
 unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
-PROPER_EFFECTS_WITH_POINTS_TO[main] (simple_cell_reference_with_address_of_cell_reference_translation) potential memory overflow due to effect -> returning anywhere
-PROPER_EFFECTS_WITH_POINTS_TO[main] (simple_cell_reference_with_address_of_cell_reference_translation) potential memory overflow due to effect -> returning anywhere

@@ -1,0 +1,108 @@
+
+Points-to for "ordered_free02"
+
+
+// Points To IN:
+// fp -> *NULL* , MAY
+// fp -> _fp_1 , MAY
+
+
+// Points To OUT:
+// fp -> undefined , EXACT
+
+int ordered_free02(int *fp)
+{
+
+// Points To:
+// fp -> *NULL* , MAY
+// fp -> _fp_1 , MAY
+
+   int *fq = fp;
+
+// Points To:
+// fp -> *NULL* , MAY
+// fp -> _fp_1 , MAY
+// fq -> *NULL* , MAY
+// fq -> _fp_1 , MAY
+
+   fp = (int *) malloc(sizeof(int));
+
+// Points To:
+// fp -> *HEAP*_l_7 , MAY
+// fq -> *NULL* , MAY
+// fq -> _fp_1 , MAY
+
+   free(fp);
+
+// Points To:
+// fp -> undefined , EXACT
+// fq -> *NULL* , MAY
+// fq -> _fp_1 , MAY
+
+   return *fq;
+}
+
+Proper effects with points-to for "ordered_free02"
+
+int ordered_free02(int *fp)
+{
+//             <    is read   >: fp
+//             <    is written>: fq
+   int *fq = fp;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: fp _MALLOC_EFFECTS:_MALLOC_
+   fp = (int *) malloc(sizeof(int));
+//             <    is read   >: fp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(fp);
+//             <    is read   >: _fp_1 fq
+   return *fq;
+}
+
+Cumulated effects with points-to for "ordered_free02"
+
+//             <    is read   >: _fp_1 fp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+int ordered_free02(int *fp)
+{
+//             <    is read   >: fp
+//             <    is written>: fq
+   int *fq = fp;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: fp _MALLOC_EFFECTS:_MALLOC_
+   fp = (int *) malloc(sizeof(int));
+//             <    is read   >: fp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(fp);
+//             <    is read   >: _fp_1 fq
+   return *fq;
+}
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p = (int *) malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_14 , MAY
+
+   ordered_free02(p);
+
+// Points To:
+// p -> *HEAP*_l_14 , MAY
+
+   // Here p has not been freed, but we have no way to know it
+   // currently; we should assume it
+   return 0;
+}
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

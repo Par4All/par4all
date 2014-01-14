@@ -1,0 +1,333 @@
+
+Transformers for "userfunction"
+
+
+//  T(__lv1,__lv2) {0<=__lv2, arg2<=__lv2}
+
+void userfunction(int unused_arg1, int arg2, int unused_arg3, int arg4, int arg5, int arg6, int unused_arg7)
+{
+
+//  T(__lv2) {__lv2==0}
+
+
+   for(__lv2 = 0; __lv2 <= 0; __lv2 += 1)
+
+//  T() {}
+
+      0;
+
+
+//  T(unused_1) {}
+
+   int unused_1;
+
+//  T(unused_2) {}
+
+   int unused_2;
+
+//  T() {}
+
+   if (arg5==1)
+
+//  T() {}
+
+      0;
+
+//  T(useless_switch_param) {useless_switch_param==0}
+
+   int useless_switch_param = 0;
+
+//  T() {}
+
+
+   if (arg6==1) goto _switch_2_case_1;
+
+//  T() {}
+
+   if (arg6==2) goto _switch_2_case_2;
+
+//  T() {}
+
+   if (arg6==3) goto _switch_2_case_3;
+
+//  T() {}
+
+_switch_2_default:   ;
+
+//  T() {}
+
+   return;
+
+//  T() {}
+
+_switch_2_case_3:   ;
+
+//  T(useless_switch_param) {useless_switch_param==0}
+
+   useless_switch_param = 0;
+   goto _break_2;
+
+//  T() {}
+
+_switch_2_case_2:   ;
+
+//  T(useless_switch_param) {useless_switch_param==1}
+
+   useless_switch_param = 1;
+   goto _break_2;
+
+//  T() {}
+
+_switch_2_case_1:   ;
+
+//  T(useless_switch_param) {useless_switch_param==0}
+
+   useless_switch_param = 0;
+
+//  T() {}
+
+_break_2:   ;
+
+
+//  T(unused_4) {}
+
+   int unused_4;
+
+//  T(__lv1,__lv2) {0<=__lv2, __lv2+1<=arg2}
+
+
+   for(__lv2 = 0; __lv2 <= arg2-1; __lv2 += 1)
+
+//  T(__lv1) {__lv1==0}
+
+      for(__lv1 = 0; __lv1 <= 0; __lv1 += 1)
+
+//  T() {}
+
+         0;
+
+
+//  T() {}
+
+   int useless_array2[arg2][1*arg4];
+}
+
+Transformers for "main"
+
+
+//  T(__lv1,__lv2) {0<=__lv2}
+
+int main(int argc, char *argv[])
+{
+   
+   
+
+//  T(useless_in_main) {}
+
+   int useless_in_main;
+
+//  T(__lv1,__lv2) {1<=__lv2}
+
+
+   userfunction(0, 1, 1, 1, 1, 2, 1);
+
+//  T(__lv1,__lv2) {0<=__lv2}
+
+   
+   // Replacing the first call with the second prevents the
+   // overflow and allow to see what the precondition looks
+   // like
+   userfunction(41874, (int) 1., 2, 1, 1, 3, 0);
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main(int argc, char *argv[])
+{
+   
+   
+
+//  P() {}
+
+   int useless_in_main;
+
+//  P(useless_in_main) {}
+
+
+   userfunction(0, 1, 1, 1, 1, 2, 1);
+
+//  P(__lv1,__lv2,useless_in_main) {1<=__lv2}
+
+   
+   // Replacing the first call with the second prevents the
+   // overflow and allow to see what the precondition looks
+   // like
+   userfunction(41874, (int) 1., 2, 1, 1, 3, 0);
+}
+
+Preconditions for "userfunction"
+
+
+//  P() {arg4==1, arg5==1, 41874arg6==unused_arg1+83748,
+//    arg6==unused_arg3+1, arg6+unused_arg7==3, 2<=arg6, arg6<=3}
+
+void userfunction(int unused_arg1, int arg2, int unused_arg3, int arg4, int arg5, int arg6, int unused_arg7)
+{
+
+//  P() {arg4==1, arg5==1, 41874arg6==unused_arg1+83748,
+//    arg6==unused_arg3+1, arg6+unused_arg7==3, 2<=arg6, arg6<=3}
+
+
+   for(__lv2 = 0; __lv2 <= 0; __lv2 += 1)
+
+//  P(__lv2) {__lv2==0, arg4==1, arg5==1,
+//    41874arg6==unused_arg1+83748, arg6==unused_arg3+1,
+//    arg6+unused_arg7==3, 2<=arg6, arg6<=3}
+
+      0;
+
+
+//  P(__lv2) {__lv2==1, arg4==1, arg5==1,
+//    41874arg6==unused_arg1+83748, arg6==unused_arg3+1,
+//    arg6+unused_arg7==3, 2<=arg6, arg6<=3}
+
+   int unused_1;
+
+//  P(__lv2,unused_1) {__lv2==1, arg4==1, arg5==1,
+//    41874arg6==unused_arg1+83748, arg6==unused_arg3+1,
+//    arg6+unused_arg7==3, 2<=arg6, arg6<=3}
+
+   int unused_2;
+
+//  P(__lv2,unused_1,unused_2) {__lv2==1, arg4==1, arg5==1,
+//    41874arg6==unused_arg1+83748, arg6==unused_arg3+1,
+//    arg6+unused_arg7==3, 2<=arg6, arg6<=3}
+
+   if (arg5==1)
+
+//  P(__lv2,unused_1,unused_2) {__lv2==1, arg4==1, arg5==1,
+//    41874arg6==unused_arg1+83748, arg6==unused_arg3+1,
+//    arg6+unused_arg7==3, 2<=arg6, arg6<=3}
+
+      0;
+
+//  P(__lv2,unused_1,unused_2) {__lv2==1, arg4==1, arg5==1,
+//    41874arg6==unused_arg1+83748, arg6==unused_arg3+1,
+//    arg6+unused_arg7==3, 2<=arg6, arg6<=3}
+
+   int useless_switch_param = 0;
+
+//  P(__lv2,unused_1,unused_2,useless_switch_param) {__lv2==1,
+//    arg4==1, arg5==1, 41874arg6==unused_arg1+83748,
+//    arg6==unused_arg3+1, arg6+unused_arg7==3,
+//    useless_switch_param==0, 2<=arg6, arg6<=3}
+
+
+   if (arg6==1) goto _switch_2_case_1;
+
+//  P(__lv2,unused_1,unused_2,useless_switch_param) {__lv2==1,
+//    arg4==1, arg5==1, 41874arg6==unused_arg1+83748,
+//    arg6==unused_arg3+1, arg6+unused_arg7==3,
+//    useless_switch_param==0, 2<=arg6, arg6<=3}
+
+   if (arg6==2) goto _switch_2_case_2;
+
+//  P(__lv2,unused_1,unused_2,useless_switch_param) {__lv2==1,
+//    arg4==1, arg5==1, arg6==3, unused_arg1==41874, unused_arg3==2,
+//    unused_arg7==0, useless_switch_param==0}
+
+   if (arg6==3) goto _switch_2_case_3;
+
+//  P() {0==-1}
+
+_switch_2_default:   ;
+
+//  P() {0==-1}
+
+   return;
+
+//  P(__lv2,unused_1,unused_2,useless_switch_param) {__lv2==1,
+//    arg4==1, arg5==1, arg6==3, unused_arg1==41874, unused_arg3==2,
+//    unused_arg7==0, useless_switch_param==0}
+
+_switch_2_case_3:   ;
+
+//  P(__lv2,unused_1,unused_2,useless_switch_param) {__lv2==1,
+//    arg4==1, arg5==1, arg6==3, unused_arg1==41874, unused_arg3==2,
+//    unused_arg7==0, useless_switch_param==0}
+
+   useless_switch_param = 0;
+   goto _break_2;
+
+//  P(__lv2,unused_1,unused_2,useless_switch_param) {__lv2==1,
+//    arg4==1, arg5==1, arg6==2, unused_arg1==0, unused_arg3==1,
+//    unused_arg7==1, useless_switch_param==0}
+
+_switch_2_case_2:   ;
+
+//  P(__lv2,unused_1,unused_2,useless_switch_param) {__lv2==1,
+//    arg4==1, arg5==1, arg6==2, unused_arg1==0, unused_arg3==1,
+//    unused_arg7==1, useless_switch_param==0}
+
+   useless_switch_param = 1;
+   goto _break_2;
+
+//  P() {0==-1}
+
+_switch_2_case_1:   ;
+
+//  P() {0==-1}
+
+   useless_switch_param = 0;
+
+//  P(__lv2,unused_1,unused_2,useless_switch_param) {__lv2==1,
+//    arg4==1, arg5==1, 41874arg6==unused_arg1+83748,
+//    arg6==unused_arg3+1, arg6+unused_arg7==3,
+//    arg6+useless_switch_param==3, 2<=arg6, arg6<=3}
+
+_break_2:   ;
+
+
+//  P(__lv2,unused_1,unused_2,useless_switch_param) {__lv2==1,
+//    arg4==1, arg5==1, 41874arg6==unused_arg1+83748,
+//    arg6==unused_arg3+1, arg6+unused_arg7==3,
+//    arg6+useless_switch_param==3, 2<=arg6, arg6<=3}
+
+   int unused_4;
+
+//  P(__lv2,unused_1,unused_2,unused_4,useless_switch_param)
+//    {__lv2==1, arg4==1, arg5==1, 41874arg6==unused_arg1+83748,
+//    arg6==unused_arg3+1, arg6+unused_arg7==3,
+//    arg6+useless_switch_param==3, 2<=arg6, arg6<=3}
+
+
+   for(__lv2 = 0; __lv2 <= arg2-1; __lv2 += 1)
+
+//  P(__lv1,__lv2,unused_1,unused_2,unused_4,useless_switch_param)
+//    {arg4==1, arg5==1, 41874arg6==unused_arg1+83748,
+//    arg6==unused_arg3+1, arg6+unused_arg7==3,
+//    arg6+useless_switch_param==3, 0<=__lv2, __lv2+1<=arg2, 2<=arg6,
+//    arg6<=3}
+
+      for(__lv1 = 0; __lv1 <= 0; __lv1 += 1)
+
+//  P(__lv1,__lv2,unused_1,unused_2,unused_4,useless_switch_param)
+//    {__lv1==0, arg4==1, arg5==1, 41874arg6==unused_arg1+83748,
+//    arg6==unused_arg3+1, arg6+unused_arg7==3,
+//    arg6+useless_switch_param==3, 0<=__lv2, __lv2+1<=arg2, 2<=arg6,
+//    arg6<=3}
+
+         0;
+
+
+//  P(__lv1,__lv2,unused_1,unused_2,unused_4,useless_switch_param)
+//    {arg4==1, arg5==1, 41874arg6==unused_arg1+83748,
+//    arg6==unused_arg3+1, arg6+unused_arg7==3,
+//    arg6+useless_switch_param==3, 0<=__lv2, arg2<=__lv2, 2<=arg6,
+//    arg6<=3}
+
+   int useless_array2[arg2][1*arg4];
+}

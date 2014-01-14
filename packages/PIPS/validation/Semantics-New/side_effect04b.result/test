@@ -1,0 +1,18 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: i j
+   int i = 0, j = 0;
+   int a[10];
+//             <    is read   >: a[i++] i
+//             <    is written>: i j
+
+   j = a[i++];
+
+   return 0;
+}
+
+Transformers with point-to
+

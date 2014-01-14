@@ -15,9 +15,6 @@ void pointer_free(pointer p)
   return;
 }
 
-
-
-
 int main(void)
 {
   pointer p1, p2;

@@ -33,7 +33,6 @@ int main(void)
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 
    printf("pp=%p\n", pp);
-//             <    is read   >: pp
    
    // possible segfault.
    // should generate an error while analyzing?
@@ -63,8 +62,6 @@ static int alea(void)
 		from <pp-W-EXACT> to <pp-W-EXACT>
 	15 --> 29 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
-	15 --> 33 with conflicts
-		from <pp-W-EXACT> to <pp-R-EXACT>
 	17 --> 18 with conflicts
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
@@ -72,11 +69,7 @@ static int alea(void)
 		from <pp-W-EXACT> to <pp-W-EXACT>
 	21 --> 29 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
-	21 --> 33 with conflicts
-		from <pp-W-EXACT> to <pp-R-EXACT>
 	26 --> 29 with conflicts
-		from <pp-W-EXACT> to <pp-R-EXACT>
-	26 --> 33 with conflicts
 		from <pp-W-EXACT> to <pp-R-EXACT>
 
 ****************** End of Dependence Graph ******************

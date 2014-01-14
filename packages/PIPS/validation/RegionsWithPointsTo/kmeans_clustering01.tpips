@@ -1,0 +1,37 @@
+setenv WS  kmeans_clustering01
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WS $WS.c
+
+setproperty CONSTANT_PATH_EFFECTS TRUE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+#setproperty CONSTANT_PATH_EFFECTS  FALSE
+
+echo
+echo Transformers for "kmeans_clustering"
+echo
+
+activate PRINT_CODE_TRANSFORMERS 
+display PRINTED_FILE[kmeans_clustering]
+
+echo
+echo Preconditions for "kmeans_clustering"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[kmeans_clustering]
+
+echo
+echo Regions for "kmeans_clustering"
+echo
+
+activate PRINT_CODE_REGIONS 
+display PRINTED_FILE[kmeans_clustering]
+
+close
+#delete $WS
+quit

@@ -125,6 +125,6 @@ Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
-TRANSFORMERS_INTER_FULL[main] (any_scalar_assign_to_transformer) Variable 0`ai in lhs is uselessly updated by the rhs 'call04(ai++)'
+TRANSFORMERS_INTER_FULL[main] (any_scalar_assign_to_transformer_without_effect) Variable 0`ai in lhs is uselessly updated by the rhs 'call04(ai++)'
 unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call04!] (ordinary_summary_precondition) empty precondition to call04! because not in call tree from main.

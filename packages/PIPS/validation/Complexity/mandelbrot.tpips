@@ -1,0 +1,17 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+
+delete mandelbrot
+
+setenv PIPS_CPP_FLAGS " -D TIME "
+
+create mandelbrot mandelbrot.c
+activate C_PARSER
+
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+activate PRINT_CODE_COMPLEXITIES
+display PRINTED_FILE[main]
+
+close
+delete mandelbrot
+quit 
+

@@ -1,0 +1,128 @@
+
+Points-to for "swap03"
+
+
+// Points To IN:
+// _p_1 -> _p_1_1 , EXACT
+// _q_2 -> _q_2_2 , EXACT
+// p -> _p_1 , EXACT
+// q -> _q_2 , EXACT
+
+
+// Points To OUT:
+// _p_1 -> _q_2_2 , EXACT
+// _q_2 -> _p_1_1 , EXACT
+// p -> _p_1 , EXACT
+// q -> _q_2 , EXACT
+
+void swap03(int **p, int **q)
+{
+
+// Points To:
+// _p_1 -> _p_1_1 , EXACT
+// p -> _p_1 , EXACT
+
+   int *pt = *p;
+
+// Points To:
+// _p_1 -> _p_1_1 , EXACT
+// _q_2 -> _q_2_2 , EXACT
+// p -> _p_1 , EXACT
+// pt -> _p_1_1 , EXACT
+// q -> _q_2 , EXACT
+
+   *p = *q;
+
+// Points To:
+// _p_1 -> _q_2_2 , EXACT
+// _q_2 -> _q_2_2 , EXACT
+// p -> _p_1 , EXACT
+// pt -> _p_1_1 , EXACT
+// q -> _q_2 , EXACT
+
+   *q = pt;
+
+// Points To:
+// _p_1 -> _q_2_2 , EXACT
+// _q_2 -> _p_1_1 , EXACT
+// p -> _p_1 , EXACT
+// pt -> _p_1_1 , EXACT
+// q -> _q_2 , EXACT
+
+   return;
+}
+
+Proper effects with points-to for "swap03"
+
+void swap03(int **p, int **q)
+{
+//             <    is read   >: _p_1 p
+//             <    is written>: pt
+   int *pt = *p;
+//             <    is read   >: _q_2 p q
+//             <    is written>: _p_1
+   *p = *q;
+//             <    is read   >: pt q
+//             <    is written>: _q_2
+   *q = pt;
+   return;
+}
+
+CUMULATED  EFFECTS WITH POINTS TO for "swap03"
+
+//             <    is read   >: _q_2 p q
+//             <    is written>: _p_1 _q_2
+void swap03(int **p, int **q)
+{
+//             <    is read   >: _p_1 p
+//             <    is written>: pt
+   int *pt = *p;
+//             <    is read   >: _q_2 p q
+//             <    is written>: _p_1
+   *p = *q;
+//             <    is read   >: pt q
+//             <    is written>: _q_2
+   *q = pt;
+   return;
+}
+
+POINTS TO for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+
+// Points To: none
+
+   int i = 1, j = 2, z = 3, *pi = &i, *pj = &j, *pz = &z, **ppi = &pi, **ppj = &pj;
+
+// Points To:
+// pi -> i , EXACT
+// pj -> j , EXACT
+// ppi -> pi , EXACT
+// ppj -> pj , EXACT
+// pz -> z , EXACT
+
+   swap03(ppi, ppj);
+
+// Points To:
+// pi -> i , EXACT
+// pj -> j , EXACT
+// ppi -> undefined , MAY
+// ppi -> pi , MAY
+// ppj -> undefined , MAY
+// ppj -> pj , MAY
+// pz -> z , EXACT
+
+
+   return 0;
+}
+C_PARSER[main] (simplify_C_expression) Variable "i" is probably used before it is defined
+C_PARSER[main] (simplify_C_expression) Variable "j" is probably used before it is defined
+C_PARSER[main] (simplify_C_expression) Variable "z" is probably used before it is defined

@@ -1,0 +1,97 @@
+
+RW regions
+
+int buildRaster(const uint32 fact, PictureHandler tif, short **raster)
+{
+   // BEGIN BLOCK
+
+//  <tif-R-EXACT-{}>
+
+   uint32 heigh = getLength(tif);
+
+//  <tif-R-EXACT-{}>
+
+   uint32 width = getWitdth(tif);
+   size_t npixels = width*heigh;
+
+
+//  <rawRaster-W-EXACT-{}>
+
+   uint32 *rawRaster = (uint32 *) _TIFFmalloc(npixels*sizeof(uint32));
+
+//  <rawRaster-R-EXACT-{}>
+
+   if (!rawRaster)
+      return -1;
+
+//  <rawRaster-R-EXACT-{}>
+//  <tif-R-EXACT-{}>
+
+   if (!TIFFReadRGBAImage(tif, width, heigh, rawRaster, 0))
+      return -1;
+
+//  <raster-R-EXACT-{}>
+
+
+   if (newRaster(fact, heigh, width, raster))
+      return -1;
+
+   uint32 f, i, j;
+   for(f = 0; f < fact; f += 1) {
+      // BEGIN BLOCK
+      for(i = 0; i < heigh; i += 1)
+         for(j = 0; j < width; j += 1) {
+            // BEGIN BLOCK
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+            PixelC r = (PixelC) (rawRaster[i*width+j]&0xff);
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+            PixelC g = (PixelC) (rawRaster[i*width+j]>>8&0xff);
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+            PixelC b = (PixelC) (rawRaster[i*width+j]>>16&0xff);
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+            (*raster)[f*BYTES_PER_PIXEL*heigh*width+E_R*heigh*width+i*width+j] = (short) r;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+            (*raster)[f*BYTES_PER_PIXEL*heigh*width+E_G*heigh*width+i*width+j] = (short) g;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+            (*raster)[f*BYTES_PER_PIXEL*heigh*width+E_B*heigh*width+i*width+j] = (short) b;
+
+            if (BYTES_PER_PIXEL>3) {
+               // BEGIN BLOCK
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+               PixelC a = (PixelC) (rawRaster[i*width+j]>>24&0xff);
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+               (*raster)[f*BYTES_PER_PIXEL*heigh*width+E_A*heigh*width+i*width+j] = (short) a;
+               // END BLOCK
+            }
+            // END BLOCK
+         }
+
+//  <rawRaster-R-EXACT-{}>
+
+
+      _TIFFfree(rawRaster);
+      return 0;
+      // END BLOCK
+   }
+   // END BLOCK
+}

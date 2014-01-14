@@ -1,14 +1,14 @@
 
-POINTS-TO
+Points-to for "pointer_alloc"
 
 
 // Points To IN: none
 
 
 // Points To OUT:
-// alloc_pointer -> *HEAP*_l_6 , MAY
+// pointer_alloc -> *HEAP*_l_13 , MAY
 
-pointer alloc_pointer(int v)
+pointer pointer_alloc(int v)
 {
 
 // Points To: none
@@ -16,118 +16,130 @@ pointer alloc_pointer(int v)
    pointer p = malloc(sizeof(int));
 
 // Points To:
-// p -> *HEAP*_l_6 , MAY
+// p -> *HEAP*_l_13 , MAY
 
    *p = v;
 
 // Points To:
-// p -> *HEAP*_l_6 , MAY
+// p -> *HEAP*_l_13 , MAY
 
    return p;
 }
 
-// Points To IN: none
+Proper effects with points-to for "pointer_alloc"
+
+pointer pointer_alloc(int v)
+{
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   pointer p = malloc(sizeof(int));
+//             <may be written>: *HEAP*_l_13
+//             <    is read   >: p v
+   *p = v;
+//             <    is read   >: p
+   return p;
+}
+
+Cumulated effects with points-to for "pointer_alloc"
+
+//             <    is read   >: v _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+pointer pointer_alloc(int v)
+{
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   pointer p = malloc(sizeof(int));
+//             <may be written>: *HEAP*_l_13
+//             <    is read   >: p v
+   *p = v;
+//             <    is read   >: p
+   return p;
+}
+
+Points-to for "pointer_free"
 
 
-// Points To OUT: none
+// Points To IN:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
-int main(void)
+
+// Points To OUT:
+// p -> undefined , EXACT
+
+void pointer_free(pointer p)
 {
 
-// Points To: none
-
-   pointer p1, p2, p3;
-
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
 
-   
-   // could differentiate allocs based on call path?
-   p1 = alloc_pointer(13);
-
-// Points To:
-// p1 -> alloc_pointer:*HEAP*_l_6 , MAY
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   p2 = alloc_pointer(17);
-
-// Points To:
-// p1 -> alloc_pointer:*HEAP*_l_6 , MAY
-// p2 -> alloc_pointer:*HEAP*_l_6 , MAY
-// p3 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-   p3 = alloc_pointer(19);
-
-// Points To:
-// p1 -> alloc_pointer:*HEAP*_l_6 , MAY
-// p2 -> alloc_pointer:*HEAP*_l_6 , MAY
-// p3 -> alloc_pointer:*HEAP*_l_6 , MAY
-
-   
-   // no pointer assigned! can keep all points-to
-   pointer_add(p1, p2, p3);
-
-// Points To:
-// p1 -> alloc_pointer:*HEAP*_l_6 , MAY
-// p2 -> alloc_pointer:*HEAP*_l_6 , MAY
-// p3 -> alloc_pointer:*HEAP*_l_6 , MAY
-
-   
-   // 36 17 19
-   fprintf(stdout, "p1=%d p2=%d p3=%d\n", pointer_get(p1), pointer_get(p2), pointer_get(p3));
-
-// Points To:
-// p1 -> alloc_pointer:*HEAP*_l_6 , MAY
-// p2 -> alloc_pointer:*HEAP*_l_6 , MAY
-// p3 -> alloc_pointer:*HEAP*_l_6 , MAY
-
-   
-   // no pointer assigned! can keep all points-to
-   pointer_set(p3, 23);
-
-// Points To:
-// p1 -> alloc_pointer:*HEAP*_l_6 , MAY
-// p2 -> alloc_pointer:*HEAP*_l_6 , MAY
-// p3 -> alloc_pointer:*HEAP*_l_6 , MAY
-
-   
-   // no pointer assigned! can keep all points-to
-   pointer_add(p3, p2, p1);
-
-// Points To:
-// p1 -> alloc_pointer:*HEAP*_l_6 , MAY
-// p2 -> alloc_pointer:*HEAP*_l_6 , MAY
-// p3 -> alloc_pointer:*HEAP*_l_6 , MAY
-
-   
-   // 36 17 53
-   fprintf(stdout, "p1=%d p2=%d p3=%d\n", pointer_get(p1), pointer_get(p2), pointer_get(p3));
-
-// Points To:
-// p1 -> alloc_pointer:*HEAP*_l_6 , MAY
-// p2 -> alloc_pointer:*HEAP*_l_6 , MAY
-// p3 -> alloc_pointer:*HEAP*_l_6 , MAY
-
-
-   pointer_free(p1);
-
-// Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p2 -> alloc_pointer:*HEAP*_l_6 , MAY
-// p3 -> alloc_pointer:*HEAP*_l_6 , MAY
-
-   pointer_free(p2);
-
-// Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p2 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p3 -> alloc_pointer:*HEAP*_l_6 , MAY
-
-   pointer_free(p3);
+   free(p);
 }
+
+Proper effects with points-to for "pointer_free"
+
+void pointer_free(pointer p)
+{
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(p);
+}
+
+Cumulated effects with points-to for "pointer_free"
+
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+void pointer_free(pointer p)
+{
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(p);
+}
+
+Points-to for "pointer_set"
+
+
+// Points To IN:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+
+
+// Points To OUT:
+// p -> _p_1[0] , EXACT
+
+void pointer_set(pointer p, int v)
+{
+
+// Points To:
+// p -> *NULL_POINTER* , MAY
+// p -> _p_1[0] , MAY
+
+   *p = v;
+}
+
+Proper effects with points-to for "pointer_set"
+
+void pointer_set(pointer p, int v)
+{
+//             <    is read   >: p v
+//             <    is written>: _p_1[0]
+   *p = v;
+}
+
+Cumulated effects with points-to for "pointer_set"
+
+//             <    is read   >: p v
+//             <    is written>: _p_1[0]
+void pointer_set(pointer p, int v)
+{
+//             <    is read   >: p v
+//             <    is written>: _p_1[0]
+   *p = v;
+}
+
+Points-to for "pointer_add"
+
 
 // Points To IN:
 // q1 -> *NULL_POINTER* , MAY
@@ -138,7 +150,10 @@ int main(void)
 // q3 -> _q3_3[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// q1 -> _q1_1[0] , EXACT
+// q2 -> _q2_2[0] , EXACT
+// q3 -> _q3_3[0] , EXACT
 
 void pointer_add(pointer q1, const pointer q2, const pointer q3)
 {
@@ -154,30 +169,36 @@ void pointer_add(pointer q1, const pointer q2, const pointer q3)
    *q1 = *q2+*q3;
 }
 
+Proper effects with points-to for "pointer_add"
+
+void pointer_add(pointer q1, const pointer q2, const pointer q3)
+{
+//             <    is read   >: _q2_2[0] _q3_3[0] q1 q2 q3
+//             <    is written>: _q1_1[0]
+   *q1 = *q2+*q3;
+}
+
+Cumulated effects with points-to for "pointer_add"
+
+//             <    is read   >: _q2_2[0] _q3_3[0] q1 q2 q3
+//             <    is written>: _q1_1[0]
+void pointer_add(pointer q1, const pointer q2, const pointer q3)
+{
+//             <    is read   >: _q2_2[0] _q3_3[0] q1 q2 q3
+//             <    is written>: _q1_1[0]
+   *q1 = *q2+*q3;
+}
+
+Points-to for "pointer_get"
+
+
 // Points To IN:
 // p -> *NULL_POINTER* , MAY
 // p -> _p_1[0] , MAY
 
 
 // Points To OUT:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-
-void pointer_free(pointer p)
-{
-
-// Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1[0] , MAY
-
-   free(p);
-}
-
-// Points To IN:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1[0] , MAY
-
-
-// Points To OUT: none
+// p -> _p_1[0] , EXACT
 
 int pointer_get(const pointer p)
 {
@@ -189,36 +210,147 @@ int pointer_get(const pointer p)
    return *p;
 }
 
+Proper effects with points-to for "pointer_get"
+
+int pointer_get(const pointer p)
+{
+//             <    is read   >: _p_1[0] p
+   return *p;
+}
+
+Cumulated effects with points-to for "pointer_get"
+
+//             <    is read   >: _p_1[0] p
+int pointer_get(const pointer p)
+{
+//             <    is read   >: _p_1[0] p
+   return *p;
+}
+
+Points-to for "main"
+
+
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1[0] , MAY
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_[0] , MAY
 
 
 // Points To OUT: none
 
-void pointer_set(pointer p, int v)
+int main(void)
 {
+
+// Points To: none
+
+   pointer p1, p2, p3;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
-// p -> _p_1[0] , MAY
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
+// p3 -> undefined , EXACT
 
-   *p = v;
+   
+   // could differentiate allocs based on call path?
+   p1 = pointer_alloc(13);
+
+// Points To:
+// p1 -> pointer_alloc:*HEAP*_l_13 , MAY
+// p2 -> undefined , EXACT
+// p3 -> undefined , EXACT
+
+   p2 = pointer_alloc(17);
+
+// Points To:
+// p1 -> pointer_alloc:*HEAP*_l_13 , MAY
+// p2 -> pointer_alloc:*HEAP*_l_13 , MAY
+// p3 -> undefined , EXACT
+
+   p3 = pointer_alloc(19);
+
+// Points To:
+// p1 -> pointer_alloc:*HEAP*_l_13 , MAY
+// p2 -> pointer_alloc:*HEAP*_l_13 , MAY
+// p3 -> pointer_alloc:*HEAP*_l_13 , MAY
+
+   
+   // no pointer assigned! can keep all points-to
+   pointer_add(p1, p2, p3);
+
+// Points To:
+// p1 -> pointer_alloc:*HEAP*_l_13 , MAY
+// p2 -> pointer_alloc:*HEAP*_l_13 , MAY
+// p3 -> pointer_alloc:*HEAP*_l_13 , MAY
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_[0] , MAY
+
+   
+   // 36 17 19
+   fprintf(stdout, "p1=%d p2=%d p3=%d\n", pointer_get(p1), pointer_get(p2), pointer_get(p3));
+
+// Points To:
+// p1 -> pointer_alloc:*HEAP*_l_13 , MAY
+// p2 -> pointer_alloc:*HEAP*_l_13 , MAY
+// p3 -> pointer_alloc:*HEAP*_l_13 , MAY
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_[0] , MAY
+
+   
+   // no pointer assigned! can keep all points-to
+   pointer_set(p3, 23);
+
+// Points To:
+// p1 -> pointer_alloc:*HEAP*_l_13 , MAY
+// p2 -> pointer_alloc:*HEAP*_l_13 , MAY
+// p3 -> pointer_alloc:*HEAP*_l_13 , MAY
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_[0] , MAY
+
+   
+   // no pointer assigned! can keep all points-to
+   pointer_add(p3, p2, p1);
+
+// Points To:
+// p1 -> pointer_alloc:*HEAP*_l_13 , MAY
+// p2 -> pointer_alloc:*HEAP*_l_13 , MAY
+// p3 -> pointer_alloc:*HEAP*_l_13 , MAY
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_[0] , MAY
+
+   
+   // 36 17 53
+   fprintf(stdout, "p1=%d p2=%d p3=%d\n", pointer_get(p1), pointer_get(p2), pointer_get(p3));
+
+// Points To:
+// p1 -> pointer_alloc:*HEAP*_l_13 , MAY
+// p2 -> pointer_alloc:*HEAP*_l_13 , MAY
+// p3 -> pointer_alloc:*HEAP*_l_13 , MAY
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_[0] , MAY
+
+
+   pointer_free(p1);
+
+// Points To:
+// p1 -> undefined , EXACT
+// p2 -> pointer_alloc:*HEAP*_l_13 , MAY
+// p3 -> pointer_alloc:*HEAP*_l_13 , MAY
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_[0] , MAY
+
+   pointer_free(p2);
+
+// Points To:
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
+// p3 -> pointer_alloc:*HEAP*_l_13 , MAY
+// stdout -> *NULL_POINTER* , MAY
+// stdout -> _stdout_[0] , MAY
+
+   pointer_free(p3);
 }
 
-PROPER  EFFECTS WITH POINTS TO
+Proper effects with points-to main"
 
-pointer alloc_pointer(int v)
-{
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-   pointer p = malloc(sizeof(int));
-//             <may be written>: *HEAP*_l_6
-//             <    is read   >: p v
-   *p = v;
-//             <    is read   >: p
-   return p;
-}
 int main(void)
 {
    pointer p1, p2, p3;
@@ -226,40 +358,40 @@ int main(void)
 //             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
    
    // could differentiate allocs based on call path?
-   p1 = alloc_pointer(13);
+   p1 = pointer_alloc(13);
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p2 _MALLOC_EFFECTS:_MALLOC_
-   p2 = alloc_pointer(17);
+   p2 = pointer_alloc(17);
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p3 _MALLOC_EFFECTS:_MALLOC_
-   p3 = alloc_pointer(19);
-//             <    is read   >: p1 p2 p3 alloc_pointer:*HEAP*_l_6
-//             <    is written>: alloc_pointer:*HEAP*_l_6
+   p3 = pointer_alloc(19);
+//             <    is read   >: p1 p2 p3 pointer_alloc:*HEAP*_l_13
+//             <    is written>: pointer_alloc:*HEAP*_l_13
    
    // no pointer assigned! can keep all points-to
    pointer_add(p1, p2, p3);
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
 //             <    is read   >: p1 p2 p3 stdout __IO_EFFECTS:LUNS[1] 
-//                               alloc_pointer:*HEAP*_l_6
+//                               pointer_alloc:*HEAP*_l_13
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    
    // 36 17 19
    fprintf(stdout, "p1=%d p2=%d p3=%d\n", pointer_get(p1), pointer_get(p2), pointer_get(p3));
 //             <    is read   >: p3
-//             <    is written>: alloc_pointer:*HEAP*_l_6
+//             <    is written>: pointer_alloc:*HEAP*_l_13
    
    // no pointer assigned! can keep all points-to
    pointer_set(p3, 23);
-//             <    is read   >: p1 p2 p3 alloc_pointer:*HEAP*_l_6
-//             <    is written>: alloc_pointer:*HEAP*_l_6
+//             <    is read   >: p1 p2 p3 pointer_alloc:*HEAP*_l_13
+//             <    is written>: pointer_alloc:*HEAP*_l_13
    
    // no pointer assigned! can keep all points-to
    pointer_add(p3, p2, p1);
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
 //             <    is read   >: p1 p2 p3 stdout __IO_EFFECTS:LUNS[1] 
-//                               alloc_pointer:*HEAP*_l_6
+//                               pointer_alloc:*HEAP*_l_13
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    
    // 36 17 53
@@ -275,102 +407,160 @@ int main(void)
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    pointer_free(p3);
 }
-void pointer_add(pointer q1, const pointer q2, const pointer q3)
+
+Cumulated effects with points-to for "main"
+
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[1]
+int main(void)
 {
-//             <    is read   >: _q2_2[0] _q3_3[0] q1 q2 q3
-//             <    is written>: _q1_1[0]
-   *q1 = *q2+*q3;
-}
-void pointer_free(pointer p)
-{
-//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+   pointer p1, p2, p3;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
+   
+   // could differentiate allocs based on call path?
+   p1 = pointer_alloc(13);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p2 _MALLOC_EFFECTS:_MALLOC_
+   p2 = pointer_alloc(17);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p3 _MALLOC_EFFECTS:_MALLOC_
+   p3 = pointer_alloc(19);
+//             <    is read   >: p1 p2 p3 pointer_alloc:*HEAP*_l_13
+//             <    is written>: pointer_alloc:*HEAP*_l_13
+   
+   // no pointer assigned! can keep all points-to
+   pointer_add(p1, p2, p3);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: p1 p2 p3 stdout __IO_EFFECTS:LUNS[1] 
+//                               pointer_alloc:*HEAP*_l_13
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   
+   // 36 17 19
+   fprintf(stdout, "p1=%d p2=%d p3=%d\n", pointer_get(p1), pointer_get(p2), pointer_get(p3));
+//             <    is read   >: p3
+//             <    is written>: pointer_alloc:*HEAP*_l_13
+   
+   // no pointer assigned! can keep all points-to
+   pointer_set(p3, 23);
+//             <    is read   >: p1 p2 p3 pointer_alloc:*HEAP*_l_13
+//             <    is written>: pointer_alloc:*HEAP*_l_13
+   
+   // no pointer assigned! can keep all points-to
+   pointer_add(p3, p2, p1);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: p1 p2 p3 stdout __IO_EFFECTS:LUNS[1] 
+//                               pointer_alloc:*HEAP*_l_13
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   
+   // 36 17 53
+   fprintf(stdout, "p1=%d p2=%d p3=%d\n", pointer_get(p1), pointer_get(p2), pointer_get(p3));
+//             <    is read   >: p1 _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   free(p);
-}
-int pointer_get(const pointer p)
-{
-//             <    is read   >: _p_1[0] p
-   return *p;
-}
-void pointer_set(pointer p, int v)
-{
-//             <    is read   >: p v
-//             <    is written>: _p_1[0]
-   *p = v;
+
+   pointer_free(p1);
+//             <    is read   >: p2 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   pointer_free(p2);
+//             <    is read   >: p3 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   pointer_free(p3);
 }
 
  *********************** Use-Def Chains *********************
 
-	11 --> 12 with conflicts
+	46 --> 47 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	11 --> 16 with conflicts
+	46 --> 51 with conflicts
 		from <p1-W-EXACT> to <p1-R-EXACT>
-	11 --> 19 with conflicts
+	46 --> 54 with conflicts
 		from <p1-W-EXACT> to <p1-R-EXACT>
-	11 --> 25 with conflicts
+	46 --> 60 with conflicts
 		from <p1-W-EXACT> to <p1-R-EXACT>
-	11 --> 28 with conflicts
+	46 --> 63 with conflicts
 		from <p1-W-EXACT> to <p1-R-EXACT>
-	11 --> 30 with conflicts
+	46 --> 65 with conflicts
 		from <p1-W-EXACT> to <p1-R-EXACT>
-	12 --> 13 with conflicts
+	47 --> 48 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	12 --> 16 with conflicts
+	47 --> 51 with conflicts
 		from <p2-W-EXACT> to <p2-R-EXACT>
-	12 --> 19 with conflicts
+	47 --> 54 with conflicts
 		from <p2-W-EXACT> to <p2-R-EXACT>
-	12 --> 25 with conflicts
+	47 --> 60 with conflicts
 		from <p2-W-EXACT> to <p2-R-EXACT>
-	12 --> 28 with conflicts
+	47 --> 63 with conflicts
 		from <p2-W-EXACT> to <p2-R-EXACT>
-	12 --> 31 with conflicts
+	47 --> 66 with conflicts
 		from <p2-W-EXACT> to <p2-R-EXACT>
-	13 --> 16 with conflicts
+	48 --> 51 with conflicts
 		from <p3-W-EXACT> to <p3-R-EXACT>
-	13 --> 19 with conflicts
+	48 --> 54 with conflicts
 		from <p3-W-EXACT> to <p3-R-EXACT>
-	13 --> 22 with conflicts
+	48 --> 57 with conflicts
 		from <p3-W-EXACT> to <p3-R-EXACT>
-	13 --> 25 with conflicts
+	48 --> 60 with conflicts
 		from <p3-W-EXACT> to <p3-R-EXACT>
-	13 --> 28 with conflicts
+	48 --> 63 with conflicts
 		from <p3-W-EXACT> to <p3-R-EXACT>
-	13 --> 30 with conflicts
+	48 --> 65 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	13 --> 32 with conflicts
+	48 --> 67 with conflicts
 		from <p3-W-EXACT> to <p3-R-EXACT>
-	16 --> 19 with conflicts
-		from <alloc_pointer:*HEAP*_l_6-W-EXACT> to <alloc_pointer:*HEAP*_l_6-R-EXACT>
-	16 --> 22 with conflicts
-		from <alloc_pointer:*HEAP*_l_6-W-EXACT> to <alloc_pointer:*HEAP*_l_6-W-EXACT>
-		from <alloc_pointer:*HEAP*_l_6-R-EXACT> to <alloc_pointer:*HEAP*_l_6-W-EXACT>
-	19 --> 22 with conflicts
-		from <alloc_pointer:*HEAP*_l_6-R-EXACT> to <alloc_pointer:*HEAP*_l_6-W-EXACT>
-	19 --> 28 with conflicts
+	51 --> 54 with conflicts
+		from <pointer_alloc:*HEAP*_l_13-W-EXACT> to <pointer_alloc:*HEAP*_l_13-R-EXACT>
+	51 --> 57 with conflicts
+		from <pointer_alloc:*HEAP*_l_13-W-EXACT> to <pointer_alloc:*HEAP*_l_13-W-EXACT>
+		from <pointer_alloc:*HEAP*_l_13-R-EXACT> to <pointer_alloc:*HEAP*_l_13-W-EXACT>
+	54 --> 57 with conflicts
+		from <pointer_alloc:*HEAP*_l_13-R-EXACT> to <pointer_alloc:*HEAP*_l_13-W-EXACT>
+	54 --> 63 with conflicts
 		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-	22 --> 25 with conflicts
-		from <alloc_pointer:*HEAP*_l_6-W-EXACT> to <alloc_pointer:*HEAP*_l_6-W-EXACT>
-		from <alloc_pointer:*HEAP*_l_6-W-EXACT> to <alloc_pointer:*HEAP*_l_6-R-EXACT>
-	25 --> 28 with conflicts
-		from <alloc_pointer:*HEAP*_l_6-W-EXACT> to <alloc_pointer:*HEAP*_l_6-R-EXACT>
-	30 --> 31 with conflicts
+	57 --> 60 with conflicts
+		from <pointer_alloc:*HEAP*_l_13-W-EXACT> to <pointer_alloc:*HEAP*_l_13-W-EXACT>
+		from <pointer_alloc:*HEAP*_l_13-W-EXACT> to <pointer_alloc:*HEAP*_l_13-R-EXACT>
+	60 --> 63 with conflicts
+		from <pointer_alloc:*HEAP*_l_13-W-EXACT> to <pointer_alloc:*HEAP*_l_13-R-EXACT>
+	65 --> 66 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	31 --> 32 with conflicts
+	66 --> 67 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 
 ****************** End of Dependence Graph ******************
+
+Warnings and errors:
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (aliased_translation_p) possible aliasing detected between formal parameters "q2" and "q3" at line 51.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (aliased_translation_p) possible aliasing detected between formal parameters "q1" and "q3" at line 51.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Aliasing between arguments at line 51.
+We would have to create a new formal context and to restart the points-to analysis and to modify the IN and OUT data structures...
+Or use a simpler analysis, here an intraprocedural one.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (CSafeSizeOfArray) Varying size for array "call20!:_IO_FILE^_unused2"
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (CSafeSizeOfArray) Not yet supported properly by PIPS
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (aliased_translation_p) possible aliasing detected between formal parameters "q2" and "q3" at line 60.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (aliased_translation_p) possible aliasing detected between formal parameters "q1" and "q3" at line 60.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Aliasing between arguments at line 60.
+We would have to create a new formal context and to restart the points-to analysis and to modify the IN and OUT data structures...
+Or use a simpler analysis, here an intraprocedural one.
+PROPER_EFFECTS_WITH_POINTS_TO[main] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.

@@ -1,0 +1,146 @@
+
+POINTS TO for null_initialization02
+
+
+// Points To IN:
+// q -> *NULL* , MAY
+// q -> _q_1 , MAY
+
+
+// Points To OUT:
+// q -> *NULL* , MAY
+// q -> _q_1 , MAY
+
+int foo(int *q)
+{
+
+// Points To: none
+
+   int i = 0, *p;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> *NULL* , MAY
+// q -> _q_1 , MAY
+
+   p = q;
+
+// Points To:
+// p -> *NULL* , MAY
+// p -> _q_1 , MAY
+// q -> *NULL* , MAY
+// q -> _q_1 , MAY
+
+   if (p==(void *) 0)
+
+// Points To:
+// p -> *NULL* , EXACT
+// q -> *NULL* , MAY
+// q -> _q_1 , MAY
+
+      printf("i = %d", i);
+
+// Points To:
+// p -> *NULL* , MAY
+// p -> _q_1 , MAY
+// q -> *NULL* , MAY
+// q -> _q_1 , MAY
+
+   return i;
+}
+
+PROPER EFFECTS WITH POINTS TO
+
+int foo(int *q)
+{
+//             <    is written>: i
+   int i = 0, *p;
+//             <    is read   >: q
+//             <    is written>: p
+   p = q;
+//             <    is read   >: p
+   if (p==(void *) 0)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("i = %d", i);
+//             <    is read   >: i
+   return i;
+}
+
+CUMULATED EFFECTS WITH POINTS TO
+
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: q
+int foo(int *q)
+{
+//             <    is written>: i
+   int i = 0, *p;
+//             <    is read   >: q
+//             <    is written>: p
+   p = q;
+//             <may be read   >: i stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: p
+   if (p==(void *) 0)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("i = %d", i);
+//             <    is read   >: i
+   return i;
+}
+
+POINTS TO for null_initialization02
+
+
+// Points To IN:
+// q -> *NULL* , MAY
+// q -> _q_1 , MAY
+
+
+// Points To OUT:
+// q -> *NULL* , MAY
+// q -> _q_1 , MAY
+
+int foo(int *q)
+{
+
+// Points To: none
+
+   int i = 0, *p;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> *NULL* , MAY
+// q -> _q_1 , MAY
+
+   p = q;
+
+// Points To:
+// p -> *NULL* , MAY
+// p -> _q_1 , MAY
+// q -> *NULL* , MAY
+// q -> _q_1 , MAY
+
+   if (p==(void *) 0)
+
+// Points To:
+// p -> *NULL* , EXACT
+// q -> *NULL* , MAY
+// q -> _q_1 , MAY
+
+      printf("i = %d", i);
+
+// Points To:
+// p -> *NULL* , MAY
+// p -> _q_1 , MAY
+// q -> *NULL* , MAY
+// q -> _q_1 , MAY
+
+   return i;
+}

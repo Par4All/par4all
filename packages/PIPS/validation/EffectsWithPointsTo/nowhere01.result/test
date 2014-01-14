@@ -19,13 +19,13 @@ int nowhere01()
    int *p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    int **q;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
 
    *p = 1;
@@ -47,6 +47,7 @@ int nowhere01()
    int i;
    int *p;
    int **q;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
 
    *p = 1;
@@ -57,11 +58,13 @@ int nowhere01()
 
 Cumulated effects with points-to for nowhere01
 
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 int nowhere01()
 {
    int i;
    int *p;
    int **q;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
 
    *p = 1;

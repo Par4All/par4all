@@ -1,0 +1,1 @@
+The points-to analysis is stopped because of a user programming error (arithmetic + strict typing requested for the analysis) while other programming mistakes result in "bottom"/unreachable.

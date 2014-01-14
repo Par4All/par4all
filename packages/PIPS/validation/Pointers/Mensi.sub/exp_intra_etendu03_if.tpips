@@ -1,0 +1,36 @@
+delete exp_intra_etendu03_if
+create exp_intra_etendu03_if exp_intra_etendu03_if.c 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+setproperty POINTS_TO_PATH_LIMIT 2
+
+# Useful to understand convergence issues
+# setenv POINTS_TO_DEBUG_LEVEL=1
+
+# This property is an aberration wrt to the constant path lattice:
+# either NULL is included in any stub and then conditions cannot be
+# analyzed or NULL is not included and it must be added explicitly
+
+# Not compatible with the current points-to implementation and CP lattice
+# setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[count]
+
+echo 
+echo PROPER EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[count]
+
+
+close
+delete exp_intra_etendu03_if
+quit

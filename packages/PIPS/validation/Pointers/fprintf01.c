@@ -4,7 +4,7 @@
 int main ()
 {
   FILE * pFile;
-   int n;
+  int n;
   char name [100];
 
   pFile = fopen ("myfile.txt","w");
@@ -13,6 +13,7 @@ int main ()
       puts ("please, enter a name: ");
       gets (name);
       fprintf (pFile,"Name %d %s\n",n,name);
+      n = n; // To see if that "pFile" cannot be "NULL" here
     }
   fclose (pFile);
   return 0;
