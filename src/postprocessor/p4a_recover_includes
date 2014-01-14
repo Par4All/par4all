@@ -734,6 +734,9 @@ def sanitize_recover_output(content):
     # into '#include <stdbool.h>'
     content = re.sub(r'#include "/usr/lib/gcc/[^/]+/[^/]+/include(-fixed)?/([^"]+)"',
                      '#include <\\2>', content)
+    # Replace for example
+    # #include <x86_64-linux-gnu/sys/time.h> by #include <sys/time.h>
+    content = re.sub('#include <x86_64-linux-gnu/', '#include <', content)
     # Recover C99 floating point constants:
     content = re.sub(r'\(__huge_val\.__d\)',
                      'HUGE_VAL', content)
@@ -741,7 +744,18 @@ def sanitize_recover_output(content):
                      'HUGE_VALF', content)
     content = re.sub(r'\(\(long double\) HUGE_VAL\)',
                      'HUGE_VALL', content)
-    # TODO to be completed...
+
+    # Remove static functions of the libc kept by PIPS
+    content = content.replace(r'''static unsigned short __bswap_16(unsigned short __bsx)
+{
+   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
+}
+''', '')
+    content = content.replace(r'''static unsigned int __bswap_32(unsigned int __bsx)
+{
+   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
+}
+''', '')
 
     return content
 
