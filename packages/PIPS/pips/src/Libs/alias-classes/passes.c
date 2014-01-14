@@ -181,6 +181,103 @@ void reset_points_to_context()
   points_to_context = pt_map_undefined;
 }
 
+/* Instead of simply adding the new arc, make sure the consistency is
+ * not broken. If "a" is an exact arc starting from source "s_a" and
+ * pointing to destination "d_a" and if "pt" contains may arcs or an
+ * exact arc s->d, these arcs must be removed. Vice-versa, if
+ * "a=(s_a,d_a)" is a may arc and if "pt" contain an exact arc (s,d)...
+ *
+ * FI: I am cheating and doing exactly what I need to deal with global
+ * variables at call sites...
+ *
+ * FI: issue with the commented out free() below: the caller doesn't
+ * know that the object may be freed and may reuse it later, for
+ * instance to make a copy of it...
+ *
+ * Argument a is either included in pt or freed. it cannot be used
+ * after the call.
+ */
+pt_map update_points_to_graph_with_arc(points_to a, pt_map pt)
+{
+  // Default functionality
+  // add_arc_to_pt_map(a, pt);
+
+  cell s_a = points_to_source(a);
+  approximation ap_a = points_to_approximation(a);
+  list dl = NIL; // delete list
+  list nl = NIL; // new list
+  bool found_p = false;
+  bool freed_p = false; // nl could be cleaned up instead at each free
+  set pt_s = points_to_graph_set(pt);
+
+  SET_FOREACH(points_to, b, pt_s) {
+    cell s_b = points_to_source(b);
+    if(points_to_cell_equal_p(s_a, s_b)) {
+      cell d_a = points_to_sink(a);
+      cell d_b = points_to_sink(b);
+      approximation ap_b = points_to_approximation(b);
+      found_p = true;
+      if(points_to_cell_equal_p(d_a, d_b)) {
+	if(approximation_tag(ap_a)==approximation_tag(ap_b)) {
+	  /* Arc a is already in relation pt*/
+	  //free_points_to(a);
+	  freed_p = true;
+	}
+	else if(approximation_may_p(ap_a)) {
+	  /* ap_b must be exact */
+	  //free_points_to(a); // a is of no use because the context is stricter
+	  freed_p = true;
+	}
+      }
+      else { /* Same source, different destinations */
+	/* We are in trouble if both arcs carry approximation exact... */
+	if(approximation_exact_p(ap_a)) {
+	  if(approximation_exact_p(ap_b)) {
+	    pips_internal_error("Conflicting arcs.\n"); // we are in trouble
+	  }
+	  else {
+	    /* Arc b is less precise and mut be removed to avoid a conflict */
+	    dl = CONS(POINTS_TO, b, dl);
+	  }
+	}
+	else {
+	  if(approximation_exact_p(ap_b)) {
+	    // pips_internal_error("Conflicting arcs.\n"); // we are in trouble
+	    // But the may arc is included in the exact arc already in pt
+	    //free_points_to(a);
+	    freed_p = true;
+	  }
+	  else {
+	    /* Two may arcs: they are compatible but this may be
+	       invalidated later by another arc in pt, for isntance
+	       making a redundant. */
+	    nl = CONS(POINTS_TO, a, nl);
+	  }
+	}
+      }
+    }
+    else {
+      /* The sources are different */
+      ; // ignore this arc from pt
+    }
+  }
+
+  if(found_p) {
+    FOREACH(POINTS_TO, d, dl)
+      remove_arc_from_pt_map(d, pt);
+
+    // 0 or 1 element, which must be "a", which may have been freed
+    // after insertion in nl
+    FOREACH(POINTS_TO, n, nl)
+      if(!freed_p)
+	add_arc_to_pt_map(n, pt);
+  }
+  else
+    add_arc_to_pt_map(a, pt);
+
+  return pt;
+}
+
 /* FI: it should rather work the other way round, with
  * add_arc_to_statement_points_to_context() calling
  * add_arc_to_points_to_context().
@@ -189,9 +286,30 @@ void add_arc_to_points_to_context(points_to pt)
 {
   pips_assert("points_to_context is defined",
 	      !pt_map_undefined_p(points_to_context));
-  (void) add_arc_to_pt_map(pt, points_to_context);
+  //(void) update_points_to_graph_with_arc(pt, points_to_context);
+  add_arc_to_pt_map(pt, points_to_context);
+  pips_assert("in is consistent", consistent_pt_map_p(points_to_context));
   points_to npt = copy_points_to(pt);
   add_arc_to_statement_points_to_context(npt);
+}
+
+/* Same as , but be careful about the arc before adding it to the
+ * points-to context.
+ *
+ * This function is used to update the contexts when dealing with
+ * global variables at a call site.
+ */
+void update_points_to_context_with_arc(points_to pt)
+{
+  pips_assert("points_to_context is defined",
+	      !pt_map_undefined_p(points_to_context));
+  // Copy "pt" before it may be freed by update_points_to_graph_with_arc()
+  points_to npt = copy_points_to(pt);
+  (void) update_points_to_graph_with_arc(pt, points_to_context);
+  //add_arc_to_pt_map(pt, points_to_context);
+  pips_assert("in is consistent", consistent_pt_map_p(points_to_context));
+  //add_arc_to_statement_points_to_context(npt);
+  update_statement_points_to_context_with_arc(npt);
 }
 
 pt_map get_points_to_context()
@@ -454,4 +572,86 @@ bool fast_interprocedural_points_to_analysis(char * module_name)
   fast_interprocedural_points_to_p = true;
   interprocedural_points_to_p = false;
   return generic_points_to_analysis(module_name);
+}
+
+/* Retrieve points-to that are statically initialized, especially in compilation units */
+bool initial_points_to(char * name)
+{
+  entity module = module_name_to_entity(name);
+  points_to_list ptl_init = points_to_list_undefined;
+
+  debug_on("POINTS_TO_DEBUG_LEVEL");
+
+  /* At least, useful for debugging */
+  set_current_module_entity(module);
+  //set_current_module_statement( (statement)
+  //	db_get_memory_resource(DBR_CODE, name, true));
+
+  if(compilation_unit_p(name)) {
+    points_to_list ptl_out = 
+      (points_to_list) db_get_memory_resource(DBR_POINTS_TO_OUT, name, true);
+    ptl_init = copy_points_to_list(ptl_out);
+  }
+  else {
+    /* Could we retrieve initializations of static variables? */
+    ptl_init = make_points_to_list(true, NIL);
+  }
+
+  DB_PUT_MEMORY_RESOURCE(DBR_INITIAL_POINTS_TO, strdup(name), (char*) ptl_init);
+
+  reset_current_module_entity();
+  //reset_current_module_statement();
+
+  debug_off();
+  return true;
+}
+
+bool program_points_to(char * name)
+{
+  //transformer t = transformer_identity();
+  entity the_main = get_main_entity();
+  int i, nmodules;
+  gen_array_t modules;
+  // list e_inter = NIL;
+  list pptl = NIL; // Program points-to list
+
+  pips_assert("main was found", the_main!=entity_undefined);
+
+  debug_on("POINTS_TO_DEBUG_LEVEL");
+  pips_debug(1, "considering program \"%s\" with main \"%s\"\n", name,
+	     module_local_name(the_main));
+
+  set_current_module_entity(the_main);
+  set_current_module_statement( (statement)
+				db_get_memory_resource(DBR_CODE,
+						       module_local_name(the_main),
+						       true));
+  modules = db_get_module_list();
+  nmodules = gen_array_nitems(modules);
+  pips_assert("some modules in the program", nmodules>0);
+
+  for(i=0; i<nmodules; i++) {
+    string mname = gen_array_item(modules, i);
+    pips_debug(1, "considering module %s\n", mname);
+
+    // Module initial points-to list
+    points_to_list mptl =
+      copy_points_to_list((points_to_list)
+			  db_get_memory_resource(DBR_INITIAL_POINTS_TO, mname, true));
+    if(!points_to_list_bottom(mptl)) {
+      // FI: a bit simplistic if C standard allows double definitions...
+      pptl = gen_nconc(pptl, points_to_list_list(mptl));
+    }
+  }
+
+  points_to_list program_ptl = make_points_to_list(false, pptl);
+  DB_PUT_MEMORY_RESOURCE(DBR_PROGRAM_POINTS_TO, "", (void *) program_ptl);
+
+  reset_current_module_entity();
+  reset_current_module_statement();
+
+  gen_array_full_free(modules);
+
+  debug_off();
+  return true;
 }

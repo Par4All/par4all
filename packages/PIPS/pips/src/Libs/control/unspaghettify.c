@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -27,7 +27,7 @@
 /* Ronan Keryell, 1995. */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 2004/01/23 13:55:04 $, ) version $Revision: 14223 $, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 2004/01/23 13:55:04 $, ) version $Revision: 14223 $, got on %D%, %T% [%P%].\n Copyright (c) ï¿½cole des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -722,8 +722,8 @@ try_to_structure_the_unstructured(statement s,
    unstructured. We just return the statement directly containing the
    unstructured.
 
-   Right now, it does not extract a RETURN since as explained in « PIPS:
-   Internal Representation of Fortran and C Code » about RETURN_LABEL_NAME
+   Right now, it does not extract a RETURN since as explained in ï¿½ PIPS:
+   Internal Representation of Fortran and C Code ï¿½ about RETURN_LABEL_NAME
    in the Entities section, since a RETURN with a label at the exit of un
    unstructured is always the representation of a RETURN in Fortran
    unstructured code... So even for C code, a return stay inside an
@@ -1113,10 +1113,10 @@ clean_up_control(statement s)
 
 	ifdebug(5) {
 	    pips_assert("Consistent unstructured", unstructured_consistent_p(u));
-	    pips_debug(0, "after remove_the_unreachable_controls_of_an_unstructured\n");
-	    pips_debug(0, "Accessible nodes from entry:\n");
+	    pips_debug(5, "after remove_the_unreachable_controls_of_an_unstructured\n");
+	    pips_debug(5, "Accessible nodes from entry:\n");
 	    display_linked_control_nodes(unstructured_control(u));
-	    pips_debug(0, "Accessible nodes from exit:\n");
+	    pips_debug(5, "Accessible nodes from exit:\n");
 	    display_linked_control_nodes(unstructured_exit(u));
 	    print_statement(s);
 	}

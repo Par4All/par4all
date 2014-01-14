@@ -1,6 +1,6 @@
 # $Id$
 #
-# Copyright 1989-2011 MINES ParisTech
+# Copyright 1989-2014 MINES ParisTech
 #
 # This file is part of PIPS.
 #
@@ -28,6 +28,7 @@ LIB_CFILES = \
 	freia_terapix.c \
 	freia_opencl.c \
 	freia_aipo.c \
+	freia_sigmac.c \
 	dag-utils.c \
 	freia-utils.c \
 	freia_transformations.c

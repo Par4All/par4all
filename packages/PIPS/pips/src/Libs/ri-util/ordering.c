@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -172,7 +172,8 @@ static void rinitialize_ordering_to_statement(hash_table ots, statement s)
    sure that the hash table ots is in sync with the current module. */
 hash_table set_ordering_to_statement(statement s)
 {
-    pips_assert("hash table is not defined", OrderingToStatement==hash_table_undefined);
+    pips_assert("hash table \"OrderingToStatement\" is undefined",
+		OrderingToStatement==hash_table_undefined);
     hash_table ots =  hash_table_make(hash_int, 0);
     rinitialize_ordering_to_statement(ots, s);
     OrderingToStatement = ots;

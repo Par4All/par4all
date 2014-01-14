@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -354,7 +354,7 @@ static statement make_loopStat1(statement stat, entity transferSize,
 			STATEMENT_ORDERING_UNDEFINED,
 			empty_comments,
 			make_instruction_loop(outerLoop1),NIL,NULL,
-			empty_extensions ());
+			empty_extensions (), make_synchronization_none());
 }
 
 #if 0
@@ -464,7 +464,7 @@ static statement usual_loop_tiling(statement stat, statement newBody,
 				  STATEMENT_ORDERING_UNDEFINED,
 				  empty_comments,
 				  make_instruction_loop(innerLoop),NIL,NULL,
-				  empty_extensions ());
+				  empty_extensions (), make_synchronization_none());
 
       if(!gGenHRE)
 	{
@@ -659,7 +659,7 @@ static statement generate_code_loop(statement stat)
 					 STATEMENT_ORDERING_UNDEFINED,
 					 empty_comments,
 					 make_instruction_loop(outerLoop),NIL,NULL,
-					 empty_extensions ());
+					 empty_extensions (), make_synchronization_none());
 
       lStats = CONS(STATEMENT, newStat, NIL);
 
@@ -975,7 +975,7 @@ static statement add_exec_mmcd(statement stat)
 				    empty_comments,
 				    make_instruction(is_instruction_test, t),
 				    NIL,NULL,
-				    empty_extensions ());
+				    empty_extensions (), make_synchronization_none());
 	}
     }
 

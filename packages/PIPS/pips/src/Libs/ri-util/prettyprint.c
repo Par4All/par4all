@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -4463,6 +4463,7 @@ text text_statement_enclosed(entity module,
 			     list pdl)
 {
   instruction i = statement_instruction(stmt);
+  //synchronization sync  = statement_synchronization(stmt);
   text r= make_text(NIL);
   text temp;
   string i_comments = statement_comments(stmt);

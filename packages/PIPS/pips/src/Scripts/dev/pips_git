@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 # Apply some git actions to some git repositories found below the current
 # directory

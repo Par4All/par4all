@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -305,6 +305,16 @@ bool anywhere_cell_p(cell c)
   return anywhere_p;
 }
 
+bool anywhere_reference_p(reference r)
+{
+  bool anywhere_p;
+  entity v = reference_variable(r);
+
+  anywhere_p =  entity_all_locations_p(v);
+
+  return anywhere_p;
+}
+
 
 
 
@@ -371,6 +381,7 @@ bool all_heap_locations_cell_p(cell c)
 //  return heap_p;
 //}
 
+/* Target of an undefined pointer */
 bool nowhere_cell_p(cell c)
 {
   bool nowhere_p;
@@ -1512,10 +1523,53 @@ void points_to_cell_add_zero_subscripts(cell c)
   points_to_cell_add_fixed_subscripts(c, true);
 }
 
+void points_to_cell_add_zero_subscript(cell c)
+{
+  reference r = cell_any_reference(c);
+  reference_add_zero_subscript(r);
+}
+
+void points_to_cell_complete_with_zero_subscripts(cell c)
+{
+  reference r = cell_any_reference(c);
+  reference_complete_with_zero_subscripts(r);
+}
+
 void points_to_cell_add_unbounded_subscripts(cell c)
 {
   points_to_cell_add_fixed_subscripts(c, false);
 }
+
+/* Transform reference a[i]...[j] and expression s into reference
+ * a[i]..[j+s] if j and s are constant integer expressions, and into
+ * reference a[i]..[*] otherwise. Cell c is updated by side effect.
+ *
+ * This has been implemented in several places...
+ */
+void points_to_cell_update_last_subscript(cell c, expression s)
+{
+  reference r = cell_any_reference(c);
+  list sl = reference_indices(r);
+  if(ENDP(sl)) {
+    // FI: we could do something special for heap abstract locations...
+    // entity v = reference_variable(r);
+    pips_internal_error("Wrong argument c.\n");
+  }
+  else {
+    list lsl = gen_last(sl);
+    expression is = EXPRESSION(CAR(lsl));
+    intptr_t c1, c2;
+    expression ns = expression_undefined;
+    if(expression_integer_value(is, &c1) && expression_integer_value(s, &c2)) {
+      ns = int_to_expression((int) c1+c2);
+    }
+    else {
+      ns = make_unbounded_expression();
+    }
+    EXPRESSION_(CAR(lsl)) = ns;
+  }
+}
+
 
 bool atomic_effect_p(effect e)
 {
@@ -1527,7 +1581,7 @@ bool atomic_effect_p(effect e)
   }
   return atomic_p;
 }
-
+
 // static list recursive_cell_to_pointer_cells(cell c)
 list recursive_cell_to_pointer_cells(cell c)
 {

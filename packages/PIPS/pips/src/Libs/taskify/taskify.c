@@ -75,7 +75,7 @@ bool taskify_statement(statement s) {
       && !empty_statement_or_continue_p(s)
       && !statement_contains_user_call_p(s)) {
     ifdebug(2) {
-      pips_debug(0,"Ouline statement into a new task : ");
+      pips_debug(2,"Ouline statement into a new task : ");
       print_statement(s);
     }
     outliner(get_next_task_name(),CONS(statement,s,NIL));

@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -168,7 +168,7 @@ complexity *pcomp;
 
     if ( !complexity_zero_p(*pcomp) ) 
 	free_complexity(*pcomp);
-    *pcomp = complexity_undefined;
+    *pcomp = make_zero_complexity();// complexity_undefined;
 }
 
 char *complexity_sprint(comp, print_stats_p, print_local_names_p)

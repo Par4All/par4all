@@ -98,7 +98,7 @@ void gpu_promote_sequential_on_sequence(sequence seq, loop l) {
       if(!parallel_loop_statement_p(s)) {
         if(!empty_statement_or_continue_p(s)) {
           ifdebug(2) {
-            pips_debug(0,"Promote statement :");
+            pips_debug(2,"Promote statement :");
             print_statement(s);
           }
 
@@ -111,7 +111,7 @@ void gpu_promote_sequential_on_sequence(sequence seq, loop l) {
         promoted_stmts = NIL;
 
         ifdebug(2) {
-          pips_debug(0,"Promote statements in loop :");
+          pips_debug(2,"Promote statements in loop :");
           print_statement(promoted);
         }
       }

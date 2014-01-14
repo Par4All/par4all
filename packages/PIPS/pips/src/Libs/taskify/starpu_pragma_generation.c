@@ -201,7 +201,7 @@ bool generate_starpu_pragma(char * module_name) {
   if(entity_main_module_p(get_current_module_entity())) {
     list regs = load_cumulated_rw_effects_list(module_stat);
     ifdebug(2) {
-      pips_debug(0,"Regions for main module : ");
+      pips_debug(2,"Regions for main module : ");
       print_regions(regs);
     }
     // Do not use regions currently because of anywhere effects !

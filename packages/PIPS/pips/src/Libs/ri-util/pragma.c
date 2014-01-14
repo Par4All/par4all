@@ -263,7 +263,7 @@ list filter_variables_in_pragma_expr(list /* of expr */ l_expr,
     list entity_to_remove = NIL;
 
     ifdebug(5) {
-      pips_debug(0,"Handling expression : ");
+      pips_debug(5,"Handling expression : ");
       print_expression(expr);
     }
     if(is_expression_omp_private_p(expr)) {

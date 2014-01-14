@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -369,7 +369,7 @@ do_clone_statement(statement s, clone_context cc, hash_table ht)
             new_instruction_with_decl,
             NIL,
             NULL,
-	    empty_extensions ());
+	    empty_extensions (), make_synchronization_none());
 
 }
 

@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -386,12 +386,23 @@ static bool statement_call_a_keep_function_p( statement s ) {
   return user_function_found;
 }
 
-
+/* FI: not only if it is useful, but if it is legal... */
 static void use_def_deal_if_useful(statement s) {
    bool this_statement_has_an_io_effect;
+   /* When a call by reference is used... */
    bool this_statement_writes_a_procedure_argument;
    bool this_statement_is_a_format;
    bool this_statement_is_an_unstructured_test = false;
+   /* FI: any statement that does not have a must/exact continuation
+    * should be preserved. For the time being, only exact
+    * non-continuing calls are checked: return, exit and abort. Since
+    * exceptions are not taken into account, the semantics of the code
+    * may be changed.
+    *
+    * Exact non-continuation can be checked with the statement
+    * transformer. beatrice Creusillet has also developped a
+    * continuation analysis.
+    */
    bool this_statement_is_a_c_return;
    bool outside_effect_p = false;
    bool this_statement_call_a_user_function;
@@ -436,7 +447,11 @@ static void use_def_deal_if_useful(statement s) {
 	   this_statement_is_an_unstructured_test = true;
    }
 
-   this_statement_is_a_c_return = return_statement_p(s);
+   /* All statements with control effects such as exit() or abort()
+      should be preserved. Continuations should be checked for
+      user-defined functions. Exceptions are also a problem. */
+   this_statement_is_a_c_return = return_statement_p(s) 
+     || exit_statement_p(s) || abort_statement_p(s);
 
    /* Check if this statement write some other things than a local variable */
    list effects_list = load_proper_rw_effects_list(s);
@@ -444,7 +459,13 @@ static void use_def_deal_if_useful(statement s) {
    FOREACH(EFFECT, eff,effects_list) {
     reference a_reference = effect_any_reference(eff);
     entity touched = reference_variable(a_reference);
-    if(effect_write_p(eff) && !entity_local_variable_p(touched,current_func)) {
+    if(effect_write_p(eff)
+       && (!entity_local_variable_p(touched,current_func)
+	   /* FI: we should also check that the static effect is
+	      leaked by the function but this is hard to check and is
+	      usually not intended by the programmer. See
+	      Transformations/Dead_code_elimination.sub/use_def_elim07/08. */
+	   || entity_static_variable_p(touched))) {
       outside_effect_p = true;
       pips_debug(7, "Statement %p, outside effect on %s (module %s)\n",
           s,
@@ -609,8 +630,89 @@ dead_code_elimination_on_a_statement(statement s)
    set_free(the_useful_statements);
 }
 
+static bool non_empty_out_regions_p(statement s)
+{
+  list l_out = load_statement_out_regions(s);
+  list l_out_global = load_statement_out_regions(get_current_module_statement());
+  bool main_p = entity_main_module_p(get_current_module_entity());
+  bool go_down = true;
+  if(s==get_current_module_statement()) {
+    if(entity_main_module_p(get_current_module_entity())) {
+    // FI: IO's have no impact on the out regions of a main...
+    // The OUT regions of a main function are always empty
+      set_add_element(the_useful_statements, the_useful_statements, (char *) s);
+    }
+    else {
+      /* We can remove all statements but must preserve at least one
+       * return statement, although it is useless, so as not to
+       * generate inconsistent C or Fortran code. So, this cannot be
+       * done directly...
+       */
+      set_add_element(the_useful_statements, the_useful_statements, (char *) s);
+    }
+  }
+  else if(declaration_statement_p(s)) {
+    // FI: the OUT regions do not take into account all effects
+    // all declaration statements are preserved to be conservative
+    // Other passes might be able to deal witht them, maybe after a
+    // split_initializations pass
+    set_add_element(the_useful_statements, the_useful_statements, (char *) s);
+  }
+  else if(ENDP(l_out)) {
+    go_down = false;
+  }
+  else if((ENDP(l_out_global) && !main_p)) {
+    /* FI: this does not work because OUT regions do not let
+       distinguish between functions whose returned value is used and
+       functions whose returned value is not used; somehow, the return
+       value should be taken into account by the region analysis. */
+    //go_down = false;
+    set_add_element(the_useful_statements, the_useful_statements, (char *) s);
+  }
+  else {
+    /* Mark statement as useful */
+    set_add_element(the_useful_statements, the_useful_statements, (char *) s);
+  }
+  return go_down;
+}
 
-bool dead_code_elimination_on_module(char * module_name)
+/**
+ * Caution : callees may be changed and should be updated for the module
+ * owning this statement !
+ */
+static void
+dead_code_elimination_on_a_statement_with_out_regions(statement s)
+{
+   the_useful_statements = set_make(set_pointer);
+   init_control_father();
+   init_statement_father();
+   
+   //ordering_to_dg_mapping = compute_ordering_to_dg_mapping(dependence_graph);
+
+   build_statement_to_statement_father_mapping(s);
+   //build_statement_to_statement_dependence_mapping(dependence_graph);
+
+   /* Mark as useful the seed statements: */
+   gen_recurse(s, statement_domain,
+	       gen_true,
+	       use_def_deal_if_useful);
+
+   /* Propagate the usefulness through all the predecessor graph: */
+   // propagate_the_usefulness_through_the_predecessor_graph();
+   // all statements with a non empty out region are useful
+   gen_recurse(s, statement_domain, non_empty_out_regions_p, gen_null);
+
+   remove_all_the_non_marked_statements(s);
+
+   //hash_table_free(ordering_to_dg_mapping);
+   //free_statement_to_statement_dependence_mapping();
+   close_statement_father();
+   close_control_father();
+   set_free(the_useful_statements);
+}
+
+
+bool dead_code_elimination_on_module(char * module_name, bool use_out_regions)
 {
    statement module_statement;
    entity module = module_name_to_entity(module_name);
@@ -621,8 +723,8 @@ bool dead_code_elimination_on_module(char * module_name)
     * arcs for declarations as these latter are separate statements now.
     */
    bool memory_effects_only_p = get_bool_property("MEMORY_EFFECTS_ONLY");
-   if(c_module_p(module) && memory_effects_only_p) {
-     pips_user_warning("Rice parallelization should be run with property "
+   if(c_module_p(module) && memory_effects_only_p && !use_out_regions) {
+     pips_user_error("Rice parallelization should be run with property "
                        "MEMORY_EFFECTS_ONLY set to FALSE.\n");
      return false; // return to pass manager with a failure code
    }
@@ -643,15 +745,19 @@ bool dead_code_elimination_on_module(char * module_name)
       (graph) db_get_memory_resource(DBR_DG, module_name, true);
       */
 
-   dependence_graph =
-      (graph) db_get_memory_resource(DBR_CHAINS, module_name, true);
+   if(!use_out_regions)
+     dependence_graph =
+       (graph) db_get_memory_resource(DBR_CHAINS, module_name, true);
 
    /* The proper effect to detect the I/O operations: */
    set_proper_rw_effects((statement_effects)
 			 db_get_memory_resource(DBR_PROPER_EFFECTS,
 						module_name,
-						true)); 
-
+						true));
+   if(use_out_regions) {
+       set_out_effects((statement_effects)
+                  db_get_memory_resource(DBR_OUT_REGIONS, module_name, true));
+   }
 
    set_current_module_statement(module_statement);
    set_current_module_entity(module);
@@ -667,7 +773,11 @@ bool dead_code_elimination_on_module(char * module_name)
    keeped_functions = strsplit(get_string_property("DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS")," ");
    keeped_functions_prefix = strsplit(get_string_property("DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS_PREFIX")," ");
 
-   dead_code_elimination_on_a_statement(module_statement);
+   if(use_out_regions) {
+     dead_code_elimination_on_a_statement_with_out_regions(module_statement);
+   }
+   else
+     dead_code_elimination_on_a_statement(module_statement);
 
    gen_map(free,keeped_functions);gen_free_list(keeped_functions);
    keeped_functions = 0;
@@ -707,6 +817,9 @@ bool dead_code_elimination_on_module(char * module_name)
 
    reset_proper_rw_effects();
    reset_cumulated_rw_effects();
+   if(use_out_regions) {
+       reset_out_effects();
+   }
    reset_current_module_statement();
    reset_current_module_entity();
    reset_ordering_to_statement();
@@ -718,20 +831,30 @@ bool dead_code_elimination_on_module(char * module_name)
 bool dead_code_elimination(char * module_name)
 {
   debug_on("DEAD_CODE_ELIMINATION_DEBUG_LEVEL");
-  return dead_code_elimination_on_module(module_name);
+  bool success = dead_code_elimination_on_module(module_name, false);
   debug_off();
+  return success;
+}
+
+bool dead_code_elimination_with_out_regions(char * module_name)
+{
+  debug_on("DEAD_CODE_ELIMINATION_DEBUG_LEVEL");
+  bool success = dead_code_elimination_on_module(module_name, true);
+  debug_off();
+  return success;
 }
 
 
-/* Obsolete name: it should be called dead_code_eliminiation()
+/* Obsolete name: it should be called dead_code_elimination()
  *
  * Maintained for backward compatibility.
  */
 bool use_def_elimination(char * module_name)
 {
   debug_on("USE_DEF_ELIMINATION_DEBUG_LEVEL");
-  return dead_code_elimination_on_module(module_name);
+  bool success = dead_code_elimination_on_module(module_name, false);
   debug_off();
+  return success;
 }
 
 /* moved from ri-util/statements.c */

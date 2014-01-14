@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
   Copyright 2009-2010 HPC Project
 
   This file is part of PIPS.
@@ -39,6 +39,7 @@
 #include "text-util.h"
 
 #include "misc.h"
+#include "properties.h"
 
 /***************************************/
 /* Function storing points to information attached to a statement
@@ -118,6 +119,25 @@ bool points_to_cell_in_list_p(cell c, list L)
   return found_p;
 }
 
+/* Add in "l1" elements of "l2" that are not yet in "l1". List "l2" is
+ * then destroyed.
+ *
+ * This is a set union.
+ */
+list merge_points_to_cell_lists(list l1, list l2)
+{
+  list lt = NIL;
+  FOREACH(CELL, c2, l2) {
+    if(!points_to_cell_in_list_p(c2, l1)) {
+      lt = CONS(CELL,c2, lt);
+    }
+  }
+  lt = gen_nreverse(lt);
+  l1 = gen_nconc(l1, lt);
+  gen_free_list(l2);
+  return l1;
+}
+
 /* Two cells are related if they are based on the same entity */
 bool related_points_to_cell_in_list_p(cell c, list L)
 {
@@ -133,6 +153,17 @@ bool related_points_to_cell_in_list_p(cell c, list L)
     }
   }
   return found_p;
+}
+
+bool related_points_to_cells_p(cell c1, cell c2)
+{
+  bool related_p = false;
+  reference rc1 = cell_any_reference(c1);
+  entity ec1 = reference_variable(rc1);
+  reference rc2 = cell_any_reference(c2);
+  entity ec2 = reference_variable(rc2);
+  related_p = (ec1==ec2);
+  return related_p;
 }
 
  /* Debug: print a cell list for points-to. Parameter f is not useful
@@ -170,8 +201,9 @@ void print_points_to_cells(list cl)
     FOREACH(CELL, c, cl) {
       reference r = cell_any_reference(c);
       entity v = reference_variable(r);
+      /* *ANY_MODULE* is unfortunately not an entity... */
       entity mv =  module_name_to_entity(entity_module_name(v));
-      if(m!=mv)
+      if(!entity_undefined_p(mv) && m!=mv)
 	fprintf(stderr,"%s" MODULE_SEP_STRING, entity_local_name(mv));
       print_points_to_cell(c);
       if(!ENDP(CDR(cl)))
@@ -374,11 +406,47 @@ list points_to_reference_to_typed_index(reference r, type t)
   return psl;
 }
 
-/* Is it a unique concrete memory location? */
+/* Is it a unique concrete memory location?
+ *
+ * Plus NULL? No doubt about the value of the pointer...
+ *
+ * Plus undefined? No doubt about the indeterminate value of the
+ * pointer according to C standard...
+ */
 bool atomic_points_to_cell_p(cell c)
 {
   reference r = cell_any_reference(c);
-  bool atomic_p = null_cell_p(c) || atomic_points_to_reference_p(r);
+  bool atomic_p = null_cell_p(c)
+    || nowhere_cell_p(c) // FI: added for EffectsWithPointsTo/call30.c
+    || atomic_points_to_reference_p(r);
+
+  // FI: atomic_p should be false for all abstract locations
+  // This is dealt with by atomic_points_to_reference_p()
+  /*
+  if(atomic_p && (heap_cell_p(c) || all_heap_locations_cell_p(c)))
+    atomic_p = false;
+
+  if(atomic_p) {
+    atomic_p = !cell_abstract_location_p(c);
+  }
+  */
+
+  return atomic_p;
+}
+
+/* Is it a unique concrete memory location?
+ *
+ * If strict_p, stubs are not considered atomic, as is the case in an
+ * interprocedural setting since they can be associated to several
+ * cells in the caller frame.
+ *
+ * Else, stubs are not considered non atomic per se.
+ */
+bool generic_atomic_points_to_cell_p(cell c, bool strict_p)
+{
+  reference r = cell_any_reference(c);
+  bool atomic_p = null_cell_p(c)
+    || generic_atomic_points_to_reference_p(r, strict_p);
 
   return atomic_p;
 }
@@ -395,7 +463,9 @@ bool atomic_points_to_cell_p(cell c)
  * know if they represent one address or a set of addresses. Unless
  * the intraprocedural points-to analysis is performed for each
  * combination of atomic/non-atomic stub, safety implies that
- * stub-based references are not atomic.
+ * stub-based references are not atomic (strict_p=true). In some other
+ * cases, you know that a stub does represent a unique location
+ * (strict_p=false).
  *
  * Note: it is assumed that the reference is a points-to
  * reference. All subscripts are constants, field references or
@@ -601,7 +671,7 @@ type points_to_array_reference_to_type(reference r)
 }
 
 
-/* Add a set of zero subscripts to a reference "r" by side effect.
+/* Add a set of zero subscripts to a constant memory path reference "r" by side effect.
  *
  * Used when a partial array reference must be converted into a
  * reference to the first array element (zero_p==true) or to any
@@ -621,12 +691,12 @@ void complete_points_to_reference_with_fixed_subscripts(reference r, bool zero_p
      subscript somewhere? */
   list sl = reference_indices(r);
   entity v = reference_variable(r);
-  list rsl = gen_nreverse(sl);
+  list rsl = gen_nreverse(sl); // sl is no longer available
   int i = 0;
   bool field_found_p = false;
 
   FOREACH(EXPRESSION, se, rsl) {
-    if(expression_field_p(se)) {
+    if(field_expression_p(se)) {
       reference fr = expression_reference(se);
       entity f = reference_variable(fr);
       t = entity_basic_concrete_type(f); 
@@ -643,7 +713,8 @@ void complete_points_to_reference_with_fixed_subscripts(reference r, bool zero_p
   list dl = variable_dimensions(vt);
   int d = (int) gen_length(dl);
 
-  pips_assert("Not Too many subscripts wrt the type.\n", i<=d);
+  /* FI: this may happen when reference "r" is not a constant memory path */
+  pips_assert("Not too many subscripts wrt the type.\n", i<=d);
 
   list nsl = NIL; // subscript list
   int j;
@@ -831,4 +902,130 @@ list points_to_cells_to_upper_bound_points_to_cells(list cl)
   }
   ubl = gen_nconc(cl, ubl);
   return ubl;
+}
+
+/* See if the subscript list sl is precise, i.e. if is does not
+ * contain any unbounded expression.
+ *
+ * It is assumed that it is a points-to subscript list. Each subscript
+ * is either an integer constant, or a field reference or an unbounded
+ * expression.
+ *
+ * This function may have been defined several times...
+ */
+bool exact_points_to_subscript_list_p(list sl)
+{
+  bool exact_p = true;
+  FOREACH(EXPRESSION, s, sl) {
+    if(unbounded_expression_p(s)) {
+      exact_p = false;
+      break;
+    }
+  }
+  return exact_p;
+}
+
+/* Two subscript are compatible if they are equal or if one of them is
+   unbounded. */
+bool compatible_points_to_subscripts_p(expression s1, expression s2)
+{
+  bool compatible_p = true;
+  bool u1 = unbounded_expression_p(s1);
+  if(!u1) {
+    bool u2 = unbounded_expression_p(s2);
+    if(!u2) {
+      /* In the ponts-to context s1 and s2 should be either integer
+	 constants or field references. */
+      compatible_p = expression_equal_p(s1, s2);
+    }
+  }
+  return compatible_p;
+}
+
+/* The value of the source can often be expressed with different
+ * subscript lists. For instance, a, a[0], a[0][0] have different
+ * types but the same value if a is a 2-D array.
+ *
+ * This function allocated a new points-to object whose sink has a
+ * minimal number of indices.
+ *
+ * FI: I have added this function to deal with pointers to arrays. It
+ * is called from generic_reference_to_points_to_matching_list() to
+ * try to adapt the points-to information to the undefined
+ * requirements of Beatrice's functions for regions_with_points_to. I
+ * do not think the function below is correct when structs are
+ * involved... The stripping may be useful, but it should be much more careful.
+ *
+ * adapt_reference_to_type() might be better here to adjust the
+ * subscripts in sink.
+ *
+ */
+points_to points_to_with_stripped_sink(points_to pt,
+				       int (*line_number_func)(void))
+{
+  cell source = points_to_source(pt);
+  cell sink = points_to_sink(pt);
+  cell new_sink_cell = cell_undefined;
+
+  // FI: first implementation
+  if(false) {
+    reference source_r = cell_any_reference(source);
+    list source_sl = reference_indices(source_r);
+    list c_source_sl = list_undefined;
+
+    reference sink_r = cell_any_reference(sink);
+    // FI: sink_sl is longer than source_sl if pt is semantically correct
+    list sink_sl = reference_indices(sink_r);
+    list c_sink_sl = list_undefined;
+    entity sink_e = reference_variable(sink_r);
+
+    list new_sink_sl = NIL;
+    for(c_source_sl = source_sl, c_sink_sl = sink_sl;
+	!ENDP(c_source_sl);
+	POP(c_source_sl), POP(c_sink_sl)) {
+      expression s = copy_expression(EXPRESSION(CAR(c_sink_sl)));
+      new_sink_sl = CONS(EXPRESSION, s, new_sink_sl);
+    }
+    if(!get_bool_property("POINTS_TO_STRICT_POINTER_TYPES")
+       && !anywhere_cell_p(sink)
+       && !cell_typed_anywhere_locations_p(sink)
+       && !ENDP(c_sink_sl)) {
+      /* Add the implicit dimension */
+      expression s = copy_expression(EXPRESSION(CAR(c_sink_sl)));
+      new_sink_sl = CONS(EXPRESSION, s, new_sink_sl);
+    }
+    new_sink_sl = gen_nreverse(new_sink_sl);
+
+    new_sink_cell = make_cell_reference(make_reference(sink_e, new_sink_sl));
+  }
+  else {
+    // Second implementation
+    if(anywhere_cell_p(sink) || cell_typed_anywhere_locations_p(sink)
+       || null_cell_p(sink) || nowhere_cell_p(sink)
+       // FI: why is the typed heap cell not handled too?
+       || heap_cell_p(sink)) {
+      new_sink_cell = copy_cell(sink);
+    }
+    else {
+      new_sink_cell = copy_cell(sink);
+      reference n_sink_r = cell_any_reference(new_sink_cell);
+      type source_t = points_to_cell_to_concrete_type(source);
+      if(pointer_type_p(source_t)) {
+	type source_pt = type_to_pointed_type(source_t);
+	if(adapt_reference_to_type(n_sink_r, source_pt, line_number_func))
+	  ;
+	else
+	  pips_internal_error("The type of a sink cell is not compatible with the source cell.\n");
+      }
+
+      else
+	pips_internal_error("The type of a source cell is not a pointer.\n");
+    }
+  }
+
+  points_to npt = make_points_to(copy_cell(source),
+				 new_sink_cell,
+				 copy_approximation(points_to_approximation(pt)),
+				 make_descriptor_none());
+  return npt;
 }

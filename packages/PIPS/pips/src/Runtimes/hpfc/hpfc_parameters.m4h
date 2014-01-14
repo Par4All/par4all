@@ -1,6 +1,6 @@
 dnl $Id$
 dnl
-dnl Copyright 1989-2010 MINES ParisTech
+dnl Copyright 1989-2014 MINES ParisTech
 dnl
 dnl This file is part of PIPS.
 dnl

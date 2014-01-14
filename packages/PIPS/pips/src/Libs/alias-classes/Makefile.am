@@ -10,7 +10,6 @@ libalias_classes_la_SOURCES=alias_pairs.c \
                 points_to_prettyprint.c \
 		points_to_analysis_general_algorithm.c \
 		points_to_init_analysis.c \
-		points_to_interprocedural_analysis.c \
 		constant-path-utils.c \
 	 	prettyprint.c \
 		statement.c \

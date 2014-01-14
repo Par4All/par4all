@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -217,7 +217,7 @@ static control make_initialization_from_loop (loop the_loop,
 				      make_instruction(is_instruction_sequence,
 						       init_sequence),
 				      NIL, NULL,
-				      statement_extensions(stat)),
+				      statement_extensions(stat), make_synchronization_none()),
 		       NIL, NIL);
 }
 
@@ -286,7 +286,7 @@ static control make_condition_from_loop (loop the_loop,
 				       make_instruction (is_instruction_test,
 							 condition_test),
 				       NIL,NULL,
-				       statement_extensions(stat));  
+				       statement_extensions(stat), make_synchronization_none());  
 
   return make_control (condition_statement, NIL, NIL);
 }
@@ -338,7 +338,7 @@ static control make_body_from_loop (loop the_loop,
 		     make_instruction (is_instruction_sequence,
 				       body_sequence),
 		     NIL,NULL,
-		     statement_extensions(stat));  
+		     statement_extensions(stat), make_synchronization_none());  
   return make_control (body_statement, NIL, NIL);
 }
 

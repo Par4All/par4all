@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -33,3 +33,9 @@
 #define USER_TOTAL_PRECONDITION_SUFFIX ".utprec"
 
 extern bool refine_transformers_p;
+
+typedef struct{
+  gen_array_t indices;
+  statement statement;
+}path;
+

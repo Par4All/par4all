@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -169,6 +169,16 @@ bool assignment_block_or_statement_p(statement s)
 bool return_statement_p(statement s) {
   instruction i = statement_instruction(s);
   return return_instruction_p(i);
+}
+
+bool exit_statement_p(statement s) {
+  instruction i = statement_instruction(s);
+  return exit_instruction_p(i);
+}
+
+bool abort_statement_p(statement s) {
+  instruction i = statement_instruction(s);
+  return abort_instruction_p(i);
 }
 
 /* Test if a statement is a Fortran "return" */
@@ -587,7 +597,7 @@ instruction_to_statement(instruction instr) {
 			STATEMENT_ORDERING_UNDEFINED,
 			empty_comments,
 			instr,NIL,NULL,
-			empty_extensions()));
+			empty_extensions(), make_synchronization_none()));
 }
 
 
@@ -990,7 +1000,7 @@ statement make_whileloop_statement(expression condition,
 		       string_undefined,
 		       make_instruction_whileloop(w),
 		       NIL, string_undefined,
-		       empty_extensions ());
+		       empty_extensions (), make_synchronization_none());
   return smt;
 }
 
@@ -1016,7 +1026,7 @@ string c; /* comments, default empty_comments (was: "" (was: string_undefined)) 
 				       make_call(called_function,args)),
 		      NIL,
 		      NULL,
-		      empty_extensions ());
+		      empty_extensions (), make_synchronization_none());
 
   ifdebug(8) {
     pips_debug(8, "cs is call to %s\n", function_name);
@@ -1487,14 +1497,14 @@ statement makeloopbody(loop l, statement s_old, bool inner_p)
 			     statement_ordering(s_old),
 			     statement_comments(s_old),
 			     instr_l,NIL,NULL,
-			     statement_extensions(s_old));
+			     statement_extensions(s_old), make_synchronization_none());
     l_body = make_statement(entity_empty_label(),
 			    STATEMENT_NUMBER_UNDEFINED,
 			    STATEMENT_ORDERING_UNDEFINED,
 			    empty_comments,
 			    make_instruction_block(CONS(STATEMENT,state_l,NIL)),
 			    NIL,NULL,
-			    empty_extensions ());
+			    empty_extensions (), make_synchronization_none());
 
     return(l_body);
 }
@@ -2362,7 +2372,7 @@ static void generic_insert_statement(statement s,
               statement_instruction(s),
               statement_declarations(s),
               statement_decls_text(s),
-              statement_extensions(s)
+              statement_extensions(s), make_synchronization_none()
               );
       /* no duplication */
       statement_label(s)=entity_empty_label();
@@ -3853,3 +3863,61 @@ void statement_remove_useless_label(statement s)
         }
     }
 }
+
+
+/* return true if s is enclosed in stmt*/
+bool belong_to_statement(statement stmt, statement s, bool found_p)
+{
+  if(!found_p){
+    if(statement_ordering(s) == statement_ordering(stmt))
+      return true;
+    else
+      {
+	instruction inst = statement_instruction(stmt);
+	switch(instruction_tag(inst))  {
+	case is_instruction_block: {
+	  bool bs = found_p;
+	  MAPL( stmt_ptr,
+		{
+		    statement local_stmt = STATEMENT(CAR( stmt_ptr ));
+		    bs = bs || belong_to_statement(local_stmt, s, found_p);
+		},
+		instruction_block( inst ) );
+	  return bs;
+	}
+	case is_instruction_test :{
+	  test t = instruction_test(inst);
+	  bool bt = found_p || belong_to_statement(test_true(t), s, found_p);
+	  return bt || belong_to_statement(test_false(t), s, found_p);
+	  break;
+	}
+	case is_instruction_loop : {
+	  loop l = statement_loop(stmt);
+	  statement body = loop_body(l);
+	  return found_p || belong_to_statement(body, s, found_p);
+	  break;
+	}
+	case is_instruction_forloop :{
+	  forloop l = statement_forloop(stmt);
+	  statement body = forloop_body(l);
+	  return found_p || belong_to_statement(body, s, found_p);
+	  break;
+	}
+	case is_instruction_whileloop : {
+	  whileloop l = statement_whileloop(stmt);
+	  statement body = whileloop_body(l);
+	  return found_p || belong_to_statement(body, s, found_p);
+	  break;
+	}
+	case is_instruction_call:
+	  return found_p || false;
+	  break;
+	default:
+	  break;
+	}
+      }
+  }
+  else return true;
+  return found_p;
+}
+

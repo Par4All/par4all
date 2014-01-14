@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright 1989-2010 MINES ParisTech
+ Copyright 1989-2014 MINES ParisTech
 
  This file is part of PIPS.
 
@@ -52,6 +52,10 @@
 #include "pipsdbm.h"
 #include "resources.h"
 #include "transformations.h"
+
+#include "accel-util.h"
+#include "properties.h"
+
 
 /* Context used for substitution with gen_context_recurse */
 typedef struct {
@@ -119,6 +123,94 @@ static bool index_of_a_loop_p( Variable v, list /* of statements */ loops ) {
   else pips_debug(4,"%s is not a loop index !\n",entity_name((entity)v));
 
   return result;
+}
+
+/**
+ * Modifies the list l so it contains all the loop indexes and scalar written variables
+ * It is a little "extension" of the induction variable detection.
+ * Required by R-Stream.
+ * Depending on the activated option, only loop indexes or both loop indexes and written scalar
+ * variables are put into the list.
+ */
+void get_variables_to_remove(list ref_ent, statement s, list* l) {
+  instruction instTop = statement_instruction(s);
+  switch(instruction_tag(instTop)) {
+  case is_instruction_sequence :
+    {
+      list stmts = sequence_statements(instruction_sequence(instTop));
+      FOREACH(statement, stmt, stmts) {
+	list enclosing_loops = load_statement_enclosing_loops(s);
+	if (!ENDP(enclosing_loops) && !statement_loop_p(stmt)) {
+	  FOREACH(entity, e, ref_ent) {
+	    if (get_bool_property("OUTLINE_REMOVE_VARIABLE_RSTREAM_IMAGE")) {
+	      bool write_p = find_write_effect_on_entity(stmt, e);
+	      if (index_of_a_loop_p((Variable)e, enclosing_loops) || (write_p && !entity_array_p(e))) {
+		*l = gen_once(e,*l);
+	      }
+	    }
+	    else if (get_bool_property("OUTLINE_REMOVE_VARIABLE_RSTREAM_SCOP")) {
+	      if (index_of_a_loop_p((Variable)e, enclosing_loops)) {
+		*l = gen_once(e,*l);
+	      }
+	    }
+	  }
+	}
+	instruction inst = statement_instruction(stmt);
+	switch(instruction_tag(inst)) {
+	case is_instruction_loop :
+	  get_variables_to_remove(ref_ent, loop_body(statement_loop(stmt)), l);
+	  break;
+	case is_instruction_whileloop :
+	  get_variables_to_remove(ref_ent, whileloop_body(statement_whileloop(stmt)), l);
+	  break;
+	case is_instruction_test :
+	  get_variables_to_remove(ref_ent, test_true(instruction_test(inst)), l);
+	  get_variables_to_remove(ref_ent, test_false(instruction_test(inst)), l);
+	  break;
+	default :
+	  break;
+	}
+	
+      }
+    }
+    break;
+  case is_instruction_loop :
+    {
+      get_variables_to_remove(ref_ent, loop_body(instruction_loop(instTop)), l);
+    }
+    break;
+  case is_instruction_whileloop :
+    {
+      get_variables_to_remove(ref_ent, whileloop_body(instruction_whileloop(instTop)), l);
+    }
+    break;
+  case is_instruction_test :
+    {
+      get_variables_to_remove(ref_ent, test_true(instruction_test(instTop)), l);
+      get_variables_to_remove(ref_ent, test_false(instruction_test(instTop)), l);
+    }
+    break;
+  default :
+    {
+      list enclosing_loops = load_statement_enclosing_loops(s);
+      if (!ENDP(enclosing_loops)) {
+	FOREACH(entity, e, ref_ent) {
+	  if (get_bool_property("OUTLINE_REMOVE_VARIABLE_RSTREAM_IMAGE")) {
+	    bool write_p = find_write_effect_on_entity(s, e);
+	    if (index_of_a_loop_p((Variable)e, enclosing_loops) || (write_p && !entity_array_p(e))) {
+	      *l = gen_once(e,*l);
+	    }
+	  }
+	  else if (get_bool_property("OUTLINE_REMOVE_VARIABLE_RSTREAM_SCOP")) {
+	    if (index_of_a_loop_p((Variable)e, enclosing_loops)) {
+	      *l = gen_once(e,*l);
+	    }
+	  }
+	}
+      }
+    }
+    break;
+  }
 }
 
 /**
@@ -368,7 +460,7 @@ static bool expression_subtitution_on_call( expression substitute,
                                             call c,
                                             instruction root_instruction) {
   ifdebug( 1 ) {
-      pips_debug(0, "Induction substitution : %s => ", //
+      pips_debug(1, "Induction substitution : %s => ", //
               entity_local_name( induction_variable_candidate ) );
       print_syntax( expression_syntax( substitute ) );
       fprintf(stderr, " on call : " );
@@ -535,34 +627,34 @@ static bool subtitute_induction_statement_in( statement s ) {
 
         ifdebug(4) {
           if ( found_loop_index ) {
-            pips_debug(0,"Loop index found !\n");
+            pips_debug(4,"Loop index found !\n");
           } else {
-            pips_debug(0,"No loop index found !\n");
+            pips_debug(4,"No loop index found !\n");
           }
           if ( !entity_undefined_p( induction_variable_candidate )) {
-            pips_debug(0,"Induction variable candidate found : %s\n",
+            pips_debug(4,"Induction variable candidate found : %s\n",
                        entity_local_name(induction_variable_candidate));
           } else {
-            pips_debug(0,"No Induction variable candidate found !\n");
+            pips_debug(4,"No Induction variable candidate found !\n");
           }
           if ( induction_variable_candidate_coeff != 0) {
-            pips_debug(0,"Variable is active !\n");
+            pips_debug(4,"Variable is active !\n");
           } else {
-            pips_debug(0,"Variable is not active !\n");
+            pips_debug(4,"Variable is not active !\n");
           }
           if ( !expression_undefined_p( substitute )) {
-            pips_debug(0,"The substitute expression is ");
+            pips_debug(4,"The substitute expression is ");
             print_syntax( expression_syntax( substitute ) );
             fprintf( stderr, "\n" );
           } else {
-            pips_debug(0,"The substitute expression is undefined.\n");
+            pips_debug(4,"The substitute expression is undefined.\n");
           }
           if( is_modified_entity_in_transformer(
               load_statement_transformer( s ), //
               induction_variable_candidate ) ) {
-            pips_debug(0,"Variable is modified by this statement\n");
+            pips_debug(4,"Variable is modified by this statement\n");
           } else {
-            pips_debug(0,"Variable is not modified by this statement\n");
+            pips_debug(4,"Variable is not modified by this statement\n");
           }
         }
 

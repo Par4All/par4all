@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -68,7 +68,7 @@
 #define MAIN_PREFIX                      "%"
 #define COMMON_PREFIX                    "~"
 #define BLOCKDATA_PREFIX                 "&"
-#define F95MODULE_PREFIX                 "¤"
+#define F95MODULE_PREFIX                 "\xa4" // unicode character CURRENCY SIGN
 
 #define FILE_SEP_CHAR                    '!'
 #define FILE_SEP                         FILE_SEP_CHAR
@@ -828,6 +828,8 @@
 #define FPUTC_FUNCTION_NAME             "fputc"
 #define FGETC_FUNCTION_NAME             "fgetc"
 #define FOPEN_FUNCTION_NAME             "fopen"
+#define FDOPEN_FUNCTION_NAME            "fdopen"
+#define FREOPEN_FUNCTION_NAME           "freopen"
 #define FCLOSE_FUNCTION_NAME            "fclose"
 #define SNPRINTF_FUNCTION_NAME          "snprintf"
 #define SSCANF_FUNCTION_NAME            "sscanf"
@@ -864,6 +866,7 @@
 #define CLEARERR_FUNCTION_NAME          "clearerr"
 #define FEOF_FUNCTION_NAME              "feof"
 #define FERROR_FUNCTION_NAME            "ferror"
+#define FILENO_FUNCTION_NAME            "fileno"
 #define PERROR_FUNCTION_NAME            "perror"
 // #define WRITE_SYSTEM_FUNCTION_NAME      "write"
 // #define READ_SYSTEM_FUNCTION_NAME       "read"
@@ -1163,6 +1166,8 @@
   (same_string_p(global_name_to_user_name(entity_name(e)), name##_OPERATOR_NAME))
 #define entity_a_function_p(e,name) \
   (same_string_p(global_name_to_user_name(entity_name(e)), name##_FUNCTION_NAME))
+#define entity_a_special_entity_p(e,name) \
+  (same_string_p(global_name_to_user_name(entity_name(e)), name))
 
 #define ENTITY_CONVERSION_P(e,name) \
   (strcmp(entity_local_name(e), name##_GENERIC_CONVERSION_NAME)==0)
@@ -1204,6 +1209,7 @@
 #define ENTITY_C_MODULO_P(e) entity_an_operator_p(e, C_MODULO)
 #define ENTITY_POWER_P(e) entity_an_operator_p(e, POWER)
 #define ENTITY_DIVIDE_P(e) entity_an_operator_p(e, DIVIDE)
+
 #define ENTITY_MIN_P(e) entity_an_operator_p(e, MIN)
 #define ENTITY_C_MIN_P(e) entity_an_operator_p(e,PIPS_C_MIN)
 #define ENTITY_MAX_P(e) entity_an_operator_p(e, MAX)
@@ -1214,10 +1220,25 @@
 #define ENTITY_DMIN1_P(e) entity_an_operator_p(e, DMIN1)
 #define ENTITY_DMAX1_P(e) entity_an_operator_p(e, DMAX1)
 #define ENTITY_MIN_OR_MAX_P(e) (ENTITY_MIN_P(e) || ENTITY_MAX_P(e) )
+
 #define ENTITY_ABS_P(e) entity_an_operator_p(e, ABS)
 #define ENTITY_IABS_P(e) entity_an_operator_p(e, IABS)
 #define ENTITY_DABS_P(e) entity_an_operator_p(e, DABS)
 #define ENTITY_CABS_P(e) entity_an_operator_p(e, CABS)
+//abs in stdlib.h C89
+#define ENTITY_C_ABS_P(e) entity_a_function_p(e, C_ABS)
+#define ENTITY_LABS_P(e) entity_a_function_p(e, LABS)
+#define ENTITY_LLABS_P(e) entity_a_function_p(e, LLABS)     //C99
+//abs in inttypes.h C99
+#define ENTITY_IMAXABS_P(e) entity_a_function_p(e, IMAXABS)
+//abs in math.h C99
+#define ENTITY_FABS_P(e) entity_an_operator_p(e, FABS)
+#define ENTITY_FABSF_P(e) entity_an_operator_p(e, FABSF)
+#define ENTITY_FABSL_P(e) entity_an_operator_p(e, FABSL)
+//abs in complex.h C99
+#define ENTITY_C_CABS_P(e) entity_an_operator_p(e, C_CABS)
+#define ENTITY_CABSF_P(e) entity_an_operator_p(e, CABSF)
+#define ENTITY_CABSL_P(e) entity_an_operator_p(e, CABSL)
 
 #define ENTITY_AND_P(e) (entity_an_operator_p(e, AND) || entity_an_operator_p(e, C_AND))
 #define ENTITY_OR_P(e) (entity_an_operator_p(e, OR) || entity_an_operator_p(e, C_OR))
@@ -1231,6 +1252,8 @@
 #define ENTITY_NON_EQUIV_P(e) entity_an_operator_p(e, NON_EQUIV)
 #define ENTITY_LEFT_SHIFT_P(e) entity_an_operator_p(e, LEFT_SHIFT)
 #define ENTITY_RIGHT_SHIFT_P(e) entity_an_operator_p(e, RIGHT_SHIFT)
+
+#define ENTITY_ADDRESS_OF_P(e) entity_an_operator_p(e, ADDRESS_OF)
 
 /* Attention :
    This definition is different with the Fortran Standard where the logical
@@ -1299,6 +1322,7 @@
 #define ENTITY_OMP_PARALLEL_P(e)         ENTITY_NAME_P(e,OMP_PARALLEL_FUNCTION_NAME)
 #define ENTITY_OMP_REDUCTION_P(e)        ENTITY_NAME_P(e,OMP_REDUCTION_FUNCTION_NAME)
 
+
 /*io functions: C library and system io.Amira Mensi*/
 
 /*#include<stdio.h> */
@@ -1316,6 +1340,8 @@
 #define ENTITY_FPUTC_P(e)                ENTITY_NAME_P(e, "fputc")
 #define ENTITY_FGETC_P(e)                ENTITY_NAME_P(e, "fgetc")
 #define ENTITY_FOPEN_P(e)                ENTITY_NAME_P(e, "fopen")
+#define ENTITY_FDOPEN_P(e)               ENTITY_NAME_P(e, "fdopen")
+#define ENTITY_FREOPEN_P(e)              ENTITY_NAME_P(e, "freopen")
 #define ENTITY_FCLOSE_P(e)               ENTITY_NAME_P(e, "fclose")
 #define ENTITY_SNPRINTF_P(e)             ENTITY_NAME_P(e, "snprintf")
 #define ENTITY_SSCANF_P(e)               ENTITY_NAME_P(e, "sscanf")
@@ -1348,6 +1374,7 @@
 #define ENTITY_CLEARERR_P(e)             ENTITY_NAME_P(e, "clearer")
 #define ENTITY_FEOF_P(e)                 ENTITY_NAME_P(e, "feof")
 #define ENTITY_FERROR_P(e)               ENTITY_NAME_P(e, "ferror")
+#define ENTITY_FILENO_P(e)               ENTITY_NAME_P(e, "fileno")
 #define ENTITY_PERROR_P(e)               ENTITY_NAME_P(e, "perror")
 
 /*io functions: C library and system io.Amira Mensi*/
@@ -1869,8 +1896,11 @@ the variable is unsigned, signed or not */
 #define MEMMOVE_EFFECTS_PACKAGE_NAME "_MEMMOVE_EFFECTS"
 /* variable name for memmove unit */
 #define MEMMOVE_EFFECTS_NAME "_MEMMOVE_"
-/* array of Logical UNits; it is more or less handled as the current file pointer */
+/* array of Logical UNits; it is more or less handled as the current file pointer; in C, used for open, close, read, write... */
 #define IO_EFFECTS_ARRAY_NAME "LUNS"
+/* Array of struct io_files pointed to by pointers returned by fopen
+   and used by fclose, fscanf, fprintf... */
+#define IO_EFFECTS_IO_FILE_NAME "IO_FILES"
 /* To express C IO intrinsics effects */
 #define IO_EFFECTS_PTR_NAME "_C_IO_ptr"
 /* array of end of file codes */
@@ -1884,8 +1914,13 @@ the variable is unsigned, signed or not */
 /* Standard unit numbers depend on the operating system. Here are UNIX definitions. */
 #define STDERR_LUN (0)
 #define STDERR_NAME "stderr"
+#define ENTITY_STDERR_P(e) entity_a_special_entity_p(e, STDERR_NAME)
 #define STDIN_LUN (5)
+#define STDIN_NAME "stdin"
+#define ENTITY_STDIN_P(e) entity_a_special_entity_p(e, STDIN_NAME)
 #define STDOUT_LUN (6)
+#define STDOUT_NAME "stdout"
+#define ENTITY_STDOUT_P(e) entity_a_special_entity_p(e, STDOUT_NAME)
 
 /*Symbolic constants for the file descriptors belonging to the standard streams: unistd.h */
 #if !defined(HAVE_UNISTD_H) && !defined(_UNISTD_H)
@@ -2208,3 +2243,26 @@ enum {
 };
 
 #define make_entity(n,t,s,i) make_entity(n,t,s,i,DEFAULT_ENTITY_KIND)
+
+/* SPIRE API */
+#define SEND_FUNCTION_NAME                        "send"  
+#define RECV_FUNCTION_NAME                          "recv" 
+#define SIGNAL_FUNCTION_NAME                        "signal"  
+#define WAIT_FUNCTION_NAME                          "wait"   
+
+
+/*MPI calls*/
+#define MPI_INIT "MPI_Init"
+#define MPI_FINALIZE "MPI_Finalize"
+#define MPI_ISEND "MPI_Isend"
+#define MPI_RECV "MPI_Recv"
+#define MPI_BARRIER "MPI_Barrier"
+
+/*MPI types*/
+#define MPI_STATUS "MPI_Status"
+#define MPI_REQUEST "MPI_Request"
+
+/* intrinsic entity declarations */
+#define ENTITY_SEND_P(e)              ENTITY_NAME_P(e, "send")
+
+

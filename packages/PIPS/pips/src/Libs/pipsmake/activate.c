@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -60,13 +60,12 @@ void save_active_phases(void)
     }
 }
 
-void
-retrieve_active_phases(void)
+void retrieve_active_phases(void)
 {
     makefile current_makefile = parse_makefile();
 
     ifdebug(9) {
-	puts("----- BEFORE RETREIVING -----");
+	puts("----- BEFORE RETRIEVING -----");
 	fprint_activated(stdout);
     }
 
@@ -86,12 +85,30 @@ retrieve_active_phases(void)
 bool active_phase_p(const char * phase)
 {
     makefile current_makefile = parse_makefile();
+    list apl = makefile_active_phases(current_makefile);
 
-    MAP(STRING, s,
-	if (same_string_p(s, phase)) return true,
-	makefile_active_phases(current_makefile));
+    FOREACH(STRING, s, apl)
+      if (same_string_p(s, phase))
+	return true; // new line for breakpoints
 
     return false;
+}
+
+/* Debugging function */
+bool saved_active_phase_p(const char * phase)
+{
+  list sapl = saved_active_phases;
+
+  if(ENDP(sapl)) {
+    fprintf(stderr, "Active phases have not been saved\n");
+  }
+  else {
+    FOREACH(STRING, s, sapl)
+      if (same_string_p(s, phase))
+	return true; // new line for breakpoints
+  }
+
+  return false;
 }
 
 

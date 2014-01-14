@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -1221,6 +1221,30 @@ transformer transformer_derivative_fix_point(transformer tf)
        inv_tf = transformer_arguments_projection(transformer_dup(tf));
        fix_tf = transformer_image_intersection(fix_tf, inv_tf);
        free_transformer(inv_tf);
+    */
+
+    /* What can be done instead is to refine fix_tf as :
+     *
+     * dom(tf) U tf(fix_tf(dom(tf)))
+     *
+     * But this fails because tf loops back to the beginning of the
+     * next iteration. Hence, the domain of tf implies *two*
+     * iterations instead of one. For instance, "i<n" becomes "i<=n-2"
+     * for a while loop such as "while(i<n) i++;".
+     *
+     * So this refinement should be performed at a higher level where
+     * t_init and t_enter are know... so as to have:
+     *
+     * dom_tf = transformer_range(t_enter(t_init)).
+     */
+    /*
+    transformer dom_tf = transformer_to_domain(tf);
+    transformer tf_plus = transformer_combine(copy_transformer(dom_tf), fix_tf);
+    tf_plus = transformer_combine(tf_plus, tf);
+    free_transformer(fix_tf);
+    fix_tf = transformer_convex_hull(dom_tf, tf_plus);
+    free_transformer(dom_tf);
+    free_transformer(tf_plus);
     */
   }
   /* That's all! */

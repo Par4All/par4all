@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -386,7 +386,7 @@ void integer_expression_and_precondition_to_integer_interval(expression e,
   transformer et = integer_expression_to_transformer(tmp, e, p, true);
 
   /* If expression e is transformer-wise side-effect free (i.e. the ABSTRACT store is not modified)*/
-  if(ENDP(transformer_arguments(et))) {
+  if(!transformer_undefined_p(et) && ENDP(transformer_arguments(et))) {
     transformer tp = transformer_range_intersection(transformer_dup(p), et);
     Psysteme s = transformer_undefined_p(tp) ?
       sc_make(CONTRAINTE_UNDEFINED, CONTRAINTE_UNDEFINED) :

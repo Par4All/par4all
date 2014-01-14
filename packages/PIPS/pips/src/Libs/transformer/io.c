@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -93,7 +93,7 @@ fprint_transformer(FILE * fd,
     /* print relation */
     if(SC_UNDEFINED_P(sc))
       pips_internal_error("undefined relation");
-    (void) fprintf(fd,"relation:");
+    (void) fprintf(fd,"\nrelation:");
     sc_fprint(fd,
 	      sc,
 	      value_name);

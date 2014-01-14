@@ -1,5 +1,5 @@
 
-/* This files containes all th eoperators defining  constant paths :
+/* This file contains all the operators defining  constant paths :
 
 CP = Mdodule * Name * Type *Vref.
 To calculate the lattice PC operators we define these operators first
@@ -749,7 +749,7 @@ bool opkill_must_module(cell m1, cell m2)
 }
 
 
-/* Opertaor gen for modules:
+/* Operator gen for modules:
    m1 is the sink, m2 the source (m2 points to m1)
    opkill_gen_module : Module * Module -> Module
 
@@ -1150,8 +1150,8 @@ set kill_may_set(list L, set in_may)
   FOREACH(cell, l, L) {
     SET_FOREACH(points_to, pt, in_may) {
       cell pt_source = points_to_source(pt);
-      if (opkill_may_constant_path(points_to_source(pt),l)) {
-	points_to npt = make_points_to(points_to_source(pt),
+      if (opkill_may_constant_path(pt_source,l)) {
+	points_to npt = make_points_to(pt_source,
 				       points_to_sink(pt), 
 				       make_approximation_exact(),
 				       make_descriptor_none());
@@ -1163,8 +1163,8 @@ set kill_may_set(list L, set in_may)
 }
 
 
-/* Generate the set of exact arcs that must be removed from the
- * current points-to graph.
+/* Generate the subset of arcs that must be removed from the
+ * points-to graph "in".
  *
  * Set "in_must" is the subset of set "in" with exact points-to arcs only.
  *
@@ -1175,18 +1175,16 @@ set kill_may_set(list L, set in_may)
  * Here, correctly, the atomicity is not checked directly, but
  * properly, using an operator of the lattice.
  */
-set kill_must_set(list L, set in_must)
+set kill_must_set(list L, set in)
 {
-  set kill_must = set_generic_make(set_private, points_to_equal_p,
-			     points_to_rank);
+  set kill_must = new_simple_pt_map();
   int nL = (int) gen_length(L);
 
   if(nL==1) {
-    FOREACH(cell, l, L){
-      SET_FOREACH(points_to, s, in_must){
-	if(opkill_must_constant_path(points_to_source(s),l))
-	  set_add_element(kill_must, kill_must,(void*)s);
-      }
+    cell l = CELL(CAR(L));
+    SET_FOREACH(points_to, s, in) {
+      if(opkill_must_constant_path(points_to_source(s),l))
+	set_add_element(kill_must, kill_must,(void*)s);
     }
   }
   return kill_must;
@@ -1366,6 +1364,10 @@ set gen_may_set(list L, list R, set in_may, bool *address_of_p)
     }
   }
 
+  // FI->FI: this is a really bad idea; it adds an upperapproximation
+  // that is not needed and that reduces accuracy.
+  // This shows on formal_parameter01
+#if 0
   FOREACH(cell, l, L) {
     // Hopefully, l' will be empty most of the time!
     list L_prime = points_to_cell_to_upper_bound_points_to_cells(l);
@@ -1376,6 +1378,7 @@ set gen_may_set(list L, list R, set in_may, bool *address_of_p)
       // free_set(gen_l);
     }
   }
+#endif
 
   set_union(gen_may2, gen_may2, gen_may1);
   set_union(gen_may2, gen_may2, gen_may3);
@@ -1928,4 +1931,123 @@ bool equal_must_vreference(cell c1, cell c2)
   }
 
   return (i==0? true: false);
+}
+
+/*
+ * want to test if r can only be a constant path and nothing else
+ * WARNING : not totally tested
+ * for instance
+ *        a[0], a[1], a[i], i, j, ... have to return false
+ *        a[*], var points by formal parameter (_p_0, ...), element of strut (s.id, ...), heap element have to return true
+ *  * !effect_reference_dereferencing_p(r, &exact_p)
+ *      can return true when it's not a constant path like a[i] (a[i] and not a[*])
+ *      can make a side effect for the declaration of variable in parameter (only?), don't know why
+ *      for instance with Semantics-New/Pointer.sub/memcopy01
+ *        void memcopy01([...], char dst[size])  -->  void memcopy01([...], char dst[i])
+ *  * store_independent_reference_p(r)
+ *      can return false for some cp like a[0], can't permit to treat the array
+ *          return false for the structure too, can't permit to treat the struct
+ *      can return true for i, j, ... that can be a constant path but not strictly a constant path
+ * param r          reference to analyze to see if it's a constant path
+ * return           true if r is exactly a constant path
+ */
+bool strict_constant_path_p(reference r)
+{
+  bool constant_path = false;
+  entity v = reference_variable(r);
+  list l_ind = reference_indices(r);
+
+  // Test the different top and bottom area
+  if (entity_all_locations_p(v)
+      || entity_anywhere_locations_p(v) || entity_typed_anywhere_locations_p(v)
+      || entity_nowhere_locations_p(v) || entity_typed_nowhere_locations_p(v)
+      || entity_all_module_locations_p(v)
+      ) {
+    constant_path = true;
+  }
+  else if (entity_all_module_heap_locations_p(v)
+      || entity_all_heap_locations_p(v)
+      ) {
+    constant_path = true;
+  }
+  else if (entity_all_module_stack_locations_p(v)
+      || entity_all_stack_locations_p(v)
+      ) {
+    constant_path = true;
+  }
+  else if (entity_all_module_static_locations_p(v)
+      || entity_all_static_locations_p(v)
+      ) {
+    constant_path = true;
+  }
+  else if (entity_all_module_dynamic_locations_p(v)
+      || entity_all_dynamic_locations_p(v)
+      ) {
+    constant_path = true;
+  }
+  else if (entity_abstract_location_p(v)) { // Maybe this test permit to eliminate the 4 test just before?
+    constant_path = true;
+  }
+  // Test if it's the constant NULL
+  else if (entity_null_locations_p(v)) {
+    constant_path = true;
+  }
+  // Test if it's a formal parameter
+  else if (entity_stub_sink_p(v)) {
+    constant_path = true;
+  }
+  // Test if it's a heap element
+  else if (heap_area_p(v)) {
+    constant_path = true;
+  }
+  // Maybe not efficient enough, for array of struct or struct of array?
+  // Test if it's a structure
+  else if (struct_type_p(entity_type(v)) && !ENDP(l_ind)) {
+    constant_path = true;
+  }
+  // Test if it's a array with only *
+  else if (!ENDP(l_ind)) {
+    // see reference_unbounded_indices_p
+    constant_path = reference_unbounded_indices_p(r);
+  }
+
+  return constant_path;
+}
+
+/* TODO
+ * most of the time return same result that !effect_reference_dereferencing_p for the moment
+ * want to test if r can be a constant path
+ * for instance
+ *        a[i] have to return false (something else?)
+ *        a[0], a[1], i, j, a[*], var points by formal parameter (_p_0, ...), element of strut (s.id, ...), heap element
+ *                  have to return true
+ *  * !effect_reference_dereferencing_p(r, &exact_p)
+ *      can return true when it's not a constant path like a[i] (a[i] and not a[*])
+ *      can make a side effect for the declaration of variable in parameter (only?), don't know why
+ *      for instance with Semantics-New/Pointer.sub/memcopy01
+ *        void memcopy01([...], char dst[size])  -->  void memcopy01([...], char dst[i])
+ *  * store_independent_reference_p(r)
+ *      can return false for some cp like a[0], can't permit to treat the array
+ *          return false for the structure too, can't permit to treat the struct
+ *      can return true for i, j, ... that can be a constant path but not strictly a constant path
+ * param r          reference to analyze to see if it's a constant path
+ * return           true if r can be constant path
+ */
+bool can_be_constant_path_p(reference r)
+{
+  bool constant_path = true;
+
+  if (strict_constant_path_p(r))
+    constant_path = true;
+  else {
+    bool exact_p = true;
+    if (!effect_reference_dereferencing_p(r, &exact_p)) {
+      constant_path = true;
+    }
+    else {
+      constant_path = false;
+    }
+  }
+
+  return constant_path;
 }

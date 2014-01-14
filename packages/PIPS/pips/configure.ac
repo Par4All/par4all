@@ -284,11 +284,14 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Libs/accel-util/Makefile
 				 src/Libs/pocc-interface/Makefile
 				 src/Libs/taskify/Makefile
+				 src/Libs/task_parallelization/Makefile
 				 src/Libs/transformer/Makefile
 				 src/Libs/static_controlize/Makefile
 				 src/Libs/paf-util/Makefile
 				 src/Libs/wp65/Makefile
 				 src/Libs/gnulib/Makefile
+				 src/Libs/rstream_interface/Makefile
+				 src/Libs/regions_to_loops/Makefile
 
 				 src/Passes/Makefile
 				 src/Passes/fortran95/Makefile

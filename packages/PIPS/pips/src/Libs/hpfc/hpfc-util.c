@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -218,7 +218,7 @@ int the_tag;
 			   STATEMENT_ORDERING_UNDEFINED,
 			   string_undefined_p(c)? c: strdup(c),
 			   make_instruction(the_tag, x),NIL,NULL,
-			   copy_extensions (statement_extensions(stat)));
+			   copy_extensions (statement_extensions(stat)), make_synchronization_none());
     fix_statement_attributes_if_sequence(new_s);
     return new_s;
 }

@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright 1989-2010 MINES ParisTech
+ Copyright 1989-2014 MINES ParisTech
 
  This file is part of PIPS.
 
@@ -178,7 +178,6 @@ bool ignore_this_conflict(vertex v1, vertex v2, conflict c, int l) {
     /* equivalences do not deserve more cpu cycles */
     return (false);
   }
-
   for (i = 1; i < l - enclosing; i++) {
     if(!ENDP(loops1)) {
       loops1 = CDR(loops1);
@@ -187,7 +186,6 @@ bool ignore_this_conflict(vertex v1, vertex v2, conflict c, int l) {
       loops2 = CDR(loops2);
     }
   }
-
   ifdebug(8) {
     pips_debug(8, "verifying the following conflit at level %d: \n",l);
     fprintf(stderr,
@@ -553,7 +551,7 @@ statement MakeLoopAs(statement old_loop_statement,
                        make_instruction(is_instruction_loop, new_loop),
                        NIL,
                        NULL,
-                       copy_extensions(statement_extensions(old_loop_statement)));
+                       copy_extensions(statement_extensions(old_loop_statement)), make_synchronization_none());
 
   ifdebug(8) {
     pips_assert("Execution is either parallel or sequential",

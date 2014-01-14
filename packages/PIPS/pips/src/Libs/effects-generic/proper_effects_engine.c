@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -1756,6 +1756,10 @@ generic_proper_effects_of_expression(expression e)
 	  }
 	else {
 	  if(!get_bool_property("MEMORY_EFFECTS_ONLY")) {
+	    // FI->BC: this piece of code generates an effect on type
+	    // "size_t" when a FILE * variable is declared...
+	    // See libio.h and Rice/fgetc01
+	    // This might be useful to control loop distribution.
 	    type sot = sizeofexpression_type(se);
 
 	    if(typedef_type_p(sot)) {
@@ -2414,6 +2418,90 @@ static bool stmt_filter(statement s)
   return(true);
 }
 
+/* Looks for effect hidden in dependent types.
+ *
+ * Type have to be traversed recursively, looking for dimensions at
+ * any level.
+ * 
+ * Might be better implemented with a gen_multirecurse(), at least if
+ * it would traverse entities...
+ *
+ * FI: This piece of code is certainly not well validated! I have seen
+ * many example of direct array dimensions and one example with a
+ * pointer to a dependent type array.
+ */
+list type_to_effects(type t)
+{
+  set ts = set_make(hash_pointer);
+  list t_eff_l = recursive_type_to_effects(t, ts);
+  set_free(ts);
+  return t_eff_l;
+}
+
+list recursive_type_to_effects(type t, set ts)
+{
+  list t_eff = NIL;
+
+  if(!set_belong_p(ts, (void *) t)) {
+    ts = set_add_element(ts, ts, (void *) t);
+    if(type_variable_p(t)) {
+      variable v = type_variable(t);
+      list dl = variable_dimensions(v);
+      FOREACH(DIMENSION, d, dl) {
+	list l_eff_l = generic_proper_effects_of_expression(dimension_lower(d));
+	list l_eff_u = generic_proper_effects_of_expression(dimension_upper(d));
+	l_eff_l = gen_nconc(l_eff_l, l_eff_u);
+	t_eff = gen_nconc(t_eff, l_eff_l);
+      }
+      basic b = variable_basic(v);
+      if(basic_pointer_p(b)) {
+	// You may have a pointer to an array as in
+	// EffectsWithPointsTo/PointersArithmetic-future.sub/pointer_sub01.diff
+	type pt = basic_pointer(b);
+	list p_eff_l = recursive_type_to_effects(pt, ts);
+	t_eff = gen_nconc(t_eff, p_eff_l);
+      }
+      else if(basic_derived_p(b)) {
+	entity de = basic_derived(b);
+	type dt = entity_type(de);
+	list dt_eff = recursive_type_to_effects(dt, ts);
+	t_eff = gen_nconc(t_eff, dt_eff);
+      }
+      else if(basic_typedef_p(b)) {
+	entity td = basic_typedef(b);
+	list td_eff = recursive_type_to_effects(entity_type(td), ts);
+	t_eff = gen_nconc(t_eff, td_eff);
+      }
+    }
+    else if(type_functional_p(t)) {
+      functional f = type_functional(t);
+      type rt = functional_result(f);
+      list r_eff = recursive_type_to_effects(rt, ts);
+      list pl = functional_parameters(f);
+      list pl_eff = NIL;
+      FOREACH(PARAMETER, p, pl) {
+	type pt = parameter_type(p);
+	list p_eff = recursive_type_to_effects(pt, ts);
+	pl_eff = gen_nconc(pl_eff, p_eff);
+      }
+      pl_eff = gen_nconc(r_eff, pl_eff);
+      t_eff = gen_nconc(t_eff, pl_eff);
+    }
+    else if(type_struct_p(t) || type_union_p(t)) {
+      list fl = type_struct_p(t)? type_struct(t) : type_union(t);
+      list s_eff = NIL;
+      FOREACH(ENTITY, f, fl) {
+	list f_eff = recursive_type_to_effects(entity_type(f), ts);
+	s_eff = gen_nconc(s_eff, f_eff);
+      }
+      t_eff = gen_nconc(t_eff, s_eff);
+    }
+    // FI: I do not remember if something should be done for enums
+    // I guess they are only initialized with constant expressions
+  }
+  return t_eff;
+}
+
 /**
  @param entity is a
  @param
@@ -2436,6 +2524,11 @@ static list generic_proper_effects_of_declaration(entity decl)
 	  expression exp_init = value_expression(v_init);
 	  l_eff = generic_proper_effects_of_expression(exp_init);
 	}
+
+      /* Check the dimensions for dependent types - problem in Fortran
+	 I guess... */
+      list t_eff = type_to_effects(entity_type(decl));
+      l_eff = gen_nconc(l_eff, t_eff);
 
       /* if there is an initial value, and if the variable is not a static one,
 	 then there is a write on the entity (well on  the reference constituted
@@ -2545,7 +2638,7 @@ static void proper_effects_of_statement(statement s)
 	      //l_eff = CONS(EFFECT, tre, l_eff);
 	    }
 	  }
-	  l_eff = gen_nconc(l_eff,generic_proper_effects_of_declaration(e));
+	  l_eff = gen_nconc(l_eff, generic_proper_effects_of_declaration(e));
 	}
       if (get_constant_paths_p())
 	{

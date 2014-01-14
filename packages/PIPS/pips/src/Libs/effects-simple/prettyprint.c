@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -330,13 +330,19 @@ void print_effect(effect e)
     fprintf(stderr,"\t effect undefined\n");
 }
 
+/* FI: could be placed in effect-generic */
 void print_effects( list pc)
 {
   if (pc != NIL) {
-    FOREACH(EFFECT, e, pc)
-      {
+    FOREACH(EFFECT, e, pc) {
+      descriptor d = effect_descriptor(e);
+      if(descriptor_none_p(d))
 	print_effect(e);
+      else {
+	void print_region(effect);
+	print_region(e);
       }
+    }
   }
   else
     fprintf(stderr, "\t<NONE>\n");

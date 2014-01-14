@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -697,6 +697,7 @@ void prettyprint_dot_dependence_graph( FILE * fd,
   const char* inputdep_style = get_string_property( "PRINT_DOTDG_INPUT_DEP_STYLE" );
 
   bool mask_loop_carried = get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS");
+  bool mask_loop_privatized = get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS");
   set_enclosing_loops_map( loops_mapping_of_statement(mod_stat) );
 
   // Loop over the graph and print all dependences
@@ -727,14 +728,30 @@ void prettyprint_dot_dependence_graph( FILE * fd,
         if(mask_loop_carried && conflict_cone(c) != cone_undefined) {
           list lls = cone_levels(conflict_cone(c));
           keep_this_conflict = false;
-          FOREACH(int, level, lls) {
-            if(level > nbrcomloops) {
-              //
-              keep_this_conflict=true;
+	  FOREACH(int, level, lls) {
+            if(level > nbrcomloops ) {
+	      keep_this_conflict = true;
               break;
             }
           }
         }
+	bool keep_this_conflict_privatized = true;
+	if(mask_loop_privatized && conflict_cone(c) != cone_undefined) {
+          list lls = cone_levels(conflict_cone(c));
+          keep_this_conflict_privatized = true;
+	  FOREACH(int, level, lls) {
+            if(level > nbrcomloops || ignore_this_conflict(v1,v2,c,level)) {
+	      keep_this_conflict_privatized=false;
+              //break;
+            }
+          }
+	}
+	 
+	keep_this_conflict =  keep_this_conflict &&  keep_this_conflict_privatized;
+	//verify also for level = 0
+	if(mask_loop_privatized && ignore_this_conflict(v1,v2,c,0))  
+	  keep_this_conflict=false;
+	
         if(!keep_this_conflict) {
           continue;
         }

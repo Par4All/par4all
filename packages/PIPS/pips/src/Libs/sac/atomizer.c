@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -247,7 +247,7 @@ static void simd_insert_statement(statement cs, statement stat)
 				statement_instruction(cs),
 				statement_declarations(cs),
 				NULL,
-				statement_extensions(cs));
+				statement_extensions(cs), make_synchronization_none());
 
 		statement_instruction(cs) =
 			make_instruction_block(CONS(STATEMENT, stat,

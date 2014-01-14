@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -206,7 +206,7 @@
 #include "preprocessor.h"
 
 #include "transformer.h"
-//#include "alias-classes.h"
+#include "alias-classes.h"
 
 /* STATIC VARIABLES */
 
@@ -221,6 +221,10 @@ static hash_table hash_entity_to_old_value = hash_table_undefined;
 static hash_table hash_entity_to_intermediate_value = hash_table_undefined;
 static hash_table hash_value_to_name = hash_table_undefined;
 static hash_table hash_entity_to_user_value_name = hash_table_undefined;
+
+static hash_table hash_reference_to_address_of_value = hash_table_undefined;
+
+static hash_table hash_type_to_sizeof_value = hash_table_undefined;
 
 bool hash_entity_to_values_undefined_p()
 {
@@ -260,6 +264,8 @@ static bool analyze_boolean_scalar_entities = false;
 static bool analyze_string_scalar_entities = false;
 static bool analyze_float_scalar_entities = false;
 static bool analyze_complex_scalar_entities = false;
+static bool analyze_pointer_scalar_entities = false;
+static bool analyze_constant_path = false;
 
 void set_analyzed_types()
 {
@@ -273,6 +279,10 @@ void set_analyzed_types()
     get_bool_property("SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES");
   analyze_complex_scalar_entities =
     get_bool_property("SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES");
+  analyze_pointer_scalar_entities =
+    get_bool_property("SEMANTICS_ANALYZE_SCALAR_POINTER_VARIABLES");
+  analyze_constant_path =
+    get_bool_property("SEMANTICS_ANALYZE_CONSTANT_PATH");
 }
 
 void reset_analyzed_types()
@@ -282,6 +292,8 @@ void reset_analyzed_types()
   analyze_string_scalar_entities = false;
   analyze_float_scalar_entities = false;
   analyze_complex_scalar_entities = false;
+  analyze_pointer_scalar_entities = false;
+  analyze_constant_path = false;
 }
 
 bool integer_analyzed_p()
@@ -309,24 +321,39 @@ bool complex_analyzed_p()
   return analyze_complex_scalar_entities;
 }
 
+bool pointer_analyzed_p()
+{
+  return analyze_pointer_scalar_entities;
+}
+
+bool constant_path_analyzed_p()
+{
+  return analyze_constant_path;
+}
+
+
 /* The entity is type of one of the analyzed types */
 bool analyzable_basic_p(basic b)
 {
   bool analyzable_p = false;
 
-  if(basic_int_p(b) && analyze_integer_scalar_entities)
+  if(analyze_integer_scalar_entities && basic_int_p(b))
     analyzable_p = true;
-  else if(basic_string_p(b) && analyze_string_scalar_entities)
+  else if(analyze_string_scalar_entities && basic_string_p(b))
     analyzable_p = true;
-  else if(basic_logical_p(b) && analyze_boolean_scalar_entities)
+  else if(analyze_boolean_scalar_entities && basic_logical_p(b))
     analyzable_p = true;
-  else if(basic_float_p(b) && analyze_float_scalar_entities)
+  else if(analyze_float_scalar_entities && basic_float_p(b))
     analyzable_p = true;
-  else if(basic_complex_p(b) && analyze_complex_scalar_entities)
+  else if(analyze_pointer_scalar_entities && basic_pointer_p(b)) {
+    pips_debug(9,"pointer type : %s\n", type_to_string(basic_pointer(b)));
     analyzable_p = true;
-  else if(basic_derived_p(b) && analyze_integer_scalar_entities) {
+  }
+  else if(analyze_complex_scalar_entities && basic_complex_p(b))
+    analyzable_p = true;
+  else if(analyze_integer_scalar_entities && basic_derived_p(b)) {
     entity de = basic_derived(b);
-    type dt = ultimate_type(entity_type(de));
+    type dt = entity_basic_concrete_type(de);
     analyzable_p = type_enum_p(dt);
   }
   else
@@ -339,12 +366,15 @@ bool analyzable_basic_p(basic b)
 bool analyzable_type_p(type t)
 {
   bool result = false;
-  type ut = ultimate_type(t);
+  type bct = compute_basic_concrete_type(t);
 
-  /* The type dimension or type_depth could be checked also... */
-  if(type_variable_p(ut) /* && entity_scalar_p(e)*/) {
-    basic b = variable_basic(type_variable(ut));
-    result = analyzable_basic_p(b);
+  if(type_variable_p(bct)) {
+    variable v = type_variable(bct);
+    if (!volatile_variable_p(v)
+        && ENDP(variable_dimensions(v))           //NL : for checking the dimension instead of entity_scalar_p which filter pointer type
+    ) {
+      result = analyzable_basic_p(variable_basic(v));
+    }
   }
 
   return result;
@@ -356,17 +386,8 @@ bool analyzable_scalar_entity_p(entity e)
   bool result = false;
 
   if(!abstract_state_variable_p(e) && !typedef_entity_p(e) ) {
-    type ut = ultimate_type(entity_type(e));
-
-    /* entity_scalar_p(e) is information provided by the type. It should
-       be checked by type_variable_p() but I'm not sure of the dimension
-       information carried by ultimate_type() whose purpose was quite
-       different for the C scanner, providing the proper basic. */
-    if(type_variable_p(ut)
-       && entity_scalar_p(e)
-       && !volatile_variable_p(e)) {
-      result = analyzable_type_p(ut);
-    }
+    type bct = entity_basic_concrete_type(e);
+    result = analyzable_type_p(bct);
   }
   return result;
 }
@@ -387,13 +408,51 @@ bool analyzed_constant_p(entity f)
       return true;
     if(basic_complex_p(b) && analyze_complex_scalar_entities)
       return true;
-    else
-      return false;
+    if(basic_pointer_p(b) && analyze_pointer_scalar_entities)
+      return true;
+  }
+  return false;
+}
+
+bool analyzed_reference_p(reference r)
+{
+  pips_debug(7, "analyzed_reference_p, ref : %s\n", reference_to_string(r));
+  bool result = false;
+
+  // Check if the reference r is a constant path or not
+  // TODO : strict_constant_path_p(r) return true when the ref is exactly a constant path
+  // strict_constant_path_p always return false for the moment
+  if (can_be_constant_path_p(r)) {
+    pips_debug(9, "can_be_constant_path_p\n");
+    if (strict_constant_path_p(r)) {
+      pips_debug(9, "strict_constant_path_p\n");
+      // if ref is a constant path
+      if (analyze_constant_path) {
+        bool to_be_free = false;
+        type t = points_to_reference_to_type(r, &to_be_free);
+        result = analyzable_type_p(t);
+        if (to_be_free) {
+          free_type(t);
+        }
+      }
+    }
+    else {
+      pips_debug(9, "NO strict_constant_path_p\n");
+      // if ref isn't a constant path
+      result = true;
+    }
   }
   else {
-    return false;
+    pips_debug(9, "NO can_be_constant_path_p\n");
+    // a[i]
+    result = false;
   }
+
+  pips_debug(7, "analyzed_reference_p result : %i\n", result);
+  return result;
 }
+
+
 
 /* LOCAL VALUE ENTITY */
 
@@ -403,7 +462,7 @@ bool analyzed_constant_p(entity f)
 static entity make_local_value_entity(int n, int nature, type t)
 {
   entity v;
-  /* 13 is a magic number that can accomodate 2 prefix characters,
+  /* 13 is a magic number that can accommodate 2 prefix characters,
      10 digits and a null character */
   char value_name[13];
   char * s;
@@ -423,9 +482,9 @@ static entity make_local_value_entity(int n, int nature, type t)
   v = gen_find_tabulated(s, entity_domain);
   if(v==entity_undefined)
     v = make_entity(s,
-		    copy_type(t),
-		    make_storage(is_storage_rom, UU),
-		    value_undefined);
+          copy_type(t),
+          make_storage(is_storage_rom, UU),
+          value_undefined);
   else {
     free(s);
     /* Another option might be to undefine types when counters are
@@ -574,9 +633,9 @@ entity global_new_value_to_global_old_value(entity v_new)
 	      strcmp(entity_module_name(v_new), SEMANTICS_MODULE_NAME) != 0);
 
   v_old = (entity) gen_find_tabulated(concatenate(entity_name(v_new),
-						  OLD_VALUE_SUFFIX,
-						  NULL),
-				      entity_domain);
+                                                  OLD_VALUE_SUFFIX,
+                                                  NULL),
+                                      entity_domain);
   if(v_old==NULL) v_old = entity_undefined;
 
   return v_old;
@@ -623,7 +682,10 @@ const char* external_value_name(entity e)
 	s = hash_get(hash_value_to_name, (char *) a);
       }
       else if(entity_constant_p(e)) {
-	s = entity_name(e);
+          s = entity_name(e);
+      }
+      else if(null_pointer_value_entity_p(e)) {
+          s = entity_name(e);
       }
       else {
 	/* This should never occur. Please core dump! */
@@ -646,12 +708,13 @@ const char* external_value_name(entity e)
 }
 
 /* This function is called many times when the constraints and the
-   system of contraints are sorted using lexicographic information
+   system of constraints are sorted using lexicographic information
    based on this particular value name. See for instance
-   Semantics-New/freia_52.c. Hence it is memoized.
+   Semantics-New/freia_52.c. Hence it is memorized.
 */
 const char * pips_user_value_name(entity e)
 {
+  pips_debug(9, "start with entity : %s\n", entity_name(e));
   const char* uvn = string_undefined;
 
   if(e == (entity) TCST) {
@@ -659,16 +722,37 @@ const char * pips_user_value_name(entity e)
   }
   else {
     // To check the execution speed, uncomment the next line
-    //return entity_name(e);
+    // return entity_name(e);
     uvn = hash_get(hash_entity_to_user_value_name, (char *) e);
 
     if(uvn==HASH_UNDEFINED_VALUE) {
-      (void) gen_check((gen_chunk *) e, entity_domain);
-      uvn = entity_has_values_p(e)? (string)entity_minimal_name(e) :
-                                  external_value_name(e);
-      hash_put(hash_entity_to_user_value_name, (char *) e, uvn);
+      // Need to discriminate the case of an address_of value
+      // because the hash table are reset between each pass
+      if (address_of_value_entity_p(e)) {
+        entity v = value_to_variable(e);
+        string temp = strdup(entity_name(e));
+        string indice = strstr(temp, "[");
+        if (indice != NULL)
+          *(indice+strlen(indice)-strlen(ADDRESS_OF_SUFFIX)) = '\0';
+        uvn = strdup(concatenate("&", entity_user_name(v), indice, (char *) NULL));
+        free(temp);
+      }
+      else if (null_pointer_value_entity_p(e)) {
+        uvn = strdup("NULL");
+      }
+      else if (sizeof_value_entity_p(e)) {
+        type t = entity_type(e);
+        uvn = strdup(concatenate("sizeof(", type_to_full_string_definition(t), ")", (char *) NULL));
+      }
+      else {
+        (void) gen_check((gen_chunk *) e, entity_domain);
+        uvn = entity_has_values_p(e)? (string)entity_minimal_name(e) :
+            external_value_name(e);
+      }
+        hash_put(hash_entity_to_user_value_name, (char *) e, uvn);
     }
   }
+  pips_debug(9, "end with string : %s\n", uvn);
   return uvn;
 }
 
@@ -699,6 +783,26 @@ entity entity_to_intermediate_value(entity e)
      == entity_undefined)
     pips_internal_error("unbounded entity %s",
 			entity_name(e));
+  return i;
+}
+
+entity reference_to_address_of_value(reference r)
+{
+  entity n;
+  if((n = (entity) hash_get(hash_reference_to_address_of_value, (char *) r))
+      == entity_undefined)
+    pips_internal_error("unbounded reference %s",
+        reference_to_string(r));
+  return n;
+}
+
+entity type_to_sizeof_value(type t)
+{
+  entity i;
+  if((i = (entity) hash_get(hash_type_to_sizeof_value, (char *) t))
+      == entity_undefined)
+    pips_internal_error("unbounded type %s : %s",
+        type_to_string(t), type_to_full_string_definition(t));
   return i;
 }
 
@@ -738,8 +842,11 @@ bool old_value_entity_p(entity e)
 
   if(!local_temporary_value_entity_p(e)) {
     string s1 = strstr(entity_local_name(e), OLD_VALUE_SUFFIX);
+    // Need to remake the search for OLD_VALUE_PREFIX
+    // bug for toto#...
     string s2 = strstr(entity_local_name(e), OLD_VALUE_PREFIX);
-    return s1!=NULL || s2!=NULL;
+    // s2==entity_local_name(e) : for the case toto#...
+    return s1!=NULL || (s2!=NULL && s2==entity_local_name(e));
   }
   else
     return false;
@@ -748,6 +855,20 @@ bool old_value_entity_p(entity e)
 bool intermediate_value_entity_p(entity e)
 {
   string s = strstr(external_value_name(e), INTERMEDIATE_VALUE_SUFFIX);
+
+  return s!=NULL;
+}
+
+bool address_of_value_entity_p(entity e)
+{
+  string s = strstr(entity_local_name(e), ADDRESS_OF_SUFFIX);
+
+  return s!=NULL;
+}
+
+bool sizeof_value_entity_p(entity e)
+{
+  string s = strstr(entity_local_name(e), SIZEOF_SUFFIX);
 
   return s!=NULL;
 }
@@ -789,7 +910,15 @@ void print_value_mappings()
 
   (void) fprintf(stderr, "\nhash table entity to intermediate value:\n");
   hash_table_fprintf(stderr, (gen_string_func_t)entity_minimal_name, (gen_string_func_t)external_value_name,
-		     hash_entity_to_intermediate_value);
+                         hash_entity_to_intermediate_value);
+
+  (void) fprintf(stderr, "\nhash table reference to address_of value:\n");
+  hash_table_fprintf(stderr, (gen_string_func_t)reference_to_string, (gen_string_func_t)external_value_name,
+                         hash_reference_to_address_of_value);
+
+  (void) fprintf(stderr, "\nhash table entity to sizeof value:\n");
+  hash_table_fprintf(stderr, (gen_string_func_t)type_to_full_string_definition, (gen_string_func_t)external_value_name,
+                         hash_type_to_sizeof_value);
 }
 
 static int mapping_to_value_number(hash_table h)
@@ -936,10 +1065,12 @@ int number_of_analyzed_variables()
 void allocate_value_mappings(int n, int o, int i)
 {
   pips_assert("undefined mappings for allocation",
-	      hash_table_undefined_p(hash_entity_to_new_value) &&
-	      hash_table_undefined_p(hash_entity_to_old_value) &&
-	      hash_table_undefined_p(hash_entity_to_intermediate_value) &&
-	      hash_table_undefined_p(hash_value_to_name));
+      hash_table_undefined_p(hash_entity_to_new_value) &&
+      hash_table_undefined_p(hash_entity_to_old_value) &&
+      hash_table_undefined_p(hash_entity_to_intermediate_value) &&
+      hash_table_undefined_p(hash_reference_to_address_of_value) &&
+      hash_table_undefined_p(hash_type_to_sizeof_value) &&
+      hash_table_undefined_p(hash_value_to_name));
 
   /* hash_warn_on_redefinition(); */
   hash_entity_to_new_value = hash_table_make(hash_pointer, n);
@@ -947,9 +1078,11 @@ void allocate_value_mappings(int n, int o, int i)
   hash_entity_to_intermediate_value =
     hash_table_make(hash_pointer, i);
   hash_value_to_name =
-    hash_table_make(hash_pointer, n + o + i);
+    hash_table_make(hash_pointer, n + o + i + n);           //The last +n for the pointer
   hash_entity_to_user_value_name =
-    hash_table_make(hash_pointer, n + o + i);
+    hash_table_make(hash_pointer, n + o + i + n);           //The last +n for the pointer
+  hash_reference_to_address_of_value = hash_table_make(hash_pointer, n);
+  hash_type_to_sizeof_value = hash_table_make(hash_pointer, n);
 }
 
 static void reset_value_mappings(void)
@@ -959,6 +1092,8 @@ static void reset_value_mappings(void)
   hash_entity_to_intermediate_value = hash_table_undefined;
   hash_value_to_name = hash_table_undefined;
   hash_entity_to_user_value_name = hash_table_undefined;
+  hash_reference_to_address_of_value = hash_table_undefined;
+  hash_type_to_sizeof_value = hash_table_undefined;
 }
 
 bool hash_value_to_name_undefined_p()
@@ -1003,6 +1138,8 @@ void error_free_value_mappings(void)
   hash_table_free(hash_entity_to_intermediate_value);
   hash_table_free(hash_value_to_name);
   hash_table_free(hash_entity_to_user_value_name);
+  hash_table_free(hash_reference_to_address_of_value);
+  hash_table_free(hash_type_to_sizeof_value);
 
   reset_value_mappings();
   reset_temporary_value_counter();
@@ -1022,6 +1159,77 @@ static void add_new_value_name(entity e)
     hash_put(hash_value_to_name, (char *) e, (char *) new_value_name);
   else
     free(new_value_name);
+}
+
+void add_address_of_value(reference r, type t)
+{
+  entity e = reference_variable(r);
+  entity address_of_value;
+  string address_of_value_name;
+  string indice = strstr(reference_to_string(r), "[");
+
+  if (indice != NULL)
+  address_of_value_name = concatenate(
+      entity_name(e), indice, ADDRESS_OF_SUFFIX, (char *) NULL);
+  else
+    address_of_value_name = concatenate(
+        entity_name(e), ADDRESS_OF_SUFFIX, (char *) NULL);
+
+
+  //address_of_value = gen_find_entity(address_of_value_name);
+  address_of_value = gen_find_tabulated(address_of_value_name, entity_domain);
+  //if (entity_undefined_p(address_of_value))
+  if(address_of_value == entity_undefined)
+    address_of_value = make_entity(strdup(address_of_value_name),
+                                  copy_type(t),
+                                  make_storage(is_storage_rom, UU),
+                                  value_undefined);
+
+  /* add the couple (e, address_of_value) */
+  if(hash_get(hash_reference_to_address_of_value, (char *) r) == HASH_UNDEFINED_VALUE) {
+    hash_put(hash_reference_to_address_of_value, (char *) r, (char *) address_of_value);
+    /* add its name */
+    hash_put(hash_value_to_name, (char *) address_of_value,
+               strdup(entity_name(address_of_value)));
+    // The next table be reset after the analysis, can't be reuse for the prettyprint, so useless to add in the table?
+    entity v = value_to_variable(address_of_value);
+    hash_put(hash_entity_to_user_value_name, (char *) address_of_value,
+               strdup(concatenate("&", entity_user_name(v), indice, (char *) NULL)));
+  }
+}
+
+void add_sizeof_value(type t)
+{
+  entity sizeof_value;
+  string sizeof_value_name;
+
+  // improvment create the entity with the name of type
+  // issue because of value_to_variable
+  /* find the sizeof entity if possible, else, generate it */
+  sizeof_value_name =
+      concatenate(
+          TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
+          type_to_full_string_definition(t), SIZEOF_SUFFIX, (char *) NULL);
+  sizeof_value = gen_find_tabulated(sizeof_value_name, entity_domain);
+  if(sizeof_value == entity_undefined)
+    sizeof_value =
+        make_entity(strdup(sizeof_value_name),
+            //make_type(is_type_variable,
+            //    make_variable(make_basic(is_basic_int, (void*)sizeof(int)),NIL,NIL)),
+            copy_type(t),
+            make_storage(is_storage_rom, UU),
+            value_undefined);
+  /* add the couple (e, old_value) */
+  if(hash_get(hash_type_to_sizeof_value, (char *) t) == HASH_UNDEFINED_VALUE) {
+    hash_put(hash_type_to_sizeof_value, (char *) t, (char *) sizeof_value);
+    /* add its name */
+    hash_put(hash_value_to_name, (char *) sizeof_value,
+        strdup(entity_name(sizeof_value)));
+    hash_put(hash_entity_to_new_value, (char *) sizeof_value,
+        (char *) sizeof_value);
+    hash_put(hash_entity_to_user_value_name, (char *) sizeof_value,
+        concatenate("sizeof(", type_to_full_string_definition(t), ")", (char *) NULL));
+  }
 }
 
 void add_new_value(entity e)
@@ -1274,6 +1482,9 @@ entity value_to_variable(entity val)
   /* pips_assert("value_to_variable",
      strchr(entity_name(val), (int) SEMANTICS_SEPARATOR) != NULL); */
 
+  // TODO : Maybe redesign the search of suffix/prefix
+  //        Can bug if the variable name is/begin/end with
+  //        o, i, t, new, init, int, address_of see SUFFIX and PREFIX in transformer.h
   if(s == HASH_UNDEFINED_VALUE) {
     /* this may be a value, but it is unknown in the current module */
     string val_name = entity_name(val);
@@ -1284,6 +1495,10 @@ entity value_to_variable(entity val)
       l_suffix = strlen(OLD_VALUE_SUFFIX);
     else if(strstr(val_name, INTERMEDIATE_VALUE_SUFFIX) != NULL)
       l_suffix = strlen(INTERMEDIATE_VALUE_SUFFIX);
+    else if(strstr(val_name, ADDRESS_OF_SUFFIX) != NULL)
+      l_suffix = strlen(ADDRESS_OF_SUFFIX);
+    else if(strstr(val_name, SIZEOF_SUFFIX) != NULL)
+      l_suffix = 0;
     else if(strchr(val_name, (int) SEMANTICS_SEPARATOR) == NULL) {
       /* new values in fact have no suffixes... */
       l_suffix = 0;
@@ -1294,12 +1509,16 @@ entity value_to_variable(entity val)
     s = val_name;
   }
   else {
-    if(new_value_entity_p(val))
+    if(sizeof_value_entity_p(val))
+      l_suffix = 0;
+    else if(new_value_entity_p(val))
       l_suffix = strlen(NEW_VALUE_SUFFIX);
     else if(old_value_entity_p(val))
       l_suffix = strlen(OLD_VALUE_SUFFIX);
     else if(intermediate_value_entity_p(val))
       l_suffix = strlen(INTERMEDIATE_VALUE_SUFFIX);
+    else if(address_of_value_entity_p(val))
+      l_suffix = strlen(ADDRESS_OF_SUFFIX);
     else
       /* It can be an equivalenced variable... Additional testing
 	 should be performed! */
@@ -1309,6 +1528,12 @@ entity value_to_variable(entity val)
 
   var_name = strdup(s);
   *(var_name+strlen(var_name)-l_suffix) = '\0';
+  if(address_of_value_entity_p(val)) {
+    string temp = strstr(var_name, "[");
+    if(temp != NULL)
+      *temp = '\0';
+  }
+
   var = gen_find_tabulated(var_name, entity_domain);
   free(var_name);
 

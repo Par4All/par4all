@@ -1,13 +1,16 @@
+/* For strdup and asprintf: */
+// Already defined elsewhere
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #include <stdlib.h>
 #include <stdio.h>
-/* For strdup: */
-// Already defined elsewhere
-//#define _GNU_SOURCE
 #include <string.h>
 
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "bootstrap.h"
 #include "effects.h"
 #include "database.h"
 #include "ri-util.h"
@@ -136,9 +139,15 @@ entity create_stub_entity(entity e, string fs, type t)
   }
   else if(top_level_entity_p(e) && !entity_stub_sink_p(e)) {
     // FI: global_variable_p()
-    // Naming for sinks of global variable: use their offsets
+    // Naming for sinks of global variables: use their offsets
     int off = ram_offset(storage_ram(entity_storage(e)));
-    s = strdup(concatenate("_", en, fs,"_", i2a(off), NULL));
+    /* FI: I assume all unknown offsets defined in ri-util-local.h to
+       be strictly negative. */
+    if(off>=0)
+      s = strdup(concatenate("_", en, fs, "_", i2a(off), NULL));
+    else
+      /* FI: we could use a 0 as default offset for clarity? */
+      s = strdup(concatenate("_", en, fs, "_", NULL));
   }
   else if(static_global_variable_p(e)){ // "static int i;"
     // Naming for sinks of static global variable: use their offsets
@@ -315,10 +324,9 @@ cell create_scalar_stub_sink_cell(entity v, // source entity
   cell sink_cell = make_cell_reference(sink_ref);
 
   ifdebug(1) {
-    bool to_be_freed;
-    type ept = points_to_cell_to_type(sink_cell, & to_be_freed);
+    type ept = points_to_cell_to_concrete_type(sink_cell);
     if(!array_pointer_type_equal_p(pt, ept)
-       && !(type_void_p(pt) && overloaded_type_p(ept))) {
+       && !(type_void_p(pt) || overloaded_type_p(ept))) {
       bool ok_p = false;
       if(array_type_p(pt)) {
 	if(!array_type_p(ept)) {
@@ -337,7 +345,6 @@ cell create_scalar_stub_sink_cell(entity v, // source entity
       pips_internal_error("Effective type of sink cell does not match its expected type\n");
       }
     }
-    if(to_be_freed) free_type(ept);
     pips_debug(1, "source entity: \"%s\", sink_cell: ", entity_user_name(v));
     print_points_to_cell(sink_cell);
     fprintf(stderr, "\n");
@@ -560,13 +567,23 @@ points_to create_stub_points_to(cell c, // source of the points-to
   // The indices of a points-to reference may include fields as well as
   // usual array subscripts
   list sl = gen_full_copy_list(reference_indices(source_r));
-  bool to_be_freed;
-  type c_t = points_to_cell_to_type(c, &to_be_freed);
-  type source_t = compute_basic_concrete_type(c_t);
+  //bool to_be_freed;
+  //type c_t = points_to_cell_to_type(c, &to_be_freed);
+  //type source_t = compute_basic_concrete_type(c_t);
+  type source_t = points_to_cell_to_concrete_type(c);
   cell sink_cell = cell_undefined;
   bool e_exact_p = true;
 
-  if(type_variable_p(source_t)) {
+  if(ENTITY_STDIN_P(v)||ENTITY_STDOUT_P(v)||ENTITY_STDERR_P(v)) {
+    entity f = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, FOPEN_FUNCTION_NAME);
+    pips_assert("fopen is fully defined", !type_undefined_p(entity_type(f)));
+    entity io_files = MakeIoFileArray(f);
+    int n = ENTITY_STDIN_P(v) ? STDIN_FILENO :
+      ENTITY_STDOUT_P(v) ? STDOUT_FILENO: STDERR_FILENO;
+    reference sr = make_reference(io_files, CONS(EXPRESSION, int_to_expression(n), NIL));
+    sink_cell = make_cell_reference(sr);
+  }
+  else if(type_variable_p(source_t)) {
     bool strict_p = get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
     //variable source_tv = type_variable(source_t);
     //list source_dl = variable_dimensions(source_tv);
@@ -576,8 +593,13 @@ points_to create_stub_points_to(cell c, // source of the points-to
     if(source_cd==0 /* && vd==0*/ ) {
       /* You may have a pointer or an unbounded array for source_t... */
       type sink_t = C_type_to_pointed_type(source_t);
-      type stub_t = (strict_p || !type_variable_p(sink_t))?
-		     copy_type(sink_t) : type_to_array_type(sink_t);
+      /* Take care of void * */
+      type r_sink_t = type_void_p(sink_t)? 
+	make_scalar_integer_type(DEFAULT_CHARACTER_TYPE_SIZE)
+	: copy_type(sink_t);
+      type stub_t = (strict_p || !type_variable_p(r_sink_t))?
+		     copy_type(r_sink_t) : type_to_array_type(r_sink_t);
+      free_type(r_sink_t);
       sink_cell = create_scalar_stub_sink_cell(v, stub_t, sink_t, 0, NIL, fs);
       e_exact_p = exact_p;
       free_type(sink_t);
@@ -593,17 +615,22 @@ points_to create_stub_points_to(cell c, // source of the points-to
       // with unbounded expressions
 	sl = points_to_indices_to_subscript_indices(sl);
       }
-      // dimensions to be added to the dimensions of "st"
+      // dimensions to be added to the dimensions of "sink_t"
       list ndl = make_unbounded_dimensions(source_cd);
       type sink_t = copy_type(type_to_pointed_type(source_t));
       if(type_void_p(sink_t)) {
 	free_type(sink_t);
 	sink_t = make_type_variable(make_variable(make_basic_overloaded(), NIL, NIL));
       }
+      /* Update sink_t to take into account all the dimensions
+	 existing in the source */
       pips_assert("type_variable_p(sink_t)", type_variable_p(sink_t));
       variable nstv = type_variable(sink_t);
       variable_dimensions(nstv) = gen_nconc(ndl, variable_dimensions(nstv));
+
+      /* stub_t is same as sink_t, but add a dimension array arithmetic */
       type stub_t = strict_p ? copy_type(sink_t) : type_to_array_type(sink_t);
+
       sink_cell = create_scalar_stub_sink_cell(v, stub_t, sink_t, source_cd, sl, fs);
       // FI: this should be performed by the previous function
       // points_to_cell_add_unbounded_subscripts(sink_cell);
@@ -625,7 +652,7 @@ points_to create_stub_points_to(cell c, // source of the points-to
 			 make_descriptor_none());
   pointer_index ++; // FI: is not used for formal parameters, is this the right place for the increment
 
-  if(to_be_freed) free_type(c_t);
+  //if(to_be_freed) free_type(c_t);
   
   return pt_to;
 }
