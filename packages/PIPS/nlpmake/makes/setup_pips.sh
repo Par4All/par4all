@@ -30,16 +30,65 @@
 }
 
 # where to get pips
-SVN_CRI='https://svn.cri.ensmp.fr/svn'
+SVN_CRI='https://scm.cri.ensmp.fr/svn'
 PIPS_SVN=$SVN_CRI/pips
 
 #POLYLIB_SITE='http://www.cri.ensmp.fr/pips'
 POLYLIB_SITE='http://icps.u-strasbg.fr/polylib/polylib_src'
 POLYLIB='polylib-5.22.5'
 
-# help
+# minimal help
 command=${0/*\//}
-usage="usage: $command [destination-directory [developer [checkout|export]]]"
+usage="$command [--opts] [directory [developer [checkout|export]]]"
+
+function error()
+{
+  echo "$@" >&2
+  echo "usage: $usage" >&2
+  exit 1
+}
+
+function warn()
+{
+  {
+    echo
+    echo "WARNING"
+    for msg in "$@" ; do
+      echo $msg ;
+    done
+    echo "Type return to continue"
+  } >&2
+  read
+}
+
+# compilation option
+gpips=
+
+while [[ $1 == -* ]]
+do
+  opt=$1
+  shift
+  case $opt in
+    --gpips)
+      gpips=1
+      ;;
+    -h|--help)
+      echo "usage: $usage" ;
+      echo " directory defaults to ./MYPIPS" ;
+      echo " default user is current user" ;
+      echo " default svn command is checkout" ;
+      echo " options: --gpips to compile gpips" ;
+      exit 0 ;
+      ;;
+    -v|--version)
+    echo 'version is $Id$' ;
+      exit 0 ;
+      ;;
+    -*)
+      error "unexpected option $1" ;
+      ;;
+  esac
+done
 
 # arguments
 destination=${1:-`pwd`/MYPIPS}
@@ -52,25 +101,6 @@ make=${MAKE:-make}
 # If the destination directory is relative, transform it in an absolute
 # path name:
 [[ $destination != /* ]] && destination=`pwd`/$destination
-
-error()
-{
-  echo "$@" >&2
-  exit 1
-}
-
-warn()
-{
-  {
-    echo
-    echo "WARNING"
-    for msg in "$@" ; do
-      echo $msg ;
-    done
-    echo "Type return to continue"
-  } >&2
-  read
-}
 
 test -d $destination  && \
     warn "Directory $destination already exists!" \
@@ -141,7 +171,7 @@ type htlatex && echo '_HAS_HTLATEX_ = 1' >> $config
 type emacs && echo '_HAS_EMACS_ = 1' >> $config
 type pkg-config && has_pkgconfig=1
 
-if [ "$has_pkgconfig" ]
+if [ "$has_pkgconfig" -a "$gpips" ]
 then
   echo '_HAS_PKGCONFIG_ = 1' >> $config
   if pkg-config --exists gtk+-2.0
@@ -261,8 +291,9 @@ PATH=$prod/newgen/bin:$prod/newgen/bin/$PIPS_ARCH:$PATH \
     $make $target
 
 echo
-echo "### checking useful softwares"
-for exe in bash m4 wish latex htlatex javac emacs indent
+echo "### checking for useful softwares"
+# not really: wish htlatex
+for exe in bash m4 latex javac emacs indent
 do
   type $exe || echo "no such executable, consider installing: $exe"
 done
