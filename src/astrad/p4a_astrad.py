@@ -293,7 +293,7 @@ class p4a_astrad_postprocessor(object):
                         length_text = "All"
                         amplitude_text = "0"
 
-                    dsl_text += ("\t" * index) + "OnIter(consume("
+                    dsl_text += ("\t" * index) + "onIter(consume("
                     if all_length:
                         dsl_text += 'op=All,'
                     else:
