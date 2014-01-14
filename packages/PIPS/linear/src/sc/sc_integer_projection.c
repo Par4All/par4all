@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2012 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of Linear/C3 Library.
 
@@ -23,15 +23,15 @@
 */
 
 /* Package SC : sc_integer_projection.c
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * Projection of a system of constraints (equalities and inequalities) 
- * along one or several variables. The variables are eliminated only 
- * if the projection is exact, i.e. introduces no integer points 
+ * Projection of a system of constraints (equalities and inequalities)
+ * along one or several variables. The variables are eliminated only
+ * if the projection is exact, i.e. introduces no integer points
  * that do not belong to the projection of the initial integer points.
  *
  * Arguments of these functions :
- * 
+ *
  * - ofl_ctrl is the way overflow errors are handled
  *     ofl_ctrl == NO_OFL_CTRL
  *               -> overflow errors are not handled
@@ -43,7 +43,7 @@
  *
  * Authors :
  *
- * Remi Triolet, Malik Imadache, Francois Irigoin, Yi-Qing Yang, 
+ * Remi Triolet, Malik Imadache, Francois Irigoin, Yi-Qing Yang,
  * Corinne Ancourt
  *
  * Last modified : Be'atrice Creusillet, 16/12/94
@@ -71,7 +71,7 @@ struct prtri_struct {
 	Pcontrainte pos,neg,cnul;
 };
 /* This function sorts all the constraints of inegs into three systems.
- * Each system contains respectively constraints where the coefficient 
+ * Each system contains respectively constraints where the coefficient
  * of the variable v is positive, negative, or null
 */
 
@@ -114,9 +114,9 @@ int *nb_pos,*nb_neg;
 }
 
 /* dans sc, elimine la Variable v des inegalites par "projections entieres".
- * Si la projection "Fourier-Motzkin" d'une variable n'est pas equivalente 
- * a la projection entiere alors des contraintes sur la variable sont  
- * conservees. Ces contraintes sont  celles qui rendent la condition 
+ * Si la projection "Fourier-Motzkin" d'une variable n'est pas equivalente
+ * a la projection entiere alors des contraintes sur la variable sont
+ * conservees. Ces contraintes sont  celles qui rendent la condition
  * suffisante non satisfaite.
  */
 
@@ -157,20 +157,20 @@ sc_integer_fourier_motzkin_variable_elimination(
     constraint_sort(inegs,v,&rtri,&nb_pos,&nb_neg);
 
 
-    /* pour chaque inegalite ou v a un coeff. positif et chaque 
+    /* pour chaque inegalite ou v a un coeff. positif et chaque
        inegalite ou v a un coefficient negatif, faire une combinaison       */
 
     for( posit=rtri.pos; posit!=NULL; ) {
-	bool integer_comb_p = true; 
+	bool integer_comb_p = true;
 	non_equivalent_projections = false;
 	for( negat=rtri.neg, i1=1; negat!=NULL; i1++) {
-	   
+
 	    ineg = sc_integer_inequalities_combination_ofl_ctrl
 		(sci, posit, negat, v, &integer_comb_p, OFL_CTRL);
 	    ineg_stay[i1] = ineg_stay[i1] && integer_comb_p;
 	    if(!integer_comb_p) non_equivalent_projections = true;
- 
-	  
+
+
 	    if (contrainte_constante_p(ineg)) {
 		if (contrainte_verifiee(ineg,false)) {
 		    vect_rm(ineg->vecteur);
@@ -190,12 +190,12 @@ sc_integer_fourier_motzkin_variable_elimination(
 		    /* systeme non faisable */
 		}
 	    }
-	    else {  
+	    else {
 		if(!integer_comb_p) {
 		    vect_rm(ineg->vecteur);
 		    ineg->vecteur = vect_dup(negat->vecteur);
 		}
-	    
+
 		ineg->succ = rtri.cnul;
 		rtri.cnul = ineg;
 		/* combinaison simple reussie => 1ineg en + */
@@ -213,7 +213,7 @@ sc_integer_fourier_motzkin_variable_elimination(
 
     }
     for( negat=rtri.neg, i1=1; negat!=NULL; negat=negat->succ, i1++) {
-	if (!ineg_stay[i1]) { 
+	if (!ineg_stay[i1]) {
 	    ineg = contrainte_dup(negat);
 	    ineg->succ = rtri.cnul;
 	    rtri.cnul = ineg;
@@ -232,55 +232,49 @@ sc_integer_fourier_motzkin_variable_elimination(
 }
 
 
-/* Integer projection of  variable v in the system sc. The system sci 
- * corresponds to the initial system on which no projection has been made. 
+/* Integer projection of  variable v in the system sc. The system sci
+ * corresponds to the initial system on which no projection has been made.
  * Sci is usefull for computing the "suffisant condition".
- * If the "Fourier-Motzkin" projection is not equivalent to the 
- * "integer projection" then some constraints on the variable v are kept. 
- * Those constraints are those for which the "suffisant condition" is not 
+ * If the "Fourier-Motzkin" projection is not equivalent to the
+ * "integer projection" then some constraints on the variable v are kept.
+ * Those constraints are those for which the "suffisant condition" is not
  * satisfied.
  */
 
 /* projection d'un sc sur une var v */
-Psysteme sc_integer_projection_along_variable(sci,sc,v) 
-Psysteme sci,sc;    /* sci est le systeme initial sans les projections  */
-Variable v;
+Psysteme sc_integer_projection_along_variable(
+  Psysteme sci,    // sci est le systeme initial sans les projections
+  volatile Psysteme sc,
+  Variable v)
 {
-    Pcontrainte eq;
-    Value coeff;
-    if (sc) {
-
-	/* trouver une egalite ou v a un coeff. minimal en valeur absolue */
-	
-	if ((eq = contrainte_var_min_coeff(sc->egalites,v,&coeff, false)) 
-	    != NULL) 
-	{		
+  Pcontrainte eq;
+  Value coeff;
+  if (sc) {
+    // trouver une egalite ou v a un coeff. minimal en valeur absolue
+    if ((eq = contrainte_var_min_coeff(sc->egalites,v,&coeff, false)) != NULL)
+    {
 	    if(!egalite_normalize(eq))
-		return SC_EMPTY;
+        return SC_EMPTY;
 	    CATCH(overflow_error) {
-		sc= sc_elim_var(sc,v);
+        sc = sc_elim_var(sc,v);
 	    }
 	    TRY {
-	    sc = sc_variable_substitution_with_eq_ofl_ctrl
-		(sc, eq, v, NO_OFL_CTRL);
-	    UNCATCH(overflow_error);
+        sc = sc_variable_substitution_with_eq_ofl_ctrl(sc, eq, v, NO_OFL_CTRL);
+        UNCATCH(overflow_error);
 	    }
-	}
-	else {
+    }
+    else {
+	    // v n'apparait dans aucune egalite, il faut l'eliminer
+      // des inegalites   par des combinaisons (fonction combiner)
 
-	    /* v n'apparait dans aucune egalite, il faut l'eliminer 
-	       des inegalites   par des combinaisons (fonction combiner)   */
-
-	    if (!sc_integer_fourier_motzkin_variable_elimination(sci,sc,v)
-		&& sc) {
-		sc_rm(sc);
-		return SC_UNDEFINED;
+	    if (!sc_integer_fourier_motzkin_variable_elimination(sci,sc,v) && sc) {
+        sc_rm(sc);
+        return SC_UNDEFINED;
 	    }
 	    sc->nb_ineq = nb_elems_list(sc->inegalites);
-	}
     }
-
-    return sc;
+  }
+  return sc;
 }
 
 

@@ -455,6 +455,7 @@ char        *(*in_fu)() ;
 extern  Psyslist  sl_yacc;  /* Psysteme construit par sl_gram.y */
 extern  FILE*     slx_in;   /* fichier lu par sl_lex.l          */
 extern void slx_parse();
+extern void sl_init_lex(void);
 
 /* void sl_read(FILE*) reads a Psyslist */
 Psyslist  sl_read( nomfic )

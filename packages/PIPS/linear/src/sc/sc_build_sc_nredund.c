@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2012 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of Linear/C3 Library.
 
@@ -412,118 +412,115 @@ int *rank_max;
 }
 
 
-/* Computation of a new system sc from the system ps, where each 
- * constraint of the system ps is added to the new system sc, 
- * if the constraint is not redundant with the system sc previously 
- * computed. 
+/* Computation of a new system sc from the system ps, where each
+ * constraint of the system ps is added to the new system sc,
+ * if the constraint is not redundant with the system sc previously
+ * computed.
  *
- * The difference with the function build_sc_nredund is that at least 
- * 2 constraints are kept for each variable: one for the upper bound 
- * and the other for the lower bound. 
+ * The difference with the function build_sc_nredund is that at least
+ * 2 constraints are kept for each variable: one for the upper bound
+ * and the other for the lower bound.
  *
  * The rational set defined by ps may be enlarged by this procedure
  * because an integer constraint negation is used.
  *
- * Modifs: 
+ * Modifs:
  *  - change _dup to _copy.
  *  - the parameters of contrainte_dup, _copy, _reverse are not changed like base_dup, so it's ok.
  */
 
-Psysteme build_integer_sc_nredund(ps,index_base,tab_info,loop_level,dim_h,n)
-Psysteme ps;
-Pbase index_base;
-int tab_info[][4];
-int loop_level;
-int dim_h __attribute__ ((unused));
-int n __attribute__ ((unused));
+Psysteme build_integer_sc_nredund(
+  volatile Psysteme ps,
+  Pbase index_base,
+  int tab_info[][4],
+  int loop_level,
+  int dim_h __attribute__ ((unused)),
+  int n __attribute__ ((unused)))
 {
 
-    Psysteme sc = sc_new();
-    Pcontrainte ineq,eq;
-    /* Automatic variables read in a CATCH block need to be declared volatile as
-     * specified by the documentation*/
-    Pcontrainte volatile pred;
-    int rank_hr,rank_max = 0;
-    Variable var_hr;
-    Value coeff;
-    int sign;
+  volatile Psysteme sc = sc_new();
+  Pcontrainte eq;
+  // Automatic variables read in a CATCH block need to be declared volatile as
+  // specified by the documentation
+  volatile Pcontrainte ineq, pred;
+  int rank_hr,rank_max = 0;
+  Variable var_hr;
+  Value coeff;
+  volatile int sign;
 
-    if (SC_UNDEFINED_P(ps) || SC_EMPTY_P(ps) || sc_empty_p(ps) )
-      return ps;
-    sc->base = base_copy(ps->base);
-    sc->dimension = ps->dimension; 
+  if (SC_UNDEFINED_P(ps) || SC_EMPTY_P(ps) || sc_empty_p(ps) )
+    return ps;
+  sc->base = base_copy(ps->base);
+  sc->dimension = ps->dimension;
 
-    for (eq = ps->egalites;
-	 !CONTRAINTE_UNDEFINED_P(eq); eq=eq->succ) {
-	Pcontrainte pc=contrainte_copy(eq);
-	sc_add_eg(sc,pc);
-    }
+  for (eq = ps->egalites;
+       !CONTRAINTE_UNDEFINED_P(eq); eq=eq->succ) {
+    Pcontrainte pc=contrainte_copy(eq);
+    sc_add_eg(sc,pc);
+  }
 
-    if (!CONTRAINTE_UNDEFINED_P(ps->inegalites))  {
+  if (!CONTRAINTE_UNDEFINED_P(ps->inegalites))  {
 
-      sc->inegalites = contrainte_copy(ps->inegalites);
-      sc->nb_ineq +=1;
-	for (pred = ps->inegalites,ineq = (ps->inegalites)->succ;
-	     !CONTRAINTE_UNDEFINED_P(ineq); ineq=ineq->succ) {
+    sc->inegalites = contrainte_copy(ps->inegalites);
+    sc->nb_ineq +=1;
+    for (pred = ps->inegalites,ineq = (ps->inegalites)->succ;
+         !CONTRAINTE_UNDEFINED_P(ineq); ineq=ineq->succ) {
 
 	    Pcontrainte volatile ineg = contrainte_copy(ineq);
-	    sc_add_inegalite(sc,ineg);	    
+	    sc_add_inegalite(sc,ineg);
 
-	    /* search the characteristics of the variable of higher rank in 
-	       the constraint ineq */
+	    // search the characteristics of the variable of higher rank in
+      // the constraint ineq
 	    if (( rank_hr= search_higher_rank(ineq->vecteur,index_base)) >0) {
-		var_hr=variable_of_rank(index_base,rank_hr);
-		coeff=vect_coeff(var_hr,ineq->vecteur);
-		sign = value_sign(coeff);
+        var_hr=variable_of_rank(index_base,rank_hr);
+        coeff=vect_coeff(var_hr,ineq->vecteur);
+        sign = value_sign(coeff);
 
-		if (sc_elim_triang_integer_redund_constraint_p
-		  (ps->inegalites,index_base,ineq, var_hr,tab_info, &rank_max)
-		    && (rank_max >= loop_level)) {
+        if (sc_elim_triang_integer_redund_constraint_p
+            (ps->inegalites,index_base,ineq, var_hr,tab_info, &rank_max)
+            && (rank_max >= loop_level)) {
 
-		    /* this condition is true if the constraint can be
-		       eliminated from the system, that means if this is
-		       not the last constraint on the variable or if all
-		       the constraints on this variable can be
-		       eliminated (the rank of variable is greater the
-		       number of loops) */
+          /* this condition is true if the constraint can be
+             eliminated from the system, that means if this is
+             not the last constraint on the variable or if all
+             the constraints on this variable can be
+             eliminated (the rank of variable is greater the
+             number of loops) */
 
-		  contrainte_reverse(ineg);
-		  CATCH(overflow_error) {
-		    pred = pred->succ;
-		    contrainte_reverse(ineg);
-		  }
-		  TRY {
-		    /* test de sc_faisabilite avec la nouvelle 
-		       inegalite */
-		    if (!sc_rational_feasibility_ofl_ctrl(sc,OFL_CTRL,true)) { 
-		      
-		      /* si le systeme est non faisable ==>
-			 inegalite redondante ==> elimination de
-			 cette inegalite */
-		      sc->inegalites = sc->inegalites->succ;
-		      ineg->succ = NULL;
-		      contrainte_rm(ineg);
-		      sc->nb_ineq -=1;
-		      pred->succ = ineq->succ;
-		      
-		      /* mise a jour du nombre de contraintes restantes 
-			 contraingnant la variable  de rang rank_hr */
-		      if (sign >0) tab_info[rank_hr][2] --;
-		      else if (sign <0) tab_info[rank_hr][3]--; 
-		    }
-		    
-		    else { pred = pred->succ;
-		    contrainte_reverse(ineg);
-			   }
-		    UNCATCH(overflow_error);
-		  }
-		}
+          contrainte_reverse(ineg);
+          CATCH(overflow_error) {
+            pred = pred->succ;
+            contrainte_reverse(ineg);
+          }
+          TRY {
+            // test de sc_faisabilite avec la nouvelle inegalite
+            if (!sc_rational_feasibility_ofl_ctrl(sc,OFL_CTRL,true)) {
+
+              // si le systeme est non faisable ==>
+              // inegalite redondante ==> elimination de cette inegalite
+              sc->inegalites = sc->inegalites->succ;
+              ineg->succ = NULL;
+              contrainte_rm(ineg);
+              sc->nb_ineq -=1;
+              pred->succ = ineq->succ;
+
+              // mise a jour du nombre de contraintes restantes
+              // contraingnant la variable  de rang rank_hr
+              if (sign >0) tab_info[rank_hr][2] --;
+              else if (sign <0) tab_info[rank_hr][3]--;
+            }
+		    else {
+          pred = pred->succ;
+          contrainte_reverse(ineg);
+        }
+            UNCATCH(overflow_error);
+          }
+        }
 	    }
-	}
     }
-    return(sc);
-} 
-
+  }
+  return sc;
+}
 
 /* This  function returns true if the constraint C (resulting of the
  *  combination of the two constraints ineq1 and ineq2) is redundant 
@@ -541,32 +538,32 @@ Pcontrainte ineq1,ineq2;
 Variable var;
 {
 
-    Pcontrainte posit, negat;
-    Pcontrainte ineg = CONTRAINTE_UNDEFINED;
-    bool result = false;
+  volatile Pcontrainte posit, negat;
+  Pcontrainte ineg = CONTRAINTE_UNDEFINED;
+  bool result = false;
 
-    if (!CONTRAINTE_UNDEFINED_P(ineq1) && !CONTRAINTE_UNDEFINED_P(ineq2)) {
-	
-	if (value_pos_p(vect_coeff(var,ineq1->vecteur))) {	    
+  if (!CONTRAINTE_UNDEFINED_P(ineq1) && !CONTRAINTE_UNDEFINED_P(ineq2)) {
+
+    if (value_pos_p(vect_coeff(var,ineq1->vecteur))) {
 	    posit = contrainte_copy(ineq1);
 	    negat = contrainte_copy(ineq2);
-	}
-	else  {
+    }
+    else  {
 	    posit = contrainte_copy(ineq2);
 	    negat = contrainte_copy(ineq1);
-	}
-	
-	CATCH(overflow_error)
+    }
+
+    CATCH(overflow_error)
 	    result = false;
-	TRY {
+    TRY {
 	    ineg = sc_integer_inequalities_combination_ofl_ctrl
-		(sc, posit, negat, var, &result, FWD_OFL_CTRL);
+        (sc, posit, negat, var, &result, FWD_OFL_CTRL);
 	    contrainte_rm(ineg);
 	    UNCATCH(overflow_error);
-	}
+    }
 
-	contrainte_rm(posit);
-	contrainte_rm(negat);
-    }    
-    return result;
+    contrainte_rm(posit);
+    contrainte_rm(negat);
+  }
+  return result;
 }

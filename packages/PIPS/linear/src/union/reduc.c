@@ -940,7 +940,7 @@ Psysteme  conv_hull, ps1, ps2;
 int       ofl_ctrl;
 bool   ofl_res;
 {
-  Ppath    chemin;
+  volatile Ppath    chemin;
   bool  result;
   int      local_ofl_ctrl = (ofl_ctrl == OFL_CTRL)?FWD_OFL_CTRL:ofl_ctrl;
   
