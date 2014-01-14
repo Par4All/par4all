@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of NewGen.
 
@@ -74,20 +74,20 @@ typedef enum {
  *   suffix for declaring temporaries.
  * - put braces around the macro when using it as a loop body or
  *   condition case.
- *
- * Ronan, I wish to avoid an ugly double macro expansion hack here.
- * Just change the scalar variable name "var" if need be.
  */
-#define SET_FOREACH(type_name, the_item, the_set)    \
-  hash_table _hash_##the_item##__LINE__ =            \
-    set_private_get_hash_table(the_set);             \
-  void * _point_##the_item##__LINE__ = NULL;         \
-  for (type_name the_item;                           \
-       (_point_##the_item##__LINE__ =                \
-        hash_table_scan(_hash_##the_item##__LINE__,  \
-                        _point_##the_item##__LINE__, \
-                        (void **) &the_item,         \
-                        NULL));)
+
+/* FC: I do not understand this hack
+ */
+#define SET_FOREACH_UNIQUE_1(prefix, x)   prefix##x
+#define SET_FOREACH_UNIQUE_2(prefix, x)   SET_FOREACH_UNIQUE_1 (prefix, x)
+#define SFE(prefix)  SET_FOREACH_UNIQUE_2 (prefix, __LINE__)
+
+#define SET_FOREACH(type_name, the_item, the_set)                       \
+  hash_table SFE(_hash) = set_private_get_hash_table(the_set);          \
+  void * SFE(_pointer) = NULL;                                          \
+  for (type_name the_item;                                              \
+       (SFE(_pointer) =                                                 \
+        hash_table_scan(SFE(_hash), SFE(_pointer), (void **) &the_item, NULL));)
 
 /* what about this replacement?
 #define SET_MAP(the_item, the_code, the_set)		\

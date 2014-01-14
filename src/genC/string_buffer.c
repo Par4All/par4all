@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of NewGen.
 
@@ -291,5 +291,21 @@ void string_buffer_cat(string_buffer sb, const string first, ...)
     string_buffer_append(sb, next);
     next = va_arg(args, string);
   }
+  va_end(args);
+}
+/* append a formatted string to sb
+ * @param sb string buffer to be appended to
+ * @param format printf format string
+ * @param ... values
+ */
+void string_buffer_printf(string_buffer sb, const string format, ...)
+{
+  message_assert("duplicate string_buffer", sb->dup);
+  va_list args;
+  va_start(args, format);
+  string str;
+  int err = vasprintf(&str, format, args);
+  message_assert("vasprintf ok", err >= 0);
+  string_buffer_append(sb, str);
   va_end(args);
 }
