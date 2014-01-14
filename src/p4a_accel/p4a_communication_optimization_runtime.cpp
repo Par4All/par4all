@@ -23,8 +23,9 @@ static p4a_memory_mapping memory_mapping;
  * @params size is the size of the area, in case we need to allocate it
  * @return a pointer in the GPU memory corresponding to host_ptr
  */
-void * P4A_runtime_host_ptr_to_accel_ptr(void *host_ptr, size_t size) {
+void * P4A_runtime_host_ptr_to_accel_ptr(const void *const_host_ptr, size_t size) {
   void *accel_ptr;
+  void *host_ptr = const_cast<void*>(const_host_ptr);
 
 
 /* Mandatory in openmp accel emulation, because of macro implementation */

@@ -5,7 +5,7 @@
 """
 Recover #include into PIPS C output
 
-The idea is to pass each standard C99 .h through PIPS and analyse the output and to store the association of a given C construction in the output to a give .h.
+The idea is to pass each standard C99 .h through PIPS and analyze the output and to store the association of a given C construction in the output to a give .h.
 
 In this way, by parsing a PIPS output, we can statistically recover the
 original #include <...h>
@@ -52,7 +52,7 @@ There are indeed 2 different methods that can be used:
   option replace each fragment from a standard include files with the
   respective #include at the place the first place a fragment appeared.
 
-Ronan.Keryell@hpc-project.com
+Ronan.Keryell@silkan.com
 """
 
 #import string, re, sys, os, types, optparse
@@ -69,7 +69,7 @@ verbose = False
 # To select if we use a simple method:
 simple_method = False
 
-# The #include files we want to analyse:
+# The #include files we want to analyze:
 # I use on the GNU libc'Appendix B Summary of Library Facilities' a
 # grep '\.h' l | sed 's/.*`/    "/; s/'"'"'.*/",/' | sort -u
 header_file_names = [
@@ -176,7 +176,7 @@ END_OF_INCLUDE_TO_FIND_MARKER = r'int p4a_recover_includes_end_of_parse;\n'
 # The file name used for #include parsing:
 tmp_header_file_name = "header.c"
 
-# File name to use for persistance of information about headers and definitions
+# File name to use for persistence of information about headers and definitions
 header_information_file_name = "header_information.pickle"
 
 
@@ -207,7 +207,7 @@ def load_header_information():
 
 
 def add_to_map_of_sets(d, key, value):
-    """Associate to a key in a dictionnary d a set with a value
+    """Associate to a key in a dictionary d a set with a value
     d is a map of set of values
     """
 
@@ -285,7 +285,7 @@ class SimpleC99Lexer:
     def t_error(self, t):
         if verbose:
             print("Found character '%s'" % t.value[0])
-        # Keep the caracter as input
+        # Keep the character as input
         t.lexer.content += t.value[0]
         # Remove it from the input:
         t.lexer.skip(1)
@@ -442,7 +442,7 @@ def init_headers():
             #  No longer used
 
             # Create a proxy include file to add a marking comment that is
-            # used to recognize more precizely the included file because
+            # used to recognize more precisely the included file because
             # of the massive cross inclusions of C99 .h...
             pn = os.path.join('include', n)
             # Crate the directory for it:
@@ -452,12 +452,12 @@ def init_headers():
                 # Just in case it already exists...
                 pass
             # And then the file:
-            
+
             proxy = open(pn, mode = 'w')
             #python 2.X
             print >>proxy, '/* This file includes ' + n + ' for PIPS */'
             print >>proxy, '#include "' + os.path.join('/usr/include', n ) + '"'
-            
+
             #python3.1
             #print('/* This file includes ' + n + ' for PIPS */',
             #      file = proxy)
@@ -557,9 +557,9 @@ def recover_header(file_name, output_file_name):
         # in content:
         (line, content) = re.split(r'\n', content, 1)
         # Output the line to the destination file:
-        print >>f, line 
+        print >>f, line
 
-    # Then write the recoverd includes:
+    # Then write the recovered includes:
     for h in found_headers:
 		#python2.X
 		print >>f, '#include <', h, '>',
@@ -682,7 +682,16 @@ def postpreprocess_simple(output_string):
                               len(include_stack))
                     if simple_method and len(include_stack) == 0:
                         # In the case of the simple method, just mark
-                        # the end of #include that are at the top-level:
+                        # the end of #include that are at the top-level.
+
+                        # Note this does no longer work with gcc-4.8 that
+                        # includes first <stdc-predef.h>. This changes the
+                        # nesting level. To have the right behaviour with
+                        # gcc-4.8, do not forget to use -ffreestanding to
+                        # prevent gcc 4.8 from including <stdc-predef.h>,
+                        # as explained "Pre-processor pre-includes"
+                        # http://gcc.gnu.org/gcc-4.8/porting_to.html
+                        # assumptions in
                         flush_lexer_output('/* P4A include '
                                            + returning_from
                                            + ' stops here */void p4a_dummy_recover();\n')
@@ -725,6 +734,9 @@ def sanitize_recover_output(content):
     # into '#include <stdbool.h>'
     content = re.sub(r'#include "/usr/lib/gcc/[^/]+/[^/]+/include(-fixed)?/([^"]+)"',
                      '#include <\\2>', content)
+    # Replace for example
+    # #include <x86_64-linux-gnu/sys/time.h> by #include <sys/time.h>
+    content = re.sub('#include <x86_64-linux-gnu/', '#include <', content)
     # Recover C99 floating point constants:
     content = re.sub(r'\(__huge_val\.__d\)',
                      'HUGE_VAL', content)
@@ -732,7 +744,18 @@ def sanitize_recover_output(content):
                      'HUGE_VALF', content)
     content = re.sub(r'\(\(long double\) HUGE_VAL\)',
                      'HUGE_VALL', content)
-    # TODO to be completed...
+
+    # Remove static functions of the libc kept by PIPS
+    content = content.replace(r'''static unsigned short __bswap_16(unsigned short __bsx)
+{
+   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
+}
+''', '')
+    content = content.replace(r'''static unsigned int __bswap_32(unsigned int __bsx)
+{
+   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
+}
+''', '')
 
     return content
 
@@ -917,15 +940,15 @@ def preprocess(args):
     inclusion.
 
     This is an optparse-callback to be able to get trailing arguments"""
-                
+
     # Pick the default values from
     # pips/src/Libs/preprocessor/preprocessor-local.h:
     cpp_args = shlex.split(" -C  -D__PIPS__ -D__HPFC__ -U__GNUC__ ")
-    
+
     # Add other options from the PIPS_CPP_FLAGS environment variable if defined:
     if 'PIPS_CPP_FLAGS' in os.environ:
         cpp_args += shlex.split(os.environ['PIPS_CPP_FLAGS'] + " ")
-    
+
     # Addded the trailing arguments of this program as options or files to
     # preprocess, if any:
     cpp_args += args
@@ -977,11 +1000,11 @@ def main():
 
     parser.add_option("-i",  "--init",
                      action = "store_true", dest = "init", default = False,
-                     help = "Initialize from PIPS exersizing the #include tables that will be used in the postprocessor")
+                     help = "Initialize from PIPS exercising the #include tables that will be used in the postprocessor")
 
     parser.add_option("-E",  "--preprocessor",
                      action = "callback", callback = record_preprocess_options,
-                      help = "Use this program as a preprocessor. It follows the PIPS_CPP_FLAGS environment variable but not PIPS_CPP since often the later is used to call this program. It must be the last option of this program before all the other options and parameters to be passed to CPP. This option override the -i/--init and -o/--output options. The arguments passed to the CPP are the PIPS default options, the content of the PIPS_CPP_FLAGS environment variable and the trailing arguments of this programm.")
+                      help = "Use this program as a preprocessor. It follows the PIPS_CPP_FLAGS environment variable but not PIPS_CPP since often the later is used to call this program. It must be the last option of this program before all the other options and parameters to be passed to CPP. This option override the -i/--init and -o/--output options. The arguments passed to the CPP are the PIPS default options, the content of the PIPS_CPP_FLAGS environment variable and the trailing arguments of this program.")
 
     parser.add_option("-s",  "--simple",
                       action = "store_true", dest="simple", default = False,
@@ -1026,7 +1049,7 @@ def main():
                 recover_header_simple(file_name, options.output_file_name)
 
 
-# If this programm is independent it is executed:
+# If this program is independent it is executed:
 if __name__ == "__main__":
     main()
 

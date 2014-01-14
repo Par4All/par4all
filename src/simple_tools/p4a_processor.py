@@ -207,11 +207,12 @@ class p4a_processor(object):
 
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
-                 filter_exclude = None, noalias = False, pointer_analysis = False, 
-                 accel = False, cuda = False, opencl = False, openmp = False, 
+                 filter_exclude = None, noalias = False,
+                 pointer_analysis = False,
+                 accel = False, cuda = False, opencl = False, openmp = False,
                  com_optimization = False, cuda_cc=2, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
-                 c99 = False, use_pocc = False, pocc_options = "", 
+                 c99 = False, use_pocc = False, pocc_options = "",
                  atomic = False, kernel_unroll=0, brokers="",
                  properties = {}, apply_phases={}, activates = []
                  , **unused_kwords):
@@ -254,8 +255,16 @@ class p4a_processor(object):
 
             if self.recover_includes and not self.native_recover_includes:
                 # Use a special preprocessor to track #include by a
-                # man-in-the-middle attack :-) :
-                os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E'
+                # man-in-the-middle attack :-).
+
+                # Use -ffreestanding to prevent gcc 4.8 from including
+                # <stdc-predef.h> that breaks assumptions in
+                # p4a_recover_includes. See "Pre-processor pre-includes"
+                # http://gcc.gnu.org/gcc-4.8/porting_to.html
+
+                # Use -D_GNU_SOURCE to have less hostile
+                # __bswap_32(), __bswap_64()... for PIPS
+                os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E -ffreestanding -D_GNU_SOURCE'
 
             for file in files:
                 if self.fortran is None:
@@ -325,7 +334,7 @@ class p4a_processor(object):
                 # changes in Pips
                 properties["CONSTANT_PATH_EFFECTS"] = False
                 properties["TRUST_CONSTANT_PATH_EFFECTS_IN_CONFLICTS"] = True
-                
+
             if pointer_analysis:
                 properties["ABSTRACT_HEAP_LOCATIONS"]="context-sensitive"
                 self.workspace.activate("proper_effects_with_points_to")
@@ -353,7 +362,7 @@ class p4a_processor(object):
         self.main_filter = (lambda module: not skip_p4a_runtime_and_compilation_unit_re.match(module.name)
             and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
             and (filter_select_re == None or filter_select_re.match(module.name)))
-        
+
 
     def set_properties (self, user_properties):
         """ Initialize the properties according to the default defined properties
@@ -602,7 +611,6 @@ class p4a_processor(object):
         """Apply transformations to parallelize the code in the workspace
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
-        
 
         if fine_grain:
             # Set to False (mandatory) for A&K algorithm on C source file
@@ -626,7 +634,7 @@ class p4a_processor(object):
                 self.workspace.props.parallelize_again_parallel_code=False
                 self.workspace.props.memory_effects_only = False # mandatory for internalize_parallel_code
                 all_modules.internalize_parallel_code(concurrent=True)
-                # and flag the remaining reductions if possible 
+                # and flag the remaining reductions if possible
                 # !! Show first a test case where it is useful !!
                 # all_modules.flag_parallel_reduced_loops_with_openmp_directives(concurrent=True)
         else:
@@ -701,8 +709,8 @@ class p4a_processor(object):
 
         # go through the call graph in a top - down fashion
         def gpuify_all(module):
-                module.gpu_ify(GPU_USE_WRAPPER = False, 
-                            GPU_USE_KERNEL = False,                             
+                module.gpu_ify(GPU_USE_WRAPPER = False,
+                            GPU_USE_KERNEL = False,
                             GPU_USE_FORTRAN_WRAPPER = self.fortran,
                             GPU_USE_LAUNCHER = True,
                             GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT = self.c99,
@@ -844,7 +852,7 @@ class p4a_processor(object):
 
         # SG: not usefull anymore. Uncomment this if you want to try it again, this is the right place to do it
         ## Unfold kernel, usually won't hurt code size, but less painful with
-        ## static functions declared in accelerator compilation units 
+        ## static functions declared in accelerator compilation units
         #kernels.unfold()
 
         # add sentinel around loop nests in launcher, used to replace the loop

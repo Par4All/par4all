@@ -216,7 +216,7 @@ void P4A_copy_from_accel_4d(size_t element_size,
  * @params size is the size of the area, in case we need to allocate it
  * @return a pointer in the GPU memory corresponding to host_ptr
  */
-void * P4A_runtime_host_ptr_to_accel_ptr(void *host_ptr, size_t size);
+void * P4A_runtime_host_ptr_to_accel_ptr(const void *host_ptr, size_t size);
 
 
 /**
