@@ -26,7 +26,7 @@ GET_VERSION	= $(MAKE.d)/version.sh
 # the actual result depends on the kind of git-svn setup used,
 # so some more tweaking may be needed here.
 .revisions_h:
-	if [ -d .svn -o -d $(ROOT)/.git -o ! -f revisions.h ] ; \
+	if [ -d $(ROOT)/.svn -o -d $(ROOT)/.git -o ! -f revisions.h ] ; \
 	then \
 	  $(RM) revisions.h ; \
 	  { \
@@ -47,4 +47,4 @@ revisions.h: .revisions_h
 clean: version-clean
 # keep revision if cannot be regenerated?
 version-clean:
-	[ -d .svn -o -d $(ROOT)/.git ] && $(RM) revisions.h
+	[ -d $(ROOT)/.svn -o -d $(ROOT)/.git ] && $(RM) revisions.h
