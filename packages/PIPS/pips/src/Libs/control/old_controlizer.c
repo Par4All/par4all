@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -321,7 +321,7 @@ static hash_table union_used_labels(hash_table l1,
 static bool covers_labels_p(statement st,
 			    hash_table used_labels) {
   if( get_debug_level() >= 5 ) {
-    pips_debug(0, "Statement %td (%p): \n ", statement_number(st), st);
+    pips_debug(5, "Statement %td (%p): \n ", statement_number(st), st);
     print_statement(st);
   }
   /* For all the labels in used_labels: */
@@ -496,7 +496,7 @@ statement loop_test(statement sl)
 		      STATEMENT_ORDERING_UNDEFINED,
 		      cs,
 		      make_instruction(is_instruction_test, t),NIL,NULL,
-		      copy_extensions (statement_extensions(sl)));
+		      copy_extensions (statement_extensions(sl)), make_synchronization_none());
   return ts;
 }
 
@@ -560,7 +560,7 @@ hash_table used_labels;
 				      make_instruction(is_instruction_loop, new_l),
 				      gen_copy_seq(statement_declarations(st)),
 				      strdup(statement_decls_text(st)),
-				      copy_extensions(statement_extensions(st))),
+				      copy_extensions(statement_extensions(st)), make_synchronization_none()),
 		       ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		       CONS(CONTROL, succ, NIL)) ;
 	controlized = false;
@@ -666,7 +666,7 @@ static statement whileloop_test(statement sl)
 			STATEMENT_ORDERING_UNDEFINED,
 			cs,
 			make_instruction(is_instruction_test, t),NIL,NULL,
-			copy_extensions (statement_extensions(sl)));
+			copy_extensions (statement_extensions(sl)), make_synchronization_none());
 
     return ts;
 }
@@ -720,7 +720,7 @@ hash_table used_labels;
 						       new_l),
 				      gen_copy_seq(statement_declarations(st)),
 				      strdup(statement_decls_text(st)),
-				      copy_extensions(statement_extensions(st))),
+				      copy_extensions(statement_extensions(st)), make_synchronization_none()),
 		       ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		       CONS(CONTROL, succ, NIL));
 	controlized = false;
@@ -783,7 +783,7 @@ statement forloop_test(statement sl)
 				STATEMENT_ORDERING_UNDEFINED,
 				cs,
 				make_instruction(is_instruction_test, t),NIL,NULL,
-				copy_extensions(statement_extensions(sl)));
+				copy_extensions(statement_extensions(sl)), make_synchronization_none());
 
   ifdebug(8) {
     pips_debug(8, "Condition expression: ");
@@ -892,7 +892,7 @@ hash_table used_labels;
 				    ni,
 				    gen_copy_seq(statement_declarations(st)),
 				    strdup(statement_decls_text(st)),
-				    copy_extensions(statement_extensions(st)));
+				    copy_extensions(statement_extensions(st)), make_synchronization_none());
     ifdebug(1) {
       statement_consistent_p(st);
       statement_consistent_p(d_st);
@@ -1060,7 +1060,7 @@ static control compact_list(list ctls,
     control c_last = c_end ;
 
     ifdebug(5) {
-	pips_debug(0, "Begin with list c_end %p, ctls:", c_end);
+	pips_debug(5, "Begin with list c_end %p, ctls:", c_end);
 	display_address_of_control_nodes(ctls);
 	fprintf(stderr, "\n");
     }
@@ -1149,7 +1149,7 @@ static control compact_list(list ctls,
 				   STATEMENT_ORDERING_UNDEFINED,
 				   string_undefined,
 				   i,NIL,NULL,
-				   empty_extensions ());
+				   empty_extensions (), make_synchronization_none());
 	    ;
 	  }
 	  else {
@@ -1167,7 +1167,7 @@ static control compact_list(list ctls,
 				   STATEMENT_ORDERING_UNDEFINED,
 				   string_undefined,
 				   i,NIL,NULL,
-				   empty_extensions ());
+				   empty_extensions (), make_synchronization_none());
 	    }
 	    if(instruction_block_p(succ_i=statement_instruction(succ_st))){
 		instruction_block(i) =
@@ -1244,7 +1244,7 @@ list controlize_list_1(list sts,
     bool unreachable;
 
     ifdebug(5) {
-      pips_debug(0, "Nodes linked with pred %p:\n", pred);
+      pips_debug(5, "Nodes linked with pred %p:\n", pred);
       display_linked_control_nodes(pred);
     }
 
@@ -1266,7 +1266,7 @@ list controlize_list_1(list sts,
       /* Keep track globally of the unreachable code: */
       Unreachable = CONS(STATEMENT, st, Unreachable);
       ifdebug(2) {
-	pips_debug(0, "There is a new unreachable statement:\n");
+	pips_debug(2, "There is a new unreachable statement:\n");
 	print_statement(st);
       }
     }
@@ -1426,9 +1426,9 @@ static bool controlize_list(statement st,
     //c_last = c_end;
     gen_free_list(ctls);
     ifdebug(5) {
-	pips_debug(0, "Nodes from c_block %p\n", c_block);
+	pips_debug(5, "Nodes from c_block %p\n", c_block);
 	display_linked_control_nodes(c_block);
-	pips_debug(0, "Nodes from c_last %p\n", c_last);
+	pips_debug(5, "Nodes from c_last %p\n", c_last);
 	display_linked_control_nodes(c_last);
     }
     /*    pips_assert("declarations are preserved in list",
@@ -1517,7 +1517,7 @@ static bool controlize_list(statement st,
 				      i,
 				      gen_copy_seq(statement_declarations(st)),
 				      strdup(statement_decls_text(st)),
-				      copy_extensions(statement_extensions(st)));
+				      copy_extensions(statement_extensions(st)), make_synchronization_none());
 	    }
 	    else {
 	      statement us =
@@ -1528,7 +1528,7 @@ static bool controlize_list(statement st,
 			       i,
 			       NIL,
 			       strdup(""),
-			       empty_extensions());
+			       empty_extensions(), make_synchronization_none());
 	      new_st =
 		make_empty_statement_with_declarations_and_comments(
 								    gen_copy_seq(statement_declarations(st)),
@@ -1674,7 +1674,7 @@ hash_table used_labels;
 				  make_instruction(is_instruction_test, it),
 				  gen_copy_seq(statement_declarations(st)),
 				  strdup(statement_decls_text(st)),
-				  copy_extensions(statement_extensions(st))),
+				  copy_extensions(statement_extensions(st)), make_synchronization_none()),
 		   ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		   CONS(CONTROL, succ, NIL));
     control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, succ);
@@ -1814,7 +1814,7 @@ simplified_unstructured(control top,
     instruction i;
 
     ifdebug(4) {
-	pips_debug(0, "Accessible nodes from top:\n");
+	pips_debug(4, "Accessible nodes from top:\n");
 	display_linked_control_nodes(top);
 	check_control_coherency(top);
 	pips_debug(1, "Accessible nodes from bottom:\n");
@@ -2195,9 +2195,9 @@ statement st;
     if(!ENDP(Unreachable)) {
 	pips_user_warning("Some statements are unreachable\n");
 	ifdebug(2) {
-	    pips_debug(0, "Unreachable statements:\n");
+	    pips_debug(2, "Unreachable statements:\n");
 	    MAP(STATEMENT, s, {
-		pips_debug(0, "Statement %p:\n", s);
+		pips_debug(2, "Statement %p:\n", s);
 		print_statement(s);
 	    }, Unreachable);
 	}

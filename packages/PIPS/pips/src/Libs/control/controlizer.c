@@ -13,7 +13,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -293,7 +293,7 @@ static hash_table union_used_labels(hash_table l1,
 static bool covers_labels_p(statement st,
 			    hash_table used_labels) {
   ifdebug(5) {
-    pips_debug(0, "Statement %td (%p): \n ", statement_number(st), st);
+    pips_debug(5, "Statement %td (%p): \n ", statement_number(st), st);
     print_statement(st);
   }
   /* For all the labels in used_labels: */
@@ -1205,7 +1205,7 @@ statement whileloop_test(statement sl)
 			STATEMENT_ORDERING_UNDEFINED,
 			cs,
 			make_instruction(is_instruction_test, t),NIL,NULL,
-			copy_extensions (statement_extensions(sl)));
+			copy_extensions (statement_extensions(sl)), make_synchronization_none());
 
     return ts;
 }
@@ -1260,7 +1260,7 @@ hash_table used_labels;
 						       new_l),
 				      gen_copy_seq(statement_declarations(st)),
 				      strdup(statement_decls_text(st)),
-				      copy_extensions(statement_extensions(st))),
+				      copy_extensions(statement_extensions(st)), make_synchronization_none()),
 		       ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		       CONS(CONTROL, succ, NIL));
 	controlized = false;
@@ -1323,7 +1323,7 @@ statement forloop_test(statement sl)
 				STATEMENT_ORDERING_UNDEFINED,
 				cs,
 				make_instruction(is_instruction_test, t),NIL,NULL,
-				copy_extensions(statement_extensions(sl)));
+				copy_extensions(statement_extensions(sl)), make_synchronization_none());
 
   ifdebug(8) {
     pips_debug(8, "Condition expression: ");
@@ -1431,7 +1431,7 @@ hash_table used_labels;
 				    ni,
 				    gen_copy_seq(statement_declarations(st)),
 				    strdup(statement_decls_text(st)),
-				    copy_extensions(statement_extensions(st)));
+				    copy_extensions(statement_extensions(st)), make_synchronization_none());
     ifdebug(1) {
       statement_consistent_p(st);
       statement_consistent_p(d_st);
@@ -1921,7 +1921,7 @@ static bool controlize_sequence(control c_res,
   pips_assert("st it a statement sequence", statement_sequence_p(st));
 
   ifdebug(5) {
-    pips_debug(0, "Entering with nodes linked with c_res %p:\n", c_res);
+    pips_debug(5, "Entering with nodes linked with c_res %p:\n", c_res);
     display_linked_control_nodes(c_res);
   }
   ifdebug(1) {
@@ -2382,10 +2382,10 @@ static bool controlize_goto(control c_res,
   control n_succ = get_label_control(name);
 
   ifdebug(5) {
-    pips_debug(0, "After freeing the goto, from c_res = %p:\n", c_res);
+    pips_debug(5, "After freeing the goto, from c_res = %p:\n", c_res);
     display_linked_control_nodes(c_res);
     check_control_coherency(c_res);
-    pips_debug(0, "From n_succ = %p:\n", n_succ);
+    pips_debug(5, "From n_succ = %p:\n", n_succ);
     display_linked_control_nodes(n_succ);
     check_control_coherency(n_succ);
   }
@@ -2421,10 +2421,10 @@ static bool controlize_goto(control c_res,
     update_used_labels(used_labels, name, st);
 
     ifdebug(5) {
-      pips_debug(0, "After freeing the goto, from c_res = %p:\n", c_res);
+      pips_debug(5, "After freeing the goto, from c_res = %p:\n", c_res);
       display_linked_control_nodes(c_res);
       check_control_coherency(c_res);
-      pips_debug(0, "From n_succ = %p:\n", succ);
+      pips_debug(5, "From n_succ = %p:\n", succ);
       display_linked_control_nodes(succ);
       check_control_coherency(succ);
     }

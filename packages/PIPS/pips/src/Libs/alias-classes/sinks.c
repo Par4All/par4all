@@ -67,6 +67,7 @@
 #include "properties.h"
 //#include "pipsmake.h"
 //#include "semantics.h"
+#include "bootstrap.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
@@ -301,6 +302,25 @@ list unary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p, boo
       offset_points_to_cells(sinks, delta, dt);
       free_expression(delta);
     }
+    else {
+      if(false) {
+	/* Needed for dereferencing17.c, but not for properties03
+	   because in the second case the dereferencing is
+	   delayed... */
+      /* There is an issue with eval_p: since we are looking for
+	 sinks, we always have to dereference "a" at least once. */
+      type dt = points_to_expression_to_pointed_type(a);
+      sinks = expression_to_points_to_sinks(a, in);
+      /* We have to undo the impact of side effects performed when the arguments were analyzed for points-to information */
+      expression delta = expression_undefined;
+      if(ENTITY_POST_INCREMENT_P(f))
+	delta = int_to_expression(-1);
+      else
+	delta = int_to_expression(1);
+      offset_points_to_cells(sinks, delta, dt);
+      free_expression(delta);
+      }
+    }
   }
   else {
   // FI: to be continued
@@ -459,11 +479,13 @@ list binary_intrinsic_call_to_points_to_sinks(call c, pt_map in, bool eval_p)
     sinks = malloc_to_points_to_sinks(a2, in);
   }
   else if(ENTITY_FOPEN_P(f)) {
-    /* Should be handled like a malloc, using the line number for malloc() */
-    pips_user_warning("Fopen() not precisely implemented.\n");
-    type rt = functional_result(type_functional(entity_type(f)));
-    type ct = copy_type(type_to_pointed_type(rt)); // FI: no risk with typedefs?
-    sinks = CONS(CELL, make_anywhere_cell(ct), NIL);
+    entity io_files = MakeIoFileArray(f);
+    expression s = make_unbounded_expression();
+    reference r = make_reference(io_files, CONS(EXPRESSION, s, NIL));
+    cell ac = make_cell_reference(r);
+    // Since fopen() may fail, a NULL can also be returned
+    cell nc = make_null_cell();
+    sinks = CONS(CELL, ac, CONS(CELL, nc, NIL));
   }
   else {
     // FI: two options, 1) generate an anywhere as sink to be always safe,
@@ -702,9 +724,9 @@ list reference_to_points_to_sinks(reference r, type et, pt_map in,
     fprintf(stderr, "\n");
   }
 
-  bool to_be_freed;
-  type srt = points_to_reference_to_type(r, &to_be_freed);
-  type rt = compute_basic_concrete_type(srt);
+  //bool to_be_freed;
+  type rt = points_to_reference_to_concrete_type(r);
+  //type rt = compute_basic_concrete_type(srt);
   if(false && eval_p && !pointer_type_p(rt)) {
     // There must be a type mismatch
     pips_user_error("Type mmismatch for reference \"%s\" at line %d.",
@@ -883,7 +905,7 @@ list reference_to_points_to_sinks(reference r, type et, pt_map in,
 	      array_pointer_type_equal_p(et, rt));
   check_type_of_points_to_cells(sinks, rt, eval_p);
 
-  if(to_be_freed) free_type(srt);
+  //if(to_be_freed) free_type(srt);
 
   ifdebug(8) {
     pips_debug(8, "Resulting cells: ");
@@ -893,18 +915,128 @@ list reference_to_points_to_sinks(reference r, type et, pt_map in,
 
   return sinks;
 }
+
+static list process_casted_sinks(list sinks, type t)
+{
+  type pt = compute_basic_concrete_type(type_to_pointed_type(t));
+  list nsinks = NIL;
+  // You may have to update the subscript lists to fit the type
+  // This can only be done on *copies* of references included into
+  // the arcs of the points-to graph
+  FOREACH(CELL, c, sinks) {
+    if(!null_cell_p(c) && !nowhere_cell_p(c) && !anywhere_cell_p(c)) {
+      type cct = points_to_cell_to_concrete_type(c);
+      if(array_pointer_type_equal_p(pt, cct))
+	; // nothing to do
+      else {
+	type mct = points_to_cell_to_concrete_type(c);
+	if(overloaded_type_p(mct))
+	  ; // nothing to do... to be checked
+	else {
+	  // You should try to add or remove zero subscripts till the expected
+	  // type is reached.
+	  reference r = cell_any_reference(c);
+	  complete_points_to_reference_with_zero_subscripts(r);
+	  if(!type_void_p(pt)
+	     && adapt_reference_to_type(r, pt, points_to_context_statement_line_number)) {
+	    mct = points_to_cell_to_concrete_type(c);
 
+	    if(array_pointer_type_equal_p(pt, mct))
+	      ; // nothing to do
+	    else if(array_type_p(mct)
+		    && array_pointer_type_equal_p(pt, array_type_to_element_type(mct)))
+	      ; // nothing to do
+	    else {
+	      pips_internal_error("Not implemented yet.\n");
+	    }
+	  }
+	  else {
+	    /* The types are really incompatible, let's use the
+	     * type lattice, max_type(cct, mct)... if it were implemented
+	     *
+	     * Could we do better for a cast to (void *)? See cast03.
+	     */
+	    type ot = make_scalar_overloaded_type();
+	    cell nc = make_anywhere_points_to_cell(ot);
+	    nsinks = CONS(CELL, nc, nsinks);
+	    // pips_internal_error("Cast handling failure 1.\n");
+	  }
+	}
+      }
+    }
+  }
 
-/* FI: do we need eval_p? Yes! We may need to produce the source or the sink
+  return nsinks;
+}
+
+/* FI: I am not sure that process_casted_sources() is nor should be
+ * different from process_casted_sinks()
  */
-list cast_to_points_to_sinks(cast c,
+static list process_casted_sources(list sinks, type t)
+{
+  list nsinks = NIL; // New sink list
+  FOREACH(CELL, c, sinks) {
+    if(!null_cell_p(c) && !nowhere_cell_p(c) && !anywhere_cell_p(c)) {
+      type cct = points_to_cell_to_concrete_type(c);
+      if(array_pointer_type_equal_p(t, cct))
+	; // nothing to do
+      else { // We should create a stub of the proper type because a
+	// reference cannot include the address-of operator, "&"
+	if(pointer_type_p(t) && array_type_p(cct)) {
+	  reference r = cell_any_reference(c);
+	  complete_points_to_reference_with_zero_subscripts(r);
+	  if(adapt_reference_to_type(r, t, points_to_context_statement_line_number))
+	    ;
+	  else
+	    pips_internal_error("Cast handling failure 2.\n");
+	}
+	else {
+	  if(type_void_p(cct)) {
+	    /* Cell c is OK if it points towards cells of type
+	       compatible with the type pointed to by type t*/
+	  }
+	  else {
+	    type ot = make_scalar_overloaded_type();
+	    cell nc = make_anywhere_points_to_cell(ot);
+	    nsinks = CONS(CELL, nc, nsinks);
+	    break;
+	    //pips_internal_error("Not implemented yet: stub with proper type needed.\n");
+	  }
+	}
+      }
+    }
+  }
+
+  /* Update "sinks" with "dsl" and "nsl" */
+
+  return nsinks;
+}
+
+/* Handling of cast: play it safe! Either the cast is partly redundant
+ * and can be ignored or anywhere is returned.
+ *
+ * Design choice: can we have static aliasing with constant paths? Can
+ * we have different types for one constant path? Maybe we could have
+ * some static aliasing for stubs, using an offset in the formal
+ * context, but we cannot manage static aliasing at the reference
+ * level, i.e. at the constant path level.
+ *
+ * FI: do we need eval_p? Yes! We may need to produce the source or the sink.
+ *
+ * Note: the problem linked to eval_p has not been analyzed properly;
+ * the code should be simplified.
+ *
+ * Relevant test cases: Rice/test03
+ */
+list cast_to_points_to_sinks(cast ce,
 			     type et __attribute__ ((unused)),
 			     pt_map in,
 			     bool eval_p)
 {
   list sinks = list_undefined;
-  expression e = cast_expression(c);
-  type t = compute_basic_concrete_type(cast_type(c));
+  list nsinks = NIL; // In case the cast cannot be handled precisely
+  expression e = cast_expression(ce);
+  type t = compute_basic_concrete_type(cast_type(ce));
   // FI: should we pass down the expected type? It would be useful for
   // heap modelling. No, we might ass well fix the type in the list of
   // sinks returned, especially for malloced buckets.
@@ -917,81 +1049,31 @@ list cast_to_points_to_sinks(cast c,
   if(eval_p) {
     sinks = expression_to_points_to_sinks(e, in);
     if(pointer_type_p(t)) {
-      type pt = compute_basic_concrete_type(type_to_pointed_type(t));
-      // You may have to update the subscript lists to fit the type
-      // This can only be done on *copies* of references included into
-      // the arcs of the points-to graph
-      FOREACH(CELL, c, sinks) {
-	if(!null_cell_p(c) && !nowhere_cell_p(c) && !anywhere_cell_p(c)) {
-	  bool to_be_freed;
-	  type ct = points_to_cell_to_type(c, &to_be_freed);
-	  type cct = compute_basic_concrete_type(ct);
-	  if(array_pointer_type_equal_p(pt, cct))
-	    ; // nothing to do
-	  else {
-	    bool m_to_be_freed;
-	    type mct = points_to_cell_to_type(c, &m_to_be_freed);
-	    if(overloaded_type_p(mct))
-	      ; // nothing to do... to be checked
-	    else {
-	      // You should try to add or remove zero subscripts till the expected
-	      // type is reached.
-	      reference r = cell_any_reference(c);
-	      complete_points_to_reference_with_zero_subscripts(r);
-	      adapt_reference_to_type(r, pt);
-	      if(to_be_freed) free_type(mct);
-	      mct = points_to_cell_to_type(c, &m_to_be_freed);
-
-	      if(array_pointer_type_equal_p(pt, mct))
-		; // nothing to do
-	      else if(array_type_p(mct)
-		      && array_pointer_type_equal_p(pt, array_type_to_element_type(mct)))
-		; // nothing to do
-	      else {
-		pips_internal_error("Not implemented yet.\n");
-	      }
-	    }
-	    if(m_to_be_freed) free_type(mct);
-	  }
-	  if(to_be_freed) free_type(ct);
-	}
-      }
+      nsinks = process_casted_sinks(sinks, t);
     }
     else {
       pips_internal_error("Not implemented yet.\n");
     }
   }
   else {
-    sinks = expression_to_points_to_sources(e, in);
-    if(pointer_type_p(t)) {
-      FOREACH(CELL, c, sinks) {
-	if(!null_cell_p(c) && !nowhere_cell_p(c) && !anywhere_cell_p(c)) {
-	  bool to_be_freed;
-	  type ct = points_to_cell_to_type(c, &to_be_freed);
-	  type cct = compute_basic_concrete_type(ct);
-	  if(array_pointer_type_equal_p(t, cct))
-	    ; // nothing to do
-	  else { // We should create a stub of the proper type because a
-	    // reference cannot include the address-of operator, "&"
-	    if(pointer_type_p(t) && array_type_p(cct)) {
-	      reference r = cell_any_reference(c);
-	      complete_points_to_reference_with_zero_subscripts(r);
-	      adapt_reference_to_type(r, t);
-	    }
-	    else
-	      pips_internal_error("Not implemented yet: stub with proper type needed.\n");
-	  }
-	}
+      sinks = expression_to_points_to_sources(e, in);
+      if(pointer_type_p(t)) {
+	nsinks = process_casted_sources(sinks, t);
+      }
+      else {
+	// FI: should we make sure that we do not tranformer pointers
+	// into integers or other types?
+	;
       }
     }
-    else {
-      // FI: should we make sure that we do not tranformer pointers
-      // into integers or other types?
-      ;
+
+    if(!ENDP(nsinks)) {
+      gen_free_list(sinks);
+      sinks = nsinks;
     }
+
+    return sinks;
   }
-  return sinks;
-}
 
 // FI: do we need eval_p? eval_p is assumed always true
 list sizeofexpression_to_points_to_sinks(sizeofexpression soe,
@@ -1087,7 +1169,7 @@ int get_heap_counter()
  * previous property is not specified...
  */
 list malloc_to_points_to_sinks(expression e,
-			       pt_map in __attribute__ ((unused)))
+			       pt_map in)
 {
   list sinks = NIL;
   const char * opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
@@ -1110,6 +1192,31 @@ list malloc_to_points_to_sinks(expression e,
     pips_user_error("Unexpected value \"%s\" for Property ABSTRACT_HEAP_LOCATION."
 		    "Possible values are \"unique\", \"insensitive\","
 		    "\"flow-sensitive\", \"context-sensitive\".\n", opt);
+  }
+
+  /* The C standard specifies that all pointers that are allocated in
+     the heap have the value "indeterminate". */
+  FOREACH(CELL, c, sinks) {
+    reference r = cell_any_reference(c);
+    entity v = reference_variable(r);
+    list l = variable_to_pointer_locations(v);
+    FOREACH(CELL, source, l) {
+      list psl = points_to_source_to_sinks(source, in, false);
+      cell sink = cell_to_nowhere_sink(source);
+      points_to pt = points_to_undefined;
+      if(ENDP(psl)) {
+	pt = make_points_to(source, sink,
+			    make_approximation_exact(),
+			    make_descriptor_none());
+      }
+      else {
+	pt = make_points_to(source, sink,
+			    make_approximation_may(),
+			    make_descriptor_none());
+	gen_free_list(psl);
+      }
+      add_arc_to_pt_map(pt, in);
+    }
   }
 
   return sinks;
@@ -1184,6 +1291,11 @@ list flow_sensitive_malloc_to_points_to_sinks(expression e)
   cell mc = make_cell_reference(mr);
   list sinks  = CONS(CELL, mc, NIL);
 
+  if(!get_bool_property("POINTS_TO_SUCCESSFUL_MALLOC_ASSUMED")) {
+    cell nc = make_null_cell();
+    sinks = CONS(CELL, nc, sinks);
+  }
+
   return sinks;
 }
 
@@ -1240,41 +1352,6 @@ expression pointer_subscript_to_expression(cell c, list csl)
     pae = unary_intrinsic_expression(DEREFERENCING_OPERATOR_NAME, pae);
   }
   return pae;
-}
-
-/* FI: a really stupid function... Why do we add zero subscript right
- *  away when building the sink cell to remove them later? Let's now
- * remove the excessive subscripts of "r" with respect to type
- * "at"...
- */
-void adapt_reference_to_type(reference r, type et)
-{
-  bool to_be_freed;
-  type at = compute_basic_concrete_type(et);
-  type rt = points_to_reference_to_type(r, &to_be_freed);
-  type t = compute_basic_concrete_type(rt);
-  while(!array_pointer_type_equal_p(at, t) && !ENDP(reference_indices(r))) {
-    if(to_be_freed) free_type(t);
-    list sl = reference_indices(r);
-    list last = gen_last(sl);
-    expression e = EXPRESSION(CAR(last));
-    if(expression_field_p(e))
-      break;
-    int l1 = (int) gen_length(sl);
-    gen_remove_once(&sl, (void *) e);
-    int l2 = (int) gen_length(sl);
-    if(l1==l2)
-      pips_internal_error("gen_remove() is ineffective.\n");
-    reference_indices(r) = sl;
-    type nrt = points_to_reference_to_type(r, &to_be_freed);
-    t = compute_basic_concrete_type(nrt);
-  }
-  if(!array_pointer_type_equal_p(at, t)) {
-    pips_user_warning("There may be a typing error at line %d (e.g. improper malloc call).",
-		      points_to_context_statement_line_number());
-    pips_internal_error("Cell type mismatch.");
-  }
-  if(to_be_freed) free_type(t);
 }
 
  /* Generate the corresponding points-to reference(s). All access
@@ -1341,9 +1418,12 @@ list subscript_to_points_to_sinks(subscript s,
 
 	  // FI: an horror... fixing a design mistake by a kludge...
 	  // useful for argv03, disastrous for dereferencing08
-	  if(!points_to_array_reference_p(r))
-	    adapt_reference_to_type(r, at);
-
+	  if(!points_to_array_reference_p(r)) {
+	    if(adapt_reference_to_type(r, at, points_to_context_statement_line_number))
+	      ;
+	    else
+	      pips_internal_error("Subscript handling failure 1.\n");
+	  }
 	  // FI: the update depends on the sink model
 	  // points_to_reference_update_final_subscripts(r, ncsl);
 	  reference_indices(r) = gen_nconc(reference_indices(r), ncsl);
@@ -1357,7 +1437,11 @@ list subscript_to_points_to_sinks(subscript s,
 	  // the new indices (Strict_typing.sub/assignment11.c
 
 	  // FI: an horror... fixing a design mistake by a kludge...
-	  adapt_reference_to_type(r, at);
+	  if(adapt_reference_to_type(r, at, points_to_context_statement_line_number))
+	    ;
+	  else
+	      pips_internal_error("Subscript handling failure 1.\n");
+
 	  reference_indices(r) = gen_nconc(reference_indices(r), ncsl);
 	}
 
@@ -1390,7 +1474,10 @@ list subscript_to_points_to_sinks(subscript s,
 	  /* The reference "p[i][j]" is transformed into an expression
 	     "*(*(p+i)+j)" if "p" is really a pointer expression, not a
 	     partial array reference. */
-	  expression pae = pointer_subscript_to_expression(c, csl);
+	  //expression pae = pointer_subscript_to_expression(c, csl);
+	  // FI: I guess csl might have to be freed...
+	  list nsl = gen_full_copy_list(sl);
+	  expression pae = pointer_subscript_to_expression(c, nsl);
 	  i_sources = expression_to_points_to_sources(pae, in);
 	  free_expression(pae);
 	}
@@ -1416,7 +1503,7 @@ list subscript_to_points_to_sinks(subscript s,
       reference r = cell_any_reference(source);
       if(points_to_array_reference_p(r)) {
 	//points_to_cell_add_zero_subscripts(source);
-	//adapt_reference_to_type(r, at);
+	//adapt_reference_to_type(r, at, points_to_context_statement_line_number);
 	expression z = make_zero_expression();
 	reference_indices(r) = gen_nconc(reference_indices(r),
 					 CONS(EXPRESSION, z, NIL));
@@ -1482,10 +1569,11 @@ list expression_to_points_to_cells(expression e,
   /* reference + range + call + cast + sizeofexpression + subscript +
      application*/
   list sinks = NIL;
-  bool to_be_freed;
-  type et = points_to_expression_to_type(e, &to_be_freed);
-  type cet = compute_basic_concrete_type(et);
-  if(to_be_freed) free_type(et);
+  //bool to_be_freed;
+  //type et = points_to_expression_to_type(e, &to_be_freed);
+  //type cet = compute_basic_concrete_type(et);
+  //if(to_be_freed) free_type(et);
+  type cet = points_to_expression_to_concrete_type(e);
   tag tt ;
   syntax s = expression_syntax(e);
 
@@ -1539,6 +1627,71 @@ list expression_to_points_to_cells(expression e,
     break;
   }
 
+  ifdebug(1) {
+    type e_t = expression_to_type(e);
+    type e_c_t = compute_basic_concrete_type(e_t);
+    type f_e_t = e_c_t;
+    bool free_f_e_t = false;
+    if(eval_p) {
+      if(pointer_type_p(e_c_t))
+	f_e_t = type_to_pointed_type(e_c_t);
+      else if(array_type_p(e_c_t)) {
+	// free_f_e_t = true;
+	// f_e_t = array_type_to_pointer_type(e_c_t);
+	type et = array_type_to_element_type(e_c_t);
+	if(pointer_type_p(et)) {
+	  f_e_t = type_to_pointed_type(et);
+	}
+	else {
+	  pips_internal_error("could be a struct - not implemented");
+	}
+      }
+    }
+    FOREACH(CELL, s, sinks) {
+      if(!null_cell_p(s)) {
+	type s_t = points_to_cell_to_concrete_type(s);
+	/* This test does not make sense for pointer19.c. Since the
+	   sink_cell is saturated with indices, its type is
+	   double. e_c_t is a 3-D array of pointers to double, f_e_t is a
+	   pointer towards a 2-D array of pointers to double... What
+	   could be checked here? */
+	/* This test does not make sence for pointer22.c either. We
+	   only need to check that the sink reference can be modified
+	   by dropping a few subscript to match the pointer type. */
+	if(!array_pointer_string_type_equal_p(f_e_t, s_t)) {
+	  if(array_type_p(f_e_t)) {
+	    type et = array_type_to_element_type(e_c_t);
+	    if(pointer_type_p(et)) {
+	      type pet = type_to_pointed_type(et);
+	      if(!array_pointer_string_type_equal_p(pet, s_t)) {
+		reference sink_r = copy_reference(cell_any_reference(s));
+		if(!adapt_reference_to_type(sink_r, pet, points_to_context_statement_line_number)) {
+		  ; // pips_internal_error("Possible type discrepancy\n");
+		}
+		free_reference(sink_r);
+	      }
+	      else {
+		; // We are fine
+	      }
+	    }
+	    else {
+	      if(!array_pointer_string_type_equal_p(et, s_t)) {
+		pips_internal_error("Type discrepancy\n");
+	      }
+	      else {
+		; // We are fine
+	      }
+	    }
+	  }
+	  else
+	    pips_internal_error("Type discrepancy\n");
+	}
+      }
+    }
+    free_type(e_t);
+    if(free_f_e_t) free_type(f_e_t);
+ }
+
   return sinks;
 }
 
@@ -1555,15 +1708,23 @@ list expression_to_points_to_sinks(expression e, pt_map in)
   return sinks;
 }
 
+/* expression_to_points_to_sources() does not always work, especially
+   with pointer arithmetic or subscripting because p[3], for instance,
+   is not recognized as a valid source: it is not a constant path */
 list expression_to_points_to_sources(expression e, pt_map in)
 {
   list sinks = expression_to_points_to_cells(e, in, false, true);
 
   /* Scalar pointers are expected but [0] subscript may have been added */
-  if(!expression_to_points_to_cell_p(e))
-    sinks = reduce_cells_to_pointer_type(sinks);
-  ifdebug(1) {
-    bool to_be_freed;
+  if(!expression_to_points_to_cell_p(e)) {
+    /* Trouble for fread04... An array element, _line_3[0], is reduced
+       to an array, _line_3, and you want to capture its address */
+    // sinks = reduce_cells_to_pointer_type(sinks);
+    ;
+  }
+
+  ifdebug(1) { bool
+    to_be_freed;
     type tmp_t = points_to_expression_to_type(e, &to_be_freed);
     type et = compute_basic_concrete_type(tmp_t);
     FOREACH(CELL, c, sinks) {

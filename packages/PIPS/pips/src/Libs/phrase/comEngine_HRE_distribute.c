@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -635,7 +635,7 @@ static statement generate_code()
 			       STATEMENT_ORDERING_UNDEFINED,
 			       empty_comments,
 			       make_instruction_loop(newLoop),NIL,NULL,
-			       empty_extensions ());
+			       empty_extensions (), make_synchronization_none());
     }
 
   newStat = add_index_statements(newStat);

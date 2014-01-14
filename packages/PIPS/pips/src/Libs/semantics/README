@@ -50,3 +50,6 @@ unstructured.c: functions to deal specifically with control flow graphs
 utils.c: contains functions based on semantics but used by other
 passes such as suppress_dead_code; static evaluation of an expression
 or of a condition or of a variable
+
+statement.c : contains the definition and functions for the stack of the current statement
+move in ri_to_transformers.c

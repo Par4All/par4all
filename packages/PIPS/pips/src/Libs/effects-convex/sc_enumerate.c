@@ -2,7 +2,7 @@
 
   $Id: sc_enumerate.c 1526 2012-04-26 08:14:32Z guelton $
 
-  Copyright 1989-2011 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 

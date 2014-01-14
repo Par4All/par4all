@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -227,7 +227,7 @@ static statement isolate_code_portion (statement begin_tag_statement,
 		       statement_ordering(sequence_statement),
 		       empty_comments,
 		       sequence_instruction,NIL,NULL,
-		       statement_extensions(sequence_statement));
+		       statement_extensions(sequence_statement), make_synchronization_none());
 
     bool isolated_seq_stats_is_inserted = false;
     
@@ -432,7 +432,7 @@ static void distribute_code (string function_name,
 				  make_instruction(is_instruction_call,
 						   make_call(new_module,call_params)),
 				  NIL,NULL,
-				  statement_extensions(externalized_code));
+				  statement_extensions(externalized_code), make_synchronization_none());
 
   ifdebug(5) {
     pips_debug(5, "BEFORE REPLACING\n");

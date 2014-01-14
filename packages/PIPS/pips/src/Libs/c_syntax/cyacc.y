@@ -707,7 +707,7 @@ file: globals
 							       STATEMENT_ORDERING_UNDEFINED,
 							       string_undefined,
 							       make_instruction_block(dsl),
-							       dl, NULL, empty_extensions ());
+							       dl, NULL, empty_extensions (), make_synchronization_none());
 			      if(ENDP(dl)) {
 				pips_user_warning("ISO C forbids an empty source file\n");
 			      }
@@ -1770,7 +1770,7 @@ statement_without_pragma:
 			                      get_current_C_comment(),
 			                      call_to_instruction(make_call(CreateIntrinsic(C_RETURN_FUNCTION_NAME),NIL)),
 					      NIL, string_undefined,
-			                      empty_extensions ());
+			                      empty_extensions (), make_synchronization_none());
 			  else
 			    $$ = C_MakeReturnStatement(NIL,
 						       get_current_C_line_number(),
@@ -1815,7 +1815,7 @@ statement_without_pragma:
 			                      get_current_C_comment(),
 			                      make_instruction(is_instruction_call,
 					      make_call(CreateIntrinsic(C_RETURN_FUNCTION_NAME), $2)),
-					      NIL, string_undefined, empty_extensions ());
+					      NIL, string_undefined, empty_extensions (), make_synchronization_none());
 			  else
 			    $$ = C_MakeReturnStatement($2,
 						       get_current_C_line_number(),
@@ -1866,7 +1866,7 @@ statement_without_pragma:
 			   					get_current_C_comment(),
 								make_instruction_call(c),
 								NIL, string_undefined,
-			   					empty_extensions());
+			   					empty_extensions(), make_synchronization_none());
 						}
 |   TK_MSASM
                         { CParserError("ASM not implemented\n"); }

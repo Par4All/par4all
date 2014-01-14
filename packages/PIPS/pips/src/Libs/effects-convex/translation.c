@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -2178,7 +2178,7 @@ void convex_region_descriptor_translation(effect eff)
     @param address_of_desc is the descriptor describing address_of_ref.
 
     @param output_ref is a pointer on the resulting convex reference
-    @param output_desc is a pointer on teh resulting descriptor describing output_ref.
+    @param output_desc is a pointer on the resulting descriptor describing output_ref.
     @param exact_p is a pointer on a bool which is set to true if the translation is exact, false otherwise.
 
     input_remaining_indices does not need to be a copy of a part of the indices of input_ref, because it is not modified.

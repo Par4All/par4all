@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -338,7 +338,7 @@ static statement isolate_code_portion(statement begin_tag_statement, statement e
 						   sequence_instruction,
 						   NIL,
 						   NULL,
-						   statement_extensions (sequence_statement));
+						   statement_extensions (sequence_statement), make_synchronization_none());
     bool isolated_seq_stats_is_inserted = false;
     
     /* Build a new sequence containing isolated sequence statement */

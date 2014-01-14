@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
   Copyright 2009-2010 TÉLÉCOM Bretagne
   Copyright 2009-2010 HPC Project
 
@@ -298,8 +298,10 @@ void capply(char * phasename, char ** targets)
     }
     bool ok = safe_concurrent_apply(phasename,target_list);
     gen_array_free(target_list);
-    if(!ok)
-        THROW(user_exception_error);
+    if(!ok) {
+      if(!pyps_last_error) asprintf(&pyps_last_error,"capply phase %s failed without setting error message" , phasename);
+      THROW(user_exception_error);
+    }
 }
 
 void display(char *rname, char *mname)

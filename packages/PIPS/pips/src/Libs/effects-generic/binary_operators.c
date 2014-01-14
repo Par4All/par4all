@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -1275,7 +1275,11 @@ bool cells_combinable_p(cell c1, cell c2)
 			  /* here we should consider the type of the non abstract location reference,
 			     whether there is a dereferencement or not to guess the memory area, ... */
 			  // FI: we end up here with c1 = *ANY_MODULE*:*ANYWHERE*_b0.next, c2 = _ll_1.next
-			  if(expression_lists_equal_p(l1, l2)) {
+			  // FI: we also end up here with c1 = array[*], c2 = *ANY_MODULE*:*ANYWHERE*_b0
+			  pips_assert("One of the effect at least is linked to an abstract location", al1_p || al2_p);
+			  if(get_bool_property("ALIASING_ACROSS_TYPES"))
+			    combinable_p = true;
+			  else if(expression_lists_equal_p(l1, l2)) {
 			    reference nr1 = make_reference(e1, NIL);
 			    reference nr2 = make_reference(e2, NIL);
 			    cell nc1 = make_cell_reference(nr1);
@@ -1283,10 +1287,18 @@ bool cells_combinable_p(cell c1, cell c2)
 			    combinable_p = cells_combinable_p(nc1, nc2);
 			    free_cell(nc1), free_cell(nc2);
 			  }
-			  else
-			    pips_internal_error("case not handled yet (c1 = %s, c2 = %s)\n",
-						effect_reference_to_string(r1),
-						effect_reference_to_string(r2));
+			  else {
+			    /* Check the types of the two cells */
+			    type t1 = points_to_reference_to_concrete_type(r1);
+			    type t2 = points_to_reference_to_concrete_type(r2);
+			    if(array_pointer_string_type_equal_p(t1, t2))
+			      combinable_p = true;
+			    else
+			      combinable_p = false;
+			    //pips_internal_error("case not handled yet (c1 = %s, c2 = %s)\n",
+			    // effect_reference_to_string(r1),
+			    // effect_reference_to_string(r2));
+			  }
 			}
 		    }
 	    }

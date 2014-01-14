@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -678,8 +678,81 @@ static void rw_effects_of_test(test t)
 }
 
 /**
+   computes the cumulated effects of the declaration from the list of
+   effects that occur after the declaration
+
+   @param[out] lrw_before_decl is the list of effects in the store before the declaration;
+   it is a modified version of lrw_after_first_decl.
+   @param[inout] lrw_after_first_decl is the list of effects in the store after the declaration;
+   @param[in] decl is the declared variable
+
+   possible usage: l = rw_effects_of_declaration(l, decl)
+
+   This is used at least in rw_effects_of_sequence to compute the
+   cumulated effect of a sequence. The statements are walked backward
+   from the last one to the first one. Each time a declaration is hit,
+   the declared variables are also analyzed backwards to project past
+   effects that cannot be moved up because the variables is no longer
+   in the environment.
+
+   For reasons I (FI) still do not understand, the effect of
+   initialization expressions are (re(re?)?) computed here. At least
+   when this code is used for the computation of the cumulated
+   effects, I'd rather use the statement effects, whether they are
+   declarations or not and only filter them, igonring initialization
+   expressions if any.
+
+   This function has been outlined from
+   rw_effects_of_declaration(). The names of the local variables
+   should probably be updated according to its signature and
+   semantics.
+ */
+static list rw_effects_of_declaration(list lrw_after_first_decl, entity decl)
+{
+  list lrw_before_decls = NIL; /* the returned list */
+  storage decl_s = entity_storage(decl);
+
+  ifdebug(8) {
+      type ct = entity_basic_concrete_type(decl);
+      pips_debug(8, "dealing with entity : %s with type %s\n", entity_local_name(decl), words_to_string(words_type(ct,NIL,false)));
+    }
+
+  if (storage_ram_p(decl_s)
+      /* static variable declaration has no effect, even in case of initialization. */
+      && !static_area_p(ram_section(storage_ram(decl_s)))
+      && type_variable_p(entity_type(decl)))
+    {
+      value v_init = entity_initial(decl);
+      expression exp_init = expression_undefined;
+      if(value_expression_p(v_init))
+	exp_init = value_expression(v_init);
+
+      // filter l_rw_after_decls with the declaration
+      lrw_before_decls = filter_effects_with_declaration(lrw_after_first_decl, decl);
+      // and then add the effects due to the initialization part
+      if(/*false &&*/ !expression_undefined_p(exp_init))
+	{
+	  pips_debug(8, "initial value: %s\n", expression_to_string(exp_init));
+	  list l_exp_init = generic_proper_effects_of_expression(exp_init);
+	  if (contract_p)
+	    l_exp_init = proper_to_summary_effects(l_exp_init);
+	  lrw_before_decls = (*effects_union_op)(l_exp_init,
+						 lrw_before_decls, effects_same_action_p);
+	}
+
+    } /* if (storage_ram(decl_s) && !static_area_p(ram_section(storage_ram(decl_s)))) */
+  else
+    {
+      lrw_before_decls = lrw_after_first_decl;
+    }
+  return lrw_before_decls;
+}
+
+/**
    computes the cumulated effects of the declarations from the list of
-   effects after the declaration
+   effects after the declaration and make sure that all effects are
+   constant (FI: with respect to dereferencements I guess) to be sure
+   that can be unioned properly.
 
    @param[out] lrw_after_decls is the list of effects in the store after the declarations;
    it is modified.
@@ -694,56 +767,22 @@ static list rw_effects_of_declarations(list lrw_after_decls, list l_decl)
 
   if (!ENDP(l_decl))
     {
-      // treat last declarations first
+      // treat last declarations first: n recursive calls instead of a
+      // gen_reverse()...
       if (!ENDP(CDR(l_decl)))
 	lrw_after_first_decl = rw_effects_of_declarations(lrw_after_decls, CDR(l_decl));
       else
 	lrw_after_first_decl = lrw_after_decls;
       // then handle top declaration
       entity decl = ENTITY(CAR(l_decl));
-      storage decl_s = entity_storage(decl);
+      lrw_before_decls = rw_effects_of_declaration(lrw_after_first_decl, decl);
 
-      ifdebug(8)
-	{
-	  type ct = entity_basic_concrete_type(decl);
-	  pips_debug(8, "dealing with entity : %s with type %s\n", entity_local_name(decl),words_to_string(words_type(ct,NIL,false)));
-	}
-
-      if (storage_ram_p(decl_s)
-	  /* static variable declaration has no effect, even in case of initialization. */
-	  && !static_area_p(ram_section(storage_ram(decl_s)))
-	  && type_variable_p(entity_type(decl)))
-	{
-	  value v_init = entity_initial(decl);
-	  expression exp_init = expression_undefined;
-	  if(value_expression_p(v_init))
-	    exp_init = value_expression(v_init);
-
-	  // filter l_rw_after_decls with the declaration
-	  lrw_before_decls = filter_effects_with_declaration(lrw_after_first_decl, decl);
-	  // and then add the effects due to the initialization part
-	  if(!expression_undefined_p(exp_init))
-	    {
-	      pips_debug(8, "initial value: %s\n", expression_to_string(exp_init));
-	      list l_exp_init = generic_proper_effects_of_expression(exp_init);
-	      if (contract_p)
-		l_exp_init = proper_to_summary_effects(l_exp_init);
-	      lrw_before_decls = (*effects_union_op)(l_exp_init,
-						     lrw_before_decls, effects_same_action_p);
-	    }
-
-	} /* if (storage_ram(decl_s) && !static_area_p(ram_section(storage_ram(decl_s)))) */
-      else
-	{
-	  lrw_before_decls = lrw_after_first_decl;
-	}
     } /* if (!ENDP(CDR(l_decl))) */
   else
      lrw_before_decls = lrw_after_decls;
       // we should also do some kind of unioning...
 
-  if (get_constant_paths_p())
-    {
+  if (get_constant_paths_p()) {
       list l_tmp = lrw_before_decls;
       lrw_before_decls = pointer_effects_to_constant_path_effects(lrw_before_decls);
       effects_free(l_tmp);
@@ -752,67 +791,102 @@ static list rw_effects_of_declarations(list lrw_after_decls, list l_decl)
   return lrw_before_decls;
 }
 
-static list r_rw_effects_of_sequence(list l_inst)
+/* Compute backwards the cumulated effects of the non-empty statement
+ * list "sl" as it is necessary to translate convex effects into
+ * the initial state.
+ *
+ * To do so, call recursively r_rw_effects_of_sequence() on the CDR of
+ * "sl" and translate them in the current state thanks to "t1", the
+ * transformer of the first statement, "s1", add the effects of the
+ * first statement "s1" which are already available in that same
+ * state, and remove effects related to variables declared in the
+ * first statement, "s1".
+ *
+ * rw_effects(sl) = projection(rw_effects(CDR(sl)) o transformer(s1)
+ *                                 U effects(s1),
+ *                                 declarations(s1))
+ * 
+ * The implementation is slightly different from the equations above
+ * if the first statement is a C declaration statement. The effect of
+ * the first statement are neglected at first and the effects of the
+ * initialization expressions are added later:
+ *
+ * rw_effects(sl) = if(declaration_p(s1)) then
+ *                        projection(rw_effects(CDR(sl)) o transformer(s1),
+ *                                   declarations(s1))
+ *                        U effects(initializations(s1))
+ *                      else
+ *                        rw_effects(CDR(l_inst)) o transformer(s1)
+ *                        U effects(s1)
+ *
+ * In both cases, a special process is used when "sl" is a singleton list:
+ *
+ * rw_effects(sl) = if(constant_p) then 
+ *                    constant_effects(projection(effects(s1), declaration(s1)))
+ *                  else
+ *                    projection(effects(s1), declaration(s1))
+ *
+ * This equation is altered with the implemented scheme because
+ * "effects(s1)" is not used when "s1" is a declaration.
+ *
+ * The precondition of "s1", called "context" is also used and should
+ * appear in the equations above.
+ */
+static list r_rw_effects_of_sequence(list sl)
 {
-    statement first_statement;
-    list remaining_block = NIL;
+    statement s1 = STATEMENT(CAR(sl));
+    list remaining_block = CDR(sl);
 
     list s1_lrw; /* rw effects of first statement */
     list rb_lrw; /* rw effects of remaining block */
     list l_rw = NIL; /* resulting rw effects */
-    transformer t1; /* transformer of first statement */
     list l_decl = NIL; /* declarations if first_statement is a declaration statement */
 
-    first_statement = STATEMENT(CAR(l_inst));
-    transformer context = (*load_context_func)(first_statement);
-    effects_private_current_context_push((*load_context_func)(first_statement));
-
-    remaining_block = CDR(l_inst);
+    /* Precondition of s1. Could be called p1... */
+    transformer context = (*load_context_func)(s1);
+    effects_private_current_context_push((*load_context_func)(s1));
 
     if (c_module_p(get_current_module_entity()) &&
-	(declaration_statement_p(first_statement) ))
-      {
+	(declaration_statement_p(s1) )) {
 	// if it's a declaration statement, effects will be added on the fly
 	// as declarations are handled.
 	pips_debug(5, "first statement is a declaration statement\n");
-	l_decl = statement_declarations(first_statement);
+	l_decl = statement_declarations(s1);
 	s1_lrw = NIL;
+	//s1_lrw = load_rw_effects_list(s1);
       }
     else
-      s1_lrw = load_rw_effects_list(first_statement);
+      s1_lrw = load_rw_effects_list(s1);
 
-    /* Is it the last instruction of the block */
-    if (!ENDP(remaining_block))
-    {
-	t1 = (*load_transformer_func)(first_statement);
+    /* Is it the last instruction of the block? */
+    if (!ENDP(remaining_block)) {
+	transformer t1 = (*load_transformer_func)(s1);
 	rb_lrw = r_rw_effects_of_sequence(remaining_block);
 
-	ifdebug(3){
+	ifdebug(3) {
 	    pips_debug(3, "R/W effects of first statement: \n");
 	    (*effects_prettyprint_func)(s1_lrw);
 	    pips_debug(3, "R/W effects of remaining sequence: \n");
 	    (*effects_prettyprint_func)(rb_lrw);
-	    if (!transformer_undefined_p(t1))
-	    {
+	    if (!transformer_undefined_p(t1)) {
 	      pips_debug(3, "transformer of first statement:\n");
 	      fprint_transformer(stderr, t1, (get_variable_name_t) entity_local_name);
 	      //print_transformer(t1);
 	    }
-	    if (!transformer_undefined_p(context))
-	    {
-	      pips_debug(3, "precondition of first statement:\n");
+	    if (!transformer_undefined_p(context)) {
+	      pips_debug(3, "Precondition of first statement:\n");
 	      fprint_transformer(stderr, context, (get_variable_name_t) entity_local_name);
 	      //print_transformer(t1);
 	    }
 	}
-	if (rb_lrw !=NIL)
-	  {
-	    rb_lrw = generic_effects_store_update(rb_lrw, first_statement, true);
+	if (rb_lrw !=NIL) {
+	  /* FI: I do not understand this update; do we store each
+	     partial accumulation of effects at each statement? */
+	    rb_lrw = generic_effects_store_update(rb_lrw, s1, true);
 	  }
 	else {
 	  ifdebug(3){
-	    pips_debug(3, "warning - no effect on  remaining block\n");
-
+	    pips_debug(3, "Warning - no effect on remaining block\n");
 	  }
 	}
 	ifdebug(5){
@@ -821,8 +895,13 @@ static list r_rw_effects_of_sequence(list l_inst)
 	    (*effects_prettyprint_func)(rb_lrw);
 	}
 
-	/* then take care of declarations if any */
+	/* then take care of declarations if any: project effects
+	   based on declared variables and add effects of
+	   initialization expressions and translate non constant
+	   effects into constant effects if necessary. */
+	effects_private_current_stmt_push(s1);
 	rb_lrw = rw_effects_of_declarations(rb_lrw, l_decl);
+	effects_private_current_stmt_pop();
 
 	ifdebug(5){
 	    pips_debug(5, "R/W effects of remaining sequence "
@@ -830,7 +909,7 @@ static list r_rw_effects_of_sequence(list l_inst)
 	    (*effects_prettyprint_func)(rb_lrw);
 	}
 
-	/* RW(block) = RW(rest_of_block) U RW(S1) */
+	/* RW(block) = RW(rest_of_block) U RW(s1) */
 	l_rw = (*effects_union_op)(rb_lrw, effects_dup(s1_lrw), effects_same_action_p);
 
 	ifdebug(5){
@@ -839,11 +918,15 @@ static list r_rw_effects_of_sequence(list l_inst)
 	    (*effects_prettyprint_func)(l_rw);
 	}
     }
-    else
-    {
+    else {
+      /* We are on the last statement of the block and end the recursion */
+      /* If l_decl is not empty, then s1_lrw is empty, and
+	 vice-versa. See prologue. */
       l_rw = rw_effects_of_declarations(effects_dup(s1_lrw), l_decl);
-      if (get_constant_paths_p())
-	  {
+      /* This should be useless because cumulated effects are applied
+	 to constant proper effects most of the time... Maybe it is
+	 useful for cumulated pointer effects? */
+      if (get_constant_paths_p()) {
 	    list l_tmp = l_rw;
 	    l_rw = pointer_effects_to_constant_path_effects(l_rw);
 	    effects_free(l_tmp);
@@ -855,6 +938,14 @@ static list r_rw_effects_of_sequence(list l_inst)
     return(l_rw);
 }
 
+/* The real work is performed by r_rw_effects_of_sequence(), the
+ * recursive backward walk of the sequence.
+ *
+ * Here, anywhere effects are dealt with, the effects are normalized
+ * and store in the cumulate effects mapping.
+ *
+ * Empty sequences are also dealt with directly here.
+ */
 static void rw_effects_of_sequence(sequence seq)
 {
     statement current_stat = effects_private_current_stmt_head();
@@ -871,7 +962,7 @@ static void rw_effects_of_sequence(sequence seq)
     else
     {
 	list l_tmp = r_rw_effects_of_sequence(l_inst);
-	le = clean_anywhere_effects( l_tmp);
+	le = clean_anywhere_effects(l_tmp);
 	gen_full_free_list(l_tmp);
     }
 

@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -412,7 +412,7 @@ static bool __attribute__ ((__unused__)) constant_region_in_context_p(effect pr,
     descriptor d = effect_descriptor(pr);
     if (descriptor_convex_p(d)) {
       ifdebug(2) {
-        pips_debug(0,"Considering regions : ");
+        pips_debug(2,"Considering regions : ");
         print_region(pr);
       }
 
@@ -835,7 +835,7 @@ static bool loop_scalarization(loop l, struct scalarization_ctx *ctx)
         !entity_is_argument_p(pv, ctx->scalarized_variables)
         && !vect_coeff(pv,var_already_seen)) {
       ifdebug(2) {
-        pips_debug(0,"Considering regions : ");
+        pips_debug(2,"Considering regions : ");
         print_region(pr);
       }
       vect_add_elem(&var_already_seen,pv,1);
@@ -846,7 +846,7 @@ static bool loop_scalarization(loop l, struct scalarization_ctx *ctx)
       if (!effect_undefined_p(pru)) {
 
         ifdebug(2) {
-          pips_debug(0,"pru not undefined: ");
+          pips_debug(2,"pru not undefined: ");
           print_region(pru);
         }
 
@@ -868,7 +868,7 @@ static bool loop_scalarization(loop l, struct scalarization_ctx *ctx)
 
         if (nvo != neo) {
           ifdebug(2) {
-            pips_debug(0,
+            pips_debug(2,
                        "Legality criterion not met: %d!=%d (nvo!=neo)\n",
                        nvo, neo);
           }
@@ -905,7 +905,7 @@ static bool loop_scalarization(loop l, struct scalarization_ctx *ctx)
                   )
               ) {
             ifdebug(2) {
-              pips_debug(0,"Profitability criterion not met: (nd) %d>0 (scalar) "
+              pips_debug(2,"Profitability criterion not met: (nd) %d>0 (scalar) "
                          "or not one of the following: (%d&&%d&&%d) "
                          "(neo) %d <= 2 and "
                          "((neo) %d <= 1 || %d read_and_written_pv) and "
@@ -1166,7 +1166,7 @@ static bool statement_scalarization(statement s,
              // several times in the
              // effect list
        && nd > 0 // Only array references can be scalarized
-       && !volatile_variable_p(pv) // Volatile arrays cannot be scalarized
+       && !entity_volatile_variable_p(pv) // Volatile arrays cannot be scalarized
        && (!top_level_entity_p(pv) || !entity_accessed_through_calls_in_statement_p(pv, s)) // global arrays accessed through calls cannot yet be scalarized
        ) { 
       // Does the current variable appear in the in effect?
@@ -1183,7 +1183,7 @@ static bool statement_scalarization(statement s,
       descriptor d = effect_descriptor(pr);
       if (descriptor_convex_p(d)) {
         ifdebug(2) {
-          pips_debug(0,"Considering regions : ");
+          pips_debug(2,"Considering regions : ");
           print_region(pr);
         }
         vect_add_elem(&var_already_seen,pv,1);
@@ -1210,7 +1210,7 @@ static bool statement_scalarization(statement s,
 
           if (nvo != neo) {
             ifdebug(2) {
-              pips_debug(0,
+              pips_debug(2,
                          "Legality criterion not met : %d!=%d (nvo!=neo)\n",
                          nvo, neo);
             }
@@ -1253,7 +1253,7 @@ static bool statement_scalarization(statement s,
                    )
                ) {
               ifdebug(2) {
-                pips_debug(0,"Profitability criterion not met: (nd) %d>0 (scalar) "
+                pips_debug(2,"Profitability criterion not met: (nd) %d>0 (scalar) "
                            "or not one of the following : (%d&&%d&&%d) "
                            "(neo) %d <= 2 and "
                            "((neo) %d <= 1 || %d read_and_written_pv) and "
@@ -1825,7 +1825,7 @@ static bool scalarizable_entity_p(entity e) {
        we allow scalarization of arrays with "static" qualifier when
        they are declared in the "main" module of a C application.
      */
-    result = entity_array_p( e ) && !volatile_variable_p(e) &&
+    result = entity_array_p( e ) && !entity_volatile_variable_p(e) &&
         ((storage_formal_p( s )
           && parameter_passing_by_value_p(get_current_module_entity()))
          ||

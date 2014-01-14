@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -821,7 +821,7 @@ bool entity_array_p(entity e)
 
 /* @return whether entity is a "register" variable
  *
- * See also volatile_variable_p()
+ * See also entity_volatile_variable_p()
  */
 bool entity_register_p(entity e)
 {

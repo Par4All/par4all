@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -343,6 +343,14 @@ entity MakeConstant(string name, tag bt)
     /* The LengthOfBasic should be updated for type "string" */
 
     return e;
+}
+
+bool constant_string_entity_p(entity e)
+{
+  const char * eun = entity_user_name(e);
+  bool first_quote = eun[0]=='"';
+  bool last_quote = eun[strlen(eun)-1] == '"';
+  return first_quote && last_quote;
 }
 
 /* make a complex constant from two calls to real or integer constants

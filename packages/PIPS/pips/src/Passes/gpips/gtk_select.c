@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -32,8 +32,6 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-#include <gtk/gtk.h>
-
 #if (defined(TEXT))
 #undef TEXT
 #endif
@@ -52,10 +50,13 @@
 #include "pipsdbm.h"
 #include "pipsmake.h"
 #include "top-level.h"
-#include "gpips.h"
 
 #include "resources.h"
 #include "preprocessor.h"
+
+#undef test_undefined // also defined in glib included from gtk
+#include <gtk/gtk.h>
+#include "gpips.h"
 
 /* Maximum size of the module menu of the main frame: */
 enum {

@@ -1,5 +1,5 @@
 /*
-   Copyright 1989-2010 MINES ParisTech
+   Copyright 1989-2014 MINES ParisTech
 
    This file is part of PIPS.
 
@@ -90,7 +90,7 @@ size_t type_dereferencement_depth(type t) {
   t = ultimate_type(t);
   if(type_variable_p(t)) {
     ifdebug(8) {
-      pips_debug(0,"Type is : ");
+      pips_debug(8,"Type is : ");
       print_type(t);
     }
     variable v = type_variable(t);
@@ -397,8 +397,8 @@ static void do_linearize_array_cast(cast c) {
 }
 static void do_linearize_array_walker(void* obj) {
   gen_multi_recurse(obj,
-      reference_domain,gen_true,do_linearize_array_reference,
-      subscript_domain,gen_true,do_linearize_array_subscript,
+      reference_domain,do_linearize_array_reference,gen_true,
+      subscript_domain,do_linearize_array_subscript,gen_true,
       cast_domain,gen_true,do_linearize_array_cast,
       NULL);
 }

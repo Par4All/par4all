@@ -2,7 +2,7 @@
 
  $Id $
 
- Copyright 1989-2012 MINES ParisTech
+ Copyright 1989-2014 MINES ParisTech
  Copyright 2012 Silkan
 
  This file is part of PIPS.
@@ -71,7 +71,7 @@ static statement enclose_in_a_parallel_loop(statement module_statement) {
                         loop_inst,
                         NIL,
                         NULL,
-                        empty_extensions());
+                        empty_extensions(), make_synchronization_none());
 }
 
 bool one_thread_parallelize(string mod_name) {

@@ -61,6 +61,61 @@
 #include "points_to_private.h"
 #include "alias-classes.h"
 
+/* FI: what is this function supposed to do? Just update "pt_in" to
+   make sure that "r" can be dereferenced? And then recursively, with
+   the different subscripts? */
+void subscripted_reference_to_points_to(reference r, list sl, pt_map pt_in)
+{
+  if(!ENDP(sl)) {
+    type rt = points_to_reference_to_concrete_type(r);
+    if(pointer_type_p(rt)) {
+      //type pt = type_to_pointed_type(rt);
+      //list cl = reference_to_points_to_sinks(r, pt, pt_in, false, true);
+      list cl = reference_to_points_to_sinks(r, rt, pt_in, true, true);
+      // FI: the arc between "r" and NULL should be removed...
+      remove_impossible_arcs_to_null(&cl, pt_in);
+      FOREACH(CELL, c, cl) {
+	if(!ENDP(CDR(sl))) {
+	  expression fs = EXPRESSION(CAR(sl));
+	  /* FI: we have to find the right location for the subscript
+	   * to update. Some dimensions are due to the dimension of
+	   * the source in pt_in, one dimension is due to the fact
+	   * that we are dealing with a pointer, some dimensions are
+	   * due to the fact that an array is pointed. The dimension
+	   * to update may be the first one, the last one, or one in
+	   * the middle.
+	   *
+	   * This also depends on strict typing...
+	   *
+	   * See for instance, Pointers/pointer20.c
+	   */
+	  reference or = cell_any_reference(c);
+	  if(adapt_reference_to_type(or, rt, points_to_context_statement_line_number)) {
+	    list osl = reference_indices(or);
+	    if(ENDP(osl)) {
+	      reference_indices(or) = CONS(EXPRESSION,
+					   copy_expression(EXPRESSION(CAR(sl))),
+					   NIL);
+	    }
+	    else {
+	      points_to_cell_update_last_subscript(c, fs);
+	    }
+	    reference nr = cell_any_reference(c);
+	    subscripted_reference_to_points_to(nr, CDR(sl), pt_in);
+	  }
+	  else
+	    pips_internal_error("reference could not be updated.\n");
+	}
+      }
+    }
+    else if(array_of_pointers_type_p(rt)) {
+      pips_internal_error("Not implemented yet.\n");
+    }
+    else
+      pips_internal_error("Meaningless call.\n");
+  }
+}
+
 /* Update pt_in and pt_out according to expression e.
  *
  * Ignore side effects due to pointer arithmetic and assignment and
@@ -82,11 +137,24 @@ pt_map expression_to_points_to(expression e, pt_map pt_in, bool side_effect_p)
       type vt = entity_basic_concrete_type(v);
       // FI: call16.c shows that the C parser does not generate the
       // right construct, a subscript, when a scalar pointer is indexed
-      if(pointer_type_p(vt) && !ENDP(sl)) {
-	expression tmp = entity_to_expression(v);
-	pt_out = dereferencing_to_points_to(tmp, pt_in);
-	pt_out = expressions_to_points_to(sl, pt_out, side_effect_p);
-	free_expression(tmp);
+      if(!ENDP(sl)) {
+	if(pointer_type_p(vt)) {
+	  // expression tmp = entity_to_expression(v);
+	  // pt_out = dereferencing_to_points_to(tmp, pt_in);
+	  // pt_out = expressions_to_points_to(sl, pt_out, side_effect_p);
+	  // free_expression(tmp);
+	  reference nr = make_reference(v, NIL);
+	  subscripted_reference_to_points_to(nr, sl, pt_in);
+	}
+	else if(array_of_pointers_type_p(vt)) {
+	  int td = type_depth(vt);
+	  int sn = (int) gen_length(sl);
+	  if(sn<=td) {
+	    ; // Nothing to do: a standard array subscript list
+	  }
+	  else
+	    pips_internal_error("Not implemented yet.\n");
+	}
       }
       pt_out = reference_to_points_to(r, pt_in, side_effect_p);
       break;
@@ -177,6 +245,8 @@ pt_map expression_to_points_to(expression e, pt_map pt_in, bool side_effect_p)
  * evaluation of a possibly empty list of expression. A new data
  * structure is allocated.
  *
+ * Ignore side-effects unless side_effect_p is set to true.
+ *
  * The result is correct only if you are sure that all expressions in
  * "el" are always evaluated.
  */
@@ -195,7 +265,9 @@ pt_map expressions_to_points_to(list el, pt_map pt_in, bool side_effect_p)
 /* The subscript expressions may impact the points-to
  * information. E.g. a[*(p++)]
  *
- * I'm surprised that pointers can be indexed instead of being subscripted...
+ * FI: I'm surprised that pointers can be indexed instead of being
+ * subscripted... This is linked to the parser in
+ * expression_to_points_to().
  */
 pt_map reference_to_points_to(reference r, pt_map pt_in, bool side_effect_p)
 {
@@ -203,7 +275,7 @@ pt_map reference_to_points_to(reference r, pt_map pt_in, bool side_effect_p)
   if(!points_to_graph_bottom(pt_in)) {
     list sel = reference_indices(r);
     entity v = reference_variable(r);
-    type t = ultimate_type(entity_type(v));
+    type t = entity_basic_concrete_type(v);
     // FI: some or all of these tests could be placed in
     // dereferencing_to_points_to()
     if(!entity_stub_sink_p(v)
@@ -230,160 +302,6 @@ pt_map range_to_points_to(range r, pt_map pt_in, bool side_effect_p)
   pt_out = expression_to_points_to(i, pt_out, side_effect_p);
   return pt_out;
 }
-
-/* /\* Three different kinds of calls are distinguished: */
-/*  * */
-/*  * - calls to constants, e.g. NULL, */
-/*  * */
-/*  * - calls to intrinsics, e.g. ++ or malloc(), */
-/*  * */
-/*  * - and calls to a user function. */
-/*  *\/ */
-/* pt_map call_to_points_to(call c, pt_map pt_in) */
-/* { */
-/*   pt_map pt_out = pt_in; */
-
-/*   entity f = call_function(c); */
-/*   list al = call_arguments(c); */
-/*   type ft = entity_type(f); */
-/*   type rt = type_undefined; */
-/*   if(type_functional_p(ft)) { */
-/*     functional ff = type_functional(ft); */
-/*     rt = functional_result(ff); */
-/*   } */
-/*   else if(type_variable_p(ft)) { */
-/*     /\* Must be a pointer to a function *\/ */
-/*     if(pointer_type_p(ft)) { */
-/*       /\* I do not know if nft must be freed later *\/ */
-/*       type nft = type_to_pointed_type(ft); */
-/*       pips_assert("Must be a function", type_functional_p(nft)); */
-/*       functional nff = type_functional(nft); */
-/*       rt = functional_result(nff); */
-/*     } */
-/*     else */
-/*       pips_internal_error("Unexpected type.\n"); */
-/*   } */
-/*   else */
-/*     pips_internal_error("Unexpected type.\n"); */
-
-/*   if(ENTITY_STOP_P(f)||ENTITY_ABORT_SYSTEM_P(f)||ENTITY_EXIT_SYSTEM_P(f) */
-/*      || ENTITY_ASSERT_FAIL_SYSTEM_P(f)) { */
-/*     clear_pt_map(pt_out); */
-/*   } */
-/*   else if(ENTITY_C_RETURN_P(f)) { */
-/*     /\* it is assumed that only one return is present in any module */
-/*        code because internal returns are replaced by gotos *\/ */
-/*     if(ENDP(al)) { */
-/*       // clear_pt_map(pt_out); */
-/*       ; // the necessary projections are performed elsewhere */
-/*     } */
-/*     else { */
-/*       expression rhs = EXPRESSION(CAR(al)); */
-/*       type rhst = expression_to_type(rhs); */
-/*       // FI: should we use the type of the current module? */
-/*       if(pointer_type_p(rhst)) { */
-/* 	list sinks = expression_to_points_to_sinks(rhs, pt_out); */
-/* 	entity rv = function_to_return_value(get_current_module_entity()); */
-/* 	reference rvr = make_reference(rv, NIL); */
-/* 	cell rvc = make_cell_reference(rvr); */
-/* 	list sources = CONS(CELL, rvc, NIL); */
-/* 	pt_out = list_assignment_to_points_to(sources, sinks, pt_out); */
-/* 	gen_free_list(sources); */
-/* 	// FI: not too sure about "sinks" being or not a memory leak */
-/* 	; // The necessary projections are performed elsewhere */
-/*       } */
-/*       free_type(rhst); */
-/*     } */
-/*   } */
-/*   else if(ENTITY_FCLOSE_P(f)) { */
-/*     expression lhs = EXPRESSION(CAR(al)); */
-/*     pt_out = freed_pointer_to_points_to(lhs, pt_out); */
-/*   } */
-/*   else if(ENTITY_FREE_SYSTEM_P(f)) { */
-/*     expression lhs = EXPRESSION(CAR(al)); */
-/*     pt_out = freed_pointer_to_points_to(lhs, pt_out); */
-/*   } */
-/*   else if(ENTITY_CONDITIONAL_P(f)) { */
-/*     // FI: I needs this piece of code for assert(); */
-/*     expression c = EXPRESSION(CAR(al)); */
-/*     pt_map in_t = full_copy_pt_map(pt_out); */
-/*     pt_map in_f = full_copy_pt_map(pt_out); */
-/*     in_t = condition_to_points_to(c, in_t, true); */
-/*     in_f = condition_to_points_to(c, in_f, true); */
-/*     expression e1 = EXPRESSION(CAR(CDR(al))); */
-/*     expression e2 = EXPRESSION(CAR(CDR(CDR(al)))); */
-/*     pt_map out_t = pt_map_undefined; */
-/*     if(!empty_pt_map_p(in_t)) */
-/*       out_t = expression_to_points_to(e1, in_t); */
-/*     pt_map out_f = pt_map_undefined; */
-/*     // FI: should be factored out in a more general merge function... */
-/*     if(!empty_pt_map_p(in_f)) */
-/*       out_f = expression_to_points_to(e2, in_f); */
-/*     if(empty_pt_map_p(in_t)) */
-/*       pt_out = out_f; */
-/*     else if(empty_pt_map_p(in_f)) */
-/*       pt_out = out_t; */
-/*     else */
-/*       pt_out = merge_points_to_set(out_t, out_f); */
-/*     // FI: this destroys pt_out for test case pointer02 */
-/*     //free_pt_map(in_t), free_pt_map(in_f), free_pt_map(out_t), free_pt_map(out_f); */
-/*   } */
-/*   else { */
-/*     if(ENTITY_DEREFERENCING_P(f) || ENTITY_POINT_TO_P(f)) { */
-/*       /\* Is the dereferenced pointer null or undefined? *\/ */
-/*       expression p = EXPRESSION(CAR(al)); */
-/*       pt_out = dereferencing_to_points_to(p, pt_out);  */
-/*     } */
-/*     if(!type_void_p(rt)) { */
-/*       value fv = entity_initial(f); */
-
-/*       /\* points-to updates due to arguments *\/ */
-/*       // FI: this cannot be delayed but it is unfortunately applied */
-/*       // again when going down? See arithmetic08 and 09? */
-/*       // This is necessary but cannot be placed here because of the */
-/*       // recursive calls */
-/*       // FI: we are in trouble for post increment and post decrement... */
-/*       // We should update the target a second time in sinks.c! */
-/*       pt_out = expressions_to_points_to(al, pt_in); */
-
-/*       // FI: I wanted to use the return type but it is too often */
-/*       // overloaded with intrinsics */
-/*       type ct = call_to_type(c); */
-/*       if(pointer_type_p(ct) || struct_type_p(ct)) { */
-/* 	/\* points-to updates due to the function itself *\/ */
-/* 	if(entity_constant_p(f)) { */
-/* 	  // pt_out = constant_call_to_points_to(c, pt_out); */
-/* 	  pt_out = pt_in; */
-/* 	} */
-/* 	else if(intrinsic_entity_p(f)) */
-/* 	  pt_out = intrinsic_call_to_points_to(c, pt_out); */
-/* 	else if(symbolic_entity_p(f)) */
-/* 	  pt_out = pt_in; // FI? */
-/* 	else if(value_unknown_p(fv)) { */
-/* 	  pips_internal_error("function %s has an unknown value\n", */
-/* 			      entity_name(f)); */
-/* 	} */
-/* 	else { */
-/* 	  // must be a user-defined function */
-/* 	  pips_assert("f is a user-defined function", value_code_p(entity_initial(f))); */
-/* 	  pt_out = user_call_to_points_to(c, pt_out); */
-/* 	} */
-/*       } */
-/*       else { */
-/* 	/\* points-to updates due to arguments: already performed *\/ */
-/* 	// pt_out = expressions_to_points_to(al, pt_in); */
-/* 	; */
-/*       } */
-/*       free_type(ct); */
-/*     } */
-/*     else { */
-/*       /\* points-to updates due to arguments *\/ */
-/*       pt_out = expressions_to_points_to(al, pt_in); */
-/*     } */
-/*   } */
-
-/*   return pt_out; */
-/* } */
 
 /* Three different kinds of calls are distinguished:
  *
@@ -578,37 +496,20 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in, bool side_effect_p)
     expression p = EXPRESSION(CAR(al));
     pt_out = dereferencing_to_points_to(p, pt_out);
   }
+  else if(ENTITY_PLUS_C_P(f) || ENTITY_MINUS_C_P(f)) {
+    /* Is the dereferenced pointer null or undefined? */
+    expression p1 = EXPRESSION(CAR(al));
+    type t1 = expression_to_type(p1);
+    if(pointer_type_p(t1))
+      pt_out = dereferencing_to_points_to(p1, pt_out);
+    else {
+      expression p2 = EXPRESSION(CAR(CDR(al)));
+      type t2 = expression_to_type(p2);
+      if(pointer_type_p(t2))
+	pt_out = dereferencing_to_points_to(p2, pt_out);
+    }
+  }
   else if(ENTITY_ASSERT_FAIL_SYSTEM_P(f)) {
-    // FI: I needs this piece of code for assert();
-    // FI: why? it looks like the evaluation of a conditional expression...
-    // See assert01.c and its expansion?
-    // This piece of code seems completety wrong
-    // The actual arguments of __assert_fail() are two character
-    // strings, an integer and a NULL pointer for assert01.c
-#if 0
-    expression c = EXPRESSION(CAR(al));
-    pt_map in_t = full_copy_pt_map(pt_out);
-    pt_map in_f = full_copy_pt_map(pt_out);
-    in_t = condition_to_points_to(c, in_t, true);
-    in_f = condition_to_points_to(c, in_f, true);
-    expression e1 = EXPRESSION(CAR(CDR(al)));
-    expression e2 = EXPRESSION(CAR(CDR(CDR(al))));
-    pt_map out_t = pt_map_undefined;
-    if(!points_to_graph_bottom(in_t))
-      out_t = expression_to_points_to(e1, in_t, side_effect_p);
-    pt_map out_f = pt_map_undefined;
-    // FI: should be factored out in a more general merge function...
-    if(!points_to_graph_bottom(in_f))
-      out_f = expression_to_points_to(e2, in_f, side_effect_p);
-    if(points_to_graph_bottom(in_t))
-      pt_out = out_f;
-    else if(points_to_graph_bottom(in_f))
-      pt_out = out_t;
-    else
-      pt_out = merge_points_to_graphs(out_t, out_f);
-    // FI: this destroys pt_out for test case pointer02
-    //free_pt_map(in_t), free_pt_map(in_f), free_pt_map(out_t), free_pt_map(out_f);
-#endif
     // FI: no return from assert failure
     clear_pt_map(pt_out);
     points_to_graph_bottom(pt_out) = true;
@@ -617,6 +518,40 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in, bool side_effect_p)
      /* || ENTITY_ASSERT_FAIL_SYSTEM_P(f) */) {
     clear_pt_map(pt_out);
     points_to_graph_bottom(pt_out) = true;
+  }
+  else if(ENTITY_PRINTF_P(f) || ENTITY_FPRINTF_P(f) || ENTITY_SPRINTF_P(f)
+	  || ENTITY_SCANF_P(f) || ENTITY_FSCANF_P(f) || ENTITY_SSCANF_P(f)
+	  || ENTITY_ISOC99_FSCANF_P(f)|| ENTITY_ISOC99_SSCANF_P(f)) {
+    FOREACH(EXPRESSION, a, al) {
+      type at = points_to_expression_to_concrete_type(a);
+      if(C_pointer_type_p(at)) {
+	// For the side-effects on pt_out
+	list sinks = expression_to_points_to_sinks(a, pt_out);
+	if(gen_length(sinks)==1 && nowhere_cell_p(CELL(CAR(sinks)))) {
+	  /* attempt at using an undefined value */
+	  pips_user_warning("Undefined value \"%s\" is used at line %d.\n",
+			    expression_to_string(a),
+			    points_to_context_statement_line_number());
+
+	  clear_pt_map(pt_out);
+	  points_to_graph_bottom(pt_out) = true;
+	}
+	gen_free_list(sinks);
+      }
+    }
+    if(!points_to_graph_bottom(pt_out)
+       && (ENTITY_FPRINTF_P(f) || ENTITY_FSCANF_P(f)
+	   || ENTITY_ISOC99_FSCANF_P(f))) {
+      /* stdin, stdout, stderr, fd... must be defined and not NULL */
+      expression a1 = EXPRESSION(CAR(al));
+      if(expression_reference_p(a1)) {
+	expression d =
+	  unary_intrinsic_expression(DEREFERENCING_OPERATOR_NAME,
+					      copy_expression(a1));
+	pt_out = expression_to_points_to(d, pt_out, false);
+	free_expression(d);
+      }
+    }
   }
   else if(ENTITY_C_RETURN_P(f)) {
     /* it is assumed that only one return is present in any module
@@ -630,17 +565,6 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in, bool side_effect_p)
       type rhst = expression_to_type(rhs);
       // FI: should we use the type of the current module?
       if(pointer_type_p(rhst) || struct_type_p(rhst)) {
-#if 0
-	list sinks = expression_to_points_to_sinks(rhs, pt_out);
-	entity rv = function_to_return_value(get_current_module_entity());
-	reference rvr = make_reference(rv, NIL);
-	cell rvc = make_cell_reference(rvr);
-	list sources = CONS(CELL, rvc, NIL);
-	pt_out = list_assignment_to_points_to(sources, sinks, pt_out);
-	gen_free_list(sources);
-	// FI: not too sure about "sinks" being or not a memory leak
-	; // The necessary projections are performed elsewhere
-#endif
 	entity rv = function_to_return_value(get_current_module_entity());
 	expression lhs = entity_to_expression(rv);
 	pt_out = assignment_to_points_to(lhs, rhs, pt_out);
@@ -650,7 +574,11 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in, bool side_effect_p)
   }
   else if(ENTITY_FCLOSE_P(f)) {
     expression lhs = EXPRESSION(CAR(al));
-    pt_out = freed_pointer_to_points_to(lhs, pt_out, side_effect_p);
+    // pt_out = freed_pointer_to_points_to(lhs, pt_out, side_effect_p);
+    list lhc = expression_to_points_to_sources(lhs, pt_out);
+    cell uc = make_nowhere_cell();
+    list rhc = CONS(CELL, uc, NIL);
+    pt_out = list_assignment_to_points_to(lhc, rhc, pt_out);
   }
   else if(ENTITY_CONDITIONAL_P(f)) {
     // FI: I needs this piece of code for assert();
@@ -684,6 +612,35 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in, bool side_effect_p)
     // FI: this destroys pt_out for test case pointer02, Memory leaks...
     //free_pt_map(in_t), free_pt_map(in_f), free_pt_map(out_t), free_pt_map(out_f);
   }
+  else if(ENTITY_FOPEN_P(f)) {
+    expression e1 = EXPRESSION(CAR(al));
+    pt_out = dereferencing_to_points_to(e1, pt_out);
+    expression e2 = EXPRESSION(CAR(CDR(al)));
+    pt_out = dereferencing_to_points_to(e2, pt_out);
+  }
+  else if(ENTITY_FDOPEN_P(f)) {
+    expression e2 = EXPRESSION(CAR(CDR(al)));
+    pt_out = dereferencing_to_points_to(e2, pt_out);
+  }
+  else if(ENTITY_FREOPEN_P(f)) {
+    expression e1 = EXPRESSION(CAR(al));
+    pt_out = dereferencing_to_points_to(e1, pt_out);
+    expression e2 = EXPRESSION(CAR(CDR(al)));
+    pt_out = dereferencing_to_points_to(e2, pt_out);
+    expression e3 = EXPRESSION(CAR(CDR(CDR(al))));
+    pt_out = dereferencing_to_points_to(e3, pt_out);
+  }
+  else if(ENTITY_FREAD_P(f) || ENTITY_FWRITE_P(f)) {
+    expression e1 = EXPRESSION(CAR(al));
+    pt_out = dereferencing_to_points_to(e1, pt_out);
+    expression e4 = EXPRESSION(CAR(CDR(CDR(CDR(al)))));
+    pt_out = dereferencing_to_points_to(e4, pt_out);
+  }
+  else if(ENTITY_CLEARERR_P(f) || ENTITY_FEOF_P(f)
+	  || ENTITY_FERROR_P(f) || ENTITY_FILENO_P(f)) {
+    expression e1 = EXPRESSION(CAR(al));
+    pt_out = dereferencing_to_points_to(e1, pt_out);
+  }
   else {
     // FI: fopen(), fclose() should be dealt with
     // fopen implies that its path argument is not NULL, just like a test
@@ -703,96 +660,6 @@ pt_map intrinsic_call_to_points_to(call c, pt_map pt_in, bool side_effect_p)
   return pt_out;
 }
 
-
-/* pt_map intrinsic_call_to_points_to(call c, pt_map pt_in) */
-/* { */
-/*   pt_map pt_out = pt_in; */
-/*   entity f = call_function(c); */
-
-/*   list al = call_arguments(c); */
-
-/*   //set_methods_for_proper_simple_effects(); */
-/*   //list el = call_to_proper_effects(c); */
-/*   //generic_effects_reset_all_methods(); */
-
-/*   pips_debug(5, "intrinsic function \"%s\"\n", entity_name(f)); */
-
-/*   // FI: short term version */
-/*   // pt_out = points_to_intrinsic(statement_undefined, c, f, al, pt_in, el); */
-/*   // return pt_out; */
-
-/*   // FI: Where should we check that the update is linked to a pointer? */
-/*   // Should we go down because a pointer assignment may be hidden anywhere... */
-/*   // Or have we already taken care of this in call_to_points_to() */
-
-/*   if(ENTITY_ASSIGN_P(f)) { */
-/*     expression lhs = EXPRESSION(CAR(al)); */
-/*     expression rhs = EXPRESSION(CAR(CDR(al))); */
-/*     pt_out = assignment_to_points_to(lhs, rhs, pt_out); */
-/*   } */
-/*   else if (ENTITY_FREE_SYSTEM_P(f)) { */
-/*     expression lhs = EXPRESSION(CAR(al)); */
-/*     pt_out = freed_pointer_to_points_to(lhs, pt_out); */
-/*   } */
-/*    // According to C standard, pointer arithmetics does not change */
-/*   // the targeted object. */
-/*   else if(ENTITY_PLUS_UPDATE_P(f)) { */
-/*     expression lhs = EXPRESSION(CAR(al)); */
-/*     type lhst = expression_to_type(lhs); */
-/*     if(pointer_type_p(lhst)) { */
-/*       expression delta = EXPRESSION(CAR(CDR(al))); */
-/*       pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out); */
-/*     } */
-/*     free_type(lhst); */
-/*   } */
-/*   else if(ENTITY_MINUS_UPDATE_P(f)) { */
-/*     expression lhs = EXPRESSION(CAR(al)); */
-/*     type lhst = expression_to_type(lhs); */
-/*     if(pointer_type_p(lhst)) { */
-/*       expression rhs = EXPRESSION(CAR(CDR(al))); */
-/*       entity um = FindOrCreateTopLevelEntity(UNARY_MINUS_OPERATOR_NAME); */
-/*       expression delta = MakeUnaryCall(um, copy_expression(rhs)); */
-/*       pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out); */
-/*       free_expression(delta); */
-/*     } */
-/*     free_type(lhst); */
-/*   } */
-/*   else if(ENTITY_POST_INCREMENT_P(f) || ENTITY_PRE_INCREMENT_P(f)) { */
-/*     expression lhs = EXPRESSION(CAR(al)); */
-/*     type lhst = expression_to_type(lhs); */
-/*     if(pointer_type_p(lhst)) { */
-/*       pt_out = dereferencing_to_points_to(lhs, pt_out); */
-/*       expression delta = int_to_expression(1); */
-/*       pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out); */
-/*       free_expression(delta); */
-/*     } */
-/*     free_type(lhst); */
-/*   } */
-/*   else if(ENTITY_POST_DECREMENT_P(f) || ENTITY_PRE_DECREMENT_P(f)) { */
-/*     expression lhs = EXPRESSION(CAR(al)); */
-/*     type lhst = expression_to_type(lhs); */
-/*     if(pointer_type_p(lhst)) { */
-/*       pt_out = dereferencing_to_points_to(lhs, pt_out); */
-/*       expression delta = int_to_expression(-1); */
-/*       pt_out = pointer_arithmetic_to_points_to(lhs, delta, pt_out); */
-/*       free_expression(delta); */
-/*     } */
-/*     free_type(lhst); */
-/*   } */
-/*   else { */
-/*     // FI: fopen(), fclose() should be dealt with */
-/*     // fopen implies that its path argument is not NULL, just like a test */
-/*     // fclose implies that its fp argument is not NULL on input and */
-/*     // points to undefined on output. */
-
-/*     // Not safe till all previous tests are defined */
-/*     // It is assumed that other intrinsics do not generate points-to arcs... */
-/*     // pips_internal_error("Not implemented yet\n"); */
-/*     pt_out = pt_in; */
-/*   } */
-
-/*   return pt_out; */
-/* } */
 
 /* Update the sink locations associated to the source "lhs" under
  * points-to information pt_map by "delta".
@@ -911,14 +778,32 @@ void offset_array_reference(reference r, expression delta, type et)
  */
 void offset_cells(cell source, list sinks, expression delta, type et, pt_map in)
 {
+  // FI: it would be easier to use two lists of arcs rather than sets.
+  // FI: should we assert that expression delta!=0?
   pt_map old = new_pt_map();
   pt_map new = new_pt_map();
   FOREACH(CELL, sink, sinks) {
     if(!anywhere_cell_p(sink) && !cell_typed_anywhere_locations_p(sink)) {
       points_to pt = find_arc_in_points_to_set(source, sink, in);
-      add_arc_to_pt_map(pt, old);
-      points_to npt = offset_cell(pt, delta, et);
-      add_arc_to_pt_map(npt, new);
+      // FI: the arc may not be found; for instance, you know that
+      // _pp_1[1] points towards *NULL_POINTER*, but this is due to an arc
+      // _pp_1[*]->*NULL_POINTER*; this arc does not have to be updated
+      if(!points_to_undefined_p(pt)) {
+	add_arc_to_pt_map(pt, old);
+	points_to npt = offset_cell(pt, delta, et);
+	add_arc_to_pt_map(npt, new);
+      }
+      else {
+	// Another option would be to generate nothing in this case
+	// since it is taken care of by the lattice...
+
+	// Since pt has not been found in "in", the approximation must be may
+	pt = make_points_to(copy_cell(source), copy_cell(sink),
+			    make_approximation_may(),
+			    make_descriptor_none());
+	points_to npt = offset_cell(pt, delta, et);
+	add_arc_to_pt_map(npt, new);
+      }
     }
   }
   difference_of_pt_maps(in, in, old);
@@ -1018,7 +903,7 @@ points_to offset_cell(points_to pt, expression delta, type et)
 void offset_points_to_cells(list sinks, expression delta, type t)
 {
   FOREACH(CELL, sink, sinks) {
-    offset_points_to_cell(sink, delta, t);
+    offset_points_to_cell(sink, delta, t, ENDP(CDR(sinks)));
   }
 }
 
@@ -1031,7 +916,10 @@ void offset_points_to_cells(list sinks, expression delta, type t)
  *
  * Type "t" is used to decide which subscript should be updated by delta.
  */
-void offset_points_to_cell(cell sink, expression delta, type t)
+void offset_points_to_cell(cell sink,
+			   expression delta,
+			   type t,
+			   bool unique_p __attribute__ ((__unused__)))
 {
   /* "&a[i]" should be transformed into "&a[i+eval(delta)]" when
      "delta" can be statically evaluated */
@@ -1068,32 +956,42 @@ void offset_points_to_cell(cell sink, expression delta, type t)
       else {
 	// FI: this is wrong, there is no reason to update the last
 	// subscript; the type of the offset should be passed as an
-	// argument. See for instance dereferencing08.c
+	// argument. See for instance dereferencing08.c. And
+	// dereferencing18.c
 	list tsl = find_points_to_subscript_for_type(sink, t);
-	// expression lse = EXPRESSION(CAR(gen_last(sl)));
-	expression lse = EXPRESSION(CAR(tsl));
-	value vlse = EvalExpression(lse);
-	if(value_constant_p(vlse) && constant_int_p(value_constant(vlse))) {
-	  int ov =  constant_int(value_constant(vlse));
-	  int k = get_int_property("POINTS_TO_SUBSCRIPT_LIMIT");
-	  if(-k <= ov && ov <= k) {
-	    expression nse = int_to_expression(dv+ov);
-	    //EXPRESSION_(CAR(gen_last(sl))) = nse;
-	    EXPRESSION_(CAR(tsl)) = nse;
+	if(ENDP(tsl)) {
+	  // dereferencing18: the only possible offset is 0, dv==0,
+	  // Or the points-to information is approximate.
+	  // unique_p should be used here to decide if a warning should
+	  // be emitted
+	  ;
+	}
+	else {
+	  // expression lse = EXPRESSION(CAR(gen_last(sl)));
+	  expression lse = EXPRESSION(CAR(tsl));
+	  value vlse = EvalExpression(lse);
+	  if(value_constant_p(vlse) && constant_int_p(value_constant(vlse))) {
+	    int ov =  constant_int(value_constant(vlse));
+	    int k = get_int_property("POINTS_TO_SUBSCRIPT_LIMIT");
+	    if(-k <= ov && ov <= k) {
+	      expression nse = int_to_expression(dv+ov);
+	      //EXPRESSION_(CAR(gen_last(sl))) = nse;
+	      EXPRESSION_(CAR(tsl)) = nse;
+	    }
+	    else {
+	      expression nse = make_unbounded_expression();
+	      //EXPRESSION_(CAR(gen_last(sl))) = nse;
+	      EXPRESSION_(CAR(tsl)) = nse;
+	    }
+	    free_expression(lse);
 	  }
 	  else {
+	    // If the index cannot be computed, used the unbounded expression
 	    expression nse = make_unbounded_expression();
 	    //EXPRESSION_(CAR(gen_last(sl))) = nse;
 	    EXPRESSION_(CAR(tsl)) = nse;
+	    free_expression(lse);
 	  }
-	  free_expression(lse);
-	}
-	else {
-	  // If the index cannot be computed, used the unbounded expression
-	  expression nse = make_unbounded_expression();
-	  //EXPRESSION_(CAR(gen_last(sl))) = nse;
-	  EXPRESSION_(CAR(tsl)) = nse;
-	  free_expression(lse);
 	}
       }
     }
@@ -1104,12 +1002,25 @@ void offset_points_to_cell(cell sink, expression delta, type t)
       }
       else {
 	list tsl = find_points_to_subscript_for_type(sink, t);
+	if(ENDP(tsl)) {
+	  /* No subscript is possible, but 0 and it does not need to appear */
+	  /* dereferencing18.c: a scalar was malloced */
+	  if(zero_expression_p(delta))
+	    ; // Nothing to be done: the subscript is ignored
+	  else {
+	    /* We might use unique_p and the value of delta to detect
+	       an error or to warn the user about a possible error */
+	    ;
+	  }
+	}
+	else {
 	//expression ose = EXPRESSION(CAR(gen_last(sl)));
 	expression ose = EXPRESSION(CAR(tsl));
 	expression nse = make_unbounded_expression();
 	//EXPRESSION_(CAR(gen_last(sl))) = nse;
 	EXPRESSION_(CAR(tsl)) = nse;
 	free_expression(ose);
+	}
       }
     }
   }
@@ -1280,9 +1191,9 @@ void check_rhs_value_types(expression lhs,
  * New points-to information must be added when a formal parameter
  * is dereferenced.
  */
-pt_map pointer_assignment_to_points_to(expression lhs,
-				       expression rhs,
-				       pt_map pt_in)
+pt_map internal_pointer_assignment_to_points_to(expression lhs,
+						expression rhs,
+						pt_map pt_in)
 {
   pt_map pt_out = pt_in;
 
@@ -1350,14 +1261,22 @@ pt_map pointer_assignment_to_points_to(expression lhs,
 
     /* We must be in a dead-code portion. If not pleased, adjust properties... */
     if(ENDP(L)) {
-      pips_user_warning("Expression \"%s\" could not be dereferenced at line %d.\n",
-			expression_to_string(lhs),
-			points_to_context_statement_line_number());
+      if(statement_points_to_context_defined_p())
+	pips_user_warning("Expression \"%s\" could not be dereferenced at line %d.\n",
+			  expression_to_string(lhs),
+			  points_to_context_statement_line_number());
+      else
+	pips_user_warning("Expression \"%s\" could not be dereferenced.\n",
+			  expression_to_string(lhs));
     }
     if(ENDP(R)) {
-      pips_user_warning("Expression \"%s\" could not be dereferenced at line %d.\n",
-			expression_to_string(rhs),
-			points_to_context_statement_line_number());
+      if(statement_points_to_context_defined_p())
+	pips_user_warning("Expression \"%s\" could not be dereferenced at line %d.\n",
+			  expression_to_string(rhs),
+			  points_to_context_statement_line_number());
+      else
+	pips_user_warning("Expression \"%s\" could not be dereferenced.\n",
+			  expression_to_string(rhs));
     }
     clear_pt_map(pt_out);
     points_to_graph_bottom(pt_out) = true;
@@ -1367,10 +1286,21 @@ pt_map pointer_assignment_to_points_to(expression lhs,
     // We are not sure what to do if null in L or if nowhere in R
     int nR = (int) gen_length(R);
     if(nR==1 && nowhere_cell_p(CELL(CAR(R)))) {
-      pips_user_warning("Assignment of an undefined value at line %d.\n",
-			points_to_context_statement_line_number());
-      clear_pt_map(pt_out);
-      points_to_graph_bottom(pt_out) = true;
+      if(statement_points_to_context_defined_p())
+	pips_user_warning("Assignment of an undefined value to \"%s\" at line %d.\n",
+			  expression_to_string(lhs),
+			  points_to_context_statement_line_number());
+      else
+	pips_user_warning("Assignment of an undefined value to \"%s\".\n",
+			  expression_to_string(lhs));
+      /* The C99 standard does not preclude the propagation of
+	 indeterminate values. It is often used in our test cases when
+	 structs are assigned.
+
+	 clear_pt_map(pt_out);
+	 points_to_graph_bottom(pt_out) = true;
+      */
+      pt_out = list_assignment_to_points_to(L, R, pt_out);
     }
     else
       pt_out = list_assignment_to_points_to(L, R, pt_out);
@@ -1382,109 +1312,36 @@ pt_map pointer_assignment_to_points_to(expression lhs,
 
   return pt_out;
 }
-
-/* Any abstract location of the lhs in L is going to point to nowhere.
- *
- * Any source in pt_in pointing towards any location in lhs may or
- * nust now points towards nowhere (malloc07).
- *
- * New points-to information must be added when a formal parameter
- * is dereferenced.
- *
- * Equations for "free(e);":
- *
- * Let L = expression_to_sources(e,in) and R = expression_to_sinks(e,in)
- *
- * Any location l corresponding to e can now point to nowhere/undefined:
- *
- * Gen_1 = {pts=(l,nowhere,a) | l in L}
- *
- * Any location source that pointed to a location pointed to by l can
- * now point to nowehere/undefined.
- *
- * Gen_2 = {pts=(source,nowhere,a) | exists r in R
- *                                   && r in Heap
- *                                   && exists pts'=(source,r,a') in in}
- *
- * If e corresponds to a unique (non-abstract?) location l, any arc
- * starting from l can be removed:
- *
- * Kill_1 = {pts=(l,r,a) in in | l in L && |L|=1}
- *
- * If the freed location r is precisely known, any arc pointing
- * towards it can be removed:
- *
- * Kill_2 = {pts=(l,r,a) in in | r in R && |R|=1}
- *
- * If the freed location r is precisely known, any arc pointing
- * from it can be removed:
- *
- * Kill_3 = {pts=(l,r,a) in in | l in R && |R|=1}
- *
- * out = (in - Kill_1 - Kill_2) U Gen_1 U Gen_2
- *
- * Warnings for dangling pointers:
- *
- * DP = {r|exists pts=(r,l,a) in Gen_2} // To be checked
- *
- * Memory leaks: the freed bucket may be the only bucket containing
- * pointers towards another bucket:
- *
- * PML = {source_to_sinks(r)|r in R}
- * ML = {m|m in PML && heap_cell_p(m)}
- * Note: for DP and ML, we could compute may and must sets. We only
- * compute must sets to avoid swamping the log file with false alarms.
- *
- * FI->FC: it might be better to split the problem according to
- * |R|. If |R|=1, you know which bucket is destroyed, unless it is an
- * abstract bucket... which we do not really know even at the
- * intraprocedural level.  In that case, you could remove all edges
- * starting from r and then substitute r by nowhere/undefined.
- *
- * If |R| is greater than 1, then a new node nowhere/undefined must be
- * added and any arc ending up in R must be duplicated with a similar
- * arc ending up in the new node.
- *
- * The cardinal of |L| does not seem to have an impact...
- */
-pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in, bool side_effect_p)
+
+pt_map pointer_assignment_to_points_to(expression lhs,
+				       expression rhs,
+				       pt_map pt_in)
 {
-  // FI: is this redundant?
-  pt_map pt_out = expression_to_points_to(lhs, pt_in, side_effect_p);
-  list PML = NIL;
-
-  list L = expression_to_points_to_sources(lhs, pt_out);
-  list R = expression_to_points_to_sinks(lhs, pt_out);
-
-  /* Build a nowhere cell
+  /* FI: this is a crazy idea to avoid problems in balancing test
+   * branches. It should only be useful when the formal context has to
+   * be expanded by this assignment. lhs = lhs;
    *
-   * FI->AM: typed nowhere?
+   * Of course, it is a catastrophy when expression lhs has side effects...
+   *
+   * And it does not work because the current "in" of the test is
+   * modified by side-effect no seen when the false branch is analyzed.
    */
-  //list N = CONS(CELL, make_nowhere_cell(), NIL);
-  type t = expression_to_type(lhs);
-  type pt = type_to_pointed_type(t);
-  list N = CONS(CELL, make_typed_nowhere_cell(pt), NIL);
-  free_type(t);
-
-  pips_assert("L is not empty", !ENDP(L));
-
-  /* Remove cells from R that do not belong to Heap: they cannot be
-     freed */
-  list nhl = NIL;
-  // list inds = NIL;
+  // pt_map pt_out = internal_pointer_assignment_to_points_to(lhs, lhs, pt_in);
+  pt_map pt_out = internal_pointer_assignment_to_points_to(lhs, rhs, pt_in);
+  return pt_out;
+}
+
+/* Remove from points-to cell list R cells that certainly cannot be
+   freed.  */
+list freeable_points_to_cells(list R)
+{
+  list nhl = NIL; // No heap list: cannot be freed
   FOREACH(CELL, c, R) {
-    /* FI->AM: Should be taken care of by the lattice...
-     *
-     * We need heap_cell_p() for any abstract bucket, heap_cell_p() to
-     * detect the heap abstract location, heap_cell_p() to detect
-     * cells that may be in the heap, i.e. abstract locations that are
-     * greater then the heap abstract location.
-     */
-    /* if c is a heap location with indices other than zero then we
-       have bumped into a non-legal free */
     if(heap_cell_p(c) || stub_points_to_cell_p(c)) {
       reference r = cell_any_reference(c);
       list inds = reference_indices(r);
+      /* if c is a heap location with indices other than zero then we
+	 have bumped into a non-legal free */
       if(!ENDP(inds)) {
 	expression ind = EXPRESSION (CAR(inds));
 	// No offset allowed for a free()
@@ -1493,157 +1350,333 @@ pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in, bool side_effect
       }
       // gen_free_list(inds);
     }
-    // FI: wouldn'it be easier to use an else if()?
-    if(!heap_cell_p(c)
-       && !stub_points_to_cell_p(c)
-       && !cell_typed_anywhere_locations_p(c))
+    else if(!heap_cell_p(c)
+	    && !stub_points_to_cell_p(c)
+	    && !cell_typed_anywhere_locations_p(c))
       nhl = CONS(CELL, c, nhl);
   }
   gen_list_and_not(&R, nhl);
   gen_free_list(nhl);
-  //pips_assert("R is not empty", !ENDP(R));
+  return R;
+}
 
-  if(ENDP(R)) {
-    /* We have bumped into a non-legal free such as free(&i). See test
-       case malloc10.c */
-    clear_pt_map(pt_out);
-    pips_user_warning("Free of a non-heap allocated address.\n"
-		      "Or bug in the points-to analysis...\n");
-    points_to_graph_bottom(pt_out) = true;
-  }
-  else {
+/* Error detections on "L" and "R" have already been performed. R only
+ * contains heap locations or stub locations, i.e. potential heap
+ * locations. Neither L nor R are empty. "lhs" is provided for other
+ * error messages.
+ */
+pt_map freed_list_to_points_to(expression lhs, list L, list R, pt_map pt_in)
+{
+  pt_map pt_out = pt_in;
+  list ML = NIL; /* First level memory leaks */
 
-    /* Memory leak detection... Must be computed early, before pt_out
-       has been (too?) modified. Transitive closure not performed... */
-    if(gen_length(R)==1) {
-      FOREACH(CELL, c, R) {
-	bool to_be_freed;
-	type ct = points_to_cell_to_type(c, &to_be_freed);
-	if(pointer_type_p(ct) || struct_type_p(ct)
-	   || array_of_pointers_type_p(ct)
-	   || array_of_struct_type_p(ct)) {
-	  // FI: this might not work for arrays of pointers?
-	  // Many for of "source" can be developped when we are dealing
-	  // struct and arrays
-	  // FI: do we need a specific version of source_to_sinks()?
-	  entity v = reference_variable(cell_any_reference(c));
-	  //cell nc = make_cell_reference(make_reference(v, NIL));
-	  PML = variable_to_sinks(v, pt_out, true);
-	  FOREACH(CELL, m, PML) {
-	    if(heap_cell_p(m)) {
-	      entity b = reference_variable(cell_any_reference(m));
-	      pips_user_warning("Memory leak for bucket \"%s\".\n",
-				entity_name(b));
-	      // The impact of this memory leak should be computed
-	      // transitively and recursively
-	      // FI->AM: we could almost call recursively
-	      // freed_freed_pointer_to_points_to() with a reference to b...
-	    }
-	  }
-	  //free_cell(nc);
-	}
-	if(to_be_freed) free_type(ct);
+  pips_assert("L is not empty", !ENDP(L));
+  pips_assert("R is not empty", !ENDP(R));
+
+  /* Build a nowhere cell - Should we check a property to type it or not? */
+  //list N = CONS(CELL, make_nowhere_cell(), NIL);
+  type t = points_to_expression_to_concrete_type(lhs);
+  type pt = compute_basic_concrete_type(type_to_pointed_type(t));
+  list N = CONS(CELL, make_typed_nowhere_cell(pt), NIL);
+
+  /* Remove Kill_1 if it is not empty by definition */
+  if(gen_length(L)==1 && atomic_points_to_cell_p(CELL(CAR(L)))) {
+    set pt_out_s = points_to_graph_set(pt_out);
+    SET_FOREACH(points_to, pts, pt_out_s) {
+      cell l = points_to_source(pts);
+      // FI: use the CP lattice and its operators instead?
+      //if(related_points_to_cell_in_list_p(l, L)) {
+      if(points_to_cell_in_list_p(l, L)) {
+	// FI: assuming you can perform the removal inside the loop...
+	remove_arc_from_pt_map(pts, pt_out);
       }
     }
+  }
 
-    /* Remove Kill_1 if it is not empty by definition */
-    if(gen_length(L)==1) {
-      set pt_out_s = points_to_graph_set(pt_out);
+  /* Memory leak detection... Must be computed early, before pt_out
+     has been (too?) modified. Transitive closure not performed... If
+     one cell has been freed and if it has become unreachable, then
+     arcs starting from it have become useless and other cells that
+     were pointed by it may also have become unreachable. */
+  if(gen_length(R)==1 && unreachable_points_to_cell_p(CELL(CAR(R)),pt_out)) {
+    cell c = CELL(CAR(R));
+    type ct = points_to_cell_to_concrete_type(c);
+    if(pointer_type_p(ct) || struct_type_p(ct)
+       || array_of_pointers_type_p(ct)
+       || array_of_struct_type_p(ct)) {
+      // FI: this might not work for arrays of pointers?
+      // Many forms of "source" can be developped when we are dealing
+      // struct and arrays
+      // FI: do we need a specific version of source_to_sinks()?
+      entity v = reference_variable(cell_any_reference(c));
+      //cell nc = make_cell_reference(make_reference(v, NIL));
+      list PML = variable_to_sinks(v, pt_out, true);
+      FOREACH(CELL, m, PML) {
+	if(heap_cell_p(m)) {
+	  entity b = reference_variable(cell_any_reference(m));
+	  pips_user_warning("Memory leak for bucket \"%s\".\n",
+			    entity_name(b));
+	  ML = CONS(CELL, m, ML);
+	}
+      }
+    }
+  }
+
+  /*  Add Gen_2, which is not conditionned by gen_length(R) or atomicity. */
+  set pt_out_s = points_to_graph_set(pt_out);
+  SET_FOREACH(points_to, pts, pt_out_s) {
+    cell r = points_to_sink(pts);
+    if(points_to_cell_in_list_p(r, R)) {
+      if(!null_cell_p(r) && !anywhere_cell_p(r) && !nowhere_cell_p(r)) {
+	/* Compute and add Gen_2 */
+	cell source = points_to_source(pts);
+	// FI: it should be a make_typed_nowhere_cell()
+	type t = points_to_cell_to_concrete_type(source);
+	type pt = compute_basic_concrete_type(type_to_pointed_type(t));
+	cell sink = make_typed_nowhere_cell(pt);
+	// FI: why may? because heap cells are always abstract locations
+	//approximation a = make_approximation_may();
+	approximation a = copy_approximation(points_to_approximation(pts));
+	points_to npt = make_points_to(copy_cell(source), sink, a,
+				       make_descriptor_none());
+	add_arc_to_pt_map(npt, pt_out);
+	/* Do not notify the user that the source of the new
+	   nowhere points to relation is a dangling pointer
+	   because it is only a may information. Exact alias
+	   information or a more precise heap model would be
+	   necessary to have exact information about dangling
+	   pointers. */
+	if(stub_points_to_cell_p(r)) {
+	  entity b = reference_variable(cell_any_reference(source));
+	  pips_user_warning("Dangling pointer \"%s\" has been detected at line %d.\n",
+			    entity_user_name(b),
+			    points_to_context_statement_line_number());
+	}
+      }
+    }
+  }
+
+
+  /* Remove Kill_2 if it is not empty by definition... which it is if
+     heap(r) is true, but not if stub(r). Has to be done after Gen_2,
+     or modification of pt_out should be delayed, which would avoid
+     the internal modification of pt_out_s and make the code easier to
+     understand... */
+  if(gen_length(R)==1 && generic_atomic_points_to_cell_p(CELL(CAR(R)), false)) {
+    set pt_out_s = points_to_graph_set(pt_out);
+    cell r = CELL(CAR(R));
+    if(!null_cell_p(r) && !anywhere_cell_p(r) && !nowhere_cell_p(r)) {
       SET_FOREACH(points_to, pts, pt_out_s) {
-	cell l = points_to_source(pts);
-	if(points_to_cell_in_list_p(l, L)) {
+	cell s = points_to_sink(pts);
+	if(points_to_cell_equal_p(r, s)) {
+	  // FI: pv_whileloop05, lots of related cells to remove after a free...
 	  // FI: assuming you can perform the removal inside the loop...
 	  remove_arc_from_pt_map(pts, pt_out);
 	}
       }
     }
+  }
 
-    /* Remove Kill_2 if it is not empty by definition and add Gen_2 */
-    if(gen_length(R)==1) {
-      set pt_out_s = points_to_graph_set(pt_out);
-      SET_FOREACH(points_to, pts, pt_out_s) {
-	cell r = points_to_sink(pts);
-	if(points_to_cell_in_list_p(r, R)) {
-	  if(!null_cell_p(r) && !anywhere_cell_p(r) && !nowhere_cell_p(r)) {
-	    /* FI: should be easier and more efficient to substitute the
-	       sink... But is is impossible with the representation of
-	       the points-to set. */
-	    /*
-	      cell source = copy_cell(points_to_source(pts));
-	      cell sink = make_nowhere_cell();
-	      approximation a = copy_approximation(points_to_approximation(pts));
-	      points_to npts = make_points_to(source, sink, a, make_descriptor_none());
-	      add_arc_to_pt_map(npts, pt_out);
-	    */
-	    // FI: pv_whileloop05, lots of related cells to remove after a free...
-	    // FI: assuming you can perform the removal inside the loop...
-	    remove_arc_from_pt_map(pts, pt_out);
-	    {
-	      cell source = points_to_source(pts);
-	      // FI: it should be a make_typed_nowhere_cell()
-	      bool to_be_freed;
-	      type t = points_to_cell_to_type(source, &to_be_freed);
-	      type pt = type_to_pointed_type(t);
-	      cell sink = make_typed_nowhere_cell(pt);
-	      //approximation a = make_approximation_may(); // FI: why may?
-	      approximation a = copy_approximation(points_to_approximation(pts));
-	      points_to npt = make_points_to(source, sink, a,
-					     make_descriptor_none());
-	      add_arc_to_pt_map(npt, pt_out);
-	      /* Notify the user that the source of the new nowhere points to relation
-		 is a dangling pointer */
-	      entity b = reference_variable(cell_any_reference(source));
-	      pips_user_warning("Dangling pointer \"%s\".\n",
-				entity_name(b));
-	      //free_points_to(pts);
-	      if(to_be_freed) free_type(t);
-	    }
-	  }
-	}
-      }
-    }
+  /* Remove Kill_3 if it is not empty by definition: with the
+     current heap model, it is always empty. Unreachable cells are
+     dealt somewhere else. They can be tested with
+     points_to_sink_to_sources().
 
-    /* Remove Kill_3 if it is not empty by definition */
-    if(gen_length(R)==1) {
+     FI: Must be placed after gen_1 in case the assignment makes the cell
+     reachable? Nonsense?
+ */
+  if(gen_length(R)==1
+     && (atomic_points_to_cell_p(CELL(CAR(R))) 
+	 || unreachable_points_to_cell_p(CELL(CAR(R)), pt_out))) {
+    cell c = CELL(CAR(R));
+    list S = points_to_sink_to_sources(c, pt_out, false);
+    if(ENDP(S) || atomic_points_to_cell_p(c)) {
       set pt_out_s = points_to_graph_set(pt_out);
       SET_FOREACH(points_to, pts, pt_out_s) {
 	cell l = points_to_source(pts);
 	if(related_points_to_cell_in_list_p(l, R)) {
 	  // Potentially memory leaked cell:
-	  //cell r = points_to_sink(pts);
+	  cell r = points_to_sink(pts);
+	  pt_out = memory_leak_to_more_memory_leaks(r, pt_out);
 	  remove_arc_from_pt_map(pts, pt_out);
 	}
       }
     }
-
-    /* Add Gen_1 - Not too late since pt_out has aready been modified? */
-    pt_out = list_assignment_to_points_to(L, N, pt_out);
-
-    /* Add Gen_2: useless, already performed by Kill_2 */
-    /*
-      SET_FOREACH(points_to, pts, pt_out) {
-      cell r = points_to_sink(pts);
-      if(!null_cell_p(r) && points_to_cell_in_list_p(r, R)) {
-      cell source = copy_cell(points_to_source(pts));
-      cell sink = make_nowhere_cell();
-      approximation a = copy_approximation(points_to_approximation(pts));
-      points_to npts = make_points_to(source, sink, a, make_descriptor_none());
-      add_arc_to_pt_map(npts, pt_out);
-      }
-      }
-    */
-
-    /*
-     * Other pointers may or must now be dangling because their target
-     * has been freed. Already detected at the level of Gen_2.
-     */
+    else
+      gen_free_list(S);
   }
 
-// FI: memory leak(s) in this function?
-  gen_free_list(L);
-  gen_free_list(N);
+  /* Add Gen_1 - Not too late since pt_out has aready been modified? */
+  pt_out = list_assignment_to_points_to(L, N, pt_out);
+
+  /* Add Gen_2: useless, already performed by Kill_2 */
+
+  /*
+   * Other pointers may or must now be dangling because their target
+   * has been freed. Already detected at the level of Gen_2.
+   */
+
+  /* More memory leaks? */
+  FOREACH(CELL, m, ML)
+    pt_out = memory_leak_to_more_memory_leaks(m, pt_out);
+  gen_free_list(ML);
+
+  /* Clean up the resulting graph */
+  // pt_out = remove_unreachable_heap_vertices_in_points_to_graph(pt_out, true);
+  return pt_out;
+}
+
+
+  /* Any abstract location of the lhs in L is going to point to nowhere, maybe.
+   *
+   * Any source in pt_in pointing towards any location in lhs may or
+   * Must now points towards nowhere (malloc07).
+   *
+   * New points-to information must be added when a formal parameter
+   * is dereferenced.
+   *
+   * Equations for "free(e);":
+   *
+   * Let L = expression_to_sources(e,in) 
+   *
+   * and R_1 = (expression_to_sinks(e,in) ^ (HEAP U STUBS)) - {undefined}
+   *
+   * where ^ denotes the set intersection.
+   *
+   * If R_1 is empty, an execution error must occur.
+   *
+   * If R_1={NULL}, nothing happens. Let R=R_1-{NULL}.
+   *
+   * Any location "l" corresponding to "e" can now point to nowhere/undefined:
+   *
+   * Gen_1 = {pts=(l,nowhere,a) | l in L}
+   *
+   * Any location source that pointed to a location r in the heap,
+   * pointed to by some l by definition, can now point to
+   * nowhere/undefined also:
+   *
+   * Gen_2 = {pts=(source,nowhere,a) | exists r in R
+   *                                   && r in Heap or Stubs
+   *                                   && exists pts'=(source,r,a') in in}
+   *
+   * If e corresponds to a unique (non-abstract?) location l, any arc
+   * starting from l can be removed:
+   *
+   * Kill_1 = {pts=(l,r,a) in in | l in L && |L|=1 && atomic(l)}
+   *
+   * If the freed location r is precisely known, any arc pointing
+   * towards it can be removed:
+   *
+   * Kill_2 = {pts=(l,r,a) in in | r in R && |R|=1 && atomic(r)}
+   *
+   * If the freed location r is precisely known or if it can no longer
+   * be reached, any arc pointing from it can be removed:
+   *
+   * Kill_3 = {pts=(r,d,a) in in | r in R && |R|=1 && (atomic(r)
+   *                                                   v unreachable_p(r, in)}
+   *
+   * Then the set PML = { d | heap(d) ^ (r,d,a) in Kill_3} becomes a set
+   * of potential meory leaks. They are leaked if they become
+   * unreachable in the new points-to relation out (see below) and they
+   * generate recursively new potential memory leaks and an updated
+   * points-to relation.
+   *
+   * Since our current heap model only use abstract locations and since
+   * we do not keep any alias information, the predicate atomic should
+   * always return false and the sets Kill_2 and Kill_3 should always be
+   * empty, except if a stub is freed: locally the stub is atomic.
+   *
+   * So, after the execution of "free(e);", the points-to relation is:
+   *
+   * out = (in - Kill_1 - Kill_2 - Kill_3) U Gen_1 U Gen_2
+   *
+   * Warnings for potential dangling pointers:
+   *
+   * DP = {r|exists pts=(r,l,a) in Gen_2} // To be checked
+   *
+   * No warning is issued as those are only potential.
+   *
+   * Memory leaks: the freed bucket may be the only bucket containing
+   * pointers towards another bucket:
+   *
+   * PML = {source_to_sinks(r)|r in R}
+   * ML = {m|m in PML && heap_cell_p(m) && !reachable(m, out)}
+   *
+   * Note: for DP and ML, we could compute may and must/exact sets. We only
+   * compute must/exact sets to avoid swamping the log file with false alarms.
+   *
+   * FI->FC: it might be better to split the problem according to
+   * |R|. If |R|=1, you know which bucket is destroyed, unless it is an
+   * abstract bucket... which we do not really know even at the
+   * intraprocedural level.  In that case, you could remove all edges
+   * starting from r and then substitute r by nowhere/undefined.
+   *
+   * If |R| is greater than 1, then a new node nowhere/undefined must be
+   * added and any arc ending up in R must be duplicated with a similar
+   * arc ending up in the new node.
+   *
+   * The cardinal of |L| does not seem to have an impact: it does, see Kill_1
+   */
+pt_map freed_pointer_to_points_to(expression lhs, pt_map pt_in, bool side_effect_p)
+{
+  // FI: is this redundant with processing already performed by callers?
+  // A test case is needed...
+  pt_map pt_out = expression_to_points_to(lhs, pt_in, side_effect_p);
+  list PML = NIL;
+
+  list R_1 = expression_to_points_to_sinks(lhs, pt_out);
+  list R = NIL;
+  /* Remove cells from R_1 that do not belong to Heap: they cannot be
+     freed */
+  FOREACH(CELL,r, R_1) {
+    if(heap_cell_p(r)
+       || stub_points_to_cell_p(r)
+       || anywhere_cell_p(r) || cell_typed_anywhere_locations_p(r)
+       || null_cell_p(r))
+      R = CONS(CELL, r, R);
+  }
+  gen_free_list(R_1);
+
+  if(ENDP(R)) {
+    /* A execution error is certain */
+    pips_user_warning("Expression \"%s\" at line %d cannot be freed.\n",
+		      expression_to_string(lhs),
+		      points_to_context_statement_line_number());
+    clear_pt_map(pt_out);
+    points_to_graph_bottom(pt_out) = true;
+  }
+  else if(gen_length(R)==1 && null_cell_p(CELL(CAR(R)))) {
+    /* Free(NULL) has no effect*/
+    ;
+  }
+  else {
+    /* Remove from R locations that cannot be freed */
+    R = freeable_points_to_cells(R);
+
+    if(ENDP(R)) {
+      /* We have bumped into a non-legal free such as free(p[10]). See test
+	 case malloc10.c */
+      pips_user_warning("Free of a non-heap allocated address pointed "
+			"by \"%s\" at line %d.\n"
+			"Or bug in the points-to analysis...\n",
+			expression_to_string(lhs),
+			points_to_context_statement_line_number());
+      clear_pt_map(pt_out);
+      points_to_graph_bottom(pt_out) = true;
+    }
+    else {
+      list L = expression_to_points_to_sources(lhs, pt_out);
+      pips_assert("L is not empty", !ENDP(L));
+      pt_out = freed_list_to_points_to(lhs, L, R, pt_in);
+      gen_free_list(L);
+    }
+  }
+
+  // FI: memory leak(s) in this function?
+  //gen_free_list(N);
   gen_full_free_list(R);
   gen_free_list(PML);
+
   return pt_out;
 }
 
@@ -1697,7 +1730,98 @@ list reduce_cells_to_pointer_type(list cl)
   }
   return cl;
 }
+
+/* Returns a list of cells of pointer type which are included in cell
+ * "c". Useful when "c" is a struct or an array of structs or
+ * pointers. Returns a list with cell "c" if it denotes a pointer.
+ */
+list points_to_cell_to_pointer_cells(cell c)
+{
+  list pcl = NIL; // pointer cell list
+  type c_t = points_to_cell_to_concrete_type(c);
+  if(pointer_type_p(c_t)) {
+    cell nc = copy_cell(c);
+    pcl = CONS(CELL, nc, pcl);
+  }
+  else if(struct_type_p(c_t)) {
+    /* Look for pointer and struct and array of pointers or struct fields */
+    list fl = struct_type_to_fields(c_t);
+    FOREACH(ENTITY, f, fl) {
+      type f_t = entity_basic_concrete_type(f);
+      if(pointer_type_p(f_t) || struct_type_p(f_t)
+	 || array_of_pointers_type_p(f_t)
+	 || array_of_struct_type_p(f_t)) {
+	cell nc = copy_cell(c);
+	points_to_cell_add_field_dimension(nc, f);
+	list ppcl = points_to_cell_to_pointer_cells(nc);
+	pcl = gen_nconc(pcl, ppcl);
+      }
+    }
+  }
+  else if(array_of_pointers_type_p(c_t) || array_of_struct_type_p(c_t)) {
+    /* transformer */
+    cell nc = copy_cell(c);
+    points_to_cell_add_unbounded_subscripts(nc);
+    pcl = points_to_cell_to_pointer_cells(nc);
+  }
+  return pcl;
+}
 
+/* Cell "l" has been memory leaked for sure and is not referenced any
+   more in "in". Its successors may be leaked too. */
+pt_map memory_leak_to_more_memory_leaks(cell l, pt_map in)
+{
+  pt_map out = in;
+  // potential memory leaks
+  list pml = points_to_cell_to_pointer_cells(l);
+  FOREACH(CELL, c, pml) {
+    // This first test is probably useless because if has been
+    // partially or fully performed by the caller
+    if(heap_cell_p(c) && unreachable_points_to_cell_p(c, in)) {
+      /* Remove useless unreachable arcs */
+      list dl = NIL, npml = NIL;
+      set out_s = points_to_graph_set(out);
+      SET_FOREACH(points_to, pt, out_s) {
+	cell source = points_to_source(pt);
+	// FI: a weaker test based on the lattice is needed
+	if(points_to_cell_equal_p(source, c)) {
+	  dl = CONS(POINTS_TO, pt, dl);
+	  cell sink = points_to_sink(pt);
+	  npml = CONS(CELL, sink, npml);
+	  // FI: we need to remove pt before we can test for unreachability...
+	  /*
+	    if(heap_cell_p(sink) && unreachable_points_to_cell_p(sink, out)) {
+	    pips_user_warning("Heap bucket \"%s\" leaked at line %d.\n",
+	    points_to_cell_to_string(sink),
+	    points_to_context_statement_line_number());
+	  */
+	}
+      }
+      FOREACH(POINTS_TO, d, dl)
+	remove_arc_from_pt_map(d, out);
+      gen_free_list(dl);
+
+      FOREACH(CELL, sink, npml) {
+	if(heap_cell_p(sink) && unreachable_points_to_cell_p(sink, out)) {
+	  if(false)
+	    pips_user_warning("Heap bucket \"%s\" leaked.\n",
+			      points_to_cell_to_string(sink));
+	    else
+	      pips_user_warning("Heap bucket \"%s\" leaked at line %d.\n",
+				points_to_cell_to_string(sink),
+				points_to_context_statement_line_number());
+	  /* Look for a chain of memory leaks */
+	  //if(!points_to_cell_equal_p(c, l))
+	  out = memory_leak_to_more_memory_leaks(sink, out);
+	}
+      }
+      gen_free_list(npml);
+    }
+  }
+  return out;
+}
+
+
 /* Update "pt_out" when any element of L can be assigned any element of R
  *
  * FI->AM: Potential and sure memory leaks are not (yet) detected.
@@ -1758,8 +1882,9 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
   list udl = NIL; // undefined dereferencing error list
   // FI->AM: you have no way to know if stubs are atomic or not...
   // I am not sure the atomic predicate takes this into account
+  // but it does not really matter intraprocedurally: stubs are atomic
   bool singleton_p = (gen_length(L)==1
-		      && atomic_points_to_cell_p(CELL(CAR(L))));
+		      && generic_atomic_points_to_cell_p(CELL(CAR(L)), false));
   FOREACH(CELL, c, L) {
     if(nowhere_cell_p(c)){
       udl = CONS(CELL, c, udl);
@@ -1770,24 +1895,26 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 			  effect_reference_to_string(cell_any_reference(c)),
 			  points_to_context_statement_line_number());
       else
-	pips_user_warning("Dereferencing of an undefined pointer.\n");
+	pips_user_warning("Possible dereferencing of an undefined pointer.\n");
     }
     else if(null_cell_p(c)) {
       ndl = CONS(CELL, c, ndl);
       if(singleton_p)
 	// Not necessarily a user error if the code is dead
 	// Should be controlled by an extra property...
-	pips_user_warning("Dereferencing of a null pointer.\n");
+	pips_user_warning("Dereferencing of a null pointer \"%s\" at line %d.\n",
+			  effect_reference_to_string(cell_any_reference(c)),
+			  points_to_context_statement_line_number());
       else
-	pips_user_warning("Dereferencing of a null pointer.\n");
+	pips_user_warning("Possible dereferencing of a null pointer \"%s\" at line %d.\n",
+			  effect_reference_to_string(cell_any_reference(c)),
+			  points_to_context_statement_line_number());
     }
     else {
       /* For arrays, an extra eval has been applied by adding 0 subscripts */
       cell nc = copy_cell(c); // FI: for debugging purpose
       c = reduce_cell_to_pointer_type(c);
-      bool to_be_freed;
-      type t = points_to_cell_to_type(c, &to_be_freed);
-      type ct = compute_basic_concrete_type(t);
+      type ct = points_to_cell_to_concrete_type(c);
       if(!C_pointer_type_p(ct) && !overloaded_type_p(ct)) {
 	fprintf(stderr, "nc=");
 	print_points_to_cell(nc);
@@ -1795,7 +1922,6 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 	print_points_to_cell(c);
 	pips_internal_error("\nSource cell cannot really be a source cell\n");
       }
-      if(to_be_freed) free_type(t);
       free_cell(nc);
     }
   }
@@ -1866,6 +1992,7 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
     // FI: easiest way to find the proper set "kill_may"
     kill_may = set_difference(kill_may, kill_may, kill_must);
     bool address_of_p = true;
+    // gen_may = gen_2 in the dissertation
     set gen_may = gen_may_set(L, R, pt_out_s, &address_of_p);
     // set gen_must = gen_must_set(L, R, in_must, &address_of_p);
     //set kill/* = new_pt_map()*/;
@@ -1899,7 +2026,9 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
     set_union(pt_out_s, pt_out_s, gen);
 
     // FI->AM: use kill_may to reduce the precision of these arcs
-    // Easier than to make sure than "gen_may1" is consistent with "kill_may"
+    // Easier than to make sure than "gen_may1", i.e. "gen_1" in the
+    // dissertation, is consistent with "kill_may", i.e. kill_2 in the
+    // dissertation
 
     SET_FOREACH(points_to, pt, kill_may) {
       approximation a = points_to_approximation(pt);
@@ -1915,6 +2044,53 @@ pt_map list_assignment_to_points_to(list L, list R, pt_map pt_out)
 
     pips_assert("After union and approximation updates pt_out is consistent",
 		consistent_points_to_graph_p(pt_out));
+
+    /* Check kill_must for potential memory leaks */
+    SET_FOREACH(points_to, kpt, kill_must) {
+      cell d = points_to_sink(kpt);
+      //approximation ap = points_to_approximation(kpt);
+      // approximation_exact_p(ap) && : this is incompatible with heap_cell_p
+      if(heap_cell_p(d)
+	 && unreachable_points_to_cell_p(d, pt_out)) {
+	/* FI: this error message may be wrong in case of a call to
+	 * realloc(); see Pointers/hyantes02.c, hyantes03.c
+	 *
+	 * FI: this error message may deal with a bucket that does not
+	 * really exist because its allocation was conditional.
+	 *
+	 * To make things worse, the warning is emitted in an
+	 * iterative loop analysis.
+	 */
+	pips_user_warning("Heap bucket \"%s\" %sleaked at line %d.\n",
+			  points_to_cell_to_string(d),
+			  set_size(kill_must)>1? "possibly " : "",
+			  points_to_context_statement_line_number());
+
+	/* Look for a chain of memory leaks. Since they are also
+	   "related" to "d", this must be done before the next
+	   step. */
+	pt_out = memory_leak_to_more_memory_leaks(d, pt_out);
+
+	/* Look for related lost arcs. See Pointers/malloc18.c */
+	reference dr = cell_any_reference(d);
+	entity dv = reference_variable(dr);
+	// cell nd = make_cell_reference(make_reference(dv, NIL));
+	//points_to_cell_add_unbounded_subscripts(nd);
+	list dal = NIL; // Deleted arc list
+	SET_FOREACH(points_to, pt, pt_out_s) {
+	  cell s = points_to_source(pt);
+	  reference sr = cell_any_reference(s);
+	  entity sv = reference_variable(sr);
+	  if(dv==sv) {
+	    if(unreachable_points_to_cell_p(s, pt_out))
+	      dal = CONS(POINTS_TO, pt, dal);
+	  }
+	}
+	FOREACH(POINTS_TO, da, dal)
+	  remove_arc_from_pt_map(da, pt_out);
+	gen_free_list(dal);
+      }
+    }
 
     sets_free(in_may, in_must,
 	      kill_may, kill_must,
@@ -1934,28 +2110,44 @@ pt_map struct_initialization_to_points_to(expression lhs,
   // Implementation 0:
   // pips_internal_error("Not implemented yet.\n");
   // pips_assert("to please gcc, waiting for implementation", lhs==rhs && in==in);
-
-  /* Temporary implementation: use anywhere as default initialization */
   list L = expression_to_points_to_sources(lhs, in);
-  // ignore rhs
-  pips_assert("to please gcc, waiting for implementation", rhs==rhs);
+
   // L must contain a unique cell, containing a non-index reference
-  pips_assert("One struct to initializze", (int) gen_length(L)==1);
+  pips_assert("One struct to initialize", (int) gen_length(L)==1);
   cell c = CELL(CAR(L));
   reference r = cell_any_reference(c);
   entity e = reference_variable(r);
   pips_assert("c is not indexed", ENDP(reference_indices(r)));
-  list l = variable_to_pointer_locations(e);
-  FOREACH(CELL, source, l) {
-    bool to_be_freed;
-    type t = points_to_cell_to_type(source, &to_be_freed);
-    type c_t = type_to_pointed_type(compute_basic_concrete_type(t));
-    cell sink = make_anywhere_cell(c_t);
-    if(to_be_freed) free_type(t);
-    points_to pt = make_points_to(source, sink,
-				  make_approximation_exact(),
-				  make_descriptor_none());
-    add_arc_to_pt_map(pt, out);
+  if(0) {
+    /* Temporary implementation: use anywhere as default initialization */
+    // ignore rhs
+    list l = variable_to_pointer_locations(e);
+    FOREACH(CELL, source, l) {
+      bool to_be_freed;
+      type t = points_to_cell_to_type(source, &to_be_freed);
+      type c_t = type_to_pointed_type(compute_basic_concrete_type(t));
+      cell sink = make_anywhere_cell(c_t);
+      if(to_be_freed) free_type(t);
+      points_to pt = make_points_to(source, sink,
+				    make_approximation_exact(),
+				    make_descriptor_none());
+      add_arc_to_pt_map(pt, out);
+    }
+  }
+  else {
+    /* We must assign to each relevant field its initial value */
+    list fl = struct_variable_to_fields(e); // list of entities
+    list vl = struct_initialization_expression_to_expressions(rhs);
+    pips_assert("The field and initial value lists have the same length",
+		gen_length(fl)==gen_length(vl));
+    list cvl = vl;
+    FOREACH(ENTITY, f, fl) {
+      reference nr =
+	make_reference(e, CONS(EXPRESSION, entity_to_expression(f), NIL));
+      expression nlhs = reference_to_expression(nr);
+      out = assignment_to_points_to(nlhs, EXPRESSION(CAR(cvl)), out);
+      POP(cvl);
+    }
   }
 
   return out;
@@ -2024,6 +2216,29 @@ pt_map struct_assignment_to_points_to(expression lhs,
 		  // pt_out = assignment_to_points_to(nlhs, nrhs, pt_out);
 		  points_to pt = make_points_to(lc, rc, make_approximation_may(), make_descriptor_none());
 		  // FI: pt is allocated but not used...
+		  // FI: see update_points_to_graph_with_arc()?
+		  /* Current arc list (cal): the new arc may be
+		     conflicting with an existing must arc */
+		  list cal = points_to_source_to_arcs(lc, pt_out, false);
+		  list oal = NIL;
+		  list nal = NIL;
+		  FOREACH(POINTS_TO, a, cal) {
+		    approximation ap = points_to_approximation(a);
+		    if(approximation_exact_p(ap)) {
+		      oal = CONS(POINTS_TO, a, oal);
+		      points_to na =
+			make_points_to(copy_cell(points_to_source(a)),
+				       copy_cell(points_to_sink(a)),
+				       make_approximation_may(),
+				       make_descriptor_none());
+		      nal = CONS(POINTS_TO, na, nal);
+		    }
+		  }
+		  FOREACH(POINTS_TO, oa, oal)
+		    remove_arc_from_pt_map(oa, pt_out);
+		  FOREACH(POINTS_TO, na, nal)
+		    add_arc_to_pt_map(na, pt_out);
+		  gen_free_list(oal), gen_free_list(nal);
 		  add_arc_to_pt_map(pt, pt_out); // FI: I guess...
 		  // FI->FC: it would be nice to have a Newgen free_xxxxs() to
 		  // free a list of objects of type xxx with one call
@@ -2256,10 +2471,10 @@ pt_map intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
     // Evaluate side effects only once...
     out = intrinsic_call_to_points_to(c, in, true_p);
     expression lhs = EXPRESSION(CAR(call_arguments(c)));
-    bool to_be_freed;
-    type t = points_to_expression_to_type(lhs, &to_be_freed);
-    type lhs_t = compute_basic_concrete_type(t);
-    if(to_be_freed) free_type(t);
+    //bool to_be_freed;
+    type lhs_t = points_to_expression_to_concrete_type(lhs);
+    //type lhs_t = compute_basic_concrete_type(t);
+    //if(to_be_freed) free_type(t);
     if(pointer_type_p(lhs_t)) {
       expression rhs = EXPRESSION(CAR(CDR(call_arguments(c))));
       list R = expression_to_points_to_sinks(rhs, out);
@@ -2283,13 +2498,13 @@ pt_map intrinsic_call_condition_to_points_to(call c, pt_map in, bool true_p)
       expression p = EXPRESSION(CAR(call_arguments(c)));
       /* Make sure that all dereferencements are possible? Might be
 	 included in intrinsic_call_to_points_to()... */
-      bool to_be_freed;
-      type et = points_to_expression_to_type(p, &to_be_freed);
+      //bool to_be_freed;
+      type et = points_to_expression_to_concrete_type(p);
       if(pointer_type_p(et)) {
 	dereferencing_to_points_to(p, in);
 	out = condition_to_points_to(p, out, true_p);
       }
-      if(to_be_freed) free_type(et);
+      //if(to_be_freed) free_type(et);
     }
     // Take care of side effects as in "if(*p++)"
     // We must take care of side effects only once...

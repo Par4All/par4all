@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -173,8 +173,13 @@ transformer relation_to_transformer(entity op, entity e1, entity e2,
 	  ||(ENTITY_GREATER_OR_EQUAL_P(op) && !veracity)) {
     ineq = vect_new((Variable) e1, VALUE_ONE);
     vect_add_elem(&ineq, (Variable) e2, VALUE_MONE);
-    if((basic_int_p(b1) || basic_logical_p(b1))
-       && (basic_int_p(b2) || basic_logical_p(b2))) {
+    // if we want to authorize to compare a pointer with an integer
+    //if((basic_int_p(b1) || basic_logical_p(b1) || basic_pointer_p(b1))
+    //   && (basic_int_p(b2) || basic_logical_p(b2) || basic_pointer_p(b2))) {
+    // if we only want to compare a pointer with an another pointer
+    if(((basic_int_p(b1) || basic_logical_p(b1))
+       && (basic_int_p(b2) || basic_logical_p(b2)))
+       || (basic_pointer_p(b1) && basic_pointer_p(b2))) {
       vect_add_elem(&ineq, TCST, VALUE_ONE);
     }
   }
@@ -187,8 +192,13 @@ transformer relation_to_transformer(entity op, entity e1, entity e2,
 	  || (ENTITY_LESS_OR_EQUAL_P(op) && !veracity)) {
     ineq = vect_new((Variable) e1, VALUE_MONE);
     vect_add_elem(&ineq, (Variable) e2, VALUE_ONE);
-    if((basic_int_p(b1) || basic_logical_p(b1))
-       && (basic_int_p(b2) || basic_logical_p(b2))) {
+    // if we want to authorize to compare a pointer with an integer
+    //if((basic_int_p(b1) || basic_logical_p(b1) || basic_pointer_p(b1))
+    //   && (basic_int_p(b2) || basic_logical_p(b2) || basic_pointer_p(b2))) {
+    // if we only want to compare a pointer with an another pointer
+    if(((basic_int_p(b1) || basic_logical_p(b1))
+       && (basic_int_p(b2) || basic_logical_p(b2)))
+       || (basic_pointer_p(b1) && basic_pointer_p(b2))) {
       vect_add_elem(&ineq, TCST, VALUE_ONE);
     }
   }

@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -342,59 +342,119 @@ list backward_translation_of_points_to_formal_context_effect(entity callee,
     pt_in = graph_assign_list(pt_in, points_to_list_list(ptl_in));
     //pt_in = graph_assign_list(pt_in, points_to_list_list(pts_to_in));
     set pt_in_s = points_to_graph_set(pt_in);
-    set pts_binded = compute_points_to_binded_set(callee, real_args, pt_in_s);
-    ifdebug(8) print_points_to_set("pt_binded", pts_binded);
+    bool success_p = true;
+    set pts_binded = compute_points_to_binded_set(callee, real_args, pt_in_s,
+						  &success_p);
+    if(success_p) {
+      ifdebug(8) print_points_to_set("pt_binded", pts_binded);
 
-    list dl = code_declarations(value_code(entity_initial(callee)));
-    list formal_args = points_to_cells_parameters(dl);   
+      list dl = code_declarations(value_code(entity_initial(callee)));
+      list formal_args = points_to_cells_parameters(dl);   
 
-    /* Compute the translation table bm; pt_in_callee_filtered is useless. */
-    set bm = new_simple_pt_map();
-    points_to_translation_of_formal_parameters(formal_args, real_args, pt_in, bm);
-    set pt_in_callee_filtered =
-      filter_formal_context_according_to_actual_context(formal_args,
-							pts_to_in_s /* pt_in_callee*/,
-							pts_binded,
-							bm);
-    // bm = points_to_binding(formal_args, pts_to_in_s, pts_binded);  
-    ifdebug(8) print_points_to_set("bm", bm);
- 
-    cell eff_c = effect_cell(eff);
-    points_to_graph bm_g = make_points_to_graph(false, bm);
-    list n_eff_cells = points_to_source_to_translations(eff_c, bm_g, true);
+      /* Compute the translation table binding; pt_in_callee_filtered is useless. */
+      set binding = new_simple_pt_map();
+      points_to_translation_of_formal_parameters(formal_args, real_args, pt_in, binding);
+      set pt_in_callee_filtered =
+	filter_formal_context_according_to_actual_context(formal_args,
+							  pts_to_in_s /* pt_in_callee*/,
+							  pts_binded,
+							  binding);
 
-    // pips_assert("The effect is translated", !ENDP(n_eff_cells));
-    if(ENDP(n_eff_cells)) {
-      /* The effect cannot be translated (probably) because the caller
-	 has not initialized the calling context properly. See for
-	 instance EffectsWithPointsTo/struct08.c: the main function
-	 does not initialize p, q, r or s before calling the
-	 initialization functions. */
-      /* FI: not in the points-to context, look for a way to retrieve
-	 the statement number... */
-      pips_user_error("Effect \"%s\" of callee \"%s\" cannot be translated. "
-		      "Check that the caller \"%s\" provides initialized "
-		      "parameters.\n", effect_to_string(eff), 
-		      entity_user_name(callee),
-		      entity_user_name(get_current_module_entity()));
-    }
+      /* To please gcc */
+      pips_assert("pt_in_callee_filtered is defined",
+		  !set_undefined_p(pt_in_callee_filtered));
 
-    // FI: memory leak on bm_g
-
-    FOREACH(CELL, n_c, n_eff_cells) {
-      if(!null_cell_p(n_c) && !nowhere_cell_p(n_c)) {
+      ifdebug(8) print_points_to_set("binding", binding);
+      effect n_eff ;
+      if(descriptor_convex_p(effect_descriptor(eff))) {
+	cell n_c = effect_cell(eff);
+	reference n_r = cell_reference(n_c);
+	entity n_e = reference_variable(n_r);
+	int i = 0;
+	list inds = NIL;
+	int len = gen_length(reference_indices(n_r));
+	for(i = 0; i < len ; i++) {
+	expression ex = make_unbounded_expression();
+	inds = gen_nconc(inds,CONS(EXPRESSION,ex,NIL));
+	}
+	reference r = make_reference(n_e,inds);
+	cell c = make_cell_reference(r);
 	action ac = copy_action(effect_action(eff));
 	approximation ap = copy_approximation(effect_approximation(eff));
-	descriptor d = copy_descriptor(effect_descriptor(eff));
-	effect n_eff =  make_effect(n_c, ac, ap, d);
-	ael = CONS(EFFECT, n_eff, ael);
+	descriptor d = make_descriptor_none();
+	n_eff =  make_effect(c, ac, ap, d);
       }
-    }
+      else{
+	n_eff = copy_effect(eff);
+      }
+ 
+      cell eff_c = effect_cell(n_eff);
+      points_to_graph bm_g = make_points_to_graph(false, binding);
+      list n_eff_cells = points_to_source_to_translations(eff_c, bm_g, true);
 
-    // FI: if n_eff_cells is not empty, empty(ael) means that the
-    // input code is wrong because a pointer has not been initialized
-    // properly...
-    pips_assert("The effect is translated", !ENDP(ael));
+      // pips_assert("The effect is translated", !ENDP(n_eff_cells));
+      if(ENDP(n_eff_cells)) {
+	/* The effect cannot be translated (probably) because the caller
+	   has not initialized the calling context properly. See for
+	   instance EffectsWithPointsTo/struct08.c: the main function
+	   does not initialize p, q, r or s before calling the
+	   initialization functions. */
+	/* FI: not in the points-to context, look for a way to retrieve
+	   the statement number... */
+	approximation a = effect_approximation(eff);
+	// FI: this whole function
+	// backward_translation_of_points_to_formal_context_effect()
+	// should be in library effect_simple
+	string effect_to_string(effect);
+	if(approximation_exact_p(a) || approximation_must_p(a)) {
+	  // FI: the pass environment must be reset before the user error
+	  // is raised or PIPS is likely to core dump later
+	  // See resets in proper_effects_engine() unless there is a special
+	  // function, effects_pips_user_error(), but I did not find it
+	  pips_user_error("Effect \"%s\" of callee \"%s\" cannot be translated. "
+			  "Check that the caller \"%s\" provides initialized "
+			  "parameters.\n", effect_to_string(eff), 
+			  entity_user_name(callee),
+			  entity_user_name(get_current_module_entity()));
+	}
+	else {
+	  pips_user_warning("Effect \"%s\" of callee \"%s\" cannot be translated. "
+			    "Check that the caller \"%s\" provides initialized "
+			    "parameters.\n", effect_to_string(eff), 
+			    entity_user_name(callee),
+			    entity_user_name(get_current_module_entity()));
+	}
+      }
+
+      // FI: memory leak on bm_g
+
+      FOREACH(CELL, n_c, n_eff_cells) {
+	if(!null_cell_p(n_c) && !nowhere_cell_p(n_c)) {
+	  action ac = copy_action(effect_action(eff));
+	  approximation ap = copy_approximation(effect_approximation(eff));
+	  descriptor d = copy_descriptor(effect_descriptor(eff));
+	  effect n_eff =  make_effect(n_c, ac, ap, d);
+	  ael = CONS(EFFECT, n_eff, ael);
+	}
+      }
+
+      /* FI: if n_eff_cells is not empty, empty(ael) means that the
+       * input code is wrong because a pointer has not been initialized
+       * properly...
+       *
+       * But, the translation error may occur on an may effect that is
+       * an overapproximation. So a user error is not 100 % sure and
+       * ael may be empty.
+       */
+      approximation a = effect_approximation(eff);
+      if(approximation_exact_p(a) || approximation_must_p(a))
+	pips_assert("The effect is translated", !ENDP(ael));
+    }
+    else {
+      /* Incompatibility between call site and callee */
+      gen_free_list(ael);
+      ael = NIL;
+    }
   }
 
   return ael;

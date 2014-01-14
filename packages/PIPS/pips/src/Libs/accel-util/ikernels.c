@@ -1,5 +1,5 @@
 /*
- Copyright 1989-2010 MINES ParisTech
+ Copyright 1989-2014 MINES ParisTech
  Copyright 2010 HPC Project
 
  This file is part of PIPS.
@@ -54,7 +54,6 @@
 #include "preprocessor.h"
 #include "transformer.h"
 #include "accel-util.h"
-
 
 /** Make a sizeof expression
  *
@@ -251,7 +250,7 @@ static bool array_must_fully_written_by_regions_p( entity e_used, list lreg) {
   effect_approximation(array) = make_approximation_exact();
 
   ifdebug(6) {
-    pips_debug(0,"Array region is : ");
+    pips_debug(6,"Array region is : ");
     print_region(array);
   }
   FOREACH(effect, reg, lreg) {
@@ -271,7 +270,7 @@ static bool array_must_fully_written_by_regions_p( entity e_used, list lreg) {
 
 
     ifdebug(6) {
-      pips_debug(0,"Evaluating region : ");
+      pips_debug(6,"Evaluating region : ");
       print_region(reg);
     }
     if(effect_write_p(reg) && store_effect_p(reg) && region_exact_p(reg)) {
@@ -280,14 +279,14 @@ static bool array_must_fully_written_by_regions_p( entity e_used, list lreg) {
       FOREACH(effect, diff, ldiff) {
         if( !region_empty_p(diff)) {
           ifdebug(6) {
-            pips_debug(0,"Diff is not empty :");
+            pips_debug(6,"Diff is not empty :");
             print_region(diff);
           }
           empty = false;
           break;
         } else {
           ifdebug(6) {
-            pips_debug(0,"Diff is empty !\n");
+            pips_debug(6,"Diff is empty !\n");
           }
         }
       }
@@ -535,11 +534,11 @@ static void copy_from_call(statement st, call c) {
 
 
     // We get the inter-procedural results for copy in
-    set at_call_site = set_make(set_pointer);
-    if(!call_intrinsic_p(c)) { // Ignoring intrinsics
-      set_free(at_call_site);
+    set at_call_site;
+    if(user_call_p(c)) { // Ignoring intrinsics
       at_call_site = interprocedural_mapping(DBR_KERNEL_COPY_IN,c);
-    }
+    } else
+      at_call_site = set_make(set_pointer);
 
     // We remove from "copy from" what is used by this statement but not what's
     // in copy-in
@@ -555,11 +554,11 @@ static void copy_from_call(statement st, call c) {
     set_free(at_call_site);
 
     // We add the inter-procedural results for copy out, but not for intrinsics
-    if(!call_intrinsic_p(c)) { // Ignoring intrinsics
+    if(user_call_p(c)) { // Ignoring intrinsics
       at_call_site = interprocedural_mapping(DBR_KERNEL_COPY_OUT,c);
       copy_from_out = set_union(copy_from_out, at_call_site, copy_from_out);
       ifdebug(6) {
-        pips_debug(0,"Adding interprocedural summary : ");
+        pips_debug(6,"Adding interprocedural summary : ");
         print_entities(set_to_list(at_call_site));
         fprintf(stderr,"\n");
       }
@@ -603,6 +602,10 @@ static void copy_from_statement(statement st) {
         pips_user_warning("Unsupported stmt expression : ");
         print_expression(e);
         fprintf(stderr,"\n");
+        // Just propagate then...
+        set copy_from_in = COPY_FROM_IN( st );
+        set copy_from_out = COPY_FROM_OUT( st );
+        set_assign(copy_from_out, copy_from_in);
       }
       break;
     }
@@ -827,7 +830,7 @@ static void copy_to_call(statement st, call c) {
 
 
     // We add the inter-procedural results for copy in, but not for intrinsics
-    if(!call_intrinsic_p(c)) { // Ignoring intrinsics
+    if(user_call_p(c)) { // Ignoring intrinsics
       set at_call_site = interprocedural_mapping(DBR_KERNEL_COPY_IN,c);
       copy_to_in = set_union(copy_to_in, at_call_site, copy_to_in);
       set_free(at_call_site);
@@ -881,6 +884,11 @@ static void copy_to_statement(statement st) {
         pips_user_warning("Unsupported stmt expression : ");
         print_expression(e);
         fprintf(stderr,"\n");
+        // Just propagate then...
+        set copy_to_in = COPY_TO_IN( st );
+        set copy_to_out = COPY_TO_OUT( st );
+        /* The ins are initially the out minus CopyFrom*/
+        set_assign(copy_to_in, copy_to_out);
       }
       break;
     }
@@ -899,7 +907,7 @@ static void copy_to_statement(statement st) {
   set allowed_to_copy_to= MAKE_SET();
   gen_context_recurse(st,allowed_to_copy_to,statement_domain,gen_true,get_written_entities);
   ifdebug(4) {
-    pips_debug(0,"Removing from copy_to_out what is not written here : ");
+    pips_debug(4,"Removing from copy_to_out what is not written here : ");
     set removed = MAKE_SET();
     set_difference(removed,COPY_TO_OUT(st),allowed_to_copy_to);
     list t_to = set_to_sorted_list(removed,(gen_cmp_func_t)compare_entities);
@@ -1148,7 +1156,7 @@ static void transfert_statement(statement st,
   set allowed_to_transfer_to= MAKE_SET();
   gen_context_recurse(st,allowed_to_transfer_to,statement_domain,gen_true,get_written_entities);
   ifdebug(4) {
-    pips_debug(0,"Removing from transfer_to what is not written here : ");
+    pips_debug(4,"Removing from transfer_to what is not written here : ");
     set removed = MAKE_SET();
     set_difference(removed,transferts_to,allowed_to_transfer_to);
     list t_to = set_to_sorted_list(removed,(gen_cmp_func_t)compare_entities);
@@ -1382,7 +1390,7 @@ bool kernel_data_mapping(char * module_name) {
   }
 
   ifdebug(1) {
-    pips_debug(0,"Interprocedural summary for %s :\n To :",module_name);
+    pips_debug(1,"Interprocedural summary for %s :\n To :",module_name);
     print_entities(set_to_list(COPY_TO_IN(module_stat)));
     fprintf(stderr,"\n From :");
     print_entities(set_to_list(COPY_FROM_OUT(module_stat)));

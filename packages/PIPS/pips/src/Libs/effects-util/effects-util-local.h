@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -31,7 +31,8 @@
 #define ANY_MODULE_NAME "*ANY_MODULE*"
 #define ANYWHERE_LOCATION "*ANYWHERE*"
 #define NOWHERE_LOCATION "*NOWHERE*"
-#define NULL_POINTER_NAME "*NULL_POINTER*"
+// Target of the null pointers:
+#define NULL_POINTER_NAME "*NULL*"
 #define UNDEFINED_LOCATION "*UNDEFINED*"
 
 #define UNDEFINED_POINTER_VALUE_NAME "*UNDEFINED*"

@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -196,6 +196,15 @@ bool fortran_return_instruction_p(instruction i)
 bool C_return_instruction_p(instruction i)
 {
   return native_instruction_p(i, C_RETURN_FUNCTION_NAME);
+}
+
+bool exit_instruction_p(instruction i)
+{
+  return native_instruction_p(i, EXIT_FUNCTION_NAME);
+}
+bool abort_instruction_p(instruction i)
+{
+  return native_instruction_p(i, ABORT_FUNCTION_NAME);
 }
 
 

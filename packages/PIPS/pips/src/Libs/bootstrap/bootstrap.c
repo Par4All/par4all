@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -4197,6 +4197,21 @@ MakeVoidParameter()
                         make_dummy_unknown());
 }
 
+//unuse
+type
+pointer_to_overloaded_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeOverloadedResult());
+  t = make_type(is_type_functional, ft);
+
+  functional_parameters(ft) =
+    make_parameter_list(n, MakePointerParameter);
+  return t;
+}
+
 type
 integer_to_overloaded_type(int n)
 {
@@ -4722,6 +4737,8 @@ CreateIntrinsics( set module_list )
         {PRE_INCREMENT_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
         {PRE_DECREMENT_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
         /* ISO 6.5.3.2 address and indirection operators, add pointer type */
+        // this definition must be more precise but cause a type issue
+        // {ADDRESS_OF_OPERATOR_NAME, 1, pointer_to_overloaded_type, 0, 0},
         {ADDRESS_OF_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
         {DEREFERENCING_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
         /* ISO 6.5.3.3 unary arithmetic operators */
@@ -5542,13 +5559,24 @@ CreateIntrinsics( set module_list )
             typing_function_int_to_int, 0},
 
         /* assembly function */
-        { ASM_FUNCTION_NAME, 1, overloaded_to_void_type },
+        { ASM_FUNCTION_NAME, 1, overloaded_to_void_type , 0 , 0},
+        // The 2 last arg don't know for what
 
         /* PIPS intrinsics to simulate various effects */
         {PIPS_MEMORY_BARRIER_OPERATOR_NAME, 0, void_to_void_type, 0, 0},
         {PIPS_IO_BARRIER_OPERATOR_NAME, 0, void_to_void_type, 0, 0},
+	/*SPIRE*/
+	{SEND_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+	{RECV_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+ 
+        /*MPI necessary calls*/
+	{MPI_INIT, (INT_MAX), overloaded_to_integer_type, 0, 0},
+	{MPI_FINALIZE, (INT_MAX), overloaded_to_integer_type, 0, 0}, 
+	{MPI_ISEND, (INT_MAX), overloaded_to_integer_type, 0, 0},
+	{MPI_RECV, (INT_MAX), overloaded_to_integer_type, 0, 0}, 
+	{MPI_BARRIER, (INT_MAX), overloaded_to_integer_type, 0, 0},
 
-        {NULL, 0, 0, 0, 0}
+	{NULL, 0, 0, 0, 0}
     };
     intrinsic_type_descriptor_mapping=hash_table_make(hash_string,sizeof(IntrinsicTypeDescriptorTable));
     for(IntrinsicDescriptor *p = &IntrinsicTypeDescriptorTable[0];p->name;++p) {
@@ -5569,8 +5597,8 @@ bootstrap(string workspace)
   /* Create all intrinsics, skipping user-defined one */
   set module_list = set_make(set_string);
   gen_array_t ml = db_get_module_list();
-  for(int i=0;i< gen_array_nitems(ml);i++)
-      set_add_element(module_list, module_list, (char*)gen_array_item(ml,i));
+  for(int i=0; i < (int) gen_array_nitems(ml); i++)
+    set_add_element(module_list, module_list, (char*)gen_array_item(ml,i));
   CreateIntrinsics(module_list);
   set_free(module_list);
   gen_array_free(ml);
@@ -5639,4 +5667,44 @@ MakeFileName(prefix, base, suffix)
   strcat(s, suffix);
 
   return(s);
+}
+
+/* This array is pointed by FILE * pointers returned or used by fopen,
+   fclose,... . The argument f must be the intrinsic fopen returning a
+   FILE * or another function also returning a FILE *. So we do not
+   have to synthesize the type FILE. */
+entity MakeIoFileArray(entity f)
+{
+  entity io_files = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME, IO_EFFECTS_IO_FILE_NAME);
+
+  if(type_undefined_p(entity_type(io_files))) {
+    /* FI: this initialization is usually performed in
+       bootstrap.c, but it is easier to do it here because the
+       IO_FILE type does not have to be built from scratch. */
+    type rt = functional_result(type_functional(entity_type(f)));
+    type ct = copy_type(type_to_pointed_type(rt)); // FI: no risk with typedef
+    pips_assert("ct is a scalar type",
+		ENDP(variable_dimensions(type_variable(ct))));
+    variable_dimensions(type_variable(ct)) =
+      CONS(DIMENSION,
+	   make_dimension(int_to_expression(0),
+			  /*
+			    MakeNullaryCall
+			    (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
+			  */
+			  int_to_expression(2000)
+			  ),
+	   NIL);
+    entity_type(io_files) = ct;
+    entity ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,
+				    IO_EFFECTS_PACKAGE_NAME);
+    entity_storage(io_files) =
+      make_storage(is_storage_ram,
+		   make_ram(ent,
+			    FindEntity(IO_EFFECTS_PACKAGE_NAME,
+				       STATIC_AREA_LOCAL_NAME),
+			    0, NIL));
+    entity_initial(io_files) = make_value(is_value_unknown, UU);
+  }
+  return io_files;
 }

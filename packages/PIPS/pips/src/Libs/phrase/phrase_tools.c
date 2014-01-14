@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -370,7 +370,7 @@ statement make_binary_call_statement (const char* operator_name,
 			  make_instruction (is_instruction_call,
 					    assignment_call),
 			  NIL,NULL,
-			  empty_extensions ()); 
+			  empty_extensions (), make_synchronization_none()); 
   }
   else {
     return make_statement(entity_empty_label(),
@@ -380,7 +380,7 @@ statement make_binary_call_statement (const char* operator_name,
 			  make_instruction (is_instruction_call,
 					    assignment_call),
 			  NIL,NULL,
-			  statement_extensions(stat));
+			  statement_extensions(stat), make_synchronization_none());
   }
 }
 

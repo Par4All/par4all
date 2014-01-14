@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -314,3 +314,10 @@ bool print_parallelizedOMP_code(string mod_name)
 
     return print_parallelized_code_common(mod_name, "omp");
 }
+
+bool print_parallelizedMPI_code(string mod_name)
+{
+  return print_parallelized_code_common(mod_name, "mpi");
+}
+
+

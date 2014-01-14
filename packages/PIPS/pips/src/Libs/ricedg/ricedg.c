@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright 1989-2010 MINES ParisTech
+ Copyright 1989-2014 MINES ParisTech
 
  This file is part of PIPS.
 
@@ -934,7 +934,7 @@ list TestCoupleOfReferences(list n1,
     }
     pips_user_warning("Dependence between differents variables: "
         "%s and %s\nDependence assumed\n",
-        entity_local_name(e1), entity_local_name(e2));
+        entity_user_name(e1), entity_user_name(e2));
   }
 
   /* if (e1 == e2 && !entity_scalar_p(e1) && !entity_scalar_p(e2)) */

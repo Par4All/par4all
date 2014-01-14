@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -169,9 +169,10 @@ static void add_intraprocedural_value_entities_unconditionally(entity e)
   add_or_kill_equivalenced_variables(e, false);
 }
 
+/* Use to be static, but may be called from ri_to_transformer. */
 /* void add_intraprocedural_value_entities(entity e)
  */
-static void add_intraprocedural_value_entities(entity e)
+void add_intraprocedural_value_entities(entity e)
 {
   type ut = ultimate_type(entity_type(e));
 
@@ -664,6 +665,12 @@ bool value_mappings_compatible_vector_p(Pvecteur v)
 	  vecteur_var(v) = (Variable) new_v;
 	else
 	  return false;
+      }
+
+      /* Or a phi variable, when transformers are computed by the
+	 region analysis */
+      else if(variable_phi_p(e)) {
+	;
       }
 
       /* Or the vector cannot be used in the semantics analysis */

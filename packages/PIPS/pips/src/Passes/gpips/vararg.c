@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -35,6 +35,7 @@
 #include "ri-util.h"
 #include "pipsdbm.h"
 
+#undef test_undefined // also defined in glib included from gtk
 #include <gtk/gtk.h>
 #include "gpips.h"
 
@@ -52,7 +53,7 @@ gpips_user_error(const char * calling_function_name,
    char error_buffer[SMALL_BUFFER_LENGTH];
 
    /* print name of function causing error */
-   (void) sprintf(error_buffer, "user error in %s: ", 
+   (void) sprintf(error_buffer, "user error in %s: ",
                   calling_function_name);
 
    /* print out remainder of message */

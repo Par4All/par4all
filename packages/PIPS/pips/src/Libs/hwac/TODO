@@ -98,7 +98,10 @@
 - WW scalar dependencies may result in split that could be avoided?
 
 * spoc target
-+ check for not implemented functions, and skip them! convolution, other?
++ check for not implemented functions, and skip them! convolution,
+   other?
+- convolution could be implemented at cpp level?
+  would need constant array partial eval?
 
 * terapix target
 + must manage memory allocation in tiles

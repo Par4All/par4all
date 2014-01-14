@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -39,6 +39,7 @@
 #include "pipsdbm.h"
 #include "top-level.h"
 
+#undef test_undefined // also defined in glib included from gtk
 #include <gtk/gtk.h>
 #include "gpips.h"
 

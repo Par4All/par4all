@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -1266,6 +1266,18 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   /* PIPS internal intrinsics */
   {PIPS_MEMORY_BARRIER_OPERATOR_NAME,       make_anywhere_read_write_memory_effects},
   {PIPS_IO_BARRIER_OPERATOR_NAME,           make_io_read_write_memory_effects},
+
+  /* SPIRE intrinsics */
+  {SEND_FUNCTION_NAME,                  c_io_effects},
+  {RECV_FUNCTION_NAME,                  c_io_effects},
+
+  /* MPI intrinsics */
+  {MPI_INIT, no_write_effects},
+  {MPI_FINALIZE, no_write_effects}, 
+  {MPI_ISEND, no_write_effects},
+  {MPI_RECV, no_write_effects}, 
+  {MPI_BARRIER, no_write_effects},
+
 
   /* {int mblen(const char *, size_t, 0, 0},
      {size_t mbstowcs(wchar_t *, const char *, size_t, 0, 0},

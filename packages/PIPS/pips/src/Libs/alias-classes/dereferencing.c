@@ -64,6 +64,133 @@
 #include "points_to_private.h"
 #include "alias-classes.h"
 
+/* FI: As usual in dereferencing.c, it is not clear that this piece of
+ * code has not been implemented somewhere else because of the early
+ * restriction to pointer type only expressions. But all pointer
+ * values must be generated, whether they point to pointers or
+ * anything else.
+ *
+ * This piece of code is designed to handle pointer19.c, and hence
+ * pointer14.c, where arrays of pointers toward arrays of pointers are
+ * used.
+ *
+ * It generates too many arcs, useless arcs, when the subscript list
+ * is broken down into many subscript constructs by PIPS C
+ * parser. This shows in Pointers/pointer14, 15 and 19.
+ */
+pt_map dereferencing_subscript_to_points_to(subscript sub, pt_map in)
+{
+  expression a = subscript_array(sub);
+  type at = expression_to_type(a);
+  type apt = type_to_pointed_type(at);
+  list sel = subscript_indices(sub);
+  /* a cannot evaluate to null or undefined */
+  /* FI: we may need a special case for stubs... */
+  in = dereferencing_to_points_to(a, in);
+  /* We have to take "sel" into account since only the base of the
+     target array is pointed to. */
+  list source_l = expression_to_points_to_sources(a, in);
+  list n_arc_l = NIL;
+
+  FOREACH(CELL, source, source_l) {
+    /* We have to bother with the source if it is an array, not if it
+       is simply a pointer dereferenced by some subscripts as in
+       dereferencing18.c. */
+    reference source_r = cell_any_reference(source);
+    entity source_v = reference_variable(source_r);
+    type source_v_t =  entity_basic_concrete_type(source_v);
+
+    if(array_type_p(source_v_t)) {
+      /* Look for points-to arcs that must be duplicated using the
+	 subscripts as offsets */
+      SET_FOREACH(points_to, pt, points_to_graph_set(in)) {
+	cell pt_source = points_to_source(pt);
+	//if(points_to_cell_in_list_p(pt_source, source_l)) {
+	if(points_to_cell_equal_p(pt_source, source)) {
+	  /* We must generate a new source with the offset defined by sel,
+	     and a new sink, with or without a an offset */
+	  cell pt_sink = points_to_sink(pt);
+	  cell n_source = cell_undefined;
+
+	  /* Update the source cell */
+	  if(null_cell_p(pt_source)) {
+	    pips_internal_error("NULL cannot be a source cell.\n");;
+	  }
+	  else if(anywhere_cell_p(pt_source)
+		  || cell_typed_anywhere_locations_p(pt_source)) {
+	    pips_internal_error("Not sure what should be done here!\n");
+	  }
+	  else {
+	    n_source = copy_cell(pt_source);
+	    reference n_source_r = cell_any_reference(n_source);
+	    if(adapt_reference_to_type(n_source_r, at,
+				       points_to_context_statement_line_number)) {
+	      reference_indices(n_source_r) = gen_nconc(reference_indices(n_source_r),
+							gen_full_copy_list(sel));
+	      complete_points_to_reference_with_zero_subscripts(n_source_r);
+	    }
+	    else
+	      pips_internal_error("No idea how to deal with this source cell.\n");
+	  }
+
+	  /* Is the source cell already known in the points-to relation? */
+
+	  if(!cell_undefined_p(n_source) && !source_in_pt_map_p(n_source, in)) {
+	    cell n_sink = copy_cell(pt_sink);
+
+	    /* Update the sink cell if necessary */
+	    if(null_cell_p(pt_sink)) {
+	      ;
+	    }
+	    else if(anywhere_cell_p(pt_sink)
+		    || cell_typed_anywhere_locations_p(pt_sink)) {
+	      ;
+	    }
+	    else {
+	      reference n_sink_r = cell_any_reference(n_sink);
+	      if(adapt_reference_to_type(n_sink_r, apt,
+					 points_to_context_statement_line_number)) {
+		reference_indices(n_sink_r) = gen_nconc(reference_indices(n_sink_r),
+							gen_full_copy_list(sel));
+		complete_points_to_reference_with_zero_subscripts(n_sink_r);
+	      }
+	      else
+		pips_internal_error("No idea how to deal with this sink cell.\n");
+	    }
+
+	    /* Build the new points-to arc */
+	    approximation ap = copy_approximation(points_to_approximation(pt));
+	    points_to n_pt = make_points_to(n_source, n_sink, ap,
+					    make_descriptor_none());
+	    /* Do not update set "in" while you are enumerating its elements */
+	    n_arc_l = CONS(POINTS_TO, n_pt, n_arc_l);
+	  }
+	  else
+	    free_cell(n_source);
+	}
+      }
+    }
+  }
+
+  /* Update sets "in" with the new arcs. The arc must pre-exist the
+     reference for the effects to be able to translate a non-constant
+     effect. Thus, it should pre-exist the call site. */
+  FOREACH(POINTS_TO, n_pt, n_arc_l) {
+    add_arc_to_pt_map(n_pt, in);
+    add_arc_to_statement_points_to_context(copy_points_to(n_pt));
+    add_arc_to_points_to_context(copy_points_to(n_pt));
+  }
+  gen_free_list(n_arc_l);
+
+  /* FI: I am not sure this is useful... */
+  in = expression_to_points_to(a, in, false); // side effects
+
+  in = expressions_to_points_to(sel, in, false);
+
+  free_type(at);
+  return in;
+}
+
 
 /* Make sure that expression p can be dereferenced in points-to graph "in" 
  *
@@ -106,13 +233,43 @@ pt_map dereferencing_to_points_to(expression p, pt_map in)
       break;
     }
     case is_syntax_call: {
+      call c = syntax_call(s);
+      list al = call_arguments(c);
+      
       // FI: you do not want to apply side-effects twice...
       // But you then miss the detection of pointers that are not NULL
-      // because they are dereferenced
-      //call c = syntax_call(s);
-      //list al = call_arguments(c);
-      //in = expressions_to_points_to(al, in);
-      //in = call_to_points_to(c, in);
+      // because they are dereferenced and you miss the recursive descent
+      //in = expressions_to_points_to(al, in, false);
+      //in = call_to_points_to(c, in, el, false);
+      
+      /* You must take care of s.tab, which is encoded by a call */
+      entity f = call_function(c);
+      if(ENTITY_FIELD_P(f)) {
+	expression ae = EXPRESSION(CAR(al));
+	expression fe = EXPRESSION(CAR(CDR(al)));
+	/* EffectsWithPointsTo/struct08.c: ae = (e.champ)[i], fe = p*/
+	//pips_assert("ae and fe are references",
+	//	    expression_reference_p(ae) && expression_reference_p(fe));
+	pips_assert("fe is a reference", expression_reference_p(fe));
+	reference fr = expression_reference(fe);
+	entity fv = reference_variable(fr);
+	type ft = entity_basic_concrete_type(fv);
+	if(pointer_type_p(ft) || struct_type_p(ft)
+	   || array_of_pointers_type_p(ft) 
+	   || array_of_struct_type_p(ft)) {
+	  in = dereferencing_to_points_to(ae, in);
+	  /* For side effects on "in" */
+	  list sink_l = expression_to_points_to_sinks(p, in);
+	  gen_free_list(sink_l);
+	}
+      }
+      else {
+	// Do not take side-effects into account or they will be applied twice
+	in = expressions_to_points_to(al, in, false);
+	in = call_to_points_to(c, in, NIL, false);
+	list sl = expression_to_points_to_sinks(p, in);
+	gen_free_list(sl);
+      }
       break;
     }
     case is_syntax_cast: {
@@ -135,14 +292,8 @@ pt_map dereferencing_to_points_to(expression p, pt_map in)
       break;
     }
     case is_syntax_subscript: {
-      //subscript sub = syntax_subscript(s);
-      //expression a = subscript_array(sub);
-      //list sel = subscript_indices(sub);
-      /* a cannot evaluate to null or undefined */
-      /* FI: we may need a special case for stubs... */
-      //out = dereferencing_to_points_to(a, in);
-      //out = expression_to_points_to(a, out);
-      //out = expressions_to_points_to(sel, out);
+      subscript sub = syntax_subscript(s);
+      in = dereferencing_subscript_to_points_to(sub, in);
       break;
     }
     case is_syntax_application: {
@@ -199,6 +350,7 @@ pt_map reference_dereferencing_to_points_to(reference r,
   list sl = reference_indices(r);
 
   /* Does the reference implies some dereferencing itself? */
+  // FI: I do not remember what this means; examples are nice
   if(pointer_points_to_reference_p(r)) {
     pointer_reference_dereferencing_to_points_to(r, in);
   }
@@ -215,31 +367,40 @@ pt_map reference_dereferencing_to_points_to(reference r,
     ;
   }
   else {
-    reference nr = copy_reference(r);
-    cell source = make_cell_reference(nr);
-    /* Remove store-dependent indices */
-    reference_indices(nr) =
-      subscript_expressions_to_constant_subscript_expressions(reference_indices(nr));
-    list sinks = source_to_sinks(source, in, false);
-    int n = (int) gen_length(sinks);
-    FOREACH(CELL, sink, sinks) {
-      if(!nowhere_dereferencing_p && nowhere_cell_p(sink)) {
-	remove_points_to_arcs(source, sink, in);
-	n--;
+    // FI: I am confused here
+    // FI: we might have to do more when a struct or an array is referenced
+    if(pointer_type_p(t) || array_of_pointers_type_p(t)) { // FI: implies ENDP(sl)
+      reference nr = copy_reference(r);
+      cell source = make_cell_reference(nr);
+      /* Remove store-dependent indices */
+      reference_indices(nr) =
+	subscript_expressions_to_constant_subscript_expressions(reference_indices(nr));
+      list sinks = source_to_sinks(source, in, false);
+      int n = (int) gen_length(sinks);
+      FOREACH(CELL, sink, sinks) {
+	if(!nowhere_dereferencing_p && nowhere_cell_p(sink)) {
+	  remove_points_to_arcs(source, sink, in);
+	  n--;
+	}
+	if(!null_dereferencing_p && null_cell_p(sink)) {
+	  remove_points_to_arcs(source, sink, in);
+	  n--;
+	}
       }
-      if(!null_dereferencing_p && null_cell_p(sink)) {
-	remove_points_to_arcs(source, sink, in);
-	n--;
+      if(n==0) {
+	clear_pt_map(in);
+	points_to_graph_bottom(in) = true;
+	if(statement_points_to_context_defined_p())
+	  pips_user_warning("Null or undefined pointer may be dereferenced because of \"%s\" at line %d.\n",
+			    effect_reference_to_string(r),
+			    points_to_context_statement_line_number());
+	else
+	  pips_user_warning("Null or undefined pointer may be dereferenced because of \"%s\".\n",
+			    effect_reference_to_string(r));
       }
-    }
-    if(n==0) {
-      clear_pt_map(in);
-      points_to_graph_bottom(in) = true;
-      pips_user_warning("Null or undefined pointer may be dereferenced because of \"%s\".\n",
-			effect_reference_to_string(r));
-    }
 
-    gen_free_list(sinks);
+      gen_free_list(sinks);
+    }
   }
   return in;
 }
@@ -248,7 +409,7 @@ pt_map reference_dereferencing_to_points_to(reference r,
  *
  * For instance expression "p" can be reduced to reference "p".
  *
- * Expression "p+i" annot be reduced to a reference.
+ * Expression "p+i" cannot be reduced to a source reference, unless i==0.
  *
  * Ad'hoc development for dereferencing_to_sinks.
  */
@@ -282,75 +443,82 @@ list dereferencing_to_sinks(expression a, pt_map in, bool eval_p)
 {
   list sinks = NIL;
   /* Locate the pointer, no dereferencing yet... unless no pointer can
-     be found as in *(p+2) in which case an evaluation occurs in
-     expression_to_points_to_sources(). */
+     be found as in *(p+2) in which case an evaluation occurs/might
+     occur/used to occur in expression_to_points_to_sources(). */
   list cl = expression_to_points_to_sources(a, in);
-  remove_impossible_arcs_to_null(&cl, in);
-  // The pointer may not be found: *(p+i)
-  // list cl = expression_to_points_to_sinks(a, in);
-  bool evaluated_p = !expression_to_points_to_cell_p(a);
-  // evaluated_p = false;
-  if(!evaluated_p || eval_p) {
-    bool null_dereferencing_p
-      = get_bool_property("POINTS_TO_NULL_POINTER_DEREFERENCING");
-    bool nowhere_dereferencing_p
-      = get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
+  if(ENDP(cl)) {
+    // The source may not be found, e.g. *(p+i)
+    //sinks = expression_to_points_to_sinks(a, in);
+    cl = expression_to_points_to_sinks(a, in);
+  }
+  /*else*/ { // Some sources have been found
+    remove_impossible_arcs_to_null(&cl, in);
+    bool evaluated_p = !expression_to_points_to_cell_p(a);
+    // evaluated_p = false;
+    if(!evaluated_p || eval_p) {
+      bool null_dereferencing_p
+	= get_bool_property("POINTS_TO_NULL_POINTER_DEREFERENCING");
+      bool nowhere_dereferencing_p
+	= get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING");
 
-    /* Finds what it is pointing to, memory(p) */
-    FOREACH(CELL, c, cl) {
-      /* Do we want to dereference c? */
-      if( (null_dereferencing_p || !null_cell_p(c))
-	  && (nowhere_dereferencing_p || !nowhere_cell_p(c))) {
-	list o_pointed = source_to_sinks(c, in, true);
-	remove_impossible_arcs_to_null(&o_pointed, in);
-	/* Do not create sharing between elements of "in" and elements of
-	   "sinks". */
-	// list pointed = source_to_sinks(c, in, true);
-	list pointed = gen_full_copy_list(o_pointed);
-	gen_free_list(o_pointed);
-	if(ENDP(pointed)) {
-	  reference r = cell_any_reference(c);
-	  entity v = reference_variable(r);
-	  string words_to_string(list);
-	  pips_user_warning("No pointed location for variable \"%s\" and reference \"%s\"\n",
-			    entity_user_name(v),
-			    words_to_string(words_reference(r, NIL)));
-	  /* The sinks list is empty, whether eval_p is true or not... */
-	}
-	else {
-	  if(!evaluated_p && eval_p) {
-	    FOREACH(CELL, sc, pointed) {
-	      bool to_be_freed;
-	      type t = points_to_cell_to_type(sc, &to_be_freed);
-	      if(!pointer_type_p(t)) {
-		// FI: it might be necessary to allocate a new copy of sc
-		sinks = gen_nconc(sinks, CONS(CELL, sc, NIL));
-	      }
-	      else if(array_type_p(t) || struct_type_p(t)) {
-		/* FI: New cells have been allocated by
-		   source_to_sinks(): side-effects are OK. In
-		   theory... The source code of source_to_sinks() seems
-		   to show that fresh_p is not exploited in all
-		   situations. */
-		//cell nsc = copy_cell(sc);
-		//points_to_cell_add_zero_subscripts(nsc);
-		//sinks = gen_nconc(sinks, CONS(CELL, nsc, NIL));
-		pips_internal_error("sc assume saturated with 0 subscripts and/or field susbscripts.\n");
-	      }
-	      else {
-		list starpointed = extended_source_to_sinks(sc, in);
-		sinks = gen_nconc(sinks, starpointed);
-	      }
-	      if(to_be_freed) free_type(t);
-	    }
+      /* Finds what it is pointing to, memory(p) */
+      FOREACH(CELL, c, cl) {
+	/* Do we want to dereference c? */
+	if( (null_dereferencing_p || !null_cell_p(c))
+	    && (nowhere_dereferencing_p || !nowhere_cell_p(c))) {
+	  list o_pointed = source_to_sinks(c, in, true);
+	  remove_impossible_arcs_to_null(&o_pointed, in);
+	  /* Do not create sharing between elements of "in" and elements of
+	     "sinks". */
+	  // list pointed = source_to_sinks(c, in, true);
+	  list pointed = gen_full_copy_list(o_pointed);
+	  gen_free_list(o_pointed);
+	  if(ENDP(pointed)) {
+	    reference r = cell_any_reference(c);
+	    entity v = reference_variable(r);
+	    string words_to_string(list);
+	    pips_user_warning("No pointed location for variable \"%s\" and reference \"%s\"\n",
+			      entity_user_name(v),
+			      words_to_string(words_reference(r, NIL)));
+	    /* The sinks list is empty, whether eval_p is true or not... */
 	  }
-	  else
-	    sinks = gen_nconc(sinks, pointed);
+	  else {
+	    if(!evaluated_p && eval_p) {
+	      FOREACH(CELL, sc, pointed) {
+		bool to_be_freed;
+		type t = points_to_cell_to_type(sc, &to_be_freed);
+		if(!pointer_type_p(t)) {
+		  // FI: it might be necessary to allocate a new copy of sc
+		  sinks = gen_nconc(sinks, CONS(CELL, sc, NIL));
+		}
+		else if(array_type_p(t) || struct_type_p(t)) {
+		  /* FI: New cells have been allocated by
+		     source_to_sinks(): side-effects are OK. In
+		     theory... The source code of source_to_sinks() seems
+		     to show that fresh_p is not exploited in all
+		     situations. */
+		  //cell nsc = copy_cell(sc);
+		  //points_to_cell_add_zero_subscripts(nsc);
+		  //sinks = gen_nconc(sinks, CONS(CELL, nsc, NIL));
+		  pips_internal_error("sc assume saturated with 0 subscripts and/or field susbscripts.\n");
+		}
+		else {
+		  list starpointed = pointer_source_to_sinks(sc, in);
+		  // sinks = gen_nconc(sinks, starpointed);
+		  sinks = merge_points_to_cell_lists(sinks, starpointed);
+		}
+		if(to_be_freed) free_type(t);
+	      }
+	    }
+	    else
+	      sinks = gen_nconc(sinks, pointed);
+	  }
 	}
       }
     }
+    else
+      sinks = cl;
   }
-  else
-    sinks = cl;
+
   return sinks;
 }
