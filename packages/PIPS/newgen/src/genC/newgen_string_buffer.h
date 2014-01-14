@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of NewGen.
 
@@ -40,6 +40,7 @@ void string_buffer_append(string_buffer, const string);
 void string_buffer_cat(string_buffer, const string, ...);
 void string_buffer_append_sb(string_buffer, const string_buffer);
 void string_buffer_append_list(string_buffer, const list);
+void string_buffer_printf(string_buffer, const string, ...);
 // CONVERSIONS
 string string_buffer_to_string(const string_buffer);
 string string_buffer_to_string_reverse(const string_buffer);
