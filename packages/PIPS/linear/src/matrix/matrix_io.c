@@ -30,40 +30,35 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "assert.h"
+#include <assert.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
 
 #include "matrix.h"
 
-/* void matrix_fprint(File * f, matrice a,n,m): print an (nxm) rational matrix
+/* void matrix_fprint(File * f, matrix a): print a rational matrix
  *
- * Note: the output format is incompatible with matrix_fscan()
+ * Note: the output format is compatible with matrix_fscan()
  */
-void matrix_fprint(f,a)
-FILE * f;
-Pmatrix	a;
-
+void matrix_fprint(FILE * f, Pmatrix	a)
 {
-    int	loop1,loop2;
-    int n =MATRIX_NB_LINES(a);
-    int m = MATRIX_NB_COLUMNS(a);
-    assert(MATRIX_DENOMINATOR(a)!=0);
+  int	i, j;
+  int m = MATRIX_NB_LINES(a);
+  int n = MATRIX_NB_COLUMNS(a);
+  assert(MATRIX_DENOMINATOR(a) != VALUE_ZERO);
 
-    (void) fprintf(f,"\n\n");
-
-    for(loop1=1; loop1<=n; loop1++) {
-	for(loop2=1; loop2<=m; loop2++)
-	    matrix_pr_quot(f, 
-			   MATRIX_ELEM(a,loop1,loop2), 
-			   MATRIX_DENOMINATOR(a));
-	(void) fprintf(f,"\n\n");
+  (void) fprintf(f, "%d %d\n", m, n);
+  (void) fprint_Value(f, MATRIX_DENOMINATOR(a));
+  (void) fprintf(f, "\n");
+  for(i=1; i<=m; i++) {
+    for(j=1; j<=n; j++) {
+      // matrix_pr_quot(f, MATRIX_ELEM(a,i,j), MATRIX_DENOMINATOR(a));
+      fprint_Value(f, MATRIX_ELEM(a,i,j));
+      fprintf(f, " ");
     }
-    (void) fprintf(f," ......denominator = ");
-    (void) fprint_Value(f, MATRIX_DENOMINATOR(a));
     (void) fprintf(f, "\n");
+  }
 }
 
 /* void matrix_print(matrice a): print an (nxm) rational matrix
@@ -130,20 +125,20 @@ int * m;			/* row size */
 	}
 }
 
-/* void matrix_pr_quot(FILE * f, int a, int b): print quotient a/b in a sensible way,
+/* void matrix_pr_quot(FILE * f, int a, int b):
+ *
+ * print quotient a/b in a sensible way,
  * i.e. add a space in front of positive number to compensate for the
  * minus sign of negative number
  *
  * FI: a quoi sert le parametre b? A quoi sert la variable d? =>ARGSUSED
  */
 /*ARGSUSED*/
-void matrix_pr_quot(FILE * f,
-		    Value a,
-		    Value b __attribute__ ((unused)))
-{	
-    if (value_pos_p(a))
-	fprintf(f, " ");
+void matrix_pr_quot(FILE * f, Value a, Value b __attribute__ ((unused)))
+{
+  if (value_pos_p(a))
     fprintf(f, " ");
-    fprint_Value(f, a);
-    fprintf(f, " ");
+  fprintf(f, " ");
+  fprint_Value(f, a);
+  fprintf(f, " ");
 }
