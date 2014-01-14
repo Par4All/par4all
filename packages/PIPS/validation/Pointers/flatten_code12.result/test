@@ -1,23 +1,53 @@
 
-PROPER  EFFECTS
+Points-to for "flatten_code12"
 
-int main()
+
+// Points To IN:
+// stdout -> *NULL* , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
+
+
+// Points To OUT:
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
+
+void flatten_code12(void)
 {
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
-//                               flatten_code12:0`1`foo foo_0
-//             <    is written>: __IO_EFFECTS:LUNS[1] 
-//                               flatten_code12:0`1`foo
-   flatten_code12();
 
-   return 0;
+// Points To: none
+
+   int i = foo_0;
+
+// Points To: none
+
+
+   for(i = 0; i <= 3; i += 1) {
+
+// Points To:
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
+
+      static int foo = 0;
+
+// Points To:
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
+
+
+      foo++;
+
+// Points To:
+// stdout -> *NULL* , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
+
+
+      fprintf(stdout, "foo=%d\n", foo);
+   }
 }
 
-POINTS-TO
+Points-to for \"main\"
 
 
-// Points To IN: none
+// Points To IN:
+// stdout -> *NULL* , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
 
 
 // Points To OUT: none
@@ -25,11 +55,14 @@ POINTS-TO
 int main()
 {
 
-// Points To: none
+// Points To:
+// stdout -> *NULL* , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
 
    flatten_code12();
 
-// Points To: none
+// Points To:
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
 
    return 0;

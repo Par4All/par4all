@@ -25,7 +25,7 @@ int main()
    char *s;
 
 // Points To:
-// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s -> undefined , EXACT
 
    s = "hello\n";
 

@@ -8,7 +8,7 @@ int main()
 
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-   double *p = (int *) malloc(sizeof(double));
+   double *p = (double *) malloc(sizeof(double));
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
    foo(p);
@@ -52,7 +52,7 @@ int main()
 
 //  T() {}
 
-   double *p = (int *) malloc(sizeof(double));
+   double *p = (double *) malloc(sizeof(double));
 
 //  T(x,y,z) {}
 
@@ -78,7 +78,7 @@ int main()
 
 //  P(x,y,z) {x==1, y==2, z==3}
 
-   double *p = (int *) malloc(sizeof(double));
+   double *p = (double *) malloc(sizeof(double));
 
 //  P(x,y,z) {x==1, y==2, z==3}
 
@@ -109,9 +109,9 @@ int main()
 
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-   double *p = (int *) malloc(sizeof(double));
-//             <    is read   >: p foo:_p_1
-//             <    is written>: foo:_p_1
+   double *p = (double *) malloc(sizeof(double));
+//             <    is read   >: p *ANY_MODULE*:*HEAP*_b0
+//             <    is written>: *ANY_MODULE*:*HEAP*_b0
    foo(p);
 //             <    is read   >: x y z
    return x+y+z;
@@ -132,10 +132,8 @@ void foo(double *p)
 
 Cumulated effects for "main" with points-to information
 
-//             <    is read   >: x y z _MALLOC_EFFECTS:_MALLOC_ 
-//                               foo:_p_1
-//             <    is written>: x y z _MALLOC_EFFECTS:_MALLOC_ 
-//                               foo:_p_1
+//             <    is read   >: x y z _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: x y z _MALLOC_EFFECTS:_MALLOC_
 int main()
 {
 //             <    is written>: x y z
@@ -143,9 +141,9 @@ int main()
 
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-   double *p = (int *) malloc(sizeof(double));
-//             <    is read   >: p foo:_p_1
-//             <    is written>: foo:_p_1
+   double *p = (double *) malloc(sizeof(double));
+//             <    is read   >: p *ANY_MODULE*:*HEAP*_b0
+//             <    is written>: *ANY_MODULE*:*HEAP*_b0
    foo(p);
 //             <    is read   >: x y z
    return x+y+z;
@@ -183,7 +181,7 @@ int main()
 
 //  T() {}
 
-   double *p = (int *) malloc(sizeof(double));
+   double *p = (double *) malloc(sizeof(double));
 
 //  T() {}
 
@@ -209,7 +207,7 @@ int main()
 
 //  P(x,y,z) {x==1, y==2, z==3}
 
-   double *p = (int *) malloc(sizeof(double));
+   double *p = (double *) malloc(sizeof(double));
 
 //  P(x,y,z) {x==1, y==2, z==3}
 

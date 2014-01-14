@@ -1,0 +1,157 @@
+
+PROPER  EFFECTS 
+
+list * initialize()
+{
+   list *first, *previous, *nl;
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+   while (!feof(stdin)) {
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: nl _MALLOC_EFFECTS:_MALLOC_
+      nl = malloc(sizeof(list));
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: nl stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+      scanf("%d", &nl->val);
+//             <    is read   >: first
+      if (first!=(void *) 0)
+//             <    is read   >: nl
+//             <    is written>: first
+         first = nl;
+//             <    is read   >: previous
+      if (previous!=(void *) 0) {
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: nl previous
+         previous->next = nl;
+//             <    is read   >: nl
+//             <    is written>: previous
+         previous = nl;
+      }
+   }
+//             <    is read   >: first
+   return first;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// initialize -> undefined , EXACT
+
+list * initialize()
+{
+
+// Points To: none
+
+   list *first, *previous, *nl;
+
+// Points To:
+// first -> undefined , EXACT
+// nl -> undefined , EXACT
+// previous -> undefined , EXACT
+
+   while (!feof(stdin)) {
+
+// Points To:
+// first -> undefined , EXACT
+// nl -> undefined , EXACT
+// previous -> undefined , EXACT
+
+      nl = malloc(sizeof(list));
+
+// Points To:
+// *HEAP*_l_13.next -> undefined , EXACT
+// first -> undefined , EXACT
+// nl -> *HEAP*_l_13 , MAY
+// previous -> undefined , EXACT
+
+      scanf("%d", &nl->val);
+
+// Points To:
+// *HEAP*_l_13.next -> undefined , EXACT
+// first -> undefined , EXACT
+// nl -> *HEAP*_l_13 , MAY
+// previous -> undefined , EXACT
+
+      if (first!=(void *) 0)
+
+// Points To:
+// *HEAP*_l_13.next -> undefined , EXACT
+// first -> undefined , EXACT
+// nl -> *HEAP*_l_13 , MAY
+// previous -> undefined , EXACT
+
+         first = nl;
+
+// Points To:
+// *HEAP*_l_13.next -> undefined , EXACT
+// first -> *HEAP*_l_13 , MAY
+// nl -> *HEAP*_l_13 , MAY
+// previous -> undefined , EXACT
+
+      if (previous!=(void *) 0) {
+
+// Points To:
+// *HEAP*_l_13.next -> undefined , EXACT
+// first -> *HEAP*_l_13 , MAY
+// nl -> *HEAP*_l_13 , MAY
+// previous -> undefined , EXACT
+
+         previous->next = nl;
+
+// Points To: none
+
+         previous = nl;
+      }
+   }
+
+// Points To:
+// first -> undefined , EXACT
+// nl -> undefined , EXACT
+// previous -> undefined , EXACT
+
+   return first;
+}
+
+PROPER EFFECTS WITH POINTS TO
+
+list * initialize()
+{
+   list *first, *previous, *nl;
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+   while (!feof(stdin)) {
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: nl _MALLOC_EFFECTS:_MALLOC_
+      nl = malloc(sizeof(list));
+//             <may be read   >: stdin[0]
+//             <may be written>: *HEAP*_l_13.val stdin[0]
+//             <    is read   >: nl stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+      scanf("%d", &nl->val);
+//             <    is read   >: first
+      if (first!=(void *) 0)
+//             <    is read   >: nl
+//             <    is written>: first
+         first = nl;
+//             <    is read   >: previous
+      if (previous!=(void *) 0) {
+//             <    is read   >: nl previous
+         previous->next = nl;
+//             <    is read   >: nl
+//             <    is written>: previous
+         previous = nl;
+      }
+   }
+//             <    is read   >: first
+   return first;
+}

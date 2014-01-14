@@ -32,14 +32,14 @@ void dereferencing02()
 // Points To:
 // p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // q -> p[0] , EXACT
-// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// w -> undefined , EXACT
 
    int i = 1;
 
 // Points To:
 // p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // q -> p[0] , EXACT
-// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// w -> undefined , EXACT
 
    
    
@@ -48,14 +48,14 @@ void dereferencing02()
 // Points To:
 // p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // q -> p[0] , EXACT
-// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// w -> undefined , EXACT
 
    **(q+(i = 0)) = 3.;
 
 // Points To:
 // p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // q -> p[0] , EXACT
-// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// w -> undefined , EXACT
 
    w = q;
 

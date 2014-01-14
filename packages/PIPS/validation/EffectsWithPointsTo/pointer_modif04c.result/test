@@ -1,0 +1,108 @@
+
+Points-to for "compute_s"
+
+
+// Points To IN:
+// s.tab -> *NULL* , MAY
+// s.tab -> _s_2__1[0] , MAY
+
+
+// Points To OUT:
+// s.tab -> *NULL* , MAY
+// s.tab -> _s_2__1[0] , MAY
+
+void compute_s(s_t s, int max)
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+
+   for(i = 0; i <= max-1; i += 1)
+
+// Points To:
+// s.tab -> *NULL* , MAY
+// s.tab -> _s_2__1[0] , MAY
+
+      (s.tab)[i] = i*2.0;
+
+// Points To:
+// s.tab -> *NULL* , MAY
+// s.tab -> _s_2__1[0] , MAY
+
+
+   return;
+}
+
+Proper effects with points-to for "compute_s"
+
+void compute_s(s_t s, int max)
+{
+   int i;
+//             <    is read   >: max
+//             <    is written>: i
+
+   for(i = 0; i <= max-1; i += 1)
+//             <    is read   >: i max s.tab
+//             <    is written>: _s_2__1[i]
+      (s.tab)[i] = i*2.0;
+
+   return;
+}
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   s_t s;
+
+// Points To:
+// s.tab -> undefined , EXACT
+
+   int j;
+
+// Points To:
+// s.tab -> undefined , EXACT
+
+
+   compute_s(s, 10);
+
+// Points To:
+// s.tab -> undefined , EXACT
+
+
+   return 0;
+}
+
+Proper effects with points-to for "main"
+
+int main()
+{
+   s_t s;
+   int j;
+//             <    is read   >: s.max s.tab
+
+   compute_s(s, 10);
+
+   return 0;
+}
+
+Warnings and errors:
+
+- unitialized value passed down to a callee, here, compute_s()
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "s[tab]" at line 33.
+PROPER_EFFECTS_WITH_POINTS_TO[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "s[tab]".
+PROPER_EFFECTS_WITH_POINTS_TO[main] (backward_translation_of_points_to_formal_context_effect) Effect "compute_s:_s_2__1[*]" of callee "compute_s" cannot be translated. Check that the caller "main" provides initialized parameters.

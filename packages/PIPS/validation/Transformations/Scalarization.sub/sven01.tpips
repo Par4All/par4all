@@ -1,0 +1,23 @@
+delete sven01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+# Suggestion by Mehdi, it is effective, but it does not fic the bug
+# setproperty SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST TRUE
+
+##TODO: explain
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+create sven01 sven01.c
+
+## Needed for substracting set approximations
+activate MUST_REGIONS
+
+setproperty SCALARIZATION_PREFIX "__scalar__"
+apply SCALARIZATION[sven01]
+display PRINTED_FILE[sven01]
+
+close
+delete sven01
+quit
+

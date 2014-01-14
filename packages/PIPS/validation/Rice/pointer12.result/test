@@ -5,7 +5,8 @@ POINTS TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// a.array -> *HEAP*_l_20[0] , MAY
 
 void pointer12(array_2D a)
 {

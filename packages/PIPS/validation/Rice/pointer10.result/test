@@ -93,9 +93,9 @@ void pointer10(double (*a)[10], double (*b)[10], double (*c)[10], int N)
 //             <    is referenced>: N i
 
    for(i = 0; i <= N-1; i += 1)
-//             <may be written>: *HEAP*_l_11[i]
-//             <    is read   >: N _a_1[0][0][i] _b_2[0][0][i] 
-//                               _c_3[0][0][i] a b c i w
+//             <may be written>: *HEAP*_l_11[0][i]
+//             <    is read   >: N _a_1[0][i] _b_2[0][i] _c_3[0][i] a 
+//                               b c i w
 //             <    is referenced>: N a b c i w
       (*w)[i] = (*c)[i]+(*a)[i]*(*b)[i];
 
@@ -118,3 +118,12 @@ void pointer10(double (*a)[10], double (*b)[10], double (*c)[10], int N)
 
    return;
 }
+
+Warnings and errors
+
+unknown[unknown] (activate_phase) Rule `PROPER_EFFECTS' already active
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[pointer10] (points_to_set_block_projection) Memory leak for bucket "pointer10:*HEAP*_l_11".
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning pointer10 instead
+TRANSFORMERS_INTER_FULL[pointer10] (transformer_add_any_relation_information) pointer type not analyzed for operator TOP-LEVEL:__C-non-equal__
+TRANSFORMERS_INTER_FULL[pointer10] (transformer_add_any_relation_information) pointer type not analyzed for operator TOP-LEVEL:__C-non-equal__
+TRANSFORMERS_INTER_FULL[pointer10] (transformer_add_any_relation_information) pointer type not analyzed for operator TOP-LEVEL:__C-non-equal__

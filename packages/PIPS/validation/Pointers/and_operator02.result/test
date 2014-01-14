@@ -23,29 +23,29 @@ int main()
    int *p, *q, *r, *s, *t;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
+// s -> undefined , EXACT
+// t -> undefined , EXACT
 
    p = &k[0];
 
 // Points To:
 // p -> k[0] , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
+// s -> undefined , EXACT
+// t -> undefined , EXACT
 
    r = &i[0];
 
 // Points To:
 // p -> k[0] , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 // r -> i[0] , EXACT
-// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s -> undefined , EXACT
+// t -> undefined , EXACT
 
    q = &j[0];
 
@@ -53,8 +53,8 @@ int main()
 // p -> k[0] , EXACT
 // q -> j[0] , EXACT
 // r -> i[0] , EXACT
-// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s -> undefined , EXACT
+// t -> undefined , EXACT
 
    s = &l[0];
 
@@ -63,7 +63,7 @@ int main()
 // q -> j[0] , EXACT
 // r -> i[0] , EXACT
 // s -> l[0] , EXACT
-// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// t -> undefined , EXACT
 
    /* printf("address of p=%p\n ",p); */
    /*   printf("address of r=%p\n",r); */
@@ -77,7 +77,7 @@ int main()
 // q -> j[0] , EXACT
 // r -> l[0] , EXACT
 // s -> l[0] , EXACT
-// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// t -> undefined , EXACT
 
    if ((p = q)&&(r = s))
 
@@ -86,7 +86,7 @@ int main()
 // q -> j[0] , EXACT
 // r -> l[0] , EXACT
 // s -> l[0] , EXACT
-// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// t -> undefined , EXACT
 
       *p++;
    else
@@ -106,7 +106,7 @@ int main()
 // q -> j[0] , EXACT
 // r -> l[0] , EXACT
 // s -> l[0] , EXACT
-// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// t -> undefined , EXACT
 
 
    return 0;

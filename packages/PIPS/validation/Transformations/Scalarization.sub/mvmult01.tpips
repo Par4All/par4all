@@ -1,0 +1,60 @@
+setenv WS=mvmult01
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+#setproperty PRETTYPRINT_BLOCKS TRUE
+
+##TODO: explain
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+create $WS $WS.c
+
+## Needed for substracting set approximations
+activate MUST_REGIONS
+
+#echo
+#echo Initial code
+#echo
+#display PRINTED_FILE[$WS]
+
+echo
+echo RW regions
+echo
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[$WS]
+# quit
+#echo
+#echo IN regions
+#echo
+#activate PRINT_CODE_IN_REGIONS
+#display PRINTED_FILE[$WS]
+
+
+#echo
+#echo OUT regions
+#echo
+#activate PRINT_CODE_OUT_REGIONS
+#display PRINTED_FILE[$WS]
+
+#echo
+#echo Privatized regions
+#echo
+#activate PRINT_CODE_PRIVATIZED_REGIONS
+#display PRINTED_FILE[$WS]
+
+echo
+echo Code after scalarization
+echo
+
+# Do not play with the scalarization threshold
+# setproperty SCALARIZATION_THRESHOLD 5
+setproperty SCALARIZATION_PREFIX ""
+setproperty SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST TRUE
+apply SCALARIZATION[$WS]
+activate PRINT_CODE
+display PRINTED_FILE[$WS]
+
+close
+delete $WS
+quit

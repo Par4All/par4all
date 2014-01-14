@@ -7,7 +7,7 @@ create pointer06 pointer06.c
 setproperty MEMORY_EFFECTS_ONLY FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "flow-sensitive"
 
-activate PROPER_EFFECTS
+# activate PROPER_EFFECTS
 
 activate PRINT_CODE_POINTS_TO_LIST
 
@@ -26,12 +26,25 @@ activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE
 
 echo
+echo Cumulated effects
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+
+echo
 echo Parallel code
 echo
 
-#activate PRINT_CODE_PROPER_EFFECTS
 display PARALLELPRINTED_FILE
 
 close
-delete pointer06
+
+echo
+echo Error and warnings:
+echo
+
+shell cat pointer06.database/Warnings
+
+#delete pointer06
 quit

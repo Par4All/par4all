@@ -18,7 +18,6 @@ int varargs03(FILE * stream,const char * fmt,...)
   else return(0);
 }
 
-
 int main()
 {
   FILE * s;

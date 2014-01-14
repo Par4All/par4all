@@ -1,0 +1,21 @@
+
+//  <A[PHI1]-W-MAY-{0<=PHI1, PHI1<=441}>
+
+void function_test(int A[500], int i)
+{
+
+//  <A[PHI1]-W-MAY-{0<=PHI1, PHI1<=441}>
+
+   for(i = 0; i <= 21; i += 1)
+
+//  <A[PHI1]-W-MAY-{0<=PHI1, PHI1<=21i, 0<=i, i<=21}>
+
+      A[i*i] = 30;
+}
+void function_test(int A[500], int i)
+{
+   //PIPS generated variable
+   int autogen_0_0;
+   for(autogen_0_0 = 0; autogen_0_0 <= 441; autogen_0_0 += 1)
+      A[autogen_0_0] = 3;
+}

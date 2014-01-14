@@ -1,0 +1,30 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete pictureInterface01
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty CONSTANT_PATH_EFFECTS TRUE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+set PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+##TODO: explain
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+create pictureInterface01 pictureInterface01.c
+
+
+
+
+echo
+echo RW regions
+echo
+activate MUST_REGIONS
+activate PRINT_CODE_PROPER_REGIONS
+display PRINTED_FILE[buildRaster]
+
+
+
+
+close
+delete pictureInterface01
+quit

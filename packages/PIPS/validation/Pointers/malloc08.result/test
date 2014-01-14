@@ -1,31 +1,5 @@
 
-PROPER  EFFECTS
-
-int main(int argc, char *argv[])
-{
-   int *pi;
-   int *qi;
-   int i;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: pi _MALLOC_EFFECTS:_MALLOC_
-
-   pi = (int *) malloc(sizeof(int));
-//             <    is read   >: i
-   if (i>0)
-//             <    is read   >: pi
-//             <    is written>: qi
-      qi = pi;
-   else
-//             <    is written>: qi
-      qi = &i;
-//             <    is read   >: pi _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   free(pi);
-
-   return 0;
-}
-
-POINTS-TO
+Points-to for "main"
 
 
 // Points To IN: none
@@ -41,39 +15,39 @@ int main(int argc, char *argv[])
    int *pi;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pi -> undefined , EXACT
 
    int *qi;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pi -> undefined , EXACT
+// qi -> undefined , EXACT
 
    int i;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pi -> undefined , EXACT
+// qi -> undefined , EXACT
 
 
    pi = (int *) malloc(sizeof(int));
 
 // Points To:
 // pi -> *HEAP*_l_11 , MAY
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// qi -> undefined , EXACT
 
    if (i>0)
 
 // Points To:
 // pi -> *HEAP*_l_11 , MAY
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// qi -> undefined , EXACT
 
       qi = pi;
    else
 
 // Points To:
 // pi -> *HEAP*_l_11 , MAY
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// qi -> undefined , EXACT
 
       qi = &i;
 
@@ -85,11 +59,15 @@ int main(int argc, char *argv[])
    free(pi);
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pi -> undefined , EXACT
+// qi -> *HEAP*_l_11 , MAY
+// qi -> undefined , MAY
 // qi -> i , MAY
 
 
    return 0;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Dangling pointer "main:0`qi".
+
+Warnings and errors: Check that the potential dangling pointer is detected?
+It cannot be detected with our current heap model and without alias analysis.
+

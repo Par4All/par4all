@@ -23,7 +23,8 @@ int main(void)
     **pp = 1;
   }
 
-  // pp points to a dead value in the stack
+  // pp points to a dead value in the stack; pp's value is
+  // indeterminate according to C standard
   printf("%p\n", pp);
 
   // possible segfault.

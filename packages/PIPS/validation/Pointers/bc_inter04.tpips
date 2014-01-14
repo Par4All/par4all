@@ -1,22 +1,49 @@
-delete bc_inter04
+setenv WSPACE=bc_inter04
+delete $WSPACE
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create bc_inter04 bc_inter04.c
+create $WSPACE $WSPACE.c
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 setproperty ABSTRACT_HEAP_LOCATIONS "flow-sensitive"
-setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ALIASING_ACROSS_TYPES TRUE
+
+echo
+echo Points-to for "foo"
+echo
 
 activate PRINT_CODE_POINTS_TO_LIST
-
-echo POINTS TO for "foo"
-echo
 display PRINTED_FILE[foo]
 
+echo
+echo Proper effects for "foo"
+echo
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[foo]
+
+echo
+echo Cumulated effects for "foo"
+echo
+
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[foo]
+
+echo
 echo POINTS TO for "main"
 echo
+
+activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[main]
 
 close
-delete bc_inter04
+
+echo
+echo Warnings and errors
+echo
+shell cat $WSPACE.database/Warnings
+
+delete $WSPACE

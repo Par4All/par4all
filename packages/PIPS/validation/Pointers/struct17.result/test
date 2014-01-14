@@ -1,27 +1,4 @@
 
-PROPER  EFFECTS
-
-int main()
-{
-   int y[10];
-   char z[10];
-   float v[10];
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: x.first
-   *x.first = &y[5];
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: x.second
-   *x.second = &z[6];
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: x.third
-   *x.third = &v[7];
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: x.fourth.fifth
-   *x.fourth.fifth = &v[8];
-
-   return 0;
-}
-
 POINTS-TO
 
 

@@ -27,12 +27,12 @@ void uninitialized01()
    int **pp;
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
    int i;
 
 // Points To:
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
    *pp = &i;
 

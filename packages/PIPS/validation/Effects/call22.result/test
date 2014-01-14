@@ -12,9 +12,13 @@ int main(int argc, char **argv)
 {
 //             <    is written>: size
    int size = 5;
+//             <    is read   >: size
    int in1[size][size][size];
+//             <    is read   >: size
    int out1[size][size][size];
+//             <    is read   >: size
    int in2[size][size][size];
+//             <    is read   >: size
    int out2[size][size][size];
 //             <    is written>: i j k l
    int i = 0, j = 0, k = 0, l = 0;

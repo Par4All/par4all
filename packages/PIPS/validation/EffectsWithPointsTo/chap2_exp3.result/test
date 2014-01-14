@@ -4,10 +4,10 @@ PROPER  EFFECTS
 FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, int partIndex, int overlapSize)
 {
    FLGR_Data2D *dat;
-   int i, k, nbrow, startin;
+//             <    is written>: nbrow
+   int i, nbrow = 10;
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: dat _MALLOC_EFFECTS:_MALLOC_
-   /* dat = (FLGR_Data2D*) flgr_malloc(sizeof(FLGR_Data2D)); */
    dat = (FLGR_Data2D *) malloc(sizeof(FLGR_Data2D));
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: dat overlapSize
@@ -26,6 +26,9 @@ FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, in
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
       (dat->array)[i] = (dat->row)[i]->array;
    }
+//             <    is read   >: dat
+
+   return dat;
 }
 
 POINTS-TO
@@ -36,7 +39,10 @@ POINTS-TO
 // datain -> _datain_1 , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// *HEAP*_l_32.row -> undefined , EXACT
+// *HEAP*_l_32.array -> undefined , EXACT
+// flgr2d_create_pixmap_link -> *HEAP*_l_32 , MAY
 
 FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, int partIndex, int overlapSize)
 {
@@ -46,29 +52,34 @@ FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, in
    FLGR_Data2D *dat;
 
 // Points To:
-// dat -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// dat -> undefined , EXACT
 
-   int i, k, nbrow, startin;
+   int i, nbrow = 10;
 
 // Points To:
-// dat -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// dat -> undefined , EXACT
 
-   /* dat = (FLGR_Data2D*) flgr_malloc(sizeof(FLGR_Data2D)); */
    dat = (FLGR_Data2D *) malloc(sizeof(FLGR_Data2D));
 
 // Points To:
-// dat -> *HEAP*_l_33 , MAY
+// *HEAP*_l_32.row -> undefined , EXACT
+// *HEAP*_l_32.array -> undefined , EXACT
+// dat -> *HEAP*_l_32 , MAY
 
    dat->link_overlap = overlapSize;
 
 // Points To:
-// dat -> *HEAP*_l_33 , MAY
+// *HEAP*_l_32.row -> undefined , EXACT
+// *HEAP*_l_32.array -> undefined , EXACT
+// dat -> *HEAP*_l_32 , MAY
 
 
    for(i = 0; i <= nbrow-overlapSize-1; i += 1) {
 
 // Points To:
-// dat -> *HEAP*_l_33 , MAY
+// *HEAP*_l_32.row -> undefined , EXACT
+// *HEAP*_l_32.array -> undefined , EXACT
+// dat -> *HEAP*_l_32 , MAY
 // datain -> *NULL_POINTER* , MAY
 // datain -> _datain_1 , MAY
 
@@ -82,6 +93,14 @@ FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, in
 
       (dat->array)[i] = (dat->row)[i]->array;
    }
+
+// Points To:
+// *HEAP*_l_32.row -> undefined , EXACT
+// *HEAP*_l_32.array -> undefined , EXACT
+// dat -> *HEAP*_l_32 , MAY
+
+
+   return dat;
 }
 
 PROPER  EFFECTS WITH POINTS TO
@@ -89,20 +108,20 @@ PROPER  EFFECTS WITH POINTS TO
 FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, int partIndex, int overlapSize)
 {
    FLGR_Data2D *dat;
-   int i, k, nbrow, startin;
+//             <    is written>: nbrow
+   int i, nbrow = 10;
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: dat _MALLOC_EFFECTS:_MALLOC_
-   /* dat = (FLGR_Data2D*) flgr_malloc(sizeof(FLGR_Data2D)); */
    dat = (FLGR_Data2D *) malloc(sizeof(FLGR_Data2D));
-//             <may be written>: *HEAP*_l_33.link_overlap
+//             <may be written>: *HEAP*_l_32.link_overlap
 //             <    is read   >: dat overlapSize
    dat->link_overlap = overlapSize;
 //             <    is read   >: nbrow overlapSize
 //             <    is written>: i
 
    for(i = 0; i <= nbrow-overlapSize-1; i += 1) {
-//             <may be read   >: *HEAP*_l_33.row
-//             <may be written>: *HEAP*_l_33.row[i]
+//             <may be read   >: *HEAP*_l_32.row
+//             <may be written>: *HEAP*_l_32.row[i]
 //             <    is read   >: _datain_1.row dat datain i nbrow 
 //                               overlapSize
       (dat->row)[i] = (datain->row)[i];
@@ -111,21 +130,34 @@ FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, in
 //             <    is read   >: dat i nbrow overlapSize
       (dat->array)[i] = (dat->row)[i]->array;
    }
+//             <    is read   >: dat
+
+   return dat;
 }
 
  *********************** Use-Def Chains *********************
 
-	33 --> 34 with conflicts
+	31 --> 35 with conflicts
+		from <nbrow-W-EXACT> to <nbrow-R-EXACT>
+	31 --> 36 with conflicts
+		from <nbrow-W-EXACT> to <nbrow-R-EXACT>
+	31 --> 37 with conflicts
+		from <nbrow-W-EXACT> to <nbrow-R-EXACT>
+	31 --> 38 with conflicts
+		from <nbrow-W-EXACT> to <nbrow-R-EXACT>
+	32 --> 33 with conflicts
 		from <dat-W-EXACT> to <dat-R-EXACT>
-	33 --> 37 with conflicts
+	32 --> 36 with conflicts
 		from <dat-W-EXACT> to <dat-R-EXACT>
-	33 --> 38 with conflicts
+	32 --> 37 with conflicts
 		from <dat-W-EXACT> to <dat-R-EXACT>
-	33 --> 39 with conflicts
+	32 --> 38 with conflicts
 		from <dat-W-EXACT> to <dat-R-EXACT>
-	37 --> 37 with conflicts
-		from <*HEAP*_l_33.row[i]-W-MAY> to <*HEAP*_l_33.row[i]-W-MAY>
-		from <*HEAP*_l_33.row[i]-W-MAY> to <*HEAP*_l_33.row-R-MAY>
-		from <*HEAP*_l_33.row-R-MAY> to <*HEAP*_l_33.row[i]-W-MAY>
+	32 --> 41 with conflicts
+		from <dat-W-EXACT> to <dat-R-EXACT>
+	36 --> 36 with conflicts
+		from <*HEAP*_l_32.row[i]-W-MAY> to <*HEAP*_l_32.row[i]-W-MAY>
+		from <*HEAP*_l_32.row[i]-W-MAY> to <*HEAP*_l_32.row-R-MAY>
+		from <*HEAP*_l_32.row-R-MAY> to <*HEAP*_l_32.row[i]-W-MAY>
 
 ****************** End of Dependence Graph ******************

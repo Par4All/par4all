@@ -1,0 +1,51 @@
+setenv WS=erode01
+delete $WS
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty POINTS_TO_STRICT_POINTER_TYPES FALSE
+
+# Not compatible with the current points-to implementation and CP lattice
+# setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+create $WS $WS.c
+
+
+echo
+echo Points-to for "erode"
+echo
+activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
+#activate PRINT_CODE_POINTS_TO_LIST
+#display PRINTED_FILE[erode]
+
+echo 
+echo Proper effects with points-to for "erode"
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+#activate PRINT_CODE_PROPER_EFFECTS
+#display PRINTED_FILE[erode]
+
+
+echo 
+echo Cumulated effects with points-to for "erode"
+echo
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[erode]
+
+
+
+echo
+echo Code after unrolling
+echo
+
+apply UNROLL[erode]
+loop1
+4
+display PRINTED_FILE[erode]
+
+
+
+close
+shell cat $WS.database/Warnings
+delete $WS
+quit

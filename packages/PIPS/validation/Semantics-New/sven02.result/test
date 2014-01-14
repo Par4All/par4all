@@ -1,0 +1,102 @@
+
+TRANSFORMERS
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(n,x,x0,y,y0) {}
+
+   int x, x0, y, y0, n;
+
+//  T(x,y) {x==x0, y==y0}
+
+   x = x0, y = y0;
+
+//  T(x,y) {x#init==x0, y#init==y0, x#init<=x, x+y<=x#init+y#init}
+
+   
+   
+   
+   if (n>=2) {
+
+//  T() {x==x0, y==y0, 2<=n}
+
+      float z;
+
+//  T(x,y) {2<=n, x#init<=x, x+y<=x#init+y#init, x0<=x, x+y<=x0+y0}
+
+      while (z>0.) {
+
+//  T(x,y) {n+y==y#init+1, x==x#init+1, 2<=n}
+
+         x++, y += 1-n;
+
+//  T() {2<=n}
+
+
+         z -= 1.;
+      }
+
+//  T() {2<=n, x0<=x, x+y<=x0+y0}
+
+      z = 0;
+   }
+
+//  T(main) {main==0, x0<=x, x+y<=x0+y0}
+
+   return 0;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int x, x0, y, y0, n;
+
+//  P(n,x,x0,y,y0) {}
+
+   x = x0, y = y0;
+
+//  P(n,x,x0,y,y0) {x==x0, y==y0}
+
+   
+   
+   
+   if (n>=2) {
+
+//  P(n,x,x0,y,y0) {x==x0, y==y0, 2<=n}
+
+      float z;
+
+//  P(n,x,x0,y,y0) {x==x0, y==y0, 2<=n}
+
+      while (z>0.) {
+
+//  P(n,x,x0,y,y0) {2<=n, x0<=x, x+y<=x0+y0}
+
+         x++, y += 1-n;
+
+//  P(n,x,x0,y,y0) {2<=n, n+x+y<=x0+y0+2, x0+1<=x}
+
+
+         z -= 1.;
+      }
+
+//  P(n,x,x0,y,y0) {2<=n, x0<=x, x+y<=x0+y0}
+
+      z = 0;
+   }
+
+//  P(n,x,x0,y,y0) {x0<=x, x+y<=x0+y0}
+
+   return 0;
+}

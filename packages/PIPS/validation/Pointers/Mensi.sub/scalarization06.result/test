@@ -1,34 +1,13 @@
 
-Initial code
-
-int main(int *x, int *y, int *t)
-{
-   // BEGIN BLOCK
-   int i, n = 100;
-   
-   
-   for(i = 0; i <= n-1; i += 1) {
-      // BEGIN BLOCK
-      t[i] = x[i];
-      x[i] = y[i];
-      y[i] = t[i];
-      // END BLOCK
-   }
-   // END BLOCK
-}
-
 POINTS-TO
 
 
-// Points To IN:
-// t -> _t_3[0] , EXACT
-// x -> _x_1[0] , EXACT
-// y -> _y_2[0] , EXACT
+// Points To IN: none
 
 
 // Points To OUT: none
 
-int main(int *x, int *y, int *t)
+int main(int argc, char **argv)
 {
 
 // Points To: none
@@ -41,113 +20,355 @@ int main(int *x, int *y, int *t)
 
 // Points To: none
 
-   
-   
+   int *x, *y, *t;
+
+// Points To:
+// t -> undefined , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
+
+
+   x = (int *) malloc(sizeof(int));
+
+// Points To:
+// t -> undefined , EXACT
+// x -> *HEAP*_l_23 , MAY
+// y -> undefined , EXACT
+
+   y = (int *) malloc(sizeof(int));
+
+// Points To:
+// t -> undefined , EXACT
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
+
+   t = (int *) malloc(sizeof(int));
+
+// Points To:
+// t -> *HEAP*_l_25 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
+
+
+   for(i = 0; i <= n-1; i += 1)
+
+// Points To:
+// t -> *HEAP*_l_25 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
+
+      scanf("%d %d", &x[i], &y[i]);
+
+// Points To:
+// t -> *HEAP*_l_25 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
+
+
    for(i = 0; i <= n-1; i += 1) {
 
 // Points To:
-// t -> _t_3[0] , EXACT
-// x -> _x_1[0] , EXACT
-// y -> _y_2[0] , EXACT
+// t -> *HEAP*_l_25 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
 
       // BEGIN BLOCK
 
 // Points To:
-// t -> _t_3[0] , EXACT
-// x -> _x_1[0] , EXACT
-// y -> _y_2[0] , MAY
+// t -> *HEAP*_l_25 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
 
-      t[i] = x[i];
+      t[1] = x[i];
 
 // Points To:
-// t -> _t_3[0] , EXACT
-// x -> _x_1[0] , EXACT
-// y -> _y_2[0] , EXACT
+// t -> *HEAP*_l_25 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
 
       x[i] = y[i];
 
 // Points To:
-// t -> _t_3[0] , EXACT
-// x -> _x_1[0] , EXACT
-// y -> _y_2[0] , EXACT
+// t -> *HEAP*_l_25 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
 
-      y[i] = t[i];
+      y[i] = t[1];
       // END BLOCK
    }
+
+// Points To:
+// t -> *HEAP*_l_25 , MAY
+// x -> *HEAP*_l_23 , MAY
+// y -> *HEAP*_l_24 , MAY
+
+   printf("%d %d", x[n-1], y[n-1]);
    // END BLOCK
 }
 
 PROPER  EFFECTS WITH POINTS TO
 
-int main(int *x, int *y, int *t)
+int main(int argc, char **argv)
 {
    // BEGIN BLOCK
 //             <    is written>: n
    int i, n = 100;
+   int *x, *y, *t;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: x _MALLOC_EFFECTS:_MALLOC_
+
+   x = (int *) malloc(sizeof(int));
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: y _MALLOC_EFFECTS:_MALLOC_
+   y = (int *) malloc(sizeof(int));
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: t _MALLOC_EFFECTS:_MALLOC_
+   t = (int *) malloc(sizeof(int));
 //             <    is read   >: n
 //             <    is written>: i
-   
-   
+
+   for(i = 0; i <= n-1; i += 1)
+//             <may be read   >: stdin[0]
+//             <may be written>: *HEAP*_l_23 *HEAP*_l_24 stdin[0]
+//             <    is read   >: i n stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+      scanf("%d %d", &x[i], &y[i]);
+//             <    is read   >: n
+//             <    is written>: i
+
    for(i = 0; i <= n-1; i += 1) {
       // BEGIN BLOCK
-//             <    is read   >: _x_1[i] i n t x
-//             <    is written>: _t_3[i]
-      t[i] = x[i];
-//             <    is read   >: _y_2[i] i n x y
-//             <    is written>: _x_1[i]
+//             <may be read   >: *HEAP*_l_23
+//             <may be written>: *HEAP*_l_25
+//             <    is read   >: i n t x
+      t[1] = x[i];
+//             <may be read   >: *HEAP*_l_24
+//             <may be written>: *HEAP*_l_23
+//             <    is read   >: i n x y
       x[i] = y[i];
-//             <    is read   >: _t_3[i] i n t y
-//             <    is written>: _y_2[i]
-      y[i] = t[i];
+//             <may be read   >: *HEAP*_l_25
+//             <may be written>: *HEAP*_l_24
+//             <    is read   >: i n t y
+      y[i] = t[1];
       // END BLOCK
    }
+//             <may be read   >: *HEAP*_l_23 *HEAP*_l_24 stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: n stdout x y __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d %d", x[n-1], y[n-1]);
    // END BLOCK
 }
 
 RW regions
 
-int main(int *x, int *y, int *t)
+int main(int argc, char **argv)
 {
    // BEGIN BLOCK
    int i, n = 100;
-   
-   
+   int *x, *y, *t;
+
+//  <x-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+
+   x = (int *) malloc(sizeof(int));
+
+//  <y-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   y = (int *) malloc(sizeof(int));
+
+//  <t-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   t = (int *) malloc(sizeof(int));
+
+   for(i = 0; i <= n-1; i += 1)
+
+//  <stdin-R-EXACT-{}>
+//  <stdin[PHI1]-R-MAY-{PHI1==0}>
+//  <stdin[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==0}>
+
+      scanf("%d %d", &x[i], &y[i]);
+
    for(i = 0; i <= n-1; i += 1) {
       // BEGIN BLOCK
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <t-R-EXACT-{}>
+//  <x-R-EXACT-{}>
 
-      t[i] = x[i];
+      t[1] = x[i];
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <x-R-EXACT-{}>
+//  <y-R-EXACT-{}>
 
       x[i] = y[i];
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <t-R-EXACT-{}>
+//  <y-R-EXACT-{}>
 
-      y[i] = t[i];
+      y[i] = t[1];
       // END BLOCK
    }
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <x-R-EXACT-{}>
+//  <y-R-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+   printf("%d %d", x[n-1], y[n-1]);
+   // END BLOCK
+}
+
+IN regions
+
+
+//  <stdin-IN-EXACT-{}>
+//  <stdin[PHI1]-IN-MAY-{PHI1==0}>
+//  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <_MALLOC_EFFECTS:_MALLOC_-IN-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{0<=PHI1, PHI1<=1}>
+
+int main(int argc, char **argv)
+{
+
+//  <stdin-IN-EXACT-{}>
+//  <stdin[PHI1]-IN-MAY-{PHI1==0}>
+//  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <_MALLOC_EFFECTS:_MALLOC_-IN-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{0<=PHI1, PHI1<=1}>
+
+   // BEGIN BLOCK
+   int i, n = 100;
+   int *x, *y, *t;
+
+//  <_MALLOC_EFFECTS:_MALLOC_-IN-EXACT-{}>
+
+
+   x = (int *) malloc(sizeof(int));
+
+//  <_MALLOC_EFFECTS:_MALLOC_-IN-EXACT-{}>
+
+   y = (int *) malloc(sizeof(int));
+
+//  <_MALLOC_EFFECTS:_MALLOC_-IN-EXACT-{}>
+
+   t = (int *) malloc(sizeof(int));
+
+//  <stdin-IN-EXACT-{}>
+//  <stdin[PHI1]-IN-MAY-{PHI1==0, 1<=n}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==0, 1<=n}>
+
+
+   for(i = 0; i <= n-1; i += 1)
+
+//  <stdin-IN-EXACT-{}>
+//  <stdin[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==0}>
+
+      scanf("%d %d", &x[i], &y[i]);
+
+//  <t-IN-EXACT-{}>
+//  <x-IN-EXACT-{}>
+//  <y-IN-EXACT-{}>
+
+
+   for(i = 0; i <= n-1; i += 1) {
+
+//  <t-IN-EXACT-{}>
+//  <x-IN-EXACT-{}>
+//  <y-IN-EXACT-{}>
+
+      // BEGIN BLOCK
+
+//  <t-IN-EXACT-{}>
+//  <x-IN-EXACT-{}>
+
+      t[1] = x[i];
+
+//  <x-IN-EXACT-{}>
+//  <y-IN-EXACT-{}>
+
+      x[i] = y[i];
+
+//  <t-IN-EXACT-{}>
+//  <y-IN-EXACT-{}>
+
+      y[i] = t[1];
+      // END BLOCK
+   }
+
+//  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <x-IN-EXACT-{}>
+//  <y-IN-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==1}>
+
+   printf("%d %d", x[n-1], y[n-1]);
+   // END BLOCK
+}
+
+Privatized regions
+
+int main(int argc, char **argv)
+{
+   // BEGIN BLOCK
+   int i, n = 100;
+   int *x, *y, *t;
+
+   x = (int *) malloc(sizeof(int));
+   y = (int *) malloc(sizeof(int));
+   t = (int *) malloc(sizeof(int));
+
+#pragma omp for private(i)
+   for(i = 0; i <= n-1; i += 1)
+      scanf("%d %d", &x[i], &y[i]);
+
+#pragma omp for private(i)
+   for(i = 0; i <= n-1; i += 1) {
+      // BEGIN BLOCK
+      t[1] = x[i];
+      x[i] = y[i];
+      y[i] = t[1];
+      // END BLOCK
+   }
+   printf("%d %d", x[n-1], y[n-1]);
    // END BLOCK
 }
 
 Code after scalarization
 
-int main(int *x, int *y, int *t)
+int main(int argc, char **argv)
 {
    // BEGIN BLOCK
    int i, n = 100;
-   
-   
+   int *x, *y, *t;
+
+   x = (int *) malloc(sizeof(int));
+   y = (int *) malloc(sizeof(int));
+   t = (int *) malloc(sizeof(int));
+
+   for(i = 0; i <= n-1; i += 1)
+      scanf("%d %d", &x[i], &y[i]);
+
    for(i = 0; i <= n-1; i += 1) {
       // BEGIN BLOCK
-      t[i] = x[i];
+      t[1] = x[i];
       x[i] = y[i];
-      y[i] = t[i];
+      y[i] = t[1];
       // END BLOCK
    }
+   printf("%d %d", x[n-1], y[n-1]);
    // END BLOCK
 }

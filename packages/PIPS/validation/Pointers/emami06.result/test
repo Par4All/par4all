@@ -32,9 +32,9 @@ int main()
    int a = 2, b = 1, **x, **y, *x1 = &a, *y1 = &b;
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
 // x1 -> a , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> undefined , EXACT
 // y1 -> b , EXACT
 
    x = &x1;
@@ -42,7 +42,7 @@ int main()
 // Points To:
 // x -> x1 , EXACT
 // x1 -> a , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> undefined , EXACT
 // y1 -> b , EXACT
 
    y = &y1;

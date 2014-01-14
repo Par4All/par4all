@@ -1,0 +1,133 @@
+
+Initial code
+
+int fusion03(int *D, int *E, int *F)
+{
+   int i, j;
+   for(i = 1; i <= 100; i += 1)
+      D[i] = E[i]+F[i];
+
+   for(j = 1; j <= 100; j += 1)
+      E[j] = D[j]*F[j];
+
+   return 0;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// D -> _D_1[0] , EXACT
+// E -> _E_2[0] , EXACT
+// F -> _F_3[0] , EXACT
+
+
+// Points To OUT:
+// D -> _D_1[0] , EXACT
+// E -> _E_2[0] , EXACT
+// F -> _F_3[0] , EXACT
+
+int fusion03(int *D, int *E, int *F)
+{
+
+// Points To: none
+
+   int i, j;
+
+// Points To: none
+
+   for(i = 1; i <= 100; i += 1)
+
+// Points To:
+// D -> _D_1[0] , EXACT
+// E -> _E_2[0] , EXACT
+// F -> _F_3[0] , EXACT
+
+      D[i] = E[i]+F[i];
+
+// Points To:
+// D -> _D_1[0] , EXACT
+// E -> _E_2[0] , EXACT
+// F -> _F_3[0] , EXACT
+
+
+   for(j = 1; j <= 100; j += 1)
+
+// Points To:
+// D -> _D_1[0] , EXACT
+// E -> _E_2[0] , EXACT
+// F -> _F_3[0] , EXACT
+
+      E[j] = D[j]*F[j];
+
+// Points To:
+// D -> _D_1[0] , EXACT
+// E -> _E_2[0] , EXACT
+// F -> _F_3[0] , EXACT
+
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+
+CUMULATED EFFECTS WITH POINTS TO
+
+//             <may be read   >: _D_1[*] _E_2[*] _F_3[*]
+//             <may be written>: _D_1[*] _E_2[*]
+//             <    is read   >: D E F
+int fusion03(int *D, int *E, int *F)
+{
+   int i, j;
+//             <may be read   >: _E_2[*] _F_3[*]
+//             <may be written>: _D_1[*]
+//             <    is read   >: D E F i
+//             <    is written>: i
+   for(i = 1; i <= 100; i += 1)
+//             <may be read   >: _E_2[*] _F_3[*]
+//             <may be written>: _D_1[*]
+//             <    is read   >: D E F i
+      D[i] = E[i]+F[i];
+//             <may be read   >: _D_1[*] _F_3[*]
+//             <may be written>: _E_2[*]
+//             <    is read   >: D E F j
+//             <    is written>: j
+
+   for(j = 1; j <= 100; j += 1)
+//             <may be read   >: _D_1[*] _F_3[*]
+//             <may be written>: _E_2[*]
+//             <    is read   >: D E F j
+      E[j] = D[j]*F[j];
+
+   return 0;
+}
+
+Code after loop fusion
+
+//             <may be read   >: _D_1[*] _E_2[*] _F_3[*]
+//             <may be written>: _D_1[*] _E_2[*]
+//             <    is read   >: D E F
+int fusion03(int *D, int *E, int *F)
+{
+   int i, j;
+//             <may be read   >: _D_1[*] _E_2[*] _F_3[*]
+//             <may be written>: _D_1[*] _E_2[*]
+//             <    is read   >: D E F i
+//             <    is written>: i
+   for(i = 1; i <= 100; i += 1) {
+//             <may be read   >: _E_2[*] _F_3[*]
+//             <may be written>: _D_1[*]
+//             <    is read   >: D E F i
+      D[i] = E[i]+F[i];
+//             <may be read   >: _D_1[*] _F_3[*]
+//             <may be written>: _E_2[*]
+//             <    is read   >: D E F i
+      E[i] = D[i]*F[i];
+   }
+
+   return 0;
+}
+
+Unsplit resulting code
+

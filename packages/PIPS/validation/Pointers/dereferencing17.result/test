@@ -1,0 +1,48 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+double dereferencing17()
+{
+
+// Points To: none
+
+   double x[3] = {1., 2., 3.};
+
+// Points To: none
+
+   double *p[3] = {&x[0], &x[1], &x[2]};
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+   double **q = &p[0];
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> p[0] , EXACT
+
+
+   q++;
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> p[1] , EXACT
+
+   double *z1 = *q++;
+
+// Points To:
+// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> p[2] , EXACT
+// z1 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+   return *z1;
+}
+
+Warnings
+

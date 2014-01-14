@@ -1,0 +1,135 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i0 = 0, i1 = 1, j = -1;
+
+// Points To: none
+
+   int *p, *q;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+   p = &i0;
+
+// Points To:
+// p -> i0 , EXACT
+// q -> undefined , EXACT
+
+   q = &i1;
+
+// Points To:
+// p -> i0 , EXACT
+// q -> i1 , EXACT
+
+   j = 1?*p:*q;
+
+// Points To:
+// p -> i0 , EXACT
+// q -> i1 , EXACT
+
+
+   return j;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: i0 i1 j
+   int i0 = 0, i1 = 1, j = -1;
+   int *p, *q;
+//             <    is written>: p
+   p = &i0;
+//             <    is written>: q
+   q = &i1;
+//             <may be read   >: i0 i1 p q
+//             <    is written>: j
+   j = 1?*p:*q;
+//             <    is read   >: j
+
+   return j;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i0,i1,j) {i0==0, i1==1, j==-1}
+
+   int i0 = 0, i1 = 1, j = -1;
+
+//  T(p,q) {i0==0, i1==1, j==-1}
+
+   int *p, *q;
+
+//  T(p) {&i0==p, i0==0, i1==1, j==-1}
+
+   p = &i0;
+
+//  T(q) {&i0==p, &i1==q, i0==0, i1==1, j==-1}
+
+   q = &i1;
+
+//  T(j) {&i0==p, &i1==q, i0==0, i1==1, j==0, j#init==-1}
+
+   j = 1?*p:*q;
+
+//  T(main) {&i0==p, &i1==q, i0==0, i1==1, j==0, main==0}
+
+
+   return j;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i0 = 0, i1 = 1, j = -1;
+
+//  P(i0,i1,j) {i0==0, i1==1, j==-1}
+
+   int *p, *q;
+
+//  P(i0,i1,j,p,q) {i0==0, i1==1, j==-1}
+
+   p = &i0;
+
+//  P(i0,i1,j,p,q) {&i0==p, i0==0, i1==1, j==-1}
+
+   q = &i1;
+
+//  P(i0,i1,j,p,q) {&i0==p, &i1==q, i0==0, i1==1, j==-1}
+
+   j = 1?*p:*q;
+
+//  P(i0,i1,j,p,q) {&i0==p, &i1==q, i0==0, i1==1, j==0}
+
+
+   return j;
+}
+
+Warnings
+

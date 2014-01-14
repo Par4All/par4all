@@ -1,0 +1,18 @@
+void main(int argc, char *argv[])
+{
+   {
+      //PIPS generated variable
+      int rank0;
+      //PIPS generated variable
+      MPI_Status status0;
+      //PIPS generated variable
+      MPI_Request request0;
+      //PIPS generated variable
+      unsigned int N;
+      MPI_Init(&argc, &argv);
+      MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
+      if (rank0==0)
+         N = 10;
+   }
+   MPI_Finalize();
+}

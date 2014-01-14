@@ -11,6 +11,7 @@ int main()
    int d3 = 10;
 //             <    is written>: d4
    int d4 = 10;
+//             <    is read   >: d1 d2 d3 d4
    int y[d1][d2][d3][d4];
    int i, j;
 //             <    is read   >: d1

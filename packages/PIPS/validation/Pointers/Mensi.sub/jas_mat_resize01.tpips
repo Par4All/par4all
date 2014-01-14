@@ -1,0 +1,45 @@
+setenv WS=jas_mat_resize01
+delete $WS
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+
+# Not compatible with the current points-to implementation and CP lattice
+# setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+setproperty POINTS_TO_PATH_LIMIT 2
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+create $WS $WS.c
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+
+echo
+echo Points-to for \"$WS\"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[jas_matrix_resize]
+
+echo 
+echo Proper effects with points-to for "jas_matrix_resize"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[jas_matrix_resize]
+
+
+echo 
+echo Cumulated effects with points-to for "jas_matrix_resize"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[jas_matrix_resize]
+
+
+close
+
+echo
+echo Warnings and errors: none expected
+echo
+
+shell cat $WS.database/Warnings
+delete $WS
+quit

@@ -1,0 +1,9 @@
+pips error in transformer_projection_with_redundancy_elimination_and_check: (.../src/Libs/transformer/transformer.c:1303) assertion failed
+
+ 't is weakly consistent' not verified
+
+ 
+i must be equal to 1 at the end
+
+// the effects is strange 
+//             <    is written>: a[i++] i

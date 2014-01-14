@@ -1,0 +1,164 @@
+
+Points-to for "formal_parameter01a"
+
+
+// Points To IN:
+// pi -> *NULL* , MAY
+// pi -> _pi_1[0] , MAY
+
+
+// Points To OUT:
+// _pi_1[1] -> undefined , EXACT
+// pi -> undefined , EXACT
+
+int formal_parameter01a(int **pi)
+{
+
+// Points To: none
+
+   int **q;
+
+// Points To:
+// q -> undefined , EXACT
+
+   int *i;
+
+// Points To:
+// i -> undefined , EXACT
+// q -> undefined , EXACT
+
+   int j;
+
+// Points To:
+// i -> undefined , EXACT
+// q -> undefined , EXACT
+
+
+   i = 0;
+
+// Points To:
+// i -> *NULL* , EXACT
+// pi -> *NULL* , MAY
+// pi -> _pi_1[0] , MAY
+// q -> undefined , EXACT
+
+   q = pi;
+
+// Points To:
+// i -> *NULL* , EXACT
+// pi -> *NULL* , MAY
+// pi -> _pi_1[0] , MAY
+// q -> *NULL* , MAY
+// q -> _pi_1[0] , MAY
+
+   q++;
+
+// Points To:
+// i -> *NULL* , EXACT
+// pi -> *NULL* , MAY
+// pi -> _pi_1[0] , MAY
+// q -> _pi_1[1] , EXACT
+
+   // Incompatible with call site since pi points toward a scalar
+   pi = &i;
+
+// Points To:
+// i -> *NULL* , EXACT
+// pi -> i , EXACT
+// q -> _pi_1[1] , EXACT
+
+   *pi = &j;
+
+// Points To:
+// i -> j , EXACT
+// pi -> i , EXACT
+// q -> _pi_1[1] , EXACT
+
+   *q = &j;
+
+// Points To:
+// _pi_1[1] -> j , EXACT
+// i -> j , EXACT
+// pi -> i , EXACT
+// q -> _pi_1[1] , EXACT
+
+   // Incompatible with call site, see previous comment
+   
+   return 0;
+}
+
+Cumulated effects for "formal_parameter01a"
+
+//             <    is read   >: pi
+//             <    is written>: _pi_1[1]
+int formal_parameter01a(int **pi)
+{
+   int **q;
+   int *i;
+   int j;
+//             <    is written>: i
+
+   i = 0;
+//             <    is read   >: pi
+//             <    is written>: q
+   q = pi;
+//             <    is read   >: q
+//             <    is written>: q
+   q++;
+//             <    is written>: pi
+   // Incompatible with call site since pi points toward a scalar
+   pi = &i;
+//             <    is read   >: pi
+//             <    is written>: i
+   *pi = &j;
+//             <    is read   >: q
+//             <    is written>: _pi_1[1]
+   *q = &j;
+   // Incompatible with call site, see previous comment
+   
+   return 0;
+}
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: unreachable
+
+int main()
+{
+
+// Points To: none
+
+   int i, *ip, **aipp;
+
+// Points To:
+// aipp -> undefined , EXACT
+// ip -> undefined , EXACT
+
+   ip = &i;
+
+// Points To:
+// aipp -> undefined , EXACT
+// ip -> i , EXACT
+
+   aipp = &ip;
+
+// Points To:
+// aipp -> ip , EXACT
+// ip -> i , EXACT
+
+   i = formal_parameter01a(aipp);
+
+// Points To: unreachable
+
+   return 0;
+}
+
+Warnings and errors
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[formal_parameter01a] (points_to_set_block_projection) Dangling pointer "_pi_1" towards "j".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (compute_points_to_gen_set) Points-to source cell sr1="_pi_1[1]" could not be translated but has to be.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Incompatibility between call site and callee's output.

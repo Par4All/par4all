@@ -37,7 +37,7 @@ pointer alloc_pointer(int v)
    pointer p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 
    p = malloc(sizeof(int));
 
@@ -52,76 +52,7 @@ pointer alloc_pointer(int v)
    return p;
 }
 
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main(void)
-{
-
-// Points To: none
-
-   pointer p1;
-   //PIPS generated variable
-
-// Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-
-   pointer _return0;
-   {
-      //PIPS generated variable
-
-// Points To:
-// _return0 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-
-      int v0 = 13;
-      {
-
-// Points To:
-// _return0 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-
-         pointer p;
-
-// Points To:
-// _return0 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-
-         p = malloc(sizeof(int));
-
-// Points To:
-// _return0 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *HEAP*_l_11 , MAY
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-
-         *p = v0;
-
-// Points To:
-// _return0 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p -> *HEAP*_l_11 , MAY
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-
-         _return0 = p;
-      }
-   }
-
-// Points To:
-// _return0 -> *HEAP*_l_11 , MAY
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-
-   p1 = _return0;
-
-// Points To:
-// _return0 -> *HEAP*_l_11 , MAY
-// p1 -> *HEAP*_l_11 , MAY
-
-   return;
-}
-
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 pointer alloc_pointer(int v)
 {
@@ -135,35 +66,8 @@ pointer alloc_pointer(int v)
 //             <    is read   >: p
    return p;
 }
-int main(void)
-{
-   pointer p1;
-   //PIPS generated variable
-   pointer _return0;
-   {
-      //PIPS generated variable
-//             <    is written>: v0
-      int v0 = 13;
-      {
-         pointer p;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-         p = malloc(sizeof(int));
-//             <may be written>: *HEAP*_l_11
-//             <    is read   >: p v0
-         *p = v0;
-//             <    is read   >: p
-//             <    is written>: _return0
-         _return0 = p;
-      }
-   }
-//             <    is read   >: _return0
-//             <    is written>: p1
-   p1 = _return0;
-   return;
-}
 
-CUMULATED  EFFECTS WITH POINTS TO
+CUMULATED EFFECTS WITH POINTS TO
 
 //             <    is read   >: v _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
@@ -179,33 +83,76 @@ pointer alloc_pointer(int v)
 //             <    is read   >: p
    return p;
 }
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+POINTS TO for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
 int main(void)
 {
+
+// Points To: none
+
    pointer p1;
    //PIPS generated variable
+
+// Points To:
+// p1 -> undefined , EXACT
+
    pointer _return0;
    {
       //PIPS generated variable
-//             <    is written>: v0
+
+// Points To:
+// _return0 -> undefined , EXACT
+// p1 -> undefined , EXACT
+
       int v0 = 13;
       {
+
+// Points To:
+// _return0 -> undefined , EXACT
+// p1 -> undefined , EXACT
+
          pointer p;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+
+// Points To:
+// _return0 -> undefined , EXACT
+// p -> undefined , EXACT
+// p1 -> undefined , EXACT
+
          p = malloc(sizeof(int));
-//             <may be written>: *HEAP*_l_11
-//             <    is read   >: p v0
+
+// Points To:
+// _return0 -> undefined , EXACT
+// p -> *HEAP*_l_11 , MAY
+// p1 -> undefined , EXACT
+
          *p = v0;
-//             <    is read   >: p
-//             <    is written>: _return0
+
+// Points To:
+// _return0 -> undefined , EXACT
+// p -> *HEAP*_l_11 , MAY
+// p1 -> undefined , EXACT
+
          _return0 = p;
       }
    }
-//             <    is read   >: _return0
-//             <    is written>: p1
+
+// Points To:
+// _return0 -> *HEAP*_l_11 , MAY
+// p1 -> undefined , EXACT
+
    p1 = _return0;
+
+// Points To:
+// _return0 -> *HEAP*_l_11 , MAY
+// p1 -> *HEAP*_l_11 , MAY
+
    return;
 }
 unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active

@@ -11,6 +11,13 @@ activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[main]
 
+#echo
+#echo Proper effects for "main"
+#echo
+#activate PROPER_EFFECTS_WITH_POINTS_TO
+#activate PRINT_CODE_PROPER_EFFECTS[main]
+#display PRINTED_FILE[main]
+
 close
 shell cat $WS.database/Warnings
 delete $WS

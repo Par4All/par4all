@@ -34,8 +34,12 @@ int main()
    int *r;
 //             <    is written>: r
    r = foo();
-
-   return 0;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   
+   /* r's value is indeterminate and the dereferencement is forbidden
+      * by the standard.
+      */
+   return *r;
 }
 int *foo();
 
@@ -47,7 +51,8 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: unreachable
+// Points To OUT:
+// foo -> undefined , EXACT
 
 int * foo()
 {
@@ -62,35 +67,35 @@ int * foo()
    //PIPS generated variable
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
    int *foo;
 
 // Points To:
-// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// foo -> undefined , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
 
    p = &i;
 
 // Points To:
-// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// foo -> undefined , EXACT
 // p -> i , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
    q = &j;
 
 // Points To:
-// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// foo -> undefined , EXACT
 // p -> i , EXACT
 // q -> j , EXACT
 
 //:   BEGIN UNSTRUCTURED
 
 // Points To:
-// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// foo -> undefined , EXACT
 // p -> i , EXACT
 // q -> j , EXACT
 
@@ -98,7 +103,7 @@ int * foo()
    if (cond) goto l99999;
 
 // Points To:
-// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// foo -> undefined , EXACT
 // p -> i , EXACT
 // q -> j , EXACT
 
@@ -107,14 +112,14 @@ int * foo()
 l99999:   ;
 
 // Points To:
-// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// foo -> undefined , EXACT
 // p -> i , EXACT
 // q -> j , EXACT
 
    foo = p;
 
 // Points To:
-// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// foo -> undefined , EXACT
 // p -> i , EXACT
 // q -> j , EXACT
 
@@ -135,14 +140,18 @@ int main()
    int *r;
 
 // Points To:
-// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> undefined , EXACT
 
    r = foo();
 
-// Points To: unreachable
+// Points To:
+// r -> undefined , EXACT
 
-
-   return 0;
+   
+   /* r's value is indeterminate and the dereferencement is forbidden
+      * by the standard.
+      */
+   return *r;
 }
 
 // Points To IN: none
@@ -195,8 +204,12 @@ int main()
    int *r;
 //             <    is written>: r
    r = foo();
-
-   return 0;
+//             <    is read   >: r
+   
+   /* r's value is indeterminate and the dereferencement is forbidden
+      * by the standard.
+      */
+   return *r;
 }
 int *foo();
 
@@ -204,5 +217,7 @@ int main();
 
  *********************** Use-Def Chains *********************
 
+	21 --> -1 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
 
 ****************** End of Dependence Graph ******************

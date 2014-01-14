@@ -15,40 +15,40 @@ int main()
    int *p, *q, *r;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
 
    int a;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
 
    void *s;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
+// s -> undefined , EXACT
 
    p = (int *) calloc(2, sizeof(int));
 
 // Points To:
 // p -> *HEAP*_l_8[0] , MAY
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
+// s -> undefined , EXACT
 
    q = (int *) calloc(2, sizeof(a));
 
 // Points To:
 // p -> *HEAP*_l_8[0] , MAY
 // q -> *HEAP*_l_9[0] , MAY
-// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// r -> undefined , EXACT
+// s -> undefined , EXACT
 
    r = (int *) calloc(1, sizeof(int));
 
@@ -56,7 +56,7 @@ int main()
 // p -> *HEAP*_l_8[0] , MAY
 // q -> *HEAP*_l_9[0] , MAY
 // r -> *HEAP*_l_10[0] , MAY
-// s -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s -> undefined , EXACT
 
    s = calloc(1, 15);
 

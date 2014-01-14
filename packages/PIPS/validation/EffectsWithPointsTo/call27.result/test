@@ -1,0 +1,109 @@
+
+Points-to for call27
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void call27(int *q[10])
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// q[*] -> *HEAP*_l_13 , MAY
+
+      q[i] = (int *) malloc(sizeof(int));
+
+// Points To:
+// q[*] -> *HEAP*_l_13 , MAY
+
+   return;
+}
+
+Proper effects with points-to for call27
+
+void call27(int *q[10])
+{
+   int i;
+//             <    is written>: i
+   for(i = 0; i <= 9; i += 1)
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: q[i] _MALLOC_EFFECTS:_MALLOC_
+      q[i] = (int *) malloc(sizeof(int));
+   return;
+}
+
+Cumulated effects with points-to for call27
+
+//             <may be written>: q[*]
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+void call27(int *q[10])
+{
+   int i;
+//             <may be written>: q[*]
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: i _MALLOC_EFFECTS:_MALLOC_
+   for(i = 0; i <= 9; i += 1)
+//             <may be written>: q[*]
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+      q[i] = (int *) malloc(sizeof(int));
+   return;
+}
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *ap[10];
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   call27(ap);
+
+// Points To:
+// ap[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   *ap[4] = 3;
+
+// Points To: unreachable
+
+   return 0;
+}
+
+Proper effects with points-to for "main"
+
+int main()
+{
+   int *ap[10];
+//             <may be written>: ap[*]
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+   call27(ap);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: ap[4]
+   *ap[4] = 3;
+   return 0;
+}

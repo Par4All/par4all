@@ -1,0 +1,188 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i, a[10], *p;
+
+// Points To:
+// p -> undefined , EXACT
+
+   p = &a[0];
+
+// Points To:
+// p -> a[0] , EXACT
+
+   i = 0;
+
+// Points To:
+// p -> a[0] , EXACT
+
+
+   while (p<&a[10]) {
+
+// Points To:
+// p -> a[*] , MAY
+// p -> a[0] , MAY
+// p -> a[1] , MAY
+// p -> a[2] , MAY
+// p -> a[3] , MAY
+
+      p++;
+
+// Points To:
+// p -> a[*] , MAY
+// p -> a[1] , MAY
+// p -> a[2] , MAY
+// p -> a[3] , MAY
+
+      i++;
+
+// Points To:
+// p -> a[*] , MAY
+// p -> a[1] , MAY
+// p -> a[2] , MAY
+// p -> a[3] , MAY
+
+      i++;
+   }
+
+// Points To:
+// p -> a[*] , MAY
+// p -> a[0] , MAY
+
+
+   return i;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+   int i, a[10], *p;
+//             <    is written>: p
+   p = &a[0];
+//             <    is written>: i
+   i = 0;
+//             <    is read   >: p
+
+   while (p<&a[10]) {
+//             <    is read   >: p
+//             <    is written>: p
+      p++;
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+   }
+//             <    is read   >: i
+
+   return i;
+}
+
+Transformers with point-to
+
+
+//  T(main) {0<=main}
+
+int main()
+{
+
+//  T(i,p) {}
+
+   int i, a[10], *p;
+
+//  T(p) {&a[0]==p}
+
+   p = &a[0];
+
+//  T(i) {&a[0]==p, i==0}
+
+   i = 0;
+
+//  T(i,p) {&a[0]==p#init, i#init==0, &a[0]+1<=&a[10], p+1<=&a[10],
+//    0<=i}
+
+
+   while (p<&a[10]) {
+
+//  T(p) {p#init+sizeof(int)==p, &a[0]+1<=&a[10], p#init+1<=&a[10]}
+
+      p++;
+
+//  T(i) {i==i#init+1, &a[0]+1<=&a[10], p+1<=&a[10]+sizeof(int)}
+
+      i++;
+
+//  T(i) {i==i#init+1, &a[0]+1<=&a[10], p+1<=&a[10]+sizeof(int)}
+
+      i++;
+   }
+
+//  T(main) {i==main, &a[0]<=p, &a[10]<=p, 0<=i}
+
+
+   return i;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i, a[10], *p;
+
+//  P(i,p) {}
+
+   p = &a[0];
+
+//  P(i,p) {&a[0]==p}
+
+   i = 0;
+
+//  P(i,p) {&a[0]==p, i==0}
+
+
+   while (p<&a[10]) {
+
+//  P(i,p) {&a[0]+1<=&a[10], p+1<=&a[10], 0<=i}
+
+      p++;
+
+//  P(i,p) {&a[0]+1<=&a[10], p+1<=&a[10]+sizeof(int), 0<=i}
+
+      i++;
+
+//  P(i,p) {&a[0]+1<=&a[10], p+1<=&a[10]+sizeof(int), 1<=i}
+
+      i++;
+   }
+
+//  P(i,p) {&a[0]<=p, &a[10]<=p, 0<=i}
+
+
+   return i;
+}
+
+Warnings
+
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if p is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if p is indirectly NULL
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed

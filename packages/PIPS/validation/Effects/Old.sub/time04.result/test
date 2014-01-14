@@ -2,6 +2,7 @@ int main()
 {
 //             <    is written>: n
    int n = 100;
+//             <    is read   >: n
    int a[n];
    struct timeval tic, toc;
    {

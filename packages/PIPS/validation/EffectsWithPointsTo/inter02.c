@@ -25,7 +25,7 @@ int main()
   int y;
   
   x[0] = &y;
-  foo(x);
+  foo(x[0]);
   foo(tab);
   foo(tab2[4]);
   foo(tab3[5]);
@@ -33,7 +33,7 @@ int main()
   foo(&y);
   foo(&(tab[1]));
 
-  printf("%d\n", *x);
+  printf("%d\n", **x);
   printf("%d\n", tab[0]);
   printf("%d\n", tab2[4][0]);
   printf("%d\n", tab3[5][0]);

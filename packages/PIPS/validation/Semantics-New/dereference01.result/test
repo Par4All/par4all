@@ -1,0 +1,276 @@
+
+PROPER EFFECTS 
+
+int main()
+{
+   int a, b;
+   int *p;
+//             <    is written>: p
+
+   p = &a;
+//             <    is written>: a
+   a = 42;
+//             <    is written>: b
+   b = -1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+
+   *p = 1;
+//             <    is read   >: a
+
+   if (a==1)
+//             <    is written>: b
+      b = 1;
+   else
+//             <    is written>: b
+      b = 0;
+//             <    is read   >: b
+
+   return b;
+}
+
+Transformers 
+
+
+//  T(main) {0<=main, main<=1}
+
+int main()
+{
+
+//  T(a,b) {}
+
+   int a, b;
+
+//  T() {}
+
+   int *p;
+
+//  T() {}
+
+
+   p = &a;
+
+//  T(a) {a==42}
+
+   a = 42;
+
+//  T(b) {a==42, b==-1}
+
+   b = -1;
+
+//  T(a,b) {a#init==42, b#init==-1}
+
+
+   *p = 1;
+
+//  T(b) {0<=b, b<=1}
+
+
+   if (a==1)
+
+//  T(b) {a==1, b==1}
+
+      b = 1;
+   else
+
+//  T(b) {b==0}
+
+      b = 0;
+
+//  T(main) {b==main, 0<=b, b<=1}
+
+
+   return b;
+}
+
+Preconditions 
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int a, b;
+
+//  P(a,b) {}
+
+   int *p;
+
+//  P(a,b) {}
+
+
+   p = &a;
+
+//  P(a,b) {}
+
+   a = 42;
+
+//  P(a,b) {a==42}
+
+   b = -1;
+
+//  P(a,b) {a==42, b==-1}
+
+
+   *p = 1;
+
+//  P(a,b) {}
+
+
+   if (a==1)
+
+//  P(a,b) {a==1}
+
+      b = 1;
+   else
+
+//  P(a,b) {}
+
+      b = 0;
+
+//  P(a,b) {0<=b, b<=1}
+
+
+   return b;
+}
+
+PROPER EFFECTS WITH POINTS TO
+
+int main()
+{
+   int a, b;
+   int *p;
+//             <    is written>: p
+
+   p = &a;
+//             <    is written>: a
+   a = 42;
+//             <    is written>: b
+   b = -1;
+//             <    is read   >: p
+//             <    is written>: a
+
+   *p = 1;
+//             <    is read   >: a
+
+   if (a==1)
+//             <    is written>: b
+      b = 1;
+   else
+//             <    is written>: b
+      b = 0;
+//             <    is read   >: b
+
+   return b;
+}
+
+Transformers with points to
+
+
+//  T(main) {main==1}
+
+int main()
+{
+
+//  T(a,b) {}
+
+   int a, b;
+
+//  T() {}
+
+   int *p;
+
+//  T() {}
+
+
+   p = &a;
+
+//  T(a) {a==42}
+
+   a = 42;
+
+//  T(b) {a==42, b==-1}
+
+   b = -1;
+
+//  T(a) {a==1, a#init==42, b==-1}
+
+
+   *p = 1;
+
+//  T(b) {a==1, b==1, b#init==-1}
+
+
+   if (a==1)
+
+//  T(b) {a==1, b==1, b#init==-1}
+
+      b = 1;
+   else
+
+//  T() {0==-1}
+
+      b = 0;
+
+//  T(main) {a==1, b==1, main==1}
+
+
+   return b;
+}
+
+Preconditions with points to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int a, b;
+
+//  P(a,b) {}
+
+   int *p;
+
+//  P(a,b) {}
+
+
+   p = &a;
+
+//  P(a,b) {}
+
+   a = 42;
+
+//  P(a,b) {a==42}
+
+   b = -1;
+
+//  P(a,b) {a==42, b==-1}
+
+
+   *p = 1;
+
+//  P(a,b) {a==1, b==-1}
+
+
+   if (a==1)
+
+//  P(a,b) {a==1, b==-1}
+
+      b = 1;
+   else
+
+//  P() {0==-1}
+
+      b = 0;
+
+//  P(a,b) {a==1, b==1}
+
+
+   return b;
+}

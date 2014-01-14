@@ -3,21 +3,24 @@ Points-to for "init"
 
 
 // Points To IN:
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
+
+
+// Points To OUT:
 // p -> _p_1 , EXACT
-
-
-// Points To OUT: none
 
 void init(int *p)
 {
 
 // Points To:
-// p -> _p_1 , EXACT
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
 
    if (p==(void *) 0)
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 
       exit(1);
    else
@@ -45,24 +48,23 @@ int main()
    int *q = (void *) 0;
 
 // Points To:
-// q -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
 
    if (init_p)
 
 // Points To:
-// q -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
 
       q = (int *) malloc(4*sizeof(int));
 
 // Points To:
 // q -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 
    init(q);
 
 // Points To:
 // q -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// q -> *NULL_POINTER* , MAY
 
    return *q;
 }
@@ -99,32 +101,6 @@ void init(int *p)
 Points-to for "main"
 
 
-// Points To IN:
-// p -> _p_1 , EXACT
-
-
-// Points To OUT: none
-
-void init(int *p)
-{
-
-// Points To:
-// p -> _p_1 , EXACT
-
-   if (p==(void *) 0)
-
-// Points To:
-// p -> *NULL_POINTER* , EXACT
-
-      exit(1);
-   else
-
-// Points To:
-// p -> _p_1 , EXACT
-
-      *p = 0;
-}
-
 // Points To IN: none
 
 
@@ -142,24 +118,23 @@ int main()
    int *q = (void *) 0;
 
 // Points To:
-// q -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
 
    if (init_p)
 
 // Points To:
-// q -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
 
       q = (int *) malloc(4*sizeof(int));
 
 // Points To:
 // q -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 
    init(q);
 
 // Points To:
 // q -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
-// q -> *NULL_POINTER* , MAY
 
    return *q;
 }

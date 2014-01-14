@@ -1,0 +1,54 @@
+setenv WSPACE=array03b
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+#setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
+echo
+echo Points-to for "foo2"
+echo
+display PRINTED_FILE [foo2]
+
+echo
+echo Proper effects for "foo2"
+echo
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE [foo2]
+
+echo
+echo Proper effects for "foo2"
+echo
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE [foo2]
+
+echo
+echo Cumulated effects for "foo2"
+echo
+
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE [foo2]
+
+echo
+echo Proper effects for "main"
+echo
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE [main]
+
+
+activate PRINT_CHAINS_GRAPH
+display DG_FILE 
+
+
+close
+delete $WSPACE
+quit

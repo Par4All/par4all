@@ -1,0 +1,69 @@
+// MPI style
+void main(int argc, char *argv[])
+{
+   {
+      //PIPS generated variable
+      int rank0;
+      //PIPS generated variable
+      MPI_Status status0;
+      //PIPS generated variable
+      MPI_Request request0;
+      //PIPS generated variable
+      int _rtl_0_0, _rtl_0_0_0, _rtl_0_0_1, _rtl_0_0_2, _rtl_0_0_3, _rtl_0_0_4, _rtl_0_0_5, _rtl_0_0_6, _rtl_0_0_7, _rtl_0_0_8;
+      MPI_Init(&argc, &argv);
+      MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
+      if (rank0==0) {
+         InitHarris(in);
+         for(_rtl_0_0_8 = 0; _rtl_0_0_8 <= 1048575; _rtl_0_0_8 += 1)
+            MPI_Isend(&in[_rtl_0_0_8], 1, MPI_FLOAT, 1, 1, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==0) {
+         /* Now we run the Harris procedure */
+         //Sobel
+         SobelX(Gx, in);
+         for(_rtl_0_0_7 = 1025; _rtl_0_0_7 <= 1047550; _rtl_0_0_7 += 1)
+            MPI_Isend(&Gx[_rtl_0_0_7], 1, MPI_FLOAT, 2, 2, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==1) {
+         for(_rtl_0_0_5 = 0; _rtl_0_0_5 <= 1048575; _rtl_0_0_5 += 1)
+            MPI_Recv(&in[_rtl_0_0_5], 1, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         SobelY(Gy, in);
+         for(_rtl_0_0_6 = 1025; _rtl_0_0_6 <= 1047550; _rtl_0_0_6 += 1)
+            MPI_Isend(&Gy[_rtl_0_0_6], 1, MPI_FLOAT, 2, 2, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==0)
+         //Multiply
+         MultiplY(Ixx, Gx, Gx);
+      if (rank0==1)
+         MultiplY(Iyy, Gy, Gy);
+      if (rank0==2) {
+         for(_rtl_0_0_4 = 1025; _rtl_0_0_4 <= 1047550; _rtl_0_0_4 += 1)
+            MPI_Recv(&Gy[_rtl_0_0_4], 1, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(_rtl_0_0_3 = 1025; _rtl_0_0_3 <= 1047550; _rtl_0_0_3 += 1)
+            MPI_Recv(&Gx[_rtl_0_0_3], 1, MPI_FLOAT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         MultiplY(Ixy, Gx, Gy);
+      }
+      if (rank0==0)
+         //Gauss
+         Gauss(Sxx, Ixx);
+      if (rank0==1) {
+         Gauss(Syy, Iyy);
+         for(_rtl_0_0_2 = 1025; _rtl_0_0_2 <= 1047550; _rtl_0_0_2 += 1)
+            MPI_Isend(&Syy[_rtl_0_0_2], 1, MPI_FLOAT, 0, 0, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==2) {
+         Gauss(Sxy, Ixy);
+         for(_rtl_0_0_1 = 1025; _rtl_0_0_1 <= 1047550; _rtl_0_0_1 += 1)
+            MPI_Isend(&Sxy[_rtl_0_0_1], 1, MPI_FLOAT, 0, 0, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==0) {
+         for(_rtl_0_0_0 = 1025; _rtl_0_0_0 <= 1047550; _rtl_0_0_0 += 1)
+            MPI_Recv(&Sxy[_rtl_0_0_0], 1, MPI_FLOAT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(_rtl_0_0 = 1025; _rtl_0_0 <= 1047550; _rtl_0_0 += 1)
+            MPI_Recv(&Syy[_rtl_0_0], 1, MPI_FLOAT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         //Coarsity
+         CoarsitY(out, Sxx, Syy, Sxy);
+      }
+   }
+   MPI_Finalize();
+}

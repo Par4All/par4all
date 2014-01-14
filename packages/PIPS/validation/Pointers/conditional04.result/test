@@ -10,7 +10,9 @@ POINTS-TO
 
 // Points To OUT:
 // conditional04 -> "a" , MAY
-// conditional04 -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// conditional04 -> "b" , MAY
+// conditional04 -> "c" , MAY
+// conditional04 -> undefined , MAY
 // x -> "a" , EXACT
 // y -> "b" , EXACT
 // z -> "c" , EXACT
@@ -23,23 +25,26 @@ char * conditional04(int i)
    char *p[3];
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , EXACT
+// x -> "a" , EXACT
 
    p[0] = x;
 
 // Points To:
 // p[0] -> "a" , EXACT
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , MAY
 // x -> "a" , EXACT
+// y -> "b" , EXACT
 
    p[1] = y;
 
 // Points To:
 // p[0] -> "a" , EXACT
 // p[1] -> "b" , EXACT
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , MAY
 // x -> "a" , EXACT
 // y -> "b" , EXACT
+// z -> "c" , EXACT
 
    p[2] = z;
 
@@ -47,7 +52,7 @@ char * conditional04(int i)
 // p[0] -> "a" , EXACT
 // p[1] -> "b" , EXACT
 // p[2] -> "c" , EXACT
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , MAY
 // x -> "a" , EXACT
 // y -> "b" , EXACT
 // z -> "c" , EXACT
@@ -58,9 +63,11 @@ char * conditional04(int i)
 // p[0] -> "a" , EXACT
 // p[1] -> "b" , EXACT
 // p[2] -> "c" , EXACT
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , MAY
 // r -> "a" , MAY
-// r -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// r -> "b" , MAY
+// r -> "c" , MAY
+// r -> undefined , MAY
 // x -> "a" , EXACT
 // y -> "b" , EXACT
 // z -> "c" , EXACT

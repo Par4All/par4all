@@ -1,0 +1,10 @@
+int main()
+{
+   int A[500];
+   int i = 0;
+   while (i<500) {
+      A[i] = 400;
+      i++;
+   }
+   return A[0];
+}

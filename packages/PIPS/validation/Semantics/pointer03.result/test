@@ -84,3 +84,4 @@ Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning pointer03 instead
+TRANSFORMERS_INTER_FULL[pointer03] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer

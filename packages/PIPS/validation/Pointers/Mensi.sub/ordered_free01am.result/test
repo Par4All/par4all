@@ -1,0 +1,81 @@
+
+POINTS TO for ordered_free01am
+
+
+// Points To IN:
+// fp -> *NULL* , MAY
+// fp -> _fp_1 , MAY
+
+
+// Points To OUT:
+// fp -> *HEAP*_l_7 , MAY
+
+void ordered_free01(int *fp)
+{
+
+// Points To:
+// fp -> *NULL* , MAY
+// fp -> _fp_1 , MAY
+
+   int *fq = fp;
+
+// Points To:
+// fp -> *NULL* , MAY
+// fp -> _fp_1 , MAY
+// fq -> *NULL* , MAY
+// fq -> _fp_1 , MAY
+
+   free(fp);
+
+// Points To:
+// fp -> undefined , EXACT
+// fq -> undefined , MAY
+// fq -> *NULL* , MAY
+
+   fp = (int *) malloc(sizeof(int));
+
+// Points To:
+// fp -> *HEAP*_l_7 , MAY
+// fq -> undefined , MAY
+// fq -> *NULL* , MAY
+
+   return;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void ordered_free01(int *fp)
+{
+//             <    is read   >: fp
+//             <    is written>: fq
+   int *fq = fp;
+//             <    is read   >: fp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(fp);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: fp _MALLOC_EFFECTS:_MALLOC_
+   fp = (int *) malloc(sizeof(int));
+   return;
+}
+
+CUMULATED  EFFECTS WITH POINTS TO
+
+//             <    is read   >: fp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+void ordered_free01(int *fp)
+{
+//             <    is read   >: fp
+//             <    is written>: fq
+   int *fq = fp;
+//             <    is read   >: fp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(fp);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: fp _MALLOC_EFFECTS:_MALLOC_
+   fp = (int *) malloc(sizeof(int));
+   return;
+}
+
+Warnings and errors:
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[ordered_free01] (freed_list_to_points_to) Dangling pointer "fq" has been detected at line 6.

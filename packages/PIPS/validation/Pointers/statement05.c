@@ -1,4 +1,9 @@
+/* See tpips script: dereferencement of undefined and NULL pointers is
+ * allowed...
+ */
+
 #include <stdio.h>
+
 int main() {
   int **x, **y, *z, *t;
   int i, j;

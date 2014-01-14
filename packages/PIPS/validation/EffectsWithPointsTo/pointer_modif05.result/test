@@ -1,0 +1,268 @@
+
+Points-to for "init_s"
+
+
+// Points To IN:
+// ps -> *NULL* , MAY
+// ps -> _ps_1[0] , MAY
+// stderr -> *NULL* , MAY
+// stderr -> _stderr_[0] , MAY
+
+
+// Points To OUT:
+// _ps_1[0].tab -> *HEAP*_l_19[0] , MAY
+// ps -> _ps_1[0] , EXACT
+// stderr -> _stderr_[0] , EXACT
+
+void init_s(s_t *ps, int max)
+{
+
+// Points To:
+// ps -> *NULL* , MAY
+// ps -> _ps_1[0] , MAY
+
+
+   ps->tab = (float *) malloc(max*sizeof(float));
+
+// Points To:
+// _ps_1[0].tab -> *HEAP*_l_19[0] , MAY
+// ps -> _ps_1[0] , EXACT
+
+   ps->max = max;
+
+// Points To:
+// _ps_1[0].tab -> *HEAP*_l_19[0] , MAY
+// ps -> _ps_1[0] , EXACT
+// stderr -> *NULL* , MAY
+// stderr -> _stderr_[0] , MAY
+
+   fprintf(stderr, "In init_s, s.tab=%p\n", ps->tab);
+
+// Points To:
+// _ps_1[0].tab -> *HEAP*_l_19[0] , MAY
+// ps -> _ps_1[0] , EXACT
+// stderr -> _stderr_[0] , EXACT
+
+   return;
+}
+
+Proper effects with points-to for "init_s"
+
+void init_s(s_t *ps, int max)
+{
+//             <    is read   >: max ps _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _ps_1[0].tab _MALLOC_EFFECTS:_MALLOC_
+
+   ps->tab = (float *) malloc(max*sizeof(float));
+//             <    is read   >: max ps
+//             <    is written>: _ps_1[0].max
+   ps->max = max;
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: _ps_1[0].tab ps stderr 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "In init_s, s.tab=%p\n", ps->tab);
+   return;
+}
+
+Points-to for "compute_s"
+
+
+// Points To IN:
+// s.tab -> *NULL* , MAY
+// s.tab -> _s_2__1[0] , MAY
+
+
+// Points To OUT:
+// s.tab -> *NULL* , MAY
+// s.tab -> _s_2__1[0] , MAY
+
+void compute_s(s_t s, int max)
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+
+   for(i = 0; i <= max-1; i += 1)
+
+// Points To:
+// s.tab -> *NULL* , MAY
+// s.tab -> _s_2__1[0] , MAY
+
+      (s.tab)[i] = i*2.0;
+
+// Points To:
+// s.tab -> *NULL* , MAY
+// s.tab -> _s_2__1[0] , MAY
+
+
+   return;
+}
+
+Proper effects with points-to for "compute_s"
+
+void compute_s(s_t s, int max)
+{
+   int i;
+//             <    is read   >: max
+//             <    is written>: i
+
+   for(i = 0; i <= max-1; i += 1)
+//             <    is read   >: i max s.tab
+//             <    is written>: _s_2__1[i]
+      (s.tab)[i] = i*2.0;
+
+   return;
+}
+
+Points-to for "main"
+
+
+// Points To IN:
+// stderr -> *NULL* , MAY
+// stderr -> _stderr_[0] , MAY
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   s_t s;
+
+// Points To:
+// s.tab -> undefined , EXACT
+
+   int i;
+
+// Points To:
+// s.tab -> undefined , EXACT
+// stderr -> *NULL* , MAY
+// stderr -> _stderr_[0] , MAY
+
+
+   init_s(&s, 10);
+
+// Points To:
+// s.tab -> init_s:*HEAP*_l_19[0] , MAY
+// stderr -> _stderr_[0] , EXACT
+
+   fprintf(stderr, "In main, s.tab=%p\n", s.tab);
+
+// Points To:
+// s.tab -> init_s:*HEAP*_l_19[0] , MAY
+// stderr -> _stderr_[0] , EXACT
+
+   
+   // FI: it would be nicer to use &s, but this should work...
+   compute_s(s, 10);
+
+// Points To:
+// s.tab -> init_s:*HEAP*_l_19[0] , MAY
+// stderr -> _stderr_[0] , EXACT
+
+
+   for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// s.tab -> init_s:*HEAP*_l_19[0] , MAY
+// stderr -> _stderr_[0] , EXACT
+
+      fprintf(stderr, "In main, s.tab[i]=%f\n", (s.tab)[i]);
+
+// Points To:
+// s.tab -> init_s:*HEAP*_l_19[0] , MAY
+// stderr -> _stderr_[0] , EXACT
+
+
+   return 0;
+}
+
+Proper effects with points-to for "main"
+
+int main()
+{
+   s_t s;
+   int i;
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: s.tab stderr _MALLOC_EFFECTS:_MALLOC_
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: s.max s.tab _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2]
+
+   init_s(&s, 10);
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: s.tab stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "In main, s.tab=%p\n", s.tab);
+//             <may be written>: init_s:*HEAP*_l_19[*]
+//             <    is read   >: s.max s.tab
+   
+   // FI: it would be nicer to use &s, but this should work...
+   compute_s(s, 10);
+//             <    is written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//             <may be read   >: stderr[0] init_s:*HEAP*_l_19[i]
+//             <may be written>: stderr[0]
+//             <    is read   >: i s.tab stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+      fprintf(stderr, "In main, s.tab[i]=%f\n", (s.tab)[i]);
+
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	40 --> 41 with conflicts
+		from <stderr[0]-W-MAY> to <stderr[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[2]-W-EXACT> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
+		from <stderr[0]-W-MAY> to <stderr[0]-R-MAY>
+		from <s.tab-W-EXACT> to <s.tab-R-EXACT>
+		from <__IO_EFFECTS:LUNS[2]-W-EXACT> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
+		from <stderr[0]-R-MAY> to <stderr[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[2]-R-EXACT> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
+	40 --> 44 with conflicts
+		from <s.tab-W-EXACT> to <s.tab-R-EXACT>
+		from <s.max-W-EXACT> to <s.max-R-EXACT>
+	40 --> 47 with conflicts
+		from <stderr[0]-W-MAY> to <stderr[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[2]-W-EXACT> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
+		from <stderr[0]-W-MAY> to <stderr[0]-R-MAY>
+		from <s.tab-W-EXACT> to <s.tab-R-EXACT>
+		from <__IO_EFFECTS:LUNS[2]-W-EXACT> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
+		from <stderr[0]-R-MAY> to <stderr[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[2]-R-EXACT> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
+	41 --> 47 with conflicts
+		from <stderr[0]-W-MAY> to <stderr[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[2]-W-EXACT> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
+		from <stderr[0]-W-MAY> to <stderr[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[2]-W-EXACT> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
+		from <stderr[0]-R-MAY> to <stderr[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[2]-R-EXACT> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
+	44 --> 47 with conflicts
+		from <init_s:*HEAP*_l_19[*]-W-MAY> to <init_s:*HEAP*_l_19[i]-R-MAY>
+	47 --> 47 with conflicts
+		from <stderr[0]-W-MAY> to <stderr[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[2]-W-EXACT> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
+		from <stderr[0]-W-MAY> to <stderr[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[2]-W-EXACT> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
+		from <stderr[0]-R-MAY> to <stderr[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[2]-R-EXACT> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+Warnings and errors: nothing special expected
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[init_s] (CSafeSizeOfArray) Varying size for array "pointer_modif05!:_IO_FILE^_unused2"
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[init_s] (CSafeSizeOfArray) Not yet supported properly by PIPS
+PROPER_EFFECTS_WITH_POINTS_TO[main] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.

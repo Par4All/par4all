@@ -25,37 +25,37 @@ int main(void)
 
 // Points To:
 // pi1 -> i1 , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
    srand(time((void *) 0));
 
 // Points To:
 // pi1 -> i1 , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
    if (alea())
 
 // Points To:
 // pi1 -> i1 , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
       pp = &pi1;
 
 // Points To:
 // pi1 -> i1 , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> undefined , MAY
 // pp -> pi1 , MAY
 
    *pp = (void *) 0;
 
 // Points To:
-// pi1 -> *NULL_POINTER* , EXACT
+// pi1 -> *NULL* , EXACT
 // pp -> pi1 , EXACT
 
    printf("%p %p \n", pp, pi1);
 
 // Points To:
-// pi1 -> *NULL_POINTER* , EXACT
+// pi1 -> *NULL* , EXACT
 // pp -> pi1 , EXACT
 
    return 0;

@@ -1,1 +1,1 @@
-Wait for stabilization of points-to analysis and its coupling with points-to-with-effects
+seems to be a translation issue for effects_with_points_to(). See comments in C file.

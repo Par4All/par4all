@@ -3,11 +3,12 @@ POINTS-TO
 
 
 // Points To IN:
-// x -> *NULL_POINTER* , MAY
+// x -> *NULL* , MAY
 // x -> _x_3[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// x -> _x_3[0] , EXACT
 
 void call06(int r, int m, int *x)
 {
@@ -22,7 +23,7 @@ void call06(int r, int m, int *x)
    for(j = 0; j <= m-1; j += 1)
 
 // Points To:
-// x -> *NULL_POINTER* , MAY
+// x -> *NULL* , MAY
 // x -> _x_3[0] , MAY
 
       x[j] = 10*r+j;
@@ -91,6 +92,7 @@ int main()
    int d1 = 4;
 //             <    is written>: d2
    int d2 = 4;
+//             <    is read   >: d1 d2
    int y[d1][d2];
    int i, j;
 //             <    is read   >: d1
@@ -105,10 +107,14 @@ int main()
 
  *********************** Use-Def Chains *********************
 
+	14 --> 16 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
 	14 --> 19 with conflicts
 		from <d1-W-EXACT> to <d1-R-EXACT>
 	14 --> 20 with conflicts
 		from <d1-W-EXACT> to <d1-R-EXACT>
+	15 --> 16 with conflicts
+		from <d2-W-EXACT> to <d2-R-EXACT>
 	15 --> 20 with conflicts
 		from <d2-W-EXACT> to <d2-R-EXACT>
 	20 --> 20 with conflicts

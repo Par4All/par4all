@@ -4,15 +4,28 @@ create exp_intra_etendu03 exp_intra_etendu03.c
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
-#setenv POINTER_VALUES_DEBUG_LEVEL 3
+
+# Show the iteration control property The initial value used was 4. It
+# can be set to 2 in order to show easily the cycle created to
+# represent unbounded access paths.
+setproperty POINTS_TO_PATH_LIMIT 2
+
 setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
+setproperty POINTS_TO_PATH_LIMIT 4
+
+# This property is an aberration wrt to the constant path lattice:
+# either NULL is included in any stub and then conditions cannot be
+# analyzed or NULL is not included and it must be added explicitly
+
+# Not compatible with the current points-to implementation and CP lattice
+# setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
 
 echo 
 echo PROPER  EFFECTS 
 echo
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[count]
 
 
 
@@ -20,14 +33,14 @@ echo
 echo POINTS-TO
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[count]
 
 echo 
-echo PROPER  EFFECTS WITH POINTS TO
+echo PROPER EFFECTS WITH POINTS TO
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[count]
 
 
 close

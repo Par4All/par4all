@@ -111,12 +111,12 @@ int scalar_renaming02()
    //PIPS generated variable
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    int a0, a1, a2, a3, b0, b1, c0, c1;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    p = &a;                                                              /*0005*/
 

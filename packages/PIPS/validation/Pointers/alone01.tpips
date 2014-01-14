@@ -1,0 +1,36 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete alone01
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty CONSTANT_PATH_EFFECTS TRUE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+
+##TODO: explain
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+setproperty CONSTANT_PATH_EFFECTS FALSE
+create alone01 alone.src/alone01.c
+
+
+
+
+
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[aligned_malloc]
+
+
+
+
+
+
+
+
+
+close
+delete alone01
+quit

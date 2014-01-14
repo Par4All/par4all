@@ -85,111 +85,111 @@ int main()
    int ****p, ***p_1, **p_2, *p_3;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
+// p_1 -> undefined , EXACT
+// p_2 -> undefined , EXACT
+// p_3 -> undefined , EXACT
 
    int i, j;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
+// p_1 -> undefined , EXACT
+// p_2 -> undefined , EXACT
+// p_3 -> undefined , EXACT
 
    int ***q_1, **q_2, *q_3;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q_2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q_3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
+// p_1 -> undefined , EXACT
+// p_2 -> undefined , EXACT
+// p_3 -> undefined , EXACT
+// q_1 -> undefined , EXACT
+// q_2 -> undefined , EXACT
+// q_3 -> undefined , EXACT
 
    i = 0;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q_2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q_3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
+// p_1 -> undefined , EXACT
+// p_2 -> undefined , EXACT
+// p_3 -> undefined , EXACT
+// q_1 -> undefined , EXACT
+// q_2 -> undefined , EXACT
+// q_3 -> undefined , EXACT
 
    j = 1;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_3 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q_2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q_3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
+// p_1 -> undefined , EXACT
+// p_2 -> undefined , EXACT
+// p_3 -> undefined , EXACT
+// q_1 -> undefined , EXACT
+// q_2 -> undefined , EXACT
+// q_3 -> undefined , EXACT
 
    p_3 = &i;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
+// p_1 -> undefined , EXACT
+// p_2 -> undefined , EXACT
 // p_3 -> i , EXACT
-// q_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q_2 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q_3 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q_1 -> undefined , EXACT
+// q_2 -> undefined , EXACT
+// q_3 -> undefined , EXACT
 
    q_3 = &j;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
+// p_1 -> undefined , EXACT
+// p_2 -> undefined , EXACT
 // p_3 -> i , EXACT
-// q_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q_2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q_1 -> undefined , EXACT
+// q_2 -> undefined , EXACT
 // q_3 -> j , EXACT
 
    p_2 = &p_3;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
+// p_1 -> undefined , EXACT
 // p_2 -> p_3 , EXACT
 // p_3 -> i , EXACT
-// q_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q_2 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q_1 -> undefined , EXACT
+// q_2 -> undefined , EXACT
 // q_3 -> j , EXACT
 
    q_2 = &q_3;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// p_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
+// p_1 -> undefined , EXACT
 // p_2 -> p_3 , EXACT
 // p_3 -> i , EXACT
-// q_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q_1 -> undefined , EXACT
 // q_2 -> q_3 , EXACT
 // q_3 -> j , EXACT
 
    p_1 = &p_2;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 // p_1 -> p_2 , EXACT
 // p_2 -> p_3 , EXACT
 // p_3 -> i , EXACT
-// q_1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q_1 -> undefined , EXACT
 // q_2 -> q_3 , EXACT
 // q_3 -> j , EXACT
 
    q_1 = &q_2;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 // p_1 -> p_2 , EXACT
 // p_2 -> p_3 , EXACT
 // p_3 -> i , EXACT

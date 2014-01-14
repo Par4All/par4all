@@ -7,6 +7,14 @@ setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 #setenv POINTER_VALUES_DEBUG_LEVEL 2
 
+activate PROPER_EFFECTS_WITH_POINTS_TO
+
+# The line below can be commented out to understand the strange
+# behavior of pipsmake: all points-to information is recomputed when
+# effects for main are requested.
+
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+
 echo
 echo Points-to for "init_s"
 echo
@@ -18,8 +26,14 @@ echo
 echo Proper effects with points-to for "init_s"
 echo
 
-activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE [init_s]
+
+echo
+echo Cumulated effects with points-to for "init_s"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE [init_s]
 
 echo
@@ -33,8 +47,14 @@ echo
 echo Proper effects with points-to for "compute_s"
 echo
 
-activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE [compute_s]
+
+echo
+echo Cumulated effects with points-to for "compute_s"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE [compute_s]
 
 echo
@@ -48,19 +68,22 @@ echo
 echo Proper effects with points-to for "main"
 echo
 
-activate PROPER_EFFECTS_WITH_POINTS_TO
+#activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE [main]
-
 
 activate PRINT_CHAINS_GRAPH
 display DG_FILE[main]
 
-
 close
 
 echo
-echo Warnings (A memory leak should be detected when exiting init_s)
+echo Warnings:
+echo
+echo  1. A memory leak should be detected when exiting init_s.
+echo
+echo  2. Because struct s is passed by copy, it is left uninitialized
+echo     and the program core dumps
 echo
 shell cat $WSPACE.database/Warnings
 

@@ -55,17 +55,17 @@ void assign06()
    int **ppi, *pi, *qi, i, j, k, l, m;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// qi -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pi -> undefined , EXACT
+// ppi -> undefined , EXACT
+// qi -> undefined , EXACT
 
    ppi = i==0?&pi:&qi;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pi -> undefined , EXACT
 // ppi -> pi , MAY
 // ppi -> qi , MAY
-// qi -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// qi -> undefined , EXACT
 
    pi = i==0?&i:&j;
 
@@ -74,7 +74,7 @@ void assign06()
 // pi -> j , MAY
 // ppi -> pi , MAY
 // ppi -> qi , MAY
-// qi -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// qi -> undefined , EXACT
 
    qi = i==0?&k:&l;
 

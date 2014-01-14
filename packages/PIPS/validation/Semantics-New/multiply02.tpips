@@ -1,0 +1,22 @@
+setenv WS multiply02
+delete $WS
+setproperty ABORT_ON_USER_ERROR TRUE
+create $WS $WS.c
+
+echo
+echo Transformers for "$WS"
+echo
+
+activate PRINT_CODE_TRANSFORMERS 
+display PRINTED_FILE[$WS]
+
+echo
+echo Preconditions for "$WS"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[$WS]
+
+close
+delete $WS
+quit

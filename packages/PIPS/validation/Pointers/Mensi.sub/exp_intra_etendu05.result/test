@@ -42,15 +42,18 @@ list * initialize()
 POINTS-TO
 
 
-// Points To IN: none
+// Points To IN:
+// stdin -> *NULL* , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , MAY
 
 
 // Points To OUT:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // initialize -> *HEAP*_l_17 , MAY
-// initialize -> *NULL_POINTER* , MAY
+// initialize -> *NULL* , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
 list * initialize()
 {
@@ -60,97 +63,109 @@ list * initialize()
    int *pi, i;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pi -> undefined , EXACT
 
    list *l = (void *) 0, *nl;
 
 // Points To:
-// l -> *NULL_POINTER* , EXACT
-// nl -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> *NULL* , EXACT
+// nl -> undefined , EXACT
+// pi -> undefined , EXACT
+// stdin -> *NULL* , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , MAY
 
    while (!feof(stdin)) {
 
 // Points To:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // l -> *HEAP*_l_17 , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
-// nl -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pi -> undefined , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
       scanf("%d", &i);
 
 // Points To:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // l -> *HEAP*_l_17 , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
-// nl -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pi -> undefined , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
       pi = malloc(sizeof(int));
 
 // Points To:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // l -> *HEAP*_l_17 , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
-// nl -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
       *pi = i;
 
 // Points To:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // l -> *HEAP*_l_17 , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
-// nl -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
       nl = malloc(sizeof(list));
 
 // Points To:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.val -> undefined , MAY
+// *HEAP*_l_17.next -> undefined , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // l -> *HEAP*_l_17 , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // pi -> *HEAP*_l_15 , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
       nl->val = pi;
 
 // Points To:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> undefined , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // l -> *HEAP*_l_17 , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // pi -> *HEAP*_l_15 , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
       nl->next = l;
 
 // Points To:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // l -> *HEAP*_l_17 , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
 // pi -> *HEAP*_l_15 , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
       l = nl;
    }
@@ -158,18 +173,19 @@ list * initialize()
 // Points To:
 // *HEAP*_l_17.val -> *HEAP*_l_15 , MAY
 // *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
-// *HEAP*_l_17.next -> *NULL_POINTER* , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
 // l -> *HEAP*_l_17 , MAY
-// l -> *NULL_POINTER* , MAY
+// l -> *NULL* , MAY
 // nl -> *HEAP*_l_17 , MAY
-// nl -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// nl -> undefined , MAY
 // pi -> *HEAP*_l_15 , MAY
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pi -> undefined , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
 
    return l;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 list * initialize()
 {

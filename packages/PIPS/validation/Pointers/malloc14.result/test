@@ -1,0 +1,31 @@
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p = (void *) 0;
+
+// Points To:
+// p -> *NULL* , EXACT
+
+
+   free(p);
+
+// Points To:
+// p -> *NULL* , EXACT
+
+
+   return 0;
+}
+
+Warnings and errors: None
+

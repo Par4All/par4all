@@ -17,10 +17,12 @@ int main()
 {
 //             <    is written>: x y z
    x = 1, y = 2, z = 3;
-
+   
+   // FI: was the meaningless cast to (int *) put here with some purpose
+   // double *p = (int *) malloc(sizeof(double));
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-   double *p = (int *) malloc(sizeof(double));
+   double *p = (double *) malloc(sizeof(double));
 //             <    is read   >: p foo:_p_1
 //             <    is written>: foo:_p_1
    foo(p);

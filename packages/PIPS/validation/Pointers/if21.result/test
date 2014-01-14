@@ -1,0 +1,112 @@
+
+POINTS TO for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i, j, k, l;
+
+// Points To: none
+
+   int **pp[10], *pi = &i, *pj = &j, *pk = &k, *pl = &l;
+
+// Points To:
+// pi -> i , EXACT
+// pj -> j , EXACT
+// pk -> k , EXACT
+// pl -> l , EXACT
+// pp[*] -> undefined , EXACT
+
+   double z;
+
+// Points To:
+// pi -> i , EXACT
+// pj -> j , EXACT
+// pk -> k , EXACT
+// pl -> l , EXACT
+// pp[*] -> undefined , EXACT
+
+
+   if (z>0.)
+
+// Points To:
+// pi -> i , EXACT
+// pj -> j , EXACT
+// pk -> k , EXACT
+// pl -> l , EXACT
+// pp[*] -> undefined , EXACT
+
+      pp[i] = &pi;
+   else
+
+// Points To:
+// pi -> i , EXACT
+// pj -> j , EXACT
+// pk -> k , EXACT
+// pl -> l , EXACT
+// pp[*] -> undefined , EXACT
+
+      pp[j] = &pj;
+
+// Points To:
+// pi -> i , EXACT
+// pj -> j , EXACT
+// pk -> k , EXACT
+// pl -> l , EXACT
+// pp[*] -> undefined , MAY
+// pp[*] -> pi , MAY
+// pp[*] -> pj , MAY
+
+
+   pp[0] = &pk;
+
+// Points To:
+// pi -> i , EXACT
+// pj -> j , EXACT
+// pk -> k , EXACT
+// pl -> l , EXACT
+// pp[*] -> undefined , MAY
+// pp[*] -> pi , MAY
+// pp[*] -> pj , MAY
+// pp[0] -> pk , EXACT
+
+
+   pp[1] = &pl;
+
+// Points To:
+// pi -> i , EXACT
+// pj -> j , EXACT
+// pk -> k , EXACT
+// pl -> l , EXACT
+// pp[*] -> undefined , MAY
+// pp[*] -> pi , MAY
+// pp[*] -> pj , MAY
+// pp[0] -> pk , EXACT
+// pp[1] -> pl , EXACT
+
+
+   pp[l] = &pl;
+
+// Points To:
+// pi -> i , EXACT
+// pj -> j , EXACT
+// pk -> k , EXACT
+// pl -> l , EXACT
+// pp[*] -> undefined , MAY
+// pp[*] -> pi , MAY
+// pp[*] -> pj , MAY
+// pp[0] -> pk , MAY
+// pp[*] -> pl , MAY
+// pp[1] -> pl , MAY
+
+
+   return 0;
+}

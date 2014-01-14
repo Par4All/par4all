@@ -1,0 +1,964 @@
+
+Points-to for "read_towns"
+
+
+// Points To IN:
+// stderr -> *NULL* , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
+
+
+// Points To OUT:
+// read_towns.data -> *HEAP*_l_58[0] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+
+towns read_towns(const  char fname[])
+{
+
+// Points To: none
+
+   FILE *fd = fopen(fname, "r");
+
+// Points To:
+// fd -> *NULL* , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+
+   size_t curr = 0;
+
+// Points To:
+// fd -> *NULL* , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+
+   towns the_towns = {1, malloc(sizeof(town))};
+
+// Points To:
+// fd -> *NULL* , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> *NULL* , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
+// the_towns.data -> *HEAP*_l_31[0] , MAY
+
+   fprintf(stderr, "begin parsing ...\n");
+
+// Points To:
+// fd -> *NULL* , MAY
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_31[0] , MAY
+
+
+   while (!feof(fd)) {
+
+// Points To:
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_31[0] , MAY
+// the_towns.data -> *HEAP*_l_39[0] , MAY
+
+      if (the_towns.nb==curr) {
+
+// Points To:
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_31[0] , MAY
+// the_towns.data -> *HEAP*_l_39[0] , MAY
+
+         the_towns.nb *= 2;
+
+// Points To:
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_31[0] , MAY
+// the_towns.data -> *HEAP*_l_39[0] , MAY
+
+         the_towns.data = realloc(the_towns.data, the_towns.nb*sizeof(town));
+      }
+
+// Points To:
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_31[0] , MAY
+// the_towns.data -> *HEAP*_l_39[0] , MAY
+
+      if (fscanf(fd, "%lf%*[ \t]%lf%*[ \t]%lf", &((the_towns.data)[curr])[0], &((the_towns.data)[curr])[1], &((the_towns.data)[curr])[2])!=3) {
+
+// Points To:
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_31[0] , MAY
+// the_towns.data -> *HEAP*_l_39[0] , MAY
+
+         char c;
+l99999:         ;
+
+// Points To:
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_31[0] , MAY
+// the_towns.data -> *HEAP*_l_39[0] , MAY
+
+         if (!!feof(fd)) goto _break_2;
+
+// Points To:
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_31[0] , MAY
+// the_towns.data -> *HEAP*_l_39[0] , MAY
+
+         c = (char) fgetc(fd);
+
+// Points To:
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_31[0] , MAY
+// the_towns.data -> *HEAP*_l_39[0] , MAY
+
+         if (c=='\n'||c=='\r') {
+         }
+         else {
+            goto l99999;
+         }
+
+// Points To:
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_31[0] , MAY
+// the_towns.data -> *HEAP*_l_39[0] , MAY
+
+_break_2:         ;
+      }
+      else {
+
+// Points To:
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_31[0] , MAY
+// the_towns.data -> *HEAP*_l_39[0] , MAY
+
+         ((the_towns.data)[curr])[0] *= 3.14159265358979323846/180;
+
+// Points To:
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_31[0] , MAY
+// the_towns.data -> *HEAP*_l_39[0] , MAY
+
+         ((the_towns.data)[curr])[1] *= 3.14159265358979323846/180;
+
+// Points To:
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_31[0] , MAY
+// the_towns.data -> *HEAP*_l_39[0] , MAY
+
+         ++curr;
+      }
+   }
+
+// Points To:
+// fd -> __IO_EFFECTS:IO_FILES[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_31[0] , MAY
+// the_towns.data -> *HEAP*_l_39[0] , MAY
+
+   fclose(fd);
+
+// Points To:
+// fd -> undefined , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_31[0] , MAY
+// the_towns.data -> *HEAP*_l_39[0] , MAY
+
+   the_towns.data = realloc(the_towns.data, curr*sizeof(town));
+
+// Points To:
+// fd -> undefined , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_58[0] , MAY
+
+   the_towns.nb = curr;
+
+// Points To:
+// fd -> undefined , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_58[0] , MAY
+
+   fprintf(stderr, "parsed %d towns\n", (int) curr);
+
+// Points To:
+// fd -> undefined , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// the_towns.data -> *HEAP*_l_58[0] , MAY
+
+   /*
+       for(curr=0;curr<the_towns.nb;curr++)
+       fprintf(stderr,OUTPUT_FORMAT,the_towns.data[curr][0],the_towns.data[curr][1],the_towns.data[curr][2]);
+     */
+   return the_towns;
+}
+
+Points-to for "run"
+
+
+// Points To IN:
+// stderr -> *NULL* , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+
+
+// Points To OUT:
+// run.data -> *HEAP*_l_76[0] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+
+towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step, data_t range)
+{
+
+// Points To: none
+
+   size_t i, j;
+
+// Points To: none
+
+   size_t k;
+
+// Points To: none
+
+   size_t rangex = (xmax-xmin)/step, rangey = (ymax-ymin)/step;
+
+// Points To: none
+
+   int nb = 1+rangex*rangey;
+
+// Points To: none
+
+   towns tout = {nb, malloc(sizeof(town)*nb)};
+
+// Points To:
+// stderr -> *NULL* , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
+// tout.data -> *HEAP*_l_76[0] , MAY
+
+   fprintf(stderr, "begin computation ...\n");
+
+// Points To:
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// tout.data -> *HEAP*_l_76[0] , MAY
+
+   fprintf(stderr, "xrange: ""%lf %lf %lf\n", xmin, xmax, (double) rangex);
+
+// Points To:
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// tout.data -> *HEAP*_l_76[0] , MAY
+
+   fprintf(stderr, "yrange: ""%lf %lf %lf\n", ymin, ymax, (double) rangey);
+
+// Points To:
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// tout.data -> *HEAP*_l_76[0] , MAY
+
+
+   for(i = 0; i < rangex; i += 1)
+
+// Points To:
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+// tout.data -> *HEAP*_l_76[0] , MAY
+
+      for(j = 0; j < rangey; j += 1) {
+
+// Points To:
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+// tout.data -> *HEAP*_l_76[0] , MAY
+
+         ((tout.data)[i*rangey+j])[0] = (xmin+step*i)*180/3.14159265358979323846;
+
+// Points To:
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+// tout.data -> *HEAP*_l_76[0] , MAY
+
+         ((tout.data)[i*rangey+j])[1] = (ymin+step*j)*180/3.14159265358979323846;
+
+// Points To:
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+// tout.data -> *HEAP*_l_76[0] , MAY
+
+         ((tout.data)[i*rangey+j])[2] = 0.;
+
+// Points To:
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+// tout.data -> *HEAP*_l_76[0] , MAY
+
+         for(k = 0; k < t.nb-1+1; k += 1) {
+
+// Points To:
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+// tout.data -> *HEAP*_l_76[0] , MAY
+
+            data_t tmp = 6368.*acos(cos(xmin+step*i)*cos(((t.data)[k])[0])*cos(ymin+step*j-((t.data)[k])[1])+sin(xmin+step*i)*sin(((t.data)[k])[0]));
+
+// Points To:
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+// tout.data -> *HEAP*_l_76[0] , MAY
+
+            if (tmp<range)
+
+// Points To:
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+// tout.data -> *HEAP*_l_76[0] , MAY
+
+               ((tout.data)[i*rangey+j])[2] += ((t.data)[k])[2]/(1+tmp);
+         }
+      }
+
+// Points To:
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+// tout.data -> *HEAP*_l_76[0] , MAY
+
+   fprintf(stderr, "end computation ...\n");
+
+// Points To:
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+// tout.data -> *HEAP*_l_76[0] , MAY
+
+   return tout;
+}
+
+Points-to for "display"
+
+
+// Points To IN:
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+
+
+// Points To OUT:
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+
+void display(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step)
+{
+
+// Points To: none
+
+   size_t rangex = (xmax-xmin)/step, rangey = (ymax-ymin)/step;
+
+// Points To: none
+
+   size_t i, j;
+
+// Points To: none
+
+   for(i = 0; i < rangex; i += 1) {
+
+// Points To:
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+
+      for(j = 0; j < rangey; j += 1)
+
+// Points To:
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+
+         printf("%lf %lf %lf\n", ((t.data)[i*rangey+j])[0], ((t.data)[i*rangey+j])[1], ((t.data)[i*rangey+j])[2]);
+
+// Points To:
+// t.data -> *NULL* , MAY
+// t.data -> _t_2__1[0][0] , MAY
+
+      printf("\n");
+   }
+}
+
+Proper effects for "read_towns"
+
+towns read_towns(const  char fname[])
+{
+//             <may be read   >: fname[*] __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <    is written>: fd
+   FILE *fd = fopen(fname, "r");
+//             <    is written>: curr
+   size_t curr = 0;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: the_towns.data the_towns.nb 
+//                               _MALLOC_EFFECTS:_MALLOC_
+   towns the_towns = {1, malloc(sizeof(town))};
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "begin parsing ...\n");
+//             <may be read   >: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
+
+   while (!feof(fd)) {
+//             <    is read   >: curr the_towns.nb
+      if (the_towns.nb==curr) {
+//             <    is read   >: the_towns.nb
+//             <    is written>: the_towns.nb
+         the_towns.nb *= 2;
+//             <    is read   >: the_towns.data the_towns.nb 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: the_towns.data 
+//                               _MALLOC_EFFECTS:_MALLOC_
+         the_towns.data = realloc(the_towns.data, the_towns.nb*sizeof(town));
+      }
+//             <may be read   >: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *HEAP*_l_31[curr][*] 
+//                               *HEAP*_l_31[curr][*] 
+//                               *HEAP*_l_31[curr][*] 
+//                               *HEAP*_l_39[curr][*] 
+//                               *HEAP*_l_39[curr][*] 
+//                               *HEAP*_l_39[curr][*] 
+//                               __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: curr fd the_towns.data the_towns.data
+//                               the_towns.data
+      if (fscanf(fd, "%lf%*[ \t]%lf%*[ \t]%lf", &((the_towns.data)[curr])[0], &((the_towns.data)[curr])[1], &((the_towns.data)[curr])[2])!=3) {
+         char c;
+l99999:         ;
+//             <may be read   >: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
+         if (!!feof(fd)) goto _break_2;
+//             <may be read   >: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
+//             <    is written>: c
+         c = (char) fgetc(fd);
+//             <    is read   >: c
+         if (c=='\n'||c=='\r') {
+         }
+         else {
+            goto l99999;
+         }
+_break_2:         ;
+      }
+      else {
+//             <may be read   >: *HEAP*_l_31[curr][0] 
+//                               *HEAP*_l_39[curr][0]
+//             <may be written>: *HEAP*_l_31[curr][0] 
+//                               *HEAP*_l_39[curr][0]
+//             <    is read   >: curr the_towns.data the_towns.data
+         ((the_towns.data)[curr])[0] *= 3.14159265358979323846/180;
+//             <may be read   >: *HEAP*_l_31[curr][1] 
+//                               *HEAP*_l_39[curr][1]
+//             <may be written>: *HEAP*_l_31[curr][1] 
+//                               *HEAP*_l_39[curr][1]
+//             <    is read   >: curr the_towns.data the_towns.data
+         ((the_towns.data)[curr])[1] *= 3.14159265358979323846/180;
+//             <    is read   >: curr
+//             <    is written>: curr
+         ++curr;
+      }
+   }
+//             <may be read   >: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
+   fclose(fd);
+//             <    is read   >: curr the_towns.data 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: the_towns.data 
+//                               _MALLOC_EFFECTS:_MALLOC_
+   the_towns.data = realloc(the_towns.data, curr*sizeof(town));
+//             <    is read   >: curr
+//             <    is written>: the_towns.nb
+   the_towns.nb = curr;
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: curr stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "parsed %d towns\n", (int) curr);
+//             <    is read   >: the_towns.data the_towns.nb
+   /*
+       for(curr=0;curr<the_towns.nb;curr++)
+       fprintf(stderr,OUTPUT_FORMAT,the_towns.data[curr][0],the_towns.data[curr][1],the_towns.data[curr][2]);
+     */
+   return the_towns;
+}
+
+Proper effects for "run"
+
+towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step, data_t range)
+{
+   size_t i, j;
+   size_t k;
+//             <    is read   >: step xmax xmin ymax ymin
+//             <    is written>: rangex rangey
+   size_t rangex = (xmax-xmin)/step, rangey = (ymax-ymin)/step;
+//             <    is read   >: rangex rangey
+//             <    is written>: nb
+   int nb = 1+rangex*rangey;
+//             <    is read   >: nb _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: tout.data tout.nb 
+//                               _MALLOC_EFFECTS:_MALLOC_
+   towns tout = {nb, malloc(sizeof(town)*nb)};
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "begin computation ...\n");
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: rangex stderr xmax xmin 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "xrange: ""%lf %lf %lf\n", xmin, xmax, (double) rangex);
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: rangey stderr ymax ymin 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "yrange: ""%lf %lf %lf\n", ymin, ymax, (double) rangey);
+//             <    is read   >: rangex
+//             <    is written>: i
+
+   for(i = 0; i < rangex; i += 1)
+//             <    is read   >: rangex rangey
+//             <    is written>: j
+      for(j = 0; j < rangey; j += 1) {
+//             <may be written>: *HEAP*_l_76[i*rangey+j][0]
+//             <    is read   >: i j rangex rangey step tout.data xmin
+         ((tout.data)[i*rangey+j])[0] = (xmin+step*i)*180/3.14159265358979323846;
+//             <may be written>: *HEAP*_l_76[i*rangey+j][1]
+//             <    is read   >: i j rangex rangey step tout.data ymin
+         ((tout.data)[i*rangey+j])[1] = (ymin+step*j)*180/3.14159265358979323846;
+//             <may be written>: *HEAP*_l_76[i*rangey+j][2]
+//             <    is read   >: i j rangex rangey tout.data
+         ((tout.data)[i*rangey+j])[2] = 0.;
+//             <    is read   >: rangex rangey t.nb
+//             <    is written>: k
+         for(k = 0; k < t.nb-1+1; k += 1) {
+//             <    is read   >: _t_2__1[k][0] _t_2__1[k][0] 
+//                               _t_2__1[k][1] i j k step t.data 
+//                               t.data t.data xmin ymin
+//             <    is written>: tmp
+            data_t tmp = 6368.*acos(cos(xmin+step*i)*cos(((t.data)[k])[0])*cos(ymin+step*j-((t.data)[k])[1])+sin(xmin+step*i)*sin(((t.data)[k])[0]));
+//             <    is read   >: range rangex rangey t.nb tmp
+            if (tmp<range)
+//             <may be read   >: *HEAP*_l_76[i*rangey+j][2]
+//             <may be written>: *HEAP*_l_76[i*rangey+j][2]
+//             <    is read   >: _t_2__1[k][2] i j k rangex rangey 
+//                               t.data t.nb tmp tout.data tout.data
+               ((tout.data)[i*rangey+j])[2] += ((t.data)[k])[2]/(1+tmp);
+         }
+      }
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "end computation ...\n");
+//             <    is read   >: tout.data tout.nb
+   return tout;
+}
+
+Proper effects for "display"
+
+void display(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step)
+{
+//             <    is read   >: step xmax xmin ymax ymin
+//             <    is written>: rangex rangey
+   size_t rangex = (xmax-xmin)/step, rangey = (ymax-ymin)/step;
+   size_t i, j;
+//             <    is read   >: rangex
+//             <    is written>: i
+   for(i = 0; i < rangex; i += 1) {
+//             <    is read   >: rangex rangey
+//             <    is written>: j
+      for(j = 0; j < rangey; j += 1)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: _t_2__1[i*rangey+j][0] 
+//                               _t_2__1[i*rangey+j][1] 
+//                               _t_2__1[i*rangey+j][2] i j rangex 
+//                               rangey stdout t.data t.data t.data 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         printf("%lf %lf %lf\n", ((t.data)[i*rangey+j])[0], ((t.data)[i*rangey+j])[1], ((t.data)[i*rangey+j])[2]);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: rangex stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("\n");
+   }
+}
+
+Cumulated effects for "read_towns"
+
+//             <may be read   >: fname[*] stderr[0] 
+//                               __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: stderr[0] __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+towns read_towns(const  char fname[])
+{
+//             <may be read   >: fname[*] __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <    is written>: fd
+   FILE *fd = fopen(fname, "r");
+//             <    is written>: curr
+   size_t curr = 0;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: the_towns.data the_towns.nb 
+//                               _MALLOC_EFFECTS:_MALLOC_
+   towns the_towns = {1, malloc(sizeof(town))};
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "begin parsing ...\n");
+//             <may be read   >: *HEAP*_l_31[*][1] *HEAP*_l_39[*][1] 
+//                               curr the_towns.data the_towns.nb 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *HEAP*_l_31[*][1] *HEAP*_l_39[*][1] 
+//                               curr the_towns.data the_towns.nb 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
+
+   while (!feof(fd)) {
+//             <may be read   >: the_towns.data 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: the_towns.data the_towns.nb 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: curr the_towns.nb
+      if (the_towns.nb==curr) {
+//             <    is read   >: the_towns.nb
+//             <    is written>: the_towns.nb
+         the_towns.nb *= 2;
+//             <    is read   >: the_towns.data the_towns.nb 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: the_towns.data 
+//                               _MALLOC_EFFECTS:_MALLOC_
+         the_towns.data = realloc(the_towns.data, the_towns.nb*sizeof(town));
+      }
+//             <may be read   >: *HEAP*_l_31[*][1] *HEAP*_l_39[*][1] 
+//                               __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *HEAP*_l_31[*][1] *HEAP*_l_39[*][1] 
+//                               curr __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: curr fd the_towns.data
+      if (fscanf(fd, "%lf%*[ \t]%lf%*[ \t]%lf", &((the_towns.data)[curr])[0], &((the_towns.data)[curr])[1], &((the_towns.data)[curr])[2])!=3) {
+         char c;
+l99999:         ;
+//             <may be read   >: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
+         if (!!feof(fd)) goto _break_2;
+//             <may be read   >: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
+//             <    is written>: c
+         c = (char) fgetc(fd);
+//             <    is read   >: c
+         if (c=='\n'||c=='\r') {
+         }
+         else {
+            goto l99999;
+         }
+_break_2:         ;
+      }
+      else {
+//             <may be read   >: *HEAP*_l_31[*][0] *HEAP*_l_39[*][0]
+//             <may be written>: *HEAP*_l_31[*][0] *HEAP*_l_39[*][0]
+//             <    is read   >: curr the_towns.data
+         ((the_towns.data)[curr])[0] *= 3.14159265358979323846/180;
+//             <may be read   >: *HEAP*_l_31[*][1] *HEAP*_l_39[*][1]
+//             <may be written>: *HEAP*_l_31[*][1] *HEAP*_l_39[*][1]
+//             <    is read   >: curr the_towns.data
+         ((the_towns.data)[curr])[1] *= 3.14159265358979323846/180;
+//             <    is read   >: curr
+//             <    is written>: curr
+         ++curr;
+      }
+   }
+//             <may be read   >: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:IO_FILES[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
+   fclose(fd);
+//             <    is read   >: curr the_towns.data 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: the_towns.data 
+//                               _MALLOC_EFFECTS:_MALLOC_
+   the_towns.data = realloc(the_towns.data, curr*sizeof(town));
+//             <    is read   >: curr
+//             <    is written>: the_towns.nb
+   the_towns.nb = curr;
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: curr stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "parsed %d towns\n", (int) curr);
+//             <    is read   >: the_towns.data the_towns.nb
+   /*
+       for(curr=0;curr<the_towns.nb;curr++)
+       fprintf(stderr,OUTPUT_FORMAT,the_towns.data[curr][0],the_towns.data[curr][1],the_towns.data[curr][2]);
+     */
+   return the_towns;
+}
+
+Cumulated effects for "run"
+
+//             <may be read   >: _t_2__1[*][2] _t_2__1[*][*] range 
+//                               stderr[0] t.data t.nb
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr step xmax xmin ymax ymin 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2]
+towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step, data_t range)
+{
+   size_t i, j;
+   size_t k;
+//             <    is read   >: step xmax xmin ymax ymin
+//             <    is written>: rangex rangey
+   size_t rangex = (xmax-xmin)/step, rangey = (ymax-ymin)/step;
+//             <    is read   >: rangex rangey
+//             <    is written>: nb
+   int nb = 1+rangex*rangey;
+//             <    is read   >: nb _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: tout.data tout.nb 
+//                               _MALLOC_EFFECTS:_MALLOC_
+   towns tout = {nb, malloc(sizeof(town)*nb)};
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "begin computation ...\n");
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: rangex stderr xmax xmin 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "xrange: ""%lf %lf %lf\n", xmin, xmax, (double) rangex);
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: rangey stderr ymax ymin 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "yrange: ""%lf %lf %lf\n", ymin, ymax, (double) rangey);
+//             <may be read   >: *HEAP*_l_76[*][2] _t_2__1[*][2] 
+//                               _t_2__1[*][*] i j k range rangey step
+//                               t.data t.nb tout.data xmin ymin
+//             <may be written>: *HEAP*_l_76[*][2] j k
+//             <    is read   >: rangex
+//             <    is written>: i
+
+   for(i = 0; i < rangex; i += 1)
+//             <may be read   >: *HEAP*_l_76[*][2] _t_2__1[*][2] 
+//                               _t_2__1[*][*] i j k range step t.data
+//                               t.nb tout.data xmin ymin
+//             <may be written>: *HEAP*_l_76[*][2] k
+//             <    is read   >: rangex rangey
+//             <    is written>: j
+      for(j = 0; j < rangey; j += 1) {
+//             <may be written>: *HEAP*_l_76[*][0]
+//             <    is read   >: i j rangex rangey step tout.data xmin
+         ((tout.data)[i*rangey+j])[0] = (xmin+step*i)*180/3.14159265358979323846;
+//             <may be written>: *HEAP*_l_76[*][1]
+//             <    is read   >: i j rangex rangey step tout.data ymin
+         ((tout.data)[i*rangey+j])[1] = (ymin+step*j)*180/3.14159265358979323846;
+//             <may be written>: *HEAP*_l_76[*][2]
+//             <    is read   >: i j rangex rangey tout.data
+         ((tout.data)[i*rangey+j])[2] = 0.;
+//             <may be read   >: *HEAP*_l_76[*][2] _t_2__1[*][2] 
+//                               _t_2__1[*][*] i j k range step t.data
+//                               tout.data xmin ymin
+//             <may be written>: *HEAP*_l_76[*][2]
+//             <    is read   >: rangex rangey t.nb
+//             <    is written>: k
+         for(k = 0; k < t.nb-1+1; k += 1) {
+//             <may be read   >: _t_2__1[*][*]
+//             <    is read   >: i j k step t.data xmin ymin
+//             <    is written>: tmp
+            data_t tmp = 6368.*acos(cos(xmin+step*i)*cos(((t.data)[k])[0])*cos(ymin+step*j-((t.data)[k])[1])+sin(xmin+step*i)*sin(((t.data)[k])[0]));
+//             <may be read   >: *HEAP*_l_76[*][2] _t_2__1[*][2] i j k
+//                               t.data tout.data
+//             <may be written>: *HEAP*_l_76[*][2]
+//             <    is read   >: range rangex rangey t.nb tmp
+            if (tmp<range)
+//             <may be read   >: *HEAP*_l_76[*][2] _t_2__1[*][2]
+//             <may be written>: *HEAP*_l_76[*][2]
+//             <    is read   >: i j k rangex rangey t.data t.nb tmp 
+//                               tout.data
+               ((tout.data)[i*rangey+j])[2] += ((t.data)[k])[2]/(1+tmp);
+         }
+      }
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "end computation ...\n");
+//             <    is read   >: tout.data tout.nb
+   return tout;
+}
+
+Cumulated effects for "display"
+
+//             <may be read   >: _t_2__1[*][*] stdout stdout[0] t.data
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: step xmax xmin ymax ymin
+void display(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step)
+{
+//             <    is read   >: step xmax xmin ymax ymin
+//             <    is written>: rangex rangey
+   size_t rangex = (xmax-xmin)/step, rangey = (ymax-ymin)/step;
+   size_t i, j;
+//             <may be read   >: _t_2__1[*][*] i j rangey stdout 
+//                               stdout[0] t.data __IO_EFFECTS:LUNS[1]
+//             <may be written>: j stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: rangex
+//             <    is written>: i
+   for(i = 0; i < rangex; i += 1) {
+//             <may be read   >: _t_2__1[*][*] i j stdout stdout[0] 
+//                               t.data __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: rangex rangey
+//             <    is written>: j
+      for(j = 0; j < rangey; j += 1)
+//             <may be read   >: _t_2__1[*][*] stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i j rangex rangey stdout t.data 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         printf("%lf %lf %lf\n", ((t.data)[i*rangey+j])[0], ((t.data)[i*rangey+j])[1], ((t.data)[i*rangey+j])[2]);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: rangex stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("\n");
+   }
+}
+
+Points-to for "main"
+
+
+// Points To IN:
+// stderr -> *NULL* , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
+
+
+// Points To OUT: none
+
+int main(int argc, char *argv[])
+{
+
+// Points To: none
+
+   int code = 0;
+
+// Points To: none
+
+
+   if (argc!=8)
+
+// Points To: none
+
+      code = 1;
+   else {
+
+// Points To: none
+
+      towns t;
+
+// Points To:
+// stderr -> *NULL* , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
+// t.data -> undefined , EXACT
+
+      t = read_towns(argv[1]);
+      
+      
+      
+      
+      
+
+// Points To:
+// read_towns:read_towns.data -> read_towns:*HEAP*_l_58[0] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// t.data -> read_towns:*HEAP*_l_58[0] , MAY
+
+      data_t xmin = atof(argv[2])*3.14159265358979323846/180., ymin = atof(argv[3])*3.14159265358979323846/180., xmax = atof(argv[4])*3.14159265358979323846/180., ymax = atof(argv[5])*3.14159265358979323846/180., step = atof(argv[6])*3.14159265358979323846/180., range = atof(argv[7]);
+
+// Points To:
+// read_towns:read_towns.data -> read_towns:*HEAP*_l_58[0] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// t.data -> read_towns:*HEAP*_l_58[0] , MAY
+
+      towns out = run(t, xmin, ymin, xmax, ymax, step, range);
+
+// Points To:
+// out.data -> run:*HEAP*_l_76[0] , MAY
+// read_towns:read_towns.data -> read_towns:*HEAP*_l_58[0] , MAY
+// run:run.data -> run:*HEAP*_l_76[0] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// t.data -> read_towns:*HEAP*_l_58[0][0] , MAY
+
+      display(out, xmin, ymin, xmax, ymax, step);
+   }
+
+// Points To:
+// read_towns:read_towns.data -> read_towns:*HEAP*_l_58[0] , MAY
+// run:run.data -> run:*HEAP*_l_76[0] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+
+
+   return code;
+}
+
+Warnings and errors:
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (list_assignment_to_points_to) Heap bucket "*HEAP*_l_31[0]" leaked at line 39.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (list_assignment_to_points_to) Heap bucket "*HEAP*_l_31[0]" possibly leaked at line 39.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (list_assignment_to_points_to) Heap bucket "*HEAP*_l_31[0]" possibly leaked at line 39.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (list_assignment_to_points_to) Heap bucket "*HEAP*_l_39[0]" possibly leaked at line 58.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (list_assignment_to_points_to) Heap bucket "*HEAP*_l_31[0]" possibly leaked at line 58.
+PROPER_EFFECTS_WITH_POINTS_TO[read_towns] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_set_block_projection) Memory leak for bucket "run:*HEAP*_l_76".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (points_to_set_block_projection) Memory leak for bucket "read_towns:*HEAP*_l_58".

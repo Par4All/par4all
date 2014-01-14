@@ -1,0 +1,32 @@
+
+Source code with transformers
+
+
+//  T(main) {9<=main, main<=90}
+
+int main()
+{
+
+//  T(i,k) {}
+
+   int i, k;
+
+//  T(k) {k==0}
+
+
+   k = 0;
+
+//  T(i,k) {k#init==0, 0<=i, i<=9, k<=9i, 0<=k}
+
+   for(i = 0; i <= 9; i += 1)
+
+//  T(k) {i+k#init==k, 0<=i, i<=9}
+
+      k = i+k;
+
+//  T(main) {i==10, k==main, 9<=k, k<=90}
+
+   
+   // k is exactly equal to sum(0..9)=45
+   return k;
+}

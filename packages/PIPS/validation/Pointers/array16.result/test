@@ -19,249 +19,152 @@ void array16()
    int *p[10];
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , EXACT
 
    int x[10];
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , EXACT
 
    int ii;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , EXACT
 
    p[0] = &a;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p[*] -> a , MAY
+// p[*] -> undefined , MAY
 // p[0] -> a , EXACT
 
    p[1] = &b;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p[*] -> a , MAY
+// p[*] -> undefined , MAY
 // p[0] -> a , EXACT
-// p[*] -> b , MAY
 // p[1] -> b , EXACT
 
    p[2] = &c;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p[*] -> a , MAY
+// p[*] -> undefined , MAY
 // p[0] -> a , EXACT
-// p[*] -> b , MAY
 // p[1] -> b , EXACT
-// p[*] -> c , MAY
 // p[2] -> c , EXACT
 
    p[3] = &d;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p[*] -> a , MAY
+// p[*] -> undefined , MAY
 // p[0] -> a , EXACT
-// p[*] -> b , MAY
 // p[1] -> b , EXACT
-// p[*] -> c , MAY
 // p[2] -> c , EXACT
-// p[*] -> d , MAY
 // p[3] -> d , EXACT
 
    p[4] = &e;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p[*] -> a , MAY
+// p[*] -> undefined , MAY
 // p[0] -> a , EXACT
-// p[*] -> b , MAY
 // p[1] -> b , EXACT
-// p[*] -> c , MAY
 // p[2] -> c , EXACT
-// p[*] -> d , MAY
 // p[3] -> d , EXACT
-// p[*] -> e , MAY
 // p[4] -> e , EXACT
 
    p[5] = &f;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p[*] -> a , MAY
+// p[*] -> undefined , MAY
 // p[0] -> a , EXACT
-// p[*] -> b , MAY
 // p[1] -> b , EXACT
-// p[*] -> c , MAY
 // p[2] -> c , EXACT
-// p[*] -> d , MAY
 // p[3] -> d , EXACT
-// p[*] -> e , MAY
 // p[4] -> e , EXACT
-// p[*] -> f , MAY
 // p[5] -> f , EXACT
 
    p[6] = &g;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p[*] -> a , MAY
+// p[*] -> undefined , MAY
 // p[0] -> a , EXACT
-// p[*] -> b , MAY
 // p[1] -> b , EXACT
-// p[*] -> c , MAY
 // p[2] -> c , EXACT
-// p[*] -> d , MAY
 // p[3] -> d , EXACT
-// p[*] -> e , MAY
 // p[4] -> e , EXACT
-// p[*] -> f , MAY
 // p[5] -> f , EXACT
-// p[*] -> g , MAY
 // p[6] -> g , EXACT
 
    p[7] = &h;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p[*] -> a , MAY
+// p[*] -> undefined , MAY
 // p[0] -> a , EXACT
-// p[*] -> b , MAY
 // p[1] -> b , EXACT
-// p[*] -> c , MAY
 // p[2] -> c , EXACT
-// p[*] -> d , MAY
 // p[3] -> d , EXACT
-// p[*] -> e , MAY
 // p[4] -> e , EXACT
-// p[*] -> f , MAY
 // p[5] -> f , EXACT
-// p[*] -> g , MAY
 // p[6] -> g , EXACT
-// p[*] -> h , MAY
 // p[7] -> h , EXACT
 
    p[8] = &i;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p[*] -> a , MAY
+// p[*] -> undefined , MAY
 // p[0] -> a , EXACT
-// p[*] -> b , MAY
 // p[1] -> b , EXACT
-// p[*] -> c , MAY
 // p[2] -> c , EXACT
-// p[*] -> d , MAY
 // p[3] -> d , EXACT
-// p[*] -> e , MAY
 // p[4] -> e , EXACT
-// p[*] -> f , MAY
 // p[5] -> f , EXACT
-// p[*] -> g , MAY
 // p[6] -> g , EXACT
-// p[*] -> h , MAY
 // p[7] -> h , EXACT
-// p[*] -> i , MAY
 // p[8] -> i , EXACT
 
    p[9] = &j;
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p[*] -> a , MAY
+// p[*] -> undefined , MAY
 // p[0] -> a , EXACT
-// p[*] -> b , MAY
 // p[1] -> b , EXACT
-// p[*] -> c , MAY
 // p[2] -> c , EXACT
-// p[*] -> d , MAY
 // p[3] -> d , EXACT
-// p[*] -> e , MAY
 // p[4] -> e , EXACT
-// p[*] -> f , MAY
 // p[5] -> f , EXACT
-// p[*] -> g , MAY
 // p[6] -> g , EXACT
-// p[*] -> h , MAY
 // p[7] -> h , EXACT
-// p[*] -> i , MAY
 // p[8] -> i , EXACT
-// p[*] -> j , MAY
 // p[9] -> j , EXACT
 
    for(ii = 0; ii <= 9; ii += 1)
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[0] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[1] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[2] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[3] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[4] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[5] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[6] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[7] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[8] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[9] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p[*] -> a , MAY
+// p[*] -> undefined , MAY
 // p[0] -> a , MAY
-// p[*] -> b , MAY
 // p[1] -> b , MAY
-// p[*] -> c , MAY
 // p[2] -> c , MAY
-// p[*] -> d , MAY
 // p[3] -> d , MAY
-// p[*] -> e , MAY
 // p[4] -> e , MAY
-// p[*] -> f , MAY
 // p[5] -> f , MAY
-// p[*] -> g , MAY
 // p[6] -> g , MAY
-// p[*] -> h , MAY
 // p[7] -> h , MAY
-// p[*] -> i , MAY
 // p[8] -> i , MAY
-// p[*] -> j , MAY
 // p[9] -> j , MAY
 // p[*] -> x[*] , MAY
 
       p[ii] = &x[ii];
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[0] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[1] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[2] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[3] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[4] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[5] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[6] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[7] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[8] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[9] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p[*] -> a , MAY
+// p[*] -> undefined , MAY
 // p[0] -> a , MAY
-// p[*] -> b , MAY
 // p[1] -> b , MAY
-// p[*] -> c , MAY
 // p[2] -> c , MAY
-// p[*] -> d , MAY
 // p[3] -> d , MAY
-// p[*] -> e , MAY
 // p[4] -> e , MAY
-// p[*] -> f , MAY
 // p[5] -> f , MAY
-// p[*] -> g , MAY
 // p[6] -> g , MAY
-// p[*] -> h , MAY
 // p[7] -> h , MAY
-// p[*] -> i , MAY
 // p[8] -> i , MAY
-// p[*] -> j , MAY
 // p[9] -> j , MAY
 // p[*] -> x[*] , MAY
 

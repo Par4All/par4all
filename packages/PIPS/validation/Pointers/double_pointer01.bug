@@ -1,0 +1,1 @@
+For assignments of non-pointer values, the analysis of dereferencing does not seem to handle multiple levels.

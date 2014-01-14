@@ -15,12 +15,12 @@ void structure02()
 
    int i = 0;
 
-//  T(i) {i==1, i#init==0}
+//  T(i) {i#init==0}
 
 
    (c.re)[i++] = 0.;
 
-//  T(i) {i#init==1}
+//  T(i) {}
 
    (p->re)[i++] = 0.;
 }

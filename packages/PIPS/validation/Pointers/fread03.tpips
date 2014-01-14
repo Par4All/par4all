@@ -1,5 +1,8 @@
 delete fread03
 create fread03 fread03.c
+
+# The source code has been simplified and seems to be wrong.
+# A user error is now detected
 setproperty ABORT_ON_USER_ERROR TRUE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE

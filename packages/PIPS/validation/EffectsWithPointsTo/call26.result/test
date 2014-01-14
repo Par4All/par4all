@@ -1,0 +1,80 @@
+
+Points-to for call26
+
+
+// Points To IN:
+// q[4] -> *NULL* , MAY
+// q[4] -> _q_1[4][0] , MAY
+
+
+// Points To OUT:
+// q[4] -> _q_1[4][0] , EXACT
+
+void call26(int *q[10])
+{
+
+// Points To:
+// q[4] -> *NULL* , MAY
+// q[4] -> _q_1[4][0] , MAY
+
+   *q[4] = 3;
+}
+
+Proper effects with points-to for call26
+
+void call26(int *q[10])
+{
+//             <    is read   >: q[4]
+//             <    is written>: _q_1[4][0]
+   *q[4] = 3;
+}
+
+Cumulated effects with points-to for call26
+
+//             <    is read   >: q[4]
+//             <    is written>: _q_1[4][0]
+void call26(int *q[10])
+{
+//             <    is read   >: q[4]
+//             <    is written>: _q_1[4][0]
+   *q[4] = 3;
+}
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *ap[10];
+
+// Points To:
+// ap[*] -> undefined , EXACT
+
+
+   call26(ap);
+
+// Points To:
+// ap[*] -> undefined , EXACT
+
+   return 0;
+}
+
+Proper effects with points-to for "main"
+
+
+Warnings and errors (an unitialized array is passed as parameter)
+
+PROPER_EFFECTS_WITH_POINTS_TO[main] (backward_translation_of_points_to_formal_context_effect) user error
+PROPER_EFFECTS_WITH_POINTS_TO[main] (backward_translation_of_points_to_formal_context_effect) Effect "call26:_q_1[4][0]" of callee "call26" cannot be translated. Check that the caller "main" provides initialized parameters.
+PROPER_EFFECTS_WITH_POINTS_TO[main] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module main.
+unknown[unknown] (display_a_resource) user error
+unknown[unknown] (display_a_resource) Cannot build view file PRINTED_FILE

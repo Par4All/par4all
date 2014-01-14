@@ -1,4 +1,7 @@
 
+PRINT_CODE_SIMPLE_POINTER_VALUES
+
+
 // IN Pointer values: none
 
 
@@ -49,6 +52,9 @@ int main()
 
    return b;
 }
+
+PROPER_EFFECTS_WITH_POINTER_VALUES
+
 int main()
 {
    int a, b, c, *p;
@@ -70,6 +76,9 @@ int main()
 //             <    is read   >: b
    return b;
 }
+
+MUST_REGIONS_WITH_POINTER_VALUES
+
 int main()
 {
    int a, b, c, *p;
@@ -104,6 +113,9 @@ int main()
 
    return b;
 }
+
+PRINT_CODE_REGIONS
+
 int main()
 {
    int a, b, c, *p;

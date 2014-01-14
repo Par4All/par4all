@@ -2,33 +2,119 @@ setenv WSPACE=list00
 delete $WSPACE
 create $WSPACE $WSPACE.c
 
-activate INTRAPROCEDURAL_POINTS_TO_ANALYSIS
+# Has to be debugged...
+#activate INTRAPROCEDURAL_POINTS_TO_ANALYSIS
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
-#setenv POINTER_VALUES_DEBUG_LEVEL 2
 
 # Key property for this test case
 # setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 setproperty POINTS_TO_PATH_LIMIT 10
 
-#module main
-
-
-echo 
-echo PROPER  EFFECTS
-echo
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
-
-
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
 
 echo 
-echo POINTS-TO
+echo Points-to for "list_free"
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[list_free]
+
+echo 
+echo Proper effects for "list_free"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[list_free]
+
+echo 
+echo Cumulated effects for "list_free"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[list_free]
+
+echo 
+echo Points-to for "list_cons"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[list_cons]
+
+echo 
+echo Proper effects for "list_cons"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[list_cons]
+
+echo 
+echo Cumulated effects for "list_cons"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[list_cons]
+
+echo 
+echo Points-to for "list_next"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[list_next]
+
+echo 
+echo Proper effects for "list_next"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[list_next]
+
+echo 
+echo Cumulated effects for "list_next"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[list_next]
+
+echo 
+echo Points-to for "list_len"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[list_len]
+
+echo 
+echo Proper effects for "list_len"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[list_len]
+
+echo 
+echo Cumulated effects for "list_len"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[list_len]
+
+echo 
+echo Points-to for "main"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+echo 
+echo Proper effects for "main"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+echo 
+echo Cumulated effects for "main"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
 
 close
 delete $WSPACE

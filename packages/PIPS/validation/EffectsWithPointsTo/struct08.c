@@ -1,3 +1,10 @@
+/* The code is buggy because the pointers declared in the main
+ * function are not initialized because they are used as actual
+ * parameters.
+ *
+ * The bug is detected by the proper effects pass.
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 

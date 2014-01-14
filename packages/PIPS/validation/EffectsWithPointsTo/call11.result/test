@@ -23,6 +23,7 @@ int main()
    int d3 = 10;
 //             <    is written>: d4
    int d4 = 10;
+//             <    is read   >: d1 d2 d3 d4
    int y[d1][d2][d3][d4];
    int i, j;
 //             <    is read   >: d1
@@ -39,18 +40,26 @@ int main()
 
  *********************** Use-Def Chains *********************
 
+	14 --> 18 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
 	14 --> 21 with conflicts
 		from <d1-W-EXACT> to <d1-R-EXACT>
 	14 --> 22 with conflicts
 		from <d1-W-EXACT> to <d1-R-EXACT>
 	14 --> 23 with conflicts
 		from <d1-W-EXACT> to <d1-R-EXACT>
+	15 --> 18 with conflicts
+		from <d2-W-EXACT> to <d2-R-EXACT>
 	15 --> 22 with conflicts
 		from <d2-W-EXACT> to <d2-R-EXACT>
 	15 --> 23 with conflicts
 		from <d2-W-EXACT> to <d2-R-EXACT>
+	16 --> 18 with conflicts
+		from <d3-W-EXACT> to <d3-R-EXACT>
 	16 --> 23 with conflicts
 		from <d3-W-EXACT> to <d3-R-EXACT>
+	17 --> 18 with conflicts
+		from <d4-W-EXACT> to <d4-R-EXACT>
 	17 --> 23 with conflicts
 		from <d4-W-EXACT> to <d4-R-EXACT>
 	22 --> 22 with conflicts

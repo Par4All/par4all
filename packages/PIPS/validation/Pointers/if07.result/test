@@ -15,7 +15,7 @@ int main()
    int *p = (void *) 0, i;
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 
    if (p!=(void *) 0)
 
@@ -25,7 +25,7 @@ int main()
    else
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 
       *p = 1;
 
@@ -34,4 +34,4 @@ int main()
 
    return 0;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_dereferencing_to_points_to) Null or undefined pointer may be dereferenced because of "p".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_dereferencing_to_points_to) Null or undefined pointer may be dereferenced because of "p" at line 16.

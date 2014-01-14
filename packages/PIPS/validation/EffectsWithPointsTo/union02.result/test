@@ -1,0 +1,103 @@
+
+Points-to for "union02"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int union02()
+{
+
+// Points To: none
+
+   union one {
+      int first;
+      int second;
+   } x, *px;
+
+// Points To:
+// px -> undefined , EXACT
+
+   int y[10];
+
+// Points To:
+// px -> undefined , EXACT
+
+
+   px = &x;
+
+// Points To:
+// px -> x , EXACT
+
+   px->first = 1;
+
+// Points To:
+// px -> x , EXACT
+
+   px->second = 2;
+
+// Points To:
+// px -> x , EXACT
+
+
+   y[0] = 1;
+}
+
+Proper effects for "union02"
+
+int union02()
+{
+   union one {
+      int first;
+      int second;
+   } x, *px;
+   int y[10];
+//             <    is written>: px
+
+   px = &x;
+//             <    is read   >: px
+//             <    is written>: x.first
+   px->first = 1;
+//             <    is read   >: px
+//             <    is written>: x.second
+   px->second = 2;
+//             <    is written>: y[0]
+
+   y[0] = 1;
+}
+
+Cumulated effects for "union02"
+
+int union02()
+{
+   union one {
+      int first;
+      int second;
+   } x, *px;
+   int y[10];
+//             <    is written>: px
+
+   px = &x;
+//             <    is read   >: px
+//             <    is written>: x.first
+   px->first = 1;
+//             <    is read   >: px
+//             <    is written>: x.second
+   px->second = 2;
+//             <    is written>: y[0]
+
+   y[0] = 1;
+}
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 12 with conflicts
+		from <px-W-EXACT> to <px-R-EXACT>
+	11 --> 13 with conflicts
+		from <px-W-EXACT> to <px-R-EXACT>
+	12 --> 13 with conflicts
+		from <x.first-W-EXACT> to <x.second-W-EXACT>
+
+****************** End of Dependence Graph ******************

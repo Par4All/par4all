@@ -3,37 +3,38 @@ POINTS TO
 
 
 // Points To IN:
-// _dat_1[0].array -> *NULL_POINTER* , MAY
+// _dat_1[0].array -> *NULL* , MAY
 // _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
-// _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
+// _dat_1_1__1[0][*] -> *NULL* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
-// dat -> *NULL_POINTER* , MAY
+// dat -> *NULL* , MAY
 // dat -> _dat_1[0] , MAY
 
 
 // Points To OUT:
-// _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
-// _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
+// _dat_1[0].array -> _dat_1_1__1[0][0] , EXACT
+// _dat_1_1__1[0][*] -> *NULL* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
+// dat -> _dat_1[0] , EXACT
 
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row)
 {
 
 // Points To:
-// _dat_1[0].array -> *NULL_POINTER* , MAY
+// _dat_1[0].array -> *NULL* , MAY
 // _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
-// _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
+// _dat_1_1__1[0][*] -> *NULL* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
-// dat -> *NULL_POINTER* , MAY
+// dat -> *NULL* , MAY
 // dat -> _dat_1[0] , MAY
 
    fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];
 
 // Points To:
-// _dat_1[0].array -> _dat_1_1__1[0][0] , MAY
-// _dat_1_1__1[0][*] -> *NULL_POINTER* , MAY
+// _dat_1[0].array -> _dat_1_1__1[0][0] , EXACT
+// _dat_1_1__1[0][*] -> *NULL* , MAY
 // _dat_1_1__1[0][*] -> _dat_1_1__1_1[0][*][0] , MAY
-// array_d -> *NULL_POINTER* , MAY
+// array_d -> *NULL* , MAY
 // array_d -> _dat_1_1__1_1[0][*][0] , MAY
 // dat -> _dat_1[0] , EXACT
 

@@ -1,0 +1,14 @@
+delete SCoPDetection2
+create SCoPDetection2 SCoPDetection2.c
+setproperty ABORT_ON_USER_ERROR TRUE
+activate C_PARSER
+
+
+capply POCC_PRETTYPRINTER[main]
+activate PRINT_CODE
+display PRINTED_FILE[main]
+
+close
+delete SCoPDetection2
+quit
+

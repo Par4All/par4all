@@ -3,21 +3,23 @@ PROPER  EFFECTS
 
 int use_def_elim01()
 {
-   int i, *x, *y;                                                       /*0005*/
+   int i, j, *x, *y;                                                    /*0005*/
 //             <    is written>: i
 
    i = 2;                                                               /*0007*/
 //             <    is written>: x
-   x = &i;                                                              /*0008*/
+   x = &j;                                                              /*0008*/
+//             <    is written>: x
+   x = &i;                                                              /*0009*/
 //             <    is read   >: x
 //             <    is written>: y
-   y = x;                                                               /*0009*/
+   y = x;                                                               /*0010*/
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: y
-   *y = 1;                                                              /*0010*/
+   *y = 1;                                                              /*0011*/
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 
-   return *y;                                                           /*0012*/
+   return *y;                                                           /*0013*/
 }
 
 POINTS-TO
@@ -33,80 +35,91 @@ int use_def_elim01()
 
 // Points To: none
 
-   int i, *x, *y;                                                       /*0005*/
+   int i, j, *x, *y;                                                    /*0005*/
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
 
 
    i = 2;                                                               /*0007*/
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
 
-   x = &i;                                                              /*0008*/
+   x = &j;                                                              /*0008*/
+
+// Points To:
+// x -> j , EXACT
+// y -> undefined , EXACT
+
+   x = &i;                                                              /*0009*/
 
 // Points To:
 // x -> i , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> undefined , EXACT
 
-   y = x;                                                               /*0009*/
+   y = x;                                                               /*0010*/
 
 // Points To:
 // x -> i , EXACT
 // y -> i , EXACT
 
-   *y = 1;                                                              /*0010*/
+   *y = 1;                                                              /*0011*/
 
 // Points To:
 // x -> i , EXACT
 // y -> i , EXACT
 
 
-   return *y;                                                           /*0012*/
+   return *y;                                                           /*0013*/
 }
 
 PROPER  EFFECTS WITH POINTS TO
 
 int use_def_elim01()
 {
-   int i, *x, *y;                                                       /*0005*/
+   int i, j, *x, *y;                                                    /*0005*/
 //             <    is written>: i
 
    i = 2;                                                               /*0007*/
 //             <    is written>: x
-   x = &i;                                                              /*0008*/
+   x = &j;                                                              /*0008*/
+//             <    is written>: x
+   x = &i;                                                              /*0009*/
 //             <    is read   >: x
 //             <    is written>: y
-   y = x;                                                               /*0009*/
+   y = x;                                                               /*0010*/
 //             <    is read   >: y
 //             <    is written>: i
-   *y = 1;                                                              /*0010*/
+   *y = 1;                                                              /*0011*/
 //             <    is read   >: i y
 
-   return *y;                                                           /*0012*/
+   return *y;                                                           /*0013*/
 }
 int use_def_elim01()
 {
-//             <    is declared>: i x y
-   int i, *x, *y;                                                       /*0005*/
+//             <    is declared>: i j x y
+   int i, j, *x, *y;                                                    /*0005*/
 
 
 //             <    is written>: x
+//             <    is referenced>: j x
+   x = &j;                                                              /*0008*/
+//             <    is written>: x
 //             <    is referenced>: i x
-   x = &i;                                                              /*0008*/
+   x = &i;                                                              /*0009*/
 //             <    is read   >: x
 //             <    is written>: y
 //             <    is referenced>: x y
-   y = x;                                                               /*0009*/
+   y = x;                                                               /*0010*/
 //             <    is read   >: y
 //             <    is written>: i
 //             <    is referenced>: y
-   *y = 1;                                                              /*0010*/
+   *y = 1;                                                              /*0011*/
 //             <    is read   >: i y
 //             <    is referenced>: y
 
-   return *y;                                                           /*0012*/
+   return *y;                                                           /*0013*/
 }

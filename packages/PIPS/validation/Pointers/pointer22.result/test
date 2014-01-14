@@ -1,0 +1,74 @@
+
+Points-to for "pointer22"
+
+
+// Points To IN:
+// s.my_struct.my_array -> *NULL* , MAY
+// s.my_struct.my_array -> _s_1_1__1[0][0][0] , MAY
+
+
+// Points To OUT:
+// s.my_struct.my_array -> *NULL* , MAY
+// s.my_struct.my_array -> _s_1_1__1[0][0][0] , MAY
+
+int pointer22(s2_t s, int i, int j)
+{
+
+// Points To: none
+
+   int k;
+
+// Points To:
+// s.my_struct.my_array -> *NULL* , MAY
+// s.my_struct.my_array -> _s_1_1__1[0][0][0] , MAY
+
+   int (*p)[5][6] = s.my_struct.my_array;
+
+// Points To:
+// p -> *NULL* , MAY
+// p -> _s_1_1__1[0][0][0] , MAY
+// s.my_struct.my_array -> *NULL* , MAY
+// s.my_struct.my_array -> _s_1_1__1[0][0][0] , MAY
+
+   k = p[i][0][j];
+
+// Points To:
+// p -> _s_1_1__1[0][0][0] , EXACT
+// s.my_struct.my_array -> *NULL* , MAY
+// s.my_struct.my_array -> _s_1_1__1[0][0][0] , MAY
+
+   return k;
+}
+
+Proper effects with points-to for "pointer22"
+
+int pointer22(s2_t s, int i, int j)
+{
+   int k;
+//             <    is read   >: s.my_struct.my_array
+//             <    is written>: p
+   int (*p)[5][6] = s.my_struct.my_array;
+//             <    is read   >: _s_1_1__1[i][0][j] i j p
+//             <    is written>: k
+   k = p[i][0][j];
+//             <    is read   >: k
+   return k;
+}
+
+Cumulated effects for "pointer22"
+
+//             <may be read   >: _s_1_1__1[*][0][*]
+//             <    is read   >: i j s.my_struct.my_array
+int pointer22(s2_t s, int i, int j)
+{
+   int k;
+//             <    is read   >: s.my_struct.my_array
+//             <    is written>: p
+   int (*p)[5][6] = s.my_struct.my_array;
+//             <may be read   >: _s_1_1__1[*][0][*]
+//             <    is read   >: i j p
+//             <    is written>: k
+   k = p[i][0][j];
+//             <    is read   >: k
+   return k;
+}

@@ -15,23 +15,25 @@ int main()
    list *root;
 
 // Points To:
-// root -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// root -> undefined , EXACT
 
    root = malloc(sizeof(list));
 
 // Points To:
+// *HEAP*_l_20.next -> undefined , EXACT
 // root -> *HEAP*_l_20 , MAY
 
    root->next = malloc(sizeof(list));
 
 // Points To:
 // *HEAP*_l_20.next -> *HEAP*_l_21 , MAY
+// *HEAP*_l_21.next -> undefined , EXACT
 // root -> *HEAP*_l_20 , MAY
 
    free(root);
 
 // Points To:
-// root -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// root -> undefined , EXACT
 
    return 0;
 }

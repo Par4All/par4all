@@ -1,0 +1,16 @@
+int main()
+{
+   int A[500];
+   int i = 0;
+   {
+      int i;
+
+#pragma scop
+      for(i = 0; i <= 246; i += 1)
+         A[2*i+3] = 1234;
+#pragma endscop
+
+   }
+
+   return A[0];
+}

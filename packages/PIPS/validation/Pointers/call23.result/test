@@ -29,12 +29,12 @@ int main()
    int *p = 0;
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 
    call23(p);
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 
    return 0;
 }

@@ -3,7 +3,7 @@ C  T() {}
 
       SUBROUTINE NON_LINEAR06
 
-C  T(I,N) {2<=I}
+C  T(I,N) {2<=I+N, N+2<=I}
 
 C (0,1)
 C     BEGIN BLOCK
@@ -16,7 +16,7 @@ C     Check rules for multiplication
 
       READ *, N                                                         0005
 
-C  T(I) {2<=I}
+C  T(I) {2<=I+N, N+2<=I}
 
 C (0,3)
       I = N*N+2                                                         0006
@@ -51,7 +51,7 @@ C  P(N) {}
 C (0,3)
       I = N*N+2                                                         0006
 
-C  P(I,N) {2<=I}
+C  P(I,N) {2<=I+N, N+2<=I}
 
 C (0,4)
       PRINT *, I                                                        0007

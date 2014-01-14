@@ -1,0 +1,107 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int mainInt()
+{
+
+// Points To: none
+
+   int a;
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> undefined , EXACT
+
+
+   p = &a;
+
+// Points To:
+// p -> a , EXACT
+
+
+   *p = 0;
+
+// Points To:
+// p -> a , EXACT
+
+
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(mainInt) {mainInt==0}
+
+int mainInt()
+{
+
+//  T(a) {}
+
+   int a;
+
+//  T(p) {}
+
+   int *p;
+
+//  T(p) {&a==p}
+
+
+   p = &a;
+
+//  T(a) {&a==p, a==0}
+
+
+   *p = 0;
+
+//  T(mainInt) {&a==p, a==0, mainInt==0}
+
+
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int mainInt()
+{
+
+//  P() {}
+
+   int a;
+
+//  P(a) {}
+
+   int *p;
+
+//  P(a,p) {}
+
+
+   p = &a;
+
+//  P(a,p) {&a==p}
+
+
+   *p = 0;
+
+//  P(a,p) {&a==p, a==0}
+
+
+   return 0;
+}
+
+Warnings
+
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning mainInt instead
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning mainInt instead

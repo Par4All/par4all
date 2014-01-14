@@ -1,0 +1,17 @@
+int linearize(int a[10][10], int b[10][10])
+{
+   int ret;
+   ret = a[0][(int) (1+b[2][1])];
+
+   return ret;
+}
+#
+# Code after linearize_array for module linearize
+#
+int linearize(int *a, int *b)
+{
+   int ret;
+   ret = *(a+(int) (1+*(b+21)));
+
+   return ret;
+}

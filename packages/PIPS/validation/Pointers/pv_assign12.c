@@ -1,7 +1,7 @@
 // to test points_to_compare_cells()
 int main()
 {
-  int *a[2];
+  int *a[2], *q;
   int b[2];
   int c = 0;
   
@@ -11,5 +11,6 @@ int main()
     a[0] = &b[1];
   
   a[1] = &c;
+  q = a[0];
   return(0);
 }

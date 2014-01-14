@@ -15,8 +15,8 @@ int main()
    int *p, *q, i;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 
 
    p = q = &i;
@@ -35,7 +35,7 @@ int main()
       p = (void *) 0;
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 // q -> i , EXACT
 
 

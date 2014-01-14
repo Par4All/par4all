@@ -1,0 +1,166 @@
+sven02 RW must regions
+
+//  <x[PHI1]-R-MAY-{0<=PHI1, PHI1<=n, 1<=n}>
+//  <x[PHI1]-W-MAY-{0<=PHI1, PHI1<=n, 1<=n}>
+
+void sven02(int n, double x[n])
+{
+
+//  <x[PHI1]-R-MAY-{0<=PHI1, PHI1<=n, 1<=n}>
+//  <x[PHI1]-W-MAY-{0<=PHI1, PHI1<=n, 1<=n}>
+
+   // BEGIN BLOCK
+   int i, j, k;
+
+//  <x[PHI1]-R-MAY-{0<=PHI1, PHI1<=n, 1<=n}>
+//  <x[PHI1]-W-MAY-{0<=PHI1, PHI1<=n, 1<=n}>
+
+   for(i = 0; i <= n-1; i += 1)
+
+//  <x[PHI1]-R-MAY-{i<=PHI1, PHI1<=n, 0<=i, i+1<=n, 1<=n}>
+//  <x[PHI1]-W-MAY-{i<=PHI1, PHI1<=n, 0<=i, i+1<=n, 1<=n}>
+
+      for(j = 0; j <= n-1; j += 1)
+
+//  <x[PHI1]-R-MAY-{i<=PHI1, PHI1<=n, 0<=i, i+1<=n, 0<=j, j+1<=n,
+//    1<=n}>
+//  <x[PHI1]-W-MAY-{i<=PHI1, PHI1<=n, 0<=i, i+1<=n, 0<=j, j+1<=n,
+//    1<=n}>
+
+         for(k = 0; k <= n-1; k += 1) {
+
+//  <x[PHI1]-R-MAY-{i<=PHI1, PHI1<=n, 0<=i, i+1<=n, 0<=j, j+1<=n,
+//    0<=k, k+1<=n}>
+//  <x[PHI1]-W-MAY-{i<=PHI1, PHI1<=n, 0<=i, i+1<=n, 0<=j, j+1<=n,
+//    0<=k, k+1<=n}>
+
+            // BEGIN BLOCK
+
+//  <x[PHI1]-W-EXACT-{PHI1==n, 0<=i, i+1<=n, 0<=j, j+1<=n, 0<=k,
+//    k+1<=n}>
+
+            x[n] = f(i, j, k);
+
+//  <x[PHI1]-R-MAY-{i<=PHI1, PHI1<=n, 0<=i, i+1<=n, 0<=j, j+1<=n,
+//    0<=k, k+1<=n}>
+//  <x[PHI1]-W-EXACT-{PHI1==i, 0<=i, i+1<=n, 0<=j, j+1<=n, 0<=k,
+//    k+1<=n}>
+
+            x[i] = g(x[i], x[n]);
+            // END BLOCK
+         }
+   return;
+   // END BLOCK
+}
+sven02 in regions
+
+//  <x[PHI1]-IN-MAY-{0<=PHI1, PHI1+1<=n}>
+
+void sven02(int n, double x[n])
+{
+
+//  <x[PHI1]-IN-MAY-{0<=PHI1, PHI1+1<=n}>
+
+   // BEGIN BLOCK
+   int i, j, k;
+
+//  <x[PHI1]-IN-MAY-{0<=PHI1, PHI1+1<=n}>
+
+   for(i = 0; i <= n-1; i += 1)
+
+//  <x[PHI1]-IN-MAY-{i<=PHI1, PHI1+1<=n, 0<=i, i+1<=n, 1<=n}>
+
+      for(j = 0; j <= n-1; j += 1)
+
+//  <x[PHI1]-IN-MAY-{i<=PHI1, PHI1<=n, PHI1+1<=n, 0<=i, i+1<=n, 0<=j,
+//    j+1<=n, 1<=n}>
+
+         for(k = 0; k <= n-1; k += 1) {
+
+//  <x[PHI1]-IN-MAY-{i<=PHI1, PHI1<=n, PHI1+1<=n, 0<=i, i+1<=n, 0<=j,
+//    j+1<=n, 0<=k, k+1<=n}>
+
+            // BEGIN BLOCK
+            x[n] = f(i, j, k);
+
+//  <x[PHI1]-IN-MAY-{i<=PHI1, PHI1<=n, 0<=i, i+1<=n, 0<=j, j+1<=n,
+//    0<=k, k+1<=n}>
+
+            x[i] = g(x[i], x[n]);
+            // END BLOCK
+         }
+   return;
+   // END BLOCK
+}
+sven02 out regions
+void sven02(int n, double x[n])
+{
+   // BEGIN BLOCK
+   int i, j, k;
+   for(i = 0; i <= n-1; i += 1)
+
+//  <x[PHI1]-OUT-MAY-{0<=PHI1, i+1<=PHI1, PHI1+1<=n, 0<=i, i+1<=n,
+//    1<=n}>
+
+      for(j = 0; j <= n-1; j += 1)
+
+//  <x[PHI1]-OUT-MAY-{i<=PHI1, i+j+2<=PHI1+n, PHI1+1<=n, 0<=i, 0<=j,
+//    j+1<=n}>
+
+         for(k = 0; k <= n-1; k += 1) {
+
+//  <x[PHI1]-OUT-MAY-{i<=PHI1, i+j+k+3<=PHI1+2n, PHI1+1<=n, 0<=i,
+//    0<=j, j+3<=2n, j+1<=n, 0<=k, k+1<=n}>
+
+            // BEGIN BLOCK
+
+//  <x[PHI1]-OUT-MAY-{PHI1==n, 0<=i, i+1<=n, 0<=j, j+1<=n, 0<=k,
+//    k+1<=n}>
+
+            x[n] = f(i, j, k);
+
+//  <x[PHI1]-OUT-MAY-{PHI1==i, i+j+k+3<=PHI1+2n, 0<=i, i+1<=n, 0<=j,
+//    j+3<=2n, j+1<=n, 0<=k, k+1<=n}>
+
+            x[i] = g(x[i], x[n]);
+            // END BLOCK
+         }
+   return;
+   // END BLOCK
+}
+sven02 privatized regions
+void sven02(int n, double x[n])
+{
+
+//  <x[PHI1]-PRIVATE-MAY-{PHI1==n, 0<=PHI1, 1<=n}>
+
+   // BEGIN BLOCK
+   int i, j, k;
+#pragma omp for private(i,j,k,x[n])
+   for(i = 0; i <= n-1; i += 1)
+
+//  <j-PRIVATE-EXACT-{}>
+//  <k-PRIVATE-EXACT-{}>
+//  <x[PHI1]-PRIVATE-MAY-{PHI1==n, i<=PHI1, 0<=i, i+1<=n}>
+
+#pragma omp for private(j,k,x[n])
+      for(j = 0; j <= n-1; j += 1)
+
+//  <k-PRIVATE-EXACT-{}>
+//  <x[PHI1]-PRIVATE-MAY-{PHI1==n, i<=PHI1, 0<=i, i+1<=n, 0<=j,
+//    j+1<=n}>
+
+#pragma omp for private(k,x[n])
+         for(k = 0; k <= n-1; k += 1) {
+
+//  <x[PHI1]-PRIVATE-MAY-{PHI1==n, i<=PHI1, 0<=i, i+1<=n, 0<=j,
+//    j+1<=n, 0<=k, k+1<=n}>
+
+            // BEGIN BLOCK
+            x[n] = f(i, j, k);
+            x[i] = g(x[i], x[n]);
+            // END BLOCK
+         }
+   return;
+   // END BLOCK
+}

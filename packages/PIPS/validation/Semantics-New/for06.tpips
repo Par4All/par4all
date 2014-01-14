@@ -1,0 +1,37 @@
+setenv WSPACE=for06
+delete $WSPACE
+create $WSPACE $WSPACE.c 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT  TRUE
+
+#setproperty SEMANTICS_KEEP_DO_LOOP_EXIT_CONDITION FALSE
+
+echo
+echo Source code with transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+quit
+echo
+echo Source code with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+quit
+apply UNSPLIT[%PROGRAM]
+
+close
+
+echo
+echo Warnings
+echo
+
+shell cat $WSPACE.database/Warnings
+
+delete $WSPACE
+quit

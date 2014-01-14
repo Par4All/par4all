@@ -1,0 +1,38 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: unreachable
+
+int main()
+{
+
+// Points To: none
+
+   int *p = (int *) malloc(10*sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_8[0] , MAY
+
+
+   p++;
+
+// Points To:
+// p -> *HEAP*_l_8[1] , MAY
+
+
+   free(p);
+
+// Points To: unreachable
+
+
+   return 0;
+}
+
+Warnings and errors: Check that the illegal free is detected
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Free of a non-heap allocated address pointed by "p" at line 12.
+Or bug in the points-to analysis...

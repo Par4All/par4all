@@ -60,10 +60,13 @@ int main()
 //             <    is referenced>: m n
 //             <    is declared>: m n
    int n = 4, m = 3;
+//             <    is read   >: m n
+//             <    is referenced>: m n
 //             <    is declared>: a
    int a[n][m];
+//             <    is read   >: m
 //             <    is written>: p
-//             <    is referenced>: a p
+//             <    is referenced>: a m p
 //             <    is declared>: p
    int (*p)[m] = a;
 //             <    is read   >: p

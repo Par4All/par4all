@@ -1,0 +1,58 @@
+
+Points-to for "foo"
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// foo -> *HEAP*_l_17 , MAY
+
+int * foo(void)
+{
+
+// Points To: none
+
+   int *p = (int *) malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_17 , MAY
+
+   return p;
+}
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To:
+// p -> foo:*HEAP*_l_17 , MAY
+
+   int i = 1, *p = foo(), *q = foo();
+
+// Points To:
+// p -> foo:*HEAP*_l_17 , MAY
+// q -> foo:*HEAP*_l_17 , MAY
+
+
+   free(p);
+
+// Points To:
+// p -> undefined , EXACT
+// q -> foo:*HEAP*_l_17 , MAY
+// q -> undefined , MAY
+
+
+   return i;
+}
+
+Warnings and errors: Check that the dangling pointer and the memory leak is detected?
+They cannot be detected with our current heap model
+

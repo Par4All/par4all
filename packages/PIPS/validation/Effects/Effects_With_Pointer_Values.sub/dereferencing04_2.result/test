@@ -1,4 +1,7 @@
 
+PRINT_CODE_SIMPLE_POINTER_VALUES
+
+
 // IN Pointer values: none
 
 
@@ -46,6 +49,9 @@ int main()
 
    return 1;
 }
+
+PROPER_EFFECTS_WITH_POINTER_VALUES
+
 void dereferencing04()
 {
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
@@ -68,6 +74,9 @@ int main()
    dereferencing04();
    return 1;
 }
+
+MUST_REGIONS_WITH_POINTER_VALUES
+
 void dereferencing04()
 {
 
@@ -105,6 +114,9 @@ int main()
    dereferencing04();
    return 1;
 }
+
+PRINT_CODE_REGIONS
+
 
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>

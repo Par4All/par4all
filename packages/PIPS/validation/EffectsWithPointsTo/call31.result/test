@@ -3,24 +3,24 @@ Points-to for call31
 
 
 // Points To IN:
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_2[0] , MAY
 
 
 // Points To OUT:
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
 void call31(int i, int *q)
 {
 
 // Points To:
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _q_2[0] , MAY
 
    free(q);
 
 // Points To:
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
    return;
 }
@@ -29,18 +29,18 @@ Points-to for "call31_caller"
 
 
 // Points To IN:
-// qq -> *NULL_POINTER* , MAY
+// qq -> *NULL* , MAY
 // qq -> _qq_1[0] , MAY
 
 
 // Points To OUT:
-// qq -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// qq -> undefined , EXACT
 
 int call31_caller(int *qq)
 {
 
 // Points To:
-// qq -> *NULL_POINTER* , MAY
+// qq -> *NULL* , MAY
 // qq -> _qq_1[0] , MAY
 
    int ii = *qq;
@@ -51,7 +51,7 @@ int call31_caller(int *qq)
    call31(ii, qq);
 
 // Points To:
-// qq -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// qq -> undefined , EXACT
 
    return ii++;
 }

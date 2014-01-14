@@ -1,0 +1,23 @@
+
+Source code for "COUNT" after dead-code elimination 
+C      Check that effect on static variables are preserved, at least
+C      when they escape
+C
+C     If the line j = j + c is removed, c = c + 1 becomes useless...
+
+       SUBROUTINE COUNT(J)
+       INTEGER C
+       DATA C /0/
+       SAVE C
+      J = J+C                                                           0010
+      C = C+1                                                           0011
+      END
+
+Source code for "LOST_COUNT" after dead-code elimination 
+
+       SUBROUTINE LOST_COUNT(J)
+       INTEGER C
+       DATA C /0/
+       SAVE C
+      C = C+1                                                           0006
+      END

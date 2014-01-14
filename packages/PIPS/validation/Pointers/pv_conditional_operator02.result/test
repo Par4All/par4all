@@ -25,7 +25,7 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: unreachable
+// Points To OUT: none
 
 int main()
 {
@@ -35,68 +35,72 @@ int main()
    mystruct s1, s2, s3;
 
 // Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s3.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s1.b[*] -> undefined , EXACT
+// s1.a -> undefined , EXACT
+// s1.c -> undefined , EXACT
+// s2.b[*] -> undefined , EXACT
+// s2.a -> undefined , EXACT
+// s2.c -> undefined , EXACT
+// s3.b[*] -> undefined , EXACT
+// s3.a -> undefined , EXACT
+// s3.c -> undefined , EXACT
 
    int b = 1, c = 2, d;
 
 // Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s3.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s1.b[*] -> undefined , EXACT
+// s1.a -> undefined , EXACT
+// s1.c -> undefined , EXACT
+// s2.b[*] -> undefined , EXACT
+// s2.a -> undefined , EXACT
+// s2.c -> undefined , EXACT
+// s3.b[*] -> undefined , EXACT
+// s3.a -> undefined , EXACT
+// s3.c -> undefined , EXACT
 
 
    s2.a = &b;
 
 // Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s1.b[*] -> undefined , EXACT
+// s1.a -> undefined , EXACT
+// s1.c -> undefined , EXACT
+// s2.b[*] -> undefined , EXACT
+// s2.c -> undefined , EXACT
 // s2.a -> b , EXACT
-// s3.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s3.b[*] -> undefined , EXACT
+// s3.a -> undefined , EXACT
+// s3.c -> undefined , EXACT
 
    s3.a = &c;
 
 // Points To:
-// s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s1.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s1.b[*] -> undefined , EXACT
+// s1.a -> undefined , EXACT
+// s1.c -> undefined , EXACT
+// s2.b[*] -> undefined , EXACT
+// s2.c -> undefined , EXACT
 // s2.a -> b , EXACT
-// s3.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s3.c -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// s3.b[*] -> undefined , EXACT
+// s3.c -> undefined , EXACT
 // s3.a -> c , EXACT
 
    s1 = c==d?s2:s3;
 
-// Points To: unreachable
+// Points To:
+// s1.b[*] -> undefined , MAY
+// s1.c -> undefined , EXACT
+// s1.a -> c , EXACT
+// s2.b[*] -> undefined , EXACT
+// s2.c -> undefined , EXACT
+// s2.a -> b , EXACT
+// s3.b[*] -> undefined , EXACT
+// s3.c -> undefined , EXACT
+// s3.a -> c , EXACT
 
    return 0;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Assignment of an undefined value at line 15.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_to_points_to_sinks) Some kind of execution error has been encountered at line 15.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Expression "s2[c]" could not be dereferenced at line 15.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_to_points_to_sinks) Some kind of execution error has been encountered at line 15.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Expression "s3[a]" could not be dereferenced at line 15.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_to_points_to_sinks) Some kind of execution error has been encountered at line 15.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Expression "s3[b][*]" could not be dereferenced at line 15.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (reference_to_points_to_sinks) Some kind of execution error has been encountered at line 15.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (pointer_assignment_to_points_to) Expression "s3[c]" could not be dereferenced at line 15.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "s1[b][*]" at line 15.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "s1[c]" at line 15.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "s1[b][*]" at line 15.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "s1[c]" at line 15.

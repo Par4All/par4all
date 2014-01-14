@@ -1,0 +1,58 @@
+
+RW regions
+
+
+//  <a[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=n}>
+//  <a[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=n}>
+//  <b[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=n, 1<=n}>
+//  <m[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=n}>
+
+void mvmult01(int n, double a[n], double b[n], double m[n][n])
+{
+   int i, j;
+
+//  <a[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=n}>
+//  <a[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=n}>
+//  <b[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=n, 1<=n}>
+//  <m[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=n}>
+
+
+   for(i = 0; i <= n-1; i += 1) {
+
+//  <a[PHI1]-W-EXACT-{PHI1==i, 0<=i, i+1<=n}>
+
+      a[i] = 0;
+
+//  <a[PHI1]-R-EXACT-{PHI1==i, 0<=i, i+1<=n, 1<=n}>
+//  <a[PHI1]-W-EXACT-{PHI1==i, 0<=i, i+1<=n, 1<=n}>
+//  <b[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=n, 0<=i, i+1<=n}>
+//  <m[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=n, 0<=i,
+//    i+1<=n}>
+
+      for(j = 0; j <= n-1; j += 1)
+
+//  <a[PHI1]-R-EXACT-{PHI1==i, 0<=i, i+1<=n, 0<=j, j+1<=n}>
+//  <a[PHI1]-W-EXACT-{PHI1==i, 0<=i, i+1<=n, 0<=j, j+1<=n}>
+//  <b[PHI1]-R-EXACT-{PHI1==j, 0<=i, i+1<=n, 0<=j, j+1<=n}>
+//  <m[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=n, 0<=j,
+//    j+1<=n}>
+
+         a[i] += m[i][j]*b[j];
+   }
+}
+
+Code after scalarization
+
+void mvmult01(int n, double a[n], double b[n], double m[n][n])
+{
+   int i, j;
+   //PIPS generated variable
+   register double a_0;
+
+   for(i = 0; i <= n-1; i += 1) {
+      a_0 = 0;
+      for(j = 0; j <= n-1; j += 1)
+         a_0 += m[i][j]*b[j];
+      a[i] = a_0;
+   }
+}

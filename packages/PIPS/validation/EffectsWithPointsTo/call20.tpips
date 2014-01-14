@@ -10,22 +10,143 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 # This property is not compatible with the source code
 # set POINTS_TO_STRICT_POINTER_TYPES TRUE
 
-echo 
-echo POINTS-TO
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+
+
+echo
+echo Points-to for "pointer_alloc"
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE [%ALLFUNC]
+display PRINTED_FILE[pointer_alloc]
 
-echo 
-echo PROPER  EFFECTS WITH POINTS TO
 echo
-activate PROPER_EFFECTS_WITH_POINTS_TO
+echo Proper effects with points-to for "pointer_alloc"
+echo
+
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE [%ALLFUNC]
+display PRINTED_FILE[pointer_alloc]
+
+echo
+echo Cumulated effects with points-to for "pointer_alloc"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[pointer_alloc]
+
+echo
+echo Points-to for "pointer_free"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[pointer_free]
+
+echo
+echo Proper effects with points-to for "pointer_free"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[pointer_free]
+
+echo
+echo Cumulated effects with points-to for "pointer_free"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[pointer_free]
+
+echo
+echo Points-to for "pointer_set"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[pointer_set]
+
+echo
+echo Proper effects with points-to for "pointer_set"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[pointer_set]
+
+echo
+echo Cumulated effects with points-to for "pointer_set"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[pointer_set]
+
+
+echo
+echo Points-to for "pointer_add"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[pointer_add]
+
+echo
+echo Proper effects with points-to for "pointer_add"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[pointer_add]
+
+echo
+echo Cumulated effects with points-to for "pointer_add"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[pointer_add]
+
+
+echo
+echo Points-to for "pointer_get"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[pointer_get]
+
+echo
+echo Proper effects with points-to for "pointer_get"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[pointer_get]
+
+echo
+echo Cumulated effects with points-to for "pointer_get"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[pointer_get]
+
+
+echo
+echo Points-to for "main"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+echo
+echo Proper effects with points-to main"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Cumulated effects with points-to for "main"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
 
 activate PRINT_CHAINS_GRAPH
-display DG_FILE 
+display DG_FILE[main]
 
 close
+
+echo
+echo Warnings and errors:
+echo
+
+shell cat $WSPACE.database/Warnings
+
 delete $WSPACE
 quit

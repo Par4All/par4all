@@ -1,4 +1,1353 @@
 
+PROPER  EFFECTS 
+
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+   int j;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: psrc1
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: psrc2
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: pdest
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+   fgINT32 v1;
+   fgINT32 v2;
+   fgINT32 result;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: spp
+   int spp = datdest->spp;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: length
+   int length = datdest->length*spp;
+//             <    is read   >: length
+//             <    is written>: j
+   for(j = 0; j <= length-1; j += 1) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: v1
+      v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: v2
+      v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
+//             <    is read   >: length v1 v2
+//             <    is written>: result
+      result = flgr_defop_add_fgINT32(v1, v2);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: j length pdest result
+      flgr1d_set_data_array_fgINT32(pdest, j, result);
+   }
+   return;
+}
+FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
+{
+   FLGR_Ret ret;
+//             <    is read   >: data1 data2 datdest
+   if (datdest==(void *) 0||data1==(void *) 0||data2==(void *) 0) {
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
+      return FLGR_RET_NULL_OBJECT;
+   }
+//             <    is read   >: data1 datdest
+//             <    is written>: ret
+   if ((ret = flgr2d_is_data_same_attributes(datdest, data1))!=FLGR_RET_OK)
+//             <    is read   >: ret
+      return ret;
+//             <    is read   >: data1 data2
+//             <    is written>: ret
+   if ((ret = flgr2d_is_data_same_attributes(data2, data1))!=FLGR_RET_OK)
+//             <    is read   >: ret
+      return ret;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+
+   if (datdest->type==FLGR_BIT) {
+//             <    is read   >: data1 data2 datdest
+      flgr2d_arith_add_fgBIT(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (datdest->type==FLGR_UINT8) {
+//             <    is read   >: data1 data2 datdest
+      flgr2d_arith_add_fgUINT8(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (datdest->type==FLGR_UINT16) {
+//             <    is read   >: data1 data2 datdest
+      flgr2d_arith_add_fgUINT16(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (datdest->type==FLGR_UINT32) {
+//             <    is read   >: data1 data2 datdest
+      flgr2d_arith_add_fgUINT32(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (datdest->type==FLGR_INT8) {
+//             <    is read   >: data1 data2 datdest
+      flgr2d_arith_add_fgINT8(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (datdest->type==FLGR_INT16) {
+//             <    is read   >: data1 data2 datdest
+      flgr2d_arith_add_fgINT16(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (datdest->type==FLGR_INT32) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      flgr2d_arith_add_fgINT32(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (datdest->type==FLGR_FLOAT32) {
+//             <    is read   >: data1 data2 datdest
+      flgr2d_arith_add_fgFLOAT32(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (datdest->type==FLGR_FLOAT64) {
+//             <    is read   >: data1 data2 datdest
+      flgr2d_arith_add_fgFLOAT64(datdest, data1, data2);
+      return FLGR_RET_OK;
+   }
+//             <may be read   >: stderr[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "type <%s> unknown!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
+   return FLGR_RET_TYPE_UNKNOWN;
+}
+void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: pdest
+   FLGR_Data1D **pdest = datdest->row;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: p1
+   FLGR_Data1D **p1 = data1->row;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: p2
+   FLGR_Data1D **p2 = data2->row;
+   int i;
+//             <    is written>: i
+   i = 0;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   while (i<data1->size_y) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      flgr1d_arith_add_fgINT32(*pdest, *p1, *p2);
+//             <    is read   >: i p1 p2 pdest
+//             <    is written>: i p1 p2 pdest
+      i++, pdest++, p1++, p2++;
+   }
+   return;
+}
+static fgINT32 flgr1d_get_data_array_fgINT32(fgINT32 *array, int pos)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   return flgr_get_array_fgINT32(array, pos);
+}
+static void flgr1d_set_data_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: array pos value
+   flgr_set_array_fgINT32(array, pos, value);
+}
+static fgINT32 flgr_defop_add_fgINT32(fgINT32 a, fgINT32 b)
+{
+//             <    is read   >: a b
+   return a+b;
+}
+static fgINT32 flgr_get_array_fgINT32(fgINT32 *array, int pos)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   return array[pos];
+}
+static void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: array pos value
+   array[pos] = value;
+}
+
+POINTS-TO
+
+
+// Points To IN:
+// _data1_2[0].array -> *NULL_POINTER* , MAY
+// _data1_2[0].array -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].array -> *NULL_POINTER* , MAY
+// _data2_3[0].array -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].array -> *NULL_POINTER* , MAY
+// _datdest_1[0].array -> _datdest_1_1__1[0][0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1[0] , MAY
+
+
+// Points To OUT:
+// _data1_2[0].array -> *NULL_POINTER* , MAY
+// _data1_2[0].array -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].array -> *NULL_POINTER* , MAY
+// _data2_3[0].array -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].array -> *NULL_POINTER* , MAY
+// _datdest_1[0].array -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+
+// Points To: none
+
+   int j;
+
+// Points To:
+// _data1_2[0].array -> *NULL_POINTER* , MAY
+// _data1_2[0].array -> _data1_2_1__2[0][0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+
+// Points To:
+// _data1_2[0].array -> *NULL_POINTER* , MAY
+// _data1_2[0].array -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].array -> *NULL_POINTER* , MAY
+// _data2_3[0].array -> _data2_3_1__3[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_1__2[0][0] , MAY
+
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+
+// Points To:
+// _data1_2[0].array -> *NULL_POINTER* , MAY
+// _data1_2[0].array -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].array -> *NULL_POINTER* , MAY
+// _data2_3[0].array -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].array -> *NULL_POINTER* , MAY
+// _datdest_1[0].array -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1[0] , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_1__2[0][0] , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_1__3[0][0] , MAY
+
+   fgINT32 *pdest = (fgINT32 *) datdest->array;
+
+// Points To:
+// _data1_2[0].array -> *NULL_POINTER* , MAY
+// _data1_2[0].array -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].array -> *NULL_POINTER* , MAY
+// _data2_3[0].array -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].array -> *NULL_POINTER* , MAY
+// _datdest_1[0].array -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_1__2[0][0] , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_1__3[0][0] , MAY
+
+   fgINT32 v1;
+
+// Points To:
+// _data1_2[0].array -> *NULL_POINTER* , MAY
+// _data1_2[0].array -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].array -> *NULL_POINTER* , MAY
+// _data2_3[0].array -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].array -> *NULL_POINTER* , MAY
+// _datdest_1[0].array -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_1__2[0][0] , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_1__3[0][0] , MAY
+
+   fgINT32 v2;
+
+// Points To:
+// _data1_2[0].array -> *NULL_POINTER* , MAY
+// _data1_2[0].array -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].array -> *NULL_POINTER* , MAY
+// _data2_3[0].array -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].array -> *NULL_POINTER* , MAY
+// _datdest_1[0].array -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_1__2[0][0] , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_1__3[0][0] , MAY
+
+   fgINT32 result;
+
+// Points To:
+// _data1_2[0].array -> *NULL_POINTER* , MAY
+// _data1_2[0].array -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].array -> *NULL_POINTER* , MAY
+// _data2_3[0].array -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].array -> *NULL_POINTER* , MAY
+// _datdest_1[0].array -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_1__2[0][0] , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_1__3[0][0] , MAY
+
+   int spp = datdest->spp;
+
+// Points To:
+// _data1_2[0].array -> *NULL_POINTER* , MAY
+// _data1_2[0].array -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].array -> *NULL_POINTER* , MAY
+// _data2_3[0].array -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].array -> *NULL_POINTER* , MAY
+// _datdest_1[0].array -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_1__2[0][0] , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_1__3[0][0] , MAY
+
+   int length = datdest->length*spp;
+
+// Points To:
+// _data1_2[0].array -> *NULL_POINTER* , MAY
+// _data1_2[0].array -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].array -> *NULL_POINTER* , MAY
+// _data2_3[0].array -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].array -> *NULL_POINTER* , MAY
+// _datdest_1[0].array -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_1__2[0][0] , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_1__3[0][0] , MAY
+
+   for(j = 0; j <= length-1; j += 1) {
+
+// Points To:
+// _data1_2[0].array -> *NULL_POINTER* , MAY
+// _data1_2[0].array -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].array -> *NULL_POINTER* , MAY
+// _data2_3[0].array -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].array -> *NULL_POINTER* , MAY
+// _datdest_1[0].array -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_1__2[0][0] , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_1__3[0][0] , MAY
+
+      v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
+
+// Points To:
+// _data1_2[0].array -> *NULL_POINTER* , MAY
+// _data1_2[0].array -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].array -> *NULL_POINTER* , MAY
+// _data2_3[0].array -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].array -> *NULL_POINTER* , MAY
+// _datdest_1[0].array -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+// psrc1 -> _data1_2_1__2[0][0] , EXACT
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_1__3[0][0] , MAY
+
+      v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
+
+// Points To:
+// _data1_2[0].array -> *NULL_POINTER* , MAY
+// _data1_2[0].array -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].array -> *NULL_POINTER* , MAY
+// _data2_3[0].array -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].array -> *NULL_POINTER* , MAY
+// _datdest_1[0].array -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+// psrc1 -> _data1_2_1__2[0][0] , EXACT
+// psrc2 -> _data2_3_1__3[0][0] , EXACT
+
+      result = flgr_defop_add_fgINT32(v1, v2);
+
+// Points To:
+// _data1_2[0].array -> *NULL_POINTER* , MAY
+// _data1_2[0].array -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].array -> *NULL_POINTER* , MAY
+// _data2_3[0].array -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].array -> *NULL_POINTER* , MAY
+// _datdest_1[0].array -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+// psrc1 -> _data1_2_1__2[0][0] , EXACT
+// psrc2 -> _data2_3_1__3[0][0] , EXACT
+
+      flgr1d_set_data_array_fgINT32(pdest, j, result);
+   }
+
+// Points To:
+// _data1_2[0].array -> *NULL_POINTER* , MAY
+// _data1_2[0].array -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].array -> *NULL_POINTER* , MAY
+// _data2_3[0].array -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].array -> *NULL_POINTER* , MAY
+// _datdest_1[0].array -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+// psrc1 -> *NULL_POINTER* , MAY
+// psrc1 -> _data1_2_1__2[0][0] , MAY
+// psrc2 -> *NULL_POINTER* , MAY
+// psrc2 -> _data2_3_1__3[0][0] , MAY
+
+   return;
+}
+
+// Points To IN:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1[0] , MAY
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+
+// Points To OUT:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
+{
+
+// Points To: none
+
+   FLGR_Ret ret;
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1[0] , MAY
+
+   if (datdest==(void *) 0||data1==(void *) 0||data2==(void *) 0) {
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data2 -> *NULL_POINTER* , MAY
+// datdest -> *NULL_POINTER* , MAY
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data2 -> *NULL_POINTER* , MAY
+// datdest -> *NULL_POINTER* , MAY
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      return FLGR_RET_NULL_OBJECT;
+   }
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1[0] , MAY
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+   if ((ret = flgr2d_is_data_same_attributes(datdest, data1))!=FLGR_RET_OK)
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1[0] , MAY
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      return ret;
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1[0] , MAY
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+   if ((ret = flgr2d_is_data_same_attributes(data2, data1))!=FLGR_RET_OK)
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1[0] , MAY
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      return ret;
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1[0] , MAY
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+
+   if (datdest->type==FLGR_BIT) {
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      flgr2d_arith_add_fgBIT(datdest, data1, data2);
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      return FLGR_RET_OK;
+   }
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+   if (datdest->type==FLGR_UINT8) {
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      flgr2d_arith_add_fgUINT8(datdest, data1, data2);
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      return FLGR_RET_OK;
+   }
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+   if (datdest->type==FLGR_UINT16) {
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      flgr2d_arith_add_fgUINT16(datdest, data1, data2);
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      return FLGR_RET_OK;
+   }
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+   if (datdest->type==FLGR_UINT32) {
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      flgr2d_arith_add_fgUINT32(datdest, data1, data2);
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      return FLGR_RET_OK;
+   }
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+   if (datdest->type==FLGR_INT8) {
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      flgr2d_arith_add_fgINT8(datdest, data1, data2);
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      return FLGR_RET_OK;
+   }
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+   if (datdest->type==FLGR_INT16) {
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      flgr2d_arith_add_fgINT16(datdest, data1, data2);
+
+// Points To:
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      return FLGR_RET_OK;
+   }
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+   if (datdest->type==FLGR_INT32) {
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      flgr2d_arith_add_fgINT32(datdest, data1, data2);
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      return FLGR_RET_OK;
+   }
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+   if (datdest->type==FLGR_FLOAT32) {
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      flgr2d_arith_add_fgFLOAT32(datdest, data1, data2);
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      return FLGR_RET_OK;
+   }
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+   if (datdest->type==FLGR_FLOAT64) {
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      flgr2d_arith_add_fgFLOAT64(datdest, data1, data2);
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+      return FLGR_RET_OK;
+   }
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+   fprintf(stderr, "type <%s> unknown!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// stderr -> *NULL_POINTER* , MAY
+// stderr -> _stderr_[0] , MAY
+
+   return FLGR_RET_TYPE_UNKNOWN;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int flgr2d_arith_add_fgBIT(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
+{
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int flgr2d_arith_add_fgFLOAT32(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
+{
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int flgr2d_arith_add_fgFLOAT64(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
+{
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int flgr2d_arith_add_fgINT16(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
+{
+}
+
+// Points To IN:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data1_2_1__2[0][0] -> *NULL_POINTER* , MAY
+// _data1_2_1__2[0][0] -> _data1_2_1__2_2[0][0][0] , MAY
+// _data1_2_1__2_2[0][0][0].array -> *NULL_POINTER* , MAY
+// _data1_2_1__2_2[0][0][0].array -> _data1_2_1__2_2_1__2[0][0][0][0]
+//     , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _data2_3_1__3[0][0] -> *NULL_POINTER* , MAY
+// _data2_3_1__3[0][0] -> _data2_3_1__3_3[0][0][0] , MAY
+// _data2_3_1__3_3[0][0][0].array -> *NULL_POINTER* , MAY
+// _data2_3_1__3_3[0][0][0].array -> _data2_3_1__3_3_1__3[0][0][0][0]
+//     , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// _datdest_1_1__1[0][0] -> *NULL_POINTER* , MAY
+// _datdest_1_1__1[0][0] -> _datdest_1_1__1_1[0][0][0] , MAY
+// _datdest_1_1__1_1[0][0][0].array -> *NULL_POINTER* , MAY
+// _datdest_1_1__1_1[0][0][0].array -> _datdest_1_1__1_1_1__1[0][0][0]
+//    [0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1[0] , MAY
+
+
+// Points To OUT:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+
+void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
+{
+
+// Points To:
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// datdest -> *NULL_POINTER* , MAY
+// datdest -> _datdest_1[0] , MAY
+
+   FLGR_Data1D **pdest = datdest->row;
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> *NULL_POINTER* , MAY
+// data1 -> _data1_2[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+
+   FLGR_Data1D **p1 = data1->row;
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> *NULL_POINTER* , MAY
+// data2 -> _data2_3[0] , MAY
+// datdest -> _datdest_1[0] , EXACT
+// p1 -> *NULL_POINTER* , MAY
+// p1 -> _data1_2_1__2[0][0] , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+
+   FLGR_Data1D **p2 = data2->row;
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+// p1 -> *NULL_POINTER* , MAY
+// p1 -> _data1_2_1__2[0][0] , MAY
+// p2 -> *NULL_POINTER* , MAY
+// p2 -> _data2_3_1__3[0][0] , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+
+   int i;
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+// p1 -> *NULL_POINTER* , MAY
+// p1 -> _data1_2_1__2[0][0] , MAY
+// p2 -> *NULL_POINTER* , MAY
+// p2 -> _data2_3_1__3[0][0] , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+
+   i = 0;
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+// p1 -> *NULL_POINTER* , MAY
+// p1 -> _data1_2_1__2[0][0] , MAY
+// p2 -> *NULL_POINTER* , MAY
+// p2 -> _data2_3_1__3[0][0] , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+
+   while (i<data1->size_y) {
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data1_2_1__2[0][0] -> *NULL_POINTER* , MAY
+// _data1_2_1__2[0][0] -> _data1_2_1__2_2[0][0][0] , MAY
+// _data1_2_1__2_2[0][0][0].array -> *NULL_POINTER* , MAY
+// _data1_2_1__2_2[0][0][0].array -> _data1_2_1__2_2_1__2[0][0][0][0]
+//     , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _data2_3_1__3[0][0] -> *NULL_POINTER* , MAY
+// _data2_3_1__3[0][0] -> _data2_3_1__3_3[0][0][0] , MAY
+// _data2_3_1__3_3[0][0][0].array -> *NULL_POINTER* , MAY
+// _data2_3_1__3_3[0][0][0].array -> _data2_3_1__3_3_1__3[0][0][0][0]
+//     , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// _datdest_1_1__1[0][0] -> *NULL_POINTER* , MAY
+// _datdest_1_1__1[0][0] -> _datdest_1_1__1_1[0][0][0] , MAY
+// _datdest_1_1__1_1[0][0][0].array -> *NULL_POINTER* , MAY
+// _datdest_1_1__1_1[0][0][0].array -> _datdest_1_1__1_1_1__1[0][0][0]
+//    [0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+// p1 -> *NULL_POINTER* , MAY
+// p1 -> _data1_2_1__2[0][0] , MAY
+// p2 -> *NULL_POINTER* , MAY
+// p2 -> _data2_3_1__3[0][0] , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+
+      flgr1d_arith_add_fgINT32(*pdest, *p1, *p2);
+
+// Points To: none
+
+      i++, pdest++, p1++, p2++;
+   }
+
+// Points To:
+// _data1_2[0].row -> *NULL_POINTER* , MAY
+// _data1_2[0].row -> _data1_2_1__2[0][0] , MAY
+// _data2_3[0].row -> *NULL_POINTER* , MAY
+// _data2_3[0].row -> _data2_3_1__3[0][0] , MAY
+// _datdest_1[0].row -> *NULL_POINTER* , MAY
+// _datdest_1[0].row -> _datdest_1_1__1[0][0] , MAY
+// data1 -> _data1_2[0] , EXACT
+// data2 -> _data2_3[0] , EXACT
+// datdest -> _datdest_1[0] , EXACT
+// p1 -> *NULL_POINTER* , MAY
+// p1 -> _data1_2_1__2[0][0] , MAY
+// p2 -> *NULL_POINTER* , MAY
+// p2 -> _data2_3_1__3[0][0] , MAY
+// pdest -> *NULL_POINTER* , MAY
+// pdest -> _datdest_1_1__1[0][0] , MAY
+
+   return;
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int flgr2d_arith_add_fgINT8(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
+{
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int flgr2d_arith_add_fgUINT16(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
+{
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int flgr2d_arith_add_fgUINT32(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
+{
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int flgr2d_arith_add_fgUINT8(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
+{
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int flgr2d_is_data_same_attributes(FLGR_Data2D *f1, FLGR_Data2D *f2)
+{
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int flgr_get_type_string(enum FLGR_TYPE f1)
+{
+}
+
+// Points To IN:
+// array -> *NULL_POINTER* , MAY
+// array -> _array_1[0] , MAY
+
+
+// Points To OUT:
+// array -> _array_1[0] , EXACT
+
+static fgINT32 flgr1d_get_data_array_fgINT32(fgINT32 *array, int pos)
+{
+
+// Points To:
+// array -> *NULL_POINTER* , MAY
+// array -> _array_1[0] , MAY
+
+   return flgr_get_array_fgINT32(array, pos);
+}
+
+// Points To IN:
+// array -> *NULL_POINTER* , MAY
+// array -> _array_1[0] , MAY
+
+
+// Points To OUT:
+// array -> _array_1[0] , EXACT
+
+static void flgr1d_set_data_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
+{
+
+// Points To:
+// array -> *NULL_POINTER* , MAY
+// array -> _array_1[0] , MAY
+
+   flgr_set_array_fgINT32(array, pos, value);
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+static fgINT32 flgr_defop_add_fgINT32(fgINT32 a, fgINT32 b)
+{
+
+// Points To: none
+
+   return a+b;
+}
+
+// Points To IN:
+// array -> *NULL_POINTER* , MAY
+// array -> _array_1[0] , MAY
+
+
+// Points To OUT:
+// array -> _array_1[0] , EXACT
+
+static fgINT32 flgr_get_array_fgINT32(fgINT32 *array, int pos)
+{
+
+// Points To:
+// array -> *NULL_POINTER* , MAY
+// array -> _array_1[0] , MAY
+
+   return array[pos];
+}
+
+// Points To IN:
+// array -> *NULL_POINTER* , MAY
+// array -> _array_1[0] , MAY
+
+
+// Points To OUT:
+// array -> _array_1[0] , EXACT
+
+static void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
+{
+
+// Points To:
+// array -> *NULL_POINTER* , MAY
+// array -> _array_1[0] , MAY
+
+   array[pos] = value;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
    int j;
@@ -23,15 +1372,18 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
 //             <    is read   >: length
 //             <    is written>: j
    for(j = 0; j <= length-1; j += 1) {
+//             <may be read   >: _data1_2_1__2[0][*]
 //             <    is read   >: j length psrc1
 //             <    is written>: v1
       v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
+//             <may be read   >: _data2_3_1__3[0][*]
 //             <    is read   >: j length psrc2
 //             <    is written>: v2
       v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
 //             <    is read   >: length v1 v2
 //             <    is written>: result
       result = flgr_defop_add_fgINT32(v1, v2);
+//             <may be written>: _datdest_1_1__1[0][*]
 //             <    is read   >: j length pdest result
       flgr1d_set_data_array_fgINT32(pdest, j, result);
    }
@@ -98,7 +1450,8 @@ FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D 
    }
 //             <    is read   >: _datdest_1[0].type datdest
    if (datdest->type==FLGR_INT32) {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _data1_2[0].size_y data1 data2 
+//                               datdest
       flgr2d_arith_add_fgINT32(datdest, data1, data2);
       return FLGR_RET_OK;
    }
@@ -150,7 +1503,9 @@ void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Dat
    i = 0;
 //             <    is read   >: _data1_2[0].size_y data1 i
    while (i<data1->size_y) {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _data1_2_1__2[0][0] 
+//                               _data2_3_1__3[0][0] 
+//                               _datdest_1_1__1[0][0] p1 p2 pdest
       flgr1d_arith_add_fgINT32(*pdest, *p1, *p2);
 //             <    is read   >: i p1 p2 pdest
 //             <    is written>: i p1 p2 pdest
@@ -178,11 +1533,13 @@ int flgr_get_type_string(enum FLGR_TYPE f1)
 }
 static fgINT32 flgr1d_get_data_array_fgINT32(fgINT32 *array, int pos)
 {
+//             <may be read   >: _array_1[*]
 //             <    is read   >: array pos
    return flgr_get_array_fgINT32(array, pos);
 }
 static void flgr1d_set_data_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
 {
+//             <may be written>: _array_1[*]
 //             <    is read   >: array pos value
    flgr_set_array_fgINT32(array, pos, value);
 }
@@ -207,3 +1564,130 @@ static void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
 
 
 ****************** End of Dependence Graph ******************
+
+Warnings and errors:
+
+unknown[unknown] (splitc_lex) gcc extension keyword "__inline__" is ignored
+unknown[unknown] (splitc_lex) gcc extension keyword "__inline__" is ignored
+C_PARSER[fulguro01!flgr_defop_add_fgINT32] (c_lex) gcc extension keyword "__inline__" is ignored
+C_PARSER[fulguro01!flgr1d_get_data_array_fgINT32] (c_lex) gcc extension keyword "__inline__" is ignored
+C_PARSER[flgr2d_arith_add] (check_C_function_type) Type updated for function "flgr2d_is_data_same_attributes"
+C_PARSER[flgr2d_arith_add] (check_C_function_type) Type updated for function "flgr2d_arith_add_fgBIT"
+C_PARSER[flgr2d_arith_add] (check_C_function_type) Type updated for function "flgr2d_arith_add_fgUINT8"
+C_PARSER[flgr2d_arith_add] (check_C_function_type) Type updated for function "flgr2d_arith_add_fgUINT16"
+C_PARSER[flgr2d_arith_add] (check_C_function_type) Type updated for function "flgr2d_arith_add_fgUINT32"
+C_PARSER[flgr2d_arith_add] (check_C_function_type) Type updated for function "flgr2d_arith_add_fgINT8"
+C_PARSER[flgr2d_arith_add] (check_C_function_type) Type updated for function "flgr2d_arith_add_fgINT16"
+C_PARSER[flgr2d_arith_add] (check_C_function_type) Type updated for function "flgr2d_arith_add_fgFLOAT32"
+C_PARSER[flgr2d_arith_add] (check_C_function_type) Type updated for function "flgr2d_arith_add_fgFLOAT64"
+C_PARSER[flgr2d_arith_add] (check_C_function_type) Type updated for function "flgr_get_type_string"
+unknown[unknown] (build_real_resources) No source code for module flgr_get_type_string.
+unknown[unknown] (build_real_resources) No source code for module flgr_get_type_string.
+C_INITIALIZER[flgr_get_type_string] (missing_file_initializer) no source file for flgr_get_type_string: synthetic code is generated
+unknown[unknown] (make_required) More resources are now requested: 3 instead of 2...
+unknown[unknown] (build_real_resources) No source code for module flgr2d_arith_add_fgFLOAT64.
+unknown[unknown] (build_real_resources) No source code for module flgr2d_arith_add_fgFLOAT64.
+C_INITIALIZER[flgr2d_arith_add_fgFLOAT64] (missing_file_initializer) no source file for flgr2d_arith_add_fgFLOAT64: synthetic code is generated
+unknown[unknown] (make_required) More resources are now requested: 3 instead of 2...
+unknown[unknown] (build_real_resources) No source code for module flgr2d_arith_add_fgFLOAT32.
+unknown[unknown] (build_real_resources) No source code for module flgr2d_arith_add_fgFLOAT32.
+C_INITIALIZER[flgr2d_arith_add_fgFLOAT32] (missing_file_initializer) no source file for flgr2d_arith_add_fgFLOAT32: synthetic code is generated
+unknown[unknown] (make_required) More resources are now requested: 3 instead of 2...
+unknown[unknown] (build_real_resources) No source code for module flgr2d_arith_add_fgINT16.
+unknown[unknown] (build_real_resources) No source code for module flgr2d_arith_add_fgINT16.
+C_INITIALIZER[flgr2d_arith_add_fgINT16] (missing_file_initializer) no source file for flgr2d_arith_add_fgINT16: synthetic code is generated
+unknown[unknown] (make_required) More resources are now requested: 3 instead of 2...
+unknown[unknown] (build_real_resources) No source code for module flgr2d_arith_add_fgINT8.
+unknown[unknown] (build_real_resources) No source code for module flgr2d_arith_add_fgINT8.
+C_INITIALIZER[flgr2d_arith_add_fgINT8] (missing_file_initializer) no source file for flgr2d_arith_add_fgINT8: synthetic code is generated
+unknown[unknown] (make_required) More resources are now requested: 3 instead of 2...
+unknown[unknown] (build_real_resources) No source code for module flgr2d_arith_add_fgUINT32.
+unknown[unknown] (build_real_resources) No source code for module flgr2d_arith_add_fgUINT32.
+C_INITIALIZER[flgr2d_arith_add_fgUINT32] (missing_file_initializer) no source file for flgr2d_arith_add_fgUINT32: synthetic code is generated
+unknown[unknown] (make_required) More resources are now requested: 3 instead of 2...
+unknown[unknown] (build_real_resources) No source code for module flgr2d_arith_add_fgUINT16.
+unknown[unknown] (build_real_resources) No source code for module flgr2d_arith_add_fgUINT16.
+C_INITIALIZER[flgr2d_arith_add_fgUINT16] (missing_file_initializer) no source file for flgr2d_arith_add_fgUINT16: synthetic code is generated
+unknown[unknown] (make_required) More resources are now requested: 3 instead of 2...
+unknown[unknown] (build_real_resources) No source code for module flgr2d_arith_add_fgUINT8.
+unknown[unknown] (build_real_resources) No source code for module flgr2d_arith_add_fgUINT8.
+C_INITIALIZER[flgr2d_arith_add_fgUINT8] (missing_file_initializer) no source file for flgr2d_arith_add_fgUINT8: synthetic code is generated
+unknown[unknown] (make_required) More resources are now requested: 3 instead of 2...
+unknown[unknown] (build_real_resources) No source code for module flgr2d_arith_add_fgBIT.
+unknown[unknown] (build_real_resources) No source code for module flgr2d_arith_add_fgBIT.
+C_INITIALIZER[flgr2d_arith_add_fgBIT] (missing_file_initializer) no source file for flgr2d_arith_add_fgBIT: synthetic code is generated
+unknown[unknown] (make_required) More resources are now requested: 3 instead of 2...
+unknown[unknown] (build_real_resources) No source code for module flgr2d_is_data_same_attributes.
+unknown[unknown] (build_real_resources) No source code for module flgr2d_is_data_same_attributes.
+C_INITIALIZER[flgr2d_is_data_same_attributes] (missing_file_initializer) no source file for flgr2d_is_data_same_attributes: synthetic code is generated
+unknown[unknown] (make_required) More resources are now requested: 3 instead of 2...
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr1d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Function "flgr_defop_add_fgINT32" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr1d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Function "flgr_defop_add_fgINT32" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr1d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Function "flgr_defop_add_fgINT32" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr1d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Function "flgr_defop_add_fgINT32" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add_fgINT32] (compute_points_to_gen_set) Points-to sink cell sk1="_data2_3_1__3[0][0]" could not be translated but has to be.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Incompatibility between call site and callee's output.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add_fgINT32] (compute_points_to_gen_set) Points-to sink cell sk1="_data2_3_1__3[0][0]" could not be translated but has to be.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Incompatibility between call site and callee's output.
+PROPER_EFFECTS_WITH_POINTS_TO[flgr2d_arith_add_fgINT32] (backward_translation_of_points_to_formal_context_effect) Effect "flgr1d_arith_add_fgINT32:_data2_3_1__3[0][*]" of callee "flgr1d_arith_add_fgINT32" cannot be translated. Check that the caller "flgr2d_arith_add_fgINT32" provides initialized parameters.
+PROPER_EFFECTS_WITH_POINTS_TO[flgr2d_arith_add_fgINT32] (backward_translation_of_points_to_formal_context_effect) Effect "flgr1d_arith_add_fgINT32:_datdest_1_1__1[0][*]" of callee "flgr1d_arith_add_fgINT32" cannot be translated. Check that the caller "flgr2d_arith_add_fgINT32" provides initialized parameters.
+PROPER_EFFECTS_WITH_POINTS_TO[flgr2d_arith_add_fgINT32] (backward_translation_of_points_to_formal_context_effect) Effect "flgr1d_arith_add_fgINT32:_data1_2_1__2[0][*]" of callee "flgr1d_arith_add_fgINT32" cannot be translated. Check that the caller "flgr2d_arith_add_fgINT32" provides initialized parameters.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (CSafeSizeOfArray) Varying size for array "fulguro01!:_IO_FILE^_unused2"
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (CSafeSizeOfArray) Not yet supported properly by PIPS
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_is_data_same_attributes" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_is_data_same_attributes" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_arith_add_fgBIT" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_arith_add_fgUINT8" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_arith_add_fgUINT16" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_arith_add_fgUINT32" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_arith_add_fgINT8" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_arith_add_fgINT16" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (compute_points_to_gen_set) Points-to sink cell sk1="_datdest_1_1__1[0][0]" could not be translated.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (compute_points_to_gen_set) Points-to sink cell sk1="_data2_3_1__3[0][0]" could not be translated.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (compute_points_to_gen_set) Points-to sink cell sk1="_data1_2_1__2[0][0]" could not be translated.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_arith_add_fgFLOAT32" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_arith_add_fgFLOAT64" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr_get_type_string" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr1d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Function "flgr_defop_add_fgINT32" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr1d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Function "flgr_defop_add_fgINT32" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add_fgINT32] (compute_points_to_gen_set) Points-to sink cell sk1="_data2_3_1__3[0][0]" could not be translated but has to be.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Incompatibility between call site and callee's output.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add_fgINT32] (compute_points_to_gen_set) Points-to sink cell sk1="_data2_3_1__3[0][0]" could not be translated but has to be.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Incompatibility between call site and callee's output.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr1d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Function "flgr_defop_add_fgINT32" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr1d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Function "flgr_defop_add_fgINT32" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr1d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Function "flgr_defop_add_fgINT32" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr1d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Function "flgr_defop_add_fgINT32" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add_fgINT32] (compute_points_to_gen_set) Points-to sink cell sk1="_data2_3_1__3[0][0]" could not be translated but has to be.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Incompatibility between call site and callee's output.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add_fgINT32] (compute_points_to_gen_set) Points-to sink cell sk1="_data2_3_1__3[0][0]" could not be translated but has to be.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Incompatibility between call site and callee's output.
+PROPER_EFFECTS_WITH_POINTS_TO[flgr2d_arith_add_fgINT32] (backward_translation_of_points_to_formal_context_effect) Effect "flgr1d_arith_add_fgINT32:_data2_3_1__3[0][*]" of callee "flgr1d_arith_add_fgINT32" cannot be translated. Check that the caller "flgr2d_arith_add_fgINT32" provides initialized parameters.
+PROPER_EFFECTS_WITH_POINTS_TO[flgr2d_arith_add_fgINT32] (backward_translation_of_points_to_formal_context_effect) Effect "flgr1d_arith_add_fgINT32:_datdest_1_1__1[0][*]" of callee "flgr1d_arith_add_fgINT32" cannot be translated. Check that the caller "flgr2d_arith_add_fgINT32" provides initialized parameters.
+PROPER_EFFECTS_WITH_POINTS_TO[flgr2d_arith_add_fgINT32] (backward_translation_of_points_to_formal_context_effect) Effect "flgr1d_arith_add_fgINT32:_data1_2_1__2[0][*]" of callee "flgr1d_arith_add_fgINT32" cannot be translated. Check that the caller "flgr2d_arith_add_fgINT32" provides initialized parameters.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_is_data_same_attributes" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_is_data_same_attributes" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_arith_add_fgBIT" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_arith_add_fgUINT8" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_arith_add_fgUINT16" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_arith_add_fgUINT32" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_arith_add_fgINT8" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_arith_add_fgINT16" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (compute_points_to_gen_set) Points-to sink cell sk1="_datdest_1_1__1[0][0]" could not be translated.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (compute_points_to_gen_set) Points-to sink cell sk1="_data2_3_1__3[0][0]" could not be translated.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (compute_points_to_gen_set) Points-to sink cell sk1="_data1_2_1__2[0][0]" could not be translated.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_arith_add_fgFLOAT32" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr2d_arith_add_fgFLOAT64" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add] (user_call_to_points_to_interprocedural) Function "flgr_get_type_string" has no side effect on its formal context via pointer variables.
+PROPER_EFFECTS_WITH_POINTS_TO[flgr2d_arith_add] (backward_translation_of_points_to_formal_context_effect) Effect "flgr2d_arith_add_fgINT32:_data2_3_1__3[0][0]" of callee "flgr2d_arith_add_fgINT32" cannot be translated. Check that the caller "flgr2d_arith_add" provides initialized parameters.
+PROPER_EFFECTS_WITH_POINTS_TO[flgr2d_arith_add] (backward_translation_of_points_to_formal_context_effect) Effect "flgr2d_arith_add_fgINT32:_data1_2_1__2[0][0]" of callee "flgr2d_arith_add_fgINT32" cannot be translated. Check that the caller "flgr2d_arith_add" provides initialized parameters.
+PROPER_EFFECTS_WITH_POINTS_TO[flgr2d_arith_add] (backward_translation_of_points_to_formal_context_effect) Effect "flgr2d_arith_add_fgINT32:_datdest_1_1__1[0][0]" of callee "flgr2d_arith_add_fgINT32" cannot be translated. Check that the caller "flgr2d_arith_add" provides initialized parameters.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr1d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Function "flgr_defop_add_fgINT32" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr1d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Function "flgr_defop_add_fgINT32" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add_fgINT32] (compute_points_to_gen_set) Points-to sink cell sk1="_data2_3_1__3[0][0]" could not be translated but has to be.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Incompatibility between call site and callee's output.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add_fgINT32] (compute_points_to_gen_set) Points-to sink cell sk1="_data2_3_1__3[0][0]" could not be translated but has to be.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[flgr2d_arith_add_fgINT32] (user_call_to_points_to_interprocedural) Incompatibility between call site and callee's output.
+PROPER_EFFECTS_WITH_POINTS_TO[flgr2d_arith_add_fgINT32] (backward_translation_of_points_to_formal_context_effect) Effect "flgr1d_arith_add_fgINT32:_data2_3_1__3[0][*]" of callee "flgr1d_arith_add_fgINT32" cannot be translated. Check that the caller "flgr2d_arith_add_fgINT32" provides initialized parameters.
+PROPER_EFFECTS_WITH_POINTS_TO[flgr2d_arith_add_fgINT32] (backward_translation_of_points_to_formal_context_effect) Effect "flgr1d_arith_add_fgINT32:_datdest_1_1__1[0][*]" of callee "flgr1d_arith_add_fgINT32" cannot be translated. Check that the caller "flgr2d_arith_add_fgINT32" provides initialized parameters.
+PROPER_EFFECTS_WITH_POINTS_TO[flgr2d_arith_add_fgINT32] (backward_translation_of_points_to_formal_context_effect) Effect "flgr1d_arith_add_fgINT32:_data1_2_1__2[0][*]" of callee "flgr1d_arith_add_fgINT32" cannot be translated. Check that the caller "flgr2d_arith_add_fgINT32" provides initialized parameters.

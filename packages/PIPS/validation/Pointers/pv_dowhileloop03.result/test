@@ -40,30 +40,30 @@ int main()
    int *p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    int a[10];
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    do {
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> undefined , MAY
 // p -> a[*] , MAY
 
       p = &a[i];
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[*] , MAY
 
       i++;
    }
    while (i<10);
 
 // Points To:
-// p -> a[*] , EXACT
+// p -> a[*] , MAY
 
    return 0;
 }

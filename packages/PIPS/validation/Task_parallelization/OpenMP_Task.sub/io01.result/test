@@ -1,0 +1,15 @@
+// OMP style
+int main()
+{
+#pragma omp parallel default(shared) 
+   {
+#pragma omp single
+      {
+         printf("Hello ");
+      }
+#pragma omp single
+      {
+         printf("world!\n");
+      }
+   }
+}

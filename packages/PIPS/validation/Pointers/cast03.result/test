@@ -1,0 +1,83 @@
+
+POINTS TO
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// cast03 -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+void * cast03(size_t size, size_t align_size)
+{
+
+
+// Points To: none
+
+   char *ptr, *ptr2, *aligned_ptr;
+
+// Points To:
+// aligned_ptr -> undefined , EXACT
+// ptr -> undefined , EXACT
+// ptr2 -> undefined , EXACT
+
+   int align_mask = align_size-1;
+
+// Points To:
+// aligned_ptr -> undefined , EXACT
+// ptr -> undefined , EXACT
+// ptr2 -> undefined , EXACT
+
+
+   ptr = (char *) malloc(size+align_size+sizeof(int));
+
+// Points To:
+// aligned_ptr -> undefined , EXACT
+// ptr -> *ANY_MODULE*:*HEAP*_b0[0] , MAY
+// ptr2 -> undefined , EXACT
+
+   if (ptr==(void *) 0)
+
+// Points To: unreachable
+
+      return (void *) 0;
+
+// Points To:
+// aligned_ptr -> undefined , EXACT
+// ptr -> *ANY_MODULE*:*HEAP*_b0[0] , MAY
+// ptr2 -> undefined , EXACT
+
+
+   ptr2 = ptr+sizeof(int);
+
+// Points To:
+// aligned_ptr -> undefined , EXACT
+// ptr -> *ANY_MODULE*:*HEAP*_b0[0] , MAY
+// ptr2 -> *ANY_MODULE*:*HEAP*_b0[*] , MAY
+
+   aligned_ptr = ptr2+(align_size-((size_t) ptr2&align_mask));
+
+// Points To:
+// aligned_ptr -> *ANY_MODULE*:*HEAP*_b0[*] , MAY
+// ptr -> *ANY_MODULE*:*HEAP*_b0[0] , MAY
+// ptr2 -> *ANY_MODULE*:*HEAP*_b0[*] , MAY
+
+   
+   
+   ptr2 = aligned_ptr-sizeof(int);
+
+// Points To:
+// aligned_ptr -> *ANY_MODULE*:*HEAP*_b0[*] , MAY
+// ptr -> *ANY_MODULE*:*HEAP*_b0[0] , MAY
+// ptr2 -> *ANY_MODULE*:*HEAP*_b0[*] , MAY
+
+   *((int *) ptr2) = (int) (aligned_ptr-ptr);
+
+// Points To:
+// aligned_ptr -> *ANY_MODULE*:*HEAP*_b0[*] , MAY
+// ptr -> *ANY_MODULE*:*HEAP*_b0[0] , MAY
+// ptr2 -> *ANY_MODULE*:*HEAP*_b0[*] , MAY
+
+
+   return (void *) aligned_ptr;
+}

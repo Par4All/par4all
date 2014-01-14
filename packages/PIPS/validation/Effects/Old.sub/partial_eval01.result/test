@@ -17,6 +17,7 @@ int main()
    int fifi[2][3] = {{10, 11, 12}, {13, 14, 15}};
 //             <    is written>: size
    int size = 2;
+//             <    is read   >: size
    int loulou[1][size][6];
    int i;
    int j;
@@ -64,6 +65,7 @@ int main()
    int fifi[2][3] = {{10, 11, 12}, {13, 14, 15}};
 //             <    is written>: size
    int size = 2;
+//             <    is read   >: size
    int loulou[1][size][6];
    int i;
    int j;

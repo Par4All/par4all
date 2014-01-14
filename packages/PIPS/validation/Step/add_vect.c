@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <omp.h>
 
 #define N 100000
 

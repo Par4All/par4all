@@ -1,93 +1,77 @@
 
-POINTS TO for swap
+Points-to for "swap"
 
-
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main()
-{
-
-// Points To: none
-
-   int i = 1, j = 2, *pi = &i, *pj = &j;
-
-// Points To:
-// pi -> i , EXACT
-// pj -> j , EXACT
-
-   swap(&pi, &pj);
-
-// Points To:
-// pi -> j , EXACT
-// pj -> i , EXACT
-
-
-   return 0;
-}
 
 // Points To IN:
-// _p_1 -> _p_1_1 , EXACT
-// _q_2 -> _q_2_2 , EXACT
-// p -> _p_1 , EXACT
-// q -> _q_2 , EXACT
+// _p_1 -> *NULL* , MAY
+// _p_1 -> _p_1_1 , MAY
+// _q_2 -> *NULL* , MAY
+// _q_2 -> _q_2_2 , MAY
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
+// q -> *NULL* , MAY
+// q -> _q_2 , MAY
 
 
 // Points To OUT:
-// _p_1 -> _q_2_2 , EXACT
-// _q_2 -> _p_1_1 , EXACT
+// _p_1 -> *NULL* , MAY
+// _p_1 -> _q_2_2 , MAY
+// _q_2 -> *NULL* , MAY
+// _q_2 -> _p_1_1 , MAY
+// p -> _p_1 , EXACT
+// q -> _q_2 , EXACT
 
 void swap(int **p, int **q)
 {
 
 // Points To:
-// _p_1 -> _p_1_1 , EXACT
-// p -> _p_1 , EXACT
+// _p_1 -> *NULL* , MAY
+// _p_1 -> _p_1_1 , MAY
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
 
    int *pt = *p;
 
 // Points To:
-// _p_1 -> _p_1_1 , EXACT
-// _q_2 -> _q_2_2 , EXACT
+// _p_1 -> *NULL* , MAY
+// _p_1 -> _p_1_1 , MAY
+// _q_2 -> *NULL* , MAY
+// _q_2 -> _q_2_2 , MAY
 // p -> _p_1 , EXACT
-// pt -> _p_1_1 , EXACT
-// q -> _q_2 , EXACT
+// pt -> *NULL* , MAY
+// pt -> _p_1_1 , MAY
+// q -> *NULL* , MAY
+// q -> _q_2 , MAY
 
    *p = *q;
 
 // Points To:
-// _p_1 -> _q_2_2 , EXACT
-// _q_2 -> _q_2_2 , EXACT
+// _p_1 -> *NULL* , MAY
+// _p_1 -> _q_2_2 , MAY
+// _q_2 -> *NULL* , MAY
+// _q_2 -> _q_2_2 , MAY
 // p -> _p_1 , EXACT
-// pt -> _p_1_1 , EXACT
+// pt -> *NULL* , MAY
+// pt -> _p_1_1 , MAY
 // q -> _q_2 , EXACT
 
    *q = pt;
 
 // Points To:
-// _p_1 -> _q_2_2 , EXACT
-// _q_2 -> _p_1_1 , EXACT
+// _p_1 -> *NULL* , MAY
+// _p_1 -> _q_2_2 , MAY
+// _q_2 -> *NULL* , MAY
+// _q_2 -> _p_1_1 , MAY
 // p -> _p_1 , EXACT
-// pt -> _p_1_1 , EXACT
+// pt -> *NULL* , MAY
+// pt -> _p_1_1 , MAY
 // q -> _q_2 , EXACT
 
    return;
 }
 
-PROPER  EFFECTS WITH POINTS TO
+Proper effects with points-to for "swap"
 
-int main()
-{
-//             <    is written>: i j pi pj
-   int i = 1, j = 2, *pi = &i, *pj = &j;
-//             <    is read   >: pj
-//             <    is written>: pi pj
-   swap(&pi, &pj);
-
-   return 0;
-}
 void swap(int **p, int **q)
 {
 //             <    is read   >: _p_1 p
@@ -101,23 +85,10 @@ void swap(int **p, int **q)
    *q = pt;
    return;
 }
-void swap(int **p, int **q);
 
-int main();
+Cumulated effects for "swap"
 
-CUMULATED  EFFECTS WITH POINTS TO
-
-int main()
-{
-//             <    is written>: i j pi pj
-   int i = 1, j = 2, *pi = &i, *pj = &j;
-//             <    is read   >: pj
-//             <    is written>: pi pj
-   swap(&pi, &pj);
-
-   return 0;
-}
-//             <    is read   >: _q_2 p q
+//             <    is read   >: _p_1 _q_2 p q
 //             <    is written>: _p_1 _q_2
 void swap(int **p, int **q)
 {
@@ -132,11 +103,8 @@ void swap(int **p, int **q)
    *q = pt;
    return;
 }
-void swap(int **p, int **q);
 
-int main();
-
-POINTS TO for swap
+Points-to for "main"
 
 
 // Points To IN: none
@@ -158,60 +126,13 @@ int main()
    swap(&pi, &pj);
 
 // Points To:
-// pi -> j , EXACT
-// pj -> i , EXACT
+// pi -> *NULL* , MAY
+// pi -> j , MAY
+// pj -> *NULL* , MAY
+// pj -> i , MAY
 
 
    return 0;
 }
-
-// Points To IN:
-// _p_1 -> _p_1_1 , EXACT
-// _q_2 -> _q_2_2 , EXACT
-// p -> _p_1 , EXACT
-// q -> _q_2 , EXACT
-
-
-// Points To OUT:
-// _p_1 -> _q_2_2 , EXACT
-// _q_2 -> _p_1_1 , EXACT
-
-void swap(int **p, int **q)
-{
-
-// Points To:
-// _p_1 -> _p_1_1 , EXACT
-// p -> _p_1 , EXACT
-
-   int *pt = *p;
-
-// Points To:
-// _p_1 -> _p_1_1 , EXACT
-// _q_2 -> _q_2_2 , EXACT
-// p -> _p_1 , EXACT
-// pt -> _p_1_1 , EXACT
-// q -> _q_2 , EXACT
-
-   *p = *q;
-
-// Points To:
-// _p_1 -> _q_2_2 , EXACT
-// _q_2 -> _q_2_2 , EXACT
-// p -> _p_1 , EXACT
-// pt -> _p_1_1 , EXACT
-// q -> _q_2 , EXACT
-
-   *q = pt;
-
-// Points To:
-// _p_1 -> _q_2_2 , EXACT
-// _q_2 -> _p_1_1 , EXACT
-// p -> _p_1 , EXACT
-// pt -> _p_1_1 , EXACT
-// q -> _q_2 , EXACT
-
-   return;
-}
 C_PARSER[main] (simplify_C_expression) Variable "i" is probably used before it is defined
 C_PARSER[main] (simplify_C_expression) Variable "j" is probably used before it is defined
-unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

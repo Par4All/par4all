@@ -1,0 +1,179 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i, a[10], b[10], c, d;
+
+// Points To: none
+
+
+   for(i = 0; i <= 9; i += 1) {
+
+// Points To: none
+
+      a[i] = i;
+
+// Points To: none
+
+      c = i;
+   }
+
+// Points To: none
+
+   
+   //if there is a mult with more than 1 variable in rhs  transformer lose precision.
+   for(i = 0; i <= 9; i += 1) {
+
+// Points To: none
+
+      b[i] = i*i;
+
+// Points To: none
+
+      d = i*i;
+   }
+
+// Points To: none
+
+
+   return 0;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+   int i, a[10], b[10], c, d;
+//             <    is written>: i
+
+   for(i = 0; i <= 9; i += 1) {
+//             <    is read   >: i
+//             <    is written>: a[i]
+      a[i] = i;
+//             <    is read   >: i
+//             <    is written>: c
+      c = i;
+   }
+//             <    is written>: i
+   
+   //if there is a mult with more than 1 variable in rhs  transformer lose precision.
+   for(i = 0; i <= 9; i += 1) {
+//             <    is read   >: i
+//             <    is written>: b[i]
+      b[i] = i*i;
+//             <    is read   >: i
+//             <    is written>: d
+      d = i*i;
+   }
+
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(c,d,i) {}
+
+   int i, a[10], b[10], c, d;
+
+//  T(a[i],c,i) {0<=i, i<=9}
+
+
+   for(i = 0; i <= 9; i += 1) {
+
+//  T(a[i]) {a[i]==i, 0<=a[i], a[i]<=9}
+
+      a[i] = i;
+
+//  T(c) {a[i]==c, a[i]==i, 0<=a[i], a[i]<=9}
+
+      c = i;
+   }
+
+//  T(b[i],d,i) {a[i]==9, b[i]#init==10, c==9, 0<=i, i<=9}
+
+   
+   //if there is a mult with more than 1 variable in rhs  transformer lose precision.
+   for(i = 0; i <= 9; i += 1) {
+
+//  T(b[i]) {a[i]==9, c==9, 0<=b[i], b[i]<=9i, 0<=i, i<=9}
+
+      b[i] = i*i;
+
+//  T(d) {a[i]==9, c==9, 0<=b[i], b[i]<=9i, 0<=d, d<=9i, 0<=i, i<=9}
+
+      d = i*i;
+   }
+
+//  T(main) {a[i]==9, c==9, i==10, main==0, 0<=b[i], b[i]<=81, 0<=d,
+//    d<=81}
+
+
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i, a[10], b[10], c, d;
+
+//  P(c,d,i) {}
+
+
+   for(i = 0; i <= 9; i += 1) {
+
+//  P(a[i],c,d,i) {0<=i, i<=9}
+
+      a[i] = i;
+
+//  P(a[i],c,d,i) {a[i]==i, 0<=a[i], a[i]<=9}
+
+      c = i;
+   }
+
+//  P(a[i],c,d,i) {a[i]==9, c==9, i==10}
+
+   
+   //if there is a mult with more than 1 variable in rhs  transformer lose precision.
+   for(i = 0; i <= 9; i += 1) {
+
+//  P(a[i],b[i],c,d,i) {a[i]==9, c==9, 0<=i, i<=9}
+
+      b[i] = i*i;
+
+//  P(a[i],b[i],c,d,i) {a[i]==9, c==9, 0<=b[i], b[i]<=9i, 0<=i, i<=9}
+
+      d = i*i;
+   }
+
+//  P(a[i],b[i],c,d,i) {a[i]==9, c==9, i==10, 0<=b[i], b[i]<=81, 0<=d,
+//    d<=81}
+
+
+   return 0;
+}
+
+Warnings
+

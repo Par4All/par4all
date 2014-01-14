@@ -6,7 +6,7 @@ Points-to for "foo"
 
 
 // Points To OUT:
-// foo -> *NULL_POINTER* , EXACT
+// foo -> *NULL* , EXACT
 
 int * foo()
 {
@@ -32,27 +32,27 @@ void sort01()
    int a[10];
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 
    int *p = foo(), *q = foo();
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
-// q -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
+// q -> *NULL* , EXACT
 
 
    a[0] = 1;
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
-// q -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
+// q -> *NULL* , EXACT
 
 
    if (p==q)
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
-// q -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
+// q -> *NULL* , EXACT
 
       p = &a[4];
    else
@@ -63,7 +63,7 @@ void sort01()
 
 // Points To:
 // p -> a[4] , EXACT
-// q -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
 
 
    return;

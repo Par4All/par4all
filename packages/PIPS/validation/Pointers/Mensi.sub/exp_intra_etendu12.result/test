@@ -1,0 +1,192 @@
+
+POINTS-TO
+
+
+// Points To IN:
+// stdin -> *NULL* , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , MAY
+
+
+// Points To OUT:
+// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
+// initialize -> *HEAP*_l_17 , MAY
+// initialize -> *NULL* , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
+
+list * initialize()
+{
+
+// Points To: none
+
+   list *first = (void *) 0, *previous = (void *) 0;
+
+// Points To:
+// first -> *NULL* , EXACT
+// previous -> *NULL* , EXACT
+
+   _Bool break_p = 0;
+
+// Points To:
+// first -> *NULL* , EXACT
+// previous -> *NULL* , EXACT
+// stdin -> *NULL* , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , MAY
+
+   // added to avoid an untructured...
+   while (!feof(stdin)&&!break_p) {
+
+// Points To:
+// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
+// first -> *HEAP*_l_17 , MAY
+// first -> *NULL* , MAY
+// previous -> *HEAP*_l_17 , MAY
+// previous -> *NULL* , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
+
+      list *nl = (list *) malloc(sizeof(list));
+
+// Points To:
+// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
+// *HEAP*_l_17.next -> undefined , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
+// first -> *HEAP*_l_17 , MAY
+// first -> *NULL* , MAY
+// nl -> *HEAP*_l_17 , MAY
+// previous -> *HEAP*_l_17 , MAY
+// previous -> *NULL* , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
+
+      nl->next = (void *) 0;
+
+// Points To:
+// *HEAP*_l_17.next -> *NULL* , MAY
+// first -> *HEAP*_l_17 , MAY
+// first -> *NULL* , MAY
+// nl -> *HEAP*_l_17 , MAY
+// previous -> *HEAP*_l_17 , MAY
+// previous -> *NULL* , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
+
+      if (scanf("%d", &nl->val)!=1)
+
+// Points To:
+// *HEAP*_l_17.next -> *NULL* , MAY
+// first -> *HEAP*_l_17 , MAY
+// first -> *NULL* , MAY
+// nl -> *HEAP*_l_17 , MAY
+// previous -> *HEAP*_l_17 , MAY
+// previous -> *NULL* , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
+
+         break_p = 1;
+
+// Points To:
+// *HEAP*_l_17.next -> *NULL* , MAY
+// first -> *HEAP*_l_17 , MAY
+// first -> *NULL* , MAY
+// nl -> *HEAP*_l_17 , MAY
+// previous -> *HEAP*_l_17 , MAY
+// previous -> *NULL* , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
+
+      if (first==(void *) 0)
+
+// Points To:
+// *HEAP*_l_17.next -> *NULL* , MAY
+// first -> *NULL* , EXACT
+// nl -> *HEAP*_l_17 , MAY
+// previous -> *HEAP*_l_17 , MAY
+// previous -> *NULL* , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
+
+         first = nl;
+
+// Points To:
+// *HEAP*_l_17.next -> *NULL* , MAY
+// first -> *HEAP*_l_17 , MAY
+// nl -> *HEAP*_l_17 , MAY
+// previous -> *HEAP*_l_17 , MAY
+// previous -> *NULL* , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
+
+      if (previous!=(void *) 0)
+
+// Points To:
+// *HEAP*_l_17.next -> *NULL* , MAY
+// first -> *HEAP*_l_17 , MAY
+// nl -> *HEAP*_l_17 , MAY
+// previous -> *HEAP*_l_17 , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
+
+         previous->next = nl;
+
+// Points To:
+// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
+// first -> *HEAP*_l_17 , MAY
+// nl -> *HEAP*_l_17 , MAY
+// previous -> *HEAP*_l_17 , MAY
+// previous -> *NULL* , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
+
+      previous = nl;
+   }
+
+// Points To:
+// *HEAP*_l_17.next -> *HEAP*_l_17 , MAY
+// *HEAP*_l_17.next -> *NULL* , MAY
+// first -> *HEAP*_l_17 , MAY
+// first -> *NULL* , MAY
+// previous -> *HEAP*_l_17 , MAY
+// previous -> *NULL* , MAY
+// stdin -> __IO_EFFECTS:IO_FILES[0] , EXACT
+
+   return first;
+}
+
+PROPER EFFECTS WITH POINTS TO
+
+list * initialize()
+{
+//             <    is written>: first previous
+   list *first = (void *) 0, *previous = (void *) 0;
+//             <    is written>: break_p
+   _Bool break_p = 0;
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0]
+//             <    is read   >: break_p stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+   // added to avoid an untructured...
+   while (!feof(stdin)&&!break_p) {
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: nl _MALLOC_EFFECTS:_MALLOC_
+      list *nl = (list *) malloc(sizeof(list));
+//             <may be written>: *HEAP*_l_17.next
+//             <    is read   >: nl
+      nl->next = (void *) 0;
+//             <may be read   >: stdin[0]
+//             <may be written>: *HEAP*_l_17.val stdin[0]
+//             <    is read   >: nl stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+      if (scanf("%d", &nl->val)!=1)
+//             <    is written>: break_p
+         break_p = 1;
+//             <    is read   >: first
+      if (first==(void *) 0)
+//             <    is read   >: nl
+//             <    is written>: first
+         first = nl;
+//             <    is read   >: previous
+      if (previous!=(void *) 0)
+//             <may be written>: *HEAP*_l_17.next
+//             <    is read   >: nl previous
+         previous->next = nl;
+//             <    is read   >: nl
+//             <    is written>: previous
+      previous = nl;
+   }
+//             <    is read   >: first
+   return first;
+}

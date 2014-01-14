@@ -5,7 +5,8 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// fifi[3] -> fifi[3][0] , EXACT
 
 int duck1(int riri[10], int fifi[2][3], int size, int loulou[20][size][6])
 {
@@ -56,6 +57,7 @@ int duck1(int riri[10], int fifi[2][3], int size, int loulou[20][size][6])
    foo((fifi+(3-1-0+1)*1)[0]);
 
 // Points To:
+// fifi[3] -> fifi[3][0] , EXACT
 // zaza -> fifi[0][3] , EXACT
 // zizi -> fifi[3][0] , EXACT
 // zuzu -> fifi[3][0] , EXACT

@@ -1,0 +1,27 @@
+delete sven01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+##TODO: explain
+#setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+create sven01 sven01.c
+
+module sven01
+
+## Needed for substracting set approximations
+activate MUST_REGIONS
+
+activate PRINT_CODE_PRIVATIZED_REGIONS
+echo sven01 privatized regions
+display PRINTED_FILE
+
+activate ARRAY_SECTION_PRIVATIZER
+activate PRINT_CODE_PRIVATIZED_REGIONS
+echo sven01 privatized array sections
+display PRINTED_FILE
+
+close
+delete sven01
+quit
+

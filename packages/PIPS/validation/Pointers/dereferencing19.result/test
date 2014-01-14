@@ -1,0 +1,53 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// read_towns.data -> *HEAP*_l_17[0] , MAY
+// read_towns.data -> *HEAP*_l_20[0] , MAY
+
+towns read_towns(const  char fname[])
+{
+
+// Points To: none
+
+   towns the_towns = {1, malloc(sizeof(town))};
+
+// Points To:
+// the_towns.data -> *HEAP*_l_17[0] , MAY
+
+   int curr = 0;
+
+// Points To:
+// the_towns.data -> *HEAP*_l_17[0] , MAY
+
+   if (curr)
+
+// Points To:
+// the_towns.data -> *HEAP*_l_17[0] , MAY
+
+      the_towns.data = realloc(the_towns.data, the_towns.nb*sizeof(town));
+
+// Points To:
+// the_towns.data -> *HEAP*_l_17[0] , MAY
+// the_towns.data -> *HEAP*_l_20[0] , MAY
+
+   double *px = &((the_towns.data)[curr])[0];
+
+// Points To:
+// px -> *HEAP*_l_17[0] , MAY
+// px -> *HEAP*_l_20[*][0] , MAY
+// the_towns.data -> *HEAP*_l_17[0] , MAY
+// the_towns.data -> *HEAP*_l_20[0] , MAY
+
+
+   return the_towns;
+}
+
+Warnings
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (list_assignment_to_points_to) Heap bucket "*HEAP*_l_17[0]" leaked at line 20.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (points_to_set_block_projection) Memory leak for bucket "read_towns:*HEAP*_l_20".

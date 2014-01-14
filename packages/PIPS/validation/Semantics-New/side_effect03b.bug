@@ -1,0 +1,7 @@
+bug in the determination of a constant path
+have to investigate the function can_be_constant_path_p in constant-path-utils.c
+i must be equal to 1 at the end
+if we also have a[0]=0 it will be perfect
+
+// the effects is strange 
+//             <    is written>: a[i++] i

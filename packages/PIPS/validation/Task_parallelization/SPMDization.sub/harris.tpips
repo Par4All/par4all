@@ -1,0 +1,73 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+
+delete harris
+
+setenv PIPS_CPP_FLAGS " -D TIME "
+
+create harris ../harris.c
+activate C_PARSER
+#activate REGION_CHAINS
+activate MUST_REGIONS
+
+activate TRANSFORMERS_INTER_FULL
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE
+setproperty SEMANTICS_FILTER_INITIAL_VALUES TRUE
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE 
+
+#setproperty COMPLEXITY_PRINT_COST_TABLE TRUE
+#setproperty COMPLEXITY_INTERMEDIATES TRUE
+#setproperty COMPLEXITY_COST_TABLE "IntelPentium"
+
+#setproperty BDSC_INSTRUMENTED_FILE "./instrumented_main.in"
+
+apply LOOP_NORMALIZE[%ALLFUNC]
+apply PRIVATIZE_MODULE[%ALLFUNC]
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
+
+setproperty PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS TRUE
+setproperty PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS FALSE
+setproperty PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES FALSE
+setproperty REGIONS_WITH_ARRAY_BOUNDS TRUE 
+
+
+#apply BDSC_CODE_INSTRUMENTATION[main]
+#display PRINTED_FILE[main]
+#quit
+
+
+#apply PRINT_DOT_DEPENDENCE_GRAPH[main]
+#shell dot -Tpng harris.database/main/main.dot > harris.database/main/main_dg.png
+#shell gqview harris.database/main/main_dg.png
+
+
+apply SEQUENCE_DEPENDENCE_GRAPH[main]
+#shell dot -Tpng harris.database/main/main_sdg.dot > harris.database/main/main_sdg.png
+#shell gqview harris.database/main/main_sdg.png
+
+
+setproperty BDSC_NB_CLUSTERS 3
+#setproperty BDSC_MEMORY_SIZE 4194304
+
+setproperty BDSC_DISTRIBUTED_MEMORY FALSE
+#setproperty BDSC_SENSITIVITY 3000
+#setproperty COSTLY_TASKS_ONLY TRUE
+
+
+apply HBDSC_PARALLELIZATION[main]
+#shell dot -Tpng harris.database/main/main_scheduled_sdg.dot > harris.database/main/main_scheduled_sdg.png
+#shell gqview harris.database/main/main_scheduled_sdg.png
+
+apply SPIRE_DISTRIBUTED_UNSTRUCTURED_TO_STRUCTURED[main]
+echo // MPI style
+activate MPI_TASK_GENERATION
+activate PRINT_PARALLELIZEDMPI_CODE
+display PARALLELPRINTED_FILE[main]
+
+
+close
+delete harris
+quit
+
+
+

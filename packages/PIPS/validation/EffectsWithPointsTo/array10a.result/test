@@ -1,0 +1,59 @@
+
+Points-to for "foo"
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+int foo(int *p)
+{
+
+// Points To: none
+
+   int b[100];
+
+// Points To: none
+
+   p = &b[0];
+
+// Points To:
+// p -> b[0] , EXACT
+
+   a[*p+1] = 2.;
+
+// Points To:
+// p -> b[0] , EXACT
+
+   return 0;
+}
+
+Proper effects with points-to for "foo"
+
+int foo(int *p)
+{
+   int b[100];
+//             <    is written>: p
+   p = &b[0];
+//             <    is read   >: b[0] p
+//             <    is written>: a[*p+1]
+   a[*p+1] = 2.;
+   return 0;
+}
+
+Cumulated effects with points-to for "foo"
+
+//             <may be written>: a[*]
+//             <    is read   >: p
+int foo(int *p)
+{
+   int b[100];
+//             <    is written>: p
+   p = &b[0];
+//             <may be written>: a[*]
+//             <    is read   >: b[0] p
+   a[*p+1] = 2.;
+   return 0;
+}

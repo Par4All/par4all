@@ -1,0 +1,38 @@
+delete adi
+create adi adi.c
+activate C_PARSER
+
+setproperty  FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+apply LOOP_NORMALIZE[main]
+apply PRIVATIZE_MODULE[main]
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
+echo
+#echo Compute SCoPs and encapsulate them with pragmas
+echo
+
+capply POCC_PRETTYPRINTER [main]
+display PRINTED_FILE[main]
+
+echo
+#echo Outline SCoPs
+echo
+
+setproperty PRETTYPRINT_FINAL_RETURN TRUE
+setproperty PRAGMA_OUTLINER_BEGIN "scop"
+setproperty PRAGMA_OUTLINER_END "endscop"
+setproperty PRAGMA_OUTLINER_PREFIX "SCoP"
+capply PRAGMA_OUTLINER[main]
+
+echo
+#Print the result on stdout
+echo
+
+display PRINTED_FILE[main]
+display PRINTED_FILE[SCoP_0]
+
+
+close
+delete adi
+quit
+

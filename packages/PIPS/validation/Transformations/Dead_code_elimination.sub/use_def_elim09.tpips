@@ -1,0 +1,43 @@
+setenv WS=use_def_elim09
+delete $WS
+create $WS $WS.c
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+activate MUST_REGIONS
+
+#echo
+#echo Source code for "main" after dead-code elimination
+#echo
+#apply DEAD_CODE_ELIMINATION[main]
+#display PRINTED_FILE
+#quit
+
+echo
+echo OUT regions for "main"
+echo
+activate PRINT_CODE_OUT_REGIONS
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+display PRINTED_FILE
+
+echo
+echo Source code for "main" after dead-code elimination with OUT regions
+echo
+apply DEAD_CODE_ELIMINATION_WITH_OUT_REGIONS[main]
+activate PRINT_CODE
+display PRINTED_FILE
+quit
+echo
+echo Source code for "main" after control simplification
+apply SIMPLIFY_CONTROL[main]
+display PRINTED_FILE
+
+echo
+echo Source code for "main" after a second dead-code elimination 
+apply DEAD_CODE_ELIMINATION[main]
+display PRINTED_FILE
+
+close
+quit
+

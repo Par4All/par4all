@@ -8,7 +8,7 @@ Points-to for call32
 
 
 // Points To OUT:
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
 void call32(int i, int *q)
 {
@@ -20,7 +20,7 @@ void call32(int i, int *q)
    free(q);
 
 // Points To:
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
    return;
 }
@@ -34,12 +34,13 @@ Points-to for "call32_caller"
 
 
 // Points To OUT:
-// s.array -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s.array -> undefined , EXACT
 
 int call32_caller(struct ad s)
 {
 
-// Points To: none
+// Points To:
+// s.array -> _s_1__1[0] , MAY
 
    int ii = *s.array;
 
@@ -50,7 +51,7 @@ int call32_caller(struct ad s)
    call32(ii, s.array);
 
 // Points To:
-// s.array -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s.array -> undefined , EXACT
 
    return ii++;
 }
@@ -59,7 +60,7 @@ Proper effects with points-to for "call32_caller"
 
 int call32_caller(struct ad s)
 {
-//             <    is read   >: s.array
+//             <    is read   >: _s_1__1[0] s.array
 //             <    is written>: ii
    int ii = *s.array;
 //             <    is read   >: ii s.array _MALLOC_EFFECTS:_MALLOC_
@@ -74,7 +75,7 @@ Cumulated effects with points-to for "call32_caller"
 
 int call32_caller(struct ad s)
 {
-//             <    is read   >: s.array
+//             <    is read   >: _s_1__1[0] s.array
 //             <    is written>: ii
    int ii = *s.array;
 //             <    is read   >: ii s.array _MALLOC_EFFECTS:_MALLOC_

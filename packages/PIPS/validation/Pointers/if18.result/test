@@ -15,33 +15,33 @@ int main()
    int *p, *q, *r, i, j;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
-// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
 
 
    p = &i;
 
 // Points To:
 // p -> i , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
-// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
 
 
    if (i>0)
 
 // Points To:
 // p -> i , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
-// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
 
       q = &i;
 
 // Points To:
 // p -> i , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , MAY
+// q -> undefined , MAY
 // q -> i , MAY
-// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+// r -> undefined , EXACT
 
 
    if (p==q)
@@ -49,21 +49,21 @@ int main()
 // Points To:
 // p -> i , EXACT
 // q -> i , EXACT
-// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+// r -> undefined , EXACT
 
       r = q;
    else
 
 // Points To:
 // p -> i , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , MAY
-// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> undefined , MAY
+// r -> undefined , EXACT
 
       r = &i;
 
 // Points To:
 // p -> i , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , MAY
+// q -> undefined , MAY
 // q -> i , MAY
 // r -> i , EXACT
 

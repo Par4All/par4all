@@ -38,12 +38,12 @@ void assignment06(int a[10])
    int *q;
 
 // Points To:
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
    int i;
 
 // Points To:
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
 
    q = a;

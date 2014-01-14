@@ -1,3 +1,5 @@
+/* Example for dissertation by Amira Mensi */
+
 void swap(int **p, int **q)
 {
   int *pt = *p;

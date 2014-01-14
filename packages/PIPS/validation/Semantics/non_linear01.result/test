@@ -3,7 +3,7 @@ C  T() {}
 
       PROGRAM NON_LINEAR01
 
-C  T(K) {I==1, 0<=K}
+C  T(K) {I==1, 1<=K}
 
 C (0,1)
 C     BEGIN BLOCK
@@ -16,7 +16,7 @@ C     Check
 
       IF (I.NE.1) STOP                                                  0005
 
-C  T(K) {0<=K}
+C  T(K) {0<=I+K, I<=K}
 
 C (0,5)
 

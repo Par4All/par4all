@@ -33,34 +33,34 @@ int main()
    float *p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    float a[10];
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    int i;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
 
    i = 0;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
    while (i<10)
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> undefined , MAY
 // p -> a[*] , MAY
 
       p = &a[i];
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> undefined , MAY
 // p -> a[*] , MAY
 
    return 0;

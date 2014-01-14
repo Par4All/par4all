@@ -3,7 +3,6 @@
 #include <stdarg.h>
 #define MAXARGS 31
 
-
 void f2(int n_ptrs, char *array[MAXARGS])
 {
   int ptr_no;
@@ -18,8 +17,6 @@ void f4(int n_ptrs, char *array[MAXARGS])
   for(ptr_no=0; ptr_no < n_ptrs; ptr_no++)
     fprintf(stdout, "%s\n", array[ptr_no]); 
 }
-
-
 
 /* adapted from ISO/IEC 9899:1999 */
 void f3(int n_ptrs, int f4_after, ...)

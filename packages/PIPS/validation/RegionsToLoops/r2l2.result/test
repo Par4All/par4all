@@ -1,0 +1,21 @@
+
+//  <A[PHI1]-W-MAY-{0<=PHI1, PHI1<=498}>
+
+void function_test(int A[500], int i)
+{
+
+//  <A[PHI1]-W-MAY-{0<=PHI1, PHI1<=498}>
+
+   for(i = 0; i <= 249; i += 1)
+
+//  <A[PHI1]-W-EXACT-{PHI1==2i, 0<=i, i<=249}>
+
+      A[2*i] = 1234;
+}
+void function_test(int A[500], int i)
+{
+   //PIPS generated variable
+   int autogen_0_0;
+   for(autogen_0_0 = 0; autogen_0_0 <= 498; autogen_0_0 += 1)
+      A[autogen_0_0] = 3;
+}

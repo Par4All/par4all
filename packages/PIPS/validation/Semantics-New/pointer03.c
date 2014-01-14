@@ -2,6 +2,8 @@
 
 // Defined for a smaller version of pointer01.tpips, used for debugging
 
+// Same bug in effect translation for "foo(p)" as in pointer02b.c
+
 #include <assert.h>
 
 int x;

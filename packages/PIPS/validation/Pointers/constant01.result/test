@@ -1,0 +1,21 @@
+
+Points-to for "constant01"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int constant01()
+{
+
+// Points To: none
+
+   int *p = (int *) 123;
+
+// Points To:
+// p -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
+   return *p;
+}

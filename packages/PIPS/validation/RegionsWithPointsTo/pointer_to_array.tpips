@@ -1,0 +1,69 @@
+delete pointer_to_array
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+
+
+create pointer_to_array pointer_to_array.c
+
+
+
+echo
+echo Points-to lists
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[init_tab_dynamique]
+
+echo 
+echo PROPER  EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[init_tab_dynamique]
+
+
+echo 
+echo  CUMULATED EFFECTS WITH POINTS TO
+echo
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[init_tab_dynamique]
+
+echo
+echo Points-to lists
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+echo 
+echo PROPER  EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+
+echo 
+echo  CUMULATED EFFECTS WITH POINTS TO
+echo
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+
+
+
+
+echo
+echo Regions
+echo
+activate MUST_REGIONS_WITH_POINTS_TO
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+
+
+close
+delete pointer_to_array
+quit

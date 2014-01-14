@@ -1,0 +1,20 @@
+
+Points-to for "constant02"
+
+
+// Points To IN: none
+
+
+// Points To OUT: unreachable
+
+int constant02(long int i)
+{
+
+// Points To: none
+
+   int *p = (int *) i;
+
+// Points To: unreachable
+
+   return *p;
+}

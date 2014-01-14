@@ -1,0 +1,139 @@
+
+Points-to inc01c
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int inc01c()
+{
+
+// Points To: none
+
+   int i = 0;
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> undefined , EXACT
+
+
+   p = &i;
+
+// Points To:
+// p -> i , EXACT
+
+   *p += 1;
+
+// Points To:
+// p -> i , EXACT
+
+
+   return i;
+}
+
+PROPER EFFECTS inc01c
+
+int inc01c()
+{
+//             <    is written>: i
+   int i = 0;
+   int *p;
+//             <    is written>: p
+
+   p = &i;
+//             <    is read   >: i p
+//             <    is written>: i
+   *p += 1;
+//             <    is read   >: i
+
+   return i;
+}
+
+CUMULATED EFFECTS inc01c
+
+int inc01c()
+{
+//             <    is written>: i
+   int i = 0;
+   int *p;
+//             <    is written>: p
+
+   p = &i;
+//             <    is read   >: i p
+//             <    is written>: i
+   *p += 1;
+//             <    is read   >: i
+
+   return i;
+}
+
+Transformers with point-to inc01c
+
+
+//  T(inc01c) {inc01c==1}
+
+int inc01c()
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T(p) {i==0}
+
+   int *p;
+
+//  T(p) {&i==p, i==0}
+
+
+   p = &i;
+
+//  T(i) {&i==p, i==1, i#init==0}
+
+   *p += 1;
+
+//  T(inc01c) {&i==p, i==1, inc01c==1}
+
+
+   return i;
+}
+
+Preconditions with point-to inc01c
+
+
+//  P() {}
+
+int inc01c()
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   int *p;
+
+//  P(i,p) {i==0}
+
+
+   p = &i;
+
+//  P(i,p) {&i==p, i==0}
+
+   *p += 1;
+
+//  P(i,p) {&i==p, i==1}
+
+
+   return i;
+}
+
+Warnings
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function "inc01c" has no side effect on its formal context via pointer variables.

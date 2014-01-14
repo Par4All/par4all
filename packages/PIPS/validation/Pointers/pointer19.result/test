@@ -1,0 +1,91 @@
+
+Points-to for "foo"
+
+
+// Points To IN:
+// _t_1[2][3][0][0][0][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][0][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][2][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][2][3] -> *NULL* , MAY
+// _t_1[2][3][0][0][0][0] -> _t_1_1[2][3][0][0][0][0][0] , MAY
+// _t_1[2][3][0][1][0][0] -> _t_1_1[2][3][0][1][0][0][0] , MAY
+// _t_1[2][3][0][1][2][0] -> _t_1_1[2][3][0][1][2][0][0] , MAY
+// _t_1[2][3][0][1][2][3] -> _t_1_1[2][3][0][1][2][3][0] , MAY
+// t[2][3] -> *NULL* , MAY
+// t[2][3] -> _t_1[2][3][0][0][0][0] , MAY
+
+
+// Points To OUT:
+// _t_1[2][3][0][0][0][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][0][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][2][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][2][3] -> *NULL* , MAY
+// _t_1[2][3][0][0][0][0] -> _t_1_1[2][3][0][0][0][0][0] , MAY
+// _t_1[2][3][0][1][0][0] -> _t_1_1[2][3][0][1][0][0][0] , MAY
+// _t_1[2][3][0][1][2][0] -> _t_1_1[2][3][0][1][2][0][0] , MAY
+// _t_1[2][3][0][1][2][3] -> _t_1_1[2][3][0][1][2][3][0] , MAY
+// t[2][3] -> _t_1[2][3][0][0][0][0] , EXACT
+
+void foo(double *(*t[3][4])[5][6][7])
+{
+
+// Points To:
+// _t_1[2][3][0][0][0][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][0][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][2][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][2][3] -> *NULL* , MAY
+// _t_1[2][3][0][0][0][0] -> _t_1_1[2][3][0][0][0][0][0] , MAY
+// _t_1[2][3][0][1][0][0] -> _t_1_1[2][3][0][1][0][0][0] , MAY
+// _t_1[2][3][0][1][2][0] -> _t_1_1[2][3][0][1][2][0][0] , MAY
+// _t_1[2][3][0][1][2][3] -> _t_1_1[2][3][0][1][2][3][0] , MAY
+// t[2][3] -> *NULL* , MAY
+// t[2][3] -> _t_1[2][3][0][0][0][0] , MAY
+
+   *(((*t[2][3])[1])[2])[3] = 2.5;
+
+// Points To:
+// _t_1[2][3][0][0][0][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][0][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][2][0] -> *NULL* , MAY
+// _t_1[2][3][0][1][2][3] -> *NULL* , MAY
+// _t_1[2][3][0][0][0][0] -> _t_1_1[2][3][0][0][0][0][0] , MAY
+// _t_1[2][3][0][1][0][0] -> _t_1_1[2][3][0][1][0][0][0] , MAY
+// _t_1[2][3][0][1][2][0] -> _t_1_1[2][3][0][1][2][0][0] , MAY
+// _t_1[2][3][0][1][2][3] -> _t_1_1[2][3][0][1][2][3][0] , MAY
+// t[2][3] -> _t_1[2][3][0][0][0][0] , EXACT
+
+   return;
+}
+
+Proper effects with points-to for "foo"
+
+void foo(double *(*t[3][4])[5][6][7])
+{
+//             <    is read   >: _t_1[2][3][0][1][2][3] t[2][3]
+//             <    is written>: _t_1_1[2][3][0][1][2][3][0]
+   *(((*t[2][3])[1])[2])[3] = 2.5;
+   return;
+}
+
+Cumulated effects for "foo"
+
+//             <    is read   >: _t_1[2][3][0][1][2][3] t[2][3]
+//             <    is written>: _t_1_1[2][3][0][1][2][3][0]
+void foo(double *(*t[3][4])[5][6][7])
+{
+//             <    is read   >: _t_1[2][3][0][1][2][3] t[2][3]
+//             <    is written>: _t_1_1[2][3][0][1][2][3][0]
+   *(((*t[2][3])[1])[2])[3] = 2.5;
+   return;
+}
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 18 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 18 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 18 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 18 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 18 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 18 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 18 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 18 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 18 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 18 (e.g. improper malloc call).
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[foo] (adapt_reference_to_type) There may be a typing error at line 18 (e.g. improper malloc call).
