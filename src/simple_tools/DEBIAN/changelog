@@ -1,3 +1,18 @@
+2014-01-14 Ronan Keryell <Ronan.Keryell@silkan.com>
+
+ * Par4All 1.4.4
+
+   * Update the include recovery for gcc-4.8 and recent Debian & Ubuntu
+
+   * Improve documentation
+
+   * Improve compilation documentation for OpenSuse
+
+   * Fix const-ness issues in Par4All Accel back-end
+
+   * Update to latest PIPS version
+
+
 2012-11-29 Ronan Keryell <Ronan.Keryell@wild-systems.com>
 
  * Par4All 1.4.3
