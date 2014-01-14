@@ -254,8 +254,13 @@ class p4a_processor(object):
 
             if self.recover_includes and not self.native_recover_includes:
                 # Use a special preprocessor to track #include by a
-                # man-in-the-middle attack :-) :
-                os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E'
+                # man-in-the-middle attack :-).
+
+                # Use -ffreestanding to prevent gcc 4.8 from including
+                # <stdc-predef.h> that breaks assumptions in
+                # p4a_recover_includes. See "Pre-processor pre-includes"
+                # http://gcc.gnu.org/gcc-4.8/porting_to.html
+                os.environ['PIPS_CPP'] = 'p4a_recover_includes --simple -E -ffreestanding '
 
             for file in files:
                 if self.fortran is None:
