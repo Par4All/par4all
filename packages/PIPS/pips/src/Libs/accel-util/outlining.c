@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -55,6 +55,7 @@
 #include "text-util.h"
 #include "parser_private.h"
 #include "accel-util.h"
+#include "transformations.h"
 /**
  * @name outlining
  * @{ */
@@ -256,9 +257,9 @@ list outliner_statements_referenced_entities(list statements)
         }
 
         ifdebug(7) {
-          pips_debug(0,"Statement :");
+          pips_debug(7,"Statement :");
           print_statement(s);
-          pips_debug(0,"referenced entities :");
+          pips_debug(7,"referenced entities :");
           print_entities(set_to_list(tmp));
           fprintf(stderr,"\n");
         }
@@ -545,7 +546,7 @@ list outliner_scan(entity new_fun, list statements_to_outline, statement new_bod
     list referenced_entities = outliner_statements_referenced_entities(statements_to_outline);
 
     ifdebug(5) {
-      pips_debug(0,"Referenced entities :\n");
+      pips_debug(5,"Referenced entities :\n");
       print_entities(referenced_entities);
     }
 
@@ -666,6 +667,20 @@ type type_to_named_type(type t, entity cu) {
     return copy_type(t);
 }
 
+/**
+ * Checks if an entity is in a list.
+ * Done by comparing the minimal user name.
+ */
+bool is_entity_in_list (entity e, list l) {
+  if (ENDP(l))
+    return false;
+  FOREACH(entity, ent, l) {
+    if (!strcmp(entity_minimal_user_name(ent), entity_minimal_user_name(e)))
+      return true;
+  }
+  return false;
+}
+
 void outliner_parameters(entity new_fun,  statement new_body, list referenced_entities,
 			 hash_table entity_to_effective_parameter,
 			 list *effective_parameters_, list *formal_parameters_)
@@ -678,9 +693,23 @@ void outliner_parameters(entity new_fun,  statement new_body, list referenced_en
     list formal_parameters = *formal_parameters_;
     intptr_t i=0;
 
+    // Addition for R-Stream compatibility
+    // Prevent from adding a parameter if the entity is in the list
+    list induction_var = NIL;
+    // If no property activated then induction_var should stay to NIL
+    bool is_rstream = get_bool_property("OUTLINE_REMOVE_VARIABLE_RSTREAM_IMAGE") || get_bool_property("OUTLINE_REMOVE_VARIABLE_RSTREAM_SCOP");
+    if (is_rstream) {
+      // Enclosing loops map needed for get_variables_to_remove
+      set_enclosing_loops_map(loops_mapping_of_statement(new_body));
+      get_variables_to_remove(referenced_entities, new_body, &induction_var);
+      clean_enclosing_loops();
+      // Adding the declarations to the new body
+      add_induction_var_to_local_declarations(&new_body, induction_var);
+    }
+
     FOREACH(ENTITY,e,referenced_entities)
       {
-        if( entity_variable_p(e) || entity_symbolic_p(e) )
+        if( (entity_variable_p(e) || entity_symbolic_p(e))  && (!is_entity_in_list(e, induction_var)))
         {
             pips_debug(6,"Add %s to outlined function parameters\n",entity_name(e));
 
@@ -726,11 +755,11 @@ void outliner_parameters(entity new_fun,  statement new_body, list referenced_en
     *formal_parameters_=gen_nreverse(formal_parameters);
     *effective_parameters_=gen_nreverse(effective_parameters);
     hash_table_free(entity_to_effective_parameter);
-
+    gen_free_list(induction_var);
     ifdebug(5) {
-      pips_debug(0,"Formals : \n");
+      pips_debug(5,"Formals : \n");
       print_parameters(*formal_parameters_);
-      pips_debug(0,"Effectives : \n");
+      pips_debug(5,"Effectives : \n");
       print_expressions(*effective_parameters_);
      }
 }
@@ -776,7 +805,7 @@ void outliner_patch_parameters(list statements_to_outline, list referenced_entit
                 bool write_p = find_write_effect_on_entity(stmt,ex);
                 ifdebug(5) {
                     if(write_p) {
-                        pips_debug(0,"Entity %s written by statement (%d) : \n",entity_name(ex),the_current_debug_level);
+                        pips_debug(5,"Entity %s written by statement (%d) : \n",entity_name(ex),the_current_debug_level);
                         print_statement(stmt);
                     }
                 }
@@ -1170,8 +1199,50 @@ statement outliner_call(entity new_fun, list statements_to_outline, list effecti
     return new_stmt;
 }
 
+void remove_from_formal_parameters(list induction_var, list* formal_parameters) {
+  list form_par = gen_copy_seq(*formal_parameters);
+  FOREACH(entity, ent, induction_var) {
+    FOREACH(parameter, param, form_par) {
+      dummy dum = parameter_dummy(param);
+      entity param_ent = dummy_identifier(dum);
+      if (!entity_undefined_p(ent) && !strcmp(entity_minimal_user_name(param_ent), entity_minimal_user_name(ent))) {
+	printf("removing : \n");
+	printf("formal parameter \n");
+	printf("%s\n", entity_minimal_user_name(param_ent));
+	printf("induction var\n");
+	printf("%s\n", entity_minimal_user_name(ent));
+	printf("\n\n");
+	gen_remove_once(formal_parameters, param);
+      }
+    }
+  }
+  gen_free_list(form_par);
+}
 
+void remove_from_effective_parameters(list induction_var, list* effective_parameters) {
+  list eff_par = gen_copy_seq(*effective_parameters);
+  FOREACH(entity, ent, induction_var) {
+    FOREACH(expression, exp, eff_par) {
+      entity exp_ent = expression_to_entity(exp);
+      if (!entity_undefined_p(exp_ent) && !strcmp(entity_minimal_user_name(exp_ent), entity_minimal_user_name(ent))) {
+	printf("removing : \n");
+	printf("effective parameter \n");
+	printf("%s\n", entity_minimal_user_name(exp_ent));
+	printf("induction var\n");
+	printf("%s\n", entity_minimal_user_name(ent));
+	printf("\n\n");
+	gen_remove_once(effective_parameters, exp);
+      }
+    }
+  }
+  gen_free_list(eff_par);
+}
 
+void add_induction_var_to_local_declarations(statement* new_body, list induction_var) {
+  FOREACH(entity, ent, induction_var) {
+    *new_body = add_declaration_statement(*new_body, ent);
+  }
+}
 
 /**
  * outline the statements in statements_to_outline into a module named outline_module_name
@@ -1212,14 +1283,13 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
     /* 4 : patch parameters */
     if(c_module_p(get_current_module_entity()) && get_bool_property("OUTLINE_WRITTEN_SCALAR_BY_REFERENCE"))
       outliner_patch_parameters(statements_to_outline, referenced_entities, effective_parameters, formal_parameters, new_body, new_body, new_body);
-
-
+    
     /* 5 : file */
     outliner_file(new_fun, formal_parameters, &new_body );
 
     /* 6 : call */
     statement new_stmt = outliner_call(new_fun, statements_to_outline, effective_parameters);
-
+    
     /* 7: remove obsolete entities, this is needed otherwise the IR keeps some obsolete data */
     list declared_entities = statements_to_declarations(statements_to_outline);
     FOREACH(ENTITY,de,declared_entities) {
@@ -1233,12 +1303,8 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
         }
     }
     gen_free_list(declared_entities);
-
-
     return new_stmt;
 }
-
-
 
 /**
  * @brief entry point for outline module

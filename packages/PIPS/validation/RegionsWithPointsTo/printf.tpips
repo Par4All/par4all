@@ -1,0 +1,59 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete printf
+
+
+setproperty CONSTANT_PATH_EFFECTS TRUE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
+
+# This property causes a user error because the actual argument is not
+# a character but a character string (a.k.a. array)
+# 
+# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+
+create printf printf.c
+
+
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[error]
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+echo 
+echo PROPER  EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+
+echo 
+echo  CUMULATED EFFECTS WITH POINTS TO
+echo
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+
+
+echo
+echo RW regions
+echo
+activate MUST_REGIONS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_REGIONS
+display PRINTED_FILE[main]
+
+
+
+close
+delete printf
+quit

@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2011 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -748,7 +748,8 @@ string freia_compile(string module, statement mod_stat, string target)
   string file = NULL;
   set helpers = NULL;
   FILE * helper = NULL;
-  if (freia_spoc_p(target) || freia_terapix_p(target) || freia_opencl_p(target))
+  if (freia_spoc_p(target) || freia_terapix_p(target) ||
+      freia_opencl_p(target) || freia_sigmac_p(target))
   {
     file = helper_file_name(module);
     if (file_readable_p(file))
@@ -768,6 +769,8 @@ string freia_compile(string module, statement mod_stat, string target)
     fprintf(helper, "%s", FREIA_TRPX_INCLUDES);
   else if (freia_opencl_p(target))
     fprintf(helper, "%s", FREIA_OPENCL_INCLUDES);
+  else if (freia_sigmac_p(target))
+    fprintf(helper, "%s", FREIA_SIGMAC_INCLUDES);
 
   // hmmm... should rely on use-defs
   hash_table occs = freia_build_image_occurrences(mod_stat, NULL, NULL, NULL);
@@ -826,6 +829,9 @@ string freia_compile(string module, statement mod_stat, string target)
     else if (freia_opencl_p(target))
       allocated = freia_opencl_compile_calls(module, d, sq, ls, occs, exchanges,
                            output_images, helper, helpers, n_dags, signatures);
+    else if (freia_sigmac_p(target))
+      allocated = freia_sigmac_compile_calls(module, d, sq, ls, occs, exchanges,
+                           output_images, helper, helpers, n_dags);
     else if (freia_aipo_p(target))
       allocated = freia_aipo_compile_calls(module, d, ls, occs, exchanges,
                                            n_dags);

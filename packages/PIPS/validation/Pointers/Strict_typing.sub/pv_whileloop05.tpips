@@ -5,7 +5,7 @@ create $WSPACE $WSPACE.c
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
-#setenv POINTER_VALUES_DEBUG_LEVEL 2
+
 setproperty POINTS_TO_SUBSCRIPT_LIMIT 10
 
 # Key property for this test case
@@ -13,17 +13,6 @@ setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
 # Do not create to many stubs, easier to debug...
 setproperty POINTS_TO_PATH_LIMIT 2
-
-#module main
-
-
-echo 
-echo PROPER  EFFECTS
-echo
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
-
-
 
 echo 
 echo POINTS-TO

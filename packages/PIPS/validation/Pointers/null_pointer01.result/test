@@ -39,13 +39,13 @@ int main()
    int *p = 0;
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
 
    int **q = 0;
 
 // Points To:
-// p -> *NULL_POINTER* , EXACT
-// q -> *NULL_POINTER* , EXACT
+// p -> *NULL* , EXACT
+// q -> *NULL* , EXACT
 
 
    *p = 1;

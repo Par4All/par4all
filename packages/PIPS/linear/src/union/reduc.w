@@ -1,7 +1,7 @@
 %%
 %% $Id$
 %%
-%% Copyright 1989-2012 MINES ParisTech
+%% Copyright 1989-2014 MINES ParisTech
 %%
 %% This file is part of Linear/C3 Library.
 %%
@@ -31,7 +31,7 @@ plus les tests de faisabilités (Fourrier-Motzkin), constamment
 appelés, sont rapides. La deuxième raison est la possibilité
 de mener ces tests : un système contenant un grand nombre de
 contraintes peut exploser par Fourrier Motzkin ou mener à des
-erreurs d'overflow pour le simplexe. 
+erreurs d'overflow pour le simplexe.
 
 Cette partie rappelle la notion de polyèdre sans contraintes
 redondantes et introduit la notion de non redondance relative.
@@ -1322,13 +1322,13 @@ Pdisjunct pa_system_difference_ofl_ctrl(ps1, ps2, ofl_ctrl)
 Psysteme ps1,ps2;
 int      ofl_ctrl;
 {
-  Ppath     chemin;
+  volatile Ppath     chemin;
   Pdisjunct dj, ret_dj;
-  
-  if ((ps1 == SC_UNDEFINED)||(ps2 == SC_UNDEFINED)) return DJ_UNDEFINED; 
+
+  if ((ps1 == SC_UNDEFINED)||(ps2 == SC_UNDEFINED)) return DJ_UNDEFINED;
   if (sc_empty_p(ps2)) return sl_append_system(NULL,sc_dup(ps1));
   if (sc_empty_p(ps1)) return dj_empty();
-  
+
   chemin  =  pa_make(ps1, sl_append_system(NULL,ps2));
   dj      =  pa_path_to_few_disjunct_ofl_ctrl(chemin, ofl_ctrl);
   chemin  =  pa_free1( chemin );
@@ -1347,8 +1347,8 @@ mêmes deux systèmes.
  * input    : two Psystems and their convex hull	AL,BC 23/03/95
  * output   : TRUE if ps1 U ps2 = convex_hull, FALSE otherwise
  * modifies : nothing
- * comment  : complexity = nb_constraints(ps1) * nb_constraints(ps2)	
- *            if ofl_ctrl = OFL_CTRL, conservatively returns ofl_ctrl 
+ * comment  : complexity = nb_constraints(ps1) * nb_constraints(ps2)
+ *            if ofl_ctrl = OFL_CTRL, conservatively returns ofl_ctrl
  *            when an overflow error occurs
  */
 boolean pa_convex_hull_equals_union_p_ofl_ctrl

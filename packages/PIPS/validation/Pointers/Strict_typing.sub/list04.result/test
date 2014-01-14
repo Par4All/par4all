@@ -16,6 +16,9 @@ POINTS-TO
 // _l_1.next -> _l_1_2__1 , MAY
 // _l_1_2__1.next -> *NULL_POINTER* , MAY
 // _l_1_2__1.next -> _l_1_2__1 , MAY
+// l -> undefined , MAY
+// l -> *NULL_POINTER* , MAY
+// l -> _l_1 , MAY
 
 void list_free(list l)
 {
@@ -43,7 +46,7 @@ void list_free(list l)
 // _l_1.next -> _l_1_2__1 , MAY
 // _l_1_2__1.next -> *NULL_POINTER* , MAY
 // _l_1_2__1.next -> _l_1_2__1 , MAY
-// l -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// l -> undefined , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1 , MAY
 // n -> _l_1 , MAY
@@ -59,7 +62,7 @@ void list_free(list l)
 // _l_1.next -> _l_1_2__1 , MAY
 // _l_1_2__1.next -> *NULL_POINTER* , MAY
 // _l_1_2__1.next -> _l_1_2__1 , MAY
-// l -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// l -> undefined , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1 , MAY
 // n -> *NULL_POINTER* , MAY
@@ -75,12 +78,12 @@ void list_free(list l)
 // _l_1.next -> _l_1_2__1 , MAY
 // _l_1_2__1.next -> *NULL_POINTER* , MAY
 // _l_1_2__1.next -> _l_1_2__1 , MAY
-// l -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// l -> undefined , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1 , MAY
 // n -> *NULL_POINTER* , MAY
 // n -> _l_1_2__1 , MAY
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
       p = n;
    }
@@ -90,7 +93,7 @@ void list_free(list l)
 // _l_1.next -> _l_1_2__1 , MAY
 // _l_1_2__1.next -> *NULL_POINTER* , MAY
 // _l_1_2__1.next -> _l_1_2__1 , MAY
-// l -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// l -> undefined , MAY
 // l -> *NULL_POINTER* , MAY
 // l -> _l_1 , MAY
 // n -> *NULL_POINTER* , EXACT

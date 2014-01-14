@@ -1,0 +1,61 @@
+// OMP style
+void main(int argc, char *argv[])
+{
+#pragma omp parallel default(shared) 
+   {
+#pragma omp single
+      {
+         InitHarris(in);
+      }
+#pragma omp single
+      {
+#pragma omp task
+         {
+            /* Now we run the Harris procedure */
+            //Sobel
+            SobelX(Gx, in);
+         }
+#pragma omp task
+         {
+            SobelY(Gy, in);
+         }
+      }
+#pragma omp single
+      {
+#pragma omp task
+         {
+            //Multiply
+            MultiplY(Ixx, Gx, Gx);
+         }
+#pragma omp task
+         {
+            MultiplY(Iyy, Gy, Gy);
+         }
+#pragma omp task
+         {
+            MultiplY(Ixy, Gx, Gy);
+         }
+      }
+#pragma omp single
+      {
+#pragma omp task
+         {
+            //Gauss
+            Gauss(Sxx, Ixx);
+         }
+#pragma omp task
+         {
+            Gauss(Syy, Iyy);
+         }
+#pragma omp task
+         {
+            Gauss(Sxy, Ixy);
+         }
+      }
+#pragma omp single
+      {
+         //Coarsity
+         CoarsitY(out, Sxx, Syy, Sxy);
+      }
+   }
+}

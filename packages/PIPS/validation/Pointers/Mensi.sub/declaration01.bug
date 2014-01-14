@@ -1,0 +1,2 @@
+the read effect of p in the declaration of q is lost, probably since
+I have modified the handling of initization expressions in cumulated effects.

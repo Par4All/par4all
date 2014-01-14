@@ -44,39 +44,39 @@ int main()
    int *p, *q, *r, *s, *t;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+// r -> undefined , EXACT
+// s -> undefined , EXACT
+// t -> undefined , EXACT
 
 
    r = &i;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
+// q -> undefined , EXACT
 // r -> i , EXACT
-// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s -> undefined , EXACT
+// t -> undefined , EXACT
 
    q = &j;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 // q -> j , EXACT
 // r -> i , EXACT
-// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s -> undefined , EXACT
+// t -> undefined , EXACT
 
    s = &k;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 // q -> j , EXACT
 // r -> i , EXACT
 // s -> k , EXACT
-// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// t -> undefined , EXACT
 
    p = r, r = s;
 
@@ -85,7 +85,7 @@ int main()
 // q -> j , EXACT
 // r -> k , EXACT
 // s -> k , EXACT
-// t -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// t -> undefined , EXACT
 
    /* we treat this instruction as :
         p = r;

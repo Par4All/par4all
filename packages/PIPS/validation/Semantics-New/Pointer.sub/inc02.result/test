@@ -1,0 +1,69 @@
+
+Points-to inc02
+
+
+// Points To IN:
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
+
+
+// Points To OUT:
+// p -> _p_1 , EXACT
+
+void inc02(int *p)
+{
+
+// Points To:
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
+
+   *p = *p+1;
+
+// Points To:
+// p -> _p_1 , EXACT
+
+   return;
+}
+
+PROPER EFFECTS inc02
+
+void inc02(int *p)
+{
+//             <    is read   >: _p_1 p
+//             <    is written>: _p_1
+   *p = *p+1;
+   return;
+}
+
+CUMULATED EFFECTS inc02
+
+//             <    is read   >: _p_1 p
+//             <    is written>: _p_1
+void inc02(int *p)
+{
+//             <    is read   >: _p_1 p
+//             <    is written>: _p_1
+   *p = *p+1;
+   return;
+}
+
+Transformers with point-to inc02
+
+
+//  T(_p_1) {_p_1==_p_1#init+1}
+
+void inc02(int *p)
+{
+
+//  T(_p_1) {_p_1==_p_1#init+1}
+
+   *p = *p+1;
+
+//  T() {}
+
+   return;
+}
+
+Warnings
+
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[inc02] (points_to_unary_operation_to_transformer) The pointer p can points to NULL

@@ -1,0 +1,57 @@
+
+Points-to for "pointer21"
+
+
+// Points To IN:
+// pa -> *NULL* , MAY
+// pa -> _pa_1[0][0][0] , MAY
+
+
+// Points To OUT:
+// pa -> _pa_1[0][0][0] , EXACT
+
+int pointer21(int (*pa)[5][6], int i, int j)
+{
+
+// Points To: none
+
+   int k;
+
+// Points To:
+// pa -> *NULL* , MAY
+// pa -> _pa_1[0][0][0] , MAY
+
+   k = pa[i][0][j];
+
+// Points To:
+// pa -> _pa_1[0][0][0] , EXACT
+
+   return k;
+}
+
+Proper effects with points-to for "pointer21"
+
+int pointer21(int (*pa)[5][6], int i, int j)
+{
+   int k;
+//             <    is read   >: _pa_1[i][0][j] i j pa
+//             <    is written>: k
+   k = pa[i][0][j];
+//             <    is read   >: k
+   return k;
+}
+
+Cumulated effects for "pointer21"
+
+//             <may be read   >: _pa_1[*][0][*]
+//             <    is read   >: i j pa
+int pointer21(int (*pa)[5][6], int i, int j)
+{
+   int k;
+//             <may be read   >: _pa_1[*][0][*]
+//             <    is read   >: i j pa
+//             <    is written>: k
+   k = pa[i][0][j];
+//             <    is read   >: k
+   return k;
+}

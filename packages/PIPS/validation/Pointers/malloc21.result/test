@@ -1,0 +1,25 @@
+
+POINTS TO for malloc21
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// malloc21 -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// malloc21 -> *NULL* , MAY
+
+char * malloc21(unsigned int n)
+{
+
+// Points To: none
+
+   char *p = malloc(n);
+
+// Points To:
+// p -> *ANY_MODULE*:*HEAP**ANYWHERE* , MAY
+// p -> *NULL* , MAY
+
+
+   return p;
+}

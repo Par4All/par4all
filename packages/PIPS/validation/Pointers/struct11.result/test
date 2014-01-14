@@ -15,13 +15,13 @@ int struct11()
    struct foo s1;
 
 // Points To:
-// s1.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.two -> undefined , EXACT
 
    my_struct s2;
 
 // Points To:
-// s1.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// s2.two -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s1.two -> undefined , EXACT
+// s2.two -> undefined , EXACT
 
 
    return 0;

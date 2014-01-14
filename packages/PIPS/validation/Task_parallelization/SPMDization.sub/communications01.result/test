@@ -1,0 +1,75 @@
+// MPI style
+int main(int argc, char *argv[])
+{
+   {
+      //PIPS generated variable
+      int rank0;
+      //PIPS generated variable
+      MPI_Status status0;
+      //PIPS generated variable
+      MPI_Request request0;
+      //PIPS generated variable
+      int size, a[size], b[size], i, bi, j, bj, _rtl_0_0, _rtl_0_0_0, _rtl_0_0_1, _rtl_0_0_2, _rtl_0_0_3, _rtl_0_0_4;
+      MPI_Init(&argc, &argv);
+      MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
+      if (rank0==0) {
+         scanf("%d", &size);
+         MPI_Isend(&size, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&size, 1, MPI_INT, 2, 2, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&size, 1, MPI_INT, 2, 2, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==0) {
+         scanf("%d", &bi);
+         MPI_Isend(&bi, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&bi, 1, MPI_INT, 2, 2, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==0) {
+         scanf("%d", &bj);
+         MPI_Isend(&bj, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
+         MPI_Isend(&bj, 1, MPI_INT, 2, 2, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==1) {
+         MPI_Recv(&bi, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(i = 0; i <= bi-1; i += 1)
+            a[i] = i;
+         for(_rtl_0_0_4 = bj; _rtl_0_0_4 <= bi-1; _rtl_0_0_4 += 1)
+            MPI_Isend(&a[_rtl_0_0_4], 1, MPI_INT, 2, 2, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==2) {
+         MPI_Recv(&bi, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         MPI_Recv(&size, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(i = bi; i <= size-1; i += 1)
+            a[i] = i;
+         for(_rtl_0_0_3 = bi; _rtl_0_0_3 <= bj-1; _rtl_0_0_3 += 1)
+            MPI_Isend(&a[_rtl_0_0_3], 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==0)
+         0<=bi&&bi<size&&0<=bj&&bj<size?(void) 0:__assert_fail("0<=bi && bi<size && 0<=bj && bj<size", "../communications01.c", 19, (const char *) 0);
+      if (rank0==1) {
+         for(_rtl_0_0_2 = bi; _rtl_0_0_2 <= bj-1; _rtl_0_0_2 += 1)
+            MPI_Recv(&a[_rtl_0_0_2], 1, MPI_INT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         MPI_Recv(&bj, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(j = 0; j <= bj-1; j += 1)
+            b[j] = 2*a[j];
+      }
+      if (rank0==2) {
+         for(_rtl_0_0_0 = bj; _rtl_0_0_0 <= bi-1; _rtl_0_0_0 += 1)
+            MPI_Recv(&a[_rtl_0_0_0], 1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         MPI_Recv(&bj, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         MPI_Recv(&size, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(j = bj; j <= size-1; j += 1)
+            b[j] = 2*a[j];
+         for(_rtl_0_0_1 = bj; _rtl_0_0_1 <= i-1; _rtl_0_0_1 += 1)
+            MPI_Isend(&b[_rtl_0_0_1], 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==1) {
+         for(_rtl_0_0 = bj; _rtl_0_0 <= i-1; _rtl_0_0 += 1)
+            MPI_Recv(&b[_rtl_0_0], 1, MPI_INT, 2, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         MPI_Recv(&size, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(j = 0; j <= size-1; j += 1)
+            printf("%d\n", b[j]);
+      }
+   }
+   MPI_Finalize();
+   return 0;
+}

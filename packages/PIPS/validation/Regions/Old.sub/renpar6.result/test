@@ -8,47 +8,49 @@ C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N}>
       DIMENSION WORK(100,100)
       K = M*M                                                           0005
 
-C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N, 0<=K}>
-C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N, 0<=K}>
+C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N, 0<=K+M, M<=K}>
+C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N, 0<=K+M, M<=K}>
 C  <WORK(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, K<=PHI2, PHI2<=K+N,
-C    0<=K, 1<=N}>
+C    0<=K+M, M<=K, 1<=N}>
 C  <WORK(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, K<=PHI2, PHI2<=K+N,
-C    0<=K, 1<=N}>
+C    0<=K+M, M<=K, 1<=N}>
 
       DO I = 1, N                                                       0006
 
-C  <WORK(PHI1,PHI2)-W-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=I, I<=K+1,
-C    I<=N}>
+C  <WORK(PHI1,PHI2)-W-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=I,
+C    I<=K+M+1, I+M<=K+1, I<=N}>
 
          DO J = 1, N                                                    0007
 
-C  <WORK(PHI1,PHI2)-W-EXACT-{PHI1==J, PHI2==K, 1<=I, I<=K+1, I<=N,
-C    1<=J, J<=N}>
+C  <WORK(PHI1,PHI2)-W-EXACT-{PHI1==J, PHI2==K, 1<=I, I<=K+M+1,
+C    I+M<=K+1, I<=N, 1<=J, J<=N}>
 
             WORK(J,K) = J+K                                             0008
          ENDDO
 
          CALL INC1(K)                                                   0011
 
-C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=K, I<=N, 1<=N}>
-C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=K, I<=N, 1<=N}>
+C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=K+M, I+M<=K, I<=N, 1<=N}>
+C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=K+M, I+M<=K, I<=N, 1<=N}>
 C  <WORK(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, PHI2<=K, K<=PHI2+1,
-C    1<=I, I<=K, I<=N}>
-C  <WORK(PHI1,PHI2)-W-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=I, I<=K,
-C    I<=N, 1<=N}>
+C    1<=I, I<=K+M, I+M<=K, I<=N}>
+C  <WORK(PHI1,PHI2)-W-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=I, I<=K+M,
+C    I+M<=K, I<=N, 1<=N}>
 
 
          DO J = 1, N                                                    0013
 
-C  <WORK(PHI1,PHI2)-W-EXACT-{PHI1==J, PHI2==K, 1<=I, I<=K, I<=N, 1<=J,
-C    J<=N, 1<=N}>
+C  <WORK(PHI1,PHI2)-W-EXACT-{PHI1==J, PHI2==K, 1<=I, I<=K+M, I+M<=K,
+C    I<=N, 1<=J, J<=N, 1<=N}>
 
             WORK(J,K) = J*J-K*K                                         0014
 
-C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=K, I<=N, 1<=J, J<=N, 1<=N}>
-C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=K, I<=N, 1<=J, J<=N, 1<=N}>
+C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=K+M, I+M<=K, I<=N, 1<=J, J<=N,
+C    1<=N}>
+C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=K+M, I+M<=K, I<=N, 1<=J, J<=N,
+C    1<=N}>
 C  <WORK(PHI1,PHI2)-R-EXACT-{PHI1==J, 1<=PHI1, PHI1<=N, PHI2<=K,
-C    K<=PHI2+1, 1<=I, I<=K, I<=N}>
+C    K<=PHI2+1, 1<=I, I<=K+M, I+M<=K, I<=N}>
 
             A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0015
          ENDDO
@@ -63,7 +65,7 @@ C  <A(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=N}>
       DIMENSION WORK(100,100)
       K = M*M                                                           0005
 
-C  <A(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=N, 0<=K}>
+C  <A(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=N, 0<=K+M, M<=K}>
 
       DO I = 1, N                                                       0006
          DO J = 1, N                                                    0007
@@ -72,17 +74,18 @@ C  <A(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=N, 0<=K}>
 
          CALL INC1(K)                                                   0011
 
-C  <A(PHI1)-IN-EXACT-{PHI1==I, 1<=I, I<=K, I<=N}>
-C  <WORK(PHI1,PHI2)-IN-EXACT-{PHI2==K-1, 1<=PHI1, PHI1<=N, 1<=I, I<=K,
-C    I<=N}>
+C  <A(PHI1)-IN-EXACT-{PHI1==I, 1<=I, I<=K+M, I+M<=K, I<=N}>
+C  <WORK(PHI1,PHI2)-IN-EXACT-{PHI2==K-1, 1<=PHI1, PHI1<=N, 1<=I,
+C    I<=K+M, I+M<=K, I<=N}>
 
 
          DO J = 1, N                                                    0013
             WORK(J,K) = J*J-K*K                                         0014
 
-C  <A(PHI1)-IN-EXACT-{PHI1==I, 1<=I, I<=K, I<=N, 1<=J, J<=N, 1<=N}>
+C  <A(PHI1)-IN-EXACT-{PHI1==I, 1<=I, I<=K+M, I+M<=K, I<=N, 1<=J, J<=N,
+C    1<=N}>
 C  <WORK(PHI1,PHI2)-IN-EXACT-{PHI1==J, 1<=PHI1, PHI1<=N, PHI2<=K,
-C    K<=PHI2+1, 1<=I, I<=K, I<=N}>
+C    K<=PHI2+1, 1<=I, I<=K+M, I+M<=K, I<=N}>
 
             A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0015
          ENDDO
@@ -96,12 +99,12 @@ C    K<=PHI2+1, 1<=I, I<=K, I<=N}>
       DO I = 1, N                                                       0006
 
 C  <WORK(PHI1,PHI2)-OUT-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=I,
-C    I<=K+1, I<=N}>
+C    I<=K+M+1, I+M<=K+1, I<=N}>
 
          DO J = 1, N                                                    0007
 
-C  <WORK(PHI1,PHI2)-OUT-EXACT-{PHI1==J, PHI2==K, 1<=I, I<=K+1, I<=N,
-C    1<=J, J<=N}>
+C  <WORK(PHI1,PHI2)-OUT-EXACT-{PHI1==J, PHI2==K, 1<=I, I<=K+M+1,
+C    I+M<=K+1, I<=N, 1<=J, J<=N}>
 
             WORK(J,K) = J+K                                             0008
          ENDDO
@@ -110,12 +113,13 @@ C    1<=J, J<=N}>
 
          DO J = 1, N                                                    0013
 
-C  <WORK(PHI1,PHI2)-OUT-EXACT-{PHI1==J, PHI2==K, 1<=I, I<=K, I<=N,
-C    1<=J, J<=N, 1<=N}>
+C  <WORK(PHI1,PHI2)-OUT-EXACT-{PHI1==J, PHI2==K, 1<=I, I<=K+M, I+M<=K,
+C    I<=N, 1<=J, J<=N, 1<=N}>
 
             WORK(J,K) = J*J-K*K                                         0014
 
-C  <A(PHI1)-OUT-EXACT-{PHI1==I, 1<=I, I<=K, I<=N, 1<=J, J+1<=N, 1<=N}>
+C  <A(PHI1)-OUT-EXACT-{PHI1==I, 1<=I, I<=K+M, I+M<=K, I<=N, 1<=J,
+C    J+1<=N, 1<=N}>
 
             A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0015
          ENDDO

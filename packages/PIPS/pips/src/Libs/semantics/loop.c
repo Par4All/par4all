@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -804,7 +804,7 @@ static transformer add_good_loop_conditions(transformer pre,
 }
 
 /* Always returns newly allocated memory */
-transformer add_loop_index_initialization(transformer tf,
+static transformer add_loop_index_initialization(transformer tf,
 					  loop l,
 					  transformer pre)
 {
@@ -1061,7 +1061,7 @@ transformer precondition_filter_old_values(transformer pre)
 }
 
 /* The loop initialization is performed before tf */
-static transformer transformer_add_loop_index_initialization(transformer tf,
+transformer transformer_add_loop_index_initialization(transformer tf,
 							     loop l,
 							     transformer pre)
 {
@@ -1115,7 +1115,7 @@ static transformer transformer_add_loop_index_initialization(transformer tf,
 return tf;
 }
 
-static transformer transformer_add_loop_index_incrementation(transformer tf,
+transformer transformer_add_loop_index_incrementation(transformer tf,
 							     loop l,
 							     transformer pre)
 {

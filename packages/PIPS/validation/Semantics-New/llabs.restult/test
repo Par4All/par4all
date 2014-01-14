@@ -1,0 +1,46 @@
+
+Transformers
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(a) {}
+
+   long long int a;
+
+//  T(a) {5<=a}
+
+
+   a = llabs(-5);
+
+//  T(main) {main==0, 5<=a}
+
+
+   return 0;
+}
+
+Preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   long long int a;
+
+//  P(a) {}
+
+
+   a = llabs(-5);
+
+//  P(a) {5<=a}
+
+
+   return 0;
+}

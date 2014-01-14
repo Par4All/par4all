@@ -12,7 +12,8 @@ typedef struct {
     town *data;
 } towns;
 
-void display(towns t, double xmin, double ymin, double xmax, double ymax, double step)
+void display(towns t, double xmin, double ymin,
+	     double xmax, double ymax, double step)
 {
     size_t rangex=( (xmax - xmin )/step ),
         rangey=( (ymax - ymin )/step );
@@ -20,7 +21,11 @@ void display(towns t, double xmin, double ymin, double xmax, double ymax, double
     for(i=0;i<rangex;i++)
     {
         for(j=0;j<rangey;j++)
-            printf("%lf %lf %lf\n", t.data[i*rangey+j][0],t.data[i*rangey+j][1],t.data[i*rangey+j][2]);
+            printf("%lf %lf %lf\n",
+		   t.data[i*rangey+j][0],
+		   t.data[i*rangey+j][1],
+		   t.data[i*rangey+j][2]);
         printf("\n");
     }
+    return;
 }

@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -266,6 +266,17 @@ AddEntityToCurrentModule(entity e) {
     : statement_undefined;
 
   AddLocalEntityToDeclarations(e, module_e, module_s);
+}
+
+/* Add a variable entity to the current module declarations. */
+void
+AddEntityToCurrentModuleWithoutDeclaration(entity e) {
+  entity module_e = get_current_module_entity();
+  /* There is no declaration local to a statement in Fortran: */
+  statement module_s = c_module_p(module_e) ? get_current_module_statement()
+    : statement_undefined;
+
+  AddLocalEntityToDeclarationsOnly(e, module_e, module_s);
 }
 
 
@@ -1393,6 +1404,19 @@ bool static_global_variable_p(entity v)
   return static_global_variable_p;
 }
 
+/* Is v a global variable such as "int i;"
+ *
+ * This is OK for C, but Fortran deals with commons.
+ */
+bool global_variable_p(entity v)
+{
+  // static global variables are decared in a compilation unit
+  bool global_variable_p =
+    (strcmp(entity_module_name(v), TOP_LEVEL_MODULE_NAME)==0);
+
+  return global_variable_p;
+}
+
 
 /* True if a variable is the pseudo-variable used to store value
    returned by a function: */
@@ -1491,15 +1515,28 @@ bool variable_in_list_p(entity e, list l)
   return(is_in_list);
 }
 
-bool volatile_variable_p(entity v)
+/* @return whether entity is a "volatile" variable
+ *
+ * See also entity_register_p()
+ */
+bool entity_volatile_variable_p(entity v)
+{
+  type t = entity_type(v);
+  pips_assert("the entity must have type variable", type_variable_p(t));
+
+  return volatile_variable_p(type_variable(t));
+}
+
+/* @return whether variable is a "volatile" variable
+ *
+ * See also entity_register_p()
+ */
+bool volatile_variable_p(variable v)
 {
   bool volatile_p = false;
-  type t = entity_type(v);
-  // ifdebug(1) pips_assert("the entity must have type variable",
-  // type_variable_p(t));
+
   // FI: no idea if volatile can he hidden in a typedef...
-  variable vt = type_variable(t);
-  list ql = variable_qualifiers(vt);
+  list ql = variable_qualifiers(v);
 
   FOREACH(QUALIFIER, q, ql) {
     if(qualifier_volatile_p(q)) {
@@ -1870,4 +1907,15 @@ bool same_scalar_location_p(entity e1, entity e2)
   }
 
   return same;
+}
+
+/* Assume that v is declared as a struct. Return the list of its fields.
+ *
+ * Apart from a possible assert, the same function should wor for a union.
+*/
+list struct_variable_to_fields(entity v)
+{
+  type c_t = entity_basic_concrete_type(v);
+  list fl = derived_type_to_fields(c_t);
+  return fl;
 }

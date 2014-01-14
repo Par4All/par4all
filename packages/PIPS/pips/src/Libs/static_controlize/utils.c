@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -72,12 +72,16 @@ typedef void * vertex_label;
 #include "text-util.h"
 #include "paf-util.h"
 #include "effects-generic.h"
-
+#include "alias-classes.h"
 #include "static_controlize.h"
 
 /* Global variables 	*/
 /* extern	list		Gscalar_written_forward; */
 extern 	list		Gstructure_parameters;
+
+
+extern list assigned_var;
+#define entity_assigned_by_array_p(ent) (gen_find_eq(ent, assigned_var) != chunk_undefined)
 /*
 extern  list		Genclosing_loops;
 extern  list		Genclosing_tests;
@@ -658,10 +662,9 @@ bool splc_linear_expression_p(expression exp, list *ell)
     for(; !VECTEUR_NUL_P(vect) && ONLY_SPLC ; vect = vect->succ)
     {
       entity var = (entity) vect->var;
-
+      bool assigned_by_array = entity_assigned_by_array_p(var);
       if( ! term_cst(vect) )
-	if(!(ENTITY_SP_P(var) ||
-           (gen_find_eq(var,loops_to_indices(*ell)) != chunk_undefined)))
+	if(!(ENTITY_SP_P(var) || (gen_find_eq(var,loops_to_indices(*ell)) != chunk_undefined)) || assigned_by_array == true)
 	  ONLY_SPLC = false;
     }
   }
@@ -1187,4 +1190,144 @@ bool normalizable_loop_p_retrieved(loop l)
   ok = normalizable_and_linear_loop_p(i, r);
 
   return ok;
+}
+
+/* State if an expression OR part of that expression corresponds to one
+   of the entity of the list l.
+   This function was specifically designed in order to find if an expression
+   is using one of the variable/entity listed in l.
+   The function considers that the list only contains scalar variables.
+*/
+ bool is_expression_in_list (expression exp, list l) {
+   if (l == NIL)
+     return false;
+   syntax s = expression_syntax(exp);
+   switch (syntax_tag(s)) {
+     // If the expression is an array we go look among the indices by calling
+     // the function on these indices
+   case is_syntax_reference :
+     {
+       reference ref = syntax_reference(s);
+       if (reference_indices(ref) != NIL) {
+	 FOREACH(expression, e, reference_indices(ref)) {
+	   if(is_expression_in_list(e, l))
+	     return true;
+	 }
+       }
+       else {
+	 entity ent = reference_variable(ref);
+	 if (gen_find_eq(ent, l) != chunk_undefined)
+	   return true;
+       }
+     }
+     break;
+     // Same principle, we go look among the arguments of the call
+   case is_syntax_call :
+     {
+       call c = syntax_call(s);
+       FOREACH(expression, e, call_arguments(c)) {
+	 if(is_expression_in_list(e, l))
+	   return true;
+       }
+     }
+     break;
+   case is_syntax_cast :
+     {
+       cast ca = syntax_cast(s);
+       entity ent = expression_to_entity(cast_expression(ca));
+       if (gen_find_eq(ent, l) != chunk_undefined) {
+	 return true;
+       }
+     }
+     break;
+     // We call the function on every component of the range object
+   case is_syntax_range :
+     {
+       range ra = syntax_range(s);
+       return is_expression_in_list(range_lower(ra), l) || is_expression_in_list(range_upper(ra), l) || is_expression_in_list(range_increment(ra), l);
+     }
+     break;
+   case is_syntax_subscript :
+     {
+       subscript sub = syntax_subscript(s);
+       bool isinArray = is_expression_in_list(subscript_array(sub), l);
+       if (isinArray)
+	 return true;
+       FOREACH(expression, e, subscript_indices(sub)) {
+	 if (is_expression_in_list(e, l)) {
+	   return true;
+	 }
+       }
+     }
+     break;
+   case is_syntax_application :
+     {
+       application app = syntax_application(s);
+       bool isinFunction = is_expression_in_list(application_function(app), l);
+       if (isinFunction)
+	 return true;
+       FOREACH(expression, e, application_arguments(app)) {
+	 if (is_expression_in_list(e, l)) {
+	   return true;
+	 }
+       }
+     }
+     break;
+   case is_syntax_va_arg :
+     {
+       list sil = syntax_va_arg(s);
+       FOREACH(sizeofexpression, soe, sil) {
+	 if (is_expression_in_list(sizeofexpression_expression(soe), l))
+	   return true;
+       }
+     }
+     break;
+   case is_syntax_sizeofexpression :
+     {
+       sizeofexpression si = syntax_sizeofexpression(s);
+       if (is_expression_in_list(sizeofexpression_expression(si), l))
+	 return true;
+     }
+     break;
+   default :
+     return false;
+   }
+   return false;
+ }
+
+/* Allows the static_controlize phase to keep and update a list containing
+   all the variables of the program assigned directly or indirectly by an array
+*/
+bool get_reference_assignments (statement s, list* l) {
+  // we only compute assignments
+  if (!assignment_statement_p(s)) {
+    return false;
+  }
+  instruction inst = statement_instruction(s);
+  // May not be necessary
+  if (!instruction_call_p(inst)) {
+    return false;
+  }
+  // Being an assignment, logically this call has only two arguments
+  call c = instruction_call(inst);
+  list args = call_arguments(c);
+  // Left member of the assignment
+  expression left = gen_car(args);
+  entity eleft = expression_to_entity(left);
+  // Right member of the assignment
+  expression right = gen_car(CDR(args));
+  // If the assigned variable is not in the list
+  if (gen_find_eq(eleft, *l) == chunk_undefined) {
+    // Test if the assignment is static control
+    entity e = sp_feautrier_scalar_assign_call(c);
+    syntax s = expression_syntax(left);
+    // We look for the right member in the list in order to know if the variable read has not been assigned by an array
+    bool isRightArrayAccess = is_expression_in_list(right, *l);
+    // If the left member is a scalar and if the right member is not static control or if it is a variable previously assigned
+    // by an array, then we add the left member to the list
+    if ((syntax_reference_p(s) && reference_indices(syntax_reference(s)) == NIL) && (entity_undefined_p(e) || isRightArrayAccess == true)) {
+      *l = gen_cons(eleft, *l);    
+    }
+  }
+  return true;
 }

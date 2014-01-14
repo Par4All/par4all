@@ -1,6 +1,6 @@
 # $Id$
 #
-# Copyright 1989-2010 MINES ParisTech
+# Copyright 1989-2014 MINES ParisTech
 #
 # This file is part of PIPS.
 #
@@ -47,5 +47,6 @@ phase3:
 phase4:
 phase5: install
 phase6:
+phase7:
 
 doxygen-publish:

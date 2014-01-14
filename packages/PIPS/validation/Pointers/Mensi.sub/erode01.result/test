@@ -1,0 +1,282 @@
+
+Points-to for "erode"
+
+
+Proper effects with points-to for "erode"
+
+
+Cumulated effects with points-to for "erode"
+
+//             <may be read   >: _image_4[*] _image_4[*] 
+//                               _image_4_4[*][*] _image_4_4[*][*] 
+//                               _new_image_3[*] image isj new_image
+//             <may be written>: _new_image_3_3[*][*]
+//             <    is read   >: isi
+void erode(int isi, int isj, int **new_image, int **image)
+{
+
+   int i, j, k, l;
+//             <may be read   >: _image_4[*] _image_4[*] 
+//                               _image_4_4[*][*] _image_4_4[*][*] 
+//                               _new_image_3[*] i image isj j k 
+//                               new_image
+//             <may be written>: _new_image_3_3[*][*] j k
+//             <    is read   >: isi
+//             <    is written>: i 0`l
+
+   for(l = 0; l <= 4; l += 1)
+//             <may be read   >: _image_4[*] _image_4[*] 
+//                               _image_4_4[*][*] _image_4_4[*][*] 
+//                               _new_image_3[*] i image isj j k 
+//                               new_image
+//             <may be written>: _new_image_3_3[*][*] j k
+//             <    is read   >: isi
+//             <    is written>: i
+
+loop1:
+      for(i = 5/2; i <= isi-5/2-1; i += 1)
+//             <may be read   >: _image_4[*] _image_4[*] 
+//                               _image_4_4[*][*] _image_4_4[*][*] 
+//                               _new_image_3[*] i image j k new_image
+//             <may be written>: _new_image_3_3[*][*] k
+//             <    is read   >: isi isj
+//             <    is written>: j
+         for(j = 5/2; j <= isj-5/2-1; j += 1) {
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: i image j
+//             <    is written>: 0`1`2`l
+            int l = image[i][j];
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: i image isi isj j k 0`1`2`l
+//             <    is written>: k 0`1`2`l
+            for(k = 0; k <= 4; k += 1)
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: i image isi isj j k 0`1`2`l
+//             <    is written>: 0`1`2`l
+               l = MIN(l, image[i][j+1-5/2+k]);
+//             <may be read   >: _new_image_3[*]
+//             <may be written>: _new_image_3_3[*][*]
+//             <    is read   >: i isi isj j 0`1`2`l new_image
+            new_image[i][j] = l;
+         }
+}
+
+Code after unrolling
+
+//             <may be read   >: _image_4[*] _image_4_4[*][*] 
+//                               _new_image_3[*] image isj new_image
+//             <may be written>: _new_image_3_3[*][*]
+//             <    is read   >: isi
+void erode(int isi, int isj, int **new_image, int **image)
+{
+
+   int i, j, k, l;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0, j0, l0, k0, j1, l1, k1, j2, l2, k2, j3, l3, k3, j4, l4, k4;
+//             <may be read   >: LU_IND0 _image_4[*] _image_4_4[*][*] 
+//                               _new_image_3[*] image isj j0 j1 j2 j3
+//                               j4 k0 k1 k2 k3 k4 l0 l1 l2 l3 l4 
+//                               new_image
+//             <may be written>: _new_image_3_3[*][*] j0 j1 j2 j3 j4 
+//                               k0 k1 k2 k3 k4 l0 l1 l2 l3 l4
+//             <    is read   >: LU_IB0 LU_NUB0 isi
+//             <    is written>: LU_IB0 LU_IND0 LU_NUB0 i 0`l
+
+   for(l = 0; l <= 4; l += 1) {
+
+
+//             <    is read   >: isi
+//             <    is written>: LU_NUB0
+loop1:      LU_NUB0 = (isi-5/2-1-5/2+1)/1;
+//             <    is read   >: LU_NUB0
+//             <    is written>: LU_IB0
+      LU_IB0 = MOD(LU_NUB0, 4);
+//             <may be read   >: LU_IND0 _image_4[*] _image_4_4[*][*] 
+//                               _new_image_3[*] image isj j0 k0 l0 
+//                               new_image
+//             <may be written>: _new_image_3_3[*][*] j0 k0 l0
+//             <    is read   >: LU_IB0
+//             <    is written>: LU_IND0
+      for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+//             <may be read   >: LU_IND0 _image_4[*] _image_4_4[*][*] 
+//                               _new_image_3[*] image j0 k0 l0 
+//                               new_image
+//             <may be written>: _new_image_3_3[*][*] k0 l0
+//             <    is read   >: LU_IB0 isj
+//             <    is written>: j0
+         for(j0 = 5/2; j0 <= isj-5/2-1; j0 += 1) {
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 image isj j0
+//             <    is written>: l0
+            l0 = image[LU_IND0*1+5/2][j0];
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 image isj j0
+//             <    is written>: l0
+            l0 = image[LU_IND0*1+5/2][j0];
+
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 image isj j0 k0 l0
+//             <    is written>: k0 l0
+            for(k0 = 0; k0 <= 4; k0 += 1)
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 image isj j0 k0 l0
+//             <    is written>: l0
+               l0 = MIN(l0, image[LU_IND0*1+5/2][j0+1-5/2+k0]);
+//             <may be read   >: _new_image_3[*]
+//             <may be written>: _new_image_3_3[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 isj j0 l0 new_image
+            new_image[LU_IND0*1+5/2][j0] = l0;
+         }
+//             <    is read   >: LU_IB0
+l99999:         ;
+      }
+//             <may be read   >: LU_IND0 _image_4[*] _image_4_4[*][*] 
+//                               _new_image_3[*] image isj j1 j2 j3 j4
+//                               k1 k2 k3 k4 l1 l2 l3 l4 new_image
+//             <may be written>: _new_image_3_3[*][*] j1 j2 j3 j4 k1 
+//                               k2 k3 k4 l1 l2 l3 l4
+//             <    is read   >: LU_IB0 LU_NUB0
+//             <    is written>: LU_IND0
+      for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+//             <may be read   >: LU_IND0 _image_4[*] _image_4_4[*][*] 
+//                               _new_image_3[*] image j4 k4 l4 
+//                               new_image
+//             <may be written>: _new_image_3_3[*][*] k4 l4
+//             <    is read   >: LU_IB0 LU_NUB0 isj
+//             <    is written>: j4
+         for(j4 = 5/2; j4 <= isj-5/2-1; j4 += 1) {
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 image isj j4
+//             <    is written>: l4
+            l4 = image[(LU_IND0+0)*1+5/2][j4];
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 image isj j4
+//             <    is written>: l4
+            l4 = image[(LU_IND0+0)*1+5/2][j4];
+
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 image isj j4 
+//                               k4 l4
+//             <    is written>: k4 l4
+            for(k4 = 0; k4 <= 4; k4 += 1)
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 image isj j4 
+//                               k4 l4
+//             <    is written>: l4
+               l4 = MIN(l4, image[(LU_IND0+0)*1+5/2][j4+1-5/2+k4]);
+//             <may be read   >: _new_image_3[*]
+//             <may be written>: _new_image_3_3[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 isj j4 l4 
+//                               new_image
+            new_image[(LU_IND0+0)*1+5/2][j4] = l4;
+         }
+//             <may be read   >: LU_IND0 _image_4[*] _image_4_4[*][*] 
+//                               _new_image_3[*] image j3 k3 l3 
+//                               new_image
+//             <may be written>: _new_image_3_3[*][*] k3 l3
+//             <    is read   >: LU_IB0 LU_NUB0 isj
+//             <    is written>: j3
+         for(j3 = 5/2; j3 <= isj-5/2-1; j3 += 1) {
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 image isj j3
+//             <    is written>: l3
+            l3 = image[(LU_IND0+1)*1+5/2][j3];
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 image isj j3
+//             <    is written>: l3
+            l3 = image[(LU_IND0+1)*1+5/2][j3];
+
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 image isj j3 
+//                               k3 l3
+//             <    is written>: k3 l3
+            for(k3 = 0; k3 <= 4; k3 += 1)
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 image isj j3 
+//                               k3 l3
+//             <    is written>: l3
+               l3 = MIN(l3, image[(LU_IND0+1)*1+5/2][j3+1-5/2+k3]);
+//             <may be read   >: _new_image_3[*]
+//             <may be written>: _new_image_3_3[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 isj j3 l3 
+//                               new_image
+            new_image[(LU_IND0+1)*1+5/2][j3] = l3;
+         }
+//             <may be read   >: LU_IND0 _image_4[*] _image_4_4[*][*] 
+//                               _new_image_3[*] image j2 k2 l2 
+//                               new_image
+//             <may be written>: _new_image_3_3[*][*] k2 l2
+//             <    is read   >: LU_IB0 LU_NUB0 isj
+//             <    is written>: j2
+         for(j2 = 5/2; j2 <= isj-5/2-1; j2 += 1) {
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 image isj j2
+//             <    is written>: l2
+            l2 = image[(LU_IND0+2)*1+5/2][j2];
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 image isj j2
+//             <    is written>: l2
+            l2 = image[(LU_IND0+2)*1+5/2][j2];
+
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 image isj j2 
+//                               k2 l2
+//             <    is written>: k2 l2
+            for(k2 = 0; k2 <= 4; k2 += 1)
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 image isj j2 
+//                               k2 l2
+//             <    is written>: l2
+               l2 = MIN(l2, image[(LU_IND0+2)*1+5/2][j2+1-5/2+k2]);
+//             <may be read   >: _new_image_3[*]
+//             <may be written>: _new_image_3_3[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 isj j2 l2 
+//                               new_image
+            new_image[(LU_IND0+2)*1+5/2][j2] = l2;
+         }
+//             <may be read   >: LU_IND0 _image_4[*] _image_4_4[*][*] 
+//                               _new_image_3[*] image j1 k1 l1 
+//                               new_image
+//             <may be written>: _new_image_3_3[*][*] k1 l1
+//             <    is read   >: LU_IB0 LU_NUB0 isj
+//             <    is written>: j1
+         for(j1 = 5/2; j1 <= isj-5/2-1; j1 += 1) {
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 image isj j1
+//             <    is written>: l1
+            l1 = image[(LU_IND0+3)*1+5/2][j1];
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 image isj j1
+//             <    is written>: l1
+            l1 = image[(LU_IND0+3)*1+5/2][j1];
+
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 image isj j1 
+//                               k1 l1
+//             <    is written>: k1 l1
+            for(k1 = 0; k1 <= 4; k1 += 1)
+//             <may be read   >: _image_4[*] _image_4_4[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 image isj j1 
+//                               k1 l1
+//             <    is written>: l1
+               l1 = MIN(l1, image[(LU_IND0+3)*1+5/2][j1+1-5/2+k1]);
+//             <may be read   >: _new_image_3[*]
+//             <may be written>: _new_image_3_3[*][*]
+//             <    is read   >: LU_IB0 LU_IND0 LU_NUB0 isj j1 l1 
+//                               new_image
+            new_image[(LU_IND0+3)*1+5/2][j1] = l1;
+         }
+//             <    is read   >: LU_IB0 LU_NUB0
+l99998:         ;
+      }
+//             <    is read   >: LU_NUB0
+//             <    is written>: i
+      i = 5/2+MAX0(LU_NUB0, 0)*1;
+   }
+}
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
+PROPER_EFFECTS_WITH_POINTS_TO[erode] (proper_effects_of_call) Statement -1 is ignored because it does not modify the store.
+PROPER_EFFECTS_WITH_POINTS_TO[erode] (proper_effects_of_call) Statement -1 is ignored because it does not modify the store.
+PROPER_EFFECTS_WITH_POINTS_TO[erode] (proper_effects_of_call) Statement -1 is ignored because it does not modify the store.
+PROPER_EFFECTS_WITH_POINTS_TO[erode] (proper_effects_of_call) Statement -1 is ignored because it does not modify the store.
+PROPER_EFFECTS_WITH_POINTS_TO[erode] (proper_effects_of_call) Statement -1 is ignored because it does not modify the store.

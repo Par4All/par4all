@@ -1,7 +1,7 @@
 %%
 %% $Id$
 %%
-%% Copyright 1989-2010 MINES ParisTech
+%% Copyright 1989-2014 MINES ParisTech
 %%
 %% This file is part of PIPS.
 %%
@@ -143,10 +143,10 @@
 
 \title{PIPS High-Level Software Interface \\
     Pipsmake configuration}
-\author{Remi Triolet and Fran\c{c}ois Irigoin\\
+\author{R\'emi Triolet and Fran\c{c}ois Irigoin\\
   with many other contributors\\
         MINES ParisTech \\
-        Math�matiques et Syst�mes \\
+        Math\'ematiques et Syst\`emes \\
         Centre de Recherche en Informatique \\
         77305 Fontainebleau Cedex \\
         France \\}
@@ -250,7 +250,7 @@
 %% \newcommand{\Delete}{\LINK{\texttt{Delete}}{http://www.cri.ensmp.fr/pips/Delete.html}}
 \newcommand{\Delete}{{\em Delete}}
 
-%% Pour B�atrice :
+%% Pour Beatrice :
 \newcommand{\exact}[0]{{\tt EXACT}}
 \newcommand{\incluseg}{\subseteq}
 \newcommand{\phik}[1]{\ifmmode\phi_{#1}\else$\phi_{#1}$\fi}
@@ -272,7 +272,6 @@
 
 %\begin{PipsExample}
 %petit essai
-%� mettre ailleurs ! @!#%!#&@*I#(**()\\$$ pour tester
 %\end{PipsExample}
 
 %% The environment used to mark up the menus layout :
@@ -2253,6 +2252,11 @@ pragma_outliner      >     MODULE.code
     < PROGRAM.entities
     < MODULE.code
     < MODULE.cumulated_effects
+    < MODULE.regions
+    < CALLEES.summary_regions
+    < MODULE.summary_regions
+    < MODULE.transformers
+    < MODULE.preconditions
 \end{PipsMake}
 
 \begin{PipsProp}{PRAGMA_OUTLINER_BEGIN}
@@ -2449,6 +2453,17 @@ proper_effects_with_points_to > MODULE.proper_effects
         < MODULE.points_to
         < CALLEES.summary_effects
 \end{PipsMake}
+
+% Specific functions used:
+%
+% simple_effect_to_constant_path_effects_with_points_to
+% eval_simple_cell_with_points_to()
+% generic_eval_cell_with_points_to()
+% transform_sink_cells_from_matching_list
+% simple_cell_reference_with_address_of_cell_reference_translation
+% simple_cell_reference_with_address_of_cell_reference_translation_fi
+%
+% For debugging: EVAL_CELL_WITH_POINTS_TO_DEBUG_LEVEL
 
 \begin{PipsMake}
 proper_effects_with_pointer_values > MODULE.proper_effects
@@ -2698,7 +2713,7 @@ turned off by setting
 \PipsPropRef{TRUST_CONSTANT_PATH_EFFECTS_IN_CONFLICTS} to {\tt
   FALSE}. This must be used with care and only when there is no aliasing.
 \begin{PipsProp}{TRUST_CONSTANT_PATH_EFFECTS_IN_CONFLICTS }
-TRUST_CONSTANT_PATH_EFFECTS_IN_CONFLICTS FALSE
+  TRUST_CONSTANT_PATH_EFFECTS_IN_CONFLICTS FALSE
 \end{PipsProp}
 
 
@@ -3168,7 +3183,7 @@ algorithms. A dependence graph is a refinement of use-def chains
 
 There are several ways to compute a dependence graph. Some of them are
 fast (\textsc{Banerjee}'s one for instance) but provide poor results, others
-might be slower (R�mi Triolet's one for instance) but produce better
+might be slower (R\'emi Triolet's one for instance) but produce better
 results.
 
 Three different dependence tests are available, all based on
@@ -3222,9 +3237,9 @@ dependence graph. If they were removed instead of being ignored,
 use-def elimination would remove all \verb/free/ statements.
 
 The main contributors for the design and development of dependence
-analysis are R�mi \textsc{Triolet}, Fran�ois \textsc{Irigoin} and Yi-qing
+analysis are R\'emi \textsc{Triolet}, Fran\c{c}ois \textsc{Irigoin} and Yi-qing
 \textsc{Yang}~\cite{Yan93}. The code was improved by Corinne
-\textsc{Ancourt} and B�atrice \textsc{Creusillet}.
+\textsc{Ancourt} and B\'eatrice \textsc{Creusillet}.
 \end{PipsPass}
 
 \subsection{Menu for Dependence Tests}
@@ -3590,7 +3605,7 @@ polynomial} equations between scalar integer variables. SUIF~\cite{}
 also performs some kind of semantics analysis.
 
 The semantics analysis part of \Pips{} was designed and developed by
-Fran�ois \textsc{Irigoin}.
+Fran\c{c}ois \textsc{Irigoin}.
 
 \subsection{Transformers}
 \label{subsubsection-transformers}
@@ -3617,6 +3632,8 @@ according to some parameter value.} :
 \PipsPropRef{SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES}
 \PipsPropRef{SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES}
 \PipsPropRef{SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES}
+\PipsPropRef{SEMANTICS_ANALYZE_SCALAR_POINTER_VARIABLES}
+\PipsPropRef{SEMANTICS_ANALYZE_CONSTANT_PATH}
 
 Transformers can be computed intraprocedurally by looking at each
 function independently or they can be computed interprocedurally
@@ -3632,7 +3649,7 @@ since call statements are accepted. Interprocedural algorithms use the
 Fast algorithms use a very primitive non-iterative transitive closure
 algorithm (two possible versions: flow sensitive or flow insensitive).
 Full algorithms use a transitive closure algorithm based on vector
-subspace (i.e. \emph{� la} K{\sc arr}~\cite{Kar76}) or one based on
+subspace (i.e. \emph{\`a la} K{\sc arr}~\cite{Kar76}) or one based on
 the discrete derivatives~\cite{Iri05,ACI10}. The iterative fix point
 algorithm for transformers (i.e. H{\sc albwachs}/C{\sc
 ousot}~\cite{CH78} is implemented but not used because the results
@@ -3691,6 +3708,7 @@ alias transformers_intra_fast 'Quick Intra-Procedural Computation'
 alias transformers_inter_fast 'Quick Inter-Procedural Computation'
 alias transformers_intra_full 'Full Intra-Procedural Computation'
 alias transformers_inter_full 'Full Inter-Procedural Computation'
+alias transformers_inter_full_with_points_to 'Full Inter-Procedural with points-to Computation'
 alias refine_transformers 'Refine Transformers'
 \end{PipsMake}
 
@@ -3759,7 +3777,25 @@ transformers_inter_full         > MODULE.transformers
         < PROGRAM.program_precondition
 \end{PipsMake}
 
-\subsubsection{Full Interprocedural Transformers}
+\subsubsection{Full Interprocedural Transformers with points-to}
+
+\begin{PipsPass}{transformers_inter_full_with_points_to}
+Build the improved interprocedural transformers with points-to informations
+\end{PipsPass}
+
+\begin{PipsMake}
+transformers_inter_full_with_points_to         > MODULE.transformers
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.points_to
+        < MODULE.cumulated_effects
+        < MODULE.summary_effects
+        < CALLEES.summary_transformer
+        < MODULE.proper_effects
+        < PROGRAM.program_precondition
+\end{PipsMake}
+
+\subsubsection{Refine Full Interprocedural Transformers}
 
 \begin{PipsPass}{refine_transformers}
 Rebuild the interprocedural transformers using interprocedural
@@ -4227,6 +4263,9 @@ program_postcondition     > PROGRAM.program_postcondition
 \index{SEMANTICS\_ANALYZE\_SCALAR\_BOOLEAN\_VARIABLES}
 \index{SEMANTICS\_ANALYZE\_SCALAR\_STRING\_VARIABLES}
 \index{SEMANTICS\_ANALYZE\_SCALAR\_FLOAT\_VARIABLES}
+\index{SEMANTICS\_ANALYZE\_SCALAR\_COMPLEX\_VARIABLES}
+\index{SEMANTICS\_ANALYZE\_SCALAR\_POINTER\_VARIABLES}
+\index{SEMANTICS\_ANALYZE\_CONSTANT\_PATH}
 
 By default, the semantic analysis is restricted to scalar integer
 variables as they are key variables to understand scientific code
@@ -4236,7 +4275,7 @@ integers. Character string constants and floating point constants are
 represented as undefined values.
 
 The analysis is thus limited to constant propagation for character strings
-and floating point values whereas integer and boolean variables are
+and floating point values whereas integer, boolean and pointer variables are
 processed with a relational analysis.
 
 Character string constants of fixed maximal length could be translated
@@ -4244,6 +4283,14 @@ into integers but the benefit is not yet assessed because they are not
 much used in the benchmark and commercial applications we have studied.
 The risk is to increase significantly the number of overflows encountered
 during the analysis.
+
+For the pointer analysis, it's strongly recommended to activate
+\PipsPassRef{proper_effects_with_points_to} before performing this analysis.
+
+In interprocedural analysis, or in presence of formal parameter, to performe 
+the pointer analysis, it's strongly recommended to set  
+\PipsPropRef{SEMANTICS_ANALYZE_CONSTANT_PATH} at TRUE.
+\PipsPropRef{SEMANTICS_ANALYZE_CONSTANT_PATH} can also serve to analyse the structures?
 
 \begin{PipsProp}{SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES}
 SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE
@@ -4264,6 +4311,15 @@ SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES FALSE
 \begin{PipsProp}{SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES}
 SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES FALSE
 \end{PipsProp}
+
+\begin{PipsProp}{SEMANTICS_ANALYZE_SCALAR_POINTER_VARIABLES}
+SEMANTICS_ANALYZE_SCALAR_POINTER_VARIABLES FALSE
+\end{PipsProp}
+
+\begin{PipsProp}{SEMANTICS_ANALYZE_CONSTANT_PATH}
+SEMANTICS_ANALYZE_CONSTANT_PATH FALSE
+\end{PipsProp}
+
 
 \subsubsection{Array Declarations and Accesses}
 \label{subsubsection:array-declarations-and-accesses}
@@ -4404,7 +4460,7 @@ SEMANTICS_INTERPROCEDURAL FALSE
 
 This property is used internally and is not user selectable.
 
-\subsubsection{Fix Point Operators}
+\subsubsection{Fix Point and Transitive Closure Operators}
 \index{Fix Point}
 \index{SEMANTICS\_FIX\_POINT}
 \index{SEMANTICS\_FIX\_POINT\_OPERATOR}
@@ -4566,7 +4622,7 @@ SEMANTICS_KEEP_DO_LOOP_EXIT_CONDITION TRUE
 SEMANTICS_FILTER_INITIAL_VALUES TRUE
 \end{PipsProp}
 
-\subsubsection{Normalization level}
+\subsubsection{Normalization Level}
 \index{SEMANTICS\_NORMALIZATION\_LEVEL\_BEFORE\_STORAGE}
 
 Normalizing transformer and preconditions systems is a delicate issue
@@ -4590,6 +4646,13 @@ performances. With any other value, the normalization level is equel to 2.
 \begin{PipsProp}{SEMANTICS_NORMALIZATION_LEVEL_BEFORE_STORAGE}
 SEMANTICS_NORMALIZATION_LEVEL_BEFORE_STORAGE 4
 \end{PipsProp}
+
+\subsubsection{Evaluation of sizeof}
+
+Property \PipsPropRef{EVAL_SIZEOF} can be set to true to force the
+static evaluation of size of. Potentially, the computed transformers
+and preconditions are only valid for the target architecture defined
+in \verb/ri-util-local.h/.
 
 \subsubsection{Prettyprint}
 \index{SEMANTICS\_FILTERED\_PRECONDITIONS}
@@ -4617,6 +4680,44 @@ SEMANTICS_STDOUT FALSE
 Debug level for semantics used to be controlled by a property. A Shell
 variable, \verb/SEMANTICS_DEBUG_LEVEL/, is used instead.
 
+\subsection{Reachability Analysis: The Path Transformer} 
+A set of operations on array regions are defined in PIPS such as the function \texttt{regions\_intersection}. However, this is not sufficient because regions should be combined with what we call path transformers in order to propagate the memory stores used in them. Indeed, regions operations must be performed with respect to the abstraction of the same memory store. 
+
+A path transformer permits to compare array regions of statements originally defined in different memory stores.   
+
+ The path transformer between two statements computes the possible changes performed by a piece of code delimited by two statements $S_{begin}$ and $S_{end}$ enclosed within a statement $S$. A path transformer is represented by a convex polyhedron over program variables and its computation is based on transformers; thus, it is a system of linear inequalities.
+The goal of the following phase is to compute the path transformer
+between two statements labeled by sb and se.
+
+
+\begin{PipsMake}
+path_transformer                 > MODULE.path_transformer_file                    
+        < PROGRAM.entities                  
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.transformers
+        < MODULE.preconditions
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
+The next properties are used by Phase \texttt{path\_transformer} to
+label the two statements $S_{begin}$ and $S_{end}$.
+
+\begin{PipsProp}{PATH_TRANSFORMER_BEGIN}
+PATH_TRANSFORMER_BEGIN "sb"
+\end{PipsProp}
+
+\begin{PipsProp}{PATH_TRANSFORMER_END}
+PATH_TRANSFORMER_END "se"
+\end{PipsProp}
+
+The next property is used to allow an empty path or not which is necessary for the test
+of dependence. If its value is false, we return an empty transformer
+for an empty path. Otherwise, an identity transformer is returned.
+
+\begin{PipsProp}{IDENTITY_EMPTY_PATH_TRANSFORMER}
+IDENTITY_EMPTY_PATH_TRANSFORMER TRUE
+\end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONTINUATIONS
 
@@ -4673,7 +4774,7 @@ The first version of the complexity estimator was designed and
 developed by Pierre \textsc{Berthomier}. It was restricted to intra-procedural
 analysis. This first version was enlarged and validated on real code for
 SPARC-2 machines by Lei Z{\sc hou}~\cite{Zho94}. Since, it has been modified
-slightly by Fran�ois I{\sc rigoin}. For simple programs, complexity
+slightly by Fran\c{c}ois I{\sc rigoin}. For simple programs, complexity
 estimation are strongly correlated with execution times. The estimations
 can be used to see if program transformations are beneficial.
 
@@ -5030,11 +5131,11 @@ body, and which appears in the loop body region polyhedron, does not appear
 anymore in the invariant region polyhedron.
 
 \verb+MAY+ \verb+READ+ and \verb+WRITE+ region analysis was first designed
-by R�mi \textsc{Triolet}~\cite{Tri84} and then revisited by Fran�ois
+by R\'emi \textsc{Triolet}~\cite{Tri84} and then revisited by Fran\c{c}ois
 \textsc{Irigoin}~\cite{TIF86}. Alexis \textsc{Platonoff}~\cite{Pla90}
 implemented the first version of region analysis in \Pips{}. These
 regions were computed with respect to the initial stores of the
-modules. Fran�ois \textsc{Irigoin} and, mainly, B�atrice
+modules. Fran\c{c}ois \textsc{Irigoin} and, mainly, B\'eatrice
 \textsc{Creusillet}~\cite{CI95,CI96,Cre96}, added new functionalities to
 this first version as well as functions to compute \verb+MUST+
 regions, and \verb+IN+ and \verb+OUT+ regions.
@@ -5323,10 +5424,14 @@ EXACT_REGIONS TRUE
 MUST_REGIONS FALSE
 \end{PipsProp}
 
-The default option is to compute regions without taking into account array
-bounds. The next property can be turned to {\tt TRUE} to
-systematically add them in
-the region descriptors. Both options have their advantages and drawbacks.
+The default option is to compute regions without taking into account
+declared array bounds. The next property can be turned to {\tt TRUE}
+to systematically add them in the region descriptors. Both options
+have their advantages and drawbacks, but the second one implies that
+the \PIPS{} user is sure that her/his program is correct with respect
+to array accesses. In case of doubt, you might want to run pass
+\PipsPassRef{array_bound_check_bottom_up} or
+\PipsPassRef{array_bound_check_top_down}.
 
 \begin{PipsProp}{REGIONS_WITH_ARRAY_BOUNDS}
 REGIONS_WITH_ARRAY_BOUNDS FALSE
@@ -5485,7 +5590,7 @@ interprocedural_points_to_analysis > MODULE.points_to
                    > MODULE.points_to_out
                    > MODULE.points_to_in
         ! SELECT.proper_effects_with_points_to
-        ! SELECT.cumulated_effects_with_points_to           
+        ! SELECT.cumulated_effects_with_points_to
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.summary_effects
@@ -5560,6 +5665,40 @@ intraprocedural_points_to_analysis > MODULE.points_to
 The pointer effects are useful, but they are recomputed for each
 expression and subexpression by the points-to analysis.
 
+
+\subsection{Initial Points-to or Program Points-to}
+\label{subsubsection-initial-points-to}
+\index{Points-to (Initial)}
+\index{Initial Points-to}
+
+Because no top-down points-to analysis is available, this two passes
+are useless. A top-down points-to analysis would be useful to check
+that the restrict assumption about formal parameters is met by the
+actual parameters. It might make possible a slighlty more precise
+points-to information in the functions. Hopefully, the formal context
+and the points-to stubs provide enough equivalent information to the
+passes that use points-to information.
+
+\begin{PipsMake}
+initial_points_to     > MODULE.initial_points_to
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.points_to_out
+\end{PipsMake}
+
+All initial points-to are combined to define the program points-to which is an
+abstraction of the program initial state.
+
+\begin{PipsMake}
+program_points_to     > PROGRAM.program_points_to
+        < PROGRAM.entities
+        < ALL.initial_points_to
+\end{PipsMake}
+
+The program points-to can only be used for the initial state of the
+main procedure. Although it appears below for all interprocedural analyses
+and it always is computed, it only is used when a main procedure is
+available.
 
 \subsection{Pointer Values Analyses}
 \label{subsection-pointer-values}
@@ -5723,6 +5862,17 @@ safe result is the top abstract location.
 ABSTRACT_HEAP_LOCATIONS "unique"
 \end{PipsProp}
 
+Property \PipsPropRef{POINTS_TO_SUCCESSFUL_MALLOC_ASSUMED} is used to
+control the analysis of a malloc call. The call may return either a
+unique target in the heap, or a pair of targets, one in the heap and
+NULL. The default value is true for historical reasons and because the
+result is shorter and correct almost all the time.
+\begin{PipsProp}{POINTS_TO_SUCCESSFUL_MALLOC_ASSUMED}
+POINTS_TO_SUCCESSFUL_MALLOC_ASSUMED TRUE
+\end{PipsProp}
+
+\subsubsection{Type Handling}
+
 The property \PipsPropRef{POINTS_TO_STRICT_POINTER_TYPES}
 is used to handle pointer arithmetic. According to C standard(section 6.5.6, item 8)
 the following C code :
@@ -5792,8 +5942,12 @@ towards the \verb/NULL/ location. Thus it prevents from dereferencing
 a null pointer when dereferencing a points-to stub and it allows the
 comparison of two points-to stubs when a condition such as \verb/p!=q/
 is interpreted or the comparison of one points-to stub to NULL as in
-\verb/p!=NULL/. Temporarily, to perform an interprocedural analysis,
-it must be turned to {\tt FALSE}.
+\verb/p!=NULL/. This property must be set to TRUE for the points-to
+analysis to return valid results since the constant path lattice used
+implies that NULL is not included in points-to stubes. Also, setting
+it to FALSE make any formal recursive data structures infinite since
+NULL is never found by the analyzer. Basically, this property should
+be removed.
 \begin{PipsProp}{POINTS_TO_NULL_POINTER_INITIALIZATION}
 POINTS_TO_NULL_POINTER_INITIALIZATION TRUE
 \end{PipsProp}
@@ -6346,7 +6500,7 @@ PARALLELIZE_AGAIN_PARALLEL_CODE FALSE
 \end{PipsProp}
 The motivation is we may want to parallelize with a coarse grain method
 first, and finish with a fine grain method here to try to parallelize what
-has not been parallelized.  When applying \emph{� la} Rice parallelizing
+has not been parallelized.  When applying \emph{\`a la} Rice parallelizing
 to parallelize some (still) sequential code, we may not want loop
 distribution on already parallel code to preserve cache resources, etc.
 
@@ -7092,7 +7246,7 @@ generated code, e.g. to propagate constant or eliminate dead code.
 Note that use-use dependencies are used to allocate temporary arrays in
 local memory (i.e. in the software cache).
 
-This compilation scheme was designed by Corinne \textsc{Ancourt} and Fran�ois
+This compilation scheme was designed by Corinne \textsc{Ancourt} and Fran\c{c}ois
 \textsc{Irigoin}. It uses theoretical results in~\cite{AI91}. Its input is a very
 small subset of Fortran program (e.g. procedure calls are not supported).
 It was implemented by the designers, with help from Lei \textsc{Zhou}.
@@ -8382,7 +8536,7 @@ of wrapper is the normal behaviour but for simulation of an accelerator
 code, not using a wrapper is useful.
 
 The intrinsics function names to get an $i^{th}$ coordinate in the
-iteration space are defined by this GNU \emph{� la} \texttt{printf}
+iteration space are defined by this GNU \emph{\`a la} \texttt{printf}
 format:
 \begin{PipsProp}{GPU_COORDINATE_INTRINSICS_FORMAT}
 GPU_COORDINATE_INTRINSICS_FORMAT "P4A_vp_%d"
@@ -8628,6 +8782,242 @@ SCALOPES_KERNEL_TASK_PREFIX "P4A_sesam_task_"
 \begin{PipsProp}{SCALOPES_SERVER_TASK_PREFIX}
 SCALOPES_SERVER_TASK_PREFIX "P4A_sesam_server_"
 \end{PipsProp}
+
+\clearpage
+
+
+
+\section{Automatic Resource-Constrained Static Task Parallelization}
+\label{subsubsection-task-parallelization}
+
+
+
+\subsection{Sequence Dependence DAG (SDG)}
+A Sequence Dependence DAG $G$ is a data dependence DAG where task vertices $\tau$ are labeled with statements, while control dependences are encoded in the abstract syntax trees of statements. Any statement $S$ can label a DAG vertex, i.e. each vertex $\tau$  contains a statement $S$, which corresponds to the code it runs when scheduled.  An SDG is not built only on simple instructions, represented as $call$ statements; compound statements such as test statements (both true and false branches) and loop nests may constitute indivisible vertices of the SDG
+
+\begin{PipsPass}{sequence_dependence_graph}
+Phase \texttt{sequence\_dependence\_graph} generates the Sequence
+Dependence Graph (SDG) in the dg ressource and in a dot file.
+\end{PipsPass}
+
+\begin{PipsMake}
+sequence_dependence_graph                       > MODULE.sdg                    
+        < PROGRAM.entities                  
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.dg
+        < MODULE.regions
+        < MODULE.in_regions
+        < MODULE.out_regions
+        < MODULE.transformers
+        < MODULE.preconditions
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
+\subsection{BDSC-Based Hierarchical  Task Parallelization (HBDSC)}
+The goal of the following phase is to generate the scheduled task
+graph using BDSC: A Ressource-Constrained Scheduling Algorithm for
+Shared and Distributed Memory Systems, in order
+to automate the task-based parallelization of sequential
+applications. 
+
+\begin{PipsPass}{hbdsc_parallelization}
+Phase \texttt{bdsc\_kdg\_parallelization} applies BDSC and generates
+the scheduled Clustered Dependence Graph (KDG) in the dg ressource and
+in a dot file.
+\end{PipsPass}
+
+\begin{PipsMake}
+hbdsc_parallelization                       > MODULE.sdg                    
+        < PROGRAM.entities                  > MODULE.schedule
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.sdg
+        < MODULE.regions
+        < MODULE.in_regions
+        < MODULE.out_regions
+        < MODULE.complexities
+        < MODULE.transformers
+        < MODULE.preconditions
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
+The next properties are used by Phase \texttt{bdsc\_kdg\_parallelization} to
+permit the user defining the number of clusters and the memory size based
+on the properties of the target architecture, generating communications or not
+in SPIRE code.
+
+\begin{PipsProp}{BDSC_NB_CLUSTERS}
+BDSC_NB_CLUSTERS 4
+\end{PipsProp}
+
+\begin{PipsProp}{BDSC_MEMORY_SIZE}
+BDSC_MEMORY_SIZE -1
+\end{PipsProp}
+
+\begin{PipsProp}{BDSC_DISTRIBUTED_MEMORY}
+BDSC_DISTRIBUTED_MEMORY TRUE
+\end{PipsProp}
+
+
+
+
+In order to control the granularity of parallel tasks, we introduce
+this property. By default, we generate the maximum parallelism in a
+code. Otherwise, i.e. COSTLY\_TASKS\_ONLY value is TRUE, only loops and call
+functions are generated as parallel tasks. This is important in order
+to make a trade-off between the cost of thread creation and task execution.    
+\begin{PipsProp}{COSTLY_TASKS_ONLY}
+COSTLY_TASKS_ONLY FALSE
+\end{PipsProp}
+
+This property is used to evaluate BDSC scheduling robustness. Since
+our BDSC scheduling heuristic relies on the numerical approximations
+of the execution time and communication costs of tasks, one needs to
+assess its sensitivity over the accuracy of these estimations. Since a
+mathematical analysis of this issue is made difficult by the heuristic
+nature of BDSC and, in fact, of scheduling processes in general, we
+ran multiple versions of each application using various static
+execution and communication cost models using a biased BDSC cost
+model, where we modulated each execution time and communication cost
+value randomly by at most $\Delta$\%, that is our propertu BDSC\_SENSITIVITY (the default BDSC cost model would thus correspond to $\Delta = 0$).
+\begin{PipsProp}{BDSC_SENSITIVITY}
+BDSC_SENSITIVITY 0
+\end{PipsProp}
+
+\begin{PipsPass}{bdsc_code_instrumentation}
+We represent cost, data and time information of different tasks in
+terms of polynomials. We instrument using the phase \texttt{bdsc\_code\_instrumentation} the input sequential code and run
+it once in order to obtain the numerical values of the polynomials.
+The instrumented code contains the initial user code plus instructions
+that compute the values of the cost polynomials for each statement.
+\end{PipsPass}
+
+\begin{PipsMake}
+bdsc_code_instrumentation                    > MODULE.code
+        < PROGRAM.entities                   
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.chains
+        < MODULE.sdg
+        < MODULE.regions
+        < MODULE.complexities
+\end{PipsMake}
+
+
+The next property is used also by Phase \texttt{bdsc\_kdg\_parallelization}. It
+decides if cost, data and time information will be extracted from the
+result of the instrumentation which is a dynamic analysis: \texttt{BDSC\_INSTRUMENTED\_FILE} file or
+not, i.e, static analysis.
+\begin{PipsProp}{BDSC_INSTRUMENTED_FILE}
+BDSC_INSTRUMENTED_FILE ""
+\end{PipsProp}
+
+\begin{PipsPass}{dsc_code_parallelization}
+We add this pass since we use in our expriments, comparison between
+DSC and BDSC. In order to make this comparison automatic and simple,
+we apply Phase \texttt{dsc\_code\_parallelization} that performs DSC algorithm
+instead of BDSC algorithm and generates the parallel code SPIRE.
+\end{PipsPass}
+
+\begin{PipsMake}
+dsc_code_parallelization                    > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.dg
+        < MODULE.regions
+        < MODULE.in_regions
+        < MODULE.out_regions
+        < MODULE.complexities
+        < MODULE.transformers
+        < MODULE.preconditions
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
+
+
+\subsection{SPIRE(PIPS) generation}
+The parallel code is represented using  SPIRE of PIPS: A Generic
+Sequential to Parallel Intermediate Representation Extension applied
+to PIPS.
+
+\begin{PipsPass}{spire_shared_unstructured_to_structured}
+Phase \texttt{spire\_shared\_unstructured\_to\_structured} applies BDSC and generates the parallel code SPIRE.
+\end{PipsPass}
+
+\begin{PipsMake}
+spire_shared_unstructured_to_structured                   > MODULE.shared_spire_code
+        < PROGRAM.entities                                > MODULE.code
+        < MODULE.code
+        < MODULE.sdg
+        < MODULE.schedule
+\end{PipsMake}
+
+\begin{PipsPass}{spire_distributed_unstructured_to_structured}
+Phase \texttt{spire\_distributed\_unstructured\_to\_structured}
+applies BDSC, generates the parallel code SPIRE (spawn and barrier
+constructs) and inserts send and recv primitives.
+\end{PipsPass}
+
+\begin{PipsMake}
+spire_distributed_unstructured_to_structured                   > MODULE.distributed_spire_code
+        < PROGRAM.entities                                     > MODULE.code
+        < MODULE.code
+        < MODULE.schedule
+        < MODULE.sdg
+        < MODULE.regions
+        < MODULE.in_regions
+        < MODULE.out_regions
+        < MODULE.transformers
+        < MODULE.preconditions
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
+
+\subsection{SPIRE-Based Parallel Code Generation}
+SPIRE is designed in such a way that it can facilitate the generation
+of code for different types of parallel systems. Different parallel
+languages can be mapped into SPIRE. The two following phases show how this intermediate representation simplifies the task of producing code for various languages such as OpenMP and MPI.
+
+\begin{PipsPass}{openmp_task_generation}
+Generate OpenMP task parallel code using SPIRE-based PIPS parallel
+intermediate representation.
+\end{PipsPass}
+
+\begin{PipsMake}
+openmp_task_generation                  > MODULE.parallelized_code
+        < PROGRAM.entities
+        < MODULE.shared_spire_code
+\end{PipsMake}
+
+And to output the code decorated with OpenMP (omp task)
+directives, we use the existing pass print\_parallelizedOMP\_code
+
+
+\begin{PipsPass}{mpi_task_generation}
+Generate MPI parallel code using SPIRE-based PIPS parallel
+intermediate representation.
+\end{PipsPass}
+
+\begin{PipsMake}
+mpi_task_generation                  > MODULE.parallelized_code
+        < PROGRAM.entities
+        < MODULE.distributed_spire_code
+\end{PipsMake}
+
+\begin{PipsPass}{print_parallelizedMPI_code}
+Output the code decorated with MPI instructions.
+\end{PipsPass}
+
+\begin{PipsMake}
+print_parallelizedMPI_code     > MODULE.parallelprinted_file
+        < PROGRAM.entities
+        < MODULE.parallelized_code
+\end{PipsMake}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRANSFORMATIONS
 
@@ -9444,7 +9834,7 @@ replaced by an index initialization and the loop body. Zero-trip loops are
 replaced by an index initialization. Effects in bound computations are
 preserved.
 
-A lot of dead code can simply be eliminated by testing its precondition
+A lot of unexecuted code can simply be eliminated by testing its precondition
 feasibility. A very simple and fast test may be used if the preconditions
 are normalized when they are computed, but this slows down the
 precondition computation. Or non-normalized preconditions are stored in
@@ -9459,19 +9849,6 @@ property \PipsPropRef{GATHER_FORMATS_AT_BEGINNING} or
 control flow graph of the module is computed.
 
 The cumulated effects are used in debug mode to display information.
-
-%% FIXME : is the following still applicable ? We renamed dead_code_elimination
-%% as expected
-%%
-%% Note that according to~\cite{ASU86}
-%% and~\cite{Muc97} , there is confusion between Dead-code elimination
-%% and Unreachable-code elimination. {\em Unreachable code} is code that
-%% cannot possibly be executed, regardless of the input data. {\em Dead code}
-%% elimination removes code that is executable but that has no effect on the
-%% result of the computation being performed (see Section $18.1$ and Section
-%% $18.10$ of~\cite{Muc97}). So \PipsPassRef{simplify_control} in PIPS is in
-%% fact unreachable code elimination. Dead code elimination is performed by
-%% phase \PipsPassRef{dead_code_elimination}.
 
 The \PipsPassRef{simplify_control} phase also performs some {\em If
   Simplifications} and {\em Loop Simplifications}~\cite{Muc97}.
@@ -9569,7 +9946,7 @@ the set of live statements without fix-point. An initial set of live
 statements is extended with new statements reached thru use-def chains,
 control dependences and....
 
-The initial set of live statements contains IO statements, RETURN, STOP,...
+The initial set of live statements contains IO statements, RETURN, STOP, return, exit, abort...
 
 Note that use-def chains are computed intraproceduraly and not
 interproceduraly. Hence some statements may be preserved because they
@@ -9585,25 +9962,13 @@ required.
 This pass was extended to C by Mehdi \textsc{Amini} in 2009-2010, but
 it is not yet stabilized. For C code, this pass requires that effects
 are calculated with property \verb/MEMORY_EFFECTS_ONLY/ set to
-\verb/FALSE/ because we need that the DG includes arcs for declarations as these
-latter are separate statements now.
+\verb/FALSE/ because we need that the DG includes arcs for
+declarations as these latter are separate statements now.
 
-\PipsPassRef{clean_declarations} is automatically done at the end, this is why
-cumulated effects are needed.
+\PipsPassRef{clean_declarations} is automatically performed at the
+end, this is why cumulated effects are needed.
 
-Comments from Nga \textsc{Nguyen}: According to~\cite{ASU86} p. 595,
-and~\cite{Muc97} p. 592, a variable is {\it dead} if it is not used
-on any path from the location in the code where it is defined to the
-exit point of the routine in the question; an instruction is {\it
-  dead} if it computes only values that are not used on any executable
-path leading from the instruction. The transformation that identifies
-and removes such dead code is called dead code elimination. So in
-fact, the {\em Use-def elimination} pass in PIPS is a {\em Dead code
-  elimination} pass and the {\em Suppress dead code} pass (see
-Section~\ref{sec:dead-code-elimination}) does not have a standard
-name. It could be {\em If and loop simplification} pass.
-
-The following properties are intended to force some functions to be kept by the
+The following properties are intended to force some function calls to be preserved by the
 algorithm, \PipsPropRef{DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS} expect a space
 separated list of function names while
 \PipsPropRef{DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS} expect a space separated list
@@ -9631,7 +9996,21 @@ dead_code_elimination          > MODULE.code
         < MODULE.chains
 \end{PipsMake}
 
-For backward compatibility, the previous pass name is preserved.
+Historical comments from Nga \textsc{Nguyen}: According
+to~\cite{ASU86} p. 595, and~\cite{Muc97} p. 592, a variable is {\it
+  dead} if it is not used on any path from the location in the code
+where it is defined to the exit point of the routine in the question;
+an instruction is {\it dead} if it computes only values that are not
+used on any executable path leading from the instruction. The
+transformation that identifies and removes such dead code is called
+dead code elimination. So in fact, the {\em Use-def elimination} pass
+in PIPS is a {\em Dead code elimination} pass and the {\em Suppress
+  dead code} pass (see Section~\ref{sec:dead-code-elimination}) does
+not have a standard name. It could be the {\em control simplification}
+pass. The wrong initial naming has been fixed, but it shows in PIPS
+source code, in tpips scripts and in validation test cases.
+
+For backward compatibility, the next pass name is preserved.
 
 \begin{PipsMake}
 alias use_def_elimination 'Use-Def elimination'
@@ -9643,9 +10022,33 @@ use_def_elimination          > MODULE.code
         < MODULE.chains
 \end{PipsMake}
 
+\begin{PipsPass}{dead_code_elimination_with_out_regions}
+OUT regions are harder to compute than a simple data dependence graph,
+but they provide two advantages over a standard dead-code
+elimination. They are computed interprocedurally. And they can be used
+to reduce the iteration sets (this is not implemented).
+
+This pass is an experimental pass.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias dead_code_elimination_with_out_regions 'Dead Code Elimination with OUT Regions'
+dead_code_elimination_with_out_regions          > MODULE.code
+                                               > MODULE.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.out_regions
+\end{PipsMake}
+
 \subsection{Control Restructurers}
 \index{Restructurer}
 \index{Control Restructurer}
+
+% FI: we might be interested in F. Zhang and E. H. D’Hollander, “Using
+% hammock graphs to structure programs,” IEEE Trans. Softw. Eng.,
+% vol. 30, no. 4, pp. 231–245, 2004.
 
 Two control restructurers are available: \PipsPassRef{unspaghettify} which is
 used by default in conjunction with \PipsPassRef{controlizer} and
@@ -10050,7 +10453,7 @@ logic (such as FPGAs or DataPaths).
 
 This library provides phases allowing to build and modify "Finite State
 Machine"-like code portions which will be later synthesized in
-reconfigurable units. This was implemented by Sylvain \textsc{Gu�rin}.
+reconfigurable units. This was implemented by Sylvain \textsc{Gu\'erin}.
 
 \subsubsection{FSM Generation}
 \label{paragraph-fsm-generation}
@@ -10419,10 +10822,18 @@ to TRUE in order to force distribution, even when it does not seem profitable
 PARTIAL_EVAL_ALWAYS_SIMPLIFY FALSE
 \end{PipsProp}
 
-Likewise, one can turn following property to true if he wants to use hard-coded value for size of types
+Likewise, one can turn following property to true if he wants to use
+hard-coded value for size of types. The C standard is broken down into
+two parts, one is target independent, and one is target
+dependent. Currently, there is no way to specify different
+architecture models such as 32/32, 32/64 or 64/64, as the architecture
+model is hardwired in ri-util-local.h.
 \begin{PipsProp}{EVAL_SIZEOF}
 EVAL_SIZEOF FALSE
 \end{PipsProp}
+Regardless of the modelization, the C source code generated when this
+property is set to true is potentially no longer portable to other
+targets. This property is also used by the semantics analysis.
 
 This function was implemented initially by Bruno \textsc{Baron}.
 
@@ -10821,9 +11232,13 @@ LINEARIZE_ARRAY_SKIP_LOCAL_ARRAYS FALSE
 
 \begin{PipsPass}{optimize_expressions}
 This is an experimental section developed by Julien \textsc{Zory} as PhD work~\cite{Zor99}.
-This phase aims at optimizing expression evaluation using algebraic
+%
+This phase aims at optimizing Fortran expression evaluation using algebraic
 properties such as associativity, commutativity, neutral elements and so
 forth.
+%
+It is unfortunately obsolete because it relies on external pieces of
+software.
 
 This phase restructure arithmetic expressions in order (1) to decrease the
 number of operations (e.g. through factorization), (2) to increase the ILP
@@ -10849,11 +11264,14 @@ expressions of mixed types such as \verb|X+1| where \verb|1| is implictly
 promoted from integer to real.
 
 \textbf{Warning}: this phase relies on an external (and unavailable) binary.
-To make it work, you can set \PipsPropRef{EOLE_OPTIMIZATION_STRATEGY} to
+To use it partly, you can set \PipsPropRef{EOLE_OPTIMIZATION_STRATEGY} to
 \verb+"CSE"+ or \verb+"ICM"+, or even \texttt{ICMCSE} to have both.
+%
 This will only activate common subexpressions elimination or invariant
-code motion. Since it is a quite common use case, they have been defined
-as independent phase too. See~\ref{sec:comm-subexpr-elim-1}.
+code motion (in fact, invariant sub-expression hoisting).
+%
+Since it is a quite common use case, they have been defined
+as independent phases too. See~\ref{sec:comm-subexpr-elim-1}.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10910,6 +11328,9 @@ One can use \PipsPropRef{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT} t
 
 The heuristic used for common subexpression elimination is described
 in Chapter~15 of Julien Zory's PhD dissertation~\cite{Zor99}.
+%
+It was designed for Fortran code. Its use for C code is experimental
+and flawed in general.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10944,7 +11365,7 @@ COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS TRUE
 \end{PipsProp}
 
 \begin{PipsPass}{icm}
-Performs invariant code motion over sub expressions
+The icm pass performs invariant code motion over sub-expressions.
 \end{PipsPass}
 
 
@@ -11273,6 +11694,20 @@ HWAC_OPENCL_TILING FALSE
 \end{PipsProp}
 
 
+\subsection{FREIA SigmaC pour MPPA Kalray}
+\label{hwac-freia-opencl}
+
+FREIA compiler for MMPA Kalray SigmaC target.
+
+\begin{PipsMake}
+freia_sigmac_compiler > MODULE.code
+                      > MODULE.callees
+                      > MODULE.sigmac_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FUNCTIONS TRANSFORMATIONS
 
 \section{Function Level Transformations}
@@ -11518,6 +11953,13 @@ are declared into this new compilation unit\marginpar{Serge: Consistency
 new compilation unit through the sub-callgraph are declared static and
 prefixed with \PipsPropRef{OUTLINE_CALLEES_PREFIX}.
 
+Added two properties for R-Stream compatibility.
+If \PipsPropRef{OUTLINE_REMOVE_VARIABLE_RSTREAM_IMAGE} is set to True, instead of outlining
+loop indexes and written scalar variables the outliner declares them as local variables inside the
+outlined function. Therefore they are not added to the effective or formal parameters.
+
+The behavior of \PipsPropRef{OUTLINE_REMOVE_VARIABLE_RSTREAM_SCOP} is the same as above. Except that this property
+only excludes loop indexes from being outlined. 
 
 \begin{PipsProp}{OUTLINE_MODULE_NAME}
 OUTLINE_MODULE_NAME ""
@@ -11545,6 +11987,12 @@ OUTLINE_WRITTEN_SCALAR_BY_REFERENCE TRUE
 \end{PipsProp}
 \begin{PipsProp}{OUTLINE_CALLEES_PREFIX}
 OUTLINE_CALLEES_PREFIX ""
+\end{PipsProp}
+\begin{PipsProp}{OUTLINE_REMOVE_VARIABLE_RSTREAM_IMAGE}
+OUTLINE_REMOVE_VARIABLE_RSTREAM_IMAGE FALSE
+\end{PipsProp}
+\begin{PipsProp}{OUTLINE_REMOVE_VARIABLE_RSTREAM_SCOP}
+OUTLINE_REMOVE_VARIABLE_RSTREAM_SCOP FALSE
 \end{PipsProp}
 
 
@@ -11636,8 +12084,15 @@ TRANSFORMATION_CLONE_ON_ARGUMENT 0
 
 Clone name can be given using the \lstinline|CLONE_NAME| properties
 Otherwise, a new one is generated
+
+\PipsPropRef{RSTREAM_CLONE_SUFFIX} is the suffix appended to cloned function for R-Stream pre-compilation.
+
 \begin{PipsProp}{CLONE_NAME}
 CLONE_NAME ""
+\end{PipsProp}
+
+\begin{PipsProp}{RSTREAM_CLONE_SUFFIX}
+RSTREAM_CLONE_SUFFIX ""
 \end{PipsProp}
 
 
@@ -12106,7 +12561,7 @@ quick_scalarization  > MODULE.code
         < MODULE.dg
 \end{PipsMake}
 
-Pass \PipsPassRef{quick_scalarization} was implemented by Beatrice Creusillet.
+Pass \PipsPassRef{quick_scalarization} was implemented by B\'eatrice Creusillet.
 
 \subsection{Induction Variable Substitution}
 
@@ -12193,7 +12648,7 @@ accelerator is performed by another phase, see for instance
 Section~\ref{hardware-accelerator}.
 
 Initially developed in August 2009 by Laurent \textsc{Daverio}, with
-help from Fabien \textsc{Coelho} and Francois \textsc{Irigoin}.
+help from Fabien \textsc{Coelho} and Fran\c{c}ois \textsc{Irigoin}.
 
 \begin{PipsMake}
 alias flatten_code 'Flatten Code'
@@ -13691,7 +14146,7 @@ print_code_static_control       > MODULE.printed_file
         < MODULE.static_control
 \end{PipsMake}
 
-\subsection{Sequential View with Points-To  Information}
+\subsection{Sequential View with Points-To Information}
 
 %%@UserManualDocumentation: print_code_points_to_sets
 Display the code decorated with the points to information.
@@ -14569,6 +15024,7 @@ alias print_parallelizedHPF_code 'HPF directives'
 alias print_parallelizedOMP_code 'OMP directives'
 alias print_parallelized90_code 'Fortran 90'
 alias print_parallelizedcray_code 'Fortran Cray'
+alias print_parallelizedMPI_code 'C MPI'
 \end{PipsMake}
 
 
@@ -15904,6 +16360,7 @@ print_code_smalltalk        > MODULE.smalltalk_code_file
 \label{subsection-prettyprinter-pocc}
 \index{Prettyprinter PoCC}
 \index{OpenGPU}
+\index{PoCC}
 
 \begin{PipsPass}{pocc_prettyprinter}
   This pass is used for printing pragmas \verb/scop/ and
@@ -15920,10 +16377,7 @@ pocc_prettyprinter      >    MODULE.code
     < MODULE.code
     < MODULE.static_control
 
-
 \end{PipsMake}
-
-
 
 For the outlining of the control static parts, function prefix names to
 be used during the generation:
@@ -15931,25 +16385,64 @@ be used during the generation:
 SCOP_PREFIX "SCoP"
 \end{PipsProp}
 
+\begin{PipsProp}{STATIC_CONTROLIZE_ACROSS_USER_CALLS}
+  STATIC_CONTROLIZE_ACROSS_USER_CALLS TRUE
+\end{PipsProp}
 
-Because of user function calls are not allowed in PoCC static control
+Because user function calls are not allowed in PoCC static control
 parts, whereas they are generally accepted in PIPS (see Arnauld
 Leservot's PhD), we introduce a property to control the impact of user
-calls. This property could be called \verb/POCC_COMPATIBILIRY/ if
+calls. This property could be called \verb/POCC_COMPATIBILITY/ if
 there were a set of limiting rules to apply for PoCC, but user calls
 are the only current issue\footnote{The PLUTO compiler does not
   support intrinsics calls either, althoug it is part of the PoCC
   collection.} So the property is called
 \PipsPropRef{STATIC_CONTROLIZE_ACROSS_USER_CALLS} and its default
 value is TRUE.
-\begin{PipsProp}{STATIC_CONTROLIZE_ACROSS_USER_CALLS}
-STATIC_CONTROLIZE_ACROSS_USER_CALLS TRUE
-\end{PipsProp}
+
 
 %\begin{PipsProp}{POCC_COMPATIBILITY}
 %POCC_COMPATIBILITY FALSE
 %\end{PipsProp}
 
+\subsection{Rstream interface}
+
+\begin{PipsPass}{rstream_interface}
+Detect non-SCoP of the code. Based on R-Stream constraints.
+Must be preceded by the pocc\_prettyprinter phase.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias rstream_interface 'rstream_interface'
+
+rstream_interface > MODULE.code
+    < PROGRAM.entities
+    < MODULE.code 
+    < MODULE.static_control
+\end{PipsMake}
+
+\section{Regions to loops}
+
+\begin{PipsPass}{regions_to_loops}
+This phase is designed to replace the body of a function by simple assignments. 
+The new body is representative of the regions described by the old body. 
+When \PipsPropRef{PSYSTEME_TO_LOOPNEST_FOR_RSTREAM} is set to True, the function
+in charge of computing loop nests from systems chooses the constant values rather 
+than the symbolic values for loop ranges. 
+\end{PipsPass}
+
+\begin{PipsMake}
+alias regions_to_loops 'regions_to_loops'
+
+regions_to_loops > MODULE.code
+< PROGRAM.entities
+< MODULE.code
+< MODULE.summary_regions
+\end{PipsMake}
+
+\begin{PipsProp}{PSYSTEME_TO_LOOPNEST_FOR_RSTREAM}
+PSYSTEME_TO_LOOPNEST_FOR_RSTREAM FALSE
+\end{PipsProp}
 
 \section{Prettyprinter for CLAIRE}
 \label{subsection-prettyprinter-claire}
@@ -16055,8 +16548,8 @@ print_xml_application      > MODULE.xml_printed_file
 \chapter{Feautrier Methods (a.k.a. Polyhedral Method)}
 \label{section-feautrier-methods}
 
-This part of \Pips{} was implemented at Centre d'�tudes Atomiques,
-Limeil-Br�vannes, by Beno�t de \textsc{Dinechin}, Arnauld
+This part of \Pips{} was implemented at Centre d'\'Etudes Atomiques,
+Limeil-Br\'evannes, by Beno\^it de \textsc{Dinechin}, Arnauld
 \textsc{Leservot} and Alexis \textsc{Platonoff}.
 
 Unfortunately, this part is no longer used in PIPS right now because of

@@ -1,5 +1,5 @@
 
-C  T(I,J) {I<=K, I<=L+2, 4<=J, K<=J}
+C  T(I,J) {I<=K, I<=L+2, 4<=J, K<=J, 0<=J+L, L<=J}
 
       SUBROUTINE MINMAX(I,J)
       COMMON /FOO/ K, L
@@ -9,7 +9,7 @@ C  T(I) {I<=K, I<=L+2}
 
       I = MIN0(K, L+2)                                                  0004
 
-C  T(J) {4<=J, K<=J}
+C  T(J) {4<=J, K<=J, 0<=J+L, L<=J}
 
 
       J = MAX0(K, L*L, 4)                                               0006

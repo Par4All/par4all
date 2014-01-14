@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -648,7 +648,7 @@ sequence for_to_do_loop_conversion(forloop theloop, statement parent)
                                 make_instruction_loop(l),
                                 statement_declarations(parent),
                                 statement_decls_text(parent),
-                                statement_extensions(parent));
+                                statement_extensions(parent), make_synchronization_none());
 
                         statement_label(parent)=entity_empty_label();
                         statement_ordering(parent)=STATEMENT_ORDERING_UNDEFINED;

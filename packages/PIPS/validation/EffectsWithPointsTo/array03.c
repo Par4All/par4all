@@ -54,8 +54,6 @@ int foo3()
   return 1;
 }
 
-
-
 int main() 
 {
   float a[N][M], ret;

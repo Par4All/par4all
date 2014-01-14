@@ -1,4 +1,8 @@
-/* */
+/* Use global variables
+ *
+ * Since the analysis is bottom-up, the global variables are not
+ * initialized and a formal context is used instead.
+ */
 
 typedef struct two_fields{int one; int two[10];} tf_t;
 

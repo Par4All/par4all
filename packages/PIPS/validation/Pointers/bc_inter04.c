@@ -1,6 +1,8 @@
 // case study with formal parameter aliasing
 // used to invalidate substitution analysis
 
+// The intraprocedural analysis is used to handle the call site
+
 #include <stdlib.h>
 #include <stdio.h>
 

@@ -1,0 +1,328 @@
+
+Points-to for "flgr2d_create_pixmap_link"
+
+
+// Points To IN:
+// _datain_1[0].row -> *NULL* , MAY
+// _datain_1[0].row -> _datain_1_5__1[0][0] , MAY
+// _datain_1_5__1[0][*] -> *NULL* , MAY
+// _datain_1_5__1[0][*] -> _datain_1_5__1_1[0][*][0] , MAY
+// _datain_1_5__1_1[*][*][0].array -> *NULL* , MAY
+// _datain_1_5__1_1[*][*][0].array -> _datain_1_5__1_1_2__1[*][*][0][0
+//    ] , MAY
+// datain -> *NULL* , MAY
+// datain -> _datain_1[0] , MAY
+
+
+// Points To OUT:
+// *HEAP*_l_25.row -> *HEAP*_l_30[0] , MAY
+// *HEAP*_l_25.array -> *HEAP*_l_31[0] , MAY
+// *HEAP*_l_30[*] -> undefined , MAY
+// *HEAP*_l_30[*] -> _datain_1_5__1_1[0][*][0] , MAY
+// *HEAP*_l_31[*] -> undefined , MAY
+// *HEAP*_l_31[*] -> *NULL* , MAY
+// *HEAP*_l_31[*] -> _datain_1_5__1_1_2__1[*][*][0][0] , MAY
+// *HEAP*_l_31[*] -> _datain_1_5__1_1_2__1[0][*][0][0] , MAY
+// _datain_1[0].row -> _datain_1_5__1[0][0] , EXACT
+// _datain_1_5__1[0][*] -> *NULL* , MAY
+// _datain_1_5__1[0][*] -> _datain_1_5__1_1[0][*][0] , MAY
+// _datain_1_5__1_1[*][*][0].array -> *NULL* , MAY
+// _datain_1_5__1_1[*][*][0].array -> _datain_1_5__1_1_2__1[*][*][0][0
+//    ] , MAY
+// datain -> _datain_1[0] , EXACT
+// flgr2d_create_pixmap_link -> *HEAP*_l_25 , MAY
+
+FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, int partIndex, int overlapSize)
+{
+
+// Points To: none
+
+   FLGR_Data2D *dat;
+
+// Points To:
+// dat -> undefined , EXACT
+
+   int i, nbrow;
+
+// Points To:
+// dat -> undefined , EXACT
+
+   dat = (FLGR_Data2D *) malloc(sizeof(FLGR_Data2D));
+
+// Points To:
+// *HEAP*_l_25.array -> undefined , EXACT
+// *HEAP*_l_25.row -> undefined , EXACT
+// dat -> *HEAP*_l_25 , MAY
+
+   dat->link_overlap = overlapSize;
+
+// Points To:
+// *HEAP*_l_25.array -> undefined , EXACT
+// *HEAP*_l_25.row -> undefined , EXACT
+// dat -> *HEAP*_l_25 , MAY
+
+   dat->size_struct = sizeof(FLGR_Data2D);
+
+// Points To:
+// *HEAP*_l_25.array -> undefined , EXACT
+// *HEAP*_l_25.row -> undefined , EXACT
+// dat -> *HEAP*_l_25 , MAY
+// datain -> *NULL* , MAY
+// datain -> _datain_1[0] , MAY
+
+   dat->size_x = datain->size_x;
+
+// Points To:
+// *HEAP*_l_25.array -> undefined , EXACT
+// *HEAP*_l_25.row -> undefined , EXACT
+// dat -> *HEAP*_l_25 , MAY
+// datain -> _datain_1[0] , EXACT
+
+   nbrow = datain->size_y/partsNumber+overlapSize;
+
+// Points To:
+// *HEAP*_l_25.array -> undefined , EXACT
+// *HEAP*_l_25.row -> undefined , EXACT
+// dat -> *HEAP*_l_25 , MAY
+// datain -> _datain_1[0] , EXACT
+
+   dat->row = (FLGR_Data1D **) malloc((nbrow+16)*sizeof(FLGR_Data1D *));
+
+// Points To:
+// *HEAP*_l_25.row -> *HEAP*_l_30[0] , MAY
+// *HEAP*_l_25.array -> undefined , EXACT
+// *HEAP*_l_30[*] -> undefined , EXACT
+// dat -> *HEAP*_l_25 , MAY
+// datain -> _datain_1[0] , EXACT
+
+   dat->array = (void **) malloc((nbrow+16)*sizeof(void *));
+
+// Points To:
+// *HEAP*_l_25.row -> *HEAP*_l_30[0] , MAY
+// *HEAP*_l_25.array -> *HEAP*_l_31[0] , MAY
+// *HEAP*_l_30[*] -> undefined , EXACT
+// *HEAP*_l_31[*] -> undefined , EXACT
+// dat -> *HEAP*_l_25 , MAY
+// datain -> _datain_1[0] , EXACT
+
+   dat->size_y = nbrow;
+
+// Points To:
+// *HEAP*_l_25.row -> *HEAP*_l_30[0] , MAY
+// *HEAP*_l_25.array -> *HEAP*_l_31[0] , MAY
+// *HEAP*_l_30[*] -> undefined , EXACT
+// *HEAP*_l_31[*] -> undefined , EXACT
+// dat -> *HEAP*_l_25 , MAY
+// datain -> _datain_1[0] , EXACT
+
+   for(i = 0; i <= nbrow-overlapSize-1; i += 1) {
+
+// Points To:
+// *HEAP*_l_25.row -> *HEAP*_l_30[0] , MAY
+// *HEAP*_l_25.array -> *HEAP*_l_31[0] , MAY
+// *HEAP*_l_30[*] -> undefined , MAY
+// *HEAP*_l_30[*] -> _datain_1_5__1_1[0][*][0] , MAY
+// *HEAP*_l_31[*] -> undefined , MAY
+// *HEAP*_l_31[*] -> *NULL* , MAY
+// *HEAP*_l_31[*] -> _datain_1_5__1_1_2__1[*][*][0][0] , MAY
+// *HEAP*_l_31[*] -> _datain_1_5__1_1_2__1[0][*][0][0] , MAY
+// _datain_1[0].row -> *NULL* , MAY
+// _datain_1[0].row -> _datain_1_5__1[0][0] , MAY
+// _datain_1_5__1[0][*] -> *NULL* , MAY
+// _datain_1_5__1[0][*] -> _datain_1_5__1_1[0][*][0] , MAY
+// _datain_1_5__1_1[*][*][0].array -> *NULL* , MAY
+// _datain_1_5__1_1[*][*][0].array -> _datain_1_5__1_1_2__1[*][*][0][0
+//    ] , MAY
+// dat -> *HEAP*_l_25 , MAY
+// datain -> _datain_1[0] , EXACT
+
+      (dat->row)[i] = (datain->row)[i];
+
+// Points To:
+// *HEAP*_l_25.row -> *HEAP*_l_30[0] , MAY
+// *HEAP*_l_25.array -> *HEAP*_l_31[0] , MAY
+// *HEAP*_l_30[*] -> undefined , MAY
+// *HEAP*_l_30[*] -> *NULL* , MAY
+// *HEAP*_l_30[*] -> _datain_1_5__1_1[0][*][0] , MAY
+// *HEAP*_l_31[*] -> undefined , MAY
+// *HEAP*_l_31[*] -> *NULL* , MAY
+// *HEAP*_l_31[*] -> _datain_1_5__1_1_2__1[*][*][0][0] , MAY
+// *HEAP*_l_31[*] -> _datain_1_5__1_1_2__1[0][*][0][0] , MAY
+// _datain_1[0].row -> _datain_1_5__1[0][0] , EXACT
+// _datain_1_5__1[0][*] -> *NULL* , MAY
+// _datain_1_5__1[0][*] -> _datain_1_5__1_1[0][*][0] , MAY
+// _datain_1_5__1_1[*][*][0].array -> *NULL* , MAY
+// _datain_1_5__1_1[*][*][0].array -> _datain_1_5__1_1_2__1[*][*][0][0
+//    ] , MAY
+// dat -> *HEAP*_l_25 , MAY
+// datain -> _datain_1[0] , EXACT
+
+      (dat->row)[i]->ref2d = i;
+
+// Points To:
+// *HEAP*_l_25.row -> *HEAP*_l_30[0] , MAY
+// *HEAP*_l_25.array -> *HEAP*_l_31[0] , MAY
+// *HEAP*_l_30[*] -> undefined , MAY
+// *HEAP*_l_30[*] -> *NULL* , MAY
+// *HEAP*_l_30[*] -> _datain_1_5__1_1[0][*][0] , MAY
+// *HEAP*_l_31[*] -> undefined , MAY
+// *HEAP*_l_31[*] -> *NULL* , MAY
+// *HEAP*_l_31[*] -> _datain_1_5__1_1_2__1[*][*][0][0] , MAY
+// *HEAP*_l_31[*] -> _datain_1_5__1_1_2__1[0][*][0][0] , MAY
+// _datain_1[0].row -> _datain_1_5__1[0][0] , EXACT
+// _datain_1_5__1[0][*] -> *NULL* , MAY
+// _datain_1_5__1[0][*] -> _datain_1_5__1_1[0][*][0] , MAY
+// _datain_1_5__1_1[*][*][0].array -> *NULL* , MAY
+// _datain_1_5__1_1[*][*][0].array -> _datain_1_5__1_1_2__1[*][*][0][0
+//    ] , MAY
+// dat -> *HEAP*_l_25 , MAY
+// datain -> _datain_1[0] , EXACT
+
+      (dat->array)[i] = (dat->row)[i]->array;
+   }
+
+// Points To:
+// *HEAP*_l_25.row -> *HEAP*_l_30[0] , MAY
+// *HEAP*_l_25.array -> *HEAP*_l_31[0] , MAY
+// *HEAP*_l_30[*] -> undefined , MAY
+// *HEAP*_l_30[*] -> _datain_1_5__1_1[0][*][0] , MAY
+// *HEAP*_l_31[*] -> undefined , MAY
+// *HEAP*_l_31[*] -> *NULL* , MAY
+// *HEAP*_l_31[*] -> _datain_1_5__1_1_2__1[*][*][0][0] , MAY
+// *HEAP*_l_31[*] -> _datain_1_5__1_1_2__1[0][*][0][0] , MAY
+// _datain_1[0].row -> _datain_1_5__1[0][0] , EXACT
+// _datain_1_5__1[0][*] -> *NULL* , MAY
+// _datain_1_5__1[0][*] -> _datain_1_5__1_1[0][*][0] , MAY
+// _datain_1_5__1_1[*][*][0].array -> *NULL* , MAY
+// _datain_1_5__1_1[*][*][0].array -> _datain_1_5__1_1_2__1[*][*][0][0
+//    ] , MAY
+// dat -> *HEAP*_l_25 , MAY
+// datain -> _datain_1[0] , EXACT
+
+   return dat;
+}
+
+Proper effects with points-to for "flgr2d_create_pixmap_link"
+
+FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, int partIndex, int overlapSize)
+{
+   FLGR_Data2D *dat;
+   int i, nbrow;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: dat _MALLOC_EFFECTS:_MALLOC_
+   dat = (FLGR_Data2D *) malloc(sizeof(FLGR_Data2D));
+//             <may be written>: *HEAP*_l_25.link_overlap
+//             <    is read   >: dat overlapSize
+   dat->link_overlap = overlapSize;
+//             <may be written>: *HEAP*_l_25.size_struct
+//             <    is read   >: dat
+   dat->size_struct = sizeof(FLGR_Data2D);
+//             <may be written>: *HEAP*_l_25.size_x
+//             <    is read   >: _datain_1[0].size_x dat datain
+   dat->size_x = datain->size_x;
+//             <    is read   >: _datain_1[0].size_y datain 
+//                               overlapSize partsNumber
+//             <    is written>: nbrow
+   nbrow = datain->size_y/partsNumber+overlapSize;
+//             <may be written>: *HEAP*_l_25.row
+//             <    is read   >: dat nbrow _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   dat->row = (FLGR_Data1D **) malloc((nbrow+16)*sizeof(FLGR_Data1D *));
+//             <may be written>: *HEAP*_l_25.array
+//             <    is read   >: dat nbrow _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   dat->array = (void **) malloc((nbrow+16)*sizeof(void *));
+//             <may be written>: *HEAP*_l_25.size_y
+//             <    is read   >: dat nbrow
+   dat->size_y = nbrow;
+//             <    is read   >: nbrow overlapSize
+//             <    is written>: i
+   for(i = 0; i <= nbrow-overlapSize-1; i += 1) {
+//             <may be read   >: *HEAP*_l_25.row
+//             <may be written>: *HEAP*_l_25.row[i]
+//             <    is read   >: _datain_1[0].row _datain_1_5__1[0][i]
+//                               dat datain i nbrow overlapSize
+      (dat->row)[i] = (datain->row)[i];
+//             <may be read   >: *HEAP*_l_25.row *HEAP*_l_25.row[i]
+//             <may be written>: *HEAP*_l_25.row[i][0].ref2d
+//             <    is read   >: dat i nbrow overlapSize
+      (dat->row)[i]->ref2d = i;
+//             <may be read   >: *HEAP*_l_25.array *HEAP*_l_25.row 
+//                               *HEAP*_l_25.row[i] 
+//                               *HEAP*_l_25.row[i][0].array
+//             <may be written>: *HEAP*_l_25.array[i]
+//             <    is read   >: dat i nbrow overlapSize
+      (dat->array)[i] = (dat->row)[i]->array;
+   }
+//             <    is read   >: dat
+   return dat;
+}
+
+Cumulated effects with points-to for "flgr2d_create_pixmap_link"
+
+//             <may be read   >: _datain_1[0].row _datain_1_5__1[0][*]
+//             <    is read   >: _datain_1[0].size_x 
+//                               _datain_1[0].size_y datain 
+//                               overlapSize partsNumber 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+FLGR_Data2D * flgr2d_create_pixmap_link(FLGR_Data2D *datain, int partsNumber, int partIndex, int overlapSize)
+{
+   FLGR_Data2D *dat;
+   int i, nbrow;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: dat _MALLOC_EFFECTS:_MALLOC_
+   dat = (FLGR_Data2D *) malloc(sizeof(FLGR_Data2D));
+//             <may be written>: *HEAP*_l_25.link_overlap
+//             <    is read   >: dat overlapSize
+   dat->link_overlap = overlapSize;
+//             <may be written>: *HEAP*_l_25.size_struct
+//             <    is read   >: dat
+   dat->size_struct = sizeof(FLGR_Data2D);
+//             <may be written>: *HEAP*_l_25.size_x
+//             <    is read   >: _datain_1[0].size_x dat datain
+   dat->size_x = datain->size_x;
+//             <    is read   >: _datain_1[0].size_y datain 
+//                               overlapSize partsNumber
+//             <    is written>: nbrow
+   nbrow = datain->size_y/partsNumber+overlapSize;
+//             <may be written>: *HEAP*_l_25.row
+//             <    is read   >: dat nbrow _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   dat->row = (FLGR_Data1D **) malloc((nbrow+16)*sizeof(FLGR_Data1D *));
+//             <may be written>: *HEAP*_l_25.array
+//             <    is read   >: dat nbrow _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   dat->array = (void **) malloc((nbrow+16)*sizeof(void *));
+//             <may be written>: *HEAP*_l_25.size_y
+//             <    is read   >: dat nbrow
+   dat->size_y = nbrow;
+//             <may be read   >: *HEAP*_l_25 *HEAP*_l_25 *HEAP*_l_25 
+//                               *HEAP*_l_25.array *HEAP*_l_25.row 
+//                               _datain_1[0].row _datain_1_5__1[0][*]
+//                               dat datain i
+//             <may be written>: *HEAP*_l_25 *HEAP*_l_25 
+//                               *HEAP*_l_25.row[*]
+//             <    is read   >: nbrow overlapSize
+//             <    is written>: i
+   for(i = 0; i <= nbrow-overlapSize-1; i += 1) {
+//             <may be read   >: *HEAP*_l_25.row _datain_1_5__1[0][*]
+//             <may be written>: *HEAP*_l_25.row[*]
+//             <    is read   >: _datain_1[0].row dat datain i nbrow 
+//                               overlapSize
+      (dat->row)[i] = (datain->row)[i];
+//             <may be read   >: *HEAP*_l_25.row *HEAP*_l_25.row[*]
+//             <may be written>: *HEAP*_l_25.row[*][0].ref2d
+//             <    is read   >: dat i nbrow overlapSize
+      (dat->row)[i]->ref2d = i;
+//             <may be read   >: *HEAP*_l_25.array *HEAP*_l_25.row 
+//                               *HEAP*_l_25.row[*] 
+//                               *HEAP*_l_25.row[*][0].array
+//             <may be written>: *HEAP*_l_25.array[*]
+//             <    is read   >: dat i nbrow overlapSize
+      (dat->array)[i] = (dat->row)[i]->array;
+   }
+//             <    is read   >: dat
+   return dat;
+}
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active

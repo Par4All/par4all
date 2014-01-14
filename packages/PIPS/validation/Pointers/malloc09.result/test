@@ -15,18 +15,20 @@ int main(int argc, char *argv[])
    int ***ppp, i = 1;
 
 // Points To:
-// ppp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppp -> undefined , EXACT
 
 
    ppp = (int ***) malloc(sizeof(int * *));
 
 // Points To:
+// *HEAP*_l_23 -> undefined , EXACT
 // ppp -> *HEAP*_l_23 , MAY
 
    *ppp = (int **) malloc(sizeof(int *));
 
 // Points To:
 // *HEAP*_l_23 -> *HEAP*_l_24 , MAY
+// *HEAP*_l_24 -> undefined , EXACT
 // ppp -> *HEAP*_l_23 , MAY
 
    **ppp = (int *) malloc(sizeof(int));
@@ -47,10 +49,10 @@ int main(int argc, char *argv[])
    free(ppp);
 
 // Points To:
-// *HEAP*_l_24 -> *HEAP*_l_25 , MAY
-// ppp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppp -> undefined , EXACT
 
 
    return 0;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Memory leak for bucket "main:*HEAP*_l_24".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_list_to_points_to) Memory leak for bucket "main:*HEAP*_l_24".
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (memory_leak_to_more_memory_leaks) Heap bucket "*HEAP*_l_25" leaked at line 28.

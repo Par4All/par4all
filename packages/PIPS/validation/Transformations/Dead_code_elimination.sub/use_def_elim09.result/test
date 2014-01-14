@@ -1,0 +1,22 @@
+
+OUT regions for "main"
+
+int main(void)
+{
+
+//  <i-OUT-EXACT-{}>
+
+   int i = 1;
+   int j = 2;
+   printf("%d\n", i);
+   return 0;
+}
+
+Source code for "main" after dead-code elimination with OUT regions
+
+int main(void)
+{
+   int i = 1;
+   printf("%d\n", i);
+   return 0;
+}

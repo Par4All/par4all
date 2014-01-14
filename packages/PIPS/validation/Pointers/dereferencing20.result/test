@@ -1,0 +1,80 @@
+
+POINTS-TO
+
+
+// Points To IN:
+// fd -> *NULL* , MAY
+// fd -> _fd_1[0] , MAY
+
+
+// Points To OUT:
+// fd -> _fd_1[0] , EXACT
+// read_towns.data -> *HEAP*_l_18[0] , MAY
+// read_towns.data -> *HEAP*_l_21[0] , MAY
+
+towns read_towns(FILE *fd)
+{
+
+// Points To: none
+
+   towns the_towns = {1, malloc(sizeof(town))};
+
+// Points To:
+// the_towns.data -> *HEAP*_l_18[0] , MAY
+
+   int curr = 0;
+
+// Points To:
+// the_towns.data -> *HEAP*_l_18[0] , MAY
+
+   if (curr)
+
+// Points To:
+// the_towns.data -> *HEAP*_l_18[0] , MAY
+
+      the_towns.data = realloc(the_towns.data, the_towns.nb*sizeof(town));
+
+// Points To:
+// the_towns.data -> *HEAP*_l_18[0] , MAY
+// the_towns.data -> *HEAP*_l_21[0] , MAY
+
+   double *px = &((the_towns.data)[curr])[0];
+
+// Points To:
+// fd -> *NULL* , MAY
+// fd -> _fd_1[0] , MAY
+// px -> *HEAP*_l_18[0] , MAY
+// px -> *HEAP*_l_21[*][0] , MAY
+// the_towns.data -> *HEAP*_l_18[0] , MAY
+// the_towns.data -> *HEAP*_l_21[0] , MAY
+
+   
+   // This fscanf shows bugs in points-to analysis
+   if (fscanf(fd, "%lf%*[ \t]%lf%*[ \t]%lf", &((the_towns.data)[curr])[0], &((the_towns.data)[curr])[1], &((the_towns.data)[curr])[2])!=3)
+
+// Points To:
+// fd -> _fd_1[0] , EXACT
+// px -> *HEAP*_l_18[0] , MAY
+// px -> *HEAP*_l_21[*][0] , MAY
+// the_towns.data -> *HEAP*_l_18[0] , MAY
+// the_towns.data -> *HEAP*_l_21[0] , MAY
+
+      ;
+
+// Points To:
+// fd -> _fd_1[0] , EXACT
+// px -> *HEAP*_l_18[0] , MAY
+// px -> *HEAP*_l_21[*][0] , MAY
+// the_towns.data -> *HEAP*_l_18[0] , MAY
+// the_towns.data -> *HEAP*_l_21[0] , MAY
+
+
+   return the_towns;
+}
+
+Warnings
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (list_assignment_to_points_to) Heap bucket "*HEAP*_l_18[0]" leaked at line 21.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (CSafeSizeOfArray) Varying size for array "dereferencing20!:_IO_FILE^_unused2"
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (CSafeSizeOfArray) Not yet supported properly by PIPS
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[read_towns] (points_to_set_block_projection) Memory leak for bucket "read_towns:*HEAP*_l_21".

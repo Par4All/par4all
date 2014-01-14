@@ -1,0 +1,53 @@
+setenv WS=conditional_free03
+delete $WS
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+# Not compatible with the current points-to implementation and CP lattice
+# setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+create $WS $WS.c
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+
+echo
+echo Points-to for "conditional_free03"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[conditional_free03]
+
+echo 
+echo Proper effects with points-to for "conditional_free03"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[conditional_free03]
+
+echo 
+echo Cumulated effects with points-to for "conditional_free03"
+echo
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[conditional_free03]
+
+echo
+echo Points-to for "main"
+echo
+#activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+close
+
+echo
+echo Warnigns and errors:
+echo
+echo  1. Two memory leaks should be indicated? Why?
+echo
+echo  2. But the current implementation of points_to_function_projection
+echo     does not allow it.
+echo
+
+shell cat $WS.database/Warnings
+delete $WS
+quit

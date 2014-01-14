@@ -3,38 +3,35 @@ POINTS TO for "recurrence03"
 
 
 // Points To IN:
-// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> *NULL* , MAY
 // _l_1[0].next -> _l_1_2__1[0][0] , MAY
-// _l_1_2__1[0][0].next -> *NULL_POINTER* , MAY
-// _l_1_2__1[0][0].next -> _l_1_2__1_2__1[0][0][0] , MAY
-// l -> *NULL_POINTER* , MAY
+// _l_1_2__1[0][0].next -> *NULL* , MAY
+// _l_1_2__1[0][0].next -> _l_1_2__1[0][0] , MAY
+// l -> *NULL* , MAY
 // l -> _l_1[0] , MAY
 
 
 // Points To OUT:
-// _l_1[0].next -> _l_1_2__1[0][0] , MAY
-// _l_1_2__1[0][0].next -> _l_1_2__1_2__1[0][0][0] , MAY
-// _l_1_2__1_2__1[*][*][*].next -> _l_1_2__1[0][0] , MAY
-// _l_1_2__1_2__1[0][0][0].next -> _l_1_2__1[0][0] , EXACT
+// _l_1[0].next -> _l_1_2__1[0][0] , EXACT
+// _l_1_2__1[0][0].next -> _l_1_2__1[0][0] , EXACT
+// l -> _l_1[0] , EXACT
 
 void recurrence03(list l)
 {
 
 // Points To:
-// _l_1[0].next -> *NULL_POINTER* , MAY
+// _l_1[0].next -> *NULL* , MAY
 // _l_1[0].next -> _l_1_2__1[0][0] , MAY
-// _l_1_2__1[0][0].next -> *NULL_POINTER* , MAY
-// _l_1_2__1[0][0].next -> _l_1_2__1_2__1[0][0][0] , MAY
-// l -> *NULL_POINTER* , MAY
+// _l_1_2__1[0][0].next -> *NULL* , MAY
+// _l_1_2__1[0][0].next -> _l_1_2__1[0][0] , MAY
+// l -> *NULL* , MAY
 // l -> _l_1[0] , MAY
 
    l->next->next->next = l->next;
 
 // Points To:
-// _l_1[0].next -> _l_1_2__1[0][0] , MAY
-// _l_1_2__1[0][0].next -> _l_1_2__1_2__1[0][0][0] , MAY
-// _l_1_2__1_2__1[*][*][*].next -> _l_1_2__1[0][0] , MAY
-// _l_1_2__1_2__1[0][0][0].next -> _l_1_2__1[0][0] , EXACT
+// _l_1[0].next -> _l_1_2__1[0][0] , EXACT
+// _l_1_2__1[0][0].next -> _l_1_2__1[0][0] , EXACT
 // l -> _l_1[0] , EXACT
 
    return;

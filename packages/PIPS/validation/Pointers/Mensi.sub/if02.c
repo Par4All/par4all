@@ -1,3 +1,6 @@
+/* Exemple de la section 1.2.4, impact d'un test, chapitre
+   interprocedural */
+
 #include<stdio.h>
 #include<stdlib.h>
 
@@ -14,7 +17,7 @@ int main()
   int init_p = 1 ;
   int *q = NULL;
   if(init_p)
-    q = (int*)malloc(4*sizeof(int));
+    q = (int*) malloc(4*sizeof(int));
   init(q);
   return 0;
 }

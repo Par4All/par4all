@@ -15,25 +15,25 @@ int main()
    int **x, *y, k, h;
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
 
    k = 1;
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
 
    h = 2;
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// x -> undefined , EXACT
+// y -> undefined , EXACT
 
    y = &h;
 
 // Points To:
-// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// x -> undefined , EXACT
 // y -> h , EXACT
 
    *x = y;

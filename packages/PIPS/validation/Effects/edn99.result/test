@@ -313,6 +313,7 @@ int main(int argc, char *raw_argv[])
    char *in_fn = (void *) 0, out_fn[256] = "";
    
    // Make the arg list nice.
+//             <    is read   >: argc
    char *argv[argc*2];
 //             <    is read   >: in_fn
    

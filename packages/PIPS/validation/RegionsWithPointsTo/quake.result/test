@@ -1,0 +1,1984 @@
+
+POINTS-TO
+
+
+// Points To IN:
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w -> _w_6[0] , EXACT
+
+
+// Points To OUT:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w -> _w_6[0] , EXACT
+
+void smvp(int nodes, double (*A)[3][3], int *Acol, int *Aindex, double (*v)[3], double (*w)[3])
+{
+
+// Points To: none
+
+   // BEGIN BLOCK
+
+// Points To: none
+
+   int i, j;
+
+// Points To: none
+
+   int Anext, Alast, col;
+
+// Points To: none
+
+   double sum0, sum1, sum2;
+
+// Points To: none
+
+   smallarray_t **w1 = (smallarray_t **) malloc(2*sizeof(smallarray_t *));
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+
+   int **w2 = (int **) malloc(2*sizeof(int *));
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+   for(j = 0; j <= 1; j += 1)
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+      for(i = 0; i <= nodes-1; i += 1)
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+         w2[j][i] = 0;
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+
+   for(i = 0; i <= nodes-1; i += 1) {
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , MAY
+// Acol -> _Acol_3 , MAY
+// Aindex -> _Aindex_4 , MAY
+// v -> _v_5[0] , MAY
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+      // BEGIN BLOCK
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , MAY
+// Acol -> _Acol_3 , MAY
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , MAY
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+      Anext = Aindex[i];
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , MAY
+// Acol -> _Acol_3 , MAY
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , MAY
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+      Alast = Aindex[i+1];
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , MAY
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+
+      sum0 = A[Anext][0][0]*v[i][0]+A[Anext][0][1]*v[i][1]+A[Anext][0][2]*v[i][2];
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , MAY
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+      sum1 = A[Anext][1][0]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][1][2]*v[i][2];
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , MAY
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+      sum2 = A[Anext][2][0]*v[i][0]+A[Anext][2][1]*v[i][1]+A[Anext][2][2]*v[i][2];
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , MAY
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+
+      Anext++;
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , MAY
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+      while (Anext<Alast) {
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , MAY
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+         // BEGIN BLOCK
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+         col = Acol[Anext];
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+
+         sum0 += A[Anext][0][0]*v[col][0]+A[Anext][0][1]*v[col][1]+A[Anext][0][2]*v[col][2];
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+         sum1 += A[Anext][1][0]*v[col][0]+A[Anext][1][1]*v[col][1]+A[Anext][1][2]*v[col][2];
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+         sum2 += A[Anext][2][0]*v[col][0]+A[Anext][2][1]*v[col][1]+A[Anext][2][2]*v[col][2];
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+
+         if (w2[0][col]==0) {
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+            // BEGIN BLOCK
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+            w2[0][col] = 1;
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+            w1[0][col].first = 0.0;
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+            w1[0][col].second = 0.0;
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+            w1[0][col].third = 0.0;
+            // END BLOCK
+         }
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+
+         w1[0][col].first += A[Anext][0][0]*v[i][0]+A[Anext][1][0]*v[i][1]+A[Anext][2][0]*v[i][2];
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+         w1[0][col].second += A[Anext][0][1]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][2][1]*v[i][2];
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+         w1[0][col].third += A[Anext][0][2]*v[i][0]+A[Anext][1][2]*v[i][1]+A[Anext][2][2]*v[i][2];
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+         Anext++;
+         // END BLOCK
+      }
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+
+      if (w2[0][i]==0) {
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+         // BEGIN BLOCK
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+         w2[0][i] = 1;
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+         w1[0][i].first = 0.0;
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+         w1[0][i].second = 0.0;
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+         w1[0][i].third = 0.0;
+         // END BLOCK
+      }
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+
+      w1[0][i].first += sum0;
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+      w1[0][i].second += sum1;
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+      w1[0][i].third += sum2;
+      // END BLOCK
+   }
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+   
+   
+   
+   for(i = 0; i <= nodes-1; i += 1)
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w -> _w_6[0] , MAY
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+      for(j = 0; j <= 1; j += 1)
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w -> _w_6[0] , MAY
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+         if (w2[j][i]) {
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w -> _w_6[0] , MAY
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+            // BEGIN BLOCK
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w -> _w_6[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+            w[i][0] += w1[j][i].first;
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w -> _w_6[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+            w[i][1] += w1[j][i].second;
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w -> _w_6[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+            w[i][2] += w1[j][i].third;
+            // END BLOCK
+         }
+
+// Points To:
+// *HEAP*_l_23[*] -> undefined , EXACT
+// *HEAP*_l_24[*] -> undefined , EXACT
+// A -> _A_2[0][0] , EXACT
+// Acol -> _Acol_3 , EXACT
+// Aindex -> _Aindex_4 , EXACT
+// v -> _v_5[0] , EXACT
+// w -> _w_6[0] , EXACT
+// w1 -> *HEAP*_l_23[0] , MAY
+// w2 -> *HEAP*_l_24[0] , MAY
+
+   return;
+   // END BLOCK
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void smvp(int nodes, double (*A)[3][3], int *Acol, int *Aindex, double (*v)[3], double (*w)[3])
+{
+   // BEGIN BLOCK
+   int i, j;
+   int Anext, Alast, col;
+   double sum0, sum1, sum2;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: w1 _MALLOC_EFFECTS:_MALLOC_
+   smallarray_t **w1 = (smallarray_t **) malloc(2*sizeof(smallarray_t *));
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: w2 _MALLOC_EFFECTS:_MALLOC_
+   int **w2 = (int **) malloc(2*sizeof(int *));
+//             <    is written>: j
+   for(j = 0; j <= 1; j += 1)
+//             <    is read   >: nodes
+//             <    is written>: i
+      for(i = 0; i <= nodes-1; i += 1)
+//             <may be read   >: *HEAP*_l_24[j]
+//             <may be written>: *HEAP*_l_24[j][i]
+//             <    is read   >: i j nodes w2
+         w2[j][i] = 0;
+//             <    is read   >: nodes
+//             <    is written>: i
+
+   for(i = 0; i <= nodes-1; i += 1) {
+      // BEGIN BLOCK
+//             <    is read   >: Aindex _Aindex_4 i nodes
+//             <    is written>: Anext
+      Anext = Aindex[i];
+//             <    is read   >: Aindex _Aindex_4 i nodes
+//             <    is written>: Alast
+      Alast = Aindex[i+1];
+//             <    is read   >: A Anext _A_2[0][0] _A_2[0][1] 
+//                               _A_2[0][2] _v_5[0] _v_5[1] _v_5[2] i 
+//                               nodes v
+//             <    is written>: sum0
+
+      sum0 = A[Anext][0][0]*v[i][0]+A[Anext][0][1]*v[i][1]+A[Anext][0][2]*v[i][2];
+//             <    is read   >: A Anext _A_2[1][0] _A_2[1][1] 
+//                               _A_2[1][2] _v_5[0] _v_5[1] _v_5[2] i 
+//                               nodes v
+//             <    is written>: sum1
+      sum1 = A[Anext][1][0]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][1][2]*v[i][2];
+//             <    is read   >: A Anext _A_2[2][0] _A_2[2][1] 
+//                               _A_2[2][2] _v_5[0] _v_5[1] _v_5[2] i 
+//                               nodes v
+//             <    is written>: sum2
+      sum2 = A[Anext][2][0]*v[i][0]+A[Anext][2][1]*v[i][1]+A[Anext][2][2]*v[i][2];
+//             <    is read   >: Anext nodes
+//             <    is written>: Anext
+
+      Anext++;
+//             <    is read   >: Alast Anext
+      while (Anext<Alast) {
+         // BEGIN BLOCK
+//             <    is read   >: Acol Anext _Acol_3 nodes
+//             <    is written>: col
+         col = Acol[Anext];
+//             <    is read   >: A Anext _A_2[0][0] _A_2[0][1] 
+//                               _A_2[0][2] _v_5[0] _v_5[1] _v_5[2] 
+//                               col nodes sum0 v
+//             <    is written>: sum0
+
+         sum0 += A[Anext][0][0]*v[col][0]+A[Anext][0][1]*v[col][1]+A[Anext][0][2]*v[col][2];
+//             <    is read   >: A Anext _A_2[1][0] _A_2[1][1] 
+//                               _A_2[1][2] _v_5[0] _v_5[1] _v_5[2] 
+//                               col nodes sum1 v
+//             <    is written>: sum1
+         sum1 += A[Anext][1][0]*v[col][0]+A[Anext][1][1]*v[col][1]+A[Anext][1][2]*v[col][2];
+//             <    is read   >: A Anext _A_2[2][0] _A_2[2][1] 
+//                               _A_2[2][2] _v_5[0] _v_5[1] _v_5[2] 
+//                               col nodes sum2 v
+//             <    is written>: sum2
+         sum2 += A[Anext][2][0]*v[col][0]+A[Anext][2][1]*v[col][1]+A[Anext][2][2]*v[col][2];
+//             <may be read   >: *HEAP*_l_24[0] *HEAP*_l_24[0][col]
+//             <    is read   >: col nodes w2
+
+         if (w2[0][col]==0) {
+            // BEGIN BLOCK
+//             <may be read   >: *HEAP*_l_24[0]
+//             <may be written>: *HEAP*_l_24[0][col]
+//             <    is read   >: col nodes w2
+            w2[0][col] = 1;
+//             <may be read   >: *HEAP*_l_23[0]
+//             <may be written>: *HEAP*_l_23[0][col].first
+//             <    is read   >: col nodes w1
+            w1[0][col].first = 0.0;
+//             <may be read   >: *HEAP*_l_23[0]
+//             <may be written>: *HEAP*_l_23[0][col].second
+//             <    is read   >: col nodes w1
+            w1[0][col].second = 0.0;
+//             <may be read   >: *HEAP*_l_23[0]
+//             <may be written>: *HEAP*_l_23[0][col].third
+//             <    is read   >: col nodes w1
+            w1[0][col].third = 0.0;
+            // END BLOCK
+         }
+//             <may be read   >: *HEAP*_l_23[0] *HEAP*_l_23[0] 
+//                               *HEAP*_l_23[0][col].first
+//             <may be written>: *HEAP*_l_23[0][col].first
+//             <    is read   >: A Anext _A_2[0][0] _A_2[1][0] 
+//                               _A_2[2][0] _v_5[0] _v_5[1] _v_5[2] 
+//                               col i nodes v w1
+
+         w1[0][col].first += A[Anext][0][0]*v[i][0]+A[Anext][1][0]*v[i][1]+A[Anext][2][0]*v[i][2];
+//             <may be read   >: *HEAP*_l_23[0] *HEAP*_l_23[0] 
+//                               *HEAP*_l_23[0][col].second
+//             <may be written>: *HEAP*_l_23[0][col].second
+//             <    is read   >: A Anext _A_2[0][1] _A_2[1][1] 
+//                               _A_2[2][1] _v_5[0] _v_5[1] _v_5[2] 
+//                               col i nodes v w1
+         w1[0][col].second += A[Anext][0][1]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][2][1]*v[i][2];
+//             <may be read   >: *HEAP*_l_23[0] *HEAP*_l_23[0] 
+//                               *HEAP*_l_23[0][col].third
+//             <may be written>: *HEAP*_l_23[0][col].third
+//             <    is read   >: A Anext _A_2[0][2] _A_2[1][2] 
+//                               _A_2[2][2] _v_5[0] _v_5[1] _v_5[2] 
+//                               col i nodes v w1
+         w1[0][col].third += A[Anext][0][2]*v[i][0]+A[Anext][1][2]*v[i][1]+A[Anext][2][2]*v[i][2];
+//             <    is read   >: Anext nodes
+//             <    is written>: Anext
+         Anext++;
+         // END BLOCK
+      }
+//             <may be read   >: *HEAP*_l_24[0] *HEAP*_l_24[0][i]
+//             <    is read   >: i nodes w2
+
+      if (w2[0][i]==0) {
+         // BEGIN BLOCK
+//             <may be read   >: *HEAP*_l_24[0]
+//             <may be written>: *HEAP*_l_24[0][i]
+//             <    is read   >: i nodes w2
+         w2[0][i] = 1;
+//             <may be read   >: *HEAP*_l_23[0]
+//             <may be written>: *HEAP*_l_23[0][i].first
+//             <    is read   >: i nodes w1
+         w1[0][i].first = 0.0;
+//             <may be read   >: *HEAP*_l_23[0]
+//             <may be written>: *HEAP*_l_23[0][i].second
+//             <    is read   >: i nodes w1
+         w1[0][i].second = 0.0;
+//             <may be read   >: *HEAP*_l_23[0]
+//             <may be written>: *HEAP*_l_23[0][i].third
+//             <    is read   >: i nodes w1
+         w1[0][i].third = 0.0;
+         // END BLOCK
+      }
+//             <may be read   >: *HEAP*_l_23[0] *HEAP*_l_23[0] 
+//                               *HEAP*_l_23[0][i].first
+//             <may be written>: *HEAP*_l_23[0][i].first
+//             <    is read   >: i nodes sum0 w1
+
+      w1[0][i].first += sum0;
+//             <may be read   >: *HEAP*_l_23[0] *HEAP*_l_23[0] 
+//                               *HEAP*_l_23[0][i].second
+//             <may be written>: *HEAP*_l_23[0][i].second
+//             <    is read   >: i nodes sum1 w1
+      w1[0][i].second += sum1;
+//             <may be read   >: *HEAP*_l_23[0] *HEAP*_l_23[0] 
+//                               *HEAP*_l_23[0][i].third
+//             <may be written>: *HEAP*_l_23[0][i].third
+//             <    is read   >: i nodes sum2 w1
+      w1[0][i].third += sum2;
+      // END BLOCK
+   }
+//             <    is read   >: nodes
+//             <    is written>: i
+   
+   
+   
+   for(i = 0; i <= nodes-1; i += 1)
+//             <    is read   >: nodes
+//             <    is written>: j
+      for(j = 0; j <= 1; j += 1)
+//             <may be read   >: *HEAP*_l_24[j] *HEAP*_l_24[j][i]
+//             <    is read   >: i j nodes w2
+         if (w2[j][i]) {
+            // BEGIN BLOCK
+//             <may be read   >: *HEAP*_l_23[j] 
+//                               *HEAP*_l_23[j][i].first
+//             <    is read   >: _w_6[0] i j nodes w w1
+//             <    is written>: _w_6[0]
+            w[i][0] += w1[j][i].first;
+//             <may be read   >: *HEAP*_l_23[j] 
+//                               *HEAP*_l_23[j][i].second
+//             <    is read   >: _w_6[1] i j nodes w w1
+//             <    is written>: _w_6[1]
+            w[i][1] += w1[j][i].second;
+//             <may be read   >: *HEAP*_l_23[j] 
+//                               *HEAP*_l_23[j][i].third
+//             <    is read   >: _w_6[2] i j nodes w w1
+//             <    is written>: _w_6[2]
+            w[i][2] += w1[j][i].third;
+            // END BLOCK
+         }
+   return;
+   // END BLOCK
+}
+
+CUMULATED EFFECTS WITH POINTS TO
+
+//             <may be read   >: A Acol Aindex _A_2[*][*] _Acol_3 
+//                               _Aindex_4 _v_5[*] _w_6[*] v w
+//             <may be written>: _w_6[*]
+//             <    is read   >: nodes _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+void smvp(int nodes, double (*A)[3][3], int *Acol, int *Aindex, double (*v)[3], double (*w)[3])
+{
+//             <may be read   >: *HEAP*_l_23 *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_23[*] *HEAP*_l_24 
+//                               *HEAP*_l_24[*] A Acol Aindex 
+//                               _A_2[*][*] _Acol_3 _Aindex_4 _v_5[*] 
+//                               _w_6[*] v w
+//             <may be written>: *HEAP*_l_23 *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_24 *HEAP*_l_24 _w_6[*]
+//             <    is read   >: nodes _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   // BEGIN BLOCK
+   int i, j;
+   int Anext, Alast, col;
+   double sum0, sum1, sum2;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: w1 _MALLOC_EFFECTS:_MALLOC_
+   smallarray_t **w1 = (smallarray_t **) malloc(2*sizeof(smallarray_t *));
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: w2 _MALLOC_EFFECTS:_MALLOC_
+   int **w2 = (int **) malloc(2*sizeof(int *));
+//             <may be read   >: *HEAP*_l_24[*] i j w2
+//             <may be written>: *HEAP*_l_24[*][*]
+//             <    is read   >: nodes
+//             <    is written>: i j
+   for(j = 0; j <= 1; j += 1)
+//             <may be read   >: *HEAP*_l_24[*] i j w2
+//             <may be written>: *HEAP*_l_24[*][*]
+//             <    is read   >: nodes
+//             <    is written>: i
+      for(i = 0; i <= nodes-1; i += 1)
+//             <may be read   >: *HEAP*_l_24[*]
+//             <may be written>: *HEAP*_l_24[*][*]
+//             <    is read   >: i j nodes w2
+         w2[j][i] = 0;
+//             <may be read   >: *HEAP*_l_23 *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_23[0] *HEAP*_l_24 
+//                               *HEAP*_l_24[0] A Acol Aindex Alast 
+//                               Anext _A_2[*][*] _Acol_3 _Aindex_4 
+//                               _v_5[*] col i sum0 sum1 sum2 v w1 w2
+//             <may be written>: *HEAP*_l_23 *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_24 Alast Anext col sum0 sum1
+//                               sum2
+//             <    is read   >: nodes
+//             <    is written>: i
+
+   for(i = 0; i <= nodes-1; i += 1) {
+//             <may be read   >: *HEAP*_l_23 *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_23[0] *HEAP*_l_24 
+//                               *HEAP*_l_24[0] Acol _A_2[*][*] 
+//                               _Acol_3 _v_5[*] col
+//             <may be written>: *HEAP*_l_23 *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_24 col
+//             <    is read   >: A Aindex Alast Anext _Aindex_4 i 
+//                               nodes sum0 sum1 sum2 v w1 w2
+//             <    is written>: Alast Anext sum0 sum1 sum2
+      // BEGIN BLOCK
+//             <    is read   >: Aindex _Aindex_4 i nodes
+//             <    is written>: Anext
+      Anext = Aindex[i];
+//             <    is read   >: Aindex _Aindex_4 i nodes
+//             <    is written>: Alast
+      Alast = Aindex[i+1];
+//             <may be read   >: _A_2[0][*] _v_5[*]
+//             <    is read   >: A Anext i nodes v
+//             <    is written>: sum0
+
+      sum0 = A[Anext][0][0]*v[i][0]+A[Anext][0][1]*v[i][1]+A[Anext][0][2]*v[i][2];
+//             <may be read   >: _A_2[1][*] _v_5[*]
+//             <    is read   >: A Anext i nodes v
+//             <    is written>: sum1
+      sum1 = A[Anext][1][0]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][1][2]*v[i][2];
+//             <may be read   >: _A_2[2][*] _v_5[*]
+//             <    is read   >: A Anext i nodes v
+//             <    is written>: sum2
+      sum2 = A[Anext][2][0]*v[i][0]+A[Anext][2][1]*v[i][1]+A[Anext][2][2]*v[i][2];
+//             <    is read   >: Anext nodes
+//             <    is written>: Anext
+
+      Anext++;
+//             <may be read   >: *HEAP*_l_23 *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_23[0] *HEAP*_l_24 
+//                               *HEAP*_l_24[0] A Acol _A_2[*][*] 
+//                               _Acol_3 _v_5[*] col i nodes sum0 sum1
+//                               sum2 v w1 w2
+//             <may be written>: *HEAP*_l_23 *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_24 Anext col sum0 sum1 sum2
+//             <    is read   >: Alast Anext
+      while (Anext<Alast) {
+//             <may be read   >: *HEAP*_l_23 *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_23[0] *HEAP*_l_24 
+//                               *HEAP*_l_24[0] _A_2[*][*] _v_5[*]
+//             <may be written>: *HEAP*_l_23 *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_24
+//             <    is read   >: A Acol Anext _Acol_3 col i nodes sum0
+//                               sum1 sum2 v w1 w2
+//             <    is written>: Anext col sum0 sum1 sum2
+         // BEGIN BLOCK
+//             <    is read   >: Acol Anext _Acol_3 nodes
+//             <    is written>: col
+         col = Acol[Anext];
+//             <may be read   >: _A_2[0][*] _v_5[*]
+//             <    is read   >: A Anext col nodes sum0 v
+//             <    is written>: sum0
+
+         sum0 += A[Anext][0][0]*v[col][0]+A[Anext][0][1]*v[col][1]+A[Anext][0][2]*v[col][2];
+//             <may be read   >: _A_2[1][*] _v_5[*]
+//             <    is read   >: A Anext col nodes sum1 v
+//             <    is written>: sum1
+         sum1 += A[Anext][1][0]*v[col][0]+A[Anext][1][1]*v[col][1]+A[Anext][1][2]*v[col][2];
+//             <may be read   >: _A_2[2][*] _v_5[*]
+//             <    is read   >: A Anext col nodes sum2 v
+//             <    is written>: sum2
+         sum2 += A[Anext][2][0]*v[col][0]+A[Anext][2][1]*v[col][1]+A[Anext][2][2]*v[col][2];
+//             <may be read   >: *HEAP*_l_23[0] *HEAP*_l_24[0] 
+//                               *HEAP*_l_24[0][*] w1
+//             <may be written>: *HEAP*_l_23 *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_24[0][*]
+//             <    is read   >: col nodes w2
+
+         if (w2[0][col]==0) {
+//             <may be read   >: *HEAP*_l_23[0] *HEAP*_l_24[0]
+//             <may be written>: *HEAP*_l_23 *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_24[0][*]
+//             <    is read   >: col nodes w1 w2
+            // BEGIN BLOCK
+//             <may be read   >: *HEAP*_l_24[0]
+//             <may be written>: *HEAP*_l_24[0][*]
+//             <    is read   >: col nodes w2
+            w2[0][col] = 1;
+//             <may be read   >: *HEAP*_l_23[0]
+//             <may be written>: *HEAP*_l_23[0][*].first
+//             <    is read   >: col nodes w1
+            w1[0][col].first = 0.0;
+//             <may be read   >: *HEAP*_l_23[0]
+//             <may be written>: *HEAP*_l_23[0][*].second
+//             <    is read   >: col nodes w1
+            w1[0][col].second = 0.0;
+//             <may be read   >: *HEAP*_l_23[0]
+//             <may be written>: *HEAP*_l_23[0][*].third
+//             <    is read   >: col nodes w1
+            w1[0][col].third = 0.0;
+            // END BLOCK
+         }
+//             <may be read   >: *HEAP*_l_23[0] 
+//                               *HEAP*_l_23[0][*].first _A_2[*][0] 
+//                               _v_5[*]
+//             <may be written>: *HEAP*_l_23[0][*].first
+//             <    is read   >: A Anext col i nodes v w1
+
+         w1[0][col].first += A[Anext][0][0]*v[i][0]+A[Anext][1][0]*v[i][1]+A[Anext][2][0]*v[i][2];
+//             <may be read   >: *HEAP*_l_23[0] 
+//                               *HEAP*_l_23[0][*].second _A_2[*][1] 
+//                               _v_5[*]
+//             <may be written>: *HEAP*_l_23[0][*].second
+//             <    is read   >: A Anext col i nodes v w1
+         w1[0][col].second += A[Anext][0][1]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][2][1]*v[i][2];
+//             <may be read   >: *HEAP*_l_23[0] 
+//                               *HEAP*_l_23[0][*].third _A_2[*][2] 
+//                               _v_5[*]
+//             <may be written>: *HEAP*_l_23[0][*].third
+//             <    is read   >: A Anext col i nodes v w1
+         w1[0][col].third += A[Anext][0][2]*v[i][0]+A[Anext][1][2]*v[i][1]+A[Anext][2][2]*v[i][2];
+//             <    is read   >: Anext nodes
+//             <    is written>: Anext
+         Anext++;
+         // END BLOCK
+      }
+//             <may be read   >: *HEAP*_l_23[0] *HEAP*_l_24[0] 
+//                               *HEAP*_l_24[0][*] w1
+//             <may be written>: *HEAP*_l_23 *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_24[0][*]
+//             <    is read   >: i nodes w2
+
+      if (w2[0][i]==0) {
+//             <may be read   >: *HEAP*_l_23[0] *HEAP*_l_24[0]
+//             <may be written>: *HEAP*_l_23 *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_24[0][*]
+//             <    is read   >: i nodes w1 w2
+         // BEGIN BLOCK
+//             <may be read   >: *HEAP*_l_24[0]
+//             <may be written>: *HEAP*_l_24[0][*]
+//             <    is read   >: i nodes w2
+         w2[0][i] = 1;
+//             <may be read   >: *HEAP*_l_23[0]
+//             <may be written>: *HEAP*_l_23[0][*].first
+//             <    is read   >: i nodes w1
+         w1[0][i].first = 0.0;
+//             <may be read   >: *HEAP*_l_23[0]
+//             <may be written>: *HEAP*_l_23[0][*].second
+//             <    is read   >: i nodes w1
+         w1[0][i].second = 0.0;
+//             <may be read   >: *HEAP*_l_23[0]
+//             <may be written>: *HEAP*_l_23[0][*].third
+//             <    is read   >: i nodes w1
+         w1[0][i].third = 0.0;
+         // END BLOCK
+      }
+//             <may be read   >: *HEAP*_l_23[0] 
+//                               *HEAP*_l_23[0][*].first
+//             <may be written>: *HEAP*_l_23[0][*].first
+//             <    is read   >: i nodes sum0 w1
+
+      w1[0][i].first += sum0;
+//             <may be read   >: *HEAP*_l_23[0] 
+//                               *HEAP*_l_23[0][*].second
+//             <may be written>: *HEAP*_l_23[0][*].second
+//             <    is read   >: i nodes sum1 w1
+      w1[0][i].second += sum1;
+//             <may be read   >: *HEAP*_l_23[0] 
+//                               *HEAP*_l_23[0][*].third
+//             <may be written>: *HEAP*_l_23[0][*].third
+//             <    is read   >: i nodes sum2 w1
+      w1[0][i].third += sum2;
+      // END BLOCK
+   }
+//             <may be read   >: *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_23[*] 
+//                               *HEAP*_l_23[*][*].first 
+//                               *HEAP*_l_24[*] *HEAP*_l_24[*][*] 
+//                               _w_6[*] i j w w1 w2
+//             <may be written>: _w_6[*] j
+//             <    is read   >: nodes
+//             <    is written>: i
+   
+   
+   
+   for(i = 0; i <= nodes-1; i += 1)
+//             <may be read   >: *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_23[*] 
+//                               *HEAP*_l_23[*][*].first 
+//                               *HEAP*_l_24[*] *HEAP*_l_24[*][*] 
+//                               _w_6[*] w w1
+//             <may be written>: _w_6[*]
+//             <    is read   >: i j nodes w2
+//             <    is written>: j
+      for(j = 0; j <= 1; j += 1)
+//             <may be read   >: *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_23[*] 
+//                               *HEAP*_l_23[*][*].first 
+//                               *HEAP*_l_24[*] *HEAP*_l_24[*][*] 
+//                               _w_6[*] w w1
+//             <may be written>: _w_6[*]
+//             <    is read   >: i j nodes w2
+         if (w2[j][i]) {
+//             <may be read   >: *HEAP*_l_23 *HEAP*_l_23 
+//                               *HEAP*_l_23[*] 
+//                               *HEAP*_l_23[*][*].first _w_6[*]
+//             <may be written>: _w_6[*]
+//             <    is read   >: i j nodes w w1
+            // BEGIN BLOCK
+//             <may be read   >: *HEAP*_l_23[*] 
+//                               *HEAP*_l_23[*][*].first
+//             <    is read   >: _w_6[0] i j nodes w w1
+//             <    is written>: _w_6[0]
+            w[i][0] += w1[j][i].first;
+//             <may be read   >: *HEAP*_l_23[*] 
+//                               *HEAP*_l_23[*][*].second
+//             <    is read   >: _w_6[1] i j nodes w w1
+//             <    is written>: _w_6[1]
+            w[i][1] += w1[j][i].second;
+//             <may be read   >: *HEAP*_l_23[*] 
+//                               *HEAP*_l_23[*][*].third
+//             <    is read   >: _w_6[2] i j nodes w w1
+//             <    is written>: _w_6[2]
+            w[i][2] += w1[j][i].third;
+            // END BLOCK
+         }
+   return;
+   // END BLOCK
+}
+
+//  T() {}
+
+void smvp(int nodes, double (*A)[3][3], int *Acol, int *Aindex, double (*v)[3], double (*w)[3])
+{
+
+//  T() {}
+
+   // BEGIN BLOCK
+
+//  T(i,j) {}
+
+   int i, j;
+
+//  T(Alast,Anext,col) {}
+
+   int Anext, Alast, col;
+
+//  T() {}
+
+   double sum0, sum1, sum2;
+
+//  T() {}
+
+   smallarray_t **w1 = (smallarray_t **) malloc(2*sizeof(smallarray_t *));
+
+//  T() {}
+
+   int **w2 = (int **) malloc(2*sizeof(int *));
+
+//  T(i,j) {}
+
+   for(j = 0; j <= 1; j += 1)
+
+//  T(i) {1<=nodes}
+
+      for(i = 0; i <= nodes-1; i += 1)
+
+//  T() {}
+
+         w2[j][i] = 0;
+
+//  T(Alast,Anext,col,i) {1<=nodes}
+
+
+   for(i = 0; i <= nodes-1; i += 1) {
+
+//  T(Alast,Anext,col) {}
+
+      // BEGIN BLOCK
+
+//  T(Anext) {}
+
+      Anext = Aindex[i];
+
+//  T(Alast) {}
+
+      Alast = Aindex[i+1];
+
+//  T() {}
+
+
+      sum0 = A[Anext][0][0]*v[i][0]+A[Anext][0][1]*v[i][1]+A[Anext][0][2]*v[i][2];
+
+//  T() {}
+
+      sum1 = A[Anext][1][0]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][1][2]*v[i][2];
+
+//  T() {}
+
+      sum2 = A[Anext][2][0]*v[i][0]+A[Anext][2][1]*v[i][1]+A[Anext][2][2]*v[i][2];
+
+//  T(Anext) {Anext==Anext#init+1}
+
+
+      Anext++;
+
+//  T(Anext,col) {Anext#init+1<=Alast}
+
+      while (Anext<Alast) {
+
+//  T(Anext,col) {}
+
+         // BEGIN BLOCK
+
+//  T(col) {}
+
+         col = Acol[Anext];
+
+//  T() {}
+
+
+         sum0 += A[Anext][0][0]*v[col][0]+A[Anext][0][1]*v[col][1]+A[Anext][0][2]*v[col][2];
+
+//  T() {}
+
+         sum1 += A[Anext][1][0]*v[col][0]+A[Anext][1][1]*v[col][1]+A[Anext][1][2]*v[col][2];
+
+//  T() {}
+
+         sum2 += A[Anext][2][0]*v[col][0]+A[Anext][2][1]*v[col][1]+A[Anext][2][2]*v[col][2];
+
+//  T() {}
+
+
+         if (w2[0][col]==0) {
+
+//  T() {}
+
+            // BEGIN BLOCK
+
+//  T() {}
+
+            w2[0][col] = 1;
+
+//  T() {}
+
+            w1[0][col].first = 0.0;
+
+//  T() {}
+
+            w1[0][col].second = 0.0;
+
+//  T() {}
+
+            w1[0][col].third = 0.0;
+            // END BLOCK
+         }
+
+//  T() {}
+
+
+         w1[0][col].first += A[Anext][0][0]*v[i][0]+A[Anext][1][0]*v[i][1]+A[Anext][2][0]*v[i][2];
+
+//  T() {}
+
+         w1[0][col].second += A[Anext][0][1]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][2][1]*v[i][2];
+
+//  T() {}
+
+         w1[0][col].third += A[Anext][0][2]*v[i][0]+A[Anext][1][2]*v[i][1]+A[Anext][2][2]*v[i][2];
+
+//  T(Anext) {Anext==Anext#init+1}
+
+         Anext++;
+         // END BLOCK
+      }
+
+//  T() {}
+
+
+      if (w2[0][i]==0) {
+
+//  T() {}
+
+         // BEGIN BLOCK
+
+//  T() {}
+
+         w2[0][i] = 1;
+
+//  T() {}
+
+         w1[0][i].first = 0.0;
+
+//  T() {}
+
+         w1[0][i].second = 0.0;
+
+//  T() {}
+
+         w1[0][i].third = 0.0;
+         // END BLOCK
+      }
+
+//  T() {}
+
+
+      w1[0][i].first += sum0;
+
+//  T() {}
+
+      w1[0][i].second += sum1;
+
+//  T() {}
+
+      w1[0][i].third += sum2;
+      // END BLOCK
+   }
+
+//  T(i,j) {1<=nodes}
+
+   
+   
+   
+   for(i = 0; i <= nodes-1; i += 1)
+
+//  T(j) {}
+
+      for(j = 0; j <= 1; j += 1)
+
+//  T() {}
+
+         if (w2[j][i]) {
+
+//  T() {}
+
+            // BEGIN BLOCK
+
+//  T() {}
+
+            w[i][0] += w1[j][i].first;
+
+//  T() {}
+
+            w[i][1] += w1[j][i].second;
+
+//  T() {}
+
+            w[i][2] += w1[j][i].third;
+            // END BLOCK
+         }
+
+//  T() {}
+
+   return;
+   // END BLOCK
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+void smvp(int nodes, double (*A)[3][3], int *Acol, int *Aindex, double (*v)[3], double (*w)[3])
+{
+
+//  P() {}
+
+   // BEGIN BLOCK
+
+//  P() {}
+
+   int i, j;
+
+//  P(i,j) {}
+
+   int Anext, Alast, col;
+
+//  P(Alast,Anext,col,i,j) {}
+
+   double sum0, sum1, sum2;
+
+//  P(Alast,Anext,col,i,j) {}
+
+   smallarray_t **w1 = (smallarray_t **) malloc(2*sizeof(smallarray_t *));
+
+//  P(Alast,Anext,col,i,j) {}
+
+   int **w2 = (int **) malloc(2*sizeof(int *));
+
+//  P(Alast,Anext,col,i,j) {}
+
+   for(j = 0; j <= 1; j += 1)
+
+//  P(Alast,Anext,col,i,j) {0<=j, j<=1}
+
+      for(i = 0; i <= nodes-1; i += 1)
+
+//  P(Alast,Anext,col,i,j) {0<=i, i+1<=nodes, 0<=j, j<=1, 1<=nodes}
+
+         w2[j][i] = 0;
+
+//  P(Alast,Anext,col,i,j) {j==2, 0<=i, nodes<=i}
+
+
+   for(i = 0; i <= nodes-1; i += 1) {
+
+//  P(Alast,Anext,col,i,j) {j==2, 0<=i, i+1<=nodes, 1<=nodes}
+
+      // BEGIN BLOCK
+
+//  P(Alast,Anext,col,i,j) {j==2, 0<=i, i+1<=nodes, 1<=nodes}
+
+      Anext = Aindex[i];
+
+//  P(Alast,Anext,col,i,j) {j==2, 0<=i, i+1<=nodes, 1<=nodes}
+
+      Alast = Aindex[i+1];
+
+//  P(Alast,Anext,col,i,j) {j==2, 0<=i, i+1<=nodes, 1<=nodes}
+
+
+      sum0 = A[Anext][0][0]*v[i][0]+A[Anext][0][1]*v[i][1]+A[Anext][0][2]*v[i][2];
+
+//  P(Alast,Anext,col,i,j) {j==2, 0<=i, i+1<=nodes, 1<=nodes}
+
+      sum1 = A[Anext][1][0]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][1][2]*v[i][2];
+
+//  P(Alast,Anext,col,i,j) {j==2, 0<=i, i+1<=nodes, 1<=nodes}
+
+      sum2 = A[Anext][2][0]*v[i][0]+A[Anext][2][1]*v[i][1]+A[Anext][2][2]*v[i][2];
+
+//  P(Alast,Anext,col,i,j) {j==2, 0<=i, i+1<=nodes, 1<=nodes}
+
+
+      Anext++;
+
+//  P(Alast,Anext,col,i,j) {j==2, 0<=i, i+1<=nodes, 1<=nodes}
+
+      while (Anext<Alast) {
+
+//  P(Alast,Anext,col,i,j) {j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+         // BEGIN BLOCK
+
+//  P(Alast,Anext,col,i,j) {j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+         col = Acol[Anext];
+
+//  P(Alast,Anext,col,i,j) {j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+
+         sum0 += A[Anext][0][0]*v[col][0]+A[Anext][0][1]*v[col][1]+A[Anext][0][2]*v[col][2];
+
+//  P(Alast,Anext,col,i,j) {j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+         sum1 += A[Anext][1][0]*v[col][0]+A[Anext][1][1]*v[col][1]+A[Anext][1][2]*v[col][2];
+
+//  P(Alast,Anext,col,i,j) {j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+         sum2 += A[Anext][2][0]*v[col][0]+A[Anext][2][1]*v[col][1]+A[Anext][2][2]*v[col][2];
+
+//  P(Alast,Anext,col,i,j) {j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+
+         if (w2[0][col]==0) {
+
+//  P(Alast,Anext,col,i,j) {j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+            // BEGIN BLOCK
+
+//  P(Alast,Anext,col,i,j) {j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+            w2[0][col] = 1;
+
+//  P(Alast,Anext,col,i,j) {j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+            w1[0][col].first = 0.0;
+
+//  P(Alast,Anext,col,i,j) {j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+            w1[0][col].second = 0.0;
+
+//  P(Alast,Anext,col,i,j) {j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+            w1[0][col].third = 0.0;
+            // END BLOCK
+         }
+
+//  P(Alast,Anext,col,i,j) {j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+
+         w1[0][col].first += A[Anext][0][0]*v[i][0]+A[Anext][1][0]*v[i][1]+A[Anext][2][0]*v[i][2];
+
+//  P(Alast,Anext,col,i,j) {j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+         w1[0][col].second += A[Anext][0][1]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][2][1]*v[i][2];
+
+//  P(Alast,Anext,col,i,j) {j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+         w1[0][col].third += A[Anext][0][2]*v[i][0]+A[Anext][1][2]*v[i][1]+A[Anext][2][2]*v[i][2];
+
+//  P(Alast,Anext,col,i,j) {j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+         Anext++;
+         // END BLOCK
+      }
+
+//  P(Alast,Anext,col,i,j) {j==2, Alast<=Anext, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+
+      if (w2[0][i]==0) {
+
+//  P(Alast,Anext,col,i,j) {j==2, Alast<=Anext, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+         // BEGIN BLOCK
+
+//  P(Alast,Anext,col,i,j) {j==2, Alast<=Anext, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+         w2[0][i] = 1;
+
+//  P(Alast,Anext,col,i,j) {j==2, Alast<=Anext, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+         w1[0][i].first = 0.0;
+
+//  P(Alast,Anext,col,i,j) {j==2, Alast<=Anext, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+         w1[0][i].second = 0.0;
+
+//  P(Alast,Anext,col,i,j) {j==2, Alast<=Anext, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+         w1[0][i].third = 0.0;
+         // END BLOCK
+      }
+
+//  P(Alast,Anext,col,i,j) {j==2, Alast<=Anext, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+
+      w1[0][i].first += sum0;
+
+//  P(Alast,Anext,col,i,j) {j==2, Alast<=Anext, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+      w1[0][i].second += sum1;
+
+//  P(Alast,Anext,col,i,j) {j==2, Alast<=Anext, 0<=i, i+1<=nodes,
+//    1<=nodes}
+
+      w1[0][i].third += sum2;
+      // END BLOCK
+   }
+
+//  P(Alast,Anext,col,i,j) {j==2, 0<=i, nodes<=i}
+
+   
+   
+   
+   for(i = 0; i <= nodes-1; i += 1)
+
+//  P(Alast,Anext,col,i,j) {0<=i, i+1<=nodes, 1<=nodes}
+
+      for(j = 0; j <= 1; j += 1)
+
+//  P(Alast,Anext,col,i,j) {0<=i, i+1<=nodes, 0<=j, j<=1, 1<=nodes}
+
+         if (w2[j][i]) {
+
+//  P(Alast,Anext,col,i,j) {0<=i, i+1<=nodes, 0<=j, j<=1, 1<=nodes}
+
+            // BEGIN BLOCK
+
+//  P(Alast,Anext,col,i,j) {0<=i, i+1<=nodes, 0<=j, j<=1, 1<=nodes}
+
+            w[i][0] += w1[j][i].first;
+
+//  P(Alast,Anext,col,i,j) {0<=i, i+1<=nodes, 0<=j, j<=1, 1<=nodes}
+
+            w[i][1] += w1[j][i].second;
+
+//  P(Alast,Anext,col,i,j) {0<=i, i+1<=nodes, 0<=j, j<=1, 1<=nodes}
+
+            w[i][2] += w1[j][i].third;
+            // END BLOCK
+         }
+
+//  P(Alast,Anext,col,i,j) {j==2, 0<=i, nodes<=i}
+
+   return;
+   // END BLOCK
+}
+
+RW regions
+
+void smvp(int nodes, double (*A)[3][3], int *Acol, int *Aindex, double (*v)[3], double (*w)[3])
+{
+   // BEGIN BLOCK
+   int i, j;
+   int Anext, Alast, col;
+   double sum0, sum1, sum2;
+
+//  <w1-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   smallarray_t **w1 = (smallarray_t **) malloc(2*sizeof(smallarray_t *));
+
+//  <w2-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   int **w2 = (int **) malloc(2*sizeof(int *));
+   for(j = 0; j <= 1; j += 1)
+      for(i = 0; i <= nodes-1; i += 1)
+
+//  <*HEAP*_l_24[PHI1]-R-MAY-{PHI1==j, 0<=i, i+1<=nodes, 0<=j, j<=1,
+//    1<=nodes}>
+//  <*HEAP*_l_24[PHI1][PHI2]-W-MAY-{PHI1==j, PHI2==i, 0<=i,
+//    i+1<=nodes, 0<=j, j<=1, 1<=nodes}>
+//  <w2-R-EXACT-{}>
+
+         w2[j][i] = 0;
+
+   for(i = 0; i <= nodes-1; i += 1) {
+      // BEGIN BLOCK
+
+//  <Aindex-R-EXACT-{}>
+
+      Anext = Aindex[i];
+
+//  <Aindex-R-EXACT-{}>
+
+      Alast = Aindex[i+1];
+
+//  <A-R-EXACT-{}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==0, PHI4==2, j==2, 0<=i, i+1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==0, PHI4==1, j==2, 0<=i, i+1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==0, PHI4==0, j==2, 0<=i, i+1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==2, j==2, 0<=i,
+//    i+1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==1, j==2, 0<=i,
+//    i+1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==0, j==2, 0<=i,
+//    i+1<=nodes}>
+//  <v-R-EXACT-{}>
+
+
+      sum0 = A[Anext][0][0]*v[i][0]+A[Anext][0][1]*v[i][1]+A[Anext][0][2]*v[i][2];
+
+//  <A-R-EXACT-{}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==1, PHI4==2, j==2, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==1, PHI4==1, j==2, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==1, PHI4==0, j==2, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==2, j==2, 0<=i,
+//    i+1<=nodes, 1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==1, j==2, 0<=i,
+//    i+1<=nodes, 1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==0, j==2, 0<=i,
+//    i+1<=nodes, 1<=nodes}>
+//  <v-R-EXACT-{}>
+
+      sum1 = A[Anext][1][0]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][1][2]*v[i][2];
+
+//  <A-R-EXACT-{}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==2, PHI4==2, j==2, 0<=i, i+1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==2, PHI4==1, j==2, 0<=i, i+1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==2, PHI4==0, j==2, 0<=i, i+1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==2, j==2, 0<=i,
+//    i+1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==1, j==2, 0<=i,
+//    i+1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==0, j==2, 0<=i,
+//    i+1<=nodes}>
+//  <v-R-EXACT-{}>
+
+      sum2 = A[Anext][2][0]*v[i][0]+A[Anext][2][1]*v[i][1]+A[Anext][2][2]*v[i][2];
+
+      Anext++;
+      while (Anext<Alast) {
+         // BEGIN BLOCK
+
+//  <Acol-R-EXACT-{}>
+
+         col = Acol[Anext];
+
+//  <A-R-EXACT-{}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==0, PHI4==2, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==0, PHI4==1, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==0, PHI4==0, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==col, PHI2==2, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==col, PHI2==1, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==col, PHI2==0, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <v-R-EXACT-{}>
+
+
+         sum0 += A[Anext][0][0]*v[col][0]+A[Anext][0][1]*v[col][1]+A[Anext][0][2]*v[col][2];
+
+//  <A-R-EXACT-{}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==1, PHI4==2, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==1, PHI4==1, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==1, PHI4==0, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==col, PHI2==2, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==col, PHI2==1, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==col, PHI2==0, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes}>
+//  <v-R-EXACT-{}>
+
+         sum1 += A[Anext][1][0]*v[col][0]+A[Anext][1][1]*v[col][1]+A[Anext][1][2]*v[col][2];
+
+//  <A-R-EXACT-{}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==2, PHI4==2, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==2, PHI4==1, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==2, PHI4==0, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==col, PHI2==2, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==col, PHI2==1, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==col, PHI2==0, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <v-R-EXACT-{}>
+
+         sum2 += A[Anext][2][0]*v[col][0]+A[Anext][2][1]*v[col][1]+A[Anext][2][2]*v[col][2];
+
+//  <*HEAP*_l_24[PHI1]-R-MAY-{PHI1==0, j==2, Anext+1<=Alast, 0<=i,
+//    i+1<=nodes}>
+//  <*HEAP*_l_24[PHI1][PHI2]-R-MAY-{PHI1==0, PHI2==col, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes}>
+//  <w2-R-EXACT-{}>
+
+
+         if (w2[0][col]==0) {
+            // BEGIN BLOCK
+
+//  <*HEAP*_l_24[PHI1]-R-MAY-{PHI1==0, j==2, Anext+1<=Alast, 0<=i,
+//    i+1<=nodes, 1<=nodes}>
+//  <*HEAP*_l_24[PHI1][PHI2]-W-MAY-{PHI1==0, PHI2==col, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <w2-R-EXACT-{}>
+
+            w2[0][col] = 1;
+
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Anext+1<=Alast, 0<=i,
+//    i+1<=nodes, 1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].first-W-MAY-{PHI1==0, PHI2==col, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <w1-R-EXACT-{}>
+
+            w1[0][col].first = 0.0;
+
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Anext+1<=Alast, 0<=i,
+//    i+1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].second-W-MAY-{PHI1==0, PHI2==col, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes}>
+//  <w1-R-EXACT-{}>
+
+            w1[0][col].second = 0.0;
+
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Anext+1<=Alast, 0<=i,
+//    i+1<=nodes, 1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].third-W-MAY-{PHI1==0, PHI2==col, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <w1-R-EXACT-{}>
+
+            w1[0][col].third = 0.0;
+            // END BLOCK
+         }
+
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Anext+1<=Alast, 0<=i,
+//    i+1<=nodes, 1<=nodes}>
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Anext+1<=Alast, 0<=i,
+//    i+1<=nodes, 1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].first-R-MAY-{PHI1==0, PHI2==col, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].first-W-MAY-{PHI1==0, PHI2==col, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <A-R-EXACT-{}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==2, PHI4==0, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==1, PHI4==0, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==0, PHI4==0, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==2, j==2, Anext+1<=Alast,
+//    0<=i, i+1<=nodes, 1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==1, j==2, Anext+1<=Alast,
+//    0<=i, i+1<=nodes, 1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==0, j==2, Anext+1<=Alast,
+//    0<=i, i+1<=nodes, 1<=nodes}>
+//  <v-R-EXACT-{}>
+//  <w1-R-EXACT-{}>
+
+
+         w1[0][col].first += A[Anext][0][0]*v[i][0]+A[Anext][1][0]*v[i][1]+A[Anext][2][0]*v[i][2];
+
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Anext+1<=Alast, 0<=i,
+//    i+1<=nodes}>
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Anext+1<=Alast, 0<=i,
+//    i+1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].second-R-MAY-{PHI1==0, PHI2==col, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].second-W-MAY-{PHI1==0, PHI2==col, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes}>
+//  <A-R-EXACT-{}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==2, PHI4==1, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==1, PHI4==1, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==0, PHI4==1, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==2, j==2, Anext+1<=Alast,
+//    0<=i, i+1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==1, j==2, Anext+1<=Alast,
+//    0<=i, i+1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==0, j==2, Anext+1<=Alast,
+//    0<=i, i+1<=nodes}>
+//  <v-R-EXACT-{}>
+//  <w1-R-EXACT-{}>
+
+         w1[0][col].second += A[Anext][0][1]*v[i][0]+A[Anext][1][1]*v[i][1]+A[Anext][2][1]*v[i][2];
+
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Anext+1<=Alast, 0<=i,
+//    i+1<=nodes, 1<=nodes}>
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Anext+1<=Alast, 0<=i,
+//    i+1<=nodes, 1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].third-R-MAY-{PHI1==0, PHI2==col, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].third-W-MAY-{PHI1==0, PHI2==col, j==2,
+//    Anext+1<=Alast, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <A-R-EXACT-{}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==2, PHI4==2, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==1, PHI4==2, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}>
+//  <_A_2[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==Anext,
+//    PHI3==0, PHI4==2, j==2, Anext+1<=Alast, 0<=i, i+1<=nodes,
+//    1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==2, j==2, Anext+1<=Alast,
+//    0<=i, i+1<=nodes, 1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==1, j==2, Anext+1<=Alast,
+//    0<=i, i+1<=nodes, 1<=nodes}>
+//  <_v_5[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==0, j==2, Anext+1<=Alast,
+//    0<=i, i+1<=nodes, 1<=nodes}>
+//  <v-R-EXACT-{}>
+//  <w1-R-EXACT-{}>
+
+         w1[0][col].third += A[Anext][0][2]*v[i][0]+A[Anext][1][2]*v[i][1]+A[Anext][2][2]*v[i][2];
+         Anext++;
+         // END BLOCK
+      }
+
+//  <*HEAP*_l_24[PHI1]-R-MAY-{PHI1==0, j==2, Alast<=Anext, 0<=i,
+//    i+1<=nodes, 1<=nodes}>
+//  <*HEAP*_l_24[PHI1][PHI2]-R-MAY-{PHI1==0, PHI2==i, j==2,
+//    Alast<=Anext, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <w2-R-EXACT-{}>
+
+
+      if (w2[0][i]==0) {
+         // BEGIN BLOCK
+
+//  <*HEAP*_l_24[PHI1]-R-MAY-{PHI1==0, j==2, Alast<=Anext, 0<=i,
+//    i+1<=nodes}>
+//  <*HEAP*_l_24[PHI1][PHI2]-W-MAY-{PHI1==0, PHI2==i, j==2,
+//    Alast<=Anext, 0<=i, i+1<=nodes}>
+//  <w2-R-EXACT-{}>
+
+         w2[0][i] = 1;
+
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Alast<=Anext, 0<=i,
+//    i+1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].first-W-MAY-{PHI1==0, PHI2==i, j==2,
+//    Alast<=Anext, 0<=i, i+1<=nodes}>
+//  <w1-R-EXACT-{}>
+
+         w1[0][i].first = 0.0;
+
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Alast<=Anext, 0<=i,
+//    i+1<=nodes, 1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].second-W-MAY-{PHI1==0, PHI2==i, j==2,
+//    Alast<=Anext, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <w1-R-EXACT-{}>
+
+         w1[0][i].second = 0.0;
+
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Alast<=Anext, 0<=i,
+//    i+1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].third-W-MAY-{PHI1==0, PHI2==i, j==2,
+//    Alast<=Anext, 0<=i, i+1<=nodes}>
+//  <w1-R-EXACT-{}>
+
+         w1[0][i].third = 0.0;
+         // END BLOCK
+      }
+
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Alast<=Anext, 0<=i,
+//    i+1<=nodes}>
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Alast<=Anext, 0<=i,
+//    i+1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].first-R-MAY-{PHI1==0, PHI2==i, j==2,
+//    Alast<=Anext, 0<=i, i+1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].first-W-MAY-{PHI1==0, PHI2==i, j==2,
+//    Alast<=Anext, 0<=i, i+1<=nodes}>
+//  <w1-R-EXACT-{}>
+
+
+      w1[0][i].first += sum0;
+
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Alast<=Anext, 0<=i,
+//    i+1<=nodes, 1<=nodes}>
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Alast<=Anext, 0<=i,
+//    i+1<=nodes, 1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].second-R-MAY-{PHI1==0, PHI2==i, j==2,
+//    Alast<=Anext, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].second-W-MAY-{PHI1==0, PHI2==i, j==2,
+//    Alast<=Anext, 0<=i, i+1<=nodes, 1<=nodes}>
+//  <w1-R-EXACT-{}>
+
+      w1[0][i].second += sum1;
+
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Alast<=Anext, 0<=i,
+//    i+1<=nodes}>
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==0, j==2, Alast<=Anext, 0<=i,
+//    i+1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].third-R-MAY-{PHI1==0, PHI2==i, j==2,
+//    Alast<=Anext, 0<=i, i+1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].third-W-MAY-{PHI1==0, PHI2==i, j==2,
+//    Alast<=Anext, 0<=i, i+1<=nodes}>
+//  <w1-R-EXACT-{}>
+
+      w1[0][i].third += sum2;
+      // END BLOCK
+   }
+   
+   
+   
+   for(i = 0; i <= nodes-1; i += 1)
+      for(j = 0; j <= 1; j += 1)
+
+//  <*HEAP*_l_24[PHI1]-R-MAY-{PHI1==j, 0<=i, i+1<=nodes, 0<=j, j<=1}>
+//  <*HEAP*_l_24[PHI1][PHI2]-R-MAY-{PHI1==j, PHI2==i, 0<=i,
+//    i+1<=nodes, 0<=j, j<=1}>
+//  <w2-R-EXACT-{}>
+
+         if (w2[j][i]) {
+            // BEGIN BLOCK
+
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==j, 0<=i, i+1<=nodes, 0<=j, j<=1}>
+//  <*HEAP*_l_23[PHI1][PHI2].first-R-MAY-{PHI1==j, PHI2==i, 0<=i,
+//    i+1<=nodes, 0<=j, j<=1}>
+//  <_w_6[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==0, 0<=i, i+1<=nodes,
+//    0<=j, j<=1}>
+//  <_w_6[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==0, 0<=i, i+1<=nodes,
+//    0<=j, j<=1}>
+//  <w-R-EXACT-{}>
+//  <w1-R-EXACT-{}>
+
+            w[i][0] += w1[j][i].first;
+
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==j, 0<=i, i+1<=nodes, 0<=j, j<=1}>
+//  <*HEAP*_l_23[PHI1][PHI2].second-R-MAY-{PHI1==j, PHI2==i, 0<=i,
+//    i+1<=nodes, 0<=j, j<=1}>
+//  <_w_6[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==1, 0<=i, i+1<=nodes,
+//    0<=j, j<=1}>
+//  <_w_6[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==1, 0<=i, i+1<=nodes,
+//    0<=j, j<=1}>
+//  <w-R-EXACT-{}>
+//  <w1-R-EXACT-{}>
+
+            w[i][1] += w1[j][i].second;
+
+//  <*HEAP*_l_23[PHI1]-R-MAY-{PHI1==j, 0<=i, i+1<=nodes, 0<=j, j<=1,
+//    1<=nodes}>
+//  <*HEAP*_l_23[PHI1][PHI2].third-R-MAY-{PHI1==j, PHI2==i, 0<=i,
+//    i+1<=nodes, 0<=j, j<=1, 1<=nodes}>
+//  <_w_6[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==2, 0<=i, i+1<=nodes,
+//    0<=j, j<=1, 1<=nodes}>
+//  <_w_6[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==2, 0<=i, i+1<=nodes,
+//    0<=j, j<=1, 1<=nodes}>
+//  <w-R-EXACT-{}>
+//  <w1-R-EXACT-{}>
+
+            w[i][2] += w1[j][i].third;
+            // END BLOCK
+         }
+   return;
+   // END BLOCK
+}

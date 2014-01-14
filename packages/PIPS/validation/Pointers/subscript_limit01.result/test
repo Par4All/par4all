@@ -1,0 +1,50 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   int *p = (int *) malloc(10*sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_5[0] , MAY
+
+   for(i = 0; i <= 9; i += 1)
+
+// Points To:
+// p -> *HEAP*_l_5[*] , MAY
+// p -> *HEAP*_l_5[0] , MAY
+// p -> *HEAP*_l_5[1] , MAY
+// p -> *HEAP*_l_5[2] , MAY
+// p -> *HEAP*_l_5[3] , MAY
+// p -> *HEAP*_l_5[4] , MAY
+// p -> *HEAP*_l_5[5] , MAY
+// p -> *HEAP*_l_5[6] , MAY
+
+      *p++ = 0;
+
+// Points To:
+// p -> *HEAP*_l_5[*] , MAY
+// p -> *HEAP*_l_5[0] , MAY
+// p -> *HEAP*_l_5[1] , MAY
+// p -> *HEAP*_l_5[2] , MAY
+// p -> *HEAP*_l_5[3] , MAY
+// p -> *HEAP*_l_5[4] , MAY
+// p -> *HEAP*_l_5[5] , MAY
+// p -> *HEAP*_l_5[6] , MAY
+
+
+   return 0;
+}

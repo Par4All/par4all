@@ -695,7 +695,13 @@ _GL_CXXALIASWARN (gets);
 /* It is very rare that the developer ever has full control of stdin,
    so any use of gets warrants an unconditional warning.  Assume it is
    always declared, since it is required by C89.  */
-_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");
+
+/* Ronan Keryell: skip this since it makes the compilation fail with
+   modern libc. On the other hand, simply upgrading this gnulib makes the
+   compilation to fail at CRI...
+
+//_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");
+*/
 #endif
 
 

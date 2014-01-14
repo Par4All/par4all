@@ -1,7 +1,18 @@
+/* Try casts
+ *
+ * We have a problem because we want all points-to information to be
+ * proprely typed. The bucket allocated for "toto" is identified as an
+ * arry of double elements. But "toto" is a "void *" and won't carry
+ * the previous information explicitly. Furthermore, the bucket is
+ * casted as a 2-D array of double elements.
+ *
+ * We could refuse the cast and return an anywhere cell for toto. Or
+ * we should check the compatibility between the cast type and the
+ * type of the cell pointed to by "toto".
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
-
-/* Try casts*/
 
 int main(int argc, char** argv){
   int a_d1, a_d2;
@@ -21,7 +32,6 @@ int main(int argc, char** argv){
 
   free(toto);
 
-
   a_d1=a_d2=10;
   toto = malloc(sizeof(double)*(a_d1*a_d2));
 
@@ -32,7 +42,6 @@ int main(int argc, char** argv){
   }
 
   free(toto);
-
 
   return 0;
 }

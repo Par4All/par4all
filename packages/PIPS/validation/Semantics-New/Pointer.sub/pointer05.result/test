@@ -1,0 +1,171 @@
+
+Points-to
+
+
+// Points To IN:
+// _tab_1[0] -> *NULL* , MAY
+// _tab_1[0] -> _tab_1_1[0][0] , MAY
+// tab -> *NULL* , MAY
+// tab -> _tab_1[0] , MAY
+
+
+// Points To OUT:
+// _tab_1[0] -> *NULL* , MAY
+// _tab_1[0] -> _tab_1_1[0][0] , MAY
+// tab -> _tab_1[0] , EXACT
+
+void foo(int **tab)
+{
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// _tab_1[0] -> *NULL* , MAY
+// _tab_1[0] -> _tab_1_1[0][0] , MAY
+// p -> undefined , EXACT
+// tab -> *NULL* , MAY
+// tab -> _tab_1[0] , MAY
+
+   p = *tab;
+
+// Points To:
+// _tab_1[0] -> *NULL* , MAY
+// _tab_1[0] -> _tab_1_1[0][0] , MAY
+// p -> *NULL* , MAY
+// p -> _tab_1_1[0][0] , MAY
+// tab -> _tab_1[0] , EXACT
+
+   p = p;
+}
+
+PROPER  EFFECTS
+
+void foo(int **tab)
+{
+   int *p;
+//             <    is read   >: _tab_1[0] tab
+//             <    is written>: p
+   p = *tab;
+//             <    is read   >: p
+//             <    is written>: p
+   p = p;
+}
+void main()
+{
+   int i, *p, **pp;
+//             <    is written>: i
+   i = 0;
+//             <    is written>: p
+   p = &i;
+//             <    is written>: pp
+   pp = &p;
+//             <    is read   >: p pp
+
+   foo(pp);
+}
+
+Transformers with point-to
+
+
+//  T() {}
+
+void foo(int **tab)
+{
+
+//  T(p) {}
+
+   int *p;
+
+//  T(p) {}
+
+   p = *tab;
+
+//  T(p) {p==p#init}
+
+   p = p;
+}
+
+//  T() {}
+
+void main()
+{
+
+//  T(i,p,pp) {}
+
+   int i, *p, **pp;
+
+//  T(i) {i==0}
+
+   i = 0;
+
+//  T(p) {&i==p, i==0}
+
+   p = &i;
+
+//  T(pp) {&i==p, &p==pp, i==0}
+
+   pp = &p;
+
+//  T() {&i==p, &p==pp, i==0}
+
+
+   foo(pp);
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+void main()
+{
+
+//  P() {}
+
+   int i, *p, **pp;
+
+//  P(i,p,pp) {}
+
+   i = 0;
+
+//  P(i,p,pp) {i==0}
+
+   p = &i;
+
+//  P(i,p,pp) {&i==p, i==0}
+
+   pp = &p;
+
+//  P(i,p,pp) {&i==p, &p==pp, i==0}
+
+
+   foo(pp);
+}
+
+//  P() {}
+
+void foo(int **tab)
+{
+
+//  P() {}
+
+   int *p;
+
+//  P(p) {}
+
+   p = *tab;
+
+//  P(p) {}
+
+   p = p;
+}
+
+Warnings
+
+C_PARSER[main] (c_parse) The "main" function should return an int value
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[foo] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[foo] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[foo] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[foo] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer

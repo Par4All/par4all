@@ -1,0 +1,85 @@
+
+Transformers for multiply06
+
+
+//  T(multiply06) {}
+
+int multiply06(int i, int j, int N)
+{
+
+//  T(k,l,m,n) {}
+
+   int k, l, m, n;
+
+//  T(k,l) {k==l-1, 0<=i+k+2, i<=k+2, 0<=k}
+
+
+   if (i*i>2) {
+
+//  T(k) {0<=i+k, i<=k}
+
+      k = i*i;
+
+//  T(l) {k==l-1, 0<=i+k, i<=k}
+
+      l = k+1;
+   }
+   else {
+
+//  T(k) {0<=i+2, i<=2, 0<=k, k<=4}
+
+      k = i*i;
+
+//  T(l) {k==l-1, 0<=i+2, i<=2, 0<=k, k<=4}
+
+      l = k+1;
+   }
+
+//  T(multiply06) {k==l-1, 2k+m+n==multiply06-1, 0<=i+k+2, i<=k+2,
+//    0<=k}
+
+
+   return k+l+m+n;
+}
+
+Preconditions for multiply06
+
+
+//  P() {}
+
+int multiply06(int i, int j, int N)
+{
+
+//  P() {}
+
+   int k, l, m, n;
+
+//  P(k,l,m,n) {}
+
+
+   if (i*i>2) {
+
+//  P(k,l,m,n) {}
+
+      k = i*i;
+
+//  P(k,l,m,n) {0<=i+k, i<=k}
+
+      l = k+1;
+   }
+   else {
+
+//  P(k,l,m,n) {0<=i+2, i<=2}
+
+      k = i*i;
+
+//  P(k,l,m,n) {0<=i+2, i<=2, 0<=k, k<=4}
+
+      l = k+1;
+   }
+
+//  P(k,l,m,n) {k==l-1, 0<=i+k+2, i<=k+2, 0<=k}
+
+
+   return k+l+m+n;
+}

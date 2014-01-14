@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2012 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of Linear/C3 Library.
 
@@ -550,6 +550,12 @@ int ofl_ctrl;
 
     assert(!SC_UNDEFINED_P(sc));
 
+    /* FI/CA: in case the overflow must be handled by this function,
+       the function should catch it and remove the constraint that
+       generate the overflow. If this is ever implemented,
+       sc_normalize2() should be simplified by delegating overflow
+       control to this function. */
+
     for(eq = sc_egalites(sc); !CONTRAINTE_UNDEFINED_P(eq);
 	eq = contrainte_succ(eq)){
       if (eq!=def) /* skip if aliased! */
@@ -724,57 +730,55 @@ alarm(0);
  * modifies :
  * comment  :
  */
-Psysteme sc_projection_on_variables(sc,index_base,pv)
-Psysteme sc;
-Pbase index_base;
-Pvecteur pv;
+Psysteme sc_projection_on_variables(
+  Psysteme sc,
+  Pbase index_base,
+  Pvecteur pv)
 {
-    Pvecteur lvar_proj;
-    Psysteme sc1=sc_init_with_sc(sc);
-    /* Automatic variables read in a CATCH block need to be declared volatile as
-     * specified by the documentation*/
-    Psysteme volatile sc2;
-    Variable var;
+  Pvecteur lvar_proj;
+  Psysteme sc1 = sc_init_with_sc(sc);
+  // Automatic variables read in a CATCH block need to be declared volatile as
+  // specified by the documentation
+  volatile Psysteme sc2;
+  Variable var;
 
-    if (!VECTEUR_NUL_P(pv)) {
-        Pvecteur pv1;
-	/* Automatic variables read in a CATCH block need to be declared volatile as
-	 * specified by the documentation*/
-        Pvecteur volatile pv2;
-        lvar_proj = vect_copy(pv);
-	for (pv1 = index_base;!VECTEUR_NUL_P(pv1); pv1=pv1->succ) {
+  if (!VECTEUR_NUL_P(pv))
+  {
+    volatile Pvecteur pv1, pv2;
+    lvar_proj = vect_copy(pv);
+    for (pv1 = index_base;!VECTEUR_NUL_P(pv1); pv1=pv1->succ) {
 	    sc2 = sc_copy(sc);
 	    var = vecteur_var(pv1);
 	    vect_erase_var(&lvar_proj,var);
 	    for (pv2 = lvar_proj;!VECTEUR_NUL_P(pv2); pv2=pv2->succ) {
 
-		CATCH(overflow_error) {
-		    sc_elim_var(sc2, vecteur_var(pv2));
-		}
-		TRY {
-		    sc_projection_along_variable_ofl_ctrl
-		    (&sc2,vecteur_var(pv2), NO_OFL_CTRL);
-		    UNCATCH(overflow_error);
-		}
-		sc2 = sc_normalize(sc2);
-		if (SC_EMPTY_P(sc2)) {
-		    sc2 = sc_empty(base_copy(sc->base));
-		    break;
-		}
-		else {
-		    build_sc_nredund_1pass(&sc2);
-		}
+        CATCH(overflow_error) {
+          sc_elim_var(sc2, vecteur_var(pv2));
+        }
+        TRY {
+          sc_projection_along_variable_ofl_ctrl
+            (&sc2,vecteur_var(pv2), NO_OFL_CTRL);
+          UNCATCH(overflow_error);
+        }
+        sc2 = sc_normalize(sc2);
+        if (SC_EMPTY_P(sc2)) {
+          sc2 = sc_empty(base_copy(sc->base));
+          break;
+        }
+        else {
+          build_sc_nredund_1pass(&sc2);
+        }
 	    }
 	    vect_chg_coeff(&lvar_proj, var, VALUE_ONE);
 	    sc1 = sc_intersection(sc1,sc1,sc2);
 	    sc1 = sc_normalize(sc1);
 	    if (SC_EMPTY_P(sc1)) {
-		sc1 = sc_empty(base_copy(sc->base));
-		break;
+        sc1 = sc_empty(base_copy(sc->base));
+        break;
 	    }
-	}
     }
-    return(sc1);
+  }
+  return sc1;
 }
 
 
@@ -962,22 +966,20 @@ int ofl_ctrl;
 
 
 
-Psysteme sc_projection_optim_along_vecteur(Psysteme sc,
-					   Pvecteur pv)
+Psysteme sc_projection_optim_along_vecteur(volatile Psysteme sc, Pvecteur pv)
 {
-    CATCH(overflow_error) {
-	/* sc_rm(sc1); */
-        return sc;
-    }
-    TRY {
-        Psysteme sc1 = sc_copy(sc);
-	bool exact = true;
-	sc1 = sc_projection_ofl_along_variables_with_test(sc1,pv,&exact);
-	sc_rm(sc);
-	UNCATCH(overflow_error);
-	return sc1;
-
-    }
+  CATCH(overflow_error) {
+    /* sc_rm(sc1); */
+    return sc;
+  }
+  TRY {
+    Psysteme sc1 = sc_copy(sc);
+    bool exact = true;
+    sc1 = sc_projection_ofl_along_variables_with_test(sc1,pv,&exact);
+    sc_rm(sc);
+    UNCATCH(overflow_error);
+    return sc1;
+  }
 }
 
 

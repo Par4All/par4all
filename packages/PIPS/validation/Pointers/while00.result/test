@@ -42,32 +42,32 @@ int main()
    int *a, *b, c, d;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a -> undefined , EXACT
+// b -> undefined , EXACT
 
    c = 0;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a -> undefined , EXACT
+// b -> undefined , EXACT
 
    d = 1;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a -> undefined , EXACT
+// b -> undefined , EXACT
 
    b = &c;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a -> undefined , EXACT
 // b -> c , EXACT
 
 
    while (c>0) {
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a -> undefined , MAY
 // a -> c , MAY
 // a -> d , MAY
 // b -> c , MAY
@@ -85,7 +85,7 @@ int main()
    }
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a -> undefined , MAY
 // a -> c , MAY
 // a -> d , MAY
 // b -> c , MAY
@@ -95,7 +95,7 @@ int main()
    b = &c;
 
 // Points To:
-// a -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// a -> undefined , MAY
 // a -> c , MAY
 // a -> d , MAY
 // b -> c , EXACT

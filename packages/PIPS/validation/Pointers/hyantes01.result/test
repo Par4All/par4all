@@ -1,0 +1,36 @@
+
+Points-to for "read_towns"
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// read_towns.data -> *HEAP*_l_16[0] , MAY
+
+towns read_towns(const  char fname[])
+{
+
+// Points To: none
+
+   towns the_towns = {1, malloc(sizeof(town))};
+
+// Points To:
+// the_towns.data -> *HEAP*_l_16[0] , MAY
+
+   return the_towns;
+}
+
+Cumulated effects for "read_towns"
+
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+towns read_towns(const  char fname[])
+{
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: the_towns.data the_towns.nb 
+//                               _MALLOC_EFFECTS:_MALLOC_
+   towns the_towns = {1, malloc(sizeof(town))};
+//             <    is read   >: the_towns.data the_towns.nb
+   return the_towns;
+}

@@ -1,0 +1,29 @@
+setenv WS=se_test_false
+delete $WS
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setenv PIPS_CPP_FLAGS " -D TIME "
+
+create $WS $WS.c
+activate C_PARSER
+activate REGION_CHAINS
+activate MUST_REGIONS
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE
+setproperty SEMANTICS_FILTER_INITIAL_VALUES TRUE
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE 
+
+apply LOOP_NORMALIZE[%ALLFUNC]
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
+
+apply PATH_TRANSFORMER[main]
+shell cat $WS.database/main/main.pt
+
+close
+delete $WS
+quit
+

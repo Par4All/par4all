@@ -14,4 +14,5 @@ int main()
   i = clone01(i,-1);
   i = clone01(i,1);
   i = clone01(i,0);
+  return i;
 }

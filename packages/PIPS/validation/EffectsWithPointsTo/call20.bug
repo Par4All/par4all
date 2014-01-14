@@ -1,0 +1,7 @@
+The equations or the implementation for free in an interprocedural setting give wrong result with the currrent heap model. 
+
+After the first pointer_free(), p1 is undefined, but p2 and p3 might as well be undefined.
+
+Apparently, it is an interprocedural issue. If a free is detected, its effect must be propagated in pt_caller, beyond translation(pt_out).
+
+OK, things might be slightly easier with a list of freed  buckets.

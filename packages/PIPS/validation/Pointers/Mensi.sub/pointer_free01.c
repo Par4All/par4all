@@ -1,4 +1,9 @@
+/* Example for Section 1.2.5, liberation d'une zone memoire, chapitre
+ * interprocedural. 
+ */
+
 #include<stdlib.h>
+
 typedef int * pointer;
 
 void pointer_free(pointer p)
@@ -14,5 +19,5 @@ int main(void)
   p2 = p1;
   pointer_free(p1);
 
-  return;
+  return 0;
 }

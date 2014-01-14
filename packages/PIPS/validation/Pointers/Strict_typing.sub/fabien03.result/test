@@ -3,21 +3,22 @@ POINTS-TO
 
 
 // Points To IN:
-// _p_1.n -> *NULL_POINTER* , MAY
+// _p_1.n -> *NULL* , MAY
 // _p_1.n -> _p_1_2__1 , MAY
-// _p_1_2__1.n -> *NULL_POINTER* , MAY
+// _p_1_2__1.n -> *NULL* , MAY
 // _p_1_2__1.n -> _p_1_2__1 , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
 
 
 // Points To OUT:
-// *HEAP*_l_30.n -> *NULL_POINTER* , MAY
-// _p_1.n -> *NULL_POINTER* , MAY
+// _p_1.n -> *NULL* , MAY
 // _p_1.n -> _p_1_2__1 , MAY
-// _p_1_2__1.n -> *NULL_POINTER* , MAY
+// _p_1_2__1.n -> *NULL* , MAY
 // _p_1_2__1.n -> _p_1_2__1 , MAY
-// reverse_copy -> *NULL_POINTER* , EXACT
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
+// reverse_copy -> *NULL* , EXACT
 
 rec reverse_copy(rec p)
 {
@@ -27,91 +28,89 @@ rec reverse_copy(rec p)
    rec r = (void *) 0;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
-// r -> *NULL_POINTER* , EXACT
+// r -> *NULL* , EXACT
 
    rec q = p;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _p_1 , MAY
-// r -> *NULL_POINTER* , EXACT
+// r -> *NULL* , EXACT
 
    while (q!=(void *) 0) {
 
 // Points To:
-// *HEAP*_l_30.n -> *NULL_POINTER* , MAY
-// _p_1.n -> *NULL_POINTER* , MAY
+// _p_1.n -> *NULL* , MAY
 // _p_1.n -> _p_1_2__1 , MAY
-// _p_1_2__1.n -> *NULL_POINTER* , MAY
+// _p_1_2__1.n -> *NULL* , MAY
 // _p_1_2__1.n -> _p_1_2__1 , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
 // q -> _p_1 , MAY
 // q -> _p_1_2__1 , MAY
-// r -> *NULL_POINTER* , EXACT
+// r -> *NULL* , EXACT
 
       rec t = (rec) malloc(sizeof(struct rec_st ));
 
 // Points To:
-// *HEAP*_l_30.n -> *NULL_POINTER* , MAY
-// _p_1.n -> *NULL_POINTER* , MAY
+// *HEAP*_l_30.n -> undefined , EXACT
+// _p_1.n -> *NULL* , MAY
 // _p_1.n -> _p_1_2__1 , MAY
-// _p_1_2__1.n -> *NULL_POINTER* , MAY
+// _p_1_2__1.n -> *NULL* , MAY
 // _p_1_2__1.n -> _p_1_2__1 , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
 // q -> _p_1 , MAY
 // q -> _p_1_2__1 , MAY
-// r -> *NULL_POINTER* , EXACT
+// r -> *NULL* , EXACT
 // t -> *HEAP*_l_30 , MAY
 
       t->i = q->i;
 
 // Points To:
-// *HEAP*_l_30.n -> *NULL_POINTER* , MAY
-// _p_1.n -> *NULL_POINTER* , MAY
+// *HEAP*_l_30.n -> undefined , EXACT
+// _p_1.n -> *NULL* , MAY
 // _p_1.n -> _p_1_2__1 , MAY
-// _p_1_2__1.n -> *NULL_POINTER* , MAY
+// _p_1_2__1.n -> *NULL* , MAY
 // _p_1_2__1.n -> _p_1_2__1 , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
 // q -> _p_1 , MAY
 // q -> _p_1_2__1 , MAY
-// r -> *NULL_POINTER* , EXACT
+// r -> *NULL* , EXACT
 // t -> *HEAP*_l_30 , MAY
 
       t->n = r;
 
 // Points To:
-// *HEAP*_l_30.n -> *NULL_POINTER* , MAY
-// _p_1.n -> *NULL_POINTER* , MAY
+// *HEAP*_l_30.n -> *NULL* , MAY
+// _p_1.n -> *NULL* , MAY
 // _p_1.n -> _p_1_2__1 , MAY
-// _p_1_2__1.n -> *NULL_POINTER* , MAY
+// _p_1_2__1.n -> *NULL* , MAY
 // _p_1_2__1.n -> _p_1_2__1 , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
 // q -> _p_1 , MAY
 // q -> _p_1_2__1 , MAY
-// r -> *NULL_POINTER* , EXACT
+// r -> *NULL* , EXACT
 // t -> *HEAP*_l_30 , MAY
 
       q = q->n;
    }
 
 // Points To:
-// *HEAP*_l_30.n -> *NULL_POINTER* , MAY
-// _p_1.n -> *NULL_POINTER* , MAY
+// _p_1.n -> *NULL* , MAY
 // _p_1.n -> _p_1_2__1 , MAY
-// _p_1_2__1.n -> *NULL_POINTER* , MAY
+// _p_1_2__1.n -> *NULL* , MAY
 // _p_1_2__1.n -> _p_1_2__1 , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_1 , MAY
-// q -> *NULL_POINTER* , EXACT
-// r -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
+// r -> *NULL* , EXACT
 
    return r;
 }

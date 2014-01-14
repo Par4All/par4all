@@ -29,7 +29,7 @@ int main()
          k--;
       }
 
-//  T(j) {j==j#init}
+//  T(j) {j==j#init, 0<=i+1, i<=1}
 
    j = j;
 }
@@ -64,7 +64,7 @@ int main()
          k--;
       }
 
-//  P(i,j,k) {2<=j, j<=3}
+//  P(i,j,k) {0<=i+1, i<=1, 2<=j, j<=3}
 
    j = j;
 }

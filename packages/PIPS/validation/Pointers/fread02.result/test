@@ -46,42 +46,43 @@ int main()
    FILE *fp;
 
 // Points To:
-// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fp -> undefined , EXACT
 
    size_t n;
 
 // Points To:
-// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fp -> undefined , EXACT
 
    char buf[200];
 
 // Points To:
-// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fp -> undefined , EXACT
 
    fp = fopen("file.txt", "rb");
 
 // Points To:
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp -> *NULL* , MAY
+// fp -> __IO_EFFECTS:IO_FILES[*] , MAY
 
    n = fread(&buf[0], sizeof(double), 50, fp);
 
 // Points To:
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp -> __IO_EFFECTS:IO_FILES[*] , MAY
 
    if (n==-1)
 
 // Points To:
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp -> __IO_EFFECTS:IO_FILES[*] , MAY
 
       printf("fread failed");
 
 // Points To:
-// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp -> __IO_EFFECTS:IO_FILES[*] , MAY
 
    fclose(fp);
 
 // Points To:
-// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fp -> undefined , EXACT
 
    return 0;
 }

@@ -1,0 +1,128 @@
+
+Points-to for "conditional_free03"
+
+
+// Points To IN:
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
+
+
+// Points To OUT:
+// p -> undefined , MAY
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
+
+int conditional_free03(int *p, _Bool c1)
+{
+
+// Points To:
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
+
+   int *q = p;
+
+// Points To:
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
+// q -> *NULL* , MAY
+// q -> _p_1 , MAY
+
+
+   if (c1)
+
+// Points To:
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
+// q -> *NULL* , MAY
+// q -> _p_1 , MAY
+
+      free(p);
+
+// Points To:
+// p -> undefined , MAY
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
+// q -> undefined , MAY
+// q -> *NULL* , MAY
+// q -> _p_1 , MAY
+
+
+   return *q;
+}
+
+Proper effects with points-to for "conditional_free03"
+
+int conditional_free03(int *p, _Bool c1)
+{
+//             <    is read   >: p
+//             <    is written>: q
+   int *q = p;
+//             <    is read   >: c1
+
+   if (c1)
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+      free(p);
+//             <    is read   >: _p_1 q
+
+   return *q;
+}
+
+Cumulated effects with points-to for "conditional_free03"
+
+//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: _p_1 c1 p
+int conditional_free03(int *p, _Bool c1)
+{
+//             <    is read   >: p
+//             <    is written>: q
+   int *q = p;
+//             <may be read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: c1
+
+   if (c1)
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+      free(p);
+//             <    is read   >: _p_1 q
+
+   return *q;
+}
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p = (int *) malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_17 , MAY
+
+   (void) conditional_free03(p, 0);
+
+// Points To:
+// p -> *HEAP*_l_17 , MAY
+// p -> undefined , MAY
+
+   return 0;
+}
+
+Warnigns and errors:
+
+1. Two memory leaks should be indicated? Why?
+
+2. But the current implementation of points_to_function_projection
+does not allow it.
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[conditional_free03] (freed_list_to_points_to) Dangling pointer "q" has been detected at line 10.

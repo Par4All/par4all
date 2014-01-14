@@ -1,0 +1,94 @@
+
+Points-to
+
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T() {}
+
+   BYTE a[10];
+
+//  T(p,q) {}
+
+   P_BYTE p, q;
+
+//  T(q) {}
+
+
+   q = a;
+
+//  T(p) {q+sizeof(unsigned char)==p}
+
+   p = q+1;
+
+//  T() {q+sizeof(unsigned char)==p}
+
+
+   *q = 0;
+
+//  T() {q+sizeof(unsigned char)==p}
+
+   *p = 0;
+
+//  T(main) {main==0, q+sizeof(unsigned char)==p}
+
+
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   BYTE a[10];
+
+//  P() {}
+
+   P_BYTE p, q;
+
+//  P(p,q) {}
+
+
+   q = a;
+
+//  P(p,q) {}
+
+   p = q+1;
+
+//  P(p,q) {q+sizeof(unsigned char)==p}
+
+
+   *q = 0;
+
+//  P(p,q) {q+sizeof(unsigned char)==p}
+
+   *p = 0;
+
+//  P(p,q) {q+sizeof(unsigned char)==p}
+
+
+   return 0;
+}
+
+Warnings
+
+TRANSFORMERS_INTER_FULL[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if q is indirectly NULL
+TRANSFORMERS_INTER_FULL[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL[main] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL[main] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL[main] (have_null_value_in_pointer_expression_p) TODO : Need to check if q is indirectly NULL
+TRANSFORMERS_INTER_FULL[main] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed
+TRANSFORMERS_INTER_FULL[main] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTER_FULL[main] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer

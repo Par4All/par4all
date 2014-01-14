@@ -90,107 +90,107 @@ int main()
    int *pa, *pb, *pc, *pd;
 
 // Points To:
-// pa -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pb -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pc -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pa -> undefined , EXACT
+// pb -> undefined , EXACT
+// pc -> undefined , EXACT
+// pd -> undefined , EXACT
 
    int **ppa, **ppb, **ppc, **ppd;
 
 // Points To:
-// pa -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pb -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pc -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// ppa -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppb -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppc -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppd -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pa -> undefined , EXACT
+// pb -> undefined , EXACT
+// pc -> undefined , EXACT
+// pd -> undefined , EXACT
+// ppa -> undefined , EXACT
+// ppb -> undefined , EXACT
+// ppc -> undefined , EXACT
+// ppd -> undefined , EXACT
 
    a = 1;
 
 // Points To:
-// pa -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pb -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pc -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// ppa -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppb -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppc -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppd -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pa -> undefined , EXACT
+// pb -> undefined , EXACT
+// pc -> undefined , EXACT
+// pd -> undefined , EXACT
+// ppa -> undefined , EXACT
+// ppb -> undefined , EXACT
+// ppc -> undefined , EXACT
+// ppd -> undefined , EXACT
 
    b = 2;
 
 // Points To:
-// pa -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pb -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pc -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// ppa -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppb -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppc -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppd -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pa -> undefined , EXACT
+// pb -> undefined , EXACT
+// pc -> undefined , EXACT
+// pd -> undefined , EXACT
+// ppa -> undefined , EXACT
+// ppb -> undefined , EXACT
+// ppc -> undefined , EXACT
+// ppd -> undefined , EXACT
 
    c = 3;
 
 // Points To:
-// pa -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pb -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pc -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// ppa -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppb -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppc -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppd -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pa -> undefined , EXACT
+// pb -> undefined , EXACT
+// pc -> undefined , EXACT
+// pd -> undefined , EXACT
+// ppa -> undefined , EXACT
+// ppb -> undefined , EXACT
+// ppc -> undefined , EXACT
+// ppd -> undefined , EXACT
 
    d = 4;
 
 // Points To:
-// pa -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pb -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pc -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// ppa -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppb -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppc -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppd -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pa -> undefined , EXACT
+// pb -> undefined , EXACT
+// pc -> undefined , EXACT
+// pd -> undefined , EXACT
+// ppa -> undefined , EXACT
+// ppb -> undefined , EXACT
+// ppc -> undefined , EXACT
+// ppd -> undefined , EXACT
 
 
    pa = &a;
 
 // Points To:
 // pa -> a , EXACT
-// pb -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pc -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// ppa -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppb -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppc -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppd -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pb -> undefined , EXACT
+// pc -> undefined , EXACT
+// pd -> undefined , EXACT
+// ppa -> undefined , EXACT
+// ppb -> undefined , EXACT
+// ppc -> undefined , EXACT
+// ppd -> undefined , EXACT
 
    ppa = &pa;
 
 // Points To:
 // pa -> a , EXACT
-// pb -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pc -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pb -> undefined , EXACT
+// pc -> undefined , EXACT
+// pd -> undefined , EXACT
 // ppa -> pa , EXACT
-// ppb -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppc -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppd -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppb -> undefined , EXACT
+// ppc -> undefined , EXACT
+// ppd -> undefined , EXACT
 
    *ppa = &b;
 
 // Points To:
 // pa -> b , EXACT
-// pb -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pc -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pb -> undefined , EXACT
+// pc -> undefined , EXACT
+// pd -> undefined , EXACT
 // ppa -> pa , EXACT
-// ppb -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppc -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppd -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppb -> undefined , EXACT
+// ppc -> undefined , EXACT
+// ppd -> undefined , EXACT
 
 
    pb = &b;
@@ -198,36 +198,36 @@ int main()
 // Points To:
 // pa -> b , EXACT
 // pb -> b , EXACT
-// pc -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pc -> undefined , EXACT
+// pd -> undefined , EXACT
 // ppa -> pa , EXACT
-// ppb -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppc -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppd -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppb -> undefined , EXACT
+// ppc -> undefined , EXACT
+// ppd -> undefined , EXACT
 
    ppb = &pb;
 
 // Points To:
 // pa -> b , EXACT
 // pb -> b , EXACT
-// pc -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pc -> undefined , EXACT
+// pd -> undefined , EXACT
 // ppa -> pa , EXACT
 // ppb -> pb , EXACT
-// ppc -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppd -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppc -> undefined , EXACT
+// ppd -> undefined , EXACT
 
    *ppb = &a;
 
 // Points To:
 // pa -> b , EXACT
 // pb -> a , EXACT
-// pc -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// pd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pc -> undefined , EXACT
+// pd -> undefined , EXACT
 // ppa -> pa , EXACT
 // ppb -> pb , EXACT
-// ppc -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppd -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppc -> undefined , EXACT
+// ppd -> undefined , EXACT
 
 
    pc = &c;
@@ -236,11 +236,11 @@ int main()
 // pa -> b , EXACT
 // pb -> a , EXACT
 // pc -> c , EXACT
-// pd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pd -> undefined , EXACT
 // ppa -> pa , EXACT
 // ppb -> pb , EXACT
-// ppc -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// ppd -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppc -> undefined , EXACT
+// ppd -> undefined , EXACT
 
    ppc = &pc;
 
@@ -248,11 +248,11 @@ int main()
 // pa -> b , EXACT
 // pb -> a , EXACT
 // pc -> c , EXACT
-// pd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pd -> undefined , EXACT
 // ppa -> pa , EXACT
 // ppb -> pb , EXACT
 // ppc -> pc , EXACT
-// ppd -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppd -> undefined , EXACT
 
    *ppc = &a;
 
@@ -260,11 +260,11 @@ int main()
 // pa -> b , EXACT
 // pb -> a , EXACT
 // pc -> a , EXACT
-// pd -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pd -> undefined , EXACT
 // ppa -> pa , EXACT
 // ppb -> pb , EXACT
 // ppc -> pc , EXACT
-// ppd -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppd -> undefined , EXACT
 
 
    pd = &d;
@@ -277,7 +277,7 @@ int main()
 // ppa -> pa , EXACT
 // ppb -> pb , EXACT
 // ppc -> pc , EXACT
-// ppd -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppd -> undefined , EXACT
 
    ppd = &pd;
 

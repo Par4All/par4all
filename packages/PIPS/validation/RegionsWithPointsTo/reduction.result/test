@@ -1,0 +1,344 @@
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(int argc, char *argv[])
+{
+
+// Points To: none
+
+   // BEGIN BLOCK
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   int sum = 0;
+
+// Points To: none
+
+   double A[100];
+
+// Points To: none
+
+
+   for(i = 0; i <= 99; i += 1)
+
+// Points To: none
+
+      A[i] = 1;
+
+// Points To: none
+
+
+#pragma omp parallel for reduction(+:sum)
+   for(i = 0; i <= 99; i += 1)
+
+// Points To: none
+
+      sum = sum+A[i];
+
+// Points To: none
+
+
+   printf("sum = %d\n", sum);
+
+// Points To: none
+
+   return 0;
+   // END BLOCK
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main(int argc, char *argv[])
+{
+   // BEGIN BLOCK
+   int i;
+//             <    is written>: sum
+   int sum = 0;
+   double A[100];
+//             <    is written>: i
+
+   for(i = 0; i <= 99; i += 1)
+//             <    is read   >: i
+//             <    is written>: A[i]
+      A[i] = 1;
+//             <    is written>: i
+
+#pragma omp parallel for reduction(+:sum)
+   for(i = 0; i <= 99; i += 1)
+//             <    is read   >: A[i] i sum
+//             <    is written>: sum
+      sum = sum+A[i];
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout sum __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+   printf("sum = %d\n", sum);
+   return 0;
+   // END BLOCK
+}
+
+CUMULATED EFFECTS WITH POINTS TO
+
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+int main(int argc, char *argv[])
+{
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   // BEGIN BLOCK
+   int i;
+//             <    is written>: sum
+   int sum = 0;
+   double A[100];
+//             <may be written>: A[*]
+//             <    is read   >: i
+//             <    is written>: i
+
+   for(i = 0; i <= 99; i += 1)
+//             <may be written>: A[*]
+//             <    is read   >: i
+      A[i] = 1;
+//             <may be read   >: A[*]
+//             <    is read   >: i sum
+//             <    is written>: i sum
+
+#pragma omp parallel for reduction(+:sum)
+   for(i = 0; i <= 99; i += 1)
+//             <may be read   >: A[*]
+//             <    is read   >: i sum
+//             <    is written>: sum
+      sum = sum+A[i];
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout sum __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+   printf("sum = %d\n", sum);
+   return 0;
+   // END BLOCK
+}
+
+//  T(main) {main==0}
+
+int main(int argc, char *argv[])
+{
+
+//  T(main) {main==0}
+
+   // BEGIN BLOCK
+
+//  T(i) {}
+
+   int i;
+
+//  T(sum) {sum==0}
+
+   int sum = 0;
+
+//  T() {}
+
+   double A[100];
+
+//  T(i) {0<=i, i<=99}
+
+
+   for(i = 0; i <= 99; i += 1)
+
+//  T() {}
+
+      A[i] = 1;
+
+//  T(i,sum) {0<=i, i<=99}
+
+
+#pragma omp parallel for reduction(+:sum)
+   for(i = 0; i <= 99; i += 1)
+
+//  T(sum) {}
+
+      sum = sum+A[i];
+
+//  T() {}
+
+
+   printf("sum = %d\n", sum);
+
+//  T(main) {main==0}
+
+   return 0;
+   // END BLOCK
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int main(int argc, char *argv[])
+{
+
+//  P() {}
+
+   // BEGIN BLOCK
+
+//  P() {}
+
+   int i;
+
+//  P(i) {}
+
+   int sum = 0;
+
+//  P(i,sum) {sum==0}
+
+   double A[100];
+
+//  P(i,sum) {sum==0}
+
+
+   for(i = 0; i <= 99; i += 1)
+
+//  P(i,sum) {sum==0, 0<=i, i<=99}
+
+      A[i] = 1;
+
+//  P(i,sum) {i==100, sum==0}
+
+
+#pragma omp parallel for reduction(+:sum)
+   for(i = 0; i <= 99; i += 1)
+
+//  P(i,sum) {0<=i, i<=99}
+
+      sum = sum+A[i];
+
+//  P(i,sum) {i==100}
+
+
+   printf("sum = %d\n", sum);
+
+//  P(i,sum) {i==100}
+
+   return 0;
+   // END BLOCK
+}
+
+RW regions
+
+int main(int argc, char *argv[])
+{
+   // BEGIN BLOCK
+   int i;
+   int sum = 0;
+   double A[100];
+
+   for(i = 0; i <= 99; i += 1)
+
+//  <A[PHI1]-W-EXACT-{PHI1==i, sum==0, 0<=i, i<=99}>
+
+      A[i] = 1;
+
+#pragma omp parallel for reduction(+:sum)
+   for(i = 0; i <= 99; i += 1)
+
+//  <A[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=99}>
+
+      sum = sum+A[i];
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+
+   printf("sum = %d\n", sum);
+   return 0;
+   // END BLOCK
+}
+
+IN regions
+
+
+//  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==1}>
+
+int main(int argc, char *argv[])
+{
+
+//  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==1}>
+
+   // BEGIN BLOCK
+   int i;
+   int sum = 0;
+   double A[100];
+
+   for(i = 0; i <= 99; i += 1)
+      A[i] = 1;
+
+//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1<=99}>
+
+
+#pragma omp parallel for reduction(+:sum)
+   for(i = 0; i <= 99; i += 1)
+
+//  <A[PHI1]-IN-EXACT-{PHI1==i, 0<=i, i<=99}>
+
+      sum = sum+A[i];
+
+//  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==1}>
+
+
+   printf("sum = %d\n", sum);
+   return 0;
+   // END BLOCK
+}
+
+Privatized regions
+
+int main(int argc, char *argv[])
+{
+   // BEGIN BLOCK
+   int i;
+   int sum = 0;
+   double A[100];
+
+#pragma omp for private(A[100],i)
+   for(i = 0; i <= 99; i += 1)
+
+//  <A[PHI1]-PRIVATE-EXACT-{PHI1==i, sum==0, 0<=i, i<=99}>
+
+
+//  <A[PHI1]-COPYOUT-EXACT-{PHI1==i, sum==0, 0<=i, i<=99}>
+
+      A[i] = 1;
+
+#pragma omp parallel for reduction(+:sum)
+#pragma omp for private(i)
+   for(i = 0; i <= 99; i += 1)
+      sum = sum+A[i];
+
+   printf("sum = %d\n", sum);
+   return 0;
+   // END BLOCK
+}

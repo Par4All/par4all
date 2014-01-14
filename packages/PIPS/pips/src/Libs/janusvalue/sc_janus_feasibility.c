@@ -2,7 +2,7 @@
 
   $Id: sc_janus_feasibility.c 1539 2012-05-31 07:27:03Z maisonneuve $
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 

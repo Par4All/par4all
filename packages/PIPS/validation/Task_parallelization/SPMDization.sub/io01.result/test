@@ -1,0 +1,19 @@
+// MPI style
+int main()
+{
+   {
+      //PIPS generated variable
+      int rank0;
+      //PIPS generated variable
+      MPI_Status status0;
+      //PIPS generated variable
+      MPI_Request request0;
+      MPI_Init(&argc, &argv);
+      MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
+      if (rank0==0)
+         printf("Hello ");
+      if (rank0==0)
+         printf("world!\n");
+   }
+   MPI_Finalize();
+}

@@ -1,4 +1,54 @@
 
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: unreachable
+
+int main()
+{
+
+// Points To: none
+
+   int **x, *y, k, h;
+
+// Points To:
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   k = 1;
+
+// Points To:
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   h = 2;
+
+// Points To:
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
+   y = &h;
+
+// Points To:
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> h , EXACT
+
+   *x = y;
+
+// Points To: unreachable
+
+   printf("x = %p \n", x);
+
+// Points To: unreachable
+
+   return 0;
+}
+
+Proper effects with points-to for "main"
+
 int main()
 {
    int **x, *y, k, h;
@@ -8,12 +58,11 @@ int main()
    h = 2;
 //             <    is written>: y
    y = &h;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: x y
    *x = y;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout x __IO_EFFECTS:LUNS[1]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("x = %p \n", x);
    return 0;
@@ -21,17 +70,7 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	04 --> 07 with conflicts
-		from <k-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	05 --> 07 with conflicts
-		from <h-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	06 --> 07 with conflicts
-		from <y-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	12 --> 13 with conflicts
 		from <y-W-EXACT> to <y-R-EXACT>
-	07 --> 08 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <x-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 
 ****************** End of Dependence Graph ******************

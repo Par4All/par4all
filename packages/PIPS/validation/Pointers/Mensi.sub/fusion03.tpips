@@ -1,0 +1,73 @@
+delete fusion03
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+setproperty POINTS_TO_STRICT_POINTER_TYPES FALSE
+create fusion03 fusion03.c
+
+#setproperty CONSTANT_PATH_EFFECTS FALSE
+
+
+
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[fusion03]
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[fusion03]
+
+echo 
+echo PROPER  EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+#activate PRINT_CODE_PROPER_EFFECTS
+#display PRINTED_FILE[fusion03]
+
+
+echo 
+echo  CUMULATED EFFECTS WITH POINTS TO
+echo
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[fusion03]
+
+
+#echo
+#echo must regions with points-to
+#echo
+
+
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+activate MUST_REGIONS_WITH_POINTS_TO
+#activate PRINT_CODE_PROPER_REGIONS
+#display PRINTED_FILE[fusion03]
+
+echo
+echo Code after loop fusion
+echo
+
+setproperty LOOP_LABEL "l99995"
+#apply FORCE_LOOP_FUSION
+apply LOOP_FUSION
+display PRINTED_FILE[fusion03]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+#shell cc -O3 fusion03.c -o fusion03.database/Tmp/ref
+#shell cc -O3 include/adds.c fusion03.database/Src/fusion03.c -o fusion03.database/Tmp/out
+#shell ./fusion03.database/Tmp/ref include/input.pgm include/mapfile.amp fusion03.database/Tmp/ref.pgm
+#shell ./fusion03.database/Tmp/out include/input.pgm include/mapfile.amp fusion03.database/Tmp/out.pgm
+#shell cmp fusion03.database/Tmp/ref.pgm fusion03.database/Tmp/out.pgm
+
+close
+delete fusion03
+quit
+

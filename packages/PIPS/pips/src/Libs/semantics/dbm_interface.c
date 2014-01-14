@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -320,6 +320,26 @@ bool transformers_inter_full(char * module_name)
     return module_name_to_transformers(module_name);
 }
 
+bool transformers_inter_full_with_points_to(char * module_name)
+{
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, true);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, true);
+    set_bool_property(SEMANTICS_FIX_POINT, true);
+    select_fix_point_operator();
+    set_bool_property(SEMANTICS_STDOUT, false);
+    /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
+
+    init_current_statement_semantic_context();
+    set_pt_to_list( (statement_points_to)
+                               db_get_memory_resource(DBR_POINTS_TO, module_name, true) );
+    bool result = module_name_to_transformers(module_name);
+
+    free_current_statement_semantic_context();
+    reset_pt_to_list();
+
+    return result;
+}
+
 /* Transformer recomputation cannot be of real use unless an
    interprocedural analysis is performed. For intraprocedural analyses,
    using property SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT is
@@ -589,8 +609,15 @@ static transformer ordinary_summary_precondition(const char* module_name,
       /* Try to eliminate (some) redundancy at a reasonnable cost. */
       /* What is a reasonnable cost? */
 
-      /* t = transformer_normalize(t, 2); */
-      t = transformer_normalize(t, 7);
+      t = transformer_normalize(t, 2);
+      /* Level 7 core dumps with
+       * Semantics-New/summary_precondition04.c unless formal
+       * parameter "_c" is renamed... external_value_name is called
+       * when the value mapping hash-tables are not
+       * available. Validations of Semantics and Semantics-new are not
+       * improved by level 7 wrt level 2.
+       */
+      /* t = transformer_normalize(t, 7); */
 
       /* Corinne's best one... for YPENT2 in ARC2D, but be ready to pay
 	 the price! And in case an overflow occurs, you may loose a lot of
@@ -1329,7 +1356,8 @@ transformer load_summary_total_postcondition(entity e)
     return t_post;
 }
 
-
+/* FI->FI, FI->BC: these two functions should be moved into
+   effects-util or effects-simple */
 list load_summary_effects(entity e)
 {
     /* memorization could be used to improve efficiency */
@@ -1341,9 +1369,26 @@ list load_summary_effects(entity e)
 	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_local_name(e),
 			       true));
 
-    pips_assert("load_summary_effects", t != list_undefined);
+    pips_assert("t is defined", t != list_undefined);
 
     return t;
+}
+
+list load_body_effects(entity e)
+{
+  string module_name = (string) module_local_name(e);
+
+    pips_assert("load_summary_effects", entity_module_p(e));
+
+    statement b = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
+    statement_effects se = (statement_effects)
+      db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true);
+    effects be = (effects) (intptr_t)HASH_GET(p, p, statement_effects_hash_table(se), (void *) b);
+    list bel = effects_effects(be);
+
+    pips_assert("bel is defined", bel != list_undefined);
+
+    return bel;
 }
 
 

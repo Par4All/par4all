@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2011 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -47,6 +47,9 @@
 // raw include for opencl code generation
 #define FREIA_OPENCL_CL_INCLUDES                \
   "#include <freia_opencl_runtime.hcl>"
+
+#define FREIA_SIGMAC_INCLUDES                   \
+  "// sigmac includes: not defined yet\n"
 
 // information about OpenCL handling of an operation
 typedef struct {

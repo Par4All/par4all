@@ -49,13 +49,13 @@ int main()
 
 // Points To:
 // p -> x , EXACT
-// q -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
 
    printf("q = %p", q);
 
 // Points To:
 // p -> x , EXACT
-// q -> *NULL_POINTER* , EXACT
+// q -> *NULL* , EXACT
 
    q = p;
 

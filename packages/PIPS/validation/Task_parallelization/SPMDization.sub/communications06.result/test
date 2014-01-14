@@ -1,0 +1,43 @@
+// MPI style
+int main(int argc, char *argv[])
+{
+   {
+      //PIPS generated variable
+      int rank0;
+      //PIPS generated variable
+      MPI_Status status0;
+      //PIPS generated variable
+      MPI_Request request0;
+      //PIPS generated variable
+      int size, a[100], i, bi, j, _rtl_0_0, _rtl_0_0_0;
+      MPI_Init(&argc, &argv);
+      MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
+      if (rank0==0) {
+         scanf("%d", &size);
+         MPI_Isend(&size, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==0) {
+         scanf("%d", &bi);
+         MPI_Isend(&bi, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==0)
+         for(i = 0; i <= bi-1; i += 1)
+            a[i] = i;
+      if (rank0==1) {
+         MPI_Recv(&bi, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         MPI_Recv(&size, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(i = bi; i <= size-1; i += 1)
+            a[i] = i;
+         for(_rtl_0_0_0 = MAX(0, bi); _rtl_0_0_0 <= MIN(99, size-1); _rtl_0_0_0 += 1)
+            MPI_Isend(&a[_rtl_0_0_0], 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &request0);
+      }
+      if (rank0==0) {
+         for(_rtl_0_0 = MAX(0, bi); _rtl_0_0 <= MIN(99, size-1); _rtl_0_0 += 1)
+            MPI_Recv(&a[_rtl_0_0], 1, MPI_INT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, &status0);
+         for(j = 0; j <= size-1; j += 1)
+            printf("%d\n", a[j]);
+      }
+   }
+   MPI_Finalize();
+   return 0;
+}

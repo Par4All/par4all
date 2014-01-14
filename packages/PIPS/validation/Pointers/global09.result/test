@@ -4,7 +4,7 @@ POINTS TO
 
 // Points To IN:
 // pa -> a[0] , EXACT
-// qa -> *NULL_POINTER* , MAY
+// qa -> *NULL* , MAY
 // qa -> _qa_48[0] , MAY
 
 
@@ -23,7 +23,7 @@ int global09()
 // Points To:
 // p -> a[0] , EXACT
 // pa -> a[0] , EXACT
-// qa -> *NULL_POINTER* , MAY
+// qa -> *NULL* , MAY
 // qa -> _qa_48[0] , MAY
 
    qa++;

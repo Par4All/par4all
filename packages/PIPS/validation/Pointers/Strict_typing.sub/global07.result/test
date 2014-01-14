@@ -3,12 +3,12 @@ POINTS TO
 
 
 // Points To IN:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_4 , MAY
 
 
 // Points To OUT:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_4 , MAY
 
 int global07()
@@ -19,18 +19,18 @@ int global07()
    int *q;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_4 , MAY
-// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> undefined , EXACT
 
    
    //q = p_amira;
    q = p;
 
 // Points To:
-// p -> *NULL_POINTER* , MAY
+// p -> *NULL* , MAY
 // p -> _p_4 , MAY
-// q -> *NULL_POINTER* , MAY
+// q -> *NULL* , MAY
 // q -> _p_4 , MAY
 
 

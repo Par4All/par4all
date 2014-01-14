@@ -11,7 +11,7 @@ echo
 echo PROPER  EFFECTS 
 echo
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[main]
 
 
 
@@ -19,14 +19,14 @@ echo
 echo POINTS-TO
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[main]
 
 echo 
-echo PROPER  EFFECTS WITH POINTS TO
+echo PROPER EFFECTS WITH POINTS TO
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[main]
 
 
 close

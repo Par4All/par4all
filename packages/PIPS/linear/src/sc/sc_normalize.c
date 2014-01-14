@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2012 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of Linear/C3 Library.
 
@@ -324,47 +324,48 @@ simplify_constraint_with_bounding_box(Pcontrainte eq,
  * The bounds are assumed initialized to VALUE_MIN and VALUE_MAX.
  *
  */
-static Pvecteur compute_x_and_y_bounds(Pvecteur v,
-				       Pvecteur l, Pvecteur lb, 
-				       Pvecteur u, Pvecteur ub,
-				       Variable * px, Variable * py,
-				       Value * px_min, Value * px_max,
-				       int * pcb)
+static Pvecteur compute_x_and_y_bounds(
+  Pvecteur v,
+  Pvecteur l, Pvecteur lb,
+  Pvecteur u, Pvecteur ub,
+  Variable * px, Variable * py,
+  Value * px_min, Value * px_max,
+  int * pcb)
 {
   Pvecteur vc;
-  Value delta_1 = VALUE_MAX;
-  Value delta_2 = VALUE_MAX;
+  Value delta_1 = VALUE_MAX, delta_2 = VALUE_MAX;
   Variable v_1 = NULL, v_2 = NULL;
   Value a_1 = VALUE_ZERO, a_2 = VALUE_ZERO;
-  Value v_1_min, v_1_max;
-  Value v_2_min, v_2_max;
+  Value
+    v_1_min = VALUE_NAN, v_1_max = VALUE_NAN,
+    v_2_min = VALUE_NAN, v_2_max = VALUE_NAN;
   Value a = VALUE_ZERO, b = VALUE_ZERO, c = VALUE_ZERO;
   Value delta_x = VALUE_MAX;
   Pvecteur nv = VECTEUR_NUL;
 
-  /* Retrieve the coefficients, the variables and their intervals */
+  // Retrieve the coefficients, the variables and their intervals
   for(vc=v; !VECTEUR_UNDEFINED_P(vc); vc=vecteur_succ(vc)) {
     Variable var = vecteur_var(vc);
     if(var!=TCST) {
       if(v_1==NULL) {
-	v_1 = var;
-	a_1 = vecteur_val(vc);
-	if(!value_zero_p(vect_coeff(var,lb))
-	   && !value_zero_p(vect_coeff(var,ub))) {
-	  v_1_min = vect_coeff(var, l);
-	  v_1_max = vect_coeff(var, u);
-	  delta_1 = value_minus(v_1_max, v_1_min);
-	}
+        v_1 = var;
+        a_1 = vecteur_val(vc);
+        if(!value_zero_p(vect_coeff(var,lb))
+           && !value_zero_p(vect_coeff(var,ub))) {
+          v_1_min = vect_coeff(var, l);
+          v_1_max = vect_coeff(var, u);
+          delta_1 = value_minus(v_1_max, v_1_min);
+        }
       }
       else {
-	v_2 = var;
-	a_2 = vecteur_val(vc);
-	if(!value_zero_p(vect_coeff(var,lb))
-	   && !value_zero_p(vect_coeff(var,ub))) {
-	  v_2_min = vect_coeff(var, l);
-	  v_2_max = vect_coeff(var, u);
-	  delta_2 = value_minus(v_2_max, v_2_min);
-	}
+        v_2 = var;
+        a_2 = vecteur_val(vc);
+        if(!value_zero_p(vect_coeff(var,lb))
+           && !value_zero_p(vect_coeff(var,ub))) {
+          v_2_min = vect_coeff(var, l);
+          v_2_max = vect_coeff(var, u);
+          delta_2 = value_minus(v_2_max, v_2_min);
+        }
       }
     }
     else {
@@ -1274,27 +1275,27 @@ small_positive_slope_reduce_coefficients_with_bounding_box(Pvecteur v,
        eliminated earlier with a simpler technique.
     */
     if(value_ge(y_x_min, y_min) && value_le(y_x_min, y_max)) {
-      if(value_lt(y_x_min, y_max)) { 
-	/* The left most point is (x_min, y_x_min) */
-	lmpx = x_min;
-	lmpy = y_x_min;
-	found_p = true;
+      if(value_lt(y_x_min, y_max)) {
+        // The left most point is (x_min, y_x_min)
+        lmpx = x_min;
+        lmpy = y_x_min;
+        found_p = true;
       }
       else {
-	/* The constraint is a redundant tangent */
-	redundant_p = true;
+        // The constraint is a redundant tangent
+        redundant_p = true;
       }
     }
     if(!redundant_p && value_ge(x_y_min, x_min) && value_le(x_y_min, x_max)) {
-      if(value_lt(x_y_min, x_max)) { 
-	/* The left most point is (x_y_min, y_min) */
-	lmpx = x_min;
-	lmpy = y_x_min;
-	found_p = true;
+      if(value_lt(x_y_min, x_max)) {
+        // The left most point is (x_y_min, y_min)
+        lmpx = x_min;
+        lmpy = y_x_min;
+        found_p = true;
       }
       else {
-	/* The constraint is a redundant tangent */
-	redundant_p = true;
+        // The constraint is a redundant tangent
+        redundant_p = true;
       }
     }
     if(!found_p)
@@ -1302,28 +1303,28 @@ small_positive_slope_reduce_coefficients_with_bounding_box(Pvecteur v,
     assert(!redundant_p);
     fprintf(stderr, "lmpx=%d, lmpy=%d\n", (int) lmpx, (int) lmpy);
     if(value_ge(y_x_max, y_min) && value_le(y_x_max, y_max)) {
-      if(value_lt(y_x_max, y_max)) { 
-	/* The right most point is (x_max, y_x_max) */
-	rmpx = x_min;
-	rmpy = y_x_min;
-	found_p = true;
+      if(value_lt(y_x_max, y_max)) {
+        // The right most point is (x_max, y_x_max)
+        rmpx = x_min;
+        rmpy = y_x_min;
+        found_p = true;
       }
       else if(value_lt(y_x_max, y_min)) {
 	/* The constraint is a redundant tangent */
 	redundant_p = true;
       }
     }
-    if(!redundant_p && !found_p
-       && value_ge(x_y_max, x_max) && value_le(x_y_max, x_max)) {
-      if(value_lt(x_y_max, x_max)) { 
-	/* The right most point is (x_y_max, y_max) */
-	rmpx = x_min;
-	rmpy = y_x_min;
-	found_p = true;
+    if (!redundant_p && !found_p
+        && value_ge(x_y_max, x_max) && value_le(x_y_max, x_max)) {
+      if (value_lt(x_y_max, x_max)) {
+        // The right most point is (x_y_max, y_max)
+        rmpx = x_min;
+        rmpy = y_x_min;
+        found_p = true;
       }
       else {
-	/* The constraint is a redundant tangent */
-	redundant_p = true;
+        // The constraint is a redundant tangent
+        redundant_p = true;
       }
     }
     if(!found_p)
@@ -1341,7 +1342,7 @@ small_positive_slope_reduce_coefficients_with_bounding_box(Pvecteur v,
     fprintf(stderr, "rmpx=%d, rmpy=%d\n", (int) rmpx, (int) rmpy);
   }
 
-  if(value_le(value_minus(rmpy,lmpy), VALUE_ZERO)) {
+  if (value_le(value_minus(rmpy,lmpy), VALUE_ZERO)) {
     /* One new horizontal constraint defined by the two vertices lmp
        and rmp: y<=lmpy; test case slope01.c */
     Pvecteur nv = VECTEUR_NUL;
@@ -1350,15 +1351,15 @@ small_positive_slope_reduce_coefficients_with_bounding_box(Pvecteur v,
     ineq = contrainte_make(nv);
     ifscdebug(1) fprintf(stderr, "Case slope01\n");
   }
-  else if(value_le(value_minus(rmpy,lmpy), VALUE_ONE)) {
-    /* There may be one vertex on the left of rmp, lrmp, with a lrmpx
-       + b rmpy <= -c, b rmpy + c <= -ax, lrmpx >= (c + b rmpy -a -1)/(-a) */
+  else if (value_le(value_minus(rmpy,lmpy), VALUE_ONE)) {
+    // There may be one vertex on the left of rmp, lrmp, with a lrmpx
+    //   + b rmpy <= -c, b rmpy + c <= -ax, lrmpx >= (c + b rmpy -a -1)/(-a)
     Value lrmpx =
       value_pdiv(
-		value_plus(c, value_plus(value_mult(b, rmpy),
-					 value_plus(value_uminus(a),
-						    VALUE_MONE))),
-		value_uminus(a));
+        value_plus(c, value_plus(value_mult(b, rmpy),
+                                 value_plus(value_uminus(a),
+                                            VALUE_MONE))),
+        value_uminus(a));
     if(value_gt(lrmpx, lmpx) && value_lt(lrmpx, rmpx)) {
       /* Two constraints defined by (lmp,lrmp) and (lrmp, rmp). test
 	 case slope02.c  */
@@ -1386,7 +1387,7 @@ small_positive_slope_reduce_coefficients_with_bounding_box(Pvecteur v,
        constraints: look for the leftmost and rightmost integer points
        between (lmpx, lmpy) and (rmpx,rmpy) that meet v and are above
        nv, the line between (lmpx,lmpy) and (rmpx,rmpy). Let them be
-       (ilmpx, ilmpy) and (irmpx, irmpy). 
+       (ilmpx, ilmpy) and (irmpx, irmpy).
 
        If ilmpx>irmpx, on constraint is enough, nv, because no
        intermediate points exist.
@@ -2285,6 +2286,8 @@ Psysteme ps;
     /* Eliminate variables linked by a two-term equation. Preserve integer
        information or choose variable with minimal rank in basis b if some
        ambiguity exists. */
+    Psysteme ps_backup = sc_copy(ps);
+    bool failure_p = false;
     for (eq = ps->egalites; (!SC_UNDEFINED_P(ps) && eq != NULL); eq=eq->succ) {
       Pvecteur veq = contrainte_vecteur(eq);
       if(((vect_size(veq)==2) && (vect_coeff(TCST,veq)==VALUE_ZERO))
@@ -2314,15 +2317,37 @@ Psysteme ps;
 	if(VARIABLE_DEFINED_P(v)) {
 	  /* An overflow is unlikely... but it should be handled here
 	     I guess rather than be subcontracted? */
+	  CATCH(overflow_error) 
+	  {
+	    /* The substitution of the variable defined by "eq" by its
+	       value leads to an overflow in one some unknown
+	       constraint of "ps". It might be better to trap the
+	       overflow at a lower level, when you know which
+	       constraint fails because the constraint could be
+	       removed altogether. */
+	    sc_rm(ps); /* */
+	    ps = ps_backup;
+	    failure_p = true;
+	    break;
+	  }
+	  TRY 
+	    {
 	  sc_simple_variable_substitution_with_eq_ofl_ctrl(ps, eq, v, OFL_CTRL);
+	    }
+	  UNCATCH(overflow_error);
 	}
       }
+    }
+    if(!failure_p) {
+      sc_rm(ps_backup);
     }
   }
 
   if (!SC_UNDEFINED_P(ps)) {
     /* Propagate constant definitions, only once although a triangular
        system might require n steps is the equations are in the worse order */
+    Psysteme ps_backup = sc_copy(ps);
+    bool failure_p = false;
     for (eq = ps->egalites; (!SC_UNDEFINED_P(ps) && eq != NULL); eq=eq->succ) {
       Pvecteur veq = contrainte_vecteur(eq);
       if(((vect_size(veq)==1) && (vect_coeff(TCST,veq)==VALUE_ZERO))
@@ -2334,13 +2359,33 @@ Psysteme ps;
 	   || value_mod(vect_coeff(TCST,veq), a)==VALUE_ZERO) {
 	  /* An overflow is unlikely... but it should be handled here
 	     I guess rather than be subcontracted. */
-	  sc_simple_variable_substitution_with_eq_ofl_ctrl(ps, eq, v, OFL_CTRL);
+	  CATCH(overflow_error) 
+	  {
+	    /* The substitution of the variable defined by "eq" by its
+	       value leads to an overflow in one some unknown
+	       constraint of "ps". It might be better to trap the
+	       overflow at a lower level, when you know which
+	       constraint fails because the constraint could be
+	       removed altogether. */
+	    sc_rm(ps); /* */
+	    ps = ps_backup;
+	    failure_p = true;
+	    break;
+	  }
+	  TRY 
+	    {
+	      sc_simple_variable_substitution_with_eq_ofl_ctrl(ps, eq, v, OFL_CTRL);
+	    }
+	  UNCATCH(overflow_error);
 	}
 	else {
 	  sc_rm(ps);
 	  ps = SC_UNDEFINED;
 	}
       }
+    }
+    if(!failure_p) {
+      sc_rm(ps_backup);
     }
 
     ps = sc_elim_double_constraints(ps);

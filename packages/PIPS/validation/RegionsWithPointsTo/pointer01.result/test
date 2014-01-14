@@ -1,0 +1,145 @@
+
+Points-to lists
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   // BEGIN BLOCK
+
+// Points To: none
+
+   int a[1000];
+
+// Points To: none
+
+   int *p = &a[0];
+
+// Points To:
+// p -> a[0] , EXACT
+
+   int i;
+
+// Points To:
+// p -> a[0] , EXACT
+
+
+   for(i = 0; i <= 999; i += 1) {
+
+// Points To:
+// p -> a[*] , MAY
+// p -> a[0] , MAY
+
+      // BEGIN BLOCK
+
+// Points To:
+// p -> a[*] , MAY
+// p -> a[0] , MAY
+
+      p = &a[i];
+
+// Points To:
+// p -> a[*] , MAY
+
+      a[i] = 1;
+
+// Points To:
+// p -> a[*] , MAY
+
+      *p = 0;
+
+// Points To:
+// p -> a[*] , MAY
+
+      a[i]++;
+      // END BLOCK
+   }
+
+// Points To:
+// p -> a[*] , MAY
+// p -> a[0] , MAY
+
+
+   printf("a[0]=%d\n", a[0]);
+   // END BLOCK
+}
+
+Regions
+
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+int main()
+{
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+   // BEGIN BLOCK
+   int a[1000];
+
+//  <p-W-EXACT-{}>
+
+   int *p = &a[0];
+   int i;
+
+//  <a[PHI1]-R-EXACT-{0<=PHI1, PHI1<=999}>
+//  <a[PHI1]-W-MAY-{}>
+//  <p-R-EXACT-{}>
+//  <p-W-EXACT-{}>
+
+
+   for(i = 0; i <= 999; i += 1) {
+
+//  <a[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=999}>
+//  <a[PHI1]-W-MAY-{0<=i, i<=999}>
+//  <p-R-EXACT-{}>
+//  <p-W-EXACT-{}>
+
+      // BEGIN BLOCK
+
+//  <p-W-EXACT-{}>
+
+      p = &a[i];
+
+//  <a[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=999}>
+
+      a[i] = 1;
+
+//  <a[PHI1]-W-MAY-{0<=i, i<=999}>
+//  <p-R-EXACT-{}>
+
+      *p = 0;
+
+//  <a[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=999}>
+//  <a[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=999}>
+
+      a[i]++;
+      // END BLOCK
+   }
+
+//  <a[PHI1]-R-EXACT-{PHI1==0, i==1000}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+
+   printf("a[0]=%d\n", a[0]);
+   // END BLOCK
+}

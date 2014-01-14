@@ -6,6 +6,7 @@ int main()
    int *p = 0;
 //             <    is written>: q
    int **q = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
 
    *p = 1;
@@ -17,6 +18,9 @@ int main()
  *********************** Use-Def Chains *********************
 
 	07 --> 10 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <p-W-EXACT> to <p-R-EXACT>
+	08 --> 10 with conflicts
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 
 ****************** End of Dependence Graph ******************

@@ -37,6 +37,7 @@ POINTS-TO
 
 
 // Points To OUT:
+// *HEAP*_l_11[*] -> undefined , EXACT
 // bmatrix -> *HEAP*_l_11[0] , MAY
 
 char * * bmatrix(long int nrl, long int nrh, long int ncl, long int nch)
@@ -51,23 +52,26 @@ char * * bmatrix(long int nrl, long int nrh, long int ncl, long int nch)
    char **m;
 
 // Points To:
-// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// m -> undefined , EXACT
 
    
    /* allocate pointers to rows */
    m = (char **) malloc((size_t) ((nrow+ncol)*sizeof(char *)));
 
 // Points To:
+// *HEAP*_l_11[*] -> undefined , EXACT
 // m -> *HEAP*_l_11[0] , MAY
 
    for(i = nrl+1; i <= nrh; i += 1)
 
 // Points To:
+// *HEAP*_l_11[*] -> undefined , EXACT
 // m -> *HEAP*_l_11[0] , MAY
 
       m[i] = m[i-1]+ncol;
 
 // Points To:
+// *HEAP*_l_11[*] -> undefined , EXACT
 // m -> *HEAP*_l_11[0] , MAY
 
    /* return pointer to array of pointers to rows */

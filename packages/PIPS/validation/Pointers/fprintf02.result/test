@@ -2,7 +2,9 @@
 POINTS-TO
 
 
-// Points To IN: none
+// Points To IN:
+// stderr -> *NULL* , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
 
 
 // Points To OUT: none
@@ -15,32 +17,35 @@ int main(int argc, char **argv)
    int *p;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
 
    if (argc>0)
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
       p = (void *) 0;
    else if (argc<0)
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> undefined , EXACT
 
       p = &argc;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
-// p -> *NULL_POINTER* , MAY
+// p -> undefined , MAY
+// p -> *NULL* , MAY
 // p -> argc , MAY
+// stderr -> *NULL* , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
 
 
    fprintf(stderr, "%d\n", *p);
 
 // Points To:
 // p -> argc , EXACT
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 
    
    // Here, p must points toward argc

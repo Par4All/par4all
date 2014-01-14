@@ -18,6 +18,7 @@ void getimage(void)
    int i, j;
 //             <    is declared>: c
    unsigned char c;
+//             <    is referenced>: size_t
 //             <    is declared>: fp
    FILE *fp;
 //             <    is written>: fp

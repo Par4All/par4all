@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -316,7 +316,7 @@ instruction i;
 			   STATEMENT_NUMBER_UNDEFINED,
 			   STATEMENT_ORDERING_UNDEFINED,
 			   empty_comments,
-			   i, NIL, NULL, empty_extensions ());
+			   i, NIL, NULL, empty_extensions (), make_synchronization_none());
     }
     else {
 	s = make_statement(l,
@@ -324,7 +324,7 @@ instruction i;
 			   STATEMENT_NUMBER_UNDEFINED : get_statement_number(),//get_next_statement_number(),
 			   STATEMENT_ORDERING_UNDEFINED,
 			   empty_comments,
-			   i, NIL, NULL, empty_extensions ());
+			   i, NIL, NULL, empty_extensions (), make_synchronization_none());
 	NewStmt(l, s);
     }
 
@@ -512,7 +512,7 @@ instruction i;
 			   STATEMENT_NUMBER_UNDEFINED : get_statement_number(), //get_next_statement_number(),
 			   STATEMENT_ORDERING_UNDEFINED,
 			   empty_comments,
-			   i,NIL,NULL, empty_extensions ());
+			   i,NIL,NULL, empty_extensions (), make_synchronization_none());
     }
 
     return(s);
@@ -714,7 +714,7 @@ make_goto_instruction(entity l)
 		       STATEMENT_ORDERING_UNDEFINED,
 		       empty_comments,
 		       instruction_undefined, NIL, NULL,
-		       empty_extensions ());
+		       empty_extensions (), make_synchronization_none());
     NewStmt(l, s);
   }
 

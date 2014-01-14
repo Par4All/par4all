@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -222,18 +222,25 @@ reference expression_to_reference(expression e)
 
 /* Add a set of zero subscripts to a reference "r" by side effect.
  *
- * Used when array names are used to convert to the first array element
+ * Used when array names or partial array references have to to
+ * converted to the first array element.
  */
 void generic_reference_add_fixed_subscripts(reference r, type t, bool zero_p)
 {
   pips_assert("type is of kind variable", type_variable_p(t));
   variable v = type_variable(t);
+  //list rsl = reference_indices(r);
 
   // FI: this assert makes sense within the ri-util framework but is
   // too strong for the kind of references used in effects-util
   // pips_assert("scalar type", ENDP(reference_indices(r)));
 
   list dl = variable_dimensions(v);
+  //
+  //pips_assert("Reference r is correct", gen_length(dl)>=gen_length(rsl));
+  //
+  //FOREACH(EXPRESSION, rs, rsl)
+  //  POP(dl);
   list sl = NIL; // subscript list
   FOREACH(DIMENSION, d, dl) {
     expression s = zero_p? int_to_expression(0) : make_unbounded_expression();
@@ -246,6 +253,40 @@ void generic_reference_add_fixed_subscripts(reference r, type t, bool zero_p)
 void reference_add_zero_subscripts(reference r, type t)
 {
   generic_reference_add_fixed_subscripts(r, t, true);
+}
+
+/* No check on reference r. This may generate an illegal reference if not called properly */
+void reference_add_zero_subscript(reference r)
+{
+  expression z = int_to_expression(0);
+  reference_indices(r) = gen_nconc(reference_indices(r),
+				   CONS(EXPRESSION, z, NIL));
+}
+
+/* Reference r to an array maybe partial, as is possible in C: with
+   declaration "int a[10][10]", references "a", "a[i]" and "a[i][j]"
+   are all legal. The subscript list of reference r is completed with
+   0 subscript to reference an array element. */
+void reference_complete_with_zero_subscripts(reference r)
+{
+  list rsl = reference_indices(r);
+  entity e = reference_variable(r);
+  type t = entity_basic_concrete_type(e);
+  pips_assert("t is a type of kind variable", type_variable_p(t));
+  variable v = type_variable(t);
+  list dl = variable_dimensions(v);
+
+  if(gen_length(dl)>gen_length(rsl)) {
+    FOREACH(EXPRESSION, rs, rsl)
+      POP(dl);
+    list sl = NIL; // subscript list
+    FOREACH(DIMENSION, d, dl) {
+      // expression s = zero_p? int_to_expression(0) : make_unbounded_expression();
+      expression s = int_to_expression(0);
+      sl = CONS(EXPRESSION, s, sl);
+    }
+    reference_indices(r) = gen_nconc(reference_indices(r), sl);
+  }
 }
 
 void reference_add_unbounded_subscripts(reference r, type t)
@@ -2188,7 +2229,7 @@ expression make_lin_op_exp(entity op_ent, expression exp1, expression exp2)
  * EvalExpression(). See also extended_expression_constant_p() for
  * more comments about what is called a "constant" expression.
  *
- * For a cleaner implementation of this function as it was originally
+ * For a cleaner implementation of this function, as it was originally
  * intended, see below expression_to_float().
  */
 int expression_to_int(expression exp)
@@ -2375,13 +2416,13 @@ constant expression_constant(expression exp)
 }
 
 bool expression_string_constant_p(expression exp) {
+  bool constant_p = false;
   if(expression_constant_p(exp) && expression_call_p(exp) ) {
     call c = expression_call(exp);
     entity operator = call_function(c);
-    const char * eun = entity_user_name(operator);
-    return ( eun[0]=='"' && eun[strlen(eun)-1] == '"' ) ;
+    constant_p = constant_string_entity_p(operator);
   }
-  return false;
+  return constant_p;
 }
 
 /* returns a newly allocated string! */
@@ -4236,4 +4277,25 @@ bool C_initialization_expression_p(expression e)
       initialization_p = true;
   }
   return initialization_p;
+}
+
+/* Returns a list of expressions hidden by the brace function.
+ *
+ * First cut: FI not too sure about recursive calls to the brace function.
+ */
+list struct_initialization_expression_to_expressions(expression e)
+{
+  pips_assert("rhs is a C initialization expression",
+	      C_initialization_expression_p(e));
+  syntax s = expression_syntax(e);
+  call c = syntax_call(s);
+  list el = call_arguments(c);
+  return el;
+}
+
+/* Free a list of expressions. */
+void free_expressions(list el)
+{
+  FOREACH(EXPRESSION,e, el)
+    free_expression(e);
 }

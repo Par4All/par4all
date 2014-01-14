@@ -9,7 +9,6 @@ typedef struct {
   int *tab2;
 } mys;
 
-
 void init2(mys *n)
 {
   int i;
@@ -27,8 +26,6 @@ void init2(mys *n)
     }
   
 }
-
-
 
 int main()
 {

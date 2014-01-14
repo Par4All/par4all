@@ -8,12 +8,24 @@ int main()
 //             <    is read   >: s1.a s1.c
 //             <    is written>: tab_s[0].a tab_s[0].c
    tab_s[0] = s1;
+//             <may be read   >: s1.b[*]
+//             <may be written>: tab_s[1].b[*]
+//             <    is read   >: s1.a s1.c
+//             <    is written>: tab_s[1].a tab_s[1].c
    tab_s[1] = s1;
+//             <may be read   >: s2.b[*]
+//             <may be written>: tab_s[1].b[*]
+//             <    is read   >: s2.a s2.c
+//             <    is written>: tab_s[1].a tab_s[1].c
    tab_s[1] = s2;
    return 0;
 }
 
  *********************** Use-Def Chains *********************
 
+	12 --> 13 with conflicts
+		from <tab_s[1].c-W-EXACT> to <tab_s[1].c-W-EXACT>
+		from <tab_s[1].b[*]-W-MAY> to <tab_s[1].b[*]-W-MAY>
+		from <tab_s[1].a-W-EXACT> to <tab_s[1].a-W-EXACT>
 
 ****************** End of Dependence Graph ******************

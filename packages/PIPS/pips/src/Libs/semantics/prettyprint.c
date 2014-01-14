@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -70,6 +70,14 @@ static bool is_transformer;
 static bool is_total_precondition;
 static bool is_user_view;
 static bool is_transformer_filtered;
+
+void set_prettyprint_transformer(void)
+{
+  is_transformer = true;
+  is_total_precondition = false;
+  is_transformer_filtered = false;
+}
+
 static hash_table nts = hash_table_undefined;
 //static string non_feasible_system;
 

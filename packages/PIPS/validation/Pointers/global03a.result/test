@@ -1,0 +1,105 @@
+
+Points-to for "global03"
+
+
+// Points To IN:
+// pi -> *NULL* , MAY
+// pi -> _pi_84[0] , MAY
+// q -> *NULL* , MAY
+// q -> _q_92[0] , MAY
+
+
+// Points To OUT:
+// pi -> _pi_84[1] , EXACT
+// q -> _q_92[0] , EXACT
+
+int global03a()
+{
+
+// Points To: none
+
+   int *p = i;
+
+// Points To:
+// p -> i[0] , EXACT
+// pi -> *NULL* , MAY
+// pi -> _pi_84[0] , MAY
+
+   *pi = 1;
+
+// Points To:
+// p -> i[0] , EXACT
+// pi -> _pi_84[0] , EXACT
+
+   pi++;
+
+// Points To:
+// p -> i[0] , EXACT
+// pi -> _pi_84[1] , EXACT
+// q -> *NULL* , MAY
+// q -> _q_92[0] , MAY
+
+   q->one = 1;
+
+// Points To:
+// p -> i[0] , EXACT
+// pi -> _pi_84[1] , EXACT
+// q -> _q_92[0] , EXACT
+
+   (q->two)[4] = 2;
+
+// Points To:
+// p -> i[0] , EXACT
+// pi -> _pi_84[1] , EXACT
+// q -> _q_92[0] , EXACT
+
+   return *p;
+}
+
+Points-to for "global03!"
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// pi -> i[0] , EXACT
+// q -> s , EXACT
+
+/* Same as global03.c, but different tpips script 
+ *
+ * Check points-to analysis for computation unit, initial points-to
+ * and program points-to.
+ */
+
+// Points To: none
+
+typedef struct two_fields {
+   int one;
+   int two[10];
+} tf_t;
+
+
+// Points To: none
+
+int i[10];
+
+// Points To: none
+
+tf_t s;
+
+// Points To: none
+
+int *pi = &i[0];
+
+// Points To:
+// pi -> i[0] , EXACT
+
+tf_t *q = &s;
+
+
+// Points To:
+// pi -> i[0] , EXACT
+// q -> s , EXACT
+
+int global03a();

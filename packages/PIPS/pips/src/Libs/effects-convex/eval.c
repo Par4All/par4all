@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
   Copyright 2009-2010 HPC Project
 
   This file is part of PIPS.
@@ -54,6 +54,13 @@
   @return true if r1 path may be a predecessor of r2 path
 
   (we consider that p[1] is a predecessor of p[*], with *exact_p = false.)
+
+  Note FI: the notion of predecessor is similar to having a prefix
+  subscript list. You might want an inclusion between the memory cells
+  accessed by the two references, but it is not the case since p[1] is
+  a predecessor of p[*]. And, the descriptors are used... with no
+  explanations. I guess you want to be able to say something with
+  p[i], 0<=i<=2, since p[0], p[1], p[2] and p[*] may be used.
 
  */
 bool convex_cell_reference_preceding_p(reference r1, descriptor d1,

@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2012 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of Linear/C3 Library.
 
@@ -38,17 +38,17 @@
 
 #include "matrix.h"
 
-Pmatrix matrix_new(n,m)
-int n,m;
-{ 
-    Pmatrix a = (Pmatrix) malloc(sizeof(Smatrix));
-    a->denominator = VALUE_ONE;
-    a->number_of_lines = n;
-    a->number_of_columns = m;
-    a->coefficients = (Value *) malloc(sizeof(Value)*((n*m)+1));
-    return (a);
+Pmatrix matrix_new(int m, int n)
+{
+  Pmatrix a = (Pmatrix) malloc(sizeof(Smatrix));
+  a->denominator = VALUE_ONE;
+  a->number_of_lines = m;
+  a->number_of_columns = n;
+  a->coefficients = (Value *) malloc(sizeof(Value)*((n*m)));
+  return a;
 }
 
+// ??? should be matrix_free(Pmatrix * a)
 void matrix_rm(Pmatrix a)
 {
   if (a) {

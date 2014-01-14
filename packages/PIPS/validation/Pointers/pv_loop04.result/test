@@ -35,24 +35,24 @@ int main()
    int *p[10];
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , EXACT
 
    int a[10];
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p[*] -> undefined , EXACT
 
 
    for(i = 0; i <= 9; i += 1)
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a[*] , MAY
 
       p[i] = &a[i];
 
 // Points To:
-// p[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p[*] -> undefined , MAY
 // p[*] -> a[*] , MAY
 
    return 0;

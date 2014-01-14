@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -143,7 +143,7 @@ make_statement_operator(entity oper,cons * args)
 					   make_call (oper, args)),
 			  NIL,
 			  NULL,
-			  empty_extensions ());
+			  empty_extensions (), make_synchronization_none());
 }
 
 

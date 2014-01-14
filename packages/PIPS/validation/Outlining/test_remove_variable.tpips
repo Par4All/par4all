@@ -1,0 +1,21 @@
+delete test_remove_variable
+setproperty ABORT_ON_USER_ERROR TRUE
+create test_remove_variable test_remove_variable.c
+activate C_PARSER
+
+setproperty OUTLINE_REMOVE_VARIABLE_RSTREAM_IMAGE TRUE
+setproperty PRETTYPRINT_FINAL_RETURN TRUE
+setproperty PRAGMA_OUTLINER_BEGIN "scop"
+setproperty PRAGMA_OUTLINER_END "endscop"
+setproperty PRAGMA_OUTLINER_PREFIX "outlined"
+setproperty OUTLINE_ALLOW_GLOBALS FALSE
+setproperty OUTLINE_WRITTEN_SCALAR_BY_REFERENCE FALSE
+setproperty OUTLINE_SMART_REFERENCE_COMPUTATION FALSE
+apply PRAGMA_OUTLINER[function_test]
+
+display PRINTED_FILE[outlined_0]
+display PRINTED_FILE[function_test]
+
+close
+delete test_remove_variable
+quit

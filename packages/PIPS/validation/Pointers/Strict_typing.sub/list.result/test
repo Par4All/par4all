@@ -3,19 +3,21 @@ Points-to for "list_next"
 
 
 // Points To IN:
-// _nl_1.next -> *NULL_POINTER* , MAY
+// _nl_1.next -> *NULL* , MAY
 // _nl_1.next -> _nl_1_2__1 , MAY
-// nil -> *NULL_POINTER* , EXACT
-// nl -> *NULL_POINTER* , MAY
+// nil -> *NULL* , EXACT
+// nl -> *NULL* , MAY
 // nl -> _nl_1 , MAY
 
 
 // Points To OUT:
-// _nl_1.next -> *NULL_POINTER* , MAY
+// _nl_1.next -> *NULL* , MAY
 // _nl_1.next -> _nl_1_2__1 , MAY
-// list_next -> *NULL_POINTER* , MAY
+// list_next -> *NULL* , MAY
 // list_next -> _nl_1_2__1 , MAY
-// nil -> *NULL_POINTER* , EXACT
+// nil -> *NULL* , EXACT
+// nl -> *NULL* , MAY
+// nl -> _nl_1 , MAY
 
 list list_next(list nl)
 {
@@ -29,37 +31,39 @@ list list_next(list nl)
    list n;
 
 // Points To:
-// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nil -> *NULL_POINTER* , EXACT
-// nl -> *NULL_POINTER* , MAY
+// _nl_1.next -> *NULL* , MAY
+// _nl_1.next -> _nl_1_2__1 , MAY
+// n -> undefined , EXACT
+// nil -> *NULL* , EXACT
+// nl -> *NULL* , MAY
 // nl -> _nl_1 , MAY
 
    if (nl==nil)
 
 // Points To:
-// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nil -> *NULL_POINTER* , EXACT
-// nl -> *NULL_POINTER* , EXACT
+// n -> undefined , EXACT
+// nil -> *NULL* , EXACT
+// nl -> *NULL* , EXACT
 
       n = nil;
    else
 
 // Points To:
-// _nl_1.next -> *NULL_POINTER* , MAY
+// _nl_1.next -> *NULL* , MAY
 // _nl_1.next -> _nl_1_2__1 , MAY
-// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// nil -> *NULL_POINTER* , EXACT
+// n -> undefined , EXACT
+// nil -> *NULL* , EXACT
 // nl -> _nl_1 , EXACT
 
       n = nl->next;
 
 // Points To:
-// _nl_1.next -> *NULL_POINTER* , MAY
+// _nl_1.next -> *NULL* , MAY
 // _nl_1.next -> _nl_1_2__1 , MAY
-// n -> *NULL_POINTER* , MAY
+// n -> *NULL* , MAY
 // n -> _nl_1_2__1 , MAY
-// nil -> *NULL_POINTER* , EXACT
-// nl -> *NULL_POINTER* , MAY
+// nil -> *NULL* , EXACT
+// nl -> *NULL* , MAY
 // nl -> _nl_1 , MAY
 
    return n;
@@ -69,37 +73,38 @@ Points-to for "list_len"
 
 
 // Points To IN:
-// _ll_1.next -> *NULL_POINTER* , MAY
+// _ll_1.next -> *NULL* , MAY
 // _ll_1.next -> _ll_1_2__1 , MAY
-// _ll_1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1.next -> _ll_1_2__1_2__1 , MAY
-// _ll_1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1.next -> _ll_1_2__1_2__1_2__1 , MAY
-// _ll_1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1_2__1_2__1 , MAY
-// _ll_1_2__1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1_2__1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1_2__1_2__1_2__1
 //     , MAY
-// _ll_1_2__1_2__1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1_2__1_2__1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1.next -> 
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// _ll_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> 
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1.next -> *NULL_POINTER*
-//     , MAY
+// _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1.next -> 
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// ll -> *NULL_POINTER* , MAY
+// ll -> *NULL* , MAY
 // ll -> _ll_1 , MAY
-// nil -> *NULL_POINTER* , EXACT
+// nil -> *NULL* , EXACT
 
 
 // Points To OUT:
 // _ll_1.next -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // _ll_1.next -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
-// _ll_1.next -> *NULL_POINTER* , MAY
-// nil -> *NULL_POINTER* , EXACT
+// _ll_1.next -> *NULL* , MAY
+// ll -> *NULL* , MAY
+// ll -> _ll_1 , MAY
+// nil -> *NULL* , EXACT
 
 int list_len(list ll)
 {
@@ -109,30 +114,30 @@ int list_len(list ll)
    int n = 0;
 
 // Points To:
-// ll -> *NULL_POINTER* , MAY
+// ll -> *NULL* , MAY
 // ll -> _ll_1 , MAY
 
    list c = ll;
 
 // Points To:
-// c -> *NULL_POINTER* , MAY
+// c -> *NULL* , MAY
 // c -> _ll_1 , MAY
-// ll -> *NULL_POINTER* , MAY
+// ll -> *NULL* , MAY
 // ll -> _ll_1 , MAY
-// nil -> *NULL_POINTER* , EXACT
+// nil -> *NULL* , EXACT
 
    while (c!=nil) {
 
 // Points To:
 // *ANY_MODULE*:*ANYWHERE*_b0.next -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // *ANY_MODULE*:*ANYWHERE*_b0.next -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
-// *ANY_MODULE*:*ANYWHERE*_b0.next -> *NULL_POINTER* , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0.next -> *NULL* , MAY
 // *ANY_MODULE*:*ANYWHERE*_b1.next -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // *ANY_MODULE*:*ANYWHERE*_b1.next -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
-// *ANY_MODULE*:*ANYWHERE*_b1.next -> *NULL_POINTER* , MAY
+// *ANY_MODULE*:*ANYWHERE*_b1.next -> *NULL* , MAY
 // _ll_1.next -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // _ll_1.next -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
-// _ll_1.next -> *NULL_POINTER* , MAY
+// _ll_1.next -> *NULL* , MAY
 // _ll_1.next -> _ll_1_2__1 , MAY
 // _ll_1.next -> _ll_1_2__1_2__1 , MAY
 // _ll_1.next -> _ll_1_2__1_2__1_2__1 , MAY
@@ -140,7 +145,7 @@ int list_len(list ll)
 // _ll_1.next -> _ll_1_2__1_2__1_2__1_2__1_2__1 , MAY
 // _ll_1.next -> _ll_1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // _ll_1.next -> _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// _ll_1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1.next -> _ll_1_2__1 , MAY
 // _ll_1_2__1.next -> _ll_1_2__1_2__1 , MAY
 // _ll_1_2__1.next -> _ll_1_2__1_2__1_2__1 , MAY
@@ -148,7 +153,7 @@ int list_len(list ll)
 // _ll_1_2__1.next -> _ll_1_2__1_2__1_2__1_2__1_2__1 , MAY
 // _ll_1_2__1.next -> _ll_1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // _ll_1_2__1.next -> _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// _ll_1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1.next -> _ll_1_2__1 , MAY
 // _ll_1_2__1_2__1.next -> _ll_1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1.next -> _ll_1_2__1_2__1_2__1 , MAY
@@ -157,7 +162,7 @@ int list_len(list ll)
 // _ll_1_2__1_2__1.next -> _ll_1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1.next -> _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1
 //     , MAY
-// _ll_1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1_2__1.next -> _ll_1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1_2__1 , MAY
@@ -167,7 +172,7 @@ int list_len(list ll)
 //     , MAY
 // _ll_1_2__1_2__1_2__1.next -> 
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// _ll_1_2__1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1_2__1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1_2__1 , MAY
@@ -178,7 +183,7 @@ int list_len(list ll)
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1.next -> 
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// _ll_1_2__1_2__1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1_2__1_2__1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1_2__1 , MAY
@@ -190,7 +195,7 @@ int list_len(list ll)
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1.next -> 
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// _ll_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1_2__1
@@ -203,8 +208,7 @@ int list_len(list ll)
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> 
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1.next -> *NULL_POINTER*
-//     , MAY
+// _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1.next -> 
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // c -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
@@ -217,9 +221,9 @@ int list_len(list ll)
 // c -> _ll_1_2__1_2__1_2__1_2__1_2__1 , MAY
 // c -> _ll_1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // c -> _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// ll -> *NULL_POINTER* , MAY
+// ll -> *NULL* , MAY
 // ll -> _ll_1 , MAY
-// nil -> *NULL_POINTER* , EXACT
+// nil -> *NULL* , EXACT
 
       // we know that c!=nil...
       c = list_next(c);
@@ -227,13 +231,13 @@ int list_len(list ll)
 // Points To:
 // *ANY_MODULE*:*ANYWHERE*_b0.next -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // *ANY_MODULE*:*ANYWHERE*_b0.next -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
-// *ANY_MODULE*:*ANYWHERE*_b0.next -> *NULL_POINTER* , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0.next -> *NULL* , MAY
 // *ANY_MODULE*:*ANYWHERE*_b1.next -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // *ANY_MODULE*:*ANYWHERE*_b1.next -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
-// *ANY_MODULE*:*ANYWHERE*_b1.next -> *NULL_POINTER* , MAY
+// *ANY_MODULE*:*ANYWHERE*_b1.next -> *NULL* , MAY
 // _ll_1.next -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // _ll_1.next -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
-// _ll_1.next -> *NULL_POINTER* , MAY
+// _ll_1.next -> *NULL* , MAY
 // _ll_1.next -> _ll_1_2__1 , MAY
 // _ll_1.next -> _ll_1_2__1_2__1 , MAY
 // _ll_1.next -> _ll_1_2__1_2__1_2__1 , MAY
@@ -242,7 +246,7 @@ int list_len(list ll)
 // _ll_1.next -> _ll_1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // _ll_1.next -> _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // _ll_1.next -> _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// _ll_1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1.next -> _ll_1_2__1 , MAY
 // _ll_1_2__1.next -> _ll_1_2__1_2__1 , MAY
 // _ll_1_2__1.next -> _ll_1_2__1_2__1_2__1 , MAY
@@ -252,7 +256,7 @@ int list_len(list ll)
 // _ll_1_2__1.next -> _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // _ll_1_2__1.next -> _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1_2__1
 //     , MAY
-// _ll_1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1.next -> _ll_1_2__1 , MAY
 // _ll_1_2__1_2__1.next -> _ll_1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1.next -> _ll_1_2__1_2__1_2__1 , MAY
@@ -263,7 +267,7 @@ int list_len(list ll)
 //     , MAY
 // _ll_1_2__1_2__1.next -> 
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// _ll_1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1_2__1.next -> _ll_1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1_2__1 , MAY
@@ -275,7 +279,7 @@ int list_len(list ll)
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1.next -> 
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// _ll_1_2__1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1_2__1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1_2__1 , MAY
@@ -288,7 +292,7 @@ int list_len(list ll)
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1.next -> 
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// _ll_1_2__1_2__1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1_2__1_2__1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1_2__1 , MAY
@@ -302,7 +306,7 @@ int list_len(list ll)
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1.next -> 
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// _ll_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> *NULL_POINTER* , MAY
+// _ll_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1_2__1
@@ -317,8 +321,7 @@ int list_len(list ll)
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1_2__1.next -> 
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1.next -> *NULL_POINTER*
-//     , MAY
+// _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1.next -> *NULL* , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1 , MAY
 // _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1.next -> _ll_1_2__1_2__1
 //     , MAY
@@ -336,7 +339,7 @@ int list_len(list ll)
 //    _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // c -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // c -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
-// c -> *NULL_POINTER* , MAY
+// c -> *NULL* , MAY
 // c -> _ll_1_2__1 , MAY
 // c -> _ll_1_2__1_2__1 , MAY
 // c -> _ll_1_2__1_2__1_2__1 , MAY
@@ -345,9 +348,9 @@ int list_len(list ll)
 // c -> _ll_1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // c -> _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
 // c -> _ll_1_2__1_2__1_2__1_2__1_2__1_2__1_2__1_2__1 , MAY
-// ll -> *NULL_POINTER* , MAY
+// ll -> *NULL* , MAY
 // ll -> _ll_1 , MAY
-// nil -> *NULL_POINTER* , EXACT
+// nil -> *NULL* , EXACT
 
       n++;
    }
@@ -355,17 +358,17 @@ int list_len(list ll)
 // Points To:
 // *ANY_MODULE*:*ANYWHERE*_b0.next -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // *ANY_MODULE*:*ANYWHERE*_b0.next -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
-// *ANY_MODULE*:*ANYWHERE*_b0.next -> *NULL_POINTER* , MAY
+// *ANY_MODULE*:*ANYWHERE*_b0.next -> *NULL* , MAY
 // *ANY_MODULE*:*ANYWHERE*_b1.next -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // *ANY_MODULE*:*ANYWHERE*_b1.next -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
-// *ANY_MODULE*:*ANYWHERE*_b1.next -> *NULL_POINTER* , MAY
+// *ANY_MODULE*:*ANYWHERE*_b1.next -> *NULL* , MAY
 // _ll_1.next -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
 // _ll_1.next -> *ANY_MODULE*:*ANYWHERE*_b1 , MAY
-// _ll_1.next -> *NULL_POINTER* , MAY
-// c -> *NULL_POINTER* , EXACT
-// ll -> *NULL_POINTER* , MAY
+// _ll_1.next -> *NULL* , MAY
+// c -> *NULL* , EXACT
+// ll -> *NULL* , MAY
 // ll -> _ll_1 , MAY
-// nil -> *NULL_POINTER* , EXACT
+// nil -> *NULL* , EXACT
 
    return n;
 }

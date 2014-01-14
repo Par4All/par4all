@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -291,7 +291,7 @@ bool controlizer(const char* module_name)
 						  control_graph(module_stat)),
 				 NIL /* gen_copy_seq(statement_declarations(parsed_mod_stat))*/,
 				 NULL,
-				 empty_extensions ());
+				 empty_extensions (), make_synchronization_none());
 
     ifdebug(1) pips_assert("the module statement is consistent "
 		"after the controlizer call",

@@ -1,0 +1,70 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+
+delete abf-initial
+
+create abf-initial   gencode-v4-initial.c   GPUradar-v4.c  appli_functions-v4.c
+
+activate MUST_REGIONS
+activate IN_SUMMARY_REGIONS
+activate OUT_SUMMARY_REGIONS
+activate SUMMARY_REGIONS
+activate SUMMARY_EFFECTS
+
+activate REGION_CHAINS
+activate PROPER_EFFECTS 
+activate IN_EFFECTS 
+activate OUT_EFFECTS 
+activate RICE_REGIONS_DEPENDENCE_GRAPH
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE
+setproperty SEMANTICS_FILTER_INITIAL_VALUES TRUE
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE 
+
+apply LOOP_NORMALIZE[%ALLFUNC]
+apply PRIVATIZE_MODULE[%ALLFUNC]
+apply ARRAY_PRIVATIZER[%ALLFUNC]
+
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
+#setproperty COMPLEXITY_COST_TABLE "IntelPentium"
+
+setproperty PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS TRUE
+setproperty PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS TRUE
+setproperty PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES TRUE
+
+
+apply SEQUENCE_DEPENDENCE_GRAPH[main_PE0]
+#shell dot -Tpng abf-initial.database/main_PE0/main_PE0_sdg.dot > abf-initial.database/main_PE0/main_PE0_sdg.png
+#shell gqview abf-initial.database/main_PE0/main_PE0_sdg.png
+
+setproperty BDSC_NB_CLUSTERS 3
+
+
+apply HBDSC_PARALLELIZATION[main_PE0]
+#shell dot -Tpng abf-initial.database/main_PE0/main_PE0_scheduled_sdg.dot > abf-initial.database/main_PE0/main_PE0_scheduled_sdg.png
+#shell gqview abf-initial.database/main_PE0/main_PE0_scheduled_sdg.png
+
+
+setproperty SPIRE_GENERATION TRUE
+apply SPIRE_UNSTRUCTURED_TO_STRUCTURED[main_PE0]
+display PRINTED_FILE[main_PE0]
+
+apply HBDSC_GEN_COMMUNICATIONS[main_PE0]
+display PRINTED_FILE[main_PE0]
+
+echo // MPI style
+activate MPI_TASK_GENERATION
+activate PRINT_PARALLELIZEDMPI_CODE
+display PARALLELPRINTED_FILE[main_PE0]
+	
+echo // OMP style
+activate OPENMP_TASK_GENERATION
+activate PRINT_PARALLELIZEDOMPTASK_CODE
+display PARALLELPRINTED_FILE[main_PE0]
+
+close
+delete abf-initial
+quit
+
+

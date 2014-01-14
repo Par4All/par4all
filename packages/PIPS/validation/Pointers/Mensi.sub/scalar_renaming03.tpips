@@ -12,40 +12,27 @@ setproperty PRINT_DOTDG_NODE_FONT_SIZE "10"
 #setproperty MEMORY_EFFECTS_ONLY  FALSE
 
 echo 
-echo PROPER  EFFECTS 
+echo Proper effects for "scalar_renaming03" 
 echo
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[scalar_renaming03]
-
-
 
 #setproperty MEMORY_EFFECTS_ONLY  TRUE
 #apply PRINT_DOT_DEPENDENCE_GRAPH[scalar_renaming03]
 #shell dot -Tpng scalar_renaming03.database/scalar_renaming03/scalar_renaming03.dot >scalar_renaming03_dg_01.png
 #shell gqview scalar_renaming03_dg_01.png
 
-
 echo 
-echo POINTS-TO
+echo Points-to for "scalar_renaming03"
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[scalar_renaming03]
 
 echo 
-echo PROPER  EFFECTS WITH POINTS TO
+echo Proper effects with points-to for "scalar_renaming03"
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
-
-#setproperty MEMORY_EFFECTS_ONLY  TRUE
-#apply PRINT_DOT_DEPENDENCE_GRAPH[scalar_renaming03]
-#shell dot -Tpng scalar_renaming03.database/scalar_renaming03/scalar_renaming03.dot >scalar_renaming03_dg03.png
-#shell gqview scalar_renaming03_dg03.png
-
-setproperty MEMORY_EFFECTS_ONLY  FALSE
-display PRINTED_FILE
-apply SCALAR_RENAMING
 display PRINTED_FILE[scalar_renaming03]
 
 #setproperty MEMORY_EFFECTS_ONLY  TRUE
@@ -53,11 +40,37 @@ display PRINTED_FILE[scalar_renaming03]
 #shell dot -Tpng scalar_renaming03.database/scalar_renaming03/scalar_renaming03.dot >scalar_renaming03_dg03.png
 #shell gqview scalar_renaming03_dg03.png
 
+
+echo
+echo Code for "scalar_renaming03" before scalar renaming
+echo
+
+activate PRINT_CODE
+setproperty MEMORY_EFFECTS_ONLY FALSE
+display PRINTED_FILE
+
+apply SCALAR_RENAMING
+
+echo
+echo Code for "scalar_renaming03" after scalar renaming
+echo
+#activate PRINT_CODE
+display PRINTED_FILE[scalar_renaming03]
+
+#setproperty MEMORY_EFFECTS_ONLY  TRUE
+#apply PRINT_DOT_DEPENDENCE_GRAPH[scalar_renaming03]
+#shell dot -Tpng scalar_renaming03.database/scalar_renaming03/scalar_renaming03.dot >scalar_renaming03_dg03.png
+#shell gqview scalar_renaming03_dg03.png
+
+echo
+echo Parallel code for "scalar_renaming03"
+echo
+
 setproperty MEMORY_EFFECTS_ONLY  FALSE
 activate PRINT_PARALLELIZEDOMP_CODE
 display PARALLELPRINTED_FILE
 
-close scalar_renaming03
+close
 delete scalar_renaming03
 quit
 

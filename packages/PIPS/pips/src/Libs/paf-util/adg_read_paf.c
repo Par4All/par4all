@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -358,7 +358,7 @@ char * s_ins;
 				    strdup(s_ins), instruction_undefined,
 				NIL, // No local declarations
 				NULL, // null or empty string...
-				empty_extensions ()),
+				empty_extensions (), make_synchronization_none()),
 		     stmt_list);
 
 /* Initialization of global variables */
@@ -722,7 +722,7 @@ char * s_ins;
 				    strdup(s_ins), instruction_undefined,
 				NIL, // No local declarations
 				NULL, // null or empty string...
-				empty_extensions ()),
+				empty_extensions (), make_synchronization_none()),
 		     stmt_list);
 
  for(aux_l = crt_node_l; aux_l != NIL; aux_l = CDR(aux_l))

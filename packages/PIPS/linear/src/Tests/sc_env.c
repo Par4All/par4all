@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2012 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of Linear/C3 Library.
 
@@ -37,20 +37,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-extern int fprintf();
-extern int printf();
-extern char * strdup();
+#include <string.h>
+#include <assert.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
-#include"assert.h"
+#include "matrix.h"
 #include "vecteur.h"
 #include "contrainte.h"
 #include "ray_dte.h"
 #include "sommet.h"
 #include "sc.h"
 #include "sg.h"
-#include "types.h"
 #include "polyedre.h"
 
 

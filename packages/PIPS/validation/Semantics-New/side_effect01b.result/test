@@ -1,0 +1,63 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: i
+   int i = 0;
+//             <    is written>: i x
+   int x = (i = 1)+2;
+
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T(i,x) {i==1, i#init==0, x==3}
+
+   int x = (i = 1)+2;
+
+//  T(main) {i==1, main==0, x==3}
+
+
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   int x = (i = 1)+2;
+
+//  P(i,x) {i==1, x==3}
+
+
+   return 0;
+}
+
+Warnings
+
+TRANSFORMERS_INTER_FULL[main] (transformer_safe_combine_with_warnings) Non standard compliant code: side effect in part
+of an expression affects variable(s) used in a later part
+PRECONDITIONS_INTER_FULL[main] (transformer_safe_combine_with_warnings) Non standard compliant code: side effect in part
+of an expression affects variable(s) used in a later part

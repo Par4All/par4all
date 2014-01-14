@@ -1,0 +1,45 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete kmeans_clustering03
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty CONSTANT_PATH_EFFECTS TRUE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+setproperty POINTS_TO_STRICT_POINTER_TYPES FALSE
+
+##TODO: explain
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+create kmeans_clustering03 kmeans_clustering03.c
+
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[kmeans_clustering]
+
+echo 
+echo PROPER  EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[kmeans_clustering]
+
+
+echo 
+echo  CUMULATED EFFECTS WITH POINTS TO
+echo
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[kmeans_clustering]
+
+
+
+
+
+
+
+close
+delete kmeans_clustering03
+quit

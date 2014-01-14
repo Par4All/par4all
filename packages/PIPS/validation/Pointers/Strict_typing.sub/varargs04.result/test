@@ -1,11 +1,18 @@
 
-POINTS TO
+Points-to for "f2"
 
 
-// Points To IN: none
+// Points To IN:
+// array[*] -> *NULL* , MAY
+// array[*] -> _array_2[*] , MAY
+// stderr -> *NULL* , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// array[*] -> *NULL* , MAY
+// array[*] -> _array_2[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 
 void f2(int n_ptrs, char *array[31])
 {
@@ -18,15 +25,77 @@ void f2(int n_ptrs, char *array[31])
 
    for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
 
-// Points To: none
+// Points To:
+// array[*] -> *NULL* , MAY
+// array[*] -> _array_2[*] , MAY
+// stderr -> *NULL* , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
 
       fprintf(stderr, "%s\n", array[ptr_no]);
+
+// Points To:
+// array[*] -> *NULL* , MAY
+// array[*] -> _array_2[*] , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+
+   return;
 }
 
-// Points To IN: none
+Points-to for "f4"
 
 
-// Points To OUT: none
+// Points To IN:
+// array[*] -> *NULL* , MAY
+// array[*] -> _array_2[*] , MAY
+// stdout -> *NULL* , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
+
+
+// Points To OUT:
+// array[*] -> *NULL* , MAY
+// array[*] -> _array_2[*] , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
+
+void f4(int n_ptrs, char *array[31])
+{
+
+// Points To: none
+
+   int ptr_no;
+
+// Points To: none
+
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+
+// Points To:
+// array[*] -> *NULL* , MAY
+// array[*] -> _array_2[*] , MAY
+// stdout -> *NULL* , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
+
+      fprintf(stdout, "%s\n", array[ptr_no]);
+
+// Points To:
+// array[*] -> *NULL* , MAY
+// array[*] -> _array_2[*] , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
+
+   return;
+}
+
+Points-to for "f3"
+
+
+// Points To IN:
+// stderr -> *NULL* , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
+// stdout -> *NULL* , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
+
+
+// Points To OUT:
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
 void f3(int n_ptrs, int f4_after, ...)
 {
@@ -40,115 +109,118 @@ void f3(int n_ptrs, int f4_after, ...)
    char *array[31];
 
 // Points To:
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// array[*] -> undefined , EXACT
 
    int ptr_no = 0;
 
 // Points To:
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// array[*] -> undefined , EXACT
 
    if (n_ptrs>31)
 
 // Points To:
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// array[*] -> undefined , EXACT
 
       n_ptrs = 31;
 
 // Points To:
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// array[*] -> undefined , EXACT
 
    va_start(ap, f4_after);
 
 // Points To:
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// array[*] -> undefined , EXACT
 
    for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1) {
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
 
       array[ptr_no] = va_arg(ap, char *);
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
 
       if (ptr_no==f4_after)
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
 
          va_copy(ap_save, ap);
    }
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
 
    va_end(ap);
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
+// stderr -> *NULL* , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
 
    f2(n_ptrs, array);
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 
    // Now process the saved copy.
    n_ptrs -= f4_after;
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 
    for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 
       array[ptr_no] = va_arg(ap_save, char *);
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
 
    va_end(ap_save);
 
 // Points To:
 // array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
-// array[*] -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// stdout -> *NULL* , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
 
    f4(n_ptrs, array);
+
+// Points To:
+// array[*] -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> undefined , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
+
+   return;
 }
 
-// Points To IN: none
+Points-to for "main"
 
 
-// Points To OUT: none
-
-void f4(int n_ptrs, char *array[31])
-{
-
-// Points To: none
-
-   int ptr_no;
-
-// Points To: none
-
-   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
-
-// Points To: none
-
-      fprintf(stdout, "%s\n", array[ptr_no]);
-}
-
-// Points To IN: none
+// Points To IN:
+// stderr -> *NULL* , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
+// stdout -> *NULL* , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
 
 
 // Points To OUT: none
@@ -156,11 +228,17 @@ void f4(int n_ptrs, char *array[31])
 int main()
 {
 
-// Points To: none
+// Points To:
+// stderr -> *NULL* , MAY
+// stderr -> __IO_EFFECTS:IO_FILES[2] , MAY
+// stdout -> *NULL* , MAY
+// stdout -> __IO_EFFECTS:IO_FILES[1] , MAY
 
    f3(6, 4, "ch1", "ch2", "ch3", "ch4", "ch5", "ch6");
 
-// Points To: none
+// Points To:
+// stderr -> __IO_EFFECTS:IO_FILES[2] , EXACT
+// stdout -> __IO_EFFECTS:IO_FILES[1] , EXACT
 
    return 0;
 }

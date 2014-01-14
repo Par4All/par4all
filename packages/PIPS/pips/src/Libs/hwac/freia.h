@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2011 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -32,6 +32,7 @@
 #include "freia_spoc.h"
 #include "freia_terapix.h"
 #include "freia_opencl.h"
+#include "freia_sigmac.h"
 
 #define HELPER "_helper_"
 
@@ -56,10 +57,11 @@
 #define freia_spoc_p(s) same_string_p((s), "spoc")
 #define freia_terapix_p(s) same_string_p((s), "terapix")
 #define freia_opencl_p(s) same_string_p((s), "opencl")
+#define freia_sigmac_p(s) same_string_p((s), "sigmac")
 
-#define freia_valid_target_p(s)             \
-  (freia_spoc_p(s) || freia_terapix_p(s) || \
-   freia_aipo_p(s) || freia_opencl_p(s))
+#define freia_valid_target_p(s)                               \
+  (freia_spoc_p(s) || freia_terapix_p(s) ||                   \
+   freia_aipo_p(s) || freia_opencl_p(s) || freia_sigmac_p(s))
 
 /* FREIA API function name -> SPoC hardware description (and others?)
  */
@@ -84,6 +86,7 @@ typedef struct {
   spoc_hw_t spoc;
   terapix_hw_t terapix;
   opencl_hw_t opencl;
+  sigmac_hw_t sigmac;
   // others? vhdl?:-)
 } freia_api_t;
 

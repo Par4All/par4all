@@ -2,7 +2,9 @@ delete fread03
 create fread03 fread03.c 
 activate C_PARSER
 
-setproperty ABORT_ON_USER_ERROR TRUE
+# The code has been so simplified that it is now erroneous
+# setproperty ABORT_ON_USER_ERROR TRUE
+
 setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE

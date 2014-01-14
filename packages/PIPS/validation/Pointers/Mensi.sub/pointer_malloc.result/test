@@ -26,30 +26,7 @@ pointer alloc_pointer(int v)
    return p;
 }
 
-// Points To IN: none
-
-
-// Points To OUT: none
-
-int main(void)
-{
-
-// Points To: none
-
-   pointer p1;
-
-// Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
-
-   p1 = alloc_pointer(13);
-
-// Points To:
-// p1 -> alloc_pointer:*HEAP*_l_7 , MAY
-
-   return;
-}
-
-PROPER  EFFECTS WITH POINTS TO
+PROPER EFFECTS WITH POINTS TO
 
 pointer alloc_pointer(int v)
 {
@@ -62,16 +39,8 @@ pointer alloc_pointer(int v)
 //             <    is read   >: p
    return p;
 }
-int main(void)
-{
-   pointer p1;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
-   p1 = alloc_pointer(13);
-   return;
-}
 
-CUMULATED  EFFECTS WITH POINTS TO
+CUMULATED EFFECTS WITH POINTS TO
 
 //             <    is read   >: v _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
@@ -85,16 +54,6 @@ pointer alloc_pointer(int v)
    *p = v;
 //             <    is read   >: p
    return p;
-}
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-int main(void)
-{
-   pointer p1;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p1 _MALLOC_EFFECTS:_MALLOC_
-   p1 = alloc_pointer(13);
-   return;
 }
 
 POINTS TO for pointer_malloc
@@ -124,6 +83,9 @@ pointer alloc_pointer(int v)
    return p;
 }
 
+POINTS TO for "main"
+
+
 // Points To IN: none
 
 
@@ -137,7 +99,7 @@ int main(void)
    pointer p1;
 
 // Points To:
-// p1 -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p1 -> undefined , EXACT
 
    p1 = alloc_pointer(13);
 
@@ -147,3 +109,5 @@ int main(void)
    return;
 }
 unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_POINTS_TO_LIST' already active

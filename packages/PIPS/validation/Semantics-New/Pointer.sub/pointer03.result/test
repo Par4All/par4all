@@ -1,0 +1,227 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i = 0;
+
+// Points To: none
+
+   int *p, *q;
+
+// Points To:
+// p -> undefined , EXACT
+// q -> undefined , EXACT
+
+   int **pp;
+
+// Points To:
+// p -> undefined , EXACT
+// pp -> undefined , EXACT
+// q -> undefined , EXACT
+
+
+   p = &i;
+
+// Points To:
+// p -> i , EXACT
+// pp -> undefined , EXACT
+// q -> undefined , EXACT
+
+   pp = &p;
+
+// Points To:
+// p -> i , EXACT
+// pp -> p , EXACT
+// q -> undefined , EXACT
+
+   //On veut avoir p=q
+   q = *pp;
+
+// Points To:
+// p -> i , EXACT
+// pp -> p , EXACT
+// q -> i , EXACT
+
+   // q = p;
+   
+   //on modifie i
+   *q = 1;
+
+// Points To:
+// p -> i , EXACT
+// pp -> p , EXACT
+// q -> i , EXACT
+
+   *p = 2;
+
+// Points To:
+// p -> i , EXACT
+// pp -> p , EXACT
+// q -> i , EXACT
+
+   **pp = 3;
+
+// Points To:
+// p -> i , EXACT
+// pp -> p , EXACT
+// q -> i , EXACT
+
+
+   return 0;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: i
+   int i = 0;
+   int *p, *q;
+   int **pp;
+//             <    is written>: p
+
+   p = &i;
+//             <    is written>: pp
+   pp = &p;
+//             <    is read   >: p pp
+//             <    is written>: q
+   //On veut avoir p=q
+   q = *pp;
+//             <    is read   >: q
+//             <    is written>: i
+   // q = p;
+   
+   //on modifie i
+   *q = 1;
+//             <    is read   >: p
+//             <    is written>: i
+   *p = 2;
+//             <    is read   >: p pp
+//             <    is written>: i
+   **pp = 3;
+
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T(p,q) {i==0}
+
+   int *p, *q;
+
+//  T(pp) {i==0}
+
+   int **pp;
+
+//  T(p) {&i==p, i==0}
+
+
+   p = &i;
+
+//  T(pp) {&i==p, &p==pp, i==0}
+
+   pp = &p;
+
+//  T(q) {&i==p, &i==q, &p==pp, i==0}
+
+   //On veut avoir p=q
+   q = *pp;
+
+//  T(i) {&i==p, &i==q, &p==pp, i==1, i#init==0}
+
+   // q = p;
+   
+   //on modifie i
+   *q = 1;
+
+//  T(i) {&i==p, &i==q, &p==pp, i==2, i#init==1}
+
+   *p = 2;
+
+//  T(i) {&i==p, &i==q, &p==pp, i==3, i#init==2}
+
+   **pp = 3;
+
+//  T(main) {&i==p, &i==q, &p==pp, i==3, main==0}
+
+
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   int *p, *q;
+
+//  P(i,p,q) {i==0}
+
+   int **pp;
+
+//  P(i,p,pp,q) {i==0}
+
+
+   p = &i;
+
+//  P(i,p,pp,q) {&i==p, i==0}
+
+   pp = &p;
+
+//  P(i,p,pp,q) {&i==p, &p==pp, i==0}
+
+   //On veut avoir p=q
+   q = *pp;
+
+//  P(i,p,pp,q) {&i==p, &i==q, &p==pp, i==0}
+
+   // q = p;
+   
+   //on modifie i
+   *q = 1;
+
+//  P(i,p,pp,q) {&i==p, &i==q, &p==pp, i==1}
+
+   *p = 2;
+
+//  P(i,p,pp,q) {&i==p, &i==q, &p==pp, i==2}
+
+   **pp = 3;
+
+//  P(i,p,pp,q) {&i==p, &i==q, &p==pp, i==3}
+
+
+   return 0;
+}
+
+Warnings
+

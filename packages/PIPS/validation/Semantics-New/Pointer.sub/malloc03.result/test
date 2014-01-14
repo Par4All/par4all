@@ -1,0 +1,183 @@
+
+Points-to
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int *p;
+
+// Points To:
+// p -> undefined , EXACT
+
+   int **pp;
+
+// Points To:
+// p -> undefined , EXACT
+// pp -> undefined , EXACT
+
+   pp = malloc(sizeof(*pp));
+
+// Points To:
+// *HEAP*_l_12 -> undefined , EXACT
+// p -> undefined , EXACT
+// pp -> *HEAP*_l_12 , MAY
+
+   *pp = malloc(sizeof(**pp));
+
+// Points To:
+// *HEAP*_l_12 -> *HEAP*_l_13 , MAY
+// p -> undefined , EXACT
+// pp -> *HEAP*_l_12 , MAY
+
+   p = *pp;
+
+// Points To:
+// *HEAP*_l_12 -> *HEAP*_l_13 , MAY
+// p -> *HEAP*_l_13 , MAY
+// pp -> *HEAP*_l_12 , MAY
+
+
+   free(p);
+
+// Points To:
+// *HEAP*_l_12 -> *HEAP*_l_13 , MAY
+// *HEAP*_l_12 -> undefined , MAY
+// p -> undefined , EXACT
+// pp -> *HEAP*_l_12 , MAY
+
+   free(pp);
+
+// Points To:
+// p -> undefined , EXACT
+// pp -> undefined , EXACT
+
+
+   return 0;
+}
+
+PROPER  EFFECTS
+
+int main()
+{
+   int *p;
+   int **pp;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: pp _MALLOC_EFFECTS:_MALLOC_
+   pp = malloc(sizeof(*pp));
+//             <may be written>: *HEAP*_l_12
+//             <    is read   >: pp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   *pp = malloc(sizeof(**pp));
+//             <may be read   >: *HEAP*_l_12
+//             <    is read   >: pp
+//             <    is written>: p
+   p = *pp;
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+   free(p);
+//             <    is read   >: pp _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(pp);
+
+   return 0;
+}
+
+Transformers with point-to
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(p) {}
+
+   int *p;
+
+//  T(pp) {}
+
+   int **pp;
+
+//  T(pp) {}
+
+   pp = malloc(sizeof(*pp));
+
+//  T(*HEAP*_l_12) {}
+
+   *pp = malloc(sizeof(**pp));
+
+//  T(p) {}
+
+   p = *pp;
+
+//  T() {*HEAP*_l_12==p}
+
+
+   free(p);
+
+//  T() {*HEAP*_l_12==p}
+
+   free(pp);
+
+//  T(main) {*HEAP*_l_12==p, main==0}
+
+
+   return 0;
+}
+
+Preconditions with point-to
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int *p;
+
+//  P(p) {}
+
+   int **pp;
+
+//  P(p,pp) {}
+
+   pp = malloc(sizeof(*pp));
+
+//  P(p,pp) {}
+
+   *pp = malloc(sizeof(**pp));
+
+//  P(*HEAP*_l_12,p,pp) {}
+
+   p = *pp;
+
+//  P(*HEAP*_l_12,p,pp) {}
+
+
+   free(p);
+
+//  P(*HEAP*_l_12,p,pp) {*HEAP*_l_12==p}
+
+   free(pp);
+
+//  P(*HEAP*_l_12,p,pp) {*HEAP*_l_12==p}
+
+
+   return 0;
+}
+
+Warnings
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_list_to_points_to) Memory leak for bucket "main:*HEAP*_l_13".
+PROPER_EFFECTS_WITH_POINTS_TO[main] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.

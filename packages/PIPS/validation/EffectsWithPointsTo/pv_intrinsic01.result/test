@@ -1,3 +1,467 @@
+ 
+Points-to for "main"
+
+
+// Points To IN:
+// stderr -> *NULL* , MAY
+// stderr -> _stderr_[0] , MAY
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   FILE *fp;
+
+// Points To:
+// fp -> undefined , EXACT
+
+   size_t n, nr;
+
+// Points To:
+// fp -> undefined , EXACT
+
+   char buf1[200];
+
+// Points To:
+// fp -> undefined , EXACT
+
+   char *buf2 = malloc(200*sizeof(char));
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fp -> undefined , EXACT
+
+   char *fmt;
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> undefined , EXACT
+// fp -> undefined , EXACT
+
+   char *i_name = "i=";
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> undefined , EXACT
+// fp -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   int i, r, c, max;
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> undefined , EXACT
+// fp -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   fpos_t *fp_pos, pos;
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> undefined , EXACT
+// fp -> undefined , EXACT
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   long int fp_pos_indic;
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> undefined , EXACT
+// fp -> undefined , EXACT
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   va_list vl;
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> undefined , EXACT
+// fp -> undefined , EXACT
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   
+   // formatted IO functions
+   fmt = "%s%d";
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> undefined , EXACT
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   max = 100;
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> undefined , EXACT
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   n = 200;
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> undefined , EXACT
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   fp = fopen("file.txt", "rb");
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   
+   
+   (void) fread(buf1, 8, 50, fp);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   (void) fscanf(fp, fmt, i_name, &i);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   (void) fprintf(fp, "%s%d", i_name, i);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   
+   
+   (void) scanf("%s%d", i_name, &i);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   (void) printf(fmt, i_name, i);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   
+   
+   (void) sscanf(buf1, fmt, i_name, &i);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   (void) sprintf(buf2, fmt, i_name, i);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   (void) snprintf(buf2, 100, fmt, i_name, i);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   
+   
+   // character IO functions
+   
+   c = fgetc(fp);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   (void) fgets(buf1, max, fp);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   (void) fputc(c, fp);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   (void) fputs(buf1, fp);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+
+   c = _IO_getc(fp);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   (void) _IO_putc(c, fp);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   (void) ungetc(c, fp);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+
+   c = getchar();
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   (void) putchar(c);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+
+   (void) gets(buf1);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   (void) puts(buf1);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   
+   // direct IO functions
+   
+   nr = fread(buf2, sizeof(char), n, fp);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   nr = fwrite(buf2, sizeof(char), n, fp);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> undefined , EXACT
+// i_name -> "i=" , EXACT
+
+   
+   // file positionning functions
+   fp_pos = &pos;
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> pos , EXACT
+// i_name -> "i=" , EXACT
+
+   (void) fgetpos(fp, fp_pos);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> pos , EXACT
+// i_name -> "i=" , EXACT
+
+   (void) fgetpos(fp, &pos);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> pos , EXACT
+// i_name -> "i=" , EXACT
+
+
+   (void) fseek(fp, 0L, 0);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> pos , EXACT
+// i_name -> "i=" , EXACT
+
+
+   (void) fsetpos(fp, fp_pos);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> pos , EXACT
+// i_name -> "i=" , EXACT
+
+
+   fp_pos_indic = ftell(fp);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> pos , EXACT
+// i_name -> "i=" , EXACT
+
+   rewind(fp);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> pos , EXACT
+// i_name -> "i=" , EXACT
+
+   
+   // error handling functions
+   
+   clearerr(fp);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> pos , EXACT
+// i_name -> "i=" , EXACT
+
+   r = feof(fp);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> pos , EXACT
+// i_name -> "i=" , EXACT
+
+   r = ferror(fp);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> pos , EXACT
+// i_name -> "i=" , EXACT
+
+   perror(buf1);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// fp_pos -> pos , EXACT
+// i_name -> "i=" , EXACT
+
+
+   fclose(fp);
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> undefined , EXACT
+// fp_pos -> pos , EXACT
+// i_name -> "i=" , EXACT
+// stderr -> *NULL* , MAY
+// stderr -> _stderr_[0] , MAY
+
+
+   fprintf(stderr, "The END\n");
+
+// Points To:
+// buf2 -> *HEAP*_l_10[0] , MAY
+// fmt -> "%s%d" , EXACT
+// fp -> undefined , EXACT
+// fp_pos -> pos , EXACT
+// i_name -> "i=" , EXACT
+// stderr -> _stderr_[0] , EXACT
+
+   return 0;
+}
+
+Proper effects for "main"
 
 int main()
 {
@@ -8,7 +472,8 @@ int main()
 //             <    is written>: buf2 _MALLOC_EFFECTS:_MALLOC_
    char *buf2 = malloc(200*sizeof(char));
    char *fmt;
-   char *i_name;
+//             <    is written>: i_name
+   char *i_name = "i=";
    int i, r, c, max;
    fpos_t *fp_pos, pos;
    long int fp_pos_indic;
@@ -43,7 +508,7 @@ int main()
 //                               __IO_EFFECTS:LUNS[*]
    (void) fprintf(fp, "%s%d", i_name, i);
 //             <may be read   >: stdin[0]
-//             <may be written>: i stdin[0]
+//             <may be written>: stdin[0] *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: i_name stdin __IO_EFFECTS:LUNS[0]
 //             <    is written>: __IO_EFFECTS:LUNS[0]
    

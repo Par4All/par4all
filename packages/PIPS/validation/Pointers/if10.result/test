@@ -15,7 +15,7 @@ int main()
    int *p, i, j;
 
 // Points To:
-// p -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> undefined , EXACT
 
 
    p = &i;

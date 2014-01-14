@@ -22,37 +22,37 @@ POINTS-TO
 
 
 // Points To IN:
-// nil -> *NULL_POINTER* , EXACT
+// nil -> *NULL* , EXACT
 
 
 // Points To OUT:
-// nil -> *NULL_POINTER* , EXACT
+// nil -> *NULL* , EXACT
 
 void list06(list l)
 {
 
 // Points To:
-// nil -> *NULL_POINTER* , EXACT
+// nil -> *NULL* , EXACT
 
    list n = nil;
 
 // Points To:
-// n -> *NULL_POINTER* , EXACT
-// nil -> *NULL_POINTER* , EXACT
+// n -> *NULL* , EXACT
+// nil -> *NULL* , EXACT
 
    list p;
 
 // Points To:
-// n -> *NULL_POINTER* , EXACT
-// nil -> *NULL_POINTER* , EXACT
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// n -> *NULL* , EXACT
+// nil -> *NULL* , EXACT
+// p -> undefined , EXACT
 
    p = nil;
 
 // Points To:
-// n -> *NULL_POINTER* , EXACT
-// nil -> *NULL_POINTER* , EXACT
-// p -> *NULL_POINTER* , EXACT
+// n -> *NULL* , EXACT
+// nil -> *NULL* , EXACT
+// p -> *NULL* , EXACT
 
    if (n!=nil)
 
@@ -61,9 +61,9 @@ void list06(list l)
       l = l->next;
 
 // Points To:
-// n -> *NULL_POINTER* , EXACT
-// nil -> *NULL_POINTER* , EXACT
-// p -> *NULL_POINTER* , EXACT
+// n -> *NULL* , EXACT
+// nil -> *NULL* , EXACT
+// p -> *NULL* , EXACT
 
    return;
 }

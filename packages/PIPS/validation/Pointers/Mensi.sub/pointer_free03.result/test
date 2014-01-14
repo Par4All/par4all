@@ -1,0 +1,100 @@
+
+POINTS-TO for "pointer_free"
+
+
+// Points To IN:
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
+
+
+// Points To OUT:
+// p -> *HEAP*_l_16 , MAY
+
+void pointer_free(pointer p)
+{
+
+// Points To:
+// p -> *NULL* , MAY
+// p -> _p_1 , MAY
+
+   free(p);
+
+// Points To:
+// p -> undefined , EXACT
+
+   p = malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_16 , MAY
+
+   return;
+}
+
+Proper effects with points-to for "pointer_free"
+
+void pointer_free(pointer p)
+{
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(p);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   p = malloc(sizeof(int));
+   return;
+}
+
+Cumulated effects with points-to for "pointer_free"
+
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+void pointer_free(pointer p)
+{
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(p);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   p = malloc(sizeof(int));
+   return;
+}
+
+POINTS-TO for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main(void)
+{
+
+// Points To: none
+
+   pointer p1, p2;
+
+// Points To:
+// p1 -> undefined , EXACT
+// p2 -> undefined , EXACT
+
+   p1 = malloc(sizeof(int));
+
+// Points To:
+// p1 -> *HEAP*_l_23 , MAY
+// p2 -> undefined , EXACT
+
+   p2 = p1;
+
+// Points To:
+// p1 -> *HEAP*_l_23 , MAY
+// p2 -> *HEAP*_l_23 , MAY
+
+   pointer_free(p1);
+
+// Points To:
+// p1 -> *HEAP*_l_23 , MAY
+// p2 -> *HEAP*_l_23 , MAY
+
+
+   return;
+}

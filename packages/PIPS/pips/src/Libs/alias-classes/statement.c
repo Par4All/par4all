@@ -120,6 +120,16 @@ void add_arc_to_statement_points_to_context(points_to pt)
 {
   pt_map in = stack_head(statement_points_to_context);
   add_arc_to_pt_map(pt, in);
+  //update_points_to_graph_with_arc(pt, in);
+  pips_assert("in is consistent", consistent_pt_map_p(in));
+}
+
+void update_statement_points_to_context_with_arc(points_to pt)
+{
+  pt_map in = stack_head(statement_points_to_context);
+  //add_arc_to_pt_map(pt, in);
+  update_points_to_graph_with_arc(pt, in);
+  pips_assert("in is consistent", consistent_pt_map_p(in));
 }
 
 int points_to_context_statement_line_number()
@@ -162,6 +172,7 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
   pt_map pt_out = new_pt_map();
   pt_out = full_copy_pt_map(pt_in);
   instruction i = statement_instruction(s);
+
   if(points_to_graph_bottom(pt_in)) {
     // The information about dead code must be propagated downwards
     pt_out = instruction_to_points_to(i, pt_out);
@@ -220,9 +231,15 @@ pt_map statement_to_points_to(statement s, pt_map pt_in)
     statement ms = get_current_module_statement();
     entity m = get_current_module_entity();
     bool main_p = ms==s && entity_main_module_p(m);
+    bool body_p = ms==s;
     list dl = statement_declarations(s);
+    /* The statement context is know unknown: it has been popped
+       above. No precise error message in
+       points_to_set_block_projection() */
+    push_statement_points_to_context(s, pt_in);
     points_to_graph_set(pt_out) =
-      points_to_set_block_projection(points_to_graph_set(pt_out), dl, main_p);
+      points_to_set_block_projection(points_to_graph_set(pt_out), dl, main_p, body_p);
+    pt_in = pop_statement_points_to_context();
   }
 
   /* Because arc removals do not update the approximations of the
@@ -435,6 +452,47 @@ pt_map sequence_to_points_to(sequence seq, pt_map pt_in)
 
   return pt_out;
 }
+
+
+/* expand the domain of pt_f according to the domain of pt_t */
+static void expand_points_to_domain(points_to_graph pt_t, points_to_graph pt_f)
+{
+  set s_t = points_to_graph_set(pt_t);
+  set s_f = points_to_graph_set(pt_f);
+  SET_FOREACH(points_to, a_t, s_t) {
+    cell c_t = points_to_source(a_t);
+    bool found_p = false;
+    SET_FOREACH(points_to, a_f, s_f) {
+      cell c_f = points_to_source(a_f);
+      if(points_to_cell_equal_p(c_t, c_f)) {
+	found_p = true;
+	break;
+      }
+    }
+    if(!found_p) {
+      reference r_t = cell_any_reference(c_t);
+      entity v_t = reference_variable(r_t);
+      if(formal_parameter_p(v_t) || entity_stub_sink_p(v_t)) {
+	expression e_t = reference_to_expression(r_t);
+	pt_f = pointer_assignment_to_points_to(e_t, e_t, pt_f);
+	if(points_to_graph_bottom(pt_f))
+	  pips_internal_error("Unexpected information loss.");
+      }
+    }
+  }
+}
+
+/* Make sure that pt_t and pt_f have the same definition domain except
+   if one of them is bottom */
+void  equalize_points_to_domains(points_to_graph pt_t, points_to_graph pt_f)
+{
+  if(!points_to_graph_bottom(pt_t)) {
+    if(!points_to_graph_bottom(pt_f)) {
+      expand_points_to_domain(pt_t, pt_f);
+      expand_points_to_domain(pt_f, pt_t);
+    }
+  }
+}
 
 /* Computing the points-to information after a test.
  *
@@ -490,6 +548,12 @@ pt_map test_to_points_to(test t, pt_map pt_in)
 
   pips_assert("pt_t is consistent", points_to_graph_consistent_p(pt_t));
   pips_assert("pt_f is consistent", points_to_graph_consistent_p(pt_f));
+
+  /* We must use a common definition domain for both relations in
+     order to obatin a really consistent points-to relation after the
+     merge. This is similar to what is done in semantics for scalar
+     preconditions. */
+  equalize_points_to_domains(pt_t, pt_f);
   
   pt_out = merge_points_to_graphs(pt_t, pt_f);
 
@@ -520,6 +584,22 @@ pt_map loop_to_points_to(loop l, pt_map pt_in)
   statement b = loop_body(l);
   //bool store = false;
   //pt_out = points_to_loop(l, pt_in, store);
+
+  /* loop range expressions may require some points-to information 
+   * See for instance Pointers/Mensi.sub/array_init02.c
+   *
+   * Side effects might have to be taken into account... But side
+   * effects should also prevent PIPS from transforming a for loop
+   * into a do loop.
+   */
+  range r = loop_range(l);
+  expression init = range_lower(r);
+  expression bound = range_upper(r);
+  expression inc = range_increment(r);
+  pt_in = expression_to_points_to(init, pt_in, false);
+  pt_in = expression_to_points_to(bound, pt_in, false);
+  pt_in = expression_to_points_to(inc, pt_in, false);
+
   pt_out = any_loop_to_points_to(b,
 				 expression_undefined,
 				 expression_undefined,
@@ -605,6 +685,7 @@ pt_map any_loop_to_points_to(statement b,
       pt_out = expression_to_points_to(init, pt_out, true);
     pt_map pt_out_skip = full_copy_pt_map(pt_out);
     if(!expression_undefined_p(c)) {
+      pt_out = expression_to_points_to(c, pt_out, true);
       pt_out = condition_to_points_to(c, pt_out, true);
       pt_out_skip = condition_to_points_to(c, pt_out_skip, false);
     }
@@ -623,7 +704,7 @@ pt_map any_loop_to_points_to(statement b,
     // FI: it should be a while loop to reach convergence
     // FI: I keep it a for loop for safety
     bool fix_point_p = false;
-    for(i = 0; i<k+2 ; i++){
+    for(i = 0; i<k+2 ; i++) {
       /* prev receives the current points-to information, pt_out */
       clear_pt_map(prev);
       prev = assign_pt_map(prev, pt_out);
@@ -639,15 +720,17 @@ pt_map any_loop_to_points_to(statement b,
       // FI: should be condition_to_points_to() for conditions such as
       // while(p!=q);
       // The condition is not always defined (do loops)
-      if(!expression_undefined_p(c))
+      if(!expression_undefined_p(c)) {
 	pt_out = condition_to_points_to(c, pt_out, true);
+	upgrade_approximations_in_points_to_set(pt_out);
+      }
 
       /* Merge the previous resut and the current result. */
       // FI: move to pt_map
       pt_out = merge_points_to_graphs(prev, pt_out);
 
       pt_out = normalize_points_to_graph(pt_out);
-      pt_out = remove_unreachable_vertices_in_points_to_graph(pt_out);
+      pt_out = remove_unreachable_stub_vertices_in_points_to_graph(pt_out);
 
       // pips_assert("", consistent_points_to_graph_p(pt_out));
 
@@ -681,8 +764,9 @@ pt_map any_loop_to_points_to(statement b,
     }
 
     if(!fix_point_p) {
-      print_points_to_set("Loop points-to set:\n", points_to_graph_set(pt_out));
-      pips_internal_error("Loop convergence not reached.\n");
+      print_points_to_set("Loop points-to set prev:\n", points_to_graph_set(prev));
+      print_points_to_set("Loop points-to set pt_out:\n", points_to_graph_set(pt_out));
+      pips_internal_error("Loop convergence not reached in %d iterations.\n", i);
     }
 
     /* FI: I suppose that p[i] is replaced by p[*] and that MAY/MUST

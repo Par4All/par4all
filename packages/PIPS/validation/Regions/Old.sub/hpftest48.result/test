@@ -1434,7 +1434,7 @@ C/////////////////////////////////////////////////////////////////////
       END
 --- Preconditions for REDMIN
 
-C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 50<=UP1, UP1<=800}
+C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 800<=UP2, UP2<=4000}
 
 
 c
@@ -1445,21 +1445,21 @@ c
       REAL*8 A(LO1:UP1,LO2:UP2), MINA
       INTEGER I,J
 
-C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 50<=UP1, UP1<=800}
+C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 800<=UP2, UP2<=4000}
 
       MINA = A(LO1,LO2)                                                 0009
 
-C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 50<=UP1, UP1<=800}
+C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 800<=UP2, UP2<=4000}
 
       DO J = LO2, UP2                                                   0010
 
-C  P(I,J) {LO1==1, LO2==1, 64UP1+15UP2==63200, 1<=J, J<=UP2, 50<=UP1,
-C    UP1<=800}
+C  P(I,J) {LO1==1, LO2==1, 64UP1+15UP2==63200, 1<=J, J<=UP2, 800<=UP2,
+C    UP2<=4000}
 
          DO I = LO1, UP1                                                0011
 
 C  P(I,J) {LO1==1, LO2==1, 64UP1+15UP2==63200, 1<=I, I<=UP1, 1<=J,
-C    J<=UP2, 50<=UP1, UP1<=800}
+C    J<=UP2, 800<=UP2, UP2<=4000}
 
             IF (A(I,J).LT.MINA) MINA = A(I,J)                           0012
          ENDDO
@@ -1472,7 +1472,7 @@ C    I<=801}
       END
 --- Preconditions for REDMAX
 
-C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 50<=UP1, UP1<=800}
+C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 800<=UP2, UP2<=4000}
 
 c
 c     calcul du max
@@ -1482,21 +1482,21 @@ c
       REAL*8 A(LO1:UP1,LO2:UP2), MAXA
       INTEGER I,J
 
-C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 50<=UP1, UP1<=800}
+C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 800<=UP2, UP2<=4000}
 
       MAXA = A(LO1,LO2)                                                 0008
 
-C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 50<=UP1, UP1<=800}
+C  P() {LO1==1, LO2==1, 64UP1+15UP2==63200, 800<=UP2, UP2<=4000}
 
       DO J = LO2, UP2                                                   0009
 
-C  P(I,J) {LO1==1, LO2==1, 64UP1+15UP2==63200, 1<=J, J<=UP2, 50<=UP1,
-C    UP1<=800}
+C  P(I,J) {LO1==1, LO2==1, 64UP1+15UP2==63200, 1<=J, J<=UP2, 800<=UP2,
+C    UP2<=4000}
 
          DO I = LO1, UP1                                                0010
 
 C  P(I,J) {LO1==1, LO2==1, 64UP1+15UP2==63200, 1<=I, I<=UP1, 1<=J,
-C    J<=UP2, 50<=UP1, UP1<=800}
+C    J<=UP2, 800<=UP2, UP2<=4000}
 
             IF (A(I,J).GT.MAXA) MAXA = A(I,J)                           0011
          ENDDO
@@ -1523,7 +1523,7 @@ c
       INTEGER I,J
 
 C  <A(PHI1,PHI2)-R-EXACT-{PHI1==1, PHI2==1, LO1==1, LO2==1,
-C    64UP1+15UP2==63200, 50<=UP1, UP1<=800}>
+C    64UP1+15UP2==63200, 800<=UP2, UP2<=4000}>
 
       MINA = A(LO1,LO2)                                                 0009
 
@@ -1562,7 +1562,7 @@ c
       INTEGER I,J
 
 C  <A(PHI1,PHI2)-R-EXACT-{PHI1==1, PHI2==1, LO1==1, LO2==1,
-C    64UP1+15UP2==63200, 50<=UP1, UP1<=800}>
+C    64UP1+15UP2==63200, 800<=UP2, UP2<=4000}>
 
       MAXA = A(LO1,LO2)                                                 0008
 

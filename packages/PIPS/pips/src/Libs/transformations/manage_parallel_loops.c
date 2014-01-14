@@ -1,5 +1,5 @@
 /*
-  Copyright 1989-2012 MINES ParisTech - HPC Project
+  Copyright 1989-2014 MINES ParisTech - HPC Project
 
   This file is part of PIPS.
 

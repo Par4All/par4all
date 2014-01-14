@@ -1,0 +1,42 @@
+
+Points-to for "main"
+
+
+// Points To IN:
+// stderr -> *NULL* , MAY
+// stderr -> _stderr_[0] , MAY
+
+
+// Points To OUT: unreachable
+
+int main()
+{
+
+// Points To: none
+
+   s_t s;
+
+// Points To:
+// s.tab -> undefined , EXACT
+
+   int j;
+
+// Points To:
+// s.tab -> undefined , EXACT
+// stderr -> *NULL* , MAY
+// stderr -> _stderr_[0] , MAY
+
+
+   fprintf(stderr, "In main, s.tab=%p\n", s.tab);
+
+// Points To: unreachable
+
+
+   return 0;
+}
+
+Warnings and error: undefined value used expected
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (CSafeSizeOfArray) Varying size for array "pointer_modif04b!:_IO_FILE^_unused2"
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (CSafeSizeOfArray) Not yet supported properly by PIPS
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (intrinsic_call_to_points_to) Undefined value "s.tab" is used at line 24.

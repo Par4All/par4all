@@ -1,0 +1,56 @@
+
+Transformers for "non_affine02"
+
+
+//  T() {}
+
+void non_affine02(int A[500], int B[500], int C[500][500], int i, int k)
+{
+
+//  T(n) {n==10}
+
+   int n = 10;
+
+//  T(i,k) {n==10, 2<=i, i<=9}
+
+   
+   /* Note that the transformer for k is more accurate than the region
+        for B[i*i+4] because the region is not dense and because the
+        constraints on i are nevertheless propagated. xs*/
+   
+   for(i = 2; i <= 9; i += 1) {
+
+//  T() {n==10, 2<=i, i<=9}
+
+      B[n*i+4] = 12345;
+
+//  T(k) {10i==k-4, n==10, 2<=i, i<=9}
+
+      k = n*i+4;
+   }
+}
+
+Regions for "non_affine02"
+
+
+//  <B[PHI1]-W-MAY-{24<=PHI1, PHI1<=94}>
+
+void non_affine02(int A[500], int B[500], int C[500][500], int i, int k)
+{
+   int n = 10;
+
+//  <B[PHI1]-W-MAY-{24<=PHI1, PHI1<=94, n==10}>
+
+   
+   /* Note that the transformer for k is more accurate than the region
+        for B[i*i+4] because the region is not dense and because the
+        constraints on i are nevertheless propagated. xs*/
+   
+   for(i = 2; i <= 9; i += 1) {
+
+//  <B[PHI1]-W-MAY-{PHI1==10i+4, n==10, 2<=i, i<=9}>
+
+      B[n*i+4] = 12345;
+      k = n*i+4;
+   }
+}

@@ -1,0 +1,61 @@
+setenv WSPACE=list00a
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+# It remains to be debugged
+# activate INTRAPROCEDURAL_POINTS_TO_ANALYSIS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+
+# Key property for this test case
+# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+setproperty POINTS_TO_PATH_LIMIT 10
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+
+echo 
+echo Points-to for "list_next"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[list_next]
+
+echo 
+echo Proper effects for "list_next"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[list_next]
+
+echo 
+echo Cumulated effects for "list_next"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[list_next]
+
+echo 
+echo Points-to for "list_len"
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[list_len]
+
+echo 
+echo Proper effects for "list_len"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[list_len]
+
+echo 
+echo Cumulated effects for "list_len"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[list_len]
+
+close
+delete $WSPACE
+quit

@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2012 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -131,11 +131,11 @@ void smart_log_handler(const char *fmt, va_list args)
 #define PIPS_THANKS_STRING(arch)                                        \
   "%s (ARCH=" arch ")\n  running as %s\n"                               \
   "\n"                                                                  \
-  "  (c) 1988-2012 Centre de Recherche en Informatique,\n"              \
+  "  (c) 1988-2014 Centre de Recherche en Informatique,\n"              \
   "                Unite de Recherche Mathematiques et Systemes,\n"     \
   "                MINES ParisTech, France.\n"                          \
   "\n"                                                                  \
-  "  CRI URL: http://cri.mines-paristech.fr/\n"                         \
+  "  CRI URL: http://www.cri.mines-paristech.fr/\n"                     \
   "  PIPS URL: http://pips4u.org/\n"                                    \
   "  EMAIL: pips-support at cri dot mines-paristech dot fr\n"           \
   "\n"                                                                  \
@@ -149,9 +149,9 @@ void smart_log_handler(const char *fmt, va_list args)
 void
 pips_thanks(string name, string path)
 {
-    if (isatty(fileno(stdout)))
-    {
-	fprintf(stdout, PIPS_THANKS_STRING(STRINGIFY(SOFT_ARCH)), name, path);
-	fflush(stdout);
-    }
+  if (isatty(fileno(stdout)))
+  {
+    fprintf(stdout, PIPS_THANKS_STRING(STRINGIFY(SOFT_ARCH)), name, path);
+    fflush(stdout);
+  }
 }

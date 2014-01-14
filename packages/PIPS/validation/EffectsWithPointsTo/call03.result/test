@@ -1,106 +1,164 @@
-0a1,105
-> 
-> POINTS-TO
-> 
-> 
-> // Points To IN:
-> // pi -> *NULL_POINTER* , MAY
-> // pi -> _pi_84[0] , MAY
-> // q -> *NULL_POINTER* , MAY
-> // q -> _q_92[0] , MAY
-> 
-> 
-> // Points To OUT:
-> // pi -> _pi_84[1] , EXACT
-> // q -> _q_92[0] , EXACT
-> 
-> void call03()
-> {
-> 
-> // Points To:
-> // pi -> *NULL_POINTER* , MAY
-> // pi -> _pi_84[0] , MAY
-> 
->    *pi = 1;
-> 
-> // Points To:
-> // pi -> _pi_84[0] , EXACT
-> 
->    pi++;
-> 
-> // Points To:
-> // pi -> _pi_84[1] , EXACT
-> 
->    *pi = 2;
-> 
-> // Points To:
-> // pi -> _pi_84[1] , EXACT
-> // q -> *NULL_POINTER* , MAY
-> // q -> _q_92[0] , MAY
-> 
->    q->one = 1;
-> 
-> // Points To:
-> // pi -> _pi_84[1] , EXACT
-> // q -> _q_92[0] , EXACT
-> 
->    (q->two)[4] = 2;
-> 
-> // Points To:
-> // pi -> _pi_84[1] , EXACT
-> // q -> _q_92[0] , EXACT
-> 
->    return;
-> }
-> 
-> // Points To IN: none
-> 
-> 
-> // Points To OUT: none
-> 
-> int main()
-> {
-> 
-> // Points To: none
-> 
->    call03();
-> 
-> // Points To: none
-> 
->    return 0;
-> }
-> 
-> PROPER  EFFECTS WITH POINTS TO
-> 
-> void call03()
-> {
-> //             <may be written>: _pi_84[0]
-> //             <    is read   >: pi
->    *pi = 1;
-> //             <    is read   >: pi
-> //             <    is written>: pi
->    pi++;
-> //             <    is read   >: pi
-> //             <    is written>: _pi_84[1]
->    *pi = 2;
-> //             <may be written>: _q_92[0].one
-> //             <    is read   >: q
->    q->one = 1;
-> //             <    is read   >: q
-> //             <    is written>: _q_92[0].two[4]
->    (q->two)[4] = 2;
->    return;
-> }
-> int main()
-> {
-> //             <may be written>: call03:_pi_84[*] call03:_q_92[0].one
-> //             <    is read   >: pi q
-> //             <    is written>: pi call03:_q_92[0].two[4]
->    call03();
->    return 0;
-> }
-> 
->  *********************** Use-Def Chains *********************
-> 
-> 
-> ****************** End of Dependence Graph ******************
+
+Points-to for "call03"
+
+
+// Points To IN:
+// pi -> *NULL* , MAY
+// pi -> _pi_84[0] , MAY
+// q -> *NULL* , MAY
+// q -> _q_92[0] , MAY
+
+
+// Points To OUT:
+// pi -> _pi_84[1] , EXACT
+// q -> _q_92[0] , EXACT
+
+void call03()
+{
+
+// Points To:
+// pi -> *NULL* , MAY
+// pi -> _pi_84[0] , MAY
+
+   *pi = 1;
+
+// Points To:
+// pi -> _pi_84[0] , EXACT
+
+   pi++;
+
+// Points To:
+// pi -> _pi_84[1] , EXACT
+
+   *pi = 2;
+
+// Points To:
+// pi -> _pi_84[1] , EXACT
+// q -> *NULL* , MAY
+// q -> _q_92[0] , MAY
+
+   q->one = 1;
+
+// Points To:
+// pi -> _pi_84[1] , EXACT
+// q -> _q_92[0] , EXACT
+
+   (q->two)[4] = 2;
+
+// Points To:
+// pi -> _pi_84[1] , EXACT
+// q -> _q_92[0] , EXACT
+
+   return;
+}
+
+Proper effects with points-to for "call03"
+
+void call03()
+{
+//             <    is read   >: pi
+//             <    is written>: _pi_84[0]
+   *pi = 1;
+//             <    is read   >: pi
+//             <    is written>: pi
+   pi++;
+//             <    is read   >: pi
+//             <    is written>: _pi_84[1]
+   *pi = 2;
+//             <    is read   >: q
+//             <    is written>: _q_92[0].one
+   q->one = 1;
+//             <    is read   >: q
+//             <    is written>: _q_92[0].two[4]
+   (q->two)[4] = 2;
+   return;
+}
+
+Cumulated effects with points-to for "call03"
+
+//             <may be written>: _pi_84[*]
+//             <    is read   >: pi q
+//             <    is written>: _q_92[0].one _q_92[0].two[4] pi
+void call03()
+{
+//             <    is read   >: pi
+//             <    is written>: _pi_84[0]
+   *pi = 1;
+//             <    is read   >: pi
+//             <    is written>: pi
+   pi++;
+//             <    is read   >: pi
+//             <    is written>: _pi_84[1]
+   *pi = 2;
+//             <    is read   >: q
+//             <    is written>: _q_92[0].one
+   q->one = 1;
+//             <    is read   >: q
+//             <    is written>: _q_92[0].two[4]
+   (q->two)[4] = 2;
+   return;
+}
+
+Points-to for "main"
+
+
+// Points To IN:
+// pi -> *NULL* , MAY
+// pi -> _pi_84[0] , MAY
+// q -> *NULL* , MAY
+// q -> _q_92[0] , MAY
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To:
+// pi -> *NULL* , MAY
+// pi -> _pi_84[0] , MAY
+// q -> *NULL* , MAY
+// q -> _q_92[0] , MAY
+
+   call03();
+
+// Points To:
+// pi -> _pi_84[1] , EXACT
+// q -> _q_92[0] , EXACT
+
+   return 0;
+}
+
+Proper effects with points-to for "main"
+
+int main()
+{
+//             <may be written>: _pi_84[*]
+//             <    is read   >: pi q
+//             <    is written>: _q_92[0].one _q_92[0].two[4] pi
+   call03();
+   return 0;
+}
+
+Cumulated effects with points-to for "main"
+
+//             <may be written>: _pi_84[*]
+//             <    is read   >: pi q
+//             <    is written>: _q_92[0].one _q_92[0].two[4] pi
+int main()
+{
+//             <may be written>: _pi_84[*]
+//             <    is read   >: pi q
+//             <    is written>: _q_92[0].one _q_92[0].two[4] pi
+   call03();
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	16 --> 17 with conflicts
+		from <pi-R-EXACT> to <pi-W-EXACT>
+	17 --> 18 with conflicts
+		from <pi-W-EXACT> to <pi-R-EXACT>
+
+****************** End of Dependence Graph ******************

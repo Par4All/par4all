@@ -1,46 +1,76 @@
 setenv WS=message_error
 delete $WS
 setproperty ABORT_ON_USER_ERROR TRUE
-setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
+# This property is incompatible with the call because a character
+# array, "hello" is passed to a char * that expect one character if
+# the property below is set to TRUE
+
+# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
+
+# Not compatible with the current points-to implementation and CP lattice
+# setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+
 create $WS $WS.c
 
-
 echo
-echo POINTS TO for "$WS"
+echo Points-to for ""
 echo
 #activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE[msg_error]
-display PRINTED_FILE[main]
 
 echo 
-echo PROPER  EFFECTS WITH POINTS TO
+echo Proper effects with points-to for "msg_error"
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[msg_error]
-display PRINTED_FILE[main]
 
 echo 
-echo CUMULATED  EFFECTS WITH POINTS TO
+echo Cumulated effects with points-to for "msg_error"
 echo
 activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[msg_error]
-display PRINTED_FILE[main]
 
 echo
-echo POINTS TO for "$WS"
+echo Points-to for "main"
 echo
-activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
+#activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[msg_error]
 display PRINTED_FILE[main]
 
+echo 
+echo Proper effects with points-to for "main"
+echo
+#activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
 
+echo 
+echo Cumulated effects with points-to for "main"
+echo
+#activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+# it used to have some sense when the interprocedural points-to analysis was not the default phase for points-to
+#echo
+#echo POINTS TO for "$WS"
+#echo
+#activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
+#activate PRINT_CODE_POINTS_TO_LIST
+#display PRINTED_FILE[msg_error]
+#display PRINTED_FILE[main]
 
 close
+
+echo
+echo Warnings and errors
+echo
+
 shell cat $WS.database/Warnings
+
 delete $WS
 quit

@@ -1,5 +1,5 @@
 
-Source code with cumulated effects
+Source code with cumulated effects with point-to
 
 int main(void)
 {
@@ -12,13 +12,13 @@ int main(void)
    pbla = &bla;
 //             <    is read   >: pbla
 //             <    is written>: bla
-   // kill all preconditions
+
    *pbla = 1;
 
    return 0;
 }
 
-Source code with transformers
+Source code with transformers with point-to
 
 
 //  T(main) {main==0}
@@ -45,7 +45,7 @@ int main(void)
 
 //  T(bla) {}
 
-   // kill all preconditions
+
    *pbla = 1;
 
 //  T(main) {main==0}
@@ -54,7 +54,7 @@ int main(void)
    return 0;
 }
 
-Source code with preconditions
+Source code with preconditions with point-to
 
 
 //  P() {}
@@ -81,7 +81,7 @@ int main(void)
 
 //  P(b,bla) {b==1}
 
-   // kill all preconditions
+
    *pbla = 1;
 
 //  P(b,bla) {b==1}

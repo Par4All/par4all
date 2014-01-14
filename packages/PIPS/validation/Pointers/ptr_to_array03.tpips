@@ -10,8 +10,9 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 # Key property for this test case
 # setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
 
+# This property is no loger supported in a meaningful way
 # To check the impact on EXACT/MAY for p->_pp_1
-setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
+# setproperty POINTS_TO_NULL_POINTER_INITIALIZATION FALSE
 
 #module main
 

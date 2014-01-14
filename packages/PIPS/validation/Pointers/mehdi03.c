@@ -1,7 +1,9 @@
 /* Same as mehdi02.c but different tpips script: here
  * context-sensitive is set to false.
  *
- * p->q cannot be evaluated because q is not initialized.
+ * p->q cannot be evaluated because q is not initialized: no p is
+ * initialized and q is a field. The assignment is OK, but the value
+ * assigned is undefined. This aso is OK with the C standard.
  */
 
 #include<stdio.h>

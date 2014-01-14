@@ -384,6 +384,7 @@ static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, 
 //             <    is written>: jmax
                jmax = lonRange;
 
+//             <    is read   >: imax imin jmax jmin
             data_t contrib[imax-imin+1][jmax-jmin+1];
             {
                size_t i;
@@ -556,6 +557,7 @@ static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t lat
 //             <    is written>: jmax
                jmax = lonRange;
 
+//             <    is read   >: imax imin jmax jmin
             data_t contrib[imax-imin+1][jmax-jmin+1];
             {
                size_t i;
@@ -728,6 +730,7 @@ static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, dat
 //             <    is written>: jmax
                jmax = lonRange;
 
+//             <    is read   >: imax imin jmax jmin
             data_t contrib[imax-imin+1][jmax-jmin+1];
             {
                size_t i;
@@ -900,6 +903,7 @@ static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t
 //             <    is written>: jmax
                jmax = lonRange;
 
+//             <    is read   >: imax imin jmax jmin
             data_t contrib[imax-imin+1][jmax-jmin+1];
             {
                size_t i;
@@ -1072,6 +1076,7 @@ static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t l
 //             <    is written>: jmax
                jmax = lonRange;
 
+//             <    is read   >: imax imin jmax jmin
             data_t contrib[imax-imin+1][jmax-jmin+1];
             {
                size_t i;

@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -33,12 +33,11 @@
 
 #include "genC.h"
 #include "top-level.h"
+#include "misc.h"
 
+#undef test_undefined // also defined in glib included from gtk
 #include <gtk/gtk.h>
 #include "gpips.h"
-
-#include "genC.h"
-#include "misc.h"
 
 #define min(a,b) ((a) < (b) ? (a) : (b))
 #define HELP_LINES 32

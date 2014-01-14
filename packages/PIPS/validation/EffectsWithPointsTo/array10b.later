@@ -1,0 +1,3 @@
+Doit-on enlever les dereferencements dans les expressions d'indices apparaissant dans les effets propres?
+
+Si on ne le fait pas, il faut le faire dans une phase ulterireure, soit dans le test de dependance, soit dans une phase d'evaluation partielle des dereferencements.

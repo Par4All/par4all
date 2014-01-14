@@ -21,9 +21,10 @@ void init(mys *m)
       m->tab1[i] = 1;
       m->tab2[i] = m->tab1[i];
     }
-  
 }
 
+/* Same as previous function, but the parameter is copied first and
+   the copy is used in the function body. */
 void init2(mys *n)
 {
   int i;
@@ -39,9 +40,9 @@ void init2(mys *n)
       m.tab1[i] = 1;
       m.tab2[i] = m.tab1[i];
     }
-  
 }
 
+/* Useless use of a copy: all the work is lost on return */
 void init3(mys **p)
 {
   int i;
@@ -90,6 +91,8 @@ int main()
 {
   mys *p, *q, **r, *s[N];
 
+  /* Since p is not initialized, the first call is useless and init()
+     core dumps. */
   init(p);
   init2(q);
   init3(r);

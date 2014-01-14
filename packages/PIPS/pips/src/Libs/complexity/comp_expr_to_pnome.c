@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2014 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -168,7 +168,7 @@ list effects_list;
 bool keep_symbols;
 int maximize;
 {
-  complexity comp = complexity_undefined;
+  complexity comp = make_zero_complexity();// complexity_undefined;
 
   trace_on("syntax -> pnome");
 
@@ -405,12 +405,10 @@ int maximize;
 	    comp = power_op_handler(args, precond, effects_list, keep_symbols, maximize);
 	else if (same_string_p(name, UNARY_MINUS_OPERATOR_NAME))
 	    comp = unary_minus_op_handler(args, precond, effects_list, keep_symbols, maximize);
-	else if (same_string_p(name, UNARY_PLUS_OPERATOR_NAME))
-	    comp = unary_plus_op_handler(args, precond, effects_list, keep_symbols, maximize);
-        else if (same_string_p(name, FIELD_OPERATOR_NAME))
-            comp = field_op_handler(args, precond, effects_list, keep_symbols, maximize);
-        else
-            pips_user_warning("operator '%s' skipped\n",name);
+	else if (same_string_p(name, FIELD_OPERATOR_NAME))
+        comp = field_op_handler(args, precond, effects_list, keep_symbols, maximize);
+    else
+        pips_user_warning("operator '%s' skipped\n",name);
 
 	break;
     default:pips_internal_error("not handled case");

@@ -1,0 +1,37 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+
+delete sb_equal_se
+
+setenv PIPS_CPP_FLAGS " -D TIME "
+
+create sb_equal_se sb_equal_se.c
+activate C_PARSER
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE
+setproperty SEMANTICS_FILTER_INITIAL_VALUES TRUE
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE 
+
+
+
+setproperty PATH_TRANSFORMER_BEGIN "sb"
+setproperty PATH_TRANSFORMER_END "sb"
+
+echo When the transformer for the empty path is identity:
+setproperty IDENTITY_EMPTY_PATH_TRANSFORMER TRUE
+apply PATH_TRANSFORMER[main]
+shell cat sb_equal_se.database/main/main.pt
+
+echo When The transformer for the empty path is false:
+setproperty IDENTITY_EMPTY_PATH_TRANSFORMER FALSE
+apply PATH_TRANSFORMER[main]
+shell cat sb_equal_se.database/main/main.pt
+
+close
+delete sb_equal_se
+quit
+
+
+

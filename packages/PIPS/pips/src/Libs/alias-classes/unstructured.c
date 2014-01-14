@@ -263,6 +263,12 @@ pt_map new_points_to_unstructured(unstructured uns,
   bool inter_p = set_intersection_p(Reachable, Pred);
   if(!inter_p)
     set_add_element(rtbp, rtbp, (void*)entry);
+  else {
+    /* The entry node is part of a cycle, rtbp is empty and the while
+       loop below is soing to be skipped. Relation "out_g" must be
+       properly initialized. */
+    out_g = full_copy_pt_map(pt_in_g);
+  }
 
   while(!set_empty_p(rtbp)) {
     rtbp_tmp = set_assign(rtbp_tmp,rtbp);

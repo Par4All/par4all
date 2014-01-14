@@ -1,0 +1,1 @@
+y[n] is privatized outside of the loop nest, which blocks the parallelization.

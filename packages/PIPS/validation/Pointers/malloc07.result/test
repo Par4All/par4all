@@ -1,25 +1,5 @@
 
-PROPER  EFFECTS
-
-int main(int argc, char *argv[])
-{
-   int *pi;
-   int *qi;
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: pi _MALLOC_EFFECTS:_MALLOC_
-
-   pi = (int *) malloc(sizeof(int));
-//             <    is read   >: pi
-//             <    is written>: qi
-   qi = pi;
-//             <    is read   >: pi _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-   free(pi);
-
-   return 0;
-}
-
-POINTS-TO
+Points-to for "malloc07"
 
 
 // Points To IN: none
@@ -27,7 +7,7 @@ POINTS-TO
 
 // Points To OUT: none
 
-int main(int argc, char *argv[])
+int malloc07(int argc, char *argv[])
 {
 
 // Points To: none
@@ -35,20 +15,20 @@ int main(int argc, char *argv[])
    int *pi;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pi -> undefined , EXACT
 
    int *qi;
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pi -> undefined , EXACT
+// qi -> undefined , EXACT
 
 
    pi = (int *) malloc(sizeof(int));
 
 // Points To:
 // pi -> *HEAP*_l_10 , MAY
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// qi -> undefined , EXACT
 
    qi = pi;
 
@@ -59,10 +39,17 @@ int main(int argc, char *argv[])
    free(pi);
 
 // Points To:
-// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// qi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pi -> undefined , EXACT
+// qi -> *HEAP*_l_10 , MAY
+// qi -> undefined , MAY
 
 
    return 0;
 }
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_pointer_to_points_to) Dangling pointer "main:0`qi".
+
+Warnings and errors: Check that the dangling pointer is detected?
+
+In fact, this information cannot be known unless alias analysis
+is also performed
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[malloc07] (points_to_set_block_projection) Memory leak for bucket "malloc07:*HEAP*_l_10".

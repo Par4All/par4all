@@ -1,0 +1,64 @@
+setenv WSPACE=pointer_modif04c
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+# The source code is buggy and the effect analysis may raise a user
+# error. However, it's only a may error as the value of max may guard
+# the compute loop...
+
+# setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+#setenv POINTER_VALUES_DEBUG_LEVEL 2
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+
+echo
+echo Points-to for "compute_s"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE [compute_s]
+
+echo
+echo Proper effects with points-to for "compute_s"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE [compute_s]
+
+echo
+echo Points-to for "main"
+echo
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE [main]
+
+echo
+echo Proper effects with points-to for "main"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE [main]
+
+# The user error raised by the proper effect analysis causes a core
+# dump in the next attempt at computing the proper effects to obtain
+# the dg. Hence, the dg computation is commented out
+
+#activate PRINT_CHAINS_GRAPH
+#display DG_FILE[main]
+
+close
+
+echo
+echo Warnings and errors:
+echo
+echo  - unitialized value passed down to a callee, here, compute_s()
+echo
+
+shell cat $WSPACE.database/Warnings
+
+delete $WSPACE
+quit

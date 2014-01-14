@@ -5,4 +5,5 @@ void dereferencing04()
   double * r;
 
   *(p+(q-r)) = 0.;
+  return;
 }

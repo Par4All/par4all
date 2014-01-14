@@ -4,15 +4,11 @@
 #define N 5
 #define M 3
 
-
-
 void foo(int *p)
 {
   *p = 4;
   return;
 }
-
-
 
 int main() 
 {
@@ -22,7 +18,6 @@ int main()
   int tab3[10][10];
   int **tab4;
   int y;
-  
 
   foo(x);
   foo(tab);

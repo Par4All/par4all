@@ -32,21 +32,21 @@ int main(void)
 // Points To:
 // pi1 -> i1 , EXACT
 // pi2 -> i2 , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
    srand(time((void *) 0));
 
 // Points To:
 // pi1 -> i1 , EXACT
 // pi2 -> i2 , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
    if (alea())
 
 // Points To:
 // pi1 -> i1 , EXACT
 // pi2 -> i2 , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
       pp = &pi1;
    else
@@ -54,7 +54,7 @@ int main(void)
 // Points To:
 // pi1 -> i1 , EXACT
 // pi2 -> i2 , EXACT
-// pp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pp -> undefined , EXACT
 
       pp = &pi2;
 
@@ -67,9 +67,9 @@ int main(void)
    *pp = (void *) 0;
 
 // Points To:
-// pi1 -> *NULL_POINTER* , MAY
+// pi1 -> *NULL* , MAY
 // pi1 -> i1 , MAY
-// pi2 -> *NULL_POINTER* , MAY
+// pi2 -> *NULL* , MAY
 // pi2 -> i2 , MAY
 // pp -> pi1 , MAY
 // pp -> pi2 , MAY
@@ -77,9 +77,9 @@ int main(void)
    printf("%p %p %p\n", pp, pi1, pi2);
 
 // Points To:
-// pi1 -> *NULL_POINTER* , MAY
+// pi1 -> *NULL* , MAY
 // pi1 -> i1 , MAY
-// pi2 -> *NULL_POINTER* , MAY
+// pi2 -> *NULL* , MAY
 // pi2 -> i2 , MAY
 // pp -> pi1 , MAY
 // pp -> pi2 , MAY

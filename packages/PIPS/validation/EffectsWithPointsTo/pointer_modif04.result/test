@@ -2,10 +2,14 @@
 Points-to for "init_s"
 
 
-// Points To IN: none
+// Points To IN:
+// stderr -> *NULL* , MAY
+// stderr -> _stderr_[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// s.tab -> *HEAP*_l_19[0] , MAY
+// stderr -> _stderr_[0] , EXACT
 
 void init_s(s_t s, int max)
 {
@@ -16,14 +20,22 @@ void init_s(s_t s, int max)
    s.tab = (float *) malloc(max*sizeof(float));
 
 // Points To:
-// s.tab -> *HEAP*_l_14[0] , MAY
+// s.tab -> *HEAP*_l_19[0] , MAY
 
    s.max = max;
 
 // Points To:
-// s.tab -> *HEAP*_l_14[0] , MAY
+// s.tab -> *HEAP*_l_19[0] , MAY
+// stderr -> *NULL* , MAY
+// stderr -> _stderr_[0] , MAY
 
    fprintf(stderr, "In init_s, s.tab=%p\n", s.tab);
+
+// Points To:
+// s.tab -> *HEAP*_l_19[0] , MAY
+// stderr -> _stderr_[0] , EXACT
+
+   return;
 }
 
 Proper effects with points-to for "init_s"
@@ -42,15 +54,46 @@ void init_s(s_t s, int max)
 //             <    is read   >: s.tab stderr __IO_EFFECTS:LUNS[2]
 //             <    is written>: __IO_EFFECTS:LUNS[2]
    fprintf(stderr, "In init_s, s.tab=%p\n", s.tab);
+   return;
+}
+
+Cumulated effects with points-to for "init_s"
+
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: max s.tab stderr 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: s.max s.tab _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2]
+void init_s(s_t s, int max)
+{
+//             <    is read   >: max _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: s.tab _MALLOC_EFFECTS:_MALLOC_
+
+   s.tab = (float *) malloc(max*sizeof(float));
+//             <    is read   >: max
+//             <    is written>: s.max
+   s.max = max;
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: s.tab stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "In init_s, s.tab=%p\n", s.tab);
+   return;
 }
 
 Points-to for "compute_s"
 
 
-// Points To IN: none
+// Points To IN:
+// s.tab -> *NULL* , MAY
+// s.tab -> _s_2__1[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT:
+// s.tab -> *NULL* , MAY
+// s.tab -> _s_2__1[0] , MAY
 
 void compute_s(s_t s, int max)
 {
@@ -64,9 +107,18 @@ void compute_s(s_t s, int max)
 
    for(i = 0; i <= max-1; i += 1)
 
-// Points To: none
+// Points To:
+// s.tab -> *NULL* , MAY
+// s.tab -> _s_2__1[0] , MAY
 
       (s.tab)[i] = i*2.0;
+
+// Points To:
+// s.tab -> *NULL* , MAY
+// s.tab -> _s_2__1[0] , MAY
+
+
+   return;
 }
 
 Proper effects with points-to for "compute_s"
@@ -79,16 +131,42 @@ void compute_s(s_t s, int max)
 
    for(i = 0; i <= max-1; i += 1)
 //             <    is read   >: i max s.tab
+//             <    is written>: _s_2__1[i]
       (s.tab)[i] = i*2.0;
+
+   return;
+}
+
+Cumulated effects with points-to for "compute_s"
+
+//             <may be read   >: s.tab
+//             <may be written>: _s_2__1[*]
+//             <    is read   >: max
+void compute_s(s_t s, int max)
+{
+   int i;
+//             <may be read   >: i s.tab
+//             <may be written>: _s_2__1[*]
+//             <    is read   >: max
+//             <    is written>: i
+
+   for(i = 0; i <= max-1; i += 1)
+//             <may be written>: _s_2__1[*]
+//             <    is read   >: i max s.tab
+      (s.tab)[i] = i*2.0;
+
+   return;
 }
 
 Points-to for "main"
 
 
-// Points To IN: none
+// Points To IN:
+// stderr -> *NULL* , MAY
+// stderr -> _stderr_[0] , MAY
 
 
-// Points To OUT: none
+// Points To OUT: unreachable
 
 int main()
 {
@@ -98,32 +176,32 @@ int main()
    s_t s;
 
 // Points To:
-// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s.tab -> undefined , EXACT
 
    int j;
 
 // Points To:
-// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s.tab -> undefined , EXACT
+// stderr -> *NULL* , MAY
+// stderr -> _stderr_[0] , MAY
 
 
    init_s(s, 10);
 
 // Points To:
-// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s.tab -> undefined , EXACT
+// stderr -> _stderr_[0] , EXACT
 
    fprintf(stderr, "In main, s.tab=%p\n", s.tab);
 
-// Points To:
-// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// Points To: unreachable
 
 
    compute_s(s, 10);
 
-// Points To:
-// s.tab -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// Points To: unreachable
 
-   
-   
+
    return 0;
 }
 
@@ -147,17 +225,15 @@ int main()
 //             <    is read   >: s.tab stderr __IO_EFFECTS:LUNS[2]
 //             <    is written>: __IO_EFFECTS:LUNS[2]
    fprintf(stderr, "In main, s.tab=%p\n", s.tab);
-//             <    is read   >: s.max s.tab
 
    compute_s(s, 10);
-   
-   
+
    return 0;
 }
 
  *********************** Use-Def Chains *********************
 
-	34 --> 35 with conflicts
+	40 --> 41 with conflicts
 		from <stderr[0]-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[2]-W-EXACT> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
 		from <stderr[0]-W-MAY> to <stderr[0]-R-MAY>
@@ -167,14 +243,19 @@ int main()
 
 ****************** End of Dependence Graph ******************
 
-Warnings (A memory leak should be detected when exiting init_s)
+Warnings:
 
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[init_s] (points_to_function_projection) Memory cell *HEAP*_l_14[0] leaked.
-unknown[unknown] (activate_phase) Rule `PROPER_EFFECTS_WITH_POINTS_TO' already active
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function has no side effect on its formal context via pointer variables.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function has no side effect on its formal context via pointer variables.
-unknown[unknown] (activate_phase) Rule `PROPER_EFFECTS_WITH_POINTS_TO' already active
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function has no side effect on its formal context via pointer variables.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function has no side effect on its formal context via pointer variables.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function has no side effect on its formal context via pointer variables.
-INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function has no side effect on its formal context via pointer variables.
+1. A memory leak should be detected when exiting init_s.
+
+2. Because struct s is passed by copy, it is left uninitialized
+and the program core dumps
+
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[init_s] (CSafeSizeOfArray) Varying size for array "pointer_modif04!:_IO_FILE^_unused2"
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[init_s] (CSafeSizeOfArray) Not yet supported properly by PIPS
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (internal_pointer_assignment_to_points_to) Assignment of an undefined value to "s[tab]" at line 40.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (intrinsic_call_to_points_to) Undefined value "s.tab" is used at line 41.
+PROPER_EFFECTS_WITH_POINTS_TO[main] (source_to_sinks) 
+Uninitialized or null pointer dereferenced: Sink missing for a source based on "s".
+Update points-to property POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING and/or POINTS_TO_UNINITIALIZED_NULL_DEREFERENCING according to needs.
+PROPER_EFFECTS_WITH_POINTS_TO[main] (reference_to_points_to_sinks) Some kind of execution error has been encountered.
+PROPER_EFFECTS_WITH_POINTS_TO[main] (internal_pointer_assignment_to_points_to) Expression "s[tab]" could not be dereferenced.

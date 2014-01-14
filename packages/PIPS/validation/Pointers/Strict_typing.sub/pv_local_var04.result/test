@@ -44,32 +44,32 @@ int main()
    int *pp = (void *) 0;
 
 // Points To:
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 
    // FI: to manage an empty points-to set
    if (a>1) {
 
 // Points To:
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 
       static int *p = &a;
 
 // Points To:
 // p -> a , EXACT
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 
       static int *q;
 
 // Points To:
 // p -> a , EXACT
-// pp -> *NULL_POINTER* , EXACT
-// q -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
+// q -> *NULL* , EXACT
 
       q = &b;
 
 // Points To:
 // p -> a , EXACT
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 // q -> b , EXACT
 
       a = a-1;
@@ -77,25 +77,25 @@ int main()
    else {
 
 // Points To:
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 
       static int *r = &a;
 
 // Points To:
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 // r -> a , EXACT
 
       static int *s;
 
 // Points To:
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 // r -> a , EXACT
-// s -> *NULL_POINTER* , EXACT
+// s -> *NULL* , EXACT
 
       s = &b;
 
 // Points To:
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 // r -> a , EXACT
 // s -> b , EXACT
 
@@ -104,7 +104,7 @@ int main()
 
 // Points To:
 // p -> a , EXACT
-// pp -> *NULL_POINTER* , EXACT
+// pp -> *NULL* , EXACT
 // q -> b , EXACT
 // r -> a , EXACT
 // s -> b , EXACT

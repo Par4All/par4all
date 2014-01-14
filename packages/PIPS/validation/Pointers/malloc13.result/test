@@ -1,0 +1,86 @@
+
+Points-to for "foo"
+
+
+// Points To IN: none
+
+
+// Points To OUT:
+// foo -> *HEAP*_l_19 , MAY
+
+int * foo(void)
+{
+
+// Points To: none
+
+   int *p = (int *) malloc(sizeof(int));
+
+// Points To:
+// p -> *HEAP*_l_19 , MAY
+
+   return p;
+}
+
+Points-to for "main"
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+int main()
+{
+
+// Points To: none
+
+   int i = 1, *p[10], *q;
+
+// Points To:
+// p[*] -> undefined , EXACT
+// q -> undefined , EXACT
+
+
+   p[i] = foo();
+
+// Points To:
+// p[*] -> foo:*HEAP*_l_19 , MAY
+// p[*] -> undefined , MAY
+// q -> undefined , EXACT
+
+   p[0] = foo();
+
+// Points To:
+// p[*] -> foo:*HEAP*_l_19 , MAY
+// p[0] -> foo:*HEAP*_l_19 , MAY
+// p[*] -> undefined , MAY
+// q -> undefined , EXACT
+
+
+   free(p[i]);
+
+// Points To:
+// p[*] -> foo:*HEAP*_l_19 , MAY
+// p[0] -> foo:*HEAP*_l_19 , MAY
+// p[*] -> undefined , MAY
+// p[0] -> undefined , MAY
+// q -> undefined , EXACT
+
+
+   q = p[i];
+
+// Points To:
+// p[*] -> foo:*HEAP*_l_19 , MAY
+// p[0] -> foo:*HEAP*_l_19 , MAY
+// p[*] -> undefined , MAY
+// p[0] -> undefined , MAY
+// q -> foo:*HEAP*_l_19 , MAY
+// q -> undefined , MAY
+
+
+   return *q;
+}
+
+Warnings and errors: Check that the dangling pointer and the memory leak are detected?
+Impossible with the current model of heap and array elements
+
