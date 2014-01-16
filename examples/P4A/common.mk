@@ -15,7 +15,6 @@ endif
 
 # You can set P4A_OPTIONS to pass options to p4a
 CFLAGS+= -O3 -std=c99 -Wall
-CPPFLAGS+= -D_GNU_SOURCE
 CPPFLAGS+=
 
 

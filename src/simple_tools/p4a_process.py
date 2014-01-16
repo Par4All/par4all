@@ -64,7 +64,7 @@ def process(input):
                 processor_class=p4a_spear_processor.p4a_spear_processor
             else:
                 processor_class=p4a_processor.p4a_processor
-            
+
             processor = processor_class(
                 project_name = input.project_name,
                 cpp_flags = input.cpp_flags,
