@@ -1,0 +1,54 @@
+#! /bin/bash
+
+# This script is to be called from VBoxManage and does not seem to goes through
+# the usual login process that initialize stuff.
+# So do some basic initializations
+export HOME=~
+export P4A_TOP=$HOME
+
+# Change the umask so that the package construction does not fail with:
+# dpkg-deb: error: control directory has bad permissions 750 (must be >=0755 and <=0775)
+umask 022
+# Create the installation directory with good access rights
+sudo mkdir /usr/local/par4all
+sudo chown `id --user --name`.`id --group --name` /usr/local/par4all
+
+cd
+
+# Install packages on a machine from scratch and compile Par4All
+# Update the list of available packages
+until sudo apt-get update ; do
+  echo Waiting for the network to be up...
+done
+
+# Update the current OS, just in case
+sudo apt-get --assume-yes upgrade
+# Now install packages needed by Par4All
+sudo apt-get --assume-yes install cproto ed gfortran gnuplot ipython libmpfr-dev libncurses5 libpython2.7 libreadline5 python python-ply \
+  freeglut3-dev libfftw3-dev libgtk2.0-dev time \
+  autoconf automake bison cproto gfortran indent flex git gnulib libgmp3-dev libmpfr-dev libncurses5-dev libreadline6-dev libtool python-dev python-ply subversion swig wget \
+  nvidia-cuda-toolkit nvidia-cuda-dev
+
+echo System installation done
+
+cd $P4A_TOP
+git clone --branch p4a file:///mnt/par4all
+cd par4all
+
+# Compile and install Par4All
+src/simple_tools/p4a_setup.py -z -vvv --jobs=4
+
+source /usr/local/par4all/etc/par4all-rc.sh
+
+# Get and run the validation
+cd $P4A_TOP
+git clone file:///mnt/par4all-priv
+cd par4all-priv/validation
+P4A_VALIDATION_DO_NOT_RUN=1 make validate-out --jobs=4
+
+
+# Compile, install and create a distribution of Par4All
+cd $P4A_TOP/par4all
+src/simple_tools/p4a_coffee.py -j4 -z -vvv --publish --git-repository=.
+
+exit
