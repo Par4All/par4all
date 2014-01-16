@@ -1,0 +1,84 @@
+#! /bin/bash -vx
+
+# Assume P4A_TOP variable initialized
+
+# Assume a basic default OS installation in the VM with the guest software
+# extension for VirtualBox already installed, a par4all administrator
+# account with a session already opened to have /usr/bin/VBoxClient
+# and the VM with a saved stated so we can restart as is.
+#
+# The machine should also have a /etc/sudoers.d/90par4all file with
+#par4all        ALL=NOPASSWD: ALL
+# to launch root commands without asking the password
+
+orig_vm_name='Ubuntu 64'
+
+# The name of the VM to create from the previous one
+vm_name=P4A
+# Where to create the virtual machine files, instead of cluttering the
+# current directory:
+basefolder=/VirtualBox
+# Replace this fake information by your true one :-)
+# Anyway, since it is a VM not reachable from outside, this is not an issue
+account=par4all
+password='this_is_for_pips!'
+
+# Execute a command on "$vm_name" VM. Note that here the first argument
+# can have several words that may be seen as a command
+function vbm_cmd () {
+    local f="$1"
+    shift
+    # It is $f and not "$f" so that a command can be indeed several words
+    VBoxManage $f "$vm_name" "$@"
+}
+
+function vbm_guestcontrol () {
+    local f="$1"
+    shift
+    until vbm_cmd guestcontrol $f --username $account --password "$password" "$@"; do
+        echo Waiting before retrying...
+        sleep 1
+    done
+}
+
+function vbm_execute () {
+    local guest_cmd=$1
+    shift
+    vbm_guestcontrol execute --wait-stdout --wait-stderr --wait-stdout --image "$guest_cmd" -- "$@"
+}
+
+
+# Clone a previous existing VM and its last state
+VBoxManage clonevm "$orig_vm_name" --name "$vm_name" --basefolder "$basefolder" --register
+#VBoxManage modifyvm "$vm_name" --vrdeport 5000,5010-5012
+#VBoxManage startvm "$vm_name" --type headless
+
+# Start the cloned VM where the original one was stopped
+vbm_cmd startvm
+
+# Try some commands
+#vbm_execute /bin/ps
+#vbm_execute /bin/sh -c 'ls /'
+
+# Shared the current working directory on the host as host_cwd in the guest
+# To be used for example with sudo mount -t vboxsf p4a_root /mnt
+vbm_cmd "sharedfolder add" --name p4a_root --hostpath $P4A_TOP --transient
+# Now mount the directory with par4all having the access right as the
+# owner running the host machine
+vbm_execute /usr/bin/sudo mount -t vboxsf -o uid=par4all p4a_root /mnt
+
+# Since the "VBoxManage guestcontrol execute --wait-stdout --wait-stderr"
+# is buggy to get big amounts of data without hanging, use a log file instead
+echo To see the log of what is going on, try tail -f \$P4A_TOP/p4a_vm_build.log
+vbm_execute /bin/bash -c '/mnt/par4all/src/dev/validation/p4a_vm_build < /dev/null >& /mnt/p4a_vm_build.log'
+
+# Do not delete the VM yet since this is still to be tweaked...
+exit
+
+# Stop the VM without saving its current state, because it is to be
+# deleted anyway
+vbm_cmd controlvm poweroff
+# This sleep is to add some time to have the VM unlocked
+sleep 1
+# Remove the files of the VM
+vbm_cmd unregistervm --delete
