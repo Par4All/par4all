@@ -1,0 +1,58 @@
+#! /bin/bash -vx
+
+# Assume a basic default OS installation in the VM with the guest software
+# extension for VirtualBox already installed, a par4all administrator
+# account with a session already opened to have /usr/bin/VBoxClient
+# and the VM with a saved stated so we can restart as is.
+#
+# The machine should also have a /etc/sudoers.d/90par4all file with
+#par4all        ALL=NOPASSWD: ALL
+# to launch root commands without asking the password
+
+orig_vm_name='Ubuntu 64'
+
+# The name of the VM to create from the previous one
+vm_name=P4A
+# Where to create the virtual machine files, instead of cluttering the
+# current directory:
+basefolder=/VirtualBox
+# Replace this fake information by your true one :-)
+account=par4all
+password='this_is_for_pips!'
+
+function vbm_cmd () {
+    local f="$1"
+    shift
+    VBoxManage "$f" "$vm_name" "$@"
+}
+
+function vbm_guestcontrol () {
+    local f=$1
+    shift
+    vbm_cmd guestcontrol $f --username $account --password "$password" "$@"
+}
+
+function vbm_execute () {
+    local guest_cmd=$1
+    shift
+    vbm_guestcontrol execute --wait-stdout --wait-stderr --image "$guest_cmd" -- "$@"
+}
+
+
+# Clone a previous existing VM and its last state
+VBoxManage clonevm "$orig_vm_name" --name "$vm_name" --basefolder "$basefolder" --register
+#VBoxManage modifyvm "$vm_name" --vrdeport 5000,5010-5012
+#VBoxManage startvm "$vm_name" --type headless
+
+# Start the cloned VM where the original one was stopped
+vbm_cmd startvm
+# Try some commands
+vbm_execute /bin/ps
+vbm_execute /bin/sh -c 'ls /'
+# Stop the VM without saving its current state, because it is to be
+# deleted anyway
+vbm_cmd controlvm poweroff
+# This sleep is to add some time to have the VM unlocked
+sleep 1
+# Remove the files of the VM
+vbm_cmd unregistervm --delete
