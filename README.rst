@@ -1,12 +1,18 @@
-Par4All version 1.4.2
+Par4All version 1.4.4
 =====================
+
+The WWW site for the project is now on
+https://github.com/keryell/par4all/wiki
 
 Par4all merges various free and open source developments. Par4All aims to
 achieve the migration of software to multi-core and other parallel
 processors, as well as to accelerating processors such as GPU. It is based
 on multiple components, including the source-to-source compiler framework
-PIPS (Inter Procedural Parallelization of scientific programs), and is
-developed by SILKAN, MINES ParisTech and Institut Télécom.
+`PIPS <http://pips4u.org>`_ (Inter Procedural Parallelization of
+scientific programs), and is developed by `SILKAN
+<http://www.silkan.com>`_, `MINES ParisTech
+<http://cri.mines-paristech.fr>`_ and `Institut Télécom
+<http://departements.telecom-bretagne.eu/info/>`_.
 
 With one command line, Par4All automatically transforms C and Fortran
 sequential programs to parallel ones. It will offer code execution
@@ -37,9 +43,9 @@ More on Par4All features:
 - Par4All supports almost complete C99;
 
 - Fortran 77 with some extensions is to be used for production. Work on
-  Fortran95 is still in progress;
+  Fortran95 is still in progress and is far from being usable yet;
 
-- CUDA:
+- OpenCL & CUDA:
 
   Par4All uses a static dataflow analysis to optimize communications
   between host and GPU and to remove redundant GPU array allocation. Have
@@ -57,12 +63,12 @@ New features :
 
 - This version of Par4All can generate OpenCL host and kernel codes.
 - Generation codes for the SCMP dataflow architecture from CEA.
-- Some more options on ``p4a``, such as --atomic to use atomic operations
-  for parallelizing reductions on GPU, --com-optimization to optimize
-  communications between the host and the GPU, --kernel-unroll=... to
+- Some more options on ``p4a``, such as ``--atomic`` to use atomic operations
+  for parallelizing reductions on GPU, ``--com-optimization`` to optimize
+  communications between the host and the GPU, ``--kernel-unroll=...`` to
   unroll loops inside kernels...
 
-Look at the changelog file for more details.
+Look at the `changelog <changelog>`_ file for more details.
 
 
 Hardware and software requirements
@@ -76,22 +82,21 @@ refer to Par4All installation guide.
 Contact
 -------
 
-SILKAN
-9, route du Colonel Marcel Moraine
-92360 Meudon La Forêt
-FRANCE
-Phone: +33 1 46 01 03 27
-Fax: +33 1 46 01 05 46
+| SILKAN
+| 9, route du Colonel Marcel Moraine
+| 92360 Meudon La Forêt
+| FRANCE
+| Phone: +33 1 46 01 03 27
+| Fax: +33 1 46 01 05 46
 
-Par4All support : support@par4all.org
+Par4All support : support at par4all.org
 
 11/11/11, 11:11:11
 
 
-
-
-# Some Emacs stuff:
-### Local Variables:
-### mode: flyspell
-### ispell-local-dictionary: "american"
-### End:
+..
+  # Some Emacs stuff:
+  ### Local Variables:
+  ### mode: flyspell
+  ### ispell-local-dictionary: "american"
+  ### End:
