@@ -1,0 +1,15 @@
+# Publish Par4All on GitHub.
+
+# Unfortunately there are big files in the Par4All history that are banned
+# from GitHub, so apply a clean-up phase to the repository before pushing it
+
+cd $P4A_TOP
+rm -rf par4all-without-big-file
+git clone --bare --branch p4a-own par4all par4all-without-big-file
+#java -jar bfg-1.11.0.jar --delete-files Home_Trailer.yuv par4all-without-big-file
+java -jar bfg-1.11.0.jar --strip-blobs-bigger-than 100M par4all-without-big-file
+cd par4all-without-big-file
+git remote add github git@github.com:keryell/par4all.git
+#git push github --tags
+#git push --force --mirror github
+git push --mirror github

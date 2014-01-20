@@ -86,7 +86,7 @@ p4a_coffee-help.tex: p4a_coffee.help Makefile
 %.eps: %.svg
 	inkscape $< --export-eps=$@ --export-text-to-path
 
-release-notes.tex: ../../RELEASE-NOTES.txt Makefile
+release-notes.tex: ../../RELEASE-NOTES.rst Makefile
 	rst2latex --section-numbering $< $@
 
 release-notes-extract.tex: release-notes.tex Makefile
