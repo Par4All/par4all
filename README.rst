@@ -68,7 +68,8 @@ New features :
   communications between the host and the GPU, ``--kernel-unroll=...`` to
   unroll loops inside kernels...
 
-Look at the `changelog <changelog>`_ file for more details.
+Look at the `changelog <src/simple_tools/DEBIAN/changelog>`_ file for more
+details.
 
 
 Hardware and software requirements
