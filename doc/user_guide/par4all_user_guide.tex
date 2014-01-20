@@ -21,6 +21,10 @@
 \RequirePackage[weather]{ifsym}
 
 
+\newcommand{\LINK}[1]{\url{#1}\xspace}
+\newcommand{\PfaUserPDF}{\LINK{http://download.par4all.org/doc/user_guide/par4all_user_guide.pdf}}
+\newcommand{\PfaAllUserHTDOC}{\LINK{http://download.par4all.org/doc/user_guide/par4all_user_guide.htdoc}}
+
 \sloppy
 
 \begin{document}
@@ -38,6 +42,14 @@
 \maketitle
 
 \tableofcontents{}
+
+% The version is here and not in the title to avoid triggering a bug in
+% tex4ht:
+\noindent\textbf{This user guide is for \Apfa version \input{VERSION}}
+\bigskip
+
+This document can be found in PDF format on \PfaUserPDF and in HTML
+on \PfaAllUserHTDOC.
 
 % To automatically build reports from this content:
 %%ContentBegin
