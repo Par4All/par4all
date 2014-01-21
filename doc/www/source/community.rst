@@ -81,7 +81,6 @@ Older projects
   <http://hpcas.enstb.org/transmedia>`_
 
 
-
 Jobs
 ----
 
@@ -107,38 +106,26 @@ academics with bleeding-edge entrepreneurs, send your résumé to jobs
 Internships
 ...........
 
+**This section is mostly obsolete but may be a source for other jobs or
+internships...**
+
 There are many internships in compilation, program
 transformation. parallelization, optimization, GPU, SIMD, hardware
-accelerators, scientific computing… in France (Paris & Montpellier), USA
+accelerators, scientific computing... in France (Paris & Montpellier), USA
 (Los Altos) & Canada (Montréal). There are so many things to do that you
 have only a small (old) sample here.  Contact us if you are interested in
 any of these subjects.
 
-- `Adding MATLAB/Octave/Scilab language to a source-to-source compiler :
-  Internship for a MSc or engineer student
-  <jobs/adding-matlaboctavescilab-language-to-a-source-to-source-compiler>`_
+.. toctree::
+   :maxdepth: 1
 
-- `Optimized program generation with static and dynamic analysis support :
-  Sujet de stage d’ingénieur ou M2 (in French)
-  <jobs/optimized-program-generation-with-static-and-dynamic-analysis-support>`_
-
-- `Coupling a pattern-matching language to a source-to-source compiler :
-  Internship for a MSc or engineer student
-  <jobs/coupling-a-pattern-matching-language-to-a-source-to-source-compiler>`_
-
-- `Multi-target program transformations Sujet de stage d’ingénieur ou M2
-  (in French) <jobs/multi-target-program-transformations>`_
-
-- `Semantics editor for a source-to-source program transformation
-  infrastructure with Eclipse Sujet de stage d’ingénieur (in French)
-  <jobs/semantics-editor-for-a-source-to-source-program-transformation-infrastructure-with-eclipse>`_
-
-- `Complexity-based (non)parallelization : Master or engineer internship
-  in Los Altos or Montpellier <jobs/complexity-based-nonparallelization>`_
-
-- `Fortran to OpenCL parallelization : Master or engineer internship in
-  Los Altos or Montpellier <jobs/fortran-to-opencl-parallelization>`_
-
+   jobs/adding-matlaboctavescilab-language-to-a-source-to-source-compiler
+   jobs/optimized-program-generation-with-static-and-dynamic-analysis-support
+   jobs/coupling-a-pattern-matching-language-to-a-source-to-source-compiler
+   jobs/multi-target-program-transformations
+   jobs/semantics-editor-for-a-source-to-source-program-transformation-infrastructure-with-eclipse
+   jobs/complexity-based-nonparallelization
+   jobs/fortran-to-opencl-parallelization
 
 ..
   # Some Emacs stuff:
