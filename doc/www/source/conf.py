@@ -44,7 +44,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Par4All'
-copyright = u'2014, Par4All Team'
+copyright = u'2014, The Par4All team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -241,7 +241,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'Par4All', u'Par4All Documentation',
-   u'Par4All Team', 'Par4All', 'One line description of project.',
+   u'Par4All Team', 'Par4All', 'Automatic parallelizer.',
    'Miscellaneous'),
 ]
 
