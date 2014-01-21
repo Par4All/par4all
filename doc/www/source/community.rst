@@ -40,6 +40,9 @@ There is no longer official support of Par4All by SILKAN.
 
 - LinkedIn : There is also a Par4All group on LinkedIn.
 
+- There is an `old forum for Par4All
+  <https://par4all.zendesk.com/forums>`_.
+
 Many Par4All developers use the xchat IRC client and Android AndChat.
 
 

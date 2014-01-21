@@ -16,7 +16,6 @@ Contents:
    features
    documentation
    community
-   forum
    background
    news-and-events
 
