@@ -14,7 +14,7 @@ Contents:
    home
    download
    features
-   documentations
+   documentation
    community
    forum
    background

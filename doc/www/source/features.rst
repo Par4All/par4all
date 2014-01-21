@@ -116,12 +116,12 @@ Internals
 Internally, Par4All is currently composed of different components:
 
 - the `PIPS <http://pips4u.org>`_ source-to-source compiler that began at
-`MINES ParisTech <http://cri.mines-paristech.fr>`_ in 1988 and is
-currently developed also in many other places: `SILKAN
-<http://www.silkan.com>`_, `Institut TÉLÉCOM/TÉLÉCOM Bretagne
-<http://departements.telecom-bretagne.eu/info>`_, `IT SudParis
-<http://inf.telecom-sudparis.eu>`_, `RPI (Rensselaer Polytechnic
-Institute) <http://www.cs.rpi.edu>`_.
+  `MINES ParisTech <http://cri.mines-paristech.fr>`_ in 1988 and is
+  currently developed also in many other places: `SILKAN
+  <http://www.silkan.com>`_, `Institut TÉLÉCOM/TÉLÉCOM Bretagne
+  <http://departements.telecom-bretagne.eu/info>`_, `IT SudParis
+  <http://inf.telecom-sudparis.eu>`_, `RPI (Rensselaer Polytechnic
+  Institute) <http://www.cs.rpi.edu>`_.
 
 - the `PolyLib <http://icps.u-strasbg.fr/polylib/>`_ used by PIPS,
 
