@@ -40,7 +40,7 @@ from `SILKAN <http://www.silkan.com>`_ it is also possible to compile and
 parallelize `Scilab <http://www.scilab.org>`_ programs to speed up
 computations.
 
-.. figure:: wp-content/uploads/2011/12/P4A-video2.png
+.. figure:: images/P4A-video2.png
    :height: 250
    :target: index.html%3Fp=356.html
 
