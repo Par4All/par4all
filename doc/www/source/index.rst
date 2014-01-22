@@ -11,12 +11,11 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   home
    download
    features
+   benchmarks
    documentation
    community
-   background
    news-and-events
 
 Par4All is an automatic parallelizing and optimizing compiler (workbench)

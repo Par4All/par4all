@@ -38,7 +38,8 @@ There is no longer official support of Par4All by SILKAN.
 - For other aspects of Par4All such as research, the following website
   http://pips4u.org has other collaborative communication tools.
 
-- LinkedIn : There is also a Par4All group on LinkedIn.
+- LinkedIn : There is also a `Par4All group on LinkedIn
+  <http://www.linkedin.com/groups?gid=3818665>`_.
 
 - There is an `old forum for Par4All
   <https://par4all.zendesk.com/forums>`_.
@@ -77,7 +78,7 @@ Older projects
 ..............
 
 - `European ARTEMIS <http://www.artemis.eu>`_ `SCALOPES project
-  (2009-2011) <http://www.scalopes.eu/>`_
+  (2009-2011) <http://www.scalopes.eu>`_
 
 - `French Images and Networks research cluster
   <http://www.images-et-reseaux.com>`_ `TransMedi@ project (2008-2010)
