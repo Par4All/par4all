@@ -16,7 +16,7 @@ Contents:
    benchmarks
    documentation
    community
-   news-and-events
+   news_and_events
 
 Par4All is an automatic parallelizing and optimizing compiler (workbench)
 for C and Fortran sequential programs.
@@ -39,12 +39,15 @@ from `SILKAN <http://www.silkan.com>`_ it is also possible to compile and
 parallelize `Scilab <http://www.scilab.org>`_ programs to speed up
 computations.
 
+..
+
+  I've not been able to have a better link that this...
+
 .. figure:: images/P4A-video2.png
    :height: 250
-   :target: index.html%3Fp=356.html
+   :target: news_and_events.html#video-showing-par4all-features
 
-   A few explanations on Par4All in a 3mn video
-
+   A few explanations on Par4All in a :ref:`3mn video <par4all-video>`
 
 
 Indices and tables
