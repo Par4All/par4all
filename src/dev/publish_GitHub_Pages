@@ -14,6 +14,8 @@ cd $tmp_git/doc/www
 # Build the WWW site from the sources with Sphinx
 make html
 
+# The special gh-pages branch is used by GitHub as the GitHub Pages WWW site
+
 # Move the build output at the top level in the gh-pages branch
 mv build $P4A_TOP/$tmp_git/._build
 cd $P4A_TOP/$tmp_git
@@ -22,9 +24,28 @@ rm -rf *
 mv ._build/html/* .
 rm -rf ._build
 
-# Keep only what has been generated
+# Add to the index (only) what has been generated
 git add *
-git commit -a -m "New Par4All WWW site version"
-# Push the special gh-pages branch that is the HitHub Pages WWW site
-git remote add github git@github.com:keryell/par4all.git
-git push --force github gh-pages
+# Take also into account what has been deleted
+git add --update
+
+# Create a snapshot of the index content
+tree_object=`git write-tree`
+
+# Create a commit object that take into account its natural history but
+# also p4a-own as an ancestor so we can figure out easily which source of
+# the WWW site is currently published
+commit_object=`git commit-tree -p HEAD -p p4a-own -m "Publish new Par4All WWW site version" $tree_object`
+
+# Update the gh-pages branch to this commit object. By construction this
+# is not a merge, it is just a fast-forward update, but add --ff-only to
+# assert this
+git merge --ff-only $commit_object
+
+# Update the gh-pages branch on the reference git repository
+git remote add par4all $P4A_TOP/par4all
+git push par4all gh-pages
+
+# Push the par4all git to GitHub after removing the big files.
+# Since the gh-pages branch has been changed, the WWW site is updated too
+$P4A_TOP/par4all/src/dev/publish_par4all_without_big_file
