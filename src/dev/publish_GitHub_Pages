@@ -1,0 +1,30 @@
+#! /bin/bash -vx
+
+# Exit if an error occurs rather than unspecified dangerous behaviour...
+set -e
+
+tmp_git=tmp_publish_github_pages
+
+cd $P4A_TOP
+
+# Work in a new working copy of the repository to compile the WWW pages
+rm -rf $tmp_git
+git clone --branch p4a-own par4all $tmp_git
+cd $tmp_git/doc/www
+# Build the WWW site from the sources with Sphinx
+make html
+
+# Move the build output at the top level in the gh-pages branch
+mv build $P4A_TOP/$tmp_git/._build
+cd $P4A_TOP/$tmp_git
+git checkout gh-pages
+rm -rf *
+mv ._build/html/* .
+rm -rf ._build
+
+# Keep only what has been generated
+git add *
+git commit -a -m "New Par4All WWW site version"
+# Push the special gh-pages branch that is the HitHub Pages WWW site
+git remote add github git@github.com:keryell/par4all.git
+git push --force github gh-pages
