@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Génération de programmes optimisés lors de l’exécution avec support par analyse statique et dynamique &mdash; Par4All 1.4.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Par4All 1.4.4 documentation" href="../index.html" />
+    <link rel="up" title="Community" href="../community.html" />
+    <link rel="next" title="Coupling a pattern-matching language to a source-to-source compiler" href="coupling-a-pattern-matching-language-to-a-source-to-source-compiler.html" />
+    <link rel="prev" title="Adding MatLab/Octave/SciLab language to a source-to-source compiler" href="adding-matlaboctavescilab-language-to-a-source-to-source-compiler.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="coupling-a-pattern-matching-language-to-a-source-to-source-compiler.html" title="Coupling a pattern-matching language to a source-to-source compiler"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="adding-matlaboctavescilab-language-to-a-source-to-source-compiler.html" title="Adding MatLab/Octave/SciLab language to a source-to-source compiler"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Par4All 1.4.4 documentation</a> &raquo;</li>
+          <li><a href="../community.html" accesskey="U">Community</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="generation-de-programmes-optimises-lors-de-lexecution-avec-support-par-analyse-statique-et-dynamique">
+<h1>Génération de programmes optimisés lors de l’exécution avec support par analyse statique et dynamique<a class="headerlink" href="#generation-de-programmes-optimises-lors-de-lexecution-avec-support-par-analyse-statique-et-dynamique" title="Permalink to this headline">¶</a></h1>
+<p><em>Optimized program generation with static and dynamic analysis support</em></p>
+<p>Sujet de stage d’ingénieur ou M2</p>
+<p><strong>Mots-clés</strong> : compilation, parallélisation, accélérateurs matériels,
+machines virtuelles, transformation de programmes, analyse statique,
+runtime, optimisation</p>
+<p>Afin de fournir aux utilisateurs toujours plus de puissance de calcul, on
+assiste actuellement au déploiement de nombreuses architectures parallèles
+bon marché basées sur différentes technologies : processeurs multi-cœurs,
+multiprocesseurs hétérogènes sur puce (Cell, Larrabee…), des coprocesseurs
+graphiques (GPGPU nVidia, AMD/ATI…) ou des accélérateurs à base de
+circuits logiques reconfigurables.</p>
+<p>De nombreux outils basés sur des analyses statiques du code
+(parallélisation automatique…) ont été développés par le passé pour cibler
+ce genre d’architectures. Malheureusement de nombreuses questions sont
+indécidables à la compilation (en fonction de données…) et les
+performances ne sont souvent pas à la hauteur.</p>
+<p>À l’opposé des approches statiques, des approches purement dynamiques
+basées éventuellement sur des principes de machines virtuelles permettent
+d’exploiter des connaissances à l’exécution. Malheureusement, ces
+approches sont souvent inefficaces dans le cas où on aurait pu optimiser
+le code de manière statique.</p>
+<p>Le but de ce stage est d’étudier les approches mixtes et en particulier la
+génération de manière statique de différents programmes optimisés qui
+seront sélectionnés selon des choix faits à l’exécution au moment où on a
+les réponses à certaines questions (« ce bout de programme est parallèle
+dans le contexte de ces données… », etc).</p>
+<p>Le travail consistera à réaliser des phases de transformation en utilisant
+le système d’analyse sémantique (basé sur de l’algèbre linéaire) de
+l’outil de transformation PIPS <a class="reference external" href="http://pips4u.org">http://pips4u.org</a> intégré dans
+l’environnement de parallélisation automatique Par4All
+(<a class="reference external" href="http://par4all.org">http://par4all.org</a>)</p>
+<p>Profil recherché : passionné d’informatique voulant faire de la vraie
+informatique et n’ayant pas peur de réfléchir (formalisme mathématique et
+sémantique) ni de programmer. Bonnes connaissances utiles : C, Python,
+Unix, Emacs, programmation parallèle…</p>
+<p>Ce stage peut enchaîner avec une embauche et/ou une thèse.</p>
+<p>Encadrant : Ronan Keryell (rk at hpc-project dot com) et collaboration
+avec Mines ParisTech/CRI et membres du projet OpenGPU</p>
+<p><a class="reference external" href="http://par4all.org">http://par4all.org</a></p>
+<p>Lieu : HPC Project <a class="reference external" href="http://www.hpc-project.com">http://www.hpc-project.com</a>, start-up de 35 personnes en
+pleine croissance.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="adding-matlaboctavescilab-language-to-a-source-to-source-compiler.html"
+                        title="previous chapter">Adding MatLab/Octave/SciLab language to a source-to-source compiler</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="coupling-a-pattern-matching-language-to-a-source-to-source-compiler.html"
+                        title="next chapter">Coupling a pattern-matching language to a source-to-source compiler</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/jobs/optimized-program-generation-with-static-and-dynamic-analysis-support.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="coupling-a-pattern-matching-language-to-a-source-to-source-compiler.html" title="Coupling a pattern-matching language to a source-to-source compiler"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="adding-matlaboctavescilab-language-to-a-source-to-source-compiler.html" title="Adding MatLab/Octave/SciLab language to a source-to-source compiler"
+             >previous</a> |</li>
+        <li><a href="../index.html">Par4All 1.4.4 documentation</a> &raquo;</li>
+          <li><a href="../community.html" >Community</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, The Par4All team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

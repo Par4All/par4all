@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Benchmarks &mdash; Par4All 1.4.4 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.4.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Par4All 1.4.4 documentation" href="index.html" />
+    <link rel="next" title="Documentation" href="documentation.html" />
+    <link rel="prev" title="Features" href="features.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="documentation.html" title="Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="features.html" title="Features"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Par4All 1.4.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="benchmarks">
+<h1>Benchmarks<a class="headerlink" href="#benchmarks" title="Permalink to this headline">¶</a></h1>
+<div class="sidebar">
+<p class="first sidebar-title">A video demonstration of Par4All</p>
+<div class="last"><iframe width="425" height="344"
+        src="http://www.youtube.com/embed/EP8mq0zh4gA?wmode=transparent"
+        frameborder="0"
+        allowfullscreen>
+</iframe></div></div>
+<p>We use Par4All to parallelize programs for customers and collaborative
+research projects but we have also used Par4All on some benchmarks. Here
+are a few results that we are allowed to communicate.</p>
+<div class="section" id="stars-pm">
+<h2>Stars-PM<a class="headerlink" href="#stars-pm" title="Permalink to this headline">¶</a></h2>
+<p>Stars-PM is a Particle-Mesh N-body cosmological simulation in C code from
+the <a class="reference external" href="http://astro.u-strasbg.fr">Observatoire Astronomique de Strasbourg</a>
+and uses 3D FFT among other things.</p>
+<p>The goal is to model gravitational interactions between particles in
+space. The 3D resolution of these interactions is obtained by
+interpolation on space discretization.</p>
+<a class="reference internal image-reference" href="_images/Stars-PM-WWW-algo.png"><img alt="_images/Stars-PM-WWW-algo.png" src="_images/Stars-PM-WWW-algo.png" style="width: 50%;" /></a>
+<p>We use Par4All automatic transformations process to on Stars-PM. The
+sequential version was written in C and has been the object of a study to
+manually optimize and adapt on GPU.</p>
+<a class="reference internal image-reference" href="_images/Stars-PM-WWW-perf.png"><img alt="_images/Stars-PM-WWW-perf.png" src="_images/Stars-PM-WWW-perf.png" style="width: 50%;" /></a>
+</div>
+<div class="section" id="static-compilation-analysis-for-host-accelerator-communication-optimization">
+<h2>Static Compilation Analysis for Host-Accelerator Communication Optimization<a class="headerlink" href="#static-compilation-analysis-for-host-accelerator-communication-optimization" title="Permalink to this headline">¶</a></h2>
+<p>This graph shows our results on 20 benchmarks from Polybench suite, 3 from
+Rodinia, and the application Stars-PM. Measurements were performed on a
+machine with 2 Xeon Westmere X5670 (12 cores at 2.93 GHz) and a nvidia
+GPU Tesla C2050.</p>
+<a class="reference internal image-reference" href="_images/speedup-part1.jpg"><img alt="_images/speedup-part1.jpg" src="_images/speedup-part1.jpg" style="width: 100%;" /></a>
+<p>The OpenMP versions used for the experiments are generated automatically
+by the parallelizer and are not manually optimized.</p>
+<a class="reference internal image-reference" href="_images/speedup-part2.jpg"><img alt="_images/speedup-part2.jpg" src="_images/speedup-part2.jpg" style="width: 100%;" /></a>
+<p>For more details:</p>
+<ul class="simple">
+<li>refer to the <cite>publication « Static Compilation Analysis for
+Host-Accelerator Communication Optimization. »</cite></li>
+<li>Polybench : <a class="reference external" href="http://sourceforge.net/projects/polybench">http://sourceforge.net/projects/polybench</a></li>
+<li>Rodinia : <a class="reference external" href="http://lava.cs.virginia.edu/wiki/rodinia">http://lava.cs.virginia.edu/wiki/rodinia</a></li>
+</ul>
+</div>
+<div class="section" id="hyantes">
+<h2>Hyantes<a class="headerlink" href="#hyantes" title="Permalink to this headline">¶</a></h2>
+<p>Hyantes is a library to compute neighbourhood population potential with
+scale control. It is developed by the MESCAL team from the Laboratoire
+Informatique de Grenoble (France), as a part of HyperCarte project. The
+HyperCarte project aims to develop new methods for the cartographic
+representation of human distributions (population density, population
+increase, etc.) with various smoothing functions and opportunities for
+time-scale animations of maps. Hyantes provides one of the smoothing
+methods related to multiscalar neighbourhood density estimation. It is a C
+library that takes sets of geographic data as inputs and computes a
+smoothed representation of this data taking account of neighbourhood’s
+influence.</p>
+<p>For more information: <a class="reference external" href="http://hyantes.gforge.inria.fr">http://hyantes.gforge.inria.fr</a></p>
+<div class="section" id="results">
+<h3>Results<a class="headerlink" href="#results" title="Permalink to this headline">¶</a></h3>
+<p>We measure the wall-clock time that includes startup time, data load time
+and output write time, that is the real time understood by users. By
+measuring kernel time only, speed-up would be better but less
+representative of the real application (Amdahl…).</p>
+<p>On a Wild Node with 2 Intel Xeon X5670 &#64; 2.93GHz (12 cores) and a Tesla
+C2050 (Fermi), Linux/Ubuntu 10.04, gcc 4.4.3, CUDA 3.1, we measure in
+double precision:</p>
+<ul class="simple">
+<li>Sequential execution time on CPU: 30.355s</li>
+<li>OpenMP parallel execution time on CPUs: 3.859s, <strong>speed-up: 7.87</strong></li>
+<li>CUDA parallel execution time on GPU: 0.441s, <strong>speed-up: 68.8</strong></li>
+</ul>
+<p>To test it by yourself on the main computational part, go to the
+examples/P4A/Hyantes directory of Par4All or look in the <tt class="docutils literal"><span class="pre">git</span></tt>
+repository
+<a class="reference external" href="https://github.com/keryell/par4all/tree/p4a/examples/P4A/Hyantes">https://github.com/keryell/par4all/tree/p4a/examples/P4A/Hyantes</a></p>
+<p>For mobile users, it is interesting to show result figures on a laptop:
+for the single precision (compiled with make USE_FLOAT=1) on a HP
+EliteBook 8730w laptop (with an Intel Core2 Extreme Q9300 &#64; 2.53GHz (4
+cores) and a nVidia GPU Quadro FX 3700M, 16 multiprocessors, 128 cores,
+architecture 1.1) with Linux/Debian/sid, gcc 4.4.3, CUDA 3.1:</p>
+<ul class="simple">
+<li>Sequential execution time on CPU: 38s</li>
+<li>OpenMP parallel execution time on CPUs: 18.9s, <strong>speed-up: 2.01</strong></li>
+<li>CUDA parallel execution time on GPU: 1.57s, <strong>speed-up: 24.2</strong></li>
+</ul>
+</div>
+</div>
+<div class="section" id="hologram-simulation">
+<h2>Hologram simulation<a class="headerlink" href="#hologram-simulation" title="Permalink to this headline">¶</a></h2>
+<p>Fresnel is a C program from the <a class="reference external" href="http://www.holotetrix.com">Holotetrix</a>
+company that simulates Fresnel diffraction in holograms before
+manufacturing.</p>
+<p>The application has been tested on various architectures:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="86%" />
+<col width="14%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Architecture</th>
+<th class="head">Cores</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Intel Core 2 duo E6600 2.4 GHz</td>
+<td>2</td>
+</tr>
+<tr class="row-odd"><td>Intel Core 2 duo T9400 2.5 GHz</td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td>2 Intel Core 2 X5472 3 GHz</td>
+<td>8</td>
+</tr>
+<tr class="row-odd"><td>2 Intel Nehalem X5570 2.9 GHz</td>
+<td>8</td>
+</tr>
+<tr class="row-even"><td>nVidia GTX 200</td>
+<td>192</td>
+</tr>
+<tr class="row-odd"><td>nVidia Tesla C1060</td>
+<td>240</td>
+</tr>
+<tr class="row-even"><td>nVidia Quadro FX 3700M (G92GL)</td>
+<td>128</td>
+</tr>
+</tbody>
+</table>
+<p>The speed-up are normalized with 1 E6600 core as reference and the
+computations are done for different hologram sizes for the following
+results:</p>
+<div class="figure" style="width: 100%">
+<img alt="_images/performances_float-fresnel-200dpi.png" src="_images/performances_float-fresnel-200dpi.png" />
+<p class="caption">Performance of Holotetrix Fresnel program on <em>x</em>86 and CUDA GPU</p>
+</div>
+</div>
+<div class="section" id="spec-cpu2006-410-bwaves">
+<h2>SPEC CPU2006 410.bwaves<a class="headerlink" href="#spec-cpu2006-410-bwaves" title="Permalink to this headline">¶</a></h2>
+<p>bwaves is a computational fluid dynamics Fortran program that simulates
+blast waves in three dimensional transonic transient laminar viscous flow.</p>
+<p>More information on the program itself on
+<a class="reference external" href="http://www.spec.org/cpu2006/Docs/410.bwaves.html">http://www.spec.org/cpu2006/Docs/410.bwaves.html</a></p>
+<p>On a Wild Node, we get a <strong>speed-up of 4.5</strong> with a 2 Intel Xeon X5670 &#64;
+2.93GHz (12 cores).</p>
+</div>
+<div class="section" id="matrix-multiplication">
+<h2>Matrix multiplication<a class="headerlink" href="#matrix-multiplication" title="Permalink to this headline">¶</a></h2>
+<p>The classical Hello World in Fortran can be found in
+<tt class="docutils literal"><span class="pre">examples/F77_matmul_OpenMP</span></tt> directory of Par4All or look in the <tt class="docutils literal"><span class="pre">git</span></tt>
+repository
+<a class="reference external" href="https://github.com/keryell/par4all/tree/p4a/examples/F77_matmul_OpenMP">https://github.com/keryell/par4all/tree/p4a/examples/F77_matmul_OpenMP</a> so
+you can try by yourself.</p>
+<p>On a Wild Node, we get a <strong>speed-up of 12.1</strong> (thanks to cache effects)
+with a 2 Intel Xeon X5670 &#64; 2.93GHz (12 cores).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Benchmarks</a><ul>
+<li><a class="reference internal" href="#stars-pm">Stars-PM</a></li>
+<li><a class="reference internal" href="#static-compilation-analysis-for-host-accelerator-communication-optimization">Static Compilation Analysis for Host-Accelerator Communication Optimization</a></li>
+<li><a class="reference internal" href="#hyantes">Hyantes</a><ul>
+<li><a class="reference internal" href="#results">Results</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hologram-simulation">Hologram simulation</a></li>
+<li><a class="reference internal" href="#spec-cpu2006-410-bwaves">SPEC CPU2006 410.bwaves</a></li>
+<li><a class="reference internal" href="#matrix-multiplication">Matrix multiplication</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="features.html"
+                        title="previous chapter">Features</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="documentation.html"
+                        title="next chapter">Documentation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/benchmarks.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="documentation.html" title="Documentation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="features.html" title="Features"
+             >previous</a> |</li>
+        <li><a href="index.html">Par4All 1.4.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, The Par4All team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Download - Par4All &mdash; Par4All 1.4.4 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.4.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Par4All 1.4.4 documentation" href="index.html" />
+    <link rel="next" title="Features" href="features.html" />
+    <link rel="prev" title="Par4All" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="features.html" title="Features"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Par4All"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Par4All 1.4.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="download-par4all">
+<h1>Download - Par4All<a class="headerlink" href="#download-par4all" title="Permalink to this headline">¶</a></h1>
+<p>Because of current limitations in PIPS there are some specific bugs on
+recent 32-bit <em>x</em>86 Linux target so please use a 64-bit platform to run
+Par4All.</p>
+<p><a class="reference external" href="https://github.com/keryell/par4all/blob/p4a/LICENSE.txt">Release note</a></p>
+<p><a class="reference external" href="https://github.com/keryell/par4all/blob/p4a/src/simple_tools/DEBIAN/changelog">Changelog</a></p>
+<p><a class="reference external" href="https://github.com/keryell/par4all/blob/p4a/LICENSE.txt">License</a></p>
+<p>If you need to run Par4All on unsupported system, please run Par4All
+inside a virtual machine running a supported OS.</p>
+<div class="section" id="binary-distribution">
+<h2>Binary distribution<a class="headerlink" href="#binary-distribution" title="Permalink to this headline">¶</a></h2>
+<p>Right now Par4All is only supported in binary form on Debian and Ubuntu
+64-bit <em>x</em>86.</p>
+<div class="section" id="repository">
+<h3>Repository<a class="headerlink" href="#repository" title="Permalink to this headline">¶</a></h3>
+<p>The best way if you are on GNU/Linux Debian or Ubuntu is to use our
+package repository. This way, when a new version is out, your classical
+package manager can automatically install it.</p>
+<p>To use our package repository, pick one of the following lines, and add it
+graphically with the <strong>Update Manager</strong> (<tt class="docutils literal"><span class="pre">Settings</span></tt>/<tt class="docutils literal"><span class="pre">Third-Party</span>
+<span class="pre">Software</span></tt>) or append it with a text editor to your
+<tt class="docutils literal"><span class="pre">/etc/apt/sources.list</span></tt> file.</p>
+<p>If you are using Ubuntu:</p>
+<div class="highlight-python"><div class="highlight"><pre>deb http://download.par4all.org/apt/ubuntu releases main
+# --OR--
+deb http://download.par4all.org/apt/ubuntu development main
+</pre></div>
+</div>
+<p>or if you are running Debian:</p>
+<div class="highlight-python"><div class="highlight"><pre>deb http://download.par4all.org/apt/debian releases main
+# --OR--
+deb http://download.par4all.org/apt/debian development main
+</pre></div>
+</div>
+<p>So you need to choose between releases or development
+versions. Development packages are generated often, may be unstable, and
+are best suited if you want to track more closely the Par4All development.</p>
+<p>Once this is done, run your favorite graphics package tool (synaptic...)
+or:</p>
+<div class="code bash highlight-python"><div class="highlight"><pre>sudo apt-get update
+sudo apt-get install par4all
+</pre></div>
+</div>
+<p>In any case, you will then need to source one of the following shell
+scripts which set up the environment variables for proper Par4All
+execution:</p>
+<ul>
+<li><p class="first">if you use <tt class="docutils literal"><span class="pre">bash</span></tt>, <tt class="docutils literal"><span class="pre">sh</span></tt>, <tt class="docutils literal"><span class="pre">dash</span></tt>, etc.:</p>
+<div class="code bash highlight-python"><div class="highlight"><pre><span class="n">source</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">par4all</span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">par4all</span><span class="o">-</span><span class="n">rc</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">if you use <tt class="docutils literal"><span class="pre">csh</span></tt>, <tt class="docutils literal"><span class="pre">tcsh</span></tt>, etc.:</p>
+<div class="code bash highlight-python"><div class="highlight"><pre><span class="n">source</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">par4all</span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">par4all</span><span class="o">-</span><span class="n">rc</span><span class="o">.</span><span class="n">csh</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>For more information, look at the <a class="reference external" href="documentation">documentation</a> section.</p>
+</div>
+<div class="section" id="package">
+<h3>Package<a class="headerlink" href="#package" title="Permalink to this headline">¶</a></h3>
+<p>A less automatic way on Debian or Ubuntu is to install a Par4All <tt class="docutils literal"><span class="pre">.deb</span></tt>
+package manually.</p>
+<p>For development versions, according to your OS and architecture, download
+a package from:</p>
+<div class="highlight-python"><div class="highlight"><pre>http://download.par4all.org/development/debian/i686
+http://download.par4all.org/development/debian/x86_64
+http://download.par4all.org/development/ubuntu/i686
+http://download.par4all.org/development/ubuntu/x86_64
+</pre></div>
+</div>
+<p>For release versions, according to your OS and architecture, download a
+package from:</p>
+<div class="highlight-python"><div class="highlight"><pre>http://download.par4all.org/releases/debian/i686
+http://download.par4all.org/releases/debian/x86_64
+http://download.par4all.org/releases/ubuntu/i686
+http://download.par4all.org/releases/ubuntu/x86_64
+</pre></div>
+</div>
+<p>You can then install the package with:</p>
+<div class="code bash highlight-python"><div class="highlight"><pre>sudo gdebi &lt;the_package&gt;.deb
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">dpkg</span> <span class="pre">-i</span> <span class="pre">&lt;the_package&gt;.deb</span></tt> would also work but does not
+automatically install dependencies you should install later.</p>
+<p>In any case, you will then need to source one of the following shell
+scripts which set up the environment variables for proper Par4All
+execution:</p>
+<ul>
+<li><p class="first">if you use <tt class="docutils literal"><span class="pre">bash</span></tt>, <tt class="docutils literal"><span class="pre">sh</span></tt>, <tt class="docutils literal"><span class="pre">dash</span></tt>, etc.:</p>
+<div class="code bash highlight-python"><div class="highlight"><pre><span class="n">source</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">par4all</span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">par4all</span><span class="o">-</span><span class="n">rc</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">if you use <tt class="docutils literal"><span class="pre">csh</span></tt>, <tt class="docutils literal"><span class="pre">tcsh</span></tt>, etc.:</p>
+<div class="code bash highlight-python"><div class="highlight"><pre><span class="n">source</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">par4all</span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">par4all</span><span class="o">-</span><span class="n">rc</span><span class="o">.</span><span class="n">csh</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>For more information, look at the <a class="reference external" href="documentation">documentation</a> section.</p>
+</div>
+<div class="section" id="manual-tar-gz-binary-installation">
+<h3>Manual tar.gz binary installation<a class="headerlink" href="#manual-tar-gz-binary-installation" title="Permalink to this headline">¶</a></h3>
+<p>An even less automatic way is to use a <tt class="docutils literal"><span class="pre">.tar.gz</span></tt> tar-ball file. It
+contains the binaries as built on a stable Ubuntu or unstable Debian
+distribution. It should work on any GNU/Linux distribution with the
+following libraries installed: (a fairly recent) <tt class="docutils literal"><span class="pre">libc.so.6</span></tt>,
+<tt class="docutils literal"><span class="pre">libncurses.so.5</span></tt>, <tt class="docutils literal"><span class="pre">libreadline.so.6</span></tt>, etc. and Python 2.7. We chose
+this Python version because it is recent enough to provide nice features
+for Par4All and not too recent to be absent from most Linux distributions…
+Look at the Par4All organization documentation to have the list of some
+needed packages.</p>
+<p>Once you have downloaded one of these <tt class="docutils literal"><span class="pre">.tar.gz</span></tt> packages from
+<a class="reference external" href="http://download.par4all.org">http://download.par4all.org</a>, extract it with the following command:</p>
+<div class="highlight-python"><div class="highlight"><pre>tar xvzf &lt;the_package&gt;.tar.gz
+</pre></div>
+</div>
+<p>It will create a directory named par4all. Move this directory to its final
+location, for example with:</p>
+<div class="highlight-python"><div class="highlight"><pre>sudo mv par4all /usr/local
+</pre></div>
+</div>
+<p>In any case, you will then need to source one of the following shell
+scripts which set up the environment variables for proper Par4All
+execution:</p>
+<ul>
+<li><p class="first">if you use <tt class="docutils literal"><span class="pre">bash</span></tt>, <tt class="docutils literal"><span class="pre">sh</span></tt>, <tt class="docutils literal"><span class="pre">dash</span></tt>, etc.:</p>
+<div class="code bash highlight-python"><div class="highlight"><pre><span class="n">source</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">par4all</span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">par4all</span><span class="o">-</span><span class="n">rc</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">if you use <tt class="docutils literal"><span class="pre">csh</span></tt>, <tt class="docutils literal"><span class="pre">tcsh</span></tt>, etc.:</p>
+<div class="code bash highlight-python"><div class="highlight"><pre><span class="n">source</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">par4all</span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">par4all</span><span class="o">-</span><span class="n">rc</span><span class="o">.</span><span class="n">csh</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>For more information, look at the <a class="reference external" href="documentation">documentation</a> section.</p>
+</div>
+</div>
+<div class="section" id="previous-releases">
+<h2>Previous releases<a class="headerlink" href="#previous-releases" title="Permalink to this headline">¶</a></h2>
+<p>Older releases of Par4All packages are available on
+<a class="reference external" href="http://download.par4all.org/releases">http://download.par4all.org/releases</a></p>
+</div>
+<div class="section" id="installing-from-the-sources">
+<h2>Installing from the sources<a class="headerlink" href="#installing-from-the-sources" title="Permalink to this headline">¶</a></h2>
+<p>This is not the preferred way to work, but it can be useful for people who
+cannot use a precompiled version and do not want to bother with <tt class="docutils literal"><span class="pre">git</span></tt>.</p>
+<p>First get a source tar-ball in the following directories (Ubuntu or Debian
+do not matter here):</p>
+<div class="highlight-python"><div class="highlight"><pre>http://download.par4all.org/development
+http://download.par4all.org/releases
+</pre></div>
+</div>
+<p>Pick up a file which name ends with <tt class="docutils literal"><span class="pre">_src.tar.gz</span></tt>. You can decompress it
+with a <tt class="docutils literal"><span class="pre">tar</span> <span class="pre">zxvf</span></tt>.</p>
+<p>Then refer to the infrastructure documentation on how to compile with
+<tt class="docutils literal"><span class="pre">p4a_setup.py</span></tt> after having installed the required packages.</p>
+</div>
+<div class="section" id="distributed-version-control-system">
+<h2>Distributed version control system<a class="headerlink" href="#distributed-version-control-system" title="Permalink to this headline">¶</a></h2>
+<p>You can also access to the latest Par4All source code and contribute using
+<tt class="docutils literal"><span class="pre">git</span></tt>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="45%" />
+<col width="55%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">git</span></tt> source viewer &#64; GitHub</td>
+<td><a class="reference external" href="https://github.com/keryell/par4all.git">https://github.com/keryell/par4all.git</a></td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">git</span></tt> source viewer &#64; SILKAN</td>
+<td><a class="reference external" href="https://git.silkan.com/cgit/par4all">https://git.silkan.com/cgit/par4all</a></td>
+</tr>
+<tr class="row-odd"><td>GitHub <tt class="docutils literal"><span class="pre">ssh</span></tt> access</td>
+<td><a class="reference external" href="mailto:git&#37;&#52;&#48;github&#46;com">git<span>&#64;</span>github<span>&#46;</span>com</a>:keryell/par4all.git</td>
+</tr>
+<tr class="row-even"><td>Anonymous <tt class="docutils literal"><span class="pre">git</span></tt> access &#64; SILKAN</td>
+<td>git://git.silkan.com/git/par4all.git</td>
+</tr>
+<tr class="row-odd"><td>Commit <tt class="docutils literal"><span class="pre">git</span></tt> access &#64; SILKAN</td>
+<td><a class="reference external" href="ssh://git.silkan.com/git/par4all.git">ssh://git.silkan.com/git/par4all.git</a></td>
+</tr>
+</tbody>
+</table>
+<p>To compile from the sources or from <tt class="docutils literal"><span class="pre">git</span></tt>, have a look at the Par4All
+organization <a class="reference external" href="documentation">Documentation</a></p>
+<p>The <tt class="docutils literal"><span class="pre">git</span></tt> repository on GitHub is a cleaned-up version without some big
+files not allowed on GitHub.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Download - Par4All</a><ul>
+<li><a class="reference internal" href="#binary-distribution">Binary distribution</a><ul>
+<li><a class="reference internal" href="#repository">Repository</a></li>
+<li><a class="reference internal" href="#package">Package</a></li>
+<li><a class="reference internal" href="#manual-tar-gz-binary-installation">Manual tar.gz binary installation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#previous-releases">Previous releases</a></li>
+<li><a class="reference internal" href="#installing-from-the-sources">Installing from the sources</a></li>
+<li><a class="reference internal" href="#distributed-version-control-system">Distributed version control system</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Par4All</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="features.html"
+                        title="next chapter">Features</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/download.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="features.html" title="Features"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Par4All"
+             >previous</a> |</li>
+        <li><a href="index.html">Par4All 1.4.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, The Par4All team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

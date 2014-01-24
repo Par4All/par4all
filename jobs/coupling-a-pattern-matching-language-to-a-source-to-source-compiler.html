@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Coupling a pattern-matching language to a source-to-source compiler &mdash; Par4All 1.4.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Par4All 1.4.4 documentation" href="../index.html" />
+    <link rel="up" title="Community" href="../community.html" />
+    <link rel="next" title="Transformation de programmes multi-cibles" href="multi-target-program-transformations.html" />
+    <link rel="prev" title="Génération de programmes optimisés lors de l’exécution avec support par analyse statique et dynamique" href="optimized-program-generation-with-static-and-dynamic-analysis-support.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="multi-target-program-transformations.html" title="Transformation de programmes multi-cibles"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="optimized-program-generation-with-static-and-dynamic-analysis-support.html" title="Génération de programmes optimisés lors de l’exécution avec support par analyse statique et dynamique"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Par4All 1.4.4 documentation</a> &raquo;</li>
+          <li><a href="../community.html" accesskey="U">Community</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="coupling-a-pattern-matching-language-to-a-source-to-source-compiler">
+<h1>Coupling a pattern-matching language to a source-to-source compiler<a class="headerlink" href="#coupling-a-pattern-matching-language-to-a-source-to-source-compiler" title="Permalink to this headline">¶</a></h1>
+<p>Internship for a MSc or engineer student</p>
+<dl class="docutils">
+<dt><strong>Keywords</strong>: pattern-matching language, compilation, parallelization,</dt>
+<dd>program transformation, optimization</dd>
+</dl>
+<p>Current computing architectures are all evolving toward parallel
+architectures with always more processors for power-efficiency reasons:
+processors with 8+ cores, GPU for graphics and computations with 1600
+cores (for example the old 2.7-TFLOPS AMD/ATI HD 5870)… This means that
+the stress is put on the programmer to parallelize her application to such
+an extend to fit the target application. Unfortunately, this is quite more
+difficult than plain sequential programming.</p>
+<p>To help the programmer job, many tools are developed: new parallel
+languages, new parallel libraries, new autoparallelizer compilers for
+existing languages, etc.</p>
+<p>In this internship, we focus on autoparallelizer compilers with the
+ability to find out in the programmer source code some constructions that
+can efficiently be executed on parallel architectures with specific
+instructions (SSE intrinsics for example) or libraries (optimized linear
+algebra function such as a matrix multiplication).</p>
+<p>The pattern matching is an old research domain we don’t want to reinvent
+and the aim of the internship is to find the best pattern-matching tool
+(<a class="reference external" href="http://tom.loria.fr">http://tom.loria.fr</a> seems a good candidate…) and language suitable to our
+domain and to couple it with ROSE Compiler to have a powerful
+source-to-source compiler with advanced algorithm recognition system.</p>
+<p>Advisor: Ronan Keryell rk(at)hpc-project(dot)com</p>
+<p><a class="reference external" href="http://par4all.org">http://par4all.org</a></p>
+<p>Location: HPC Project <a class="reference external" href="http://www.hpc-project.com">http://www.hpc-project.com</a> which is a fast-growing
+start-up with 35 people at Meudon (92) and Montpellier (34), France and
+Santa Clara (USA).</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="optimized-program-generation-with-static-and-dynamic-analysis-support.html"
+                        title="previous chapter">Génération de programmes optimisés lors de l’exécution avec support par analyse statique et dynamique</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="multi-target-program-transformations.html"
+                        title="next chapter">Transformation de programmes multi-cibles</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/jobs/coupling-a-pattern-matching-language-to-a-source-to-source-compiler.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="multi-target-program-transformations.html" title="Transformation de programmes multi-cibles"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="optimized-program-generation-with-static-and-dynamic-analysis-support.html" title="Génération de programmes optimisés lors de l’exécution avec support par analyse statique et dynamique"
+             >previous</a> |</li>
+        <li><a href="../index.html">Par4All 1.4.4 documentation</a> &raquo;</li>
+          <li><a href="../community.html" >Community</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, The Par4All team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

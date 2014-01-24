@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Features &mdash; Par4All 1.4.4 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.4.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Par4All 1.4.4 documentation" href="index.html" />
+    <link rel="next" title="Benchmarks" href="benchmarks.html" />
+    <link rel="prev" title="Download - Par4All" href="download.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="benchmarks.html" title="Benchmarks"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="download.html" title="Download - Par4All"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Par4All 1.4.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="features">
+<h1>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h1>
+<p>Par4All is an automatic parallelizing and optimizing compiler (workbench)
+for C and Fortran sequential programs.</p>
+<p>The purpose of this source-to-source compiler is to adapt existing
+applications to various hardware targets such as multicore systems, high
+performance computers and GPUs. It creates a new source code and thus
+allows the original source code of the application to remain unchanged.</p>
+<p>The main benefits of this source-to-source approach are:</p>
+<ul class="simple">
+<li>to keep the original source code of the application free from
+modifications,</li>
+<li>to obtain generated parallelized sources for various hardware platforms,</li>
+<li>to rely on vendor’s optimized target tools,</li>
+<li>to be able to optimize manually the generated source code.</li>
+</ul>
+<p>The generated sources just need to be processed through the usual compilers:</p>
+<ul class="simple">
+<li>optimized compilers for a given processor,</li>
+<li>vendor compilers for embedded processors,</li>
+<li>CUDA,</li>
+<li>OpenCL,</li>
+<li>OpenMP,</li>
+<li>linkable with MPI and other libraries.</li>
+</ul>
+<div class="section" id="par4all-current-version">
+<h2>Par4All current version<a class="headerlink" href="#par4all-current-version" title="Permalink to this headline">¶</a></h2>
+<p>The current 1.*x* version can generate CUDA and OpenCL code from C code
+and OpenMP from C and Fortran 77 code with a simple easy-to-use high-level
+script <tt class="docutils literal"><span class="pre">p4a</span></tt>. With this script, you can get a parallelized version of
+your sources or even call the backend compiler to generate executable
+binaries with <tt class="docutils literal"><span class="pre">gcc</span></tt>, <tt class="docutils literal"><span class="pre">nvcc</span></tt> or <tt class="docutils literal"><span class="pre">icc</span></tt> for example.</p>
+<p>On the <a class="reference external" href="benchmarks">benchmarks</a> page, there are some performance results
+with Par4All on multicores and GPU.</p>
+<p>Currently there is no support for Windows. Mac OS X may work by compiling
+from the sources but is not supported. But you can use a virtual machine
+with Ubuntu or Debian 64-bit <em>x</em>86 on these systems to generate parallel
+versions of your programs.</p>
+</div>
+<div class="section" id="what-is-going-on">
+<h2>What is going on?<a class="headerlink" href="#what-is-going-on" title="Permalink to this headline">¶</a></h2>
+<p>The main development of the 1.4 branch is almost stopped since we are
+focusing our developments on the 2.0 version based on Clang that takes
+most of our time.</p>
+<ul class="simple">
+<li>Switching to Clang as the base framework for Par4All 2.*x*</li>
+<li>Scilab/Xcos and MATLAB/Simulink to OpenMP/CUDA/OpenCL with Wild Cruncher</li>
+<li>Python compilation &amp; parallelization to OpenMP/CUDA/OpenCL</li>
+<li>Code generation for more embedded systems (Tilera, Kalray MPPA, ST
+P2012/STORM)</li>
+<li>More user-friendly interfaces (Eclipse...)</li>
+<li>Improving vector code generation (<em>x</em>86 SSE &amp; AVX, ARM Neon, CUDA and
+OpenCL vectors)</li>
+<li>Better CUDA and OpenCL generation (loop fusion, shared memory...)</li>
+<li>Improving the OpenMP output</li>
+<li>Automatic instrumentation for loop parameters extraction at runtime</li>
+<li>Java compilation &amp; parallelization to OpenMP/CUDA/OpenCL</li>
+<li>Fortran 95 support with the <tt class="docutils literal"><span class="pre">gcc</span></tt>/<tt class="docutils literal"><span class="pre">gfc</span></tt> front-end</li>
+</ul>
+</div>
+<div class="section" id="roadmap">
+<h2>Roadmap<a class="headerlink" href="#roadmap" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Par4All 0.1 and 0.2 went out to provide Fortran 77 to OpenMP
+parallelization to modernize legacy code and C to OpenMP
+parallelization. There were first releases to test the integration
+process and were not really distributed as packages or with high level
+compilation scripts;</li>
+<li>Par4All 1.0 (07/2010) parallelizes Fortran and C to OpenMP and C to CUDA
+and is the first easy-to-use public version;</li>
+<li>Par4All 1.1 (03/2011) deals with C99 and introduces basic support for
+Fortran 95 to OpenMP;</li>
+<li>Par4All 1.2 (07/2011) loop-fusion and communication optimizations for
+CUDA;</li>
+<li>Par4All 1.3.1 (01/2012) generates OpenCL;</li>
+<li>Par4All 1.4.3 (09/2012) deal with Spear-DE output;</li>
+<li>Par4All 2.0 : new version based on Clang/LLVM.</li>
+</ul>
+</div>
+<div class="section" id="internals">
+<h2>Internals<a class="headerlink" href="#internals" title="Permalink to this headline">¶</a></h2>
+<p>Internally, Par4All is currently composed of different components:</p>
+<ul class="simple">
+<li>the <a class="reference external" href="http://pips4u.org">PIPS</a> source-to-source compiler that began at
+<a class="reference external" href="http://cri.mines-paristech.fr">MINES ParisTech</a> in 1988 and is
+currently developed also in many other places: <a class="reference external" href="http://www.silkan.com">SILKAN</a>, <a class="reference external" href="http://departements.telecom-bretagne.eu/info">Institut TÉLÉCOM/TÉLÉCOM Bretagne</a>, <a class="reference external" href="http://inf.telecom-sudparis.eu">IT SudParis</a>, <a class="reference external" href="http://www.cs.rpi.edu">RPI (Rensselaer Polytechnic
+Institute)</a>.</li>
+<li>the <a class="reference external" href="http://icps.u-strasbg.fr/polylib/">PolyLib</a> used by PIPS,</li>
+<li>GCC/GFC for the Fortran95 parser,</li>
+<li>and of course own tools and scripts to make all these components and the
+global infrastructure usable.</li>
+</ul>
+<p>Par4All is an open source project that merges various open source
+developments. <a class="reference external" href="community">More info on the community here</a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Features</a><ul>
+<li><a class="reference internal" href="#par4all-current-version">Par4All current version</a></li>
+<li><a class="reference internal" href="#what-is-going-on">What is going on?</a></li>
+<li><a class="reference internal" href="#roadmap">Roadmap</a></li>
+<li><a class="reference internal" href="#internals">Internals</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="download.html"
+                        title="previous chapter">Download - Par4All</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="benchmarks.html"
+                        title="next chapter">Benchmarks</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/features.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="benchmarks.html" title="Benchmarks"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="download.html" title="Download - Par4All"
+             >previous</a> |</li>
+        <li><a href="index.html">Par4All 1.4.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, The Par4All team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

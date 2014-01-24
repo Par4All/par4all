@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Documentation &mdash; Par4All 1.4.4 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.4.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Par4All 1.4.4 documentation" href="index.html" />
+    <link rel="next" title="Community" href="community.html" />
+    <link rel="prev" title="Benchmarks" href="benchmarks.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="community.html" title="Community"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="benchmarks.html" title="Benchmarks"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Par4All 1.4.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="documentation">
+<h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="users-guide">
+<h2>Users guide<a class="headerlink" href="#users-guide" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">p4a</span></tt> is the basic command line interface used to do simple things
+with Par4All: parallelizing programs, compiling with backend. The
+Par4All user manual with a description of <tt class="docutils literal"><span class="pre">p4a</span></tt> is available in <a class="reference external" href="http://download.par4all.org/doc/par4all_user_guide/par4all_user_guide.pdf">PDF</a>
+and <a class="reference external" href="http://download.par4all.org/doc/par4all_user_guide/par4all_user_guide.htdoc">HTML</a>.</li>
+<li>Installation guide in <a class="reference external" href="http://download.par4all.org/doc/installation_guide/par4all_installation_guide.pdf">PDF</a>
+and <a class="reference external" href="http://download.par4all.org/doc/installation_guide/par4all_installation_guide.htdoc">HTML</a>.</li>
+<li>Some coding rules to write applications with good parallelization
+properties for Par4All in <a class="reference external" href="http://download.par4all.org/doc/p4a_coding_rules/p4a_coding_rules.pdf">PDF</a>
+and <a class="reference external" href="http://download.par4all.org/doc/p4a_coding_rules/p4a_coding_rules.htdoc">HTML</a>.
+There is no magic powder, parallelization can work only on well written
+programs. There is a more recent and general technical report that can
+be found at <a class="reference external" href="http://www.cri.ensmp.fr/classement/doc/A-503.pdf">http://www.cri.ensmp.fr/classement/doc/A-503.pdf</a></li>
+<li>Slides presenting <tt class="docutils literal"><span class="pre">p4a</span></tt> command line interface, generated
+automatically with the help of <tt class="docutils literal"><span class="pre">p4a</span></tt> (<tt class="docutils literal"><span class="pre">p4a</span> <span class="pre">-h</span></tt>) and explaining the
+<tt class="docutils literal"><span class="pre">p4a</span></tt> capabilities.</li>
+<li>Par4All primer with <tt class="docutils literal"><span class="pre">tpips</span></tt>: Introductive slide presentation for
+advanced users of the <tt class="docutils literal"><span class="pre">tpips</span></tt> command line interface of PIPS present
+in Par4All.</li>
+</ul>
+</div>
+<div class="section" id="developers-guide">
+<h2>Developers Guide<a class="headerlink" href="#developers-guide" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>The developer guide describes the internal organization of Par4All and
+its construction and is available in <a class="reference external" href="http://download.par4all.org/doc/developer_guide/par4all_developer_guide.pdf">PDF</a>
+and <a class="reference external" href="http://download.par4all.org/doc/developer_guide/par4all_developer_guide.htdoc">HTML</a>.</li>
+<li>The <strong>Par4All Accel Runtime</strong> is the adaptation layer used by the ParAll
+compiler backend to address heterogeneous accelerators (GPU for
+example). It can also be directly used by programmers that want to
+address low-level programming while remaining more abstract from the
+architectural point of view. <a class="reference external" href="http://download.par4all.org/doc/Par4All_Accel_runtime/graph">The Doxygen documentation is here</a></li>
+</ul>
+</div>
+<div class="section" id="publications">
+<h2>Publications<a class="headerlink" href="#publications" title="Permalink to this headline">¶</a></h2>
+<p>To cite Par4ll in a publication about GPUs code generation, the best
+references are:</p>
+<ul class="simple">
+<li>Mehdi AMINI, Béatrice CREUSILLET, Stéphanie EVEN, Ronan KERYELL, Onil
+GOUBIER, Serge GUELTON, Janice Onanian MCMAHON, François Xavier
+PASQUIER, Grégoire PÉAN and Pierre VILLALON. « <strong>Par4All : From Convex
+Array Regions to Heterogeneous Computing.</strong> » in 2nd International
+Workshop on Polyhedral Compilation Techniques (IMPACT 2012). Paris,
+France, 01/2012.
+<a class="reference external" href="http://impact.gforge.inria.fr/impact2012/workshop_IMPACT/amini.pdf">http://impact.gforge.inria.fr/impact2012/workshop_IMPACT/amini.pdf</a>
+<a class="reference external" href="http://impact.gforge.inria.fr/impact2012/slides/amini.pdf">http://impact.gforge.inria.fr/impact2012/slides/amini.pdf</a></li>
+<li>Mehdi AMINI. « <strong>Source-to-Source Automatic Program Transformations for
+GPU-like Hardware Accelerators</strong> ». PhD Thesis. Paris, France, 12/2012.
+<a class="reference external" href="http://www.cri.ensmp.fr/classement/doc/A-506.pdf">http://www.cri.ensmp.fr/classement/doc/A-506.pdf</a></li>
+</ul>
+<div class="section" id="articles">
+<h3>Articles<a class="headerlink" href="#articles" title="Permalink to this headline">¶</a></h3>
+<p>You may find also some other publications on the WWW pages of the authors
+and on <a class="reference external" href="http://www.cri.ensmp.fr/classement/2013.html">http://www.cri.ensmp.fr/classement/2013.html</a></p>
+<ul class="simple">
+<li>Massimo TORQUATI, Marco VANNESCHI, Mehdi AMINI, Serge GUELTON, Ronan
+KERYELL, Vincent LANORE, François-Xavier PASQUIER, Michel BARRETEAU,
+Rémi BARRÈRE, Claudia-Teodora PETRISOR, Éric LENORMAND, Claudia CANTINI
+and Filippo De STEFANI. « <strong>An innovative compilation tool-chain for
+embedded multi-core architectures.</strong> » in Embedded World
+Conference 2012. Nuremberg, Germany,
+2/2012. <a class="reference external" href="http://calvados.di.unipi.it/storage/paper_files/2012_torquati_ew.pdf">http://calvados.di.unipi.it/storage/paper_files/2012_torquati_ew.pdf</a>.</li>
+<li>Nicolas VENTROUX, Tanguy SASSOLAS, Alexandre GUERRE, Béatrice CREUSILLET
+and Ronan KERYELL. « <strong>SESAM/Par4All : A Tool for Joint Exploration of
+MPSoC Architectures and Dynamic Dataflow Code Generation.</strong> » in
+RAPIDO’12, 4th Workshop on : Rapid Simulation and Performance Evaluation
+: Methods and Tools. Paris, France,
+01/ 2012. <a class="reference external" href="http://nventrou.free.fr/papers/RAPIDO2012_NV.pdf">http://nventrou.free.fr/papers/RAPIDO2012_NV.pdf</a>. Best paper
+award.</li>
+<li>Mehdi AMINI, Béatrice CREUSILLET, Stéphanie EVEN, Ronan KERYELL, Onil
+GOUBIER, Serge GUELTON, Janice Onanian MCMAHON, François Xavier
+PASQUIER, Grégoire PÉAN and Pierre VILLALON. « <strong>Par4All : From Convex
+Array Regions to Heterogeneous Computing.</strong> » in 2nd International
+Workshop on Polyhedral Compilation Techniques (IMPACT 2012). Paris,
+France, 01/2012.
+<a class="reference external" href="http://impact.gforge.inria.fr/impact2012/workshop_IMPACT/amini.pdf">http://impact.gforge.inria.fr/impact2012/workshop_IMPACT/amini.pdf</a>
+<a class="reference external" href="http://impact.gforge.inria.fr/impact2012/slides/amini.pdf">http://impact.gforge.inria.fr/impact2012/slides/amini.pdf</a></li>
+<li>Mehdi AMINI, Fabien COELHO, François IRIGOIN and Ronan KERYELL. «
+<strong>Static Compilation Analysis for Host-Accelerator Communication
+Optimization.</strong> » in LCPC’2011 : 24th International Workshop on
+Languages and Compilers for Parallel Computing. Fort Collins, Colorado,
+USA, 9/2011. <a class="reference external" href="http://www.cri.ensmp.fr/classement/doc/A-476.pdf">http://www.cri.ensmp.fr/classement/doc/A-476.pdf</a></li>
+<li>Mehdi AMINI, Corinne ANCOURT, Fabien COELHO, Béatrice CREUSILLET, Serge
+GUELTON, François IRIGOIN, Pierre JOUVELOT, Ronan KERYELL and Pierre
+VILLALON. « <strong>PIPS Is not (just) Polyhedral Software.</strong> » in First
+International Workshop on Polyhedral Compilation Techniques (IMPACT
+2011). Chamonix, France,
+4/2011. <a class="reference external" href="http://perso.ens-lyon.fr/christophe.alias/impact2011/impact-09.pdf">http://perso.ens-lyon.fr/christophe.alias/impact2011/impact-09.pdf</a></li>
+<li>Béatrice Creusillet. « <strong>Automatic Task Generation on the SCMP
+architecture for data flow applications.</strong> » SCALOPES Technical
+Report. 03/2011.
+<a class="reference download internal" href="_downloads/bc_report2.pdf"><tt class="xref download docutils literal"><span class="pre">download/bc_report2.pdf</span></tt></a></li>
+</ul>
+</div>
+<div class="section" id="posters">
+<h3>Posters<a class="headerlink" href="#posters" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Amira MENSI. « <strong>Points-to Analysis for the C Language</strong>
+». HiPEAC 2012. Best student poster award.
+<a class="reference download internal" href="_downloads/Amira_Mensi_poster_hipeac2012.pdf"><tt class="xref download docutils literal"><span class="pre">download/Amira_Mensi_poster_hipeac2012.pdf</span></tt></a></li>
+<li>Serge GUELTON, Mehdi AMINI, Ronan KERYELL and Béatrice CREUSILLET «
+<strong>PyPS, a programmable pass manager.</strong> » In 24th International Workshop on
+Languages and Compilers for Parallel Computing, Fort Collins, Colorado,
+USA, 9/2011. <a class="reference external" href="http://www.cri.ensmp.fr/classement/doc/A-480.png">http://www.cri.ensmp.fr/classement/doc/A-480.png</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="presentations">
+<h2>Presentations<a class="headerlink" href="#presentations" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">2012/07/04 – <a class="reference external" href="http://enstb.org/~keryell/publications/exposes/2012/2012-07-04-Overview_of_HPC-HPC&#64;LR_Montpellier/2012-07-05-HPC-overview-RK-expose.pdf">Overview of HPC</a></p>
+<p>Ronan Keryell &#64; <a class="reference external" href="https://www.hpc-lr.univ-montp2.fr/lci-2012/programme-129">Linux Cluster Institute 2012</a>, Université
+Montpellier 2, Centre de compétences, Montpellier, France</p>
+</li>
+<li><p class="first">2012/04/23 – <a class="reference external" href="http://enstb.org/~keryell/publications/exposes/2012/2012-04-23-HPC-GPU_Meetup_CMU/2012-04-23-HPC-GPU_Meetup_CMU-Par4All-expose.pdf">Par4All: From Sequential Applications to Heterogeneous
+Parallel Computing</a></p>
+<p>Ronan Keryell &#64; <a class="reference external" href="http://www.meetup.com/HPC-GPU-Supercomputing-Group-of-Paris-Meetup/events/43673412/">Meetup of HPC &amp; GPU Supercomputing Group of Silicon
+Valley</a>,
+Moffett Field, CA, USA</p>
+</li>
+<li><p class="first">2012/01/25 – <a class="reference external" href="http://enstb.org/~keryell/publications/exposes/2012/2012-01-25-Paris-HPC-GPU-meetup-Par4All/2012-01-25-Paris-HPC-GPU-meetup-Par4All-expose.pdf">Par4All: Open source parallelization for heterogeneous
+computing OpenCL &amp; more</a></p>
+<p>Ronan Keryell &#64; <a class="reference external" href="http://www.meetup.com/HPC-GPU-Supercomputing-Group-of-Paris-Meetup/events/43673412/">HPC &amp; GPU Supercomputing Group of Paris Meetup</a>,
+Paris, France</p>
+</li>
+<li><p class="first">2012/01/24 - <a class="reference external" href="http://enstb.org/~keryell/publications/exposes/2012/2012-01-24-HiPEAC-OpenGPU-Par4All/Par4All-HiPEAC-OpenGPU-expose.pdf">Par4All: Open source parallelization for heterogeneous
+computing OpenCL &amp; more</a></p>
+<p>Ronan Keryell &#64; <a class="reference external" href="http://www.hipeac.net/hipeac2012">HiPEAC 2012</a> /
+<a class="reference external" href="http://opengpu.net/index.php?option=com_content&amp;view=article&amp;id=157&amp;Itemid=144">Workshop OpenGPU</a>,
+Paris, France</p>
+</li>
+<li><p class="first">2009/10/01 – <a class="reference external" href="http://download.par4all.org/doc/presentations/2009/nVidia-GPU_Technology_Conference-2009/Par4All_Cuda-RK-expose.pdf">Par4All: Auto-Parallelizing C and Fortran for the CUDA
+Architecture</a></p>
+</li>
+</ul>
+<blockquote>
+<div>A presentation of Par4All by Ronan Keryell at the <a class="reference external" href="http://www.nvidia.com/object/gpu_technology_conference.html">nVidia GPU Technology
+Conference</a> in San
+José, Ca. <a class="reference external" href="http://download.par4all.org/doc/presentations/2009/nVidia-GPU_Technology_Conference-2009/Par4All_Cuda-RK-copie.pdf">Printer friendly version</a></div></blockquote>
+<ul>
+<li><p class="first">2009/07/01 – <a class="reference external" href="http://download.par4all.org/doc/presentations/2009/Forum_Ter&#64;tec_2009-OpenGPU/Ter&#64;tec_2009-OpenGPU-RK-expose.pdf">GPU &amp; Open Source</a></p>
+<p>Presentation by Ronan Keryell from HPC Project at the OpenGPU session at
+the <a class="reference external" href="http://www.teratec.eu/forum">Ter&#64;tec Forum 2009</a>, 2009/07/01. <a class="reference external" href="http://download.par4all.org/doc/presentations/2009/Forum_Ter&#64;tec_2009-OpenGPU/Ter&#64;tec_2009-OpenGPU-RK-copie.pdf">Printer friendly version</a></p>
+</li>
+<li><p class="first">ESWEEK 2009 Panel: <a class="reference external" href="http://download.par4all.org/doc/presentations/2009/ESWEEK-2009-10-12/ESWEEK-Panel-RK-expose.pdf">compilers for embedded systems</a></p>
+<p>The contribution of Ronan Keryell to the panel at <a class="reference external" href="http://esweek09.inrialpes.fr">ESWEEK</a>, 10/14/2009 in Grenoble. <a class="reference external" href="http://download.par4all.org/doc/presentations/2009/ESWEEK-2009-10-12/ESWEEK-Panel-RK-copie.pdf">Printer
+friendly version</a></p>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Documentation</a><ul>
+<li><a class="reference internal" href="#users-guide">Users guide</a></li>
+<li><a class="reference internal" href="#developers-guide">Developers Guide</a></li>
+<li><a class="reference internal" href="#publications">Publications</a><ul>
+<li><a class="reference internal" href="#articles">Articles</a></li>
+<li><a class="reference internal" href="#posters">Posters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#presentations">Presentations</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="benchmarks.html"
+                        title="previous chapter">Benchmarks</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="community.html"
+                        title="next chapter">Community</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/documentation.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="community.html" title="Community"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="benchmarks.html" title="Benchmarks"
+             >previous</a> |</li>
+        <li><a href="index.html">Par4All 1.4.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, The Par4All team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

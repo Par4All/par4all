@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Adding MatLab/Octave/SciLab language to a source-to-source compiler &mdash; Par4All 1.4.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Par4All 1.4.4 documentation" href="../index.html" />
+    <link rel="up" title="Community" href="../community.html" />
+    <link rel="next" title="Génération de programmes optimisés lors de l’exécution avec support par analyse statique et dynamique" href="optimized-program-generation-with-static-and-dynamic-analysis-support.html" />
+    <link rel="prev" title="Community" href="../community.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="optimized-program-generation-with-static-and-dynamic-analysis-support.html" title="Génération de programmes optimisés lors de l’exécution avec support par analyse statique et dynamique"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../community.html" title="Community"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Par4All 1.4.4 documentation</a> &raquo;</li>
+          <li><a href="../community.html" accesskey="U">Community</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="adding-matlab-octave-scilab-language-to-a-source-to-source-compiler">
+<h1>Adding MatLab/Octave/SciLab language to a source-to-source compiler<a class="headerlink" href="#adding-matlab-octave-scilab-language-to-a-source-to-source-compiler" title="Permalink to this headline">¶</a></h1>
+<p>Internship for a MSc or engineer student.</p>
+<p><strong>Keywords:</strong> MatLab, Octave, SciLab, compilation, parallelization,
+program transformation, abstract interpretation, type reconstruction</p>
+<p>Dynamic languages oriented toward mathematical simulations such as
+MatLab/Octave/SciLab are quite fashionable for the rapid prototyping of
+complex applications. Unfortunately, their execution is not very quite
+efficient and often to slow compared to highly optimized coding in a
+statically compiled imperative language (C, Fortran, C++).</p>
+<p>Current computing architectures are all evolving toward parallel
+architectures with always more processors for power-efficiency reasons:
+processors with 8+ cores, GPU for graphics and computations with 1600
+cores (for example the old 2.7-TFLOPS AMD/ATI HD 5870)... This means that
+the stress is put on the programmer to parallelize her application to such
+an extend to fit the target application. Unfortunately, this is quite more
+difficult than plain sequential programming and there is no direct path
+for languages such as MatLab/Octave/SciLab.</p>
+<p>The parallel execution can be hidden in specialized libraries, but in this
+case only this part of the execution is optimized, or the parallelism can
+be hidden in some objects (for example a matrix on a parallel accelerator)
+but in this case the programmer must change the source code to use this
+new kinds of objects, and of course only some computations on these
+objects will be accelerated, say, on a GPU.</p>
+<p>Since there exist compilers that are able to parallelize some languages
+like C or Fortran, it is appealing to be able to adapt these compiler
+technologies for languages such as MatLab and Octave. Unfortunately a C
+compiler cannot deal with such a language, and even if we add a dedicated
+parser to it to deal with a new language, major improvements will be
+needed in the abstract syntax tree and the semantics analysis to deal with
+all these new dynamic constructs.</p>
+<p>In this internship, we want to try a new direction: developing a new tool
+using the MatLab/Octave free parser and generate equivalent raw C code
+with some calls to intrinsics functions to add the needed expressiveness
+lacking to a pure C translation. This translated C will be analyzed by the
+PIPS source-to-source compiler to generate an efficient equivalent
+parallel C code. For this, many improvement will be needed to deal with
+the new intrinsics functions and many new transformation phases will be
+needed to optimized the code before final generation.</p>
+<p>The translated code will be profiled against multicore and GPU executions
+for performance comparison.</p>
+<p>This internship can be followed by a full-time job or a PhD thesis.</p>
+<p>Advisor: Thierry.Porcher (at)hpc-project dot com with Mines ParisTech/CRI</p>
+<p>Montpellier, France.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../community.html"
+                        title="previous chapter">Community</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="optimized-program-generation-with-static-and-dynamic-analysis-support.html"
+                        title="next chapter">Génération de programmes optimisés lors de l’exécution avec support par analyse statique et dynamique</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/jobs/adding-matlaboctavescilab-language-to-a-source-to-source-compiler.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="optimized-program-generation-with-static-and-dynamic-analysis-support.html" title="Génération de programmes optimisés lors de l’exécution avec support par analyse statique et dynamique"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../community.html" title="Community"
+             >previous</a> |</li>
+        <li><a href="../index.html">Par4All 1.4.4 documentation</a> &raquo;</li>
+          <li><a href="../community.html" >Community</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, The Par4All team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

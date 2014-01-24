@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Complexity-based (non)parallelization &mdash; Par4All 1.4.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Par4All 1.4.4 documentation" href="../index.html" />
+    <link rel="up" title="Community" href="../community.html" />
+    <link rel="next" title="Fortran to OpenCL parallelization" href="fortran-to-opencl-parallelization.html" />
+    <link rel="prev" title="Conception d’une éditeur sémantique pour infrastructure de transformation de programme source-à-source avec Eclipse" href="semantics-editor-for-a-source-to-source-program-transformation-infrastructure-with-eclipse.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fortran-to-opencl-parallelization.html" title="Fortran to OpenCL parallelization"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="semantics-editor-for-a-source-to-source-program-transformation-infrastructure-with-eclipse.html" title="Conception d’une éditeur sémantique pour infrastructure de transformation de programme source-à-source avec Eclipse"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Par4All 1.4.4 documentation</a> &raquo;</li>
+          <li><a href="../community.html" accesskey="U">Community</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="complexity-based-non-parallelization">
+<h1>Complexity-based (non)parallelization<a class="headerlink" href="#complexity-based-non-parallelization" title="Permalink to this headline">¶</a></h1>
+<p>Master or engineer internship</p>
+<p><strong>Keywords</strong>: compilation, parallelization, complexity analysis, program
+transformations</p>
+<p>Manycore processors and heterogeneous accelerators allow good performance
+on parallel programs with good power efficiency but their programming is
+quite challenging.</p>
+<p>There exist some frameworks to ease application development on these
+platforms and Par4All (<a class="reference external" href="http://par4all.org">http://par4all.org</a>) is one of them, based on
+automatic parallelization that can parallelize C and Fortran sequential
+programs to OpenMP, CUDA and OpenCL.</p>
+<p>Unfortunately, sometimes the automatic parallelization is successful on
+some parts where it is counterproductive to have a parallel execution,
+because there is not enough parallelism to compensate the start-up
+overhead, or there is too many data to transfer compared with the
+computing intensity. In this case it is interesting not to parallelize
+according to some cost function.</p>
+<p>This internship deals with extending Par4All with some heuristics based on
+a complexity analysis relying on polyhedral model and Ehrhart polynomial
+(<a class="reference external" href="http://en.wikipedia.org/wiki/Ehrhart_polynomial">http://en.wikipedia.org/wiki/Ehrhart_polynomial</a>) already in PIPS
+(<a class="reference external" href="http://pips4u.org">http://pips4u.org</a>) but to be extended to deal with the C language. With
+it, some estimations of the computational intensity and the CPU-GPU
+communication costs will be computed.</p>
+<p>In some cases it is also interesting to do some parallel promotion, when a
+sequential part is executed redundantly in parallel to avoid having a
+sequence of parallel/sequential/parallel parts. This approach is also to
+be studied with the complexity analysis.</p>
+<p>This internship can be followed by a job or a PhD thesis.</p>
+<p>Some knowledge useful for this project: compilation, C, Python, Unix.</p>
+<p>Advisor : Thierry.porcher  at hpc-project dot com,  <a class="reference external" href="http://par4all.org">http://par4all.org</a></p>
+<p>HPC Project <a class="reference external" href="http://www.hpc-project.com">http://www.hpc-project.com</a> is a start-up with around 35 people.</p>
+<p>Meudon (92) or Montpellier (34), France.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="semantics-editor-for-a-source-to-source-program-transformation-infrastructure-with-eclipse.html"
+                        title="previous chapter">Conception d’une éditeur sémantique pour infrastructure de transformation de programme source-à-source avec Eclipse</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fortran-to-opencl-parallelization.html"
+                        title="next chapter">Fortran to OpenCL parallelization</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/jobs/complexity-based-nonparallelization.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fortran-to-opencl-parallelization.html" title="Fortran to OpenCL parallelization"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="semantics-editor-for-a-source-to-source-program-transformation-infrastructure-with-eclipse.html" title="Conception d’une éditeur sémantique pour infrastructure de transformation de programme source-à-source avec Eclipse"
+             >previous</a> |</li>
+        <li><a href="../index.html">Par4All 1.4.4 documentation</a> &raquo;</li>
+          <li><a href="../community.html" >Community</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, The Par4All team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>
