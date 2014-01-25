@@ -49,16 +49,17 @@ static char * sc_symbol_table(char *);
 %}
 
 %%
-<TEXT>VAR			{ RETURN(VAR); } 
+<TEXT>"VAR"			{ RETURN(VAR); } 
 <TEXT>[.A-Za-z_]['A-Za-z0-9_:#.]* { yylval.Variable = (Variable) sc_symbol_table(yytext); /*'*/
                                   RETURN(IDENT); }
-<TEXT>[']['A-Za-z0-9_:#?. ]*['] { yylval.Variable = (Variable) sc_symbol_table(yytext); /*'*/
+<TEXT>\'[A-Za-z0-9_:#?. ]*\' { yylval.Variable = (Variable) sc_symbol_table(yytext); /*'*/
                                   RETURN(IDENT); }
 <TEXT>[0-9]*[.DEe][0-9DEe\-]* { yylval.Variable = (Variable) sc_symbol_table(yytext); /*'*/
                                   RETURN(IDENT); }
 <TEXT>[0-9]*			{ sscan_Value(yytext,&yylval.Value);
                                   RETURN(CONSTANTE); }
 <TEXT>"=="			{ RETURN(EGAL); }
+<TEXT>"="			{ RETURN(EGAL); }
 <TEXT>","			{ RETURN(VIRG); }
 <TEXT>"+"			{ RETURN(PLUS); }
 <TEXT>"-"			{ RETURN(MOINS); }

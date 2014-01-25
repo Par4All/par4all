@@ -71,8 +71,7 @@ extern FILE * syst_in;
  *
  * Ancien nom: fscsys_uf
  */
-Psysteme * sc_read(nomfic)
-char * nomfic;
+Psysteme * sc_read(char * nomfic)
 {
 	if ((syst_in = fopen(nomfic,"r")) == NULL) {
 		(void) fprintf(stderr,
@@ -119,9 +118,7 @@ char * nomfic;
  *
  * Cette fonction peut relir un fichier cree par la fonction sc_fprint()
  */
-bool sc_fscan(f,ps)
-FILE * f;
-Psysteme * ps;
+bool sc_fscan(FILE * f, Psysteme * ps)
 {
     syst_in = f;
     sc_init_lex();
@@ -129,7 +126,7 @@ Psysteme * ps;
     syst_parse();
     ps_yacc = sc_reversal(ps_yacc);
     *ps = ps_yacc;
-    return(!syst_syntax_error);
+    return !syst_syntax_error;
 }
 
 /* void sc_dump(Psysteme sc): dump to stderr
@@ -170,8 +167,7 @@ void sc_dump(Psysteme sc)
  * may fail in very few cases, because of variable names.
  * DN(5/8/2002) 
  */
-void sc_default_dump(sc)
-Psysteme sc;
+void sc_default_dump(Psysteme sc)
 {
     if(!SC_UNDEFINED_P(sc)) {
 	(void) fprintf(stderr,"#DIMENSION: %d  ",sc->dimension);
@@ -261,10 +257,7 @@ void sc_fprint(FILE * fp,
  * should use default_variable_to_string
  * 
  */
-void sc_fprint_for_sc_fscan(f, sc, nom_var)
-FILE * f;
-Psysteme sc;
-char * (*nom_var)(Variable);
+void sc_fprint_for_sc_fscan(FILE * f, Psysteme sc, char * (*nom_var)(Variable))
 {
       if(!SC_UNDEFINED_P(sc)) {
 	(void) fprintf(f,"#DIMENSION (%d)  ",sc->dimension);
