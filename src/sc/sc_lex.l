@@ -73,6 +73,7 @@ static char * sc_symbol_table(char *);
 <TEXT>"#"                       {BEGIN COMMENT;}
 <COMMENT>\n                     {BEGIN TEXT;}
 <COMMENT>[^\n]*         ;
+.             { yyerror("unexpected character"); }
 %% 
 
 #define SYMBOLS_SIZE (10)
