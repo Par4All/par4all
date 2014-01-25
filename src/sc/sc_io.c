@@ -73,19 +73,19 @@ extern FILE * syst_in;
  */
 Psysteme * sc_read(char * nomfic)
 {
-	if ((syst_in = fopen(nomfic,"r")) == NULL) {
+	if ((syst_in = fopen(nomfic, "r")) == NULL) {
 		(void) fprintf(stderr,
 			       "Ouverture du fichier %s impossible\n",nomfic);
 		exit(4);
 	}
 	sc_init_lex();
 	syst_parse();
-	return(&ps_yacc);
+	return &ps_yacc;
 }
 
 /* bool sc_fscan(FILE * f, Psysteme * ps): construit un systeme d'inegalites
  * et d'egalites lineaires a partir d'une representation externe standard;
- * 
+ *
  * Le systeme s est alloue et son ancienne valeur est perdue. Cette fonction
  * devrait donc etre appelee avec la precondition s==NULL. La variable s
  * n'est pas retournee pour respecter la syntaxe habituelle de scanf et
@@ -100,7 +100,7 @@ Psysteme * sc_read(char * nomfic)
  *
  * les inegalites et les egalites sont melangees entre elles, mais separees
  * par des virgules et regroupees entre accolades; les inegalites sont
- * toutes mises sous la forme 
+ * toutes mises sous la forme :
  *
  * sum a x <= b
  *  i   i i
@@ -116,7 +116,7 @@ Psysteme * sc_read(char * nomfic)
  * Noter l'absence de signe "multiplier" entre les coefficients numeriques
  * et les noms de variables
  *
- * Cette fonction peut relir un fichier cree par la fonction sc_fprint()
+ * Cette fonction peut relire un fichier cree par la fonction sc_fprint()
  */
 bool sc_fscan(FILE * f, Psysteme * ps)
 {
