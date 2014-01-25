@@ -6,10 +6,9 @@
 Par4All
 =======
 
-Contents:
-
 .. toctree::
    :maxdepth: 2
+   :hidden:
 
    download
    features
@@ -40,7 +39,6 @@ parallelize `Scilab <http://www.scilab.org>`_ programs to speed up
 computations.
 
 ..
-
   I've not been able to have a better link that this...
 
 .. figure:: images/P4A-video2.png
