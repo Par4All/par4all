@@ -23,7 +23,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
+#include <getopt.h>
 
 #include "arithmetique.h"
 #include "vecteur.h"
@@ -32,13 +34,41 @@
 
 extern char * sc_internal_symbol_table(char *);
 
-int main(int argc, char * argv[])
+int main(int argc, char * const argv[])
 {
+  // option management
+  bool reverse = false;
+  int opt;
+  while ((opt = getopt(argc, argv, "r")) != -1) {
+    switch (opt) {
+    case 'r': reverse = true; break;
+    default: exit(1);
+    }
+  }
+  // get system
   Psysteme s;
   bool ok = sc_fscan(stdin, &s);
   assert(ok);
-  for(int i = 1; i < argc; i++)
-    sc_projection(s, sc_internal_symbol_table(argv[i]));
+  // project & simplify
+  if (reverse) {
+    for (Pbase b = sc_base(s); b; b = vecteur_succ(b)) {
+      bool keep = false;
+      for (int i = optind; i < argc; i++) {
+        if (strcmp(argv[i], vecteur_var(b)) == 0) {
+          keep = true;
+          break;
+        }
+      }
+      if (!keep)
+        sc_projection(s, vecteur_var(b));
+    }
+  }
+  else {
+    for(int i = optind; i < argc; i++)
+      sc_projection(s, sc_internal_symbol_table(argv[i]));
+  }
+  sc_nredund(&s);
+  // print out result
   sc_fprint(stdout, s, *variable_default_name);
   return 0;
 }
