@@ -56,6 +56,8 @@ int main(int argc, char * const argv[])
   if (reverse) {
     Pbase bnext;
     for (Pbase b = sc_base(s); b && s; b = bnext) {
+      // Oops: the system may be nullifed by sc_projection...
+      // so the next iteration must not rely on it
       bnext = vecteur_succ(b);
       bool keep = false;
       for (int i = optind; i < argc; i++) {
