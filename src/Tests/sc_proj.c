@@ -71,8 +71,8 @@ int main(int argc, char * const argv[])
     }
   }
   else {
-    for(int i = optind; i < argc; i++)
-      sc_projection(s, sc_internal_symbol_table(argv[i]));
+    for(int i = optind; i < argc && s; i++)
+      s = sc_projection(s, sc_internal_symbol_table(argv[i]));
   }
   if (debug) sc_fprint(stderr, s, *variable_default_name);
   sc_nredund(&s);
