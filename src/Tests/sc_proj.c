@@ -38,10 +38,12 @@ int main(int argc, char * const argv[])
 {
   // option management
   bool reverse = false;
+  int debug = 0;
   int opt;
-  while ((opt = getopt(argc, argv, "r")) != -1) {
+  while ((opt = getopt(argc, argv, "rD")) != -1) {
     switch (opt) {
     case 'r': reverse = true; break;
+    case 'D': debug++; break;
     default: exit(1);
     }
   }
@@ -49,9 +51,12 @@ int main(int argc, char * const argv[])
   Psysteme s;
   bool ok = sc_fscan(stdin, &s);
   assert(ok);
+  if (debug >= 2) sc_fprint(stderr, s, *variable_default_name);
   // project & simplify
   if (reverse) {
-    for (Pbase b = sc_base(s); b; b = vecteur_succ(b)) {
+    Pbase bnext;
+    for (Pbase b = sc_base(s); b && s; b = bnext) {
+      bnext = vecteur_succ(b);
       bool keep = false;
       for (int i = optind; i < argc; i++) {
         if (strcmp(argv[i], vecteur_var(b)) == 0) {
@@ -60,13 +65,14 @@ int main(int argc, char * const argv[])
         }
       }
       if (!keep)
-        sc_projection(s, vecteur_var(b));
+        s = sc_projection(s, vecteur_var(b));
     }
   }
   else {
     for(int i = optind; i < argc; i++)
       sc_projection(s, sc_internal_symbol_table(argv[i]));
   }
+  if (debug) sc_fprint(stderr, s, *variable_default_name);
   sc_nredund(&s);
   // print out result
   sc_fprint(stdout, s, *variable_default_name);
