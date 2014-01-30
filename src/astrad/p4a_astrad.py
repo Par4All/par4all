@@ -79,7 +79,6 @@ class p4a_astrad_postprocessor(object):
             self.generatedKernelFiles += os.path.split(name)[1]
 
     def save_dsl_file(self):
-        global astrad_dialect_names
 
         #print("ASTRAD: call to save_dsl_file \n")
         dsl_file_name = os.path.join(self.saveDir, self.moduleName + '.dsl')
@@ -113,6 +112,10 @@ class p4a_astrad_postprocessor(object):
 
     def save_kernel_dsl_file(self, xml_file):
 
+        # save xml file for debugging
+        xml_text = read_file(xml_file)
+        write_file(os.path.join(self.saveDir, "kernel.xml"), xml_text)
+
         # get xml file content as tree
         try:
             import xml.etree.cElementTree as ET
@@ -121,13 +124,19 @@ class p4a_astrad_postprocessor(object):
 
         tree = ET.ElementTree(file=xml_file)
         root = tree.getroot()
-        formal_arrays = root.find("FormalArrays").findall("Array")
-        task_parameters = root.find("TaskParameters").findall("TaskParameter")
-        loops = root.find('Loops').findall('Loop')
+        if root.find("FormalArrays"):
+            formal_arrays = root.find("FormalArrays").findall("Array")
+        else:
+            formal_arrays = []
+        if root.find("TaskParameters"):
+            task_parameters = root.find("TaskParameters").findall("TaskParameter")
+        else:
+            task_parameters = []
+        if root.find('Loops'):
+            loops = root.find('Loops').findall('Loop')
+        else:
+            loops = []
 
-        # save xml file for debugging
-        xml_text = read_file(xml_file)
-        write_file(os.path.join(self.saveDir, "kernel.xml"), xml_text)
 
         # generate dsl text
         dsl_text = "kernel {\n"
