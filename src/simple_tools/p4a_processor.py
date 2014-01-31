@@ -425,8 +425,18 @@ class p4a_processor(object):
         if filter_exclude:
             filter_exclude_re = re.compile(filter_exclude)
 
+        # don't try to do anything with astrad projects libraries modules
+        # this is however incomplete
+        filter_desc_re = None
+        filter_astrad_re = None
+        if (self.astrad):
+            filter_exclude_desc_re = re.compile('DESC')
+            filter_exclude_astrad_re = re.compile('astrad')
+
         filter = (lambda module: self.main_filter(module)
             and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
+            and (filter_exclude_astrad_re == None or not filter_exclude_astrad_re.search(module.name))
+            and (filter_exclude_desc_re == None or not filter_exclude_desc_re.match(module.name))
             and (filter_select_re == None or filter_select_re.match(module.name))
             and other_filter(module.name))
 
@@ -1374,7 +1384,6 @@ class p4a_processor(object):
                 elif len(possible_kernels) > 1:
                     p4a_util.die("ASTRAD post processor ERROR: several possible C99 kernels found")
                 else: # there is a single module
-                    # dirty.. look for another way to do it...
                     [kernel] = tuple(possible_kernels)
 
             kernel.print_xml_application()
