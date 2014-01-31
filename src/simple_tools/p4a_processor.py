@@ -304,7 +304,7 @@ class p4a_processor(object):
                 # Mark this file as a stub to avoid copying it out later:
                 self.accel_files += [ accel_stubs ]
 
-            if (self.astrad):
+            if (self.astrad and not self.fortran):
                 astrad_stubs = os.path.join(os.environ["P4A_ASTRAD_DIR"],
                                             "p4a_astrad_stubs.c")
                 # Add the stubs file to the list to use in PIPS:
