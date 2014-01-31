@@ -757,7 +757,7 @@ def work(options, args = None):
 
     # Install various files.
     p4a_util.info("Installing release notes")
-    p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, "RELEASE-NOTES.txt"), install_dir ])
+    p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, "RELEASE-NOTES.rst"), install_dir ])
     p4a_util.info("Installing license")
     p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, "LICENSE.txt"), install_dir ])
     if not options.skip_examples:
