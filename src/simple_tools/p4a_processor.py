@@ -13,6 +13,7 @@
 # p4a_openmp_compiler) would inherit. BC.
 
 import p4a_util
+import p4a_astrad
 import optparse
 import subprocess
 import sys
@@ -151,7 +152,6 @@ class p4a_processor_input(object):
     execute_some_python_code_in_process = None
     apply_phases={}
 
-
 class p4a_processor(object):
     """Process program files with PIPS and other tools
     """
@@ -204,12 +204,16 @@ class p4a_processor(object):
     kernel_return_type  = "P4A_accel_kernel"
     wrapper_return_type = "P4A_accel_kernel_wrapper"
 
+    astrad_postproc = None
+    astrad_module_name = None
 
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
+
                  filter_exclude = None, noalias = False,
                  pointer_analysis = False,
                  accel = False, cuda = False, opencl = False, openmp = False,
+                 spear=False, astrad=False,
                  com_optimization = False, cuda_cc=2, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
                  c99 = False, use_pocc = False, pocc_options = "",
@@ -225,6 +229,8 @@ class p4a_processor(object):
         self.cuda = cuda
         self.opencl = opencl
         self.openmp = openmp
+        self.spear = spear
+        self.astrad = astrad
         self.com_optimization = com_optimization
         self.cuda_cc = cuda_cc
         self.fftw3 = fftw3
@@ -234,6 +240,7 @@ class p4a_processor(object):
         self.atomic = atomic
         self.kernel_unroll = kernel_unroll
         self.apply_phases = apply_phases
+
 
         if workspace:
             # There is one provided: use it!
@@ -296,6 +303,14 @@ class p4a_processor(object):
                 self.files += [ accel_stubs ]
                 # Mark this file as a stub to avoid copying it out later:
                 self.accel_files += [ accel_stubs ]
+
+            if (self.astrad and not self.fortran):
+                astrad_stubs = os.path.join(os.environ["P4A_ASTRAD_DIR"],
+                                            "p4a_astrad_stubs.c")
+                # Add the stubs file to the list to use in PIPS:
+                self.files += [ astrad_stubs ]
+                # Mark this file as a stub to avoid copying it out later:
+                self.accel_files += [ astrad_stubs ]
 
             # Late import of pyps to avoid importing it until
             # we really need it.
@@ -414,6 +429,7 @@ class p4a_processor(object):
             and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
             and (filter_select_re == None or filter_select_re.match(module.name))
             and other_filter(module.name))
+
         # Select the interesting modules:
         return self.workspace.filter(filter)
 
@@ -611,6 +627,14 @@ class p4a_processor(object):
         """Apply transformations to parallelize the code in the workspace
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
+
+        if (self.astrad and not self.spear):
+            # find top function name
+            for m in all_modules:
+                if not m.callers:
+                    self.astrad_module_name = m.name
+                    #print("ASTRAD: method_name" + m.name)
+                    break
 
         if fine_grain:
             # Set to False (mandatory) for A&K algorithm on C source file
@@ -1115,6 +1139,7 @@ class p4a_processor(object):
                 extension_out = ".c"
         #p4a_util.warn("generated modules length "+str(len(self.generated_modules)))
 
+
         for name in self.generated_modules:
             p4a_util.debug("Save generated : '" + name + "'")
             # Where the file actually is in the .database workspace:
@@ -1151,14 +1176,16 @@ class p4a_processor(object):
             shutil.copyfile(pips_file, output_file)
             result.append(output_file)
 
-
-
             if (self.fortran == False):
                 # for C generate the header file
                 header_file = os.path.join(output_dir, name + ".h")
                 self.header_files.append (name + ".h")
                 p4a_util.generate_c_header (pips_file, header_file,
                                             self.get_p4a_accel_defines ())
+
+        if (self.astrad and not self.spear):
+            self.astrad_postproc.set_generated_kernel_files(result)
+
         return result
 
     def save_interface (self, output_dir):
@@ -1195,6 +1222,9 @@ class p4a_processor(object):
                 # distribution... :-/
                 #os.remove(file)
                 continue
+            if (self.astrad and not self.spear):
+                self.astrad_postproc.add_source_name(file)
+
             (dir, name) = os.path.split(file)
             # Where the file does well in the .database workspace:
             pips_file = os.path.join(self.workspace.dirname, "Src", name)
@@ -1217,6 +1247,8 @@ class p4a_processor(object):
 
             # The final destination
             output_file = os.path.join(dir, output_name)
+            if (self.astrad and not self.spear):
+                self.astrad_postproc.add_output_file_name(output_file)
 
             if self.accel and p4a_util.c_file_p(file):
                 # We generate code for P4A Accel, so first post process
@@ -1254,6 +1286,20 @@ class p4a_processor(object):
         files that might have been generated by PIPS, including headers.
         """
 
+        if self.astrad and not self.spear:
+
+            # find output dialect and initialize astrad postprocessor
+            if self.cuda:
+                dialect = "cuda"
+            elif self.opencl:
+                dialect = "opencl"
+            elif self.openmp:
+                dialect = "openmp"
+            else:
+                p4a_util.die("ASTRAD post processor ERROR: unexpected output dialect")
+            self.astrad_postproc = p4a_astrad.p4a_astrad_postprocessor(dialect, dest_dir)
+            self.astrad_postproc.set_module_name(self.astrad_module_name)
+
         output_files = []
 
         # Do not allow None suffix or prefix:
@@ -1282,10 +1328,16 @@ class p4a_processor(object):
         # Create the folder for p4a new files if needed
         new_file_flag =  self.new_file_generated ()
 
-        output_dir = os.path.join(os.getcwd(), self.new_files_folder)
-        #p4a_util.warn("p4a new file " + output_dir)
-        if dest_dir:
-            output_dir = os.path.join(dest_dir,self.new_files_folder)
+        if (self.astrad and (not self.spear) and dest_dir):
+            self.astrad_postproc.set_output_directory(dest_dir)
+            output_dir = dest_dir
+        else:
+            output_dir = os.path.join(os.getcwd(), self.new_files_folder)
+
+            #p4a_util.warn("p4a new file " + output_dir)
+            if dest_dir:
+                output_dir = os.path.join(dest_dir,self.new_files_folder)
+
         if ((not (os.path.isdir(output_dir))) and (new_file_flag == True)):
             os.makedirs (output_dir)
 
@@ -1305,6 +1357,29 @@ class p4a_processor(object):
 
         # save the user files
         output_files.extend (self.save_user_file (dest_dir, prefix, suffix))
+
+        # astrad: generate kernel.dsl file from Pips xml output
+        if (self.astrad and self.openmp and not self.spear):
+            # find out C99 inner function knowing that its name
+            # is the name of the top-level module plus the _kernel suffix
+            # beware of compilation units
+            kernel_name = self.astrad_module_name + "_kernel"
+            if kernel_name in self.workspace:
+                kernel = self.workspace[kernel_name]
+            else:
+                kernel_filter_re = re.compile(".*!" + kernel_name)
+                possible_kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
+                if len(possible_kernels) ==0:
+                    p4a_util.die("ASTRAD post processor ERROR: no C99 kernel found")
+                elif len(possible_kernels) > 1:
+                    p4a_util.die("ASTRAD post processor ERROR: several possible C99 kernels found")
+                else: # there is a single module
+                    # dirty.. look for another way to do it...
+                    [kernel] = tuple(possible_kernels)
+
+            kernel.print_xml_application()
+            xml_file = os.path.join(self.workspace.dirname, kernel.show("XML_PRINTED_FILE"))
+            self.astrad_postproc.save_kernel_dsl_file(xml_file)
 
         if self.opencl:
             # HACK inside : we expect the wrapper and the kernel to be in the
@@ -1328,6 +1403,10 @@ class p4a_processor(object):
         # generate one header to warp all the generated header files
         if (new_file_flag == True):
             self.save_header (output_dir, self.new_files_include)
+
+        if self.astrad and not self.spear:
+            self.astrad_postproc.save_dsl_file()
+            self.astrad_postproc.rename_module()
 
         return output_files
 

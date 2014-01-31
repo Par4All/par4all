@@ -54,6 +54,9 @@ export PIPS_PYPS_RUNTIME_DIR=$${PIPS_PYPS_RUNTIME_DIR:-$$P4A_DIST/share/runtime}
 # Location of the Par4All_scmp files.
 export P4A_SCMP_DIR=$${PIPS_ROOT:-$$P4A_DIST/$scmp}
 
+# Location of the Par4All_astrad files.
+export P4A_ASTRAD_DIR=$${PIPS_ROOT:-$$P4A_DIST/$astrad}
+
 # Location of the Par4All configuration files.
 export P4A_ETC=$${PIPS_ROOT:-$$P4A_DIST/etc}
 
