@@ -4,7 +4,7 @@ LC3.inc	= ../../include
 LC3.lib = ../../lib/LINUX_x86_64_LL
 
 .PHONY: all
-all: smith
+all: smith sc_proj
 
 # testing...
 CC		= gcc -std=c99
@@ -25,6 +25,7 @@ PO.lib	= -lpolyedre -lsg
 
 smith: LDFLAGS += $(MX.lib)
 feasability: LDFLAGS += $(SC.lib)
+sc_proj: LDFLAGS += $(SC.lib)
 #sc_env: LDFLAGS += $(PO.lib) $(SC.lib) $(MX.lib)
 
 clean:
