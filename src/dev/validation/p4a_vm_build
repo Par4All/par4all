@@ -32,6 +32,9 @@ sudo apt-get --assume-yes install cproto ed gfortran gnuplot ipython libmpfr-dev
 echo System installation done
 
 cd $P4A_TOP
+# Just in cas we are testing this script and there is already an old
+# par4all here, erase it
+rm -rf par4all
 git clone --branch p4a file:///mnt/par4all
 cd par4all
 
