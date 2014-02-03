@@ -72,6 +72,9 @@ def add_own_options(parser):
     proc_group.add_option("--spear-xml", action = "store", default = "",
         help = "XML Input file from SPEAR, an output XML file will also be produced.")
 
+    proc_group.add_option("--astrad", action = "store_true", default = False,
+        help = "To use Par4All from Astrad.")
+
     proc_group.add_option("--com-optimization", action = "store_true", default = False,
         help = "Enable memory transfert optimizations, implies --accel. This is an experimental option, use with caution ! Currently design to work on plain array : you shouldn't use it on a code with pointer aliasing.")
 
@@ -571,6 +574,7 @@ def main():
             input.fftw3 = options.fftw3
             input.openmp = options.openmp
             input.scmp = options.scmp
+            input.astrad = options.astrad
             input.spear = options.spear_xml
             input.fine_grain = options.fine_grain
             input.atomic = options.atomic
