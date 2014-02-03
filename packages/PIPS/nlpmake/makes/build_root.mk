@@ -1,6 +1,6 @@
 # $Id$
 #
-# Copyright 1989-2012 MINES ParisTech
+# Copyright 1989-2014 MINES ParisTech
 #
 # This file is part of PIPS.
 #
@@ -26,15 +26,25 @@ FWD_DIRS	= src makes
 # default is to "build" (phase 0 to 6)
 all: build
 
+.PHONY: compile
 compile:
 	-test -d ./makes && $(MAKE) -C ./makes build
+	@echo "### pips compile phase0 (depends)"
 	$(MAKE) -C src phase0
+	@echo "### pips compile phase1 (etc & py)"
 	$(MAKE) -C src phase1
+	@echo "### pips compile phase2 (include)"
 	$(MAKE) -C src phase2
+	@echo "### pips compile phase3 (nope?)"
 	$(MAKE) -C src phase3
+	@echo "### pips compile phase4 (lib)"
 	$(MAKE) -C src phase4
+	@echo "### pips compile phase5 (bin)"
 	$(MAKE) -C src phase5
+	#@echo "### pips compile phase6 (doc)"
+	#$(MAKE) -C src phase5
 ifndef PIPS_NO_TAGS
+	@echo "### tags"
 	$(MAKE) tags
 endif
 
