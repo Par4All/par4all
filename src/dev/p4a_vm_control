@@ -32,6 +32,7 @@ function vbm_cmd () {
     VBoxManage $f "$vm_name" "$@"
 }
 
+# Execute a guestcontrol operation in the guest account
 function vbm_guestcontrol () {
     local f="$1"
     shift
@@ -41,11 +42,32 @@ function vbm_guestcontrol () {
     done
 }
 
+# Execute a command on the guest OS by using the VM support
 function vbm_execute () {
     local guest_cmd=$1
     shift
     vbm_guestcontrol execute --wait-stdout --wait-stderr --wait-stdout --image "$guest_cmd" -- "$@"
 }
+
+# The options used for the ssh connection to the VM:
+# -A is to forward authenticating agent so for example the Par4All
+#    packages can be installed on the download servers
+# -o StrictHostKeyChecking=no is to allow the connection the first time
+#    by accepting the unknown host key
+ssh_options="-A -o StrictHostKeyChecking=no -p 55022 par4all@localhost"
+
+# Execute a command on the guest OS by using ssh connection.
+# This is useful to benefit from the ssh authentication agent forwarding
+#
+# This assume that the authentication is by a public key that is already
+# installed on the guest account, for example with a previous:
+## Push the authentication key the first time to avoid using password
+## every time:
+# ssh-copy-id $ssh_options
+function ssh_execute () {
+    ssh $ssh_options "$@"
+}
+
 
 
 # Clone a previous existing VM and its last state
@@ -53,24 +75,31 @@ VBoxManage clonevm "$orig_vm_name" --name "$vm_name" --basefolder "$basefolder" 
 #VBoxManage modifyvm "$vm_name" --vrdeport 5000,5010-5012
 #VBoxManage startvm "$vm_name" --type headless
 
+# Add some port-forwarding for ssh so than we can reach the machine
+# through port 55022:
+vbm_cmd modifyvm --natpf1 SSH,tcp,localhost,55022,,22
+
 # Start the cloned VM where the original one was stopped
 vbm_cmd startvm
 
 # Try some commands
 #vbm_execute /bin/ps
 #vbm_execute /bin/sh -c 'ls /'
+#ssh_execute ls /
 
 # Shared the current working directory on the host as host_cwd in the guest
 # To be used for example with sudo mount -t vboxsf p4a_root /mnt
 vbm_cmd "sharedfolder add" --name p4a_root --hostpath $P4A_TOP --transient
 # Now mount the directory with par4all having the access right as the
 # owner running the host machine
-vbm_execute /usr/bin/sudo mount -t vboxsf -o uid=par4all p4a_root /mnt
+#vbm_execute /usr/bin/sudo mount -t vboxsf -o uid=par4all p4a_root /mnt
+ssh_execute sudo mount -t vboxsf -o uid=par4all p4a_root /mnt
 
 # Since the "VBoxManage guestcontrol execute --wait-stdout --wait-stderr"
 # is buggy to get big amounts of data without hanging, use a log file instead
 echo To see the log of what is going on, try tail -f \$P4A_TOP/p4a_vm_build.log
-vbm_execute /bin/bash -c '/mnt/par4all/src/dev/validation/p4a_vm_build < /dev/null >& /mnt/p4a_vm_build.log'
+#vbm_execute /bin/bash -c '/mnt/par4all/src/dev/validation/p4a_vm_build < /dev/null >& /mnt/p4a_vm_build.log'
+ssh_execute /bin/bash -c '/mnt/par4all/src/dev/validation/p4a_vm_build < /dev/null >& /mnt/p4a_vm_build.log'
 
 # Do not delete the VM yet since this is still to be tweaked...
 exit
