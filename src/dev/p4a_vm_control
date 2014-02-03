@@ -65,7 +65,10 @@ ssh_options="-A -o StrictHostKeyChecking=no -p 55022 par4all@localhost"
 ## every time:
 # ssh-copy-id $ssh_options
 function ssh_execute () {
-    ssh $ssh_options "$@"
+    until ssh $ssh_options "$@" ; do
+        echo Waiting for the network to be up...
+        sleep 1
+    done
 }
 
 
