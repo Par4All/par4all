@@ -860,34 +860,30 @@ int ofl_ctrl;
 
 /* FOR BACKWARD COMPATIBILITY ONLY. DO NOT USE ANYMORE, PLEASE. */
 
-Psysteme sc_projection(sc, v)
-Psysteme sc;
-Variable v;
+Psysteme sc_projection(Psysteme sc, Variable v)
 {
-    CATCH(overflow_error) {
-	sc_elim_var(sc , v);
-    }
-    TRY {
-	sc_projection_along_variable_ofl_ctrl(&sc,v, NO_OFL_CTRL);
-	UNCATCH(overflow_error);
-    }
-    if (sc_empty_p(sc)) {
-	sc_rm(sc);
-	sc = SC_EMPTY;
-    }
-    return(sc);
+  CATCH(overflow_error) {
+    sc_elim_var(sc , v);
+  }
+  TRY {
+    sc_projection_along_variable_ofl_ctrl(&sc,v, NO_OFL_CTRL);
+    UNCATCH(overflow_error);
+  }
+  if (sc_empty_p(sc)) {
+    sc_rm(sc);
+    sc = SC_EMPTY;
+  }
+  return sc;
 }
 
-Psysteme sc_projection_ofl(sc, v)
-Psysteme sc;
-Variable v;
+Psysteme sc_projection_ofl(Psysteme sc, Variable v)
 {
 	sc_projection_along_variable_ofl_ctrl(&sc,v, FWD_OFL_CTRL);
-    if (sc_empty_p(sc)) {
-	sc_rm(sc);
-	sc = SC_EMPTY;
-    }
-    return(sc);
+  if (sc_empty_p(sc)) {
+    sc_rm(sc);
+    sc = SC_EMPTY;
+  }
+  return sc;
 }
 
 

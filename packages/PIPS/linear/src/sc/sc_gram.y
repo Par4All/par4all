@@ -115,7 +115,6 @@ inisys	:
 defvar	: VAR l_var
                  {   /* remise en ordre des vecteurs de base */
 		     Pbase b;
-		     
 		     b = ps_yacc->base;
 		     ps_yacc->base = base_reversal(b);
 		     vect_rm(b);
@@ -123,7 +122,7 @@ defvar	: VAR l_var
 	;
 
 l_var	: newid
-	| l_var VIRG newid
+	| l_var virg_opt newid
 	;
 
 l_eq	: eq

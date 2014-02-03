@@ -44,21 +44,23 @@
 
 #define RETURN(x) /* fprintf(stderr, "lex: %d\n", x); */ return x
 
-static char * sc_symbol_table(char *);
+char * sc_internal_symbol_table(char *);
+extern int yyerror(char *);
 
 %}
 
 %%
-<TEXT>VAR			{ RETURN(VAR); } 
-<TEXT>[.A-Za-z_]['A-Za-z0-9_:#.]* { yylval.Variable = (Variable) sc_symbol_table(yytext); /*'*/
+<TEXT>"VAR"			{ RETURN(VAR); } 
+<TEXT>[.A-Za-z_]['A-Za-z0-9_:#.]* { yylval.Variable = (Variable) sc_internal_symbol_table(yytext); /*'*/
                                   RETURN(IDENT); }
-<TEXT>[']['A-Za-z0-9_:#?. ]*['] { yylval.Variable = (Variable) sc_symbol_table(yytext); /*'*/
+<TEXT>\'[A-Za-z0-9_:#?. ]*\' { yylval.Variable = (Variable) sc_internal_symbol_table(yytext); /*'*/
                                   RETURN(IDENT); }
-<TEXT>[0-9]*[.DEe][0-9DEe\-]* { yylval.Variable = (Variable) sc_symbol_table(yytext); /*'*/
+<TEXT>[0-9]*[.DEe][0-9DEe\-]* { yylval.Variable = (Variable) sc_internal_symbol_table(yytext); /*'*/
                                   RETURN(IDENT); }
 <TEXT>[0-9]*			{ sscan_Value(yytext,&yylval.Value);
                                   RETURN(CONSTANTE); }
 <TEXT>"=="			{ RETURN(EGAL); }
+<TEXT>"="			{ RETURN(EGAL); }
 <TEXT>","			{ RETURN(VIRG); }
 <TEXT>"+"			{ RETURN(PLUS); }
 <TEXT>"-"			{ RETURN(MOINS); }
@@ -72,18 +74,19 @@ static char * sc_symbol_table(char *);
 <TEXT>"#"                       {BEGIN COMMENT;}
 <COMMENT>\n                     {BEGIN TEXT;}
 <COMMENT>[^\n]*         ;
+.             { yyerror("unexpected character"); }
 %% 
 
 #define SYMBOLS_SIZE (10)
 
-static char * sc_symbol_table(char * name)
+char * sc_internal_symbol_table(char * name)
 {
   static int size = 0;
   static int index = 0; /* next available chunk */
   static char ** symbols = NULL;
 
   int i;
-  
+
   if (index==size) {
     size += SYMBOLS_SIZE;
     if (symbols) symbols = (char**) realloc(symbols, sizeof(char*) * size);
