@@ -427,8 +427,8 @@ class p4a_processor(object):
 
         # don't try to do anything with astrad projects libraries modules
         # this is however incomplete
-        filter_desc_re = None
-        filter_astrad_re = None
+        filter_exclude_desc_re = None
+        filter_exclude_astrad_re = None
         if (self.astrad):
             filter_exclude_desc_re = re.compile('DESC')
             filter_exclude_astrad_re = re.compile('astrad')
