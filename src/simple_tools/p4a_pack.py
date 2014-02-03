@@ -136,6 +136,7 @@ def create_dist(pack_dir, install_prefix, version, gitrev):
             dist = abs_prefix,
             accel = "share/p4a_accel",
             scmp = "share/p4a_scmp",
+            astrad = "share/p4a_astrad",
             fortran = "gfortran" # ???
         )
     )
