@@ -65,7 +65,12 @@ ssh_options="-A -o StrictHostKeyChecking=no -p 55022 par4all@localhost"
 ## every time:
 # ssh-copy-id $ssh_options
 function ssh_execute () {
-    until ssh $ssh_options "$@" ; do
+    ssh $ssh_options "$@"
+}
+
+# Try ssh remote execution up to successful execution
+function ssh_wait_execute () {
+    until ssh_execute "$@" ; do
         echo Waiting for the network to be up...
         sleep 1
     done
@@ -96,7 +101,7 @@ vbm_cmd "sharedfolder add" --name p4a_root --hostpath $P4A_TOP --transient
 # Now mount the directory with par4all having the access right as the
 # owner running the host machine
 #vbm_execute /usr/bin/sudo mount -t vboxsf -o uid=par4all p4a_root /mnt
-ssh_execute sudo mount -t vboxsf -o uid=par4all p4a_root /mnt
+ssh_wait_execute sudo mount -t vboxsf -o uid=par4all p4a_root /mnt
 
 # Since the "VBoxManage guestcontrol execute --wait-stdout --wait-stderr"
 # is buggy to get big amounts of data without hanging, use a log file instead
