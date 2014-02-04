@@ -1,3 +1,18 @@
+2014-02-03 Ronan Keryell <Ronan.Keryell@silkan.com>
+
+ * Par4All 1.4.5
+
+   * Integrate ASTRAD support for the SIMILAN collaborative research project
+
+   * Add support to build and publish Par4All for Ubuntu in a
+	 VirtualBox virtual machine
+
+   * Integrate WWW site of the project in the repository itself
+
+   * Move the WWW site from WordPress to GitHub Pages based on ReST format
+	 via Sphinx
+
+
 2014-01-14 Ronan Keryell <Ronan.Keryell@silkan.com>
 
  * Par4All 1.4.4
