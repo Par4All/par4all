@@ -206,7 +206,7 @@ You can also access to the latest Par4All source code and contribute using
 ``git`` source viewer @ GitHub     https://github.com/keryell/par4all.git
 ``git`` source viewer @ SILKAN     https://git.silkan.com/cgit/par4all
 GitHub ``ssh`` access              git@github.com:keryell/par4all.git
-Anonymous ``git`` access @ SILKAN  git://git.silkan.com/git/par4all.git
+Anonymous ``git`` access @ SILKAN  git://git.par4all.org/par4all
 Commit ``git`` access @ SILKAN     ssh://git.silkan.com/git/par4all.git
 =================================  =========================================
 
