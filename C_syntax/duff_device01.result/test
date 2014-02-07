@@ -1,0 +1,58 @@
+"initial file:"
+int duff_device01(char *from, char *to, int count)
+{
+   int i = 0;
+
+loop1:
+   for(i = 0; i <= count-1; i += 1)
+      to[i] = from[i];
+
+   return i;
+}
+
+"parsed file:"
+int duff_device01(char *from, char *to, int count)
+{
+   int i = 0;
+
+loop1:   for (i = 0;i<count;i++)
+      to[i] = from[i];
+
+   return i;
+}
+
+"strip-mining..."
+int duff_device01(char *from, char *to, int count)
+{
+   int i = 0;
+   //PIPS generated variable
+   int i_1 = 0;
+
+loop1:
+   for(i_1 = 0; i_1 <= count-1; i_1 += 8)
+      for(i = i_1; i <= MIN(i_1+7, count-1); i += 1)
+         to[i] = from[i];
+
+   return i;
+}
+
+"partial eval..."
+int duff_device01(char *from, char *to, int count)
+{
+   int i = 0;
+   //PIPS generated variable
+   int i_1 = 0;
+
+loop1:
+   for(i_1 = 0; i_1 <= count-1; i_1 += 8)
+      for(i = i_1; i <= MIN(i_1+7, count-1); i += 1)
+         to[i] = from[i];
+
+   return i;
+}
+
+Warnings
+
+unknown[unknown] (activate_phase) Rule `C_SYMBOL_TABLE' already active
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+TRANSFORMERS_INTRA_FAST[duff_device01] (transformers_intra_fast) Property SEMANTICS_FLOW_SENSITIVE is ignored

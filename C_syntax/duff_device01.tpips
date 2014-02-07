@@ -1,0 +1,49 @@
+setenv WSPACE=duff_device01
+delete $WSPACE
+create $WSPACE $WSPACE.c 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty LOOP_LABEL "loop1"
+
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_SYMBOL_TABLE
+activate C_PARSER
+
+echo "initial file:"
+display PRINTED_FILE[$WSPACE]
+
+echo
+echo "parsed file:"
+display PARSED_PRINTED_FILE[$WSPACE]
+
+echo
+echo "strip-mining..."
+setproperty STRIP_MINE_KIND 0
+setproperty STRIP_MINE_FACTOR 8
+apply STRIP_MINE
+display PRINTED_FILE[$WSPACE]
+
+echo
+echo "partial eval..."
+apply PARTIAL_EVAL
+display PRINTED_FILE
+
+#echo
+#echo "full unrolling..."
+#apply FULL_UNROLL[$WSPACE]
+#display PRINTED_FILE[$WSPACE]
+
+
+close
+echo
+echo Warnings
+echo
+shell cat $WSPACE.database/Warnings
+
+delete $WSPACE
+quit
