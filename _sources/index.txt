@@ -6,17 +6,6 @@
 Par4All
 =======
 
-.. toctree::
-   :maxdepth: 2
-   :hidden:
-
-   download
-   features
-   benchmarks
-   documentation
-   community
-   news_and_events
-
 Par4All is an automatic parallelizing and optimizing compiler (workbench)
 for C and Fortran sequential programs.
 
@@ -48,8 +37,22 @@ computations.
    A few explanations on Par4All in a :ref:`3mn video <par4all-video>`
 
 
+Content
+-------
+
+.. toctree::
+   :maxdepth: 2
+
+   download
+   features
+   benchmarks
+   documentation
+   community
+   news_and_events
+
+
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
@@ -59,6 +62,6 @@ Indices and tables
 ..
   # Some Emacs stuff:
   ### Local Variables:
-  ### mode: flyspell
+  ### mode: rst,flyspell
   ### ispell-local-dictionary: "american"
   ### End:
