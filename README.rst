@@ -1,8 +1,7 @@
-Par4All version 1.4.4
+Par4All version 1.4.5
 =====================
 
-The WWW site for the project is now on
-https://github.com/keryell/par4all/wiki
+The WWW site for the project is http://www.par4all.org
 
 Par4all merges various free and open source developments. Par4All aims to
 achieve the migration of software to multi-core and other parallel
