@@ -1,0 +1,23 @@
+setenv WSPACE=inlining37
+delete $WSPACE
+create $WSPACE $WSPACE.c 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+echo "initial file:"
+display PRINTED_FILE[main]
+display PRINTED_FILE[maxim]
+
+echo
+echo "inlining..."
+apply INLINING[maxim]
+display PRINTED_FILE[main]
+
+close
+echo
+echo Warnings
+echo
+shell cat $WSPACE.database/Warnings
+
+# delete $WSPACE
+quit
