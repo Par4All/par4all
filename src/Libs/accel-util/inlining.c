@@ -336,384 +336,388 @@ static void slightly_rename_entities(statement s) {
 static
 statement inline_expression_call(inlining_parameters p, expression modified_expression, call callee)
 {
-    /* only inline the right call */
-    pips_assert("inline the right call",inline_should_inline(inlined_module(p),callee));
+  /* only inline the right call */
+  pips_assert("inline the right call",inline_should_inline(inlined_module(p),callee));
 
-    value inlined_value = entity_initial(inlined_module(p));
-    pips_assert("is a code", value_code_p(inlined_value));
-    code inlined_code = value_code(inlined_value);
+  value inlined_value = entity_initial(inlined_module(p));
+  pips_assert("is a code", value_code_p(inlined_value));
+  code inlined_code = value_code(inlined_value);
 
-    /* stop if the function has static declaration */
+  /* stop if the function has static declaration */
+  {
+    has_static_declaration(p)=false;
+    if( c_module_p(inlined_module(p)) )
+      gen_context_recurse(inlined_module_statement(p),p, statement_domain, gen_true, statement_with_static_declarations_p);
+    else
+      has_static_declaration(p)= inline_has_static_declaration( code_declarations(inlined_code) );
+
+    if( has_static_declaration(p))
     {
-        has_static_declaration(p)=false;
-        if( c_module_p(inlined_module(p)) )
-            gen_context_recurse(inlined_module_statement(p),p, statement_domain, gen_true, statement_with_static_declarations_p);
+      pips_user_warning("cannot inline function with static declarations\n");
+      return statement_undefined;
+    }
+  }
+
+  /* create the new instruction sequence
+   * no need to change all entities in the new statements, because we build a new text resource later
+   * sg: not so true, because of dependant types
+   */
+  expanded = copy_statement(inlined_module_statement(p));
+
+  statement declaration_holder = make_empty_block_statement();
+
+  /* add external declarations for all extern referenced entities it
+   * is needed because inlined module and current module may not
+   * share the same compilation unit.
+   * Not relevant for Fortran
+   *
+   * FI: However, it would be nice to check first if the entity is not
+   * already in the scope for the function or in the scope of its
+   * compilation unit (OK, the later is difficult because the order
+   * of declarations has to be taken into account).
+   */
+  if(c_module_p(get_current_module_entity()))
+  {
+    string cu_name = compilation_unit_of_module(get_current_module_name());
+    set inlined_referenced_entities = get_referenced_entities(expanded);
+    list lire = set_to_sorted_list(inlined_referenced_entities,(gen_cmp_func_t)compare_entities);
+    set_free(inlined_referenced_entities);
+
+
+    FOREACH(ENTITY,ref_ent,lire)
+    {
+      if( entity_field_p(ref_ent) ) /* special hook for struct member : consider their structure instead of the field */
+      {
+        ref_ent=entity_field_to_entity_struct_or_union(ref_ent);
+      }
+
+      if(!entity_enum_member_p(ref_ent) && /* enum member cannot be added to declarations */
+          !entity_formal_p(ref_ent) ) /* formal parameters are not considered */
+      {
+        const char* emn = entity_module_name(ref_ent);
+        if(extern_entity_p(get_current_module_entity(),ref_ent) &&
+            !has_entity_with_same_name(ref_ent,entity_declarations(module_name_to_entity(cu_name)) ) )
+        {
+          AddEntityToModuleCompilationUnit(ref_ent,get_current_module_entity());
+          gen_append(code_externs(entity_code(module_name_to_entity(cu_name))),CONS(ENTITY,ref_ent,NIL));
+        }
+        else if(variable_static_p(ref_ent) &&
+            !has_entity_with_same_name(ref_ent,entity_declarations(module_name_to_entity(cu_name)) ) )
+        {
+          pips_user_warning("replacing static variable \"%s\" by a global one, this may lead to incorrect code\n", entity_user_name(ref_ent));
+          entity add = make_global_entity_from_local(ref_ent);
+          replace_entity(expanded,ref_ent,add);
+          replace_entity(inlined_module_statement(p),ref_ent,add);
+          AddEntityToModuleCompilationUnit(add,get_current_module_entity());
+          gen_append(code_externs(entity_code(module_name_to_entity(cu_name))),CONS(ENTITY,add,NIL));
+        }
+        else if(!variable_entity_p(ref_ent) && !same_string_p(emn,cu_name) &&
+            !has_entity_with_same_name(ref_ent,entity_declarations(module_name_to_entity(cu_name)) ))
+        {
+          AddEntityToModuleCompilationUnit(ref_ent,get_current_module_entity());
+        }
+      }
+    }
+    gen_free_list(lire);
+    slightly_rename_entities(expanded);
+  }
+  else {
+    bool did_something = false;
+    FOREACH(ENTITY,e,entity_declarations(inlined_module(p)))
+    {
+      if(!entity_area_p(e) && !implicit_c_variable_p(e))
+      {
+        entity new;
+        if(entity_variable_p(e)) {
+          if(entity_scalar_p(e)||entity_pointer_p(e)) {
+            new = make_new_scalar_variable_with_prefix(entity_user_name(e),get_current_module_entity(),copy_basic(entity_basic(e)));
+          }
+          else {
+            new = make_new_array_variable_with_prefix(entity_user_name(e),get_current_module_entity(),
+                copy_basic(entity_basic(e)), gen_full_copy_list(variable_dimensions(type_variable(entity_type(e)))));
+          }
+        }
         else
-            has_static_declaration(p)= inline_has_static_declaration( code_declarations(inlined_code) );
-
-        if( has_static_declaration(p))
         {
-            pips_user_warning("cannot inline function with static declarations\n");
-            return statement_undefined;
+          /*sg: unsafe
+           *sg: I am unsure this is still needed */
+           bool regenerate = entity_undefined_p(FindEntity(get_current_module_name(),entity_local_name(e)));
+           new=FindOrCreateEntity(get_current_module_name(),entity_local_name(e));
+           if(regenerate)
+           {
+             pips_user_warning("regenerating entity, should this happen ?\n");
+             entity_storage(new)=copy_storage(entity_storage(e));
+             entity_initial(new)=copy_value(entity_initial(e));
+             entity_type(new)=copy_type(entity_type(e));
+           }
         }
+        gen_context_recurse(expanded, new, statement_domain, gen_true, &solve_name_clashes);
+        AddEntityToDeclarations(new,get_current_module_entity());
+        replace_entity(expanded,e,new);
+        did_something=true;
+      }
     }
-
-    /* create the new instruction sequence
-     * no need to change all entities in the new statements, because we build a new text resource later
-     * sg: not so true, because of dependant types
-     */
-    expanded = copy_statement(inlined_module_statement(p));
-
-    statement declaration_holder = make_empty_block_statement();
-
-    /* add external declarations for all extern referenced entities it
-     * is needed because inlined module and current module may not
-     * share the same compilation unit.
-     * Not relevant for Fortran
-     *
-     * FI: However, it would be nice to check first if the entity is not
-     * already in the scope for the function or in the scope of its
-     * compilation unit (OK, the later is difficult because the order
-     * of declarations has to be taken into account).
-     */
-    if(c_module_p(get_current_module_entity()))
+    if(did_something)
     {
-        string cu_name = compilation_unit_of_module(get_current_module_name());
-        set inlined_referenced_entities = get_referenced_entities(expanded);
-        list lire = set_to_sorted_list(inlined_referenced_entities,(gen_cmp_func_t)compare_entities);
-        set_free(inlined_referenced_entities);
-
-
-        FOREACH(ENTITY,ref_ent,lire)
-        {
-            if( entity_field_p(ref_ent) ) /* special hook for struct member : consider their structure instead of the field */
-            {
-                ref_ent=entity_field_to_entity_struct_or_union(ref_ent);
-            }
-
-            if(!entity_enum_member_p(ref_ent) && /* enum member cannot be added to declarations */
-                    !entity_formal_p(ref_ent) ) /* formal parameters are not considered */
-            {
-                const char* emn = entity_module_name(ref_ent);
-                if(extern_entity_p(get_current_module_entity(),ref_ent) &&
-                        !has_entity_with_same_name(ref_ent,entity_declarations(module_name_to_entity(cu_name)) ) )
-                {
-                    AddEntityToModuleCompilationUnit(ref_ent,get_current_module_entity());
-                    gen_append(code_externs(entity_code(module_name_to_entity(cu_name))),CONS(ENTITY,ref_ent,NIL));
-                }
-                else if(variable_static_p(ref_ent) &&
-                        !has_entity_with_same_name(ref_ent,entity_declarations(module_name_to_entity(cu_name)) ) )
-                {
-                    pips_user_warning("replacing static variable \"%s\" by a global one, this may lead to incorrect code\n", entity_user_name(ref_ent));
-                    entity add = make_global_entity_from_local(ref_ent);
-                    replace_entity(expanded,ref_ent,add);
-                    replace_entity(inlined_module_statement(p),ref_ent,add);
-                    AddEntityToModuleCompilationUnit(add,get_current_module_entity());
-                    gen_append(code_externs(entity_code(module_name_to_entity(cu_name))),CONS(ENTITY,add,NIL));
-                }
-                else if(!variable_entity_p(ref_ent) && !same_string_p(emn,cu_name) &&
-                        !has_entity_with_same_name(ref_ent,entity_declarations(module_name_to_entity(cu_name)) ))
-                {
-                    AddEntityToModuleCompilationUnit(ref_ent,get_current_module_entity());
-                }
-            }
-        }
-        gen_free_list(lire);
-        slightly_rename_entities(expanded);
+      string decls = code_decls_text(entity_code(get_current_module_entity()));
+      if(decls && !empty_string_p(decls)){
+        free(decls);
+        code_decls_text(entity_code(get_current_module_entity()))=strdup("");
+      }
     }
-    else {
-        bool did_something = false;
-        FOREACH(ENTITY,e,entity_declarations(inlined_module(p)))
-        {
-            if(!entity_area_p(e) && !implicit_c_variable_p(e))
-            {
-                entity new;
-                if(entity_variable_p(e)) {
-                    if(entity_scalar_p(e)||entity_pointer_p(e)) {
-                        new = make_new_scalar_variable_with_prefix(entity_user_name(e),get_current_module_entity(),copy_basic(entity_basic(e)));
-                    }
-                    else {
-                        new = make_new_array_variable_with_prefix(entity_user_name(e),get_current_module_entity(),
-                                copy_basic(entity_basic(e)), gen_full_copy_list(variable_dimensions(type_variable(entity_type(e)))));
-                    }
-                }
-                else
-                {
-                    /*sg: unsafe
-                     *sg: I am unsure this is still needed */
-                    bool regenerate = entity_undefined_p(FindEntity(get_current_module_name(),entity_local_name(e)));
-                    new=FindOrCreateEntity(get_current_module_name(),entity_local_name(e));
-                    if(regenerate)
-                    {
-                        pips_user_warning("regenerating entity, should this happen ?\n");
-                        entity_storage(new)=copy_storage(entity_storage(e));
-                        entity_initial(new)=copy_value(entity_initial(e));
-                        entity_type(new)=copy_type(entity_type(e));
-                    }
-                }
-                gen_context_recurse(expanded, new, statement_domain, gen_true, &solve_name_clashes);
-                AddEntityToDeclarations(new,get_current_module_entity());
-                replace_entity(expanded,e,new);
-                did_something=true;
-            }
-        }
-        if(did_something)
-        {
-            string decls = code_decls_text(entity_code(get_current_module_entity()));
-            if(decls && !empty_string_p(decls)){
-                free(decls);
-                code_decls_text(entity_code(get_current_module_entity()))=strdup("");
-            }
-        }
-    }
+  }
 
 
-    /* ensure block status */
-    if( ! statement_block_p( expanded ) )
+  /* ensure block status */
+  if( ! statement_block_p( expanded ) )
+  {
+    instruction i = make_instruction_sequence( make_sequence( CONS(STATEMENT,expanded,NIL) ) );
+    expanded = instruction_to_statement( i );
+  }
+
+
+  /* avoid duplicated label due to copy_statement */
+  gen_context_recurse(expanded,get_current_module_entity(),statement_domain,gen_true,inlining_regenerate_labels);
+
+  /* add label at the end of the statement */
+  laststmt(p)=make_continue_statement(make_new_label( get_current_module_entity() ) );
+  insert_statement(expanded,laststmt(p),false);
+
+  /* fix `return' calls
+   * in case a goto is immediately followed by its targeted label
+   * the goto is not needed (SG: seems difficult to do in the previous gen_recurse)
+   */
+  {
+    list tail = sequence_statements(instruction_sequence(statement_instruction(expanded)));
     {
-        instruction i = make_instruction_sequence( make_sequence( CONS(STATEMENT,expanded,NIL) ) );
-        expanded = instruction_to_statement( i );
-    }
 
+      type treturn = functional_result(type_functional(entity_type(inlined_module(p))));
+      if( type_void_p(treturn) ) /* only replace return statement by gotos */
+      {
+        gen_context_recurse(expanded, p,statement_domain, gen_true, &inline_return_remover);
+      }
+      else /* replace by affectation + goto */
+      {
+        /* create new variable to receive computation result */
+        pips_assert("returned value is a variable", type_variable_p(treturn));
+        returned_entity(p)= make_new_scalar_variable_with_prefix(
+            "_return",
+            get_current_module_entity(),
+            copy_basic(variable_basic(type_variable(treturn)))
+        );
+        AddEntityToCurrentModule(returned_entity(p));
 
-    /* avoid duplicated label due to copy_statement */
-    gen_context_recurse(expanded,get_current_module_entity(),statement_domain,gen_true,inlining_regenerate_labels);
-
-    /* add label at the end of the statement */
-    laststmt(p)=make_continue_statement(make_new_label( get_current_module_entity() ) );
-    insert_statement(expanded,laststmt(p),false);
-
-    /* fix `return' calls
-     * in case a goto is immediately followed by its targeted label
-     * the goto is not needed (SG: seems difficult to do in the previous gen_recurse)
-     */
-    {
-        list tail = sequence_statements(instruction_sequence(statement_instruction(expanded)));
-        {
-
-            type treturn = functional_result(type_functional(entity_type(inlined_module(p))));
-            if( type_void_p(treturn) ) /* only replace return statement by gotos */
-            {
-                gen_context_recurse(expanded, p,statement_domain, gen_true, &inline_return_remover);
-            }
-            else /* replace by affectation + goto */
-            {
-                /* create new variable to receive computation result */
-                pips_assert("returned value is a variable", type_variable_p(treturn));
-                    returned_entity(p)= make_new_scalar_variable_with_prefix(
-                            "_return",
-                            get_current_module_entity(),
-                            copy_basic(variable_basic(type_variable(treturn)))
-                            );
-                AddEntityToCurrentModule(returned_entity(p));
-
-                /* do the replacement */
-                if(!ENDP(tail) && !ENDP(CDR(tail))) {
-                    tail_ins(p)= statement_instruction(STATEMENT(CAR(gen_last(tail))));
-                    gen_context_recurse(expanded, p, statement_domain, gen_true, &inline_return_crawler);
-                }
-
-                /* change the caller from an expression call to a call to a constant */
-                if( entity_constant_p(returned_entity(p)) )
-                {
-                    expression_syntax(modified_expression) = make_syntax_call(make_call(returned_entity(p),NIL));
-                }
-                /* ... or to a reference */
-                else
-                {
-                    reference r = make_reference( returned_entity(p), NIL);
-                    expression_syntax(modified_expression) = make_syntax_reference(r);
-                }
-            }
+        /* do the replacement */
+        if(!ENDP(tail) && !ENDP(CDR(tail))) {
+          tail_ins(p)= statement_instruction(STATEMENT(CAR(gen_last(tail))));
+          gen_context_recurse(expanded, p, statement_domain, gen_true, &inline_return_crawler);
         }
-    }
 
-    /* fix declarations */
-    {
-        /* retrieve formal parameters*/
-        list formal_parameters = module_formal_parameters(inlined_module(p));
-        list new_old_pairs = NIL ; /* store association between new and old declarations */
-        { /* some basic checks */
-            size_t n1 = gen_length(formal_parameters), n2 = gen_length(call_arguments(callee));
-            pips_assert("function call has enough arguments",n1 >= n2);
-        }
-        /* iterate over the parameters and perform substitution between formal and actual parameters */
-        for(list iter = formal_parameters,c_iter = call_arguments(callee) ; !ENDP(c_iter); POP(iter),POP(c_iter) )
+        /* change the caller from an expression call to a call to a constant */
+        if( entity_constant_p(returned_entity(p)) )
         {
-            entity e = ENTITY(CAR(iter));
-            expression from = EXPRESSION(CAR(c_iter));
+          expression_syntax(modified_expression) = make_syntax_call(make_call(returned_entity(p),NIL));
+        }
+        /* ... or to a reference */
+        else
+        {
+          reference r = make_reference( returned_entity(p), NIL);
+          expression_syntax(modified_expression) = make_syntax_reference(r);
+        }
+      }
+    }
+  }
 
-            /* check if there is a write effect on this parameter */
-            bool need_copy = !implicit_c_variable_p(e) && ((!use_effects(p)) || find_write_effect_on_entity(inlined_module_statement(p),e));
+  /* fix declarations */
+  {
+    /* retrieve formal parameters*/
+    list formal_parameters = module_formal_parameters(inlined_module(p));
+    list new_old_pairs = NIL ; /* store association between new and old declarations */
+    { /* some basic checks */
+      size_t n1 = gen_length(formal_parameters), n2 = gen_length(call_arguments(callee));
+      pips_assert("function call has enough arguments",n1 >= n2);
+    }
+    /* iterate over the parameters and perform substitution between formal and actual parameters */
+    for(list iter = formal_parameters,c_iter = call_arguments(callee) ; !ENDP(c_iter); POP(iter),POP(c_iter) )
+    {
+      entity e = ENTITY(CAR(iter));
+      expression from = EXPRESSION(CAR(c_iter));
 
-            /* generate a copy for this parameter */
-            entity new = entity_undefined;
-            if(need_copy)
+      /* check if there is a write effect on this parameter */
+      bool need_copy = !implicit_c_variable_p(e) && ((!use_effects(p)) || find_write_effect_on_entity(inlined_module_statement(p),e));
+
+      /* generate a copy for this parameter */
+      entity new = entity_undefined;
+      if(need_copy)
+      {
+        if(entity_scalar_p(e)||entity_pointer_p(e)) {
+          new = make_new_scalar_variable_with_prefix(entity_user_name(e),get_current_module_entity(),copy_basic(entity_basic(e)));
+        }
+        else {
+          if(formal_parameter_p(e)) {
+            new = make_temporary_pointer_to_array_entity(e,expression_undefined,get_current_module_entity());
+            expression etmp = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(e));
+            replace_entity_by_expression(expanded,e,etmp);
+            free_expression(etmp);
+          }
+          else
+            new = make_new_array_variable_with_prefix(entity_user_name(e),get_current_module_entity(),
+                copy_basic(entity_basic(e)), gen_full_copy_list(variable_dimensions(type_variable(entity_type(e)))));
+        }
+
+        /* fix value */
+        if(get_bool_property("INLINING_USE_INITIALIZATION_LIST"))
+          entity_initial(new) = make_value_expression( copy_expression( from ) );
+        else
+          insert_statement(declaration_holder,make_assign_statement(entity_to_expression(new),copy_expression(from)),false);
+
+
+        /* add the entity to our list */
+        //statement_declarations(declaration_holder)=CONS(ENTITY,new,statement_declarations(declaration_holder));
+        gen_context_recurse(expanded, new, statement_domain, gen_true, &solve_name_clashes);
+        AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
+        replace_entity(expanded,e,new);
+        pips_debug(2,"replace %s by %s",entity_user_name(e),entity_user_name(new));
+      }
+      /* substitute variables */
+      else
+      {
+        /* get new reference */
+
+        bool add_dereferencment = false;
+        reget:
+        switch(syntax_tag(expression_syntax(from)))
+        {
+        case is_syntax_reference:
+        {
+          reference r = syntax_reference(expression_syntax(from));
+          size_t nb_indices = gen_length(reference_indices(r));
+          if( nb_indices == 0 )
+          {
+            new = reference_variable(r);
+          }
+          else /* need a temporary variable */
+          {
+            if( ENDP(variable_dimensions(type_variable(entity_type(e)))) )
             {
-                if(entity_scalar_p(e)||entity_pointer_p(e)) {
-                    new = make_new_scalar_variable_with_prefix(entity_user_name(e),get_current_module_entity(),copy_basic(entity_basic(e)));
-                }
-                else {
-                    if(formal_parameter_p(e)) {
-                        new = make_temporary_pointer_to_array_entity(e,expression_undefined,get_current_module_entity());
-                        expression etmp = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(e));
-                        replace_entity_by_expression(expanded,e,etmp);
-                        free_expression(etmp);
-                    }
-                    else
-                        new = make_new_array_variable_with_prefix(entity_user_name(e),get_current_module_entity(),
-                            copy_basic(entity_basic(e)), gen_full_copy_list(variable_dimensions(type_variable(entity_type(e)))));
-                }
-
-                /* fix value */
-                if(get_bool_property("INLINING_USE_INITIALIZATION_LIST"))
-                    entity_initial(new) = make_value_expression( copy_expression( from ) );
-                else
-                    insert_statement(declaration_holder,make_assign_statement(entity_to_expression(new),copy_expression(from)),false);
-
-
-                /* add the entity to our list */
-                //statement_declarations(declaration_holder)=CONS(ENTITY,new,statement_declarations(declaration_holder));
-                gen_context_recurse(expanded, new, statement_domain, gen_true, &solve_name_clashes);
-                AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
-                replace_entity(expanded,e,new);
-                pips_debug(2,"replace %s by %s",entity_user_name(e),entity_user_name(new));
+              statement st=statement_undefined;
+              new = make_temporary_scalar_entity(from,&st);
+              if(!statement_undefined_p(st))
+                insert_statement(declaration_holder,st,false);
             }
-            /* substitute variables */
             else
             {
-                /* get new reference */
-
-                bool add_dereferencment = false;
-reget:
-                switch(syntax_tag(expression_syntax(from)))
-                {
-                    case is_syntax_reference:
-                        {
-                            reference r = syntax_reference(expression_syntax(from));
-                            size_t nb_indices = gen_length(reference_indices(r));
-                            if( nb_indices == 0 )
-                            {
-                                new = reference_variable(r);
-                            }
-                            else /* need a temporary variable */
-                            {
-                                if( ENDP(variable_dimensions(type_variable(entity_type(e)))) )
-                                {
-                                    statement st=statement_undefined;
-                                    new = make_temporary_scalar_entity(from,&st);
-                                    if(!statement_undefined_p(st))
-                                        insert_statement(declaration_holder,st,false);
-                                }
-                                else
-                                {
-                                    new = make_temporary_pointer_to_array_entity(e,MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),from),get_current_module_entity());
-                                    add_dereferencment=true;
-                                }
-                                AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
-
-                            }
-                        } break;
-                        /* this one is more complicated than I thought,
-                         * what of the side effect of the call ?
-                         * we must create a new variable holding the call result before
-                         */
-                    case is_syntax_call:
-                        if( expression_constant_p(from) )
-                            new = call_function(expression_call(from));
-                        else
-                        {
-                                if( ENDP(variable_dimensions(type_variable(entity_type(e)))) )
-                                {
-                                    statement st=statement_undefined;
-                                    new = make_temporary_scalar_entity(from,&st);
-                                    if(!statement_undefined_p(st))
-                                        insert_statement(declaration_holder,st,false);
-                                }
-                                else
-                                {
-                                    statement st=statement_undefined;
-                                    new = make_temporary_scalar_entity(from,&st);
-                                    if(!statement_undefined_p(st))
-                                        insert_statement(declaration_holder,st,false);
-                                }
-                                AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
-                        } break;
-                    case is_syntax_subscript:
-                        /* need a temporary variable */
-                        {
-                            if( ENDP(variable_dimensions(type_variable(entity_type(e)))) )
-                            {
-                                    statement st=statement_undefined;
-                                    new = make_temporary_scalar_entity(from,&st);
-                                    if(!statement_undefined_p(st))
-                                        insert_statement(declaration_holder,st,false);
-                            }
-                            else
-                            {
-                                new = make_temporary_pointer_to_array_entity(e,MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),from),get_current_module_entity());
-                                add_dereferencment=true;
-                            }
-                            AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
-
-                        } break;
-                    case is_syntax_sizeofexpression: {
-                        statement st=statement_undefined;
-                        new = make_temporary_scalar_entity(from,&st);
-                        if(!statement_undefined_p(st))
-                            insert_statement(declaration_holder,st,false);
-                        AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
-                        } break;
-
-                    case is_syntax_cast:
-                        pips_user_warning("ignoring cast\n");
-                        from = cast_expression(syntax_cast(expression_syntax(from)));
-                        goto reget;
-
-                    default:
-                        pips_internal_error("unhandled tag %d", syntax_tag(expression_syntax(from)) );
-                };
-
-                /* check wether the substitution will cause naming clashes
-                 * then perform the substitution
-                 */
-                    if(!implicit_c_variable_p(e)) gen_context_recurse(expanded , new, statement_domain, gen_true, &solve_name_clashes);
-                    if(add_dereferencment) replace_entity_by_expression(expanded ,e,MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(new)));
-                    else replace_entity(expanded ,e,new);
-                    pips_debug(3,"replace %s by %s\n",entity_user_name(e),entity_user_name(new));
-
-
+              new = make_temporary_pointer_to_array_entity(e,MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),from),get_current_module_entity());
+              add_dereferencment=true;
             }
-            new_old_pairs=CONS(ENTITY,new,CONS(ENTITY,e,new_old_pairs));
+            AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
 
-        }
-        gen_free_list(formal_parameters);
-        /* SG: C dependant types are a pain in the a**,
+          }
+        } break;
+        /* this one is more complicated than I thought,
+         * what of the side effect of the call ?
+         * we must create a new variable holding the call result before
+         */
+        case is_syntax_call:
+        {
+          call c = syntax_call(expression_syntax(from));
+          size_t nb_param = gen_length(call_arguments(c));
+          if( nb_param == 0 )
+            new = call_function(c);
+          else
+          {
+            if( ENDP(variable_dimensions(type_variable(entity_type(e)))) )
+            {
+              statement st=statement_undefined;
+              new = make_temporary_scalar_entity(from,&st);
+              if(!statement_undefined_p(st))
+                insert_statement(declaration_holder,st,false);
+            }
+            else
+            {
+              statement st=statement_undefined;
+              new = make_temporary_scalar_entity(from,&st);
+              if(!statement_undefined_p(st))
+                insert_statement(declaration_holder,st,false);
+            }
+            AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
+          }
+        } break;
+        case is_syntax_subscript:
+          /* need a temporary variable */
+          {
+            if( ENDP(variable_dimensions(type_variable(entity_type(e)))) )
+            {
+              statement st=statement_undefined;
+              new = make_temporary_scalar_entity(from,&st);
+              if(!statement_undefined_p(st))
+                insert_statement(declaration_holder,st,false);
+            }
+            else
+            {
+              new = make_temporary_pointer_to_array_entity(e,MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),from),get_current_module_entity());
+              add_dereferencment=true;
+            }
+            AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
+
+          } break;
+        case is_syntax_sizeofexpression: {
+          statement st=statement_undefined;
+          new = make_temporary_scalar_entity(from,&st);
+          if(!statement_undefined_p(st))
+            insert_statement(declaration_holder,st,false);
+          AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
+        } break;
+
+        case is_syntax_cast:
+          pips_user_warning("ignoring cast\n");
+          from = cast_expression(syntax_cast(expression_syntax(from)));
+          goto reget;
+
+        default:
+          pips_internal_error("unhandled tag %d", syntax_tag(expression_syntax(from)) );
+        };
+
+        /* check wether the substitution will cause naming clashes
+         * then perform the substitution
+         */
+        if(!implicit_c_variable_p(e)) gen_context_recurse(expanded , new, statement_domain, gen_true, &solve_name_clashes);
+        if(add_dereferencment) replace_entity_by_expression(expanded ,e,MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(new)));
+        else replace_entity(expanded ,e,new);
+        pips_debug(3,"replace %s by %s\n",entity_user_name(e),entity_user_name(new));
+
+
+      }
+      new_old_pairs=CONS(ENTITY,new,CONS(ENTITY,e,new_old_pairs));
+
+    }
+    gen_free_list(formal_parameters);
+    /* SG: C dependant types are a pain in the a**,
            we fix them here, that is perform substitution if needed
-           */
-        for(list iter = new_old_pairs;!ENDP(iter);POP(iter)) {
-            entity new = ENTITY(CAR(iter));
-            POP(iter);
-            entity old = ENTITY(CAR(iter));
-            replace_entity(declaration_holder,old,new);
-        }
-        gen_free_list(new_old_pairs);
-    }
-
-
-    /* add declaration at the beginning of the statement */
-    insert_statement(declaration_holder,expanded,false);
-
-    /* final cleanings
      */
-    gen_recurse(expanded,statement_domain,gen_true,fix_statement_attributes_if_sequence);
-    unnormalize_expression(expanded);
-    ifdebug(1) statement_consistent_p(declaration_holder);
-    ifdebug(2) {
-        pips_debug(2,"inlined statement after substitution\n");
-        print_statement(declaration_holder);
+    for(list iter = new_old_pairs;!ENDP(iter);POP(iter)) {
+      entity new = ENTITY(CAR(iter));
+      POP(iter);
+      entity old = ENTITY(CAR(iter));
+      replace_entity(declaration_holder,old,new);
     }
-    return declaration_holder;
+    gen_free_list(new_old_pairs);
+  }
+
+
+  /* add declaration at the beginning of the statement */
+  insert_statement(declaration_holder,expanded,false);
+
+  /* final cleanings
+   */
+  gen_recurse(expanded,statement_domain,gen_true,fix_statement_attributes_if_sequence);
+  unnormalize_expression(expanded);
+  ifdebug(1) statement_consistent_p(declaration_holder);
+  ifdebug(2) {
+    pips_debug(2,"inlined statement after substitution\n");
+    print_statement(declaration_holder);
+  }
+  return declaration_holder;
 }
 
 
