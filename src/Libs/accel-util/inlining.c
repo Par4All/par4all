@@ -622,7 +622,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
         {
           call c = syntax_call(expression_syntax(from));
           size_t nb_param = gen_length(call_arguments(c));
-          if( nb_param == 0 )
+          if( nb_param == 0  && expression_constant_p(from))
             new = call_function(c);
           else
           {

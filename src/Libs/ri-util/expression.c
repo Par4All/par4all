@@ -3281,13 +3281,13 @@ void check_user_call_site(entity func, list args)
  * referenced
  *
  * SG: moved here from hpfc
- * NL : Warning : This function certainly need to be review,
- *   maybe just add test for size of arguments (call), or
- *   size of indice (reference) can be enough for a first time.
- *   If these size of are != 0, it can not return what we expect
- *   (for instance "-3" will return UNARY_MINUS_OPERATOR_NAME "--")
- *   But expression_to_entity are call by many function and I worry
- *   about the side effect on them.
+ * Warning: This function certainly needs to be reviewed,
+ *   maybe just testing the size of arguments (call), or the
+ *   size of index (reference) may be sufficient as a first step.
+ *   If their sizes are != 0, it may not return what we expect
+ *   (for instance "-3" will return UNARY_MINUS_OPERATOR_NAME "--").
+ *   But expression_to_entity is called by many functions and I worry
+ *   about the side effects on them.
  */
 entity expression_to_entity(expression e)
 {
