@@ -1,4 +1,4 @@
-setenv WSPACE=inlining37
+setenv WSPACE=inlining38
 delete $WSPACE
 create $WSPACE $WSPACE.c 
 
