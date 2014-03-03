@@ -1,0 +1,483 @@
+"initial file:"
+int feron()
+{
+   double Ac[2][2] = {{0.4990, -0.0500}, {0.0100, 1.0000}};
+   double Bc[2][1] = {{1.0}, {0.0}};
+   double Cc[1][2] = {{564.48, 0.0}};
+   double Dc = -1280.0;
+   double xc[2][1];
+   mat_zero(2, 1, xc);
+   double y, yd;
+   receive(&y, 2);
+   receive(&yd, 3);
+   double yc = y-yd, u;
+   while (1) {
+      yc = maxim(-1.0, minim(y-yd, 1.0));
+      skip();
+      double tmp0[1][1];
+      mat_mul(1, 2, 1, tmp0, Cc, xc);
+      u = tmp0[0][0]+Dc*yc;
+      double tmp1[2][1], tmp2[2][1];
+      mat_mul(2, 2, 1, tmp1, Ac, xc);
+      mat_mul_const(2, 1, tmp2, Bc, yc);
+      mat_add(2, 1, xc, tmp1, tmp2);
+      send(u, 1);
+      receive(&y, 2);
+      receive(&yd, 3);
+      skip();
+   }
+   return 0;
+}
+
+"inlining..."
+int feron()
+{
+   double Ac[2][2] = {{0.4990, -0.0500}, {0.0100, 1.0000}};
+   double Bc[2][1] = {{1.0}, {0.0}};
+   double Cc[1][2] = {{564.48, 0.0}};
+   double Dc = -1280.0;
+   double xc[2][1];
+   //PIPS generated variable
+   double _return0;
+   //PIPS generated variable
+   double _return1;
+   {
+      int i;
+      for(i = 0; i <= 2-1; i += 1) {
+         int j;
+         for(j = 0; j <= 1-1; j += 1)
+            xc[i][j] = 0.0;
+      }
+   }
+   double y, yd;
+   receive(&y, 2);
+   receive(&yd, 3);
+   double yc = y-yd, u;
+   while (1) {
+      {
+         //PIPS generated variable
+         double F_0;
+         F_0 = y-yd;
+         if (F_0<1.0)
+            _return0 = F_0;
+         else
+            _return0 = 1.0;
+      }
+      {
+         //PIPS generated variable
+         double F_1;
+         F_1 = -1.0;
+         if (F_1>_return0)
+            _return1 = F_1;
+         else
+            _return1 = _return0;
+      }
+      yc = _return1;
+      skip();
+      double tmp0[1][1];
+      {
+         int i;
+         for(i = 0; i <= 1-1; i += 1) {
+            int j;
+            for(j = 0; j <= 1-1; j += 1) {
+               tmp0[i][j] = 0.0;
+               {
+                  int k;
+                  for(k = 0; k <= 2-1; k += 1)
+                     tmp0[i][j] += Cc[i][k]*xc[k][j];
+               }
+            }
+         }
+      }
+      u = tmp0[0][0]+Dc*yc;
+      double tmp1[2][1], tmp2[2][1];
+      {
+         int i;
+         for(i = 0; i <= 2-1; i += 1) {
+            int j;
+            for(j = 0; j <= 1-1; j += 1) {
+               tmp1[i][j] = 0.0;
+               {
+                  int k;
+                  for(k = 0; k <= 2-1; k += 1)
+                     tmp1[i][j] += Ac[i][k]*xc[k][j];
+               }
+            }
+         }
+      }
+      {
+         int i;
+         for(i = 0; i <= 2-1; i += 1) {
+            int j;
+            for(j = 0; j <= 1-1; j += 1)
+               tmp2[i][j] = Bc[i][j]*yc;
+         }
+      }
+      {
+         int i;
+         for(i = 0; i <= 2-1; i += 1) {
+            int j;
+            for(j = 0; j <= 1-1; j += 1)
+               xc[i][j] = tmp1[i][j]+tmp2[i][j];
+         }
+      }
+      send(u, 1);
+      receive(&y, 2);
+      receive(&yd, 3);
+      skip();
+   }
+   return 0;
+}
+
+"flattening..."
+int feron()
+{
+   double Ac[2][2] = {{0.4990, -0.0500}, {0.0100, 1.0000}};
+   double Bc[2][1] = {{1.0}, {0.0}};
+   double Cc[1][2] = {{564.48, 0.0}};
+   double Dc = -1280.0;
+   double xc[2][1];
+   //PIPS generated variable
+   double _return0;
+   //PIPS generated variable
+   double _return1;
+   //PIPS generated variable
+   int i_0, j_0;
+   //PIPS generated variable
+   double tmp0[1][1], tmp1[2][1], tmp2[2][1], F_0, F_1;
+   //PIPS generated variable
+   int i_1, j_1, k_0, i_2, j_2, k_1, i_3, j_3, i_4, j_4;
+   xc[0][0] = 0.0;
+   xc[1][0] = 0.0;
+   double y, yd;
+   receive(&y, 2);
+   receive(&yd, 3);
+   double yc = y-yd, u;
+   while (1) {
+      //PIPS generated variable
+      F_0 = y-yd;
+      if (F_0<1.0)
+         _return0 = F_0;
+      else
+         _return0 = 1.0;
+      //PIPS generated variable
+      F_1 = -1.0;
+      if (F_1>_return0)
+         _return1 = F_1;
+      else
+         _return1 = _return0;
+      yc = _return1;
+      skip();
+      tmp0[0][0] = 0.0;
+      tmp0[0][0] += Cc[0][0]*xc[0][0];
+      tmp0[0][0] += Cc[0][1]*xc[1][0];
+      u = tmp0[0][0]+Dc*yc;
+      tmp1[0][0] = 0.0;
+      tmp1[0][0] += Ac[0][0]*xc[0][0];
+      tmp1[0][0] += Ac[0][1]*xc[1][0];
+      tmp1[1][0] = 0.0;
+      tmp1[1][0] += Ac[1][0]*xc[0][0];
+      tmp1[1][0] += Ac[1][1]*xc[1][0];
+      tmp2[0][0] = Bc[0][0]*yc;
+      tmp2[1][0] = Bc[1][0]*yc;
+      xc[0][0] = tmp1[0][0]+tmp2[0][0];
+      xc[1][0] = tmp1[1][0]+tmp2[1][0];
+      send(u, 1);
+      receive(&y, 2);
+      receive(&yd, 3);
+      skip();
+   }
+   return 0;
+}
+
+"split initialization..."
+int feron()
+{
+   double Ac[2][2];
+   Ac[0][0] = 0.4990;
+   Ac[0][1] = -0.0500;
+   Ac[1][0] = 0.0100;
+   Ac[1][1] = 1.0000;
+   double Bc[2][1];
+   Bc[0][0] = 1.0;
+   Bc[1][0] = 0.0;
+   double Cc[1][2];
+   Cc[0][0] = 564.48;
+   Cc[0][1] = 0.0;
+   double Dc;
+   Dc = -1280.0;
+   double xc[2][1];
+   //PIPS generated variable
+   double _return0;
+   //PIPS generated variable
+   double _return1;
+   //PIPS generated variable
+   int i_0, j_0;
+   //PIPS generated variable
+   double tmp0[1][1], tmp1[2][1], tmp2[2][1], F_0, F_1;
+   //PIPS generated variable
+   int i_1, j_1, k_0, i_2, j_2, k_1, i_3, j_3, i_4, j_4;
+   xc[0][0] = 0.0;
+   xc[1][0] = 0.0;
+   double y, yd;
+   receive(&y, 2);
+   receive(&yd, 3);
+   double yc, u;
+   yc = y-yd;
+   while (1) {
+      //PIPS generated variable
+      F_0 = y-yd;
+      if (F_0<1.0)
+         _return0 = F_0;
+      else
+         _return0 = 1.0;
+      //PIPS generated variable
+      F_1 = -1.0;
+      if (F_1>_return0)
+         _return1 = F_1;
+      else
+         _return1 = _return0;
+      yc = _return1;
+      skip();
+      tmp0[0][0] = 0.0;
+      tmp0[0][0] += Cc[0][0]*xc[0][0];
+      tmp0[0][0] += Cc[0][1]*xc[1][0];
+      u = tmp0[0][0]+Dc*yc;
+      tmp1[0][0] = 0.0;
+      tmp1[0][0] += Ac[0][0]*xc[0][0];
+      tmp1[0][0] += Ac[0][1]*xc[1][0];
+      tmp1[1][0] = 0.0;
+      tmp1[1][0] += Ac[1][0]*xc[0][0];
+      tmp1[1][0] += Ac[1][1]*xc[1][0];
+      tmp2[0][0] = Bc[0][0]*yc;
+      tmp2[1][0] = Bc[1][0]*yc;
+      xc[0][0] = tmp1[0][0]+tmp2[0][0];
+      xc[1][0] = tmp1[1][0]+tmp2[1][0];
+      send(u, 1);
+      receive(&y, 2);
+      receive(&yd, 3);
+      skip();
+   }
+   return 0;
+}
+
+"constarr scalar..."
+int feron()
+{
+   double Ac[2][2];
+   //PIPS generated variable
+   double tmp20, tmp21, Bc0, Bc1, tmp10, tmp11, Ac0, Ac1, Ac2, Ac3, tmp00, xc0, xc1, Cc0, Cc1;
+   Ac0 = 0.4990;
+   Ac1 = -0.0500;
+   Ac2 = 0.0100;
+   Ac3 = 1.0000;
+   double Bc[2][1];
+   Bc0 = 1.0;
+   Bc1 = 0.0;
+   double Cc[1][2];
+   Cc0 = 564.48;
+   Cc1 = 0.0;
+   double Dc;
+   Dc = -1280.0;
+   double xc[2][1];
+   //PIPS generated variable
+   double _return0;
+   //PIPS generated variable
+   double _return1;
+   //PIPS generated variable
+   int i_0, j_0;
+   //PIPS generated variable
+   double tmp0[1][1], tmp1[2][1], tmp2[2][1], F_0, F_1;
+   //PIPS generated variable
+   int i_1, j_1, k_0, i_2, j_2, k_1, i_3, j_3, i_4, j_4;
+   xc0 = 0.0;
+   xc1 = 0.0;
+   double y, yd;
+   receive(&y, 2);
+   receive(&yd, 3);
+   double yc, u;
+   yc = y-yd;
+   while (1) {
+      //PIPS generated variable
+      F_0 = y-yd;
+      if (F_0<1.0)
+         _return0 = F_0;
+      else
+         _return0 = 1.0;
+      //PIPS generated variable
+      F_1 = -1.0;
+      if (F_1>_return0)
+         _return1 = F_1;
+      else
+         _return1 = _return0;
+      yc = _return1;
+      skip();
+      tmp00 = 0.0;
+      tmp00 += Cc0*xc0;
+      tmp00 += Cc1*xc1;
+      u = tmp00+Dc*yc;
+      tmp10 = 0.0;
+      tmp10 += Ac0*xc0;
+      tmp10 += Ac1*xc1;
+      tmp11 = 0.0;
+      tmp11 += Ac2*xc0;
+      tmp11 += Ac3*xc1;
+      tmp20 = Bc0*yc;
+      tmp21 = Bc1*yc;
+      xc0 = tmp10+tmp20;
+      xc1 = tmp11+tmp21;
+      send(u, 1);
+      receive(&y, 2);
+      receive(&yd, 3);
+      skip();
+   }
+   return 0;
+}
+
+"forw subst..."
+int feron()
+{
+   double Ac[2][2];
+   //PIPS generated variable
+   double tmp20, tmp21, Bc0, Bc1, tmp10, tmp11, Ac0, Ac1, Ac2, Ac3, tmp00, xc0, xc1, Cc0, Cc1;
+   Ac0 = 0.4990;
+   Ac1 = -0.0500;
+   Ac2 = 0.0100;
+   Ac3 = 1.0000;
+   double Bc[2][1];
+   Bc0 = 1.0;
+   Bc1 = 0.0;
+   double Cc[1][2];
+   Cc0 = 564.48;
+   Cc1 = 0.0;
+   double Dc;
+   Dc = -1280.0;
+   double xc[2][1];
+   //PIPS generated variable
+   double _return0;
+   //PIPS generated variable
+   double _return1;
+   //PIPS generated variable
+   int i_0, j_0;
+   //PIPS generated variable
+   double tmp0[1][1], tmp1[2][1], tmp2[2][1], F_0, F_1;
+   //PIPS generated variable
+   int i_1, j_1, k_0, i_2, j_2, k_1, i_3, j_3, i_4, j_4;
+   xc0 = 0.0;
+   xc1 = 0.0;
+   double y, yd;
+   receive(&y, 2);
+   receive(&yd, 3);
+   double yc, u;
+   yc = y-yd;
+   while (1) {
+      //PIPS generated variable
+      F_0 = y-yd;
+      if (y-yd<1.0)
+         _return0 = y-yd;
+      else
+         _return0 = 1.0;
+      //PIPS generated variable
+      F_1 = -1.0;
+      if (-1.0>_return0)
+         _return1 = -1.0;
+      else
+         _return1 = _return0;
+      yc = _return1;
+      skip();
+      tmp00 = 0.0;
+      tmp00 += Cc0*xc0;
+      tmp00 += Cc1*xc1;
+      u = tmp00+Dc*_return1;
+      tmp10 = 0.0;
+      tmp10 += Ac0*xc0;
+      tmp10 += Ac1*xc1;
+      tmp11 = 0.0;
+      tmp11 += Ac2*xc0;
+      tmp11 += Ac3*xc1;
+      tmp20 = Bc0*_return1;
+      tmp21 = Bc1*_return1;
+      xc0 = tmp10+Bc0*_return1;
+      xc1 = tmp11+Bc1*_return1;
+      send(tmp00+Dc*_return1, 1);
+      receive(&y, 2);
+      receive(&yd, 3);
+      skip();
+   }
+   return 0;
+}
+
+"code cleaning..."
+int feron()
+{
+   //PIPS generated variable
+   double Bc0, Bc1, tmp10, tmp11, Ac0, Ac1, Ac2, Ac3, tmp00, xc0, xc1, Cc0, Cc1;
+   Ac0 = 0.4990;
+   Ac1 = -0.0500;
+   Ac2 = 0.0100;
+   Ac3 = 1.0000;
+   Bc0 = 1.0;
+   Bc1 = 0.0;
+   Cc0 = 564.48;
+   Cc1 = 0.0;
+   double Dc;
+   Dc = -1280.0;
+   //PIPS generated variable
+   double _return0;
+   //PIPS generated variable
+   double _return1;
+   xc0 = 0.0;
+   xc1 = 0.0;
+   double y, yd;
+   receive(&y, 2);
+   receive(&yd, 3);
+   while (1) {
+      //PIPS generated variable
+      if (y-yd<1.0)
+         ;
+      else
+         _return0 = 1.0;
+      //PIPS generated variable
+      if (-1.0>_return0)
+         ;
+      else
+         _return1 = _return0;
+      tmp00 = 0.0;
+      tmp00 += Cc0*xc0;
+      tmp00 += Cc1*xc1;
+      tmp10 = 0.0;
+      tmp10 += Ac0*xc0;
+      tmp10 += Ac1*xc1;
+      tmp11 = 0.0;
+      tmp11 += Ac2*xc0;
+      tmp11 += Ac3*xc1;
+      xc0 = tmp10+Bc0*_return1;
+      xc1 = tmp11+Bc1*_return1;
+      send(tmp00+Dc*_return1, 1);
+      receive(&y, 2);
+      receive(&yd, 3);
+   }
+}
+
+Warnings
+
+unknown[unknown] (activate_phase) Rule `C_SYMBOL_TABLE' already active
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+CONTROLIZER[feron] (control_graph) Some statements are unreachable
+CONTROLIZER[feron] (control_graph) Some statements are unreachable
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning feron instead
+TRANSFORMERS_INTER_FULL[feron!receive] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning feron instead
+TRANSFORMERS_INTER_FULL[feron!receive] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning feron instead
+TRANSFORMERS_INTER_FULL[feron!receive] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning feron instead
+TRANSFORMERS_INTER_FULL[feron!receive] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+PROPER_EFFECTS[feron] (proper_effects_of_call) Statement -1 is ignored because it does not modify the store.
+PROPER_EFFECTS[feron] (proper_effects_of_call) Statement 28 is ignored because it does not modify the store.
+PROPER_EFFECTS[feron] (proper_effects_of_expression_instruction) Statement 46 is ignored because it does not modify the store.
+PROPER_EFFECTS[feron] (proper_effects_of_call) Statement 63 is ignored because it does not modify the store.
+PROPER_EFFECTS[feron] (proper_effects_of_call) Statement -1 is ignored because it does not modify the store.
+PROPER_EFFECTS[feron] (proper_effects_of_call) Statement -1 is ignored because it does not modify the store.
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning feron instead
+TRANSFORMERS_INTER_FULL[feron!receive] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
