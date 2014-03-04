@@ -214,7 +214,7 @@ void short_debug_unstructured (unstructured an_unstructured,
 {
   list blocs = NIL ;
   string entry_as_string, exit_as_string;
-  char *temp;
+  char *temp = NULL;
 
   ifdebug (debug_level) {
     sprintf (temp, "[%p] ",unstructured_entry(an_unstructured));
