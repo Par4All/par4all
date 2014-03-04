@@ -1,0 +1,30 @@
+"initial file:"
+int use_def_elim12()
+{
+   int r;
+   int y;
+
+   if (y<1)
+      r = y;
+   else
+      r = 1;
+
+   return r;
+}
+
+"dead code elim..."
+int use_def_elim12()
+{
+   int r;
+   int y;
+
+   if (y<1)
+      ;
+   else
+      r = 1;
+
+   return r;
+}
+
+Warnings
+
