@@ -1,8 +1,9 @@
 // use-def elimination should have no effects
+// same than use_def_elim12 but declaration with init
 
-int use_def_elim12()
+int use_def_elim12b()
 {
-  int r;
+  int r=0;
 
   if (1)
     r = 1;

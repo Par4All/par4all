@@ -1,24 +1,23 @@
 "initial file:"
-int use_def_elim12()
+int use_def_elim13()
 {
    int r;
 
    if (1)
       r = 1;
-   else
+   if (0)
       r = 0;
 
    return r;
 }
 
 "dead code elim..."
-int use_def_elim12()
+int use_def_elim13()
 {
    int r;
 
-   if (1)
-      ;
-   else
+
+   if (0)
       r = 0;
 
    return r;

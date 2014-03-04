@@ -1,0 +1,38 @@
+"initial file:"
+int use_def_elim13c()
+{
+//             <    is written>: r
+   int r = 0;
+//             <may be written>: r
+
+   if (1)
+//             <    is written>: r
+      r = 1;
+//             <may be written>: r
+   if (0)
+//             <    is written>: r
+      r = 0;
+//             <    is read   >: r
+
+   return r;
+}
+
+"dead code elim..."
+int use_def_elim13c()
+{
+
+
+//             <may be written>: r
+//             <may be referenced>: r
+   if (0)
+//             <    is written>: r
+//             <    is referenced>: r
+      r = 0;
+//             <    is read   >: r
+//             <    is referenced>: r
+
+   return r;
+}
+
+Warnings
+
