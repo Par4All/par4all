@@ -285,7 +285,7 @@ static void add_loop_parallel_threshold(pragma pr) {
 /**
  merge the pragma on the outer loop
  **/
-bool omp_merge_pragma(const const char* module_name) {
+bool omp_merge_pragma(const char* module_name) {
   // Use this module name and this environment variable to set
   statement mod_stmt = PIPS_PHASE_PRELUDE(module_name,
       "OPMIFY_CODE_DEBUG_LEVEL");
@@ -342,7 +342,7 @@ bool omp_merge_pragma(const const char* module_name) {
   return true;
 }
 
-bool omp_loop_parallel_threshold_set(const const char* module_name) {
+bool omp_loop_parallel_threshold_set(const char* module_name) {
   debug_on("OPMIFY_CODE_DEBUG_LEVEL");
   statement mod_stmt = statement_undefined;
   // Get the code and tell PIPS_DBM we do want to modify it
@@ -394,7 +394,7 @@ void clear_pragma_on_statement(statement s) {
  * This should be done on any input with unhandled pragma, we don't what
  * semantic we might break...
  */
-bool clear_pragma(const const char* module_name) {
+bool clear_pragma(const char* module_name) {
   debug_on("CLEAR_PRAGMA_DEBUG_LEVEL");
   statement mod_stmt = statement_undefined;
   // Get the code and tell PIPS_DBM we do want to modify it

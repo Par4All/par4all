@@ -90,7 +90,7 @@ kernel_load_store_generator(statement s, const char* module_name)
    which data need to be allocated and transfers. It can be DBR_REGIONS
    (more precise) or DBR_EFFECTS
  */
-static bool kernel_load_store_engine(const const char* module_name,
+static bool kernel_load_store_engine(const char* module_name,
 				     const string enginerc) {
     /* generate a load stores on each caller */
 
@@ -137,7 +137,7 @@ static bool kernel_load_store_engine(const const char* module_name,
 /** Generate malloc/copy-in/copy-out on the call sites of this module.
   * based on convex array regions
   */
-bool kernel_load_store(const const char* module_name) {
+bool kernel_load_store(const char* module_name) {
     return kernel_load_store_engine(module_name, DBR_REGIONS);
 }
 
