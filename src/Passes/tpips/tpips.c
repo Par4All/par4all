@@ -495,7 +495,11 @@ static void initialize_readline(void)
   rl_basic_word_break_characters = " \t\n\"\\@$><=;|&{(";
 
   /* Tell the completer that we want a crack first. */
+#if defined (_RL_FUNCTION_TYPEDEF)
+  rl_attempted_completion_function = (rl_completion_func_t *) fun_completion;
+#else
   rl_attempted_completion_function = (CPPFunction *) fun_completion;
+#endif
 
   /* function for completing parameters */
   rl_completion_entry_function = (rl_compentry_func_t *) param_generator;
