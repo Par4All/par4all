@@ -300,7 +300,7 @@ LinExpr
 GetBoundary(simple_section Dad, int DimNo, unsigned Low)
 {
   list BoundPair = dad_struct_shape(simple_section_dad(Dad));
-  LinExpr Lin;
+  LinExpr Lin = NULL;
 
   MAP(BOUND_PAIR, bp,
   {
