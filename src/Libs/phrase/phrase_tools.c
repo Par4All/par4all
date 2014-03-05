@@ -157,7 +157,7 @@ void debug_unstructured (unstructured an_unstructured,
       list predecessors = control_predecessors(current_control);
       list successors = control_successors(current_control);
       char *temp;
-      int i;
+      size_t i;
       int ordering = 0;
 
       for (i=0; i<gen_length(predecessors); i++) {
@@ -212,14 +212,13 @@ void debug_unstructured (unstructured an_unstructured,
 void short_debug_unstructured (unstructured an_unstructured,
 			       int debug_level)
 {
-  list blocs = NIL ;
-  string entry_as_string, exit_as_string;
-  char *temp = NULL;
-
   ifdebug (debug_level) {
-    sprintf (temp, "[%p] ",unstructured_entry(an_unstructured));
+
+    list blocs = NIL;
+    string entry_as_string, exit_as_string, temp;
+    asprintf (&temp, "[%p] ",unstructured_entry(an_unstructured));
     entry_as_string = strdup(temp);
-    sprintf (temp, "[%p] ",unstructured_exit(an_unstructured));
+    asprintf (&temp, "[%p] ",unstructured_exit(an_unstructured));
     exit_as_string = strdup(temp);
     pips_debug(debug_level, "%s\n",
 	       strdup(concatenate("UNSTRUCTURED\n",
