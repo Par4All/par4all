@@ -1,0 +1,24 @@
+"initial file:"
+int use_def_elim16b()
+{
+   int r = 0;
+
+   r = 1;
+   r = 0;
+
+   return r;
+}
+
+"dead code elim..."
+int use_def_elim16b()
+{
+   int r = 0;
+
+
+   r = 0;
+
+   return r;
+}
+
+Warnings
+

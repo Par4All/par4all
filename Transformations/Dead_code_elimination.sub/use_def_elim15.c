@@ -1,5 +1,5 @@
 // use-def elimination should have no effects
-// code with if than no bug
+// code with if with no bug
 
 int use_def_elim15()
 {
