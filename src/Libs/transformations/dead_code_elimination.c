@@ -719,7 +719,7 @@ bool dead_code_elimination_on_module(char * module_name, bool use_out_regions)
 
    /*
     * For C code, this pass requires that effects are calculated with property
-    * MEMORY_EFFECTS_ONLY set to false because we need that the Chains includes
+    * MEMORY_EFFECTS_ONLY set to false because we need that the chains include
     * arcs for declarations as these latter are separate statements now.
     */
    bool memory_effects_only_p = get_bool_property("MEMORY_EFFECTS_ONLY");
@@ -727,8 +727,8 @@ bool dead_code_elimination_on_module(char * module_name, bool use_out_regions)
      pips_user_error("For C code, Dead code elimination should be run with property "
                       "MEMORY_EFFECTS_ONLY set to FALSE.\n"
                       "For C code, this pass requires that effects are calculated with property"
-                      " MEMORY_EFFECTS_ONLY set to false because we need that the Chains includes"
-                      " arcs for declarations as these latter are separate statements now.");
+                      " MEMORY_EFFECTS_ONLY set to false because we need that the chains include"
+                      " arcs for declarations as these latter are separate statements now.\n");
      return false; // return to pass manager with a failure code
    }
 
