@@ -1,0 +1,30 @@
+"initial file:"
+C     Fortran version
+C     use-def chains with if/else
+C     no dependence between if and else case have to be done
+      PROGRAM IF01F
+      
+      INTEGER R, A
+
+      IF (.TRUE.) THEN                                                  0008
+         R = 1                                                          0009
+      ELSE
+         R = 0                                                          0011
+      ENDIF
+
+      A = R                                                             0014
+      END
+
+"use def graph..."
+
+ *********************** Use-Def Chains *********************
+
+	09 --> 11 with conflicts
+		from <R-W-EXACT> to <R-W-EXACT>
+	11 --> 14 with conflicts
+		from <R-W-EXACT> to <R-R-EXACT>
+
+****************** End of Dependence Graph ******************
+
+Warnings
+
