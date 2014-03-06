@@ -1,23 +1,23 @@
 "initial file:"
 int use_def_elim16b()
 {
-   int r = 0;
+   int r = 0;                                                           /*0006*/
 
-   r = 1;
-   r = 0;
+   r = 1;                                                               /*0008*/
+   r = 0;                                                               /*0009*/
 
-   return r;
+   return r;                                                            /*0011*/
 }
 
 "dead code elim..."
 int use_def_elim16b()
 {
-   int r = 0;
+   int r = 0;                                                           /*0006*/
 
 
-   r = 0;
+   r = 0;                                                               /*0009*/
 
-   return r;
+   return r;                                                            /*0011*/
 }
 
 Warnings

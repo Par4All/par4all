@@ -1,29 +1,37 @@
 "initial file:"
-int use_def_elim12()
+int use_def_elim12c()
 {
-   int r;
-   int y;
+//             <    is written>: r
+   int r = 0;                                                           /*0006*/
+//             <    is written>: r
 
-   if (y<1)
-      r = y;
+   if (1)                                                               /*0008*/
+//             <    is written>: r
+      r = 1;                                                            /*0009*/
    else
-      r = 1;
+//             <    is written>: r
+      r = 0;                                                            /*0011*/
+//             <    is read   >: r
 
-   return r;
+   return r;                                                            /*0013*/
 }
 
 "dead code elim..."
-int use_def_elim12()
+int use_def_elim12c()
 {
-   int r;
-   int y;
+//             <may be written>: r
+//             <may be referenced>: r
 
-   if (y<1)
-      ;
+   if (1)                                                               /*0008*/
+      ;                                                                 /*0009*/
    else
-      r = 1;
+//             <    is written>: r
+//             <    is referenced>: r
+      r = 0;                                                            /*0011*/
+//             <    is read   >: r
+//             <    is referenced>: r
 
-   return r;
+   return r;                                                            /*0013*/
 }
 
 Warnings

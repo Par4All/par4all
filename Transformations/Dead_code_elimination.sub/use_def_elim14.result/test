@@ -1,29 +1,33 @@
 "initial file:"
-int use_def_elim12()
+int use_def_elim14()
 {
-   int r;
-   int y;
+   int r;                                                               /*0007*/
 
-   if (y<1)
-      r = y;
-   else
-      r = 1;
+   if (1) {                                                             /*0009*/
+      r = 1;                                                            /*0011*/
+      r = r;                                                            /*0012*/
+   }
+   else {
+      r = 0;                                                            /*0016*/
+      r = r;                                                            /*0017*/
+   }
 
-   return r;
+   return r;                                                            /*0020*/
 }
 
 "dead code elim..."
-int use_def_elim12()
+int use_def_elim14()
 {
-   int r;
-   int y;
+   int r;                                                               /*0007*/
 
-   if (y<1)
+   if (1)                                                               /*0009*/
       ;
-   else
-      r = 1;
+   else {
+      r = 0;                                                            /*0016*/
+      r = r;                                                            /*0017*/
+   }
 
-   return r;
+   return r;                                                            /*0020*/
 }
 
 Warnings
