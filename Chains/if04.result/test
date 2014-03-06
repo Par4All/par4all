@@ -1,0 +1,33 @@
+"initial file:"
+int if04()
+{
+   int r, r1 = 0, r2 = 0;                                               /*0007*/
+
+   if (1)                                                               /*0009*/
+      r1 = 10;                                                          /*0010*/
+   else
+      r2 = 50;                                                          /*0012*/
+
+   r = r1+r2;                                                           /*0014*/
+   return r;                                                            /*0015*/
+}
+
+"use def graph..."
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 10 with conflicts
+		from <r1-W-EXACT> to <r1-W-EXACT>
+	07 --> 12 with conflicts
+		from <r2-W-EXACT> to <r2-W-EXACT>
+	10 --> 14 with conflicts
+		from <r1-W-EXACT> to <r1-R-EXACT>
+	12 --> 14 with conflicts
+		from <r2-W-EXACT> to <r2-R-EXACT>
+	14 --> 15 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
+
+****************** End of Dependence Graph ******************
+
+Warnings
+
