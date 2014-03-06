@@ -724,8 +724,11 @@ bool dead_code_elimination_on_module(char * module_name, bool use_out_regions)
     */
    bool memory_effects_only_p = get_bool_property("MEMORY_EFFECTS_ONLY");
    if(c_module_p(module) && memory_effects_only_p && !use_out_regions) {
-     pips_user_error("Rice parallelization should be run with property "
-                       "MEMORY_EFFECTS_ONLY set to FALSE.\n");
+     pips_user_error("For C code, Dead code elimination should be run with property "
+                      "MEMORY_EFFECTS_ONLY set to FALSE.\n"
+                      "For C code, this pass requires that effects are calculated with property"
+                      " MEMORY_EFFECTS_ONLY set to false because we need that the Chains includes"
+                      " arcs for declarations as these latter are separate statements now.");
      return false; // return to pass manager with a failure code
    }
 
