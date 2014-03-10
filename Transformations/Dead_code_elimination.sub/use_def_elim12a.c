@@ -1,10 +1,12 @@
 // use-def elimination should have no effects
 
+#include <stdlib.h>
+
 int use_def_elim12a()
 {
   int r;
 
-  if (1)
+  if (rand())
     r = 1;
   else
     r = 0;

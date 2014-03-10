@@ -1,27 +1,27 @@
 "initial file:"
 int use_def_elim12a()
 {
-   int r;                                                               /*0005*/
+   int r;                                                               /*0007*/
 
-   if (1)                                                               /*0007*/
-      r = 1;                                                            /*0008*/
+   if (rand())                                                          /*0009*/
+      r = 1;                                                            /*0010*/
    else
-      r = 0;                                                            /*0010*/
+      r = 0;                                                            /*0012*/
 
-   return r;                                                            /*0012*/
+   return r;                                                            /*0014*/
 }
 
 "dead code elim..."
 int use_def_elim12a()
 {
-   int r;                                                               /*0005*/
+   int r;                                                               /*0007*/
 
-   if (1)                                                               /*0007*/
-      ;                                                                 /*0008*/
+   if (rand())                                                          /*0009*/
+      r = 1;                                                            /*0010*/
    else
-      r = 0;                                                            /*0010*/
+      r = 0;                                                            /*0012*/
 
-   return r;                                                            /*0012*/
+   return r;                                                            /*0014*/
 }
 
 Warnings

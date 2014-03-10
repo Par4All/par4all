@@ -2,11 +2,13 @@
 // same that use_def_elim12
 // but with braces to be sure it change nothing for the analysis
 
+#include <stdlib.h>
+
 int use_def_elim14()
 {
   int r;
 
-  if (1)
+  if (rand())
   {
     r = 1;
     r = r;
