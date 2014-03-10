@@ -17,8 +17,14 @@ int if02b()
 
 	07 --> 10 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
+	07 --> 12 with conflicts
+		from <r-W-EXACT> to <r-W-EXACT>
+	07 --> 14 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
 	10 --> 12 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
+	10 --> 14 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
 	12 --> 14 with conflicts
 		from <r-W-EXACT> to <r-R-EXACT>
 

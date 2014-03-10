@@ -15,8 +15,8 @@ int if01a()
 
  *********************** Use-Def Chains *********************
 
-	09 --> 11 with conflicts
-		from <r-W-EXACT> to <r-W-EXACT>
+	09 --> 13 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
 	11 --> 13 with conflicts
 		from <r-W-EXACT> to <r-R-EXACT>
 

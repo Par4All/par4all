@@ -22,9 +22,8 @@ int if03()
 	11 --> 12 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
 		from <r-W-EXACT> to <r-R-EXACT>
-	12 --> 16 with conflicts
-		from <r-W-EXACT> to <r-W-EXACT>
-		from <r-R-EXACT> to <r-W-EXACT>
+	12 --> 20 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
 	16 --> 17 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
 		from <r-W-EXACT> to <r-R-EXACT>

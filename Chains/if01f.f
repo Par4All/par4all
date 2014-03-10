@@ -5,6 +5,8 @@ C     no dependence between if and else case have to be done
       
       INTEGER R, A
       
+      R = -1
+      
       IF (.TRUE.) THEN
         R = 1
       ELSE

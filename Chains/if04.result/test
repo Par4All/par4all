@@ -20,6 +20,9 @@ int if04()
 		from <r1-W-EXACT> to <r1-W-EXACT>
 	07 --> 12 with conflicts
 		from <r2-W-EXACT> to <r2-W-EXACT>
+	07 --> 14 with conflicts
+		from <r2-W-EXACT> to <r2-R-EXACT>
+		from <r1-W-EXACT> to <r1-R-EXACT>
 	10 --> 14 with conflicts
 		from <r1-W-EXACT> to <r1-R-EXACT>
 	12 --> 14 with conflicts
