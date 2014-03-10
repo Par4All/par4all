@@ -85,9 +85,10 @@ class p4a_astrad_postprocessor(object):
         #print("file name :" + dsl_file_name + "\n")
 
         # file name is *.p4a.c: split it twice to recover base name
+        # and remove the .p4a so that Par4All accept the output file as input
         (base, ext1) = os.path.splitext(self.outputFileName)
         (base, ext2) = os.path.splitext(base)
-        new_file = base  + '_' + self.outputDialect + ext2 + ext1
+        new_file = base  + '_' + self.outputDialect + ext1
 
         f = open(dsl_file_name, 'w')
 
@@ -331,14 +332,27 @@ class p4a_astrad_postprocessor(object):
         # file name is *.p4a.c: split it twice to recover base name
         (base, ext1) = os.path.splitext(self.outputFileName)
         (base, ext2) = os.path.splitext(base)
-        new_file = os.path.join(self.saveDir, base  + '_' + self.outputDialect + ext2 + ext1)
+        self.outputFileName = base  + '_' + self.outputDialect + ext1
+        new_file = os.path.join(self.saveDir, self.outputFileName)
+
         new_module_name = self.moduleName + '_' + self.outputDialect
         old_module_kernel_name = self.moduleName + '_kernel'
         new_module_kernel_name = self.moduleName + '_' + self.outputDialect + '_kernel'
 
         os.rename(old_file, new_file)
         content = read_file(new_file)
-        content = content.replace (self.moduleName + '(', new_module_name + '(')
-        content = content.replace (old_module_kernel_name + '(', new_module_kernel_name + '(')
+        content = content.replace (self.moduleName + '(',
+                                   new_module_name + '(')
+        if self.outputDialect == astrad_dialect_names['openmp']:
+            content = content.replace (old_module_kernel_name + '(',
+                                       new_module_kernel_name + '(')
+        else:
+            print content
+            content = content.replace (' ' + old_module_kernel_name + '(',
+                                       ' ' + new_module_kernel_name + '(')
+            print content
+            content = content.replace ('  ' + new_module_kernel_name + '(',
+                               '  if ( !p4a_runtime_initialized) P4A_init_accel;\n  '
+                                       + new_module_kernel_name + '(')
 
         write_file(new_file, content)
