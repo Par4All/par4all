@@ -2,6 +2,7 @@ setenv WSPACE=id_elim01
 delete $WSPACE
 create $WSPACE $WSPACE.c
 setproperty ABORT_ON_USER_ERROR TRUE
+setenv IDENTITY_ELIMINATION_DEBUG_LEVEL 5
 
 echo
 echo Initial code

@@ -266,7 +266,7 @@ int feron()
 {
    double Ac[2][2];
    //PIPS generated variable
-   double tmp20, tmp21, Bc0, Bc1, tmp10, tmp11, Ac0, Ac1, Ac2, Ac3, tmp00, xc0, xc1, Cc0, Cc1;
+   double xc0, xc1, tmp20, tmp21, Bc0, Bc1, Cc0, Cc1, tmp00, tmp10, tmp11, Ac0, Ac1, Ac2, Ac3;
    Ac0 = 0.4990;
    Ac1 = -0.0500;
    Ac2 = 0.0100;
@@ -339,7 +339,7 @@ int feron()
 {
    double Ac[2][2];
    //PIPS generated variable
-   double tmp20, tmp21, Bc0, Bc1, tmp10, tmp11, Ac0, Ac1, Ac2, Ac3, tmp00, xc0, xc1, Cc0, Cc1;
+   double xc0, xc1, tmp20, tmp21, Bc0, Bc1, Cc0, Cc1, tmp00, tmp10, tmp11, Ac0, Ac1, Ac2, Ac3;
    Ac0 = 0.4990;
    Ac1 = -0.0500;
    Ac2 = 0.0100;
@@ -411,7 +411,7 @@ int feron()
 int feron()
 {
    //PIPS generated variable
-   double Bc0, Bc1, tmp10, tmp11, Ac0, Ac1, Ac2, Ac3, tmp00, xc0, xc1, Cc0, Cc1;
+   double xc0, xc1, Bc0, Bc1, Cc0, Cc1, tmp00, tmp10, tmp11, Ac0, Ac1, Ac2, Ac3;
    Ac0 = 0.4990;
    Ac1 = -0.0500;
    Ac2 = 0.0100;
@@ -434,12 +434,12 @@ int feron()
    while (1) {
       //PIPS generated variable
       if (y-yd<1.0)
-         ;
+         _return0 = y-yd;
       else
          _return0 = 1.0;
       //PIPS generated variable
       if (-1.0>_return0)
-         ;
+         _return1 = -1.0;
       else
          _return1 = _return0;
       tmp00 = 0.0;
