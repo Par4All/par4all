@@ -1,13 +1,14 @@
 // use-def chains with 2 if
-// MAY Write
+
+#include <stdlib.h>
 
 int if02a()
 {
   int r;
 
-  if (1)
+  if (rand())
     r = 1;
-  if (0)
+  if (rand())
     r = 0;
   
   return r;

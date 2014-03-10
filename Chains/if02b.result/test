@@ -1,31 +1,31 @@
 "initial file:"
 int if02b()
 {
-   int r = 0;                                                           /*0007*/
+   int r = 0;                                                           /*0008*/
 
-   if (1)                                                               /*0009*/
-      r = 1;                                                            /*0010*/
-   if (0)                                                               /*0011*/
-      r = 0;                                                            /*0012*/
+   if (rand())                                                          /*0010*/
+      r = 1;                                                            /*0011*/
+   if (rand())                                                          /*0012*/
+      r = 0;                                                            /*0013*/
 
-   return r;                                                            /*0014*/
+   return r;                                                            /*0015*/
 }
 
 "use def graph..."
 
  *********************** Use-Def Chains *********************
 
-	07 --> 10 with conflicts
+	08 --> 11 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
-	07 --> 12 with conflicts
+	08 --> 13 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
-	07 --> 14 with conflicts
+	08 --> 15 with conflicts
 		from <r-W-EXACT> to <r-R-EXACT>
-	10 --> 12 with conflicts
+	11 --> 13 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
-	10 --> 14 with conflicts
+	11 --> 15 with conflicts
 		from <r-W-EXACT> to <r-R-EXACT>
-	12 --> 14 with conflicts
+	13 --> 15 with conflicts
 		from <r-W-EXACT> to <r-R-EXACT>
 
 ****************** End of Dependence Graph ******************

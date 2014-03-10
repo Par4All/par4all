@@ -1,12 +1,13 @@
 // use-def chains with if/else
 // if and else don't work on same variable
-// MAY Write
+
+#include <stdlib.h>
 
 int if04()
 {
   int r, r1=0, r2=0;
 
-  if (1)
+  if (rand())
     r1 = 10;
   else
     r2 = 50;

@@ -8,7 +8,7 @@ C     no dependence between if and else case have to be done
 
       R = -1                                                            0008
 
-      IF (.TRUE.) THEN                                                  0010
+      IF (RAND(0).LE.1) THEN                                            0010
          R = 1                                                          0011
       ELSE
          R = 0                                                          0013
