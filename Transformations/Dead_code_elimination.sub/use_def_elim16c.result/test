@@ -16,6 +16,10 @@ int use_def_elim16c()
 "dead code elim..."
 int use_def_elim16c()
 {
+//             <    is written>: r
+//             <    is referenced>: r
+//             <    is declared>: r
+   int r = 0;                                                           /*0006*/
 
 
 //             <    is written>: r

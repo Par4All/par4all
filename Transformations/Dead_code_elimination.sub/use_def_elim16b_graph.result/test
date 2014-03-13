@@ -25,6 +25,7 @@ int use_def_elim16b_graph()
 "dead code elim..."
 int use_def_elim16b_graph()
 {
+   int r = 0;                                                           /*0006*/
 
 
    r = 0;                                                               /*0009*/

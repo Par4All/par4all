@@ -1,34 +1,33 @@
 "initial file:"
 int use_def_elim14_graph()
 {
-   int r;                                                               /*0007*/
+   int r;                                                               /*0009*/
 
-   if (1) {                                                             /*0009*/
-      r = 1;                                                            /*0011*/
-      r = r;                                                            /*0012*/
+   if (rand()) {                                                        /*0011*/
+      r = 1;                                                            /*0013*/
+      r = r;                                                            /*0014*/
    }
    else {
-      r = 0;                                                            /*0016*/
-      r = r;                                                            /*0017*/
+      r = 0;                                                            /*0018*/
+      r = r;                                                            /*0019*/
    }
 
-   return r;                                                            /*0020*/
+   return r;                                                            /*0022*/
 }
 
 "use def graph..."
 
  *********************** Use-Def Chains *********************
 
-	11 --> 12 with conflicts
+	13 --> 14 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
 		from <r-W-EXACT> to <r-R-EXACT>
-	12 --> 16 with conflicts
-		from <r-W-EXACT> to <r-W-EXACT>
-		from <r-R-EXACT> to <r-W-EXACT>
-	16 --> 17 with conflicts
+	14 --> 22 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
+	18 --> 19 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
 		from <r-W-EXACT> to <r-R-EXACT>
-	17 --> 20 with conflicts
+	19 --> 22 with conflicts
 		from <r-W-EXACT> to <r-R-EXACT>
 
 ****************** End of Dependence Graph ******************
@@ -36,15 +35,18 @@ int use_def_elim14_graph()
 "dead code elim..."
 int use_def_elim14_graph()
 {
+   int r;                                                               /*0009*/
 
-   if (1)                                                               /*0009*/
-      ;
+   if (rand()) {                                                        /*0011*/
+      r = 1;                                                            /*0013*/
+      r = r;                                                            /*0014*/
+   }
    else {
-      r = 0;                                                            /*0016*/
-      r = r;                                                            /*0017*/
+      r = 0;                                                            /*0018*/
+      r = r;                                                            /*0019*/
    }
 
-   return r;                                                            /*0020*/
+   return r;                                                            /*0022*/
 }
 
 Warnings

@@ -29,6 +29,10 @@ int use_def_elim16c_graph()
 "dead code elim..."
 int use_def_elim16c_graph()
 {
+//             <    is written>: r
+//             <    is referenced>: r
+//             <    is declared>: r
+   int r = 0;                                                           /*0006*/
 
 
 //             <    is written>: r
