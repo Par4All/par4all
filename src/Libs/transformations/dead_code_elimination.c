@@ -388,124 +388,130 @@ static bool statement_call_a_keep_function_p( statement s ) {
 
 /* FI: not only if it is useful, but if it is legal... */
 static void use_def_deal_if_useful(statement s) {
-   bool this_statement_has_an_io_effect;
-   /* When a call by reference is used... */
-   bool this_statement_writes_a_procedure_argument;
-   bool this_statement_is_a_format;
-   bool this_statement_is_an_unstructured_test = false;
-   /* FI: any statement that does not have a must/exact continuation
-    * should be preserved. For the time being, only exact
-    * non-continuing calls are checked: return, exit and abort. Since
-    * exceptions are not taken into account, the semantics of the code
-    * may be changed.
-    *
-    * Exact non-continuation can be checked with the statement
-    * transformer. beatrice Creusillet has also developped a
-    * continuation analysis.
-    */
-   bool this_statement_is_a_c_return;
-   bool outside_effect_p = false;
-   bool this_statement_call_a_user_function;
+  bool this_statement_has_an_io_effect;
+  /* When a call by reference is used... */
+  bool this_statement_writes_a_procedure_argument;
+  bool this_statement_is_a_format;
+  bool this_statement_is_an_unstructured_test = false;
+  /* FI: any statement that does not have a must/exact continuation
+   * should be preserved. For the time being, only exact
+   * non-continuing calls are checked: return, exit and abort. Since
+   * exceptions are not taken into account, the semantics of the code
+   * may be changed.
+   *
+   * Exact non-continuation can be checked with the statement
+   * transformer. beatrice Creusillet has also developped a
+   * continuation analysis.
+   */
+  bool this_statement_is_a_c_return;
+  bool outside_effect_p = false;
+  bool this_statement_call_a_user_function;
+  bool this_statement_is_a_declaration;
 
-   ifdebug(5) {
-      int debugLevel = get_debug_level();
-      set_debug_level(0);
-      fprintf(stderr, "statement %p (%#zx)\n",
-              s, statement_ordering(s));
-      print_text(stderr, text_statement(get_current_module_entity(), 0, s, NIL));
-      set_debug_level(debugLevel);
-   }
-
-   if (statement_ordering(s) == STATEMENT_ORDERING_UNDEFINED) {
-      pips_user_warning("exited since it found a statement without ordering: statement %p (%#x)\n", s, statement_ordering(s));
-      return;
-   }
-
-   /* The possible reasons to have useful code: */
-   /* - the statement does an I/O: */
-   this_statement_has_an_io_effect = statement_io_effect_p(s);
-
-  /* - the statement writes a procedure argument or the return
-      variable of the function, so the value may be used by another
-      procedure: */
-    /* Regions out should be more precise: */
-   this_statement_writes_a_procedure_argument =
-       statement_has_a_formal_argument_write_effect_p(s);
-   
-   /* Avoid to remove formats in a first approach: */
-   this_statement_is_a_format = instruction_format_p(statement_instruction(s));
-
-   /* Unstructured tests are very hard to deal with since they can
-      have major control effects, such as leading to an infinite loop,
-      etc. and it is very hard to cope with... Thus, keep all
-      unstructured tests in this approach since I cannot prove the
-      termination of the program and so on.  */
-   if (bound_control_father_p(s)) {
-       control control_father = load_control_father(s);
-       if (gen_length(control_successors(control_father)) == 2)
-	   /* It is an unstructured test: keep it: */
-	   this_statement_is_an_unstructured_test = true;
-   }
-
-   /* All statements with control effects such as exit() or abort()
-      should be preserved. Continuations should be checked for
-      user-defined functions. Exceptions are also a problem. */
-   this_statement_is_a_c_return = return_statement_p(s) 
-     || exit_statement_p(s) || abort_statement_p(s);
-
-   /* Check if this statement write some other things than a local variable */
-   list effects_list = load_proper_rw_effects_list(s);
-   entity current_func = get_current_module_entity();
-   FOREACH(EFFECT, eff,effects_list) {
-    reference a_reference = effect_any_reference(eff);
-    entity touched = reference_variable(a_reference);
-    if(effect_write_p(eff)
-       && (!entity_local_variable_p(touched,current_func)
-	   /* FI: we should also check that the static effect is
-	      leaked by the function but this is hard to check and is
-	      usually not intended by the programmer. See
-	      Transformations/Dead_code_elimination.sub/use_def_elim07/08. */
-	   || entity_static_variable_p(touched))) {
-      outside_effect_p = true;
-      pips_debug(7, "Statement %p, outside effect on %s (module %s)\n",
-          s,
-          entity_name(touched),
-          entity_local_name(current_func));
-      break;
-    }
+  ifdebug(5) {
+     int debugLevel = get_debug_level();
+     set_debug_level(0);
+     fprintf(stderr, "statement %p (%#zx)\n",
+             s, statement_ordering(s));
+     print_text(stderr, text_statement(get_current_module_entity(), 0, s, NIL));
+     set_debug_level(debugLevel);
   }
 
-   this_statement_call_a_user_function = statement_call_a_keep_function_p(s);
+  if (statement_ordering(s) == STATEMENT_ORDERING_UNDEFINED) {
+     pips_user_warning("exited since it found a statement without ordering: statement %p (%#x)\n", s, statement_ordering(s));
+     return;
+  }
 
+  /* The possible reasons to have useful code: */
+  /* - the statement does an I/O: */
+  this_statement_has_an_io_effect = statement_io_effect_p(s);
 
-   ifdebug(6) {
-      if (outside_effect_p)
-        pips_debug(6, "Statement %p has an outside effect.\n", s);
-      if (this_statement_has_an_io_effect)
-        pips_debug(6, "Statement %p has an io effect.\n", s);
-      if (this_statement_writes_a_procedure_argument)
-        pips_debug(6,"Statement %p writes an argument of its procedure.\n", s);
-      if (this_statement_is_a_format)
-        pips_debug(6, "Statement %p is a FORMAT.\n", s);
-      if (this_statement_is_an_unstructured_test)
-        pips_debug(6, "Statement %p is an unstructured test.\n", s);
-      if (this_statement_is_a_c_return)
-        pips_debug(6, "Statement %p is a C return.\n", s);
+ /* - the statement writes a procedure argument or the return
+     variable of the function, so the value may be used by another
+     procedure: */
+   /* Regions out should be more precise: */
+  this_statement_writes_a_procedure_argument =
+      statement_has_a_formal_argument_write_effect_p(s);
+
+  /* Avoid to remove formats in a first approach: */
+  this_statement_is_a_format = instruction_format_p(statement_instruction(s));
+
+  /* Unstructured tests are very hard to deal with since they can
+     have major control effects, such as leading to an infinite loop,
+     etc. and it is very hard to cope with... Thus, keep all
+     unstructured tests in this approach since I cannot prove the
+     termination of the program and so on.  */
+  if (bound_control_father_p(s)) {
+      control control_father = load_control_father(s);
+      if (gen_length(control_successors(control_father)) == 2)
+            /* It is an unstructured test: keep it: */
+            this_statement_is_an_unstructured_test = true;
+  }
+
+  /* All statements with control effects such as exit() or abort()
+     should be preserved. Continuations should be checked for
+     user-defined functions. Exceptions are also a problem. */
+  this_statement_is_a_c_return = return_statement_p(s)
+    || exit_statement_p(s) || abort_statement_p(s);
+
+  /* Check if this statement write some other things than a local variable */
+  list effects_list = load_proper_rw_effects_list(s);
+  entity current_func = get_current_module_entity();
+  FOREACH(EFFECT, eff,effects_list) {
+   reference a_reference = effect_any_reference(eff);
+   entity touched = reference_variable(a_reference);
+   if(effect_write_p(eff)
+      && (!entity_local_variable_p(touched,current_func)
+            /* FI: we should also check that the static effect is
+               leaked by the function but this is hard to check and is
+               usually not intended by the programmer. See
+               Transformations/Dead_code_elimination.sub/use_def_elim07/08. */
+            || entity_static_variable_p(touched))) {
+     outside_effect_p = true;
+     pips_debug(7, "Statement %p, outside effect on %s (module %s)\n",
+         s,
+         entity_name(touched),
+         entity_local_name(current_func));
+     break;
    }
+ }
+
+  this_statement_call_a_user_function = statement_call_a_keep_function_p(s);
+
+  this_statement_is_a_declaration = declaration_statement_p(s);
+
+  ifdebug(6) {
+    pips_debug(6, "Statement %p:\n%s\n Statement number: %d\n", s, text_to_string(statement_to_text(s)), statement_number(s));
+     if (outside_effect_p)
+       pips_debug(6, "Statement %p has an outside effect.\n", s);
+     if (this_statement_has_an_io_effect)
+       pips_debug(6, "Statement %p has an io effect.\n", s);
+     if (this_statement_writes_a_procedure_argument)
+       pips_debug(6,"Statement %p writes an argument of its procedure.\n", s);
+     if (this_statement_is_a_format)
+       pips_debug(6, "Statement %p is a FORMAT.\n", s);
+     if (this_statement_is_an_unstructured_test)
+       pips_debug(6, "Statement %p is an unstructured test.\n", s);
+     if (this_statement_is_a_c_return)
+       pips_debug(6, "Statement %p is a C return.\n", s);
+     if (this_statement_is_a_declaration)
+       pips_debug(6, "Statement %p is a declaration.\n", s);
+  }
 
 
-   
-   if (this_statement_has_an_io_effect
-       || outside_effect_p
-       || this_statement_writes_a_procedure_argument
-       || this_statement_is_a_format
-       || this_statement_is_an_unstructured_test
-       || this_statement_is_a_c_return
-       || this_statement_call_a_user_function)
-      /* Mark this statement as useful: */
-      set_add_element(the_useful_statements, the_useful_statements, (char *) s);
 
-   pips_debug(5, "end\n");
+  if (this_statement_has_an_io_effect
+      || outside_effect_p
+      || this_statement_writes_a_procedure_argument
+      || this_statement_is_a_format
+      || this_statement_is_an_unstructured_test
+      || this_statement_is_a_c_return
+      || this_statement_call_a_user_function
+      || this_statement_is_a_declaration)
+     /* Mark this statement as useful: */
+     set_add_element(the_useful_statements, the_useful_statements, (char *) s);
+
+  pips_debug(5, "end\n");
 }
 
 
