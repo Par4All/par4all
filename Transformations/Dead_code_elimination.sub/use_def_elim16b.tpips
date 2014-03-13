@@ -9,13 +9,14 @@ setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS TRUE
 setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 echo "initial file:"
 #activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[$WSPACE]
 
 echo
 echo "dead code elim..."
-setproperty MEMORY_EFFECTS_ONLY FALSE
 apply DEAD_CODE_ELIMINATION
 display PRINTED_FILE[$WSPACE]
 

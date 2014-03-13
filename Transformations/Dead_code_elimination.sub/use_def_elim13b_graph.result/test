@@ -17,10 +17,13 @@ int use_def_elim13b_graph()
 
 	08 --> 11 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
+		from <r-WE-EXACT> to <r-RE-EXACT>
 	08 --> 13 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
+		from <r-WE-EXACT> to <r-RE-EXACT>
 	08 --> 15 with conflicts
 		from <r-W-EXACT> to <r-R-EXACT>
+		from <r-WE-EXACT> to <r-RE-EXACT>
 	11 --> 13 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
 	11 --> 15 with conflicts

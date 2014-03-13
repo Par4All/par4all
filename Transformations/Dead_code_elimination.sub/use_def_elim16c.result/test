@@ -2,13 +2,18 @@
 int use_def_elim16c()
 {
 //             <    is written>: r
+//             <    is referenced>: r
+//             <    is declared>: r
    int r = 0;                                                           /*0006*/
 //             <    is written>: r
+//             <    is referenced>: r
 
    r = 1;                                                               /*0008*/
 //             <    is written>: r
+//             <    is referenced>: r
    r = 0;                                                               /*0009*/
 //             <    is read   >: r
+//             <    is referenced>: r
 
    return r;                                                            /*0011*/
 }

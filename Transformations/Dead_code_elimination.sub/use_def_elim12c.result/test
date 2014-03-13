@@ -1,20 +1,27 @@
 "initial file:"
 //             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
 //             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+//             <    is referenced>: _RANDOM_EFFECTS:GEN_SEED
 int use_def_elim12c()
 {
 //             <    is written>: r
+//             <    is referenced>: r
+//             <    is declared>: r
    int r = 0;                                                           /*0008*/
 //             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
 //             <    is written>: r _RANDOM_EFFECTS:GEN_SEED
+//             <    is referenced>: r _RANDOM_EFFECTS:GEN_SEED
 
    if (rand())                                                          /*0010*/
 //             <    is written>: r
+//             <    is referenced>: r
       r = 1;                                                            /*0011*/
    else
 //             <    is written>: r
+//             <    is referenced>: r
       r = 0;                                                            /*0013*/
 //             <    is read   >: r
+//             <    is referenced>: r
 
    return r;                                                            /*0015*/
 }

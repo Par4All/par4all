@@ -15,6 +15,12 @@ int use_def_elim13a_graph()
 
  *********************** Use-Def Chains *********************
 
+	09 --> 12 with conflicts
+		from <r-WE-EXACT> to <r-RE-EXACT>
+	09 --> 14 with conflicts
+		from <r-WE-EXACT> to <r-RE-EXACT>
+	09 --> 16 with conflicts
+		from <r-WE-EXACT> to <r-RE-EXACT>
 	12 --> 14 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
 	12 --> 16 with conflicts
