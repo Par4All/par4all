@@ -1,16 +1,10 @@
 
 Splitted file for "decl33!"
 
-# 1 "./decl33.c"
-# 1 "<built-in>"
-# 1 "<command-line>"
-# 1 "./decl33.c"
 extern int decl33();
 int decl33(int, int);
 extern int decl33();
-
 extern main();
-
 extern int decl33();
 
 Parsed printed file for "main"
@@ -93,9 +87,7 @@ Parsed printed file for "decl33!"
 int decl33(int i, int j);
 int decl33(int i, int j);
 int decl33(int i, int j);
-
 int main();
-
 int decl33(int i, int j);
 
 Symbol table for "decl33"
