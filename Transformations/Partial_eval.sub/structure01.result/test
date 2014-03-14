@@ -113,6 +113,10 @@ Code after dead code elimination
 
 int main()
 {
+   //   int dim=2;
+   ;
+   //PIPS generated variable
+   ;
 
 
 
