@@ -180,4 +180,6 @@ int main()
 Warnings
 
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (freed_list_to_points_to) Memory leak for bucket "main:*HEAP*_l_13".
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
 PROPER_EFFECTS_WITH_POINTS_TO[main] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.

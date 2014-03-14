@@ -136,4 +136,5 @@ int inc01()
 
 Warnings
 
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[main] (user_call_to_points_to_interprocedural) Function "inc01" has no side effect on its formal context via pointer variables.

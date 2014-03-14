@@ -102,3 +102,4 @@ int main()
 
 Warnings
 
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.

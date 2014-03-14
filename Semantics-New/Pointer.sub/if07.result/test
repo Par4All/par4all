@@ -190,5 +190,6 @@ int main()
 
 Warnings
 
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
 TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (intrinsic_to_transformer) Value returned by intrinsic "rand" is ignored.
 TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (intrinsic_to_transformer) Value returned by intrinsic "rand" is ignored.

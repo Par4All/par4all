@@ -118,5 +118,7 @@ int main()
 
 Warnings
 
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
 TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (assign_rhs_to_reflhs_to_transformer) Want to analyse constant path, but don't have a constant path : p[i]
 TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (assign_rhs_to_reflhs_to_transformer) Want to analyse constant path, but don't have a constant path : p[i]
