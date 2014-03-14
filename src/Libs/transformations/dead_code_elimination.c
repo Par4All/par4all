@@ -406,7 +406,6 @@ static void use_def_deal_if_useful(statement s) {
   bool this_statement_is_a_c_return;
   bool outside_effect_p = false;
   bool this_statement_call_a_user_function;
-  bool this_statement_is_a_declaration;
 
   ifdebug(5) {
      int debugLevel = get_debug_level();
@@ -478,8 +477,6 @@ static void use_def_deal_if_useful(statement s) {
 
   this_statement_call_a_user_function = statement_call_a_keep_function_p(s);
 
-  this_statement_is_a_declaration = declaration_statement_p(s);
-
   ifdebug(6) {
     pips_debug(6, "Statement %p:\n%s\n Statement number: %d\n", s, text_to_string(statement_to_text(s)), statement_number(s));
      if (outside_effect_p)
@@ -494,8 +491,6 @@ static void use_def_deal_if_useful(statement s) {
        pips_debug(6, "Statement %p is an unstructured test.\n", s);
      if (this_statement_is_a_c_return)
        pips_debug(6, "Statement %p is a C return.\n", s);
-     if (this_statement_is_a_declaration)
-       pips_debug(6, "Statement %p is a declaration.\n", s);
   }
 
 
@@ -507,7 +502,7 @@ static void use_def_deal_if_useful(statement s) {
       || this_statement_is_an_unstructured_test
       || this_statement_is_a_c_return
       || this_statement_call_a_user_function
-      || this_statement_is_a_declaration)
+      )
      /* Mark this statement as useful: */
      set_add_element(the_useful_statements, the_useful_statements, (char *) s);
 
@@ -805,6 +800,14 @@ bool dead_code_elimination_on_module(char * module_name, bool use_out_regions)
    debug_off();
 
    /* Apply clean declarations ! */
+   /*
+    * NL: This code are usefull to eliminate:
+    *  - when an useless variable is declare with some usefull variable (int usefull, useless;)
+    *  - in C, when an useless variable is initialize in the declaration (int useless=0;)
+    *  - useless declaration when we use out region for dead_code_elimination
+    *    (Transformations/Dead_code_declaratios.sub/use_def_elim10)
+    *  - other case?
+    */
    debug_on("CLEAN_DECLARATIONS_DEBUG_LEVEL");
    set_cumulated_rw_effects(
        (statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,
@@ -824,8 +827,8 @@ bool dead_code_elimination_on_module(char * module_name, bool use_out_regions)
         compute_callees(get_current_module_statement()));
 
 
-   reset_proper_rw_effects();
    reset_cumulated_rw_effects();
+   reset_proper_rw_effects();
    if(use_out_regions) {
        reset_out_effects();
    }
