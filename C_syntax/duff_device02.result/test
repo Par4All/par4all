@@ -91,7 +91,51 @@ _break_1:      ;
    return count;
 }
 
-"strip mining..."
+"dowhile loop to while..."
+int duff_device02(char *from, char *to, int count)
+{
+   {
+      int n = (count+7)/8;
+
+      if (count%8==0) goto _switch_1_case_0;
+      if (count%8==7) goto _switch_2_case_7;
+      if (count%8==6) goto _switch_2_case_6;
+      if (count%8==5) goto _switch_2_case_5;
+      if (count%8==4) goto _switch_2_case_4;
+      if (count%8==3) goto _switch_2_case_3;
+      if (count%8==2) goto _switch_2_case_2;
+      if (count%8==1) {
+      }
+      else {
+         goto _break_1;
+      }
+_switch_2_case_1:      ;
+      *to++ = *from++;
+l99999:      ;
+      if (!(--n>0)) goto _break_1;
+      *to++ = *from++;
+_switch_2_case_7:      ;
+      *to++ = *from++;
+_switch_2_case_6:      ;
+      *to++ = *from++;
+_switch_2_case_5:      ;
+      *to++ = *from++;
+_switch_2_case_4:      ;
+      *to++ = *from++;
+_switch_2_case_3:      ;
+      *to++ = *from++;
+_switch_2_case_2:      ;
+      *to++ = *from++;
+      goto _switch_2_case_1;
+_switch_1_case_0:      ;
+      goto l99999;
+_break_1:      ;
+   }
+
+   return count;
+}
+
+"partial eval..."
 int duff_device02(char *from, char *to, int count)
 {
    {
@@ -136,6 +180,52 @@ _break_1:      ;
 }
 
 "simplify control..."
+int duff_device02(char *from, char *to, int count)
+{
+   {
+      int n = (count+7)/8;
+
+      if (count%8==0) goto l99999;
+      if (count%8==7) goto l99998;
+      if (count%8==6) goto l99997;
+      if (count%8==5) goto l99996;
+      if (count%8==4) goto l99995;
+      if (count%8==3) goto l99994;
+      if (count%8==2) goto l99993;
+      if (count%8==1) {
+      }
+      else {
+         goto l99992;
+      }
+l99991:      ;
+      *to++ = *from++;
+l99990:      ;
+      if (!(--n>0)) goto l99992;
+      *to++ = *from++;
+l99998:      ;
+      *to++ = *from++;
+l99997:      ;
+      *to++ = *from++;
+l99996:      ;
+      *to++ = *from++;
+l99995:      ;
+      *to++ = *from++;
+l99994:      ;
+      *to++ = *from++;
+l99993:      ;
+      *to++ = *from++;
+      goto l99991;
+l99999:      ;
+
+      goto l99990;
+l99992:      ;
+
+   }
+
+   return count;
+}
+
+"dead code elimination"
 int duff_device02(char *from, char *to, int count)
 {
    {
@@ -233,6 +323,47 @@ TRANSFORMERS_INTRA_FAST[duff_device02] (transformer_safe_combine_with_warnings) 
 of an expression affects variable(s) used in a later part
 TRANSFORMERS_INTRA_FAST[duff_device02] (transformer_safe_combine_with_warnings) Non standard compliant code: side effect in part
 of an expression affects variable(s) used in a later part
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+PRECONDITIONS_INTRA[duff_device02] (transformer_safe_combine_with_warnings) Non standard compliant code: side effect in part
+of an expression affects variable(s) used in a later part
+PRECONDITIONS_INTRA[duff_device02] (transformer_safe_combine_with_warnings) Non standard compliant code: side effect in part
+of an expression affects variable(s) used in a later part
+TRANSFORMERS_INTRA_FAST[duff_device02] (transformers_intra_fast) Property SEMANTICS_FIX_POINT is ignored
+TRANSFORMERS_INTRA_FAST[duff_device02] (transformer_safe_combine_with_warnings) Non standard compliant code: side effect in part
+of an expression affects variable(s) used in a later part
+TRANSFORMERS_INTRA_FAST[duff_device02] (transformer_safe_combine_with_warnings) Non standard compliant code: side effect in part
+of an expression affects variable(s) used in a later part
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+TRANSFORMERS_INTRA_FAST[duff_device02] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
 PRECONDITIONS_INTRA[duff_device02] (transformer_safe_combine_with_warnings) Non standard compliant code: side effect in part
 of an expression affects variable(s) used in a later part
 PRECONDITIONS_INTRA[duff_device02] (transformer_safe_combine_with_warnings) Non standard compliant code: side effect in part
