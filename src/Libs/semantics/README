@@ -8,7 +8,7 @@ as total preconditions. Total preconditions are not fully implemented:
 only the intraprocedural part is available.
 
 It is sometimes broken down according to analyses, and some times
-according to the internal representation structure.
+according to the internal representation data structures.
 
 Source file list:
 
@@ -24,10 +24,16 @@ interprocedural.c: handling of call sites for all analyses
 
 loop.c: handling of loops for all analyses
 
+loop.c.new: undebugged attempt at cleaning up path_transformer.c
+
 mappings.c: relationship between variables and their values (old,
 intermediate, new and temporary)
 
 misc.c: functions to be moved elsewhere
+
+path_transformer.c: compute a transformer between any pair of statements (Dounia Khaldi)
+
+path_transformer.c.new: attempt at cleaning up path_transformer in conjunction with loop.c.new
 
 postcondition.c: used to compute the postcondition of a statement instead ot its precondition (?)
 

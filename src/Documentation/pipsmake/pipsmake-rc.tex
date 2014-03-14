@@ -734,6 +734,18 @@ ACTIVE_PHASES "PRINT_SOURCE PRINT_CODE PRINT_PARALLELIZED77_CODE
 They still are used for the old non-regression tests.
 
 
+Property
+\begin{PipsProp}{CONSISTENCY_ENFORCED_P}
+CONSISTENCY_ENFORCED_P FALSE
+\end{PipsProp}
+specifies that properties cannot be set once a PIPS database has been
+created. Pipsmake does not know the impacts of properties on the
+resources. Setting a property can make a resource obsolete, but
+pipsmake is going to use it as consistent. To avoid the issue, set
+\PipsPropRef{CONSISTENCY_ENFORCED_P} to true and \TPIPS{} will detect
+a user error if a property is possibly altered during a processing
+phase.
+
 
 
 \subsection{Warning Management}

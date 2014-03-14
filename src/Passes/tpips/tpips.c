@@ -925,6 +925,10 @@ static string tp_substitutions(string line)
 
 /* variable globale, utilisee par le parser helas */
 bool tpips_init_done = false;
+/* Pipsmake does not enforce consistency when properties are
+   changed. The consistency can be enforced by forbidding setproperty
+   during a processing phase. */
+bool consistency_enforced_p = false;
 
 void tpips_init(void)
 {
@@ -941,6 +945,7 @@ void tpips_init(void)
   /* initialize_signal_catcher(); */
 
   set_bool_property("ABORT_ON_USER_ERROR", false); /* ??? */
+  consistency_enforced_p = get_bool_property("CONSISTENCY_ENFORCED_P");
 
   pips_log_handler = smart_log_handler;
   pips_request_handler = tpips_user_request;
