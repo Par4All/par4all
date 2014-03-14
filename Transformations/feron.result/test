@@ -266,7 +266,7 @@ int feron()
 {
    double Ac[2][2];
    //PIPS generated variable
-   double xc0, xc1, tmp20, tmp21, Bc0, Bc1, Cc0, Cc1, tmp00, tmp10, tmp11, Ac0, Ac1, Ac2, Ac3;
+   double tmp10, tmp11, Cc0, Cc1, Bc0, Bc1, tmp00, xc0, xc1, Ac0, Ac1, Ac2, Ac3, tmp20, tmp21;
    Ac0 = 0.4990;
    Ac1 = -0.0500;
    Ac2 = 0.0100;
@@ -339,7 +339,7 @@ int feron()
 {
    double Ac[2][2];
    //PIPS generated variable
-   double xc0, xc1, tmp20, tmp21, Bc0, Bc1, Cc0, Cc1, tmp00, tmp10, tmp11, Ac0, Ac1, Ac2, Ac3;
+   double tmp10, tmp11, Cc0, Cc1, Bc0, Bc1, tmp00, xc0, xc1, Ac0, Ac1, Ac2, Ac3, tmp20, tmp21;
    Ac0 = 0.4990;
    Ac1 = -0.0500;
    Ac2 = 0.0100;
@@ -386,20 +386,20 @@ int feron()
       yc = _return1;
       skip();
       tmp00 = 0.0;
-      tmp00 += Cc0*xc0;
-      tmp00 += Cc1*xc1;
-      u = tmp00+Dc*_return1;
+      tmp00 += 564.48*xc0;
+      tmp00 += 0.0*xc1;
+      u = tmp00+(-1280.0)*_return1;
       tmp10 = 0.0;
-      tmp10 += Ac0*xc0;
-      tmp10 += Ac1*xc1;
+      tmp10 += 0.4990*xc0;
+      tmp10 += -0.0500*xc1;
       tmp11 = 0.0;
-      tmp11 += Ac2*xc0;
-      tmp11 += Ac3*xc1;
-      tmp20 = Bc0*_return1;
-      tmp21 = Bc1*_return1;
-      xc0 = tmp10+Bc0*_return1;
-      xc1 = tmp11+Bc1*_return1;
-      send(tmp00+Dc*_return1, 1);
+      tmp11 += 0.0100*xc0;
+      tmp11 += 1.0000*xc1;
+      tmp20 = 1.0*_return1;
+      tmp21 = 0.0*_return1;
+      xc0 = tmp10+1.0*_return1;
+      xc1 = tmp11+0.0*_return1;
+      send(tmp00+(-1280.0)*_return1, 1);
       receive(&y, 2);
       receive(&yd, 3);
       skip();
@@ -411,17 +411,7 @@ int feron()
 int feron()
 {
    //PIPS generated variable
-   double xc0, xc1, Bc0, Bc1, Cc0, Cc1, tmp00, tmp10, tmp11, Ac0, Ac1, Ac2, Ac3;
-   Ac0 = 0.4990;
-   Ac1 = -0.0500;
-   Ac2 = 0.0100;
-   Ac3 = 1.0000;
-   Bc0 = 1.0;
-   Bc1 = 0.0;
-   Cc0 = 564.48;
-   Cc1 = 0.0;
-   double Dc;
-   Dc = -1280.0;
+   double tmp10, tmp11, tmp00, xc0, xc1;
    //PIPS generated variable
    double _return0;
    //PIPS generated variable
@@ -442,18 +432,62 @@ int feron()
          _return1 = -1.0;
       else
          _return1 = _return0;
+      skip();
       tmp00 = 0.0;
-      tmp00 += Cc0*xc0;
-      tmp00 += Cc1*xc1;
+      tmp00 += 564.48*xc0;
+      tmp00 += 0.0*xc1;
       tmp10 = 0.0;
-      tmp10 += Ac0*xc0;
-      tmp10 += Ac1*xc1;
+      tmp10 += 0.4990*xc0;
+      tmp10 += -0.0500*xc1;
       tmp11 = 0.0;
-      tmp11 += Ac2*xc0;
-      tmp11 += Ac3*xc1;
-      xc0 = tmp10+Bc0*_return1;
-      xc1 = tmp11+Bc1*_return1;
-      send(tmp00+Dc*_return1, 1);
+      tmp11 += 0.0100*xc0;
+      tmp11 += 1.0000*xc1;
+      xc0 = tmp10+1.0*_return1;
+      xc1 = tmp11+0.0*_return1;
+      send(tmp00+(-1280.0)*_return1, 1);
+      receive(&y, 2);
+      receive(&yd, 3);
+      skip();
+   }
+}
+
+"dead code elim..."
+int feron()
+{
+   //PIPS generated variable
+   double tmp10, tmp11, tmp00, xc0, xc1;
+   //PIPS generated variable
+   double _return0;
+   //PIPS generated variable
+   double _return1;
+   xc0 = 0.0;
+   xc1 = 0.0;
+   double y, yd;
+   receive(&y, 2);
+   receive(&yd, 3);
+   while (1) {
+      //PIPS generated variable
+      if (y-yd<1.0)
+         ;
+      else
+         _return0 = 1.0;
+      //PIPS generated variable
+      if (-1.0>_return0)
+         ;
+      else
+         _return1 = _return0;
+      tmp00 = 0.0;
+      tmp00 += 564.48*xc0;
+      tmp00 += 0.0*xc1;
+      tmp10 = 0.0;
+      tmp10 += 0.4990*xc0;
+      tmp10 += -0.0500*xc1;
+      tmp11 = 0.0;
+      tmp11 += 0.0100*xc0;
+      tmp11 += 1.0000*xc1;
+      xc0 = tmp10+1.0*_return1;
+      xc1 = tmp11+0.0*_return1;
+      send(tmp00+(-1280.0)*_return1, 1);
       receive(&y, 2);
       receive(&yd, 3);
    }
@@ -465,19 +499,61 @@ unknown[unknown] (activate_phase) Rule `C_SYMBOL_TABLE' already active
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 CONTROLIZER[feron] (control_graph) Some statements are unreachable
 CONTROLIZER[feron] (control_graph) Some statements are unreachable
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "send" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "send" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning feron instead
 TRANSFORMERS_INTER_FULL[feron!receive] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "send" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "send" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning feron instead
 TRANSFORMERS_INTER_FULL[feron!receive] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "send" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "send" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning feron instead
 TRANSFORMERS_INTER_FULL[feron!receive] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "send" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "send" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning feron instead
 TRANSFORMERS_INTER_FULL[feron!receive] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
-PROPER_EFFECTS[feron] (proper_effects_of_call) Statement -1 is ignored because it does not modify the store.
-PROPER_EFFECTS[feron] (proper_effects_of_call) Statement 28 is ignored because it does not modify the store.
-PROPER_EFFECTS[feron] (proper_effects_of_expression_instruction) Statement 46 is ignored because it does not modify the store.
-PROPER_EFFECTS[feron] (proper_effects_of_call) Statement 63 is ignored because it does not modify the store.
-PROPER_EFFECTS[feron] (proper_effects_of_call) Statement -1 is ignored because it does not modify the store.
-PROPER_EFFECTS[feron] (proper_effects_of_call) Statement -1 is ignored because it does not modify the store.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "send" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "send" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "send" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "send" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+PROPER_EFFECTS_WITH_POINTS_TO[feron] (proper_effects_of_call) Statement -1 is ignored because it does not modify the store.
+PROPER_EFFECTS_WITH_POINTS_TO[feron] (proper_effects_of_call) Statement 28 is ignored because it does not modify the store.
+PROPER_EFFECTS_WITH_POINTS_TO[feron] (proper_effects_of_expression_instruction) Statement 46 is ignored because it does not modify the store.
+PROPER_EFFECTS_WITH_POINTS_TO[feron] (proper_effects_of_call) Statement 63 is ignored because it does not modify the store.
+PROPER_EFFECTS_WITH_POINTS_TO[feron] (proper_effects_of_call) Statement -1 is ignored because it does not modify the store.
+PROPER_EFFECTS_WITH_POINTS_TO[feron] (proper_effects_of_call) Statement -1 is ignored because it does not modify the store.
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning feron instead
 TRANSFORMERS_INTER_FULL[feron!receive] (points_to_unary_operation_to_transformer) activate TRANSFORMERS_INTER_FULL_WITH_POINTS_TO and setproperty SEMANTICS_ANALYZE_CONSTANT_PATH TRUE can maybe make better transformer
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "send" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "send" has no side effect on its formal context via pointer variables.
+INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
