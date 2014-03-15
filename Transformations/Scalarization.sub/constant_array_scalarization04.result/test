@@ -1,0 +1,39 @@
+void constant_array_scalarization04()
+{
+   int a[3], b[3];
+   static int c[3];
+
+   b[2] = 1;
+   a[0] = 1;
+   c[1] = 1;
+   a[2] = 1;
+
+   c[0] = 1;
+   c[2] = 1;
+
+   b[1] = 1;
+   a[1] = 1;
+   b[0] = 1;
+}
+void constant_array_scalarization04()
+{
+   int a[3], b[3];
+   static int c[3];
+   //PIPS generated variable
+   int a0, a1, a2, b0, b1, b2, c0, c1, c2;
+
+   b0 = 1;
+   a0 = 1;
+   c0 = 1;
+   a1 = 1;
+
+   c1 = 1;
+   c2 = 1;
+
+   b1 = 1;
+   a2 = 1;
+   b2 = 1;
+}
+
+Warnings
+
