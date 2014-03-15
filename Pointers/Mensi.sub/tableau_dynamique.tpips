@@ -24,7 +24,7 @@ activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[allocate_array]
 
 echo
-echo POINTS TO for "init_array"
+echo Points-to for "init_array"
 echo
 # Default option is interprocedural_points_to_analysis
 #activate INTERPROCEDURAL_POINTS_TO_ANALYSIS
