@@ -1703,29 +1703,47 @@ static void replace_constant_array_references(statement in, entity array) {
                       replace_constant_array_references_walker);
 }
 
+/* Pass constant_array_scalarization 
+ */
+
 bool constant_array_scalarization(const char * module_name) {
   set_current_module_entity(module_name_to_entity(module_name));
   set_current_module_statement((statement) db_get_memory_resource(DBR_CODE,
                                                                   module_name,
                                                                   true));
-  set sreferenced_entities =
-      get_referenced_entities(get_current_module_statement());
-  SET_FOREACH(entity,e,sreferenced_entities) {
+  statement cms = get_current_module_statement();
+  set sreferenced_entities = get_referenced_entities(cms);
+  // Use a sorted list of entities to generate code deterministically
+  list rel = set_to_sorted_list(sreferenced_entities,
+				(gen_cmp_func_t) compare_entities);
+
+  FOREACH(entity, e, rel) {
     if((entity_array_p(e)||entity_pointer_p(e)) &&
-        all_array_references_constant_p(get_current_module_statement(),e)) {
-      replace_constant_array_references(get_current_module_statement(),e);
-      if(!same_string_p(entity_module_name(e),module_name)) {
-        pips_user_warning("changing entity %s from other module, "
-            "result may be wrong\n",
+        all_array_references_constant_p(cms,e)) {
+      // Check legality...
+      if(same_string_p(entity_module_name(e), module_name)
+	 && !formal_parameter_p(e)) {
+	replace_constant_array_references(cms,e);
+	// FI: should the initial declaration be removed?
+	// This could be left to another pass cleaning unused declarations:
+	// CLEAN_DECLARATIONS?
+      }
+      else {
+        pips_user_warning("Entity %s not changed, "
+            "because result may be wrong\n",
             entity_user_name(e));
       }
     }
   }
+
   set_free(sreferenced_entities);
+  gen_free_list(rel);
+
   module_reorder(get_current_module_statement());
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
   reset_current_module_entity();
   reset_current_module_statement();
+
   return true;
 }
 
