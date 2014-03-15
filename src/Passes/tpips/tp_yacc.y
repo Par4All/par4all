@@ -539,7 +539,7 @@ i_setprop: TK_SET_PROPERTY TK_LINE TK_ENDOFLINE
 		reset_property_error(); // We start again at tpips
 					// level and should be able to
 					// avoid the fatal loop...
-		parse_properties_string($2);
+		parse_properties_string($2, processing_started_p);
 		if(processing_started_p) {
 		  pips_user_warning("Properties should not be updated during "
 				    "tpips processing."
