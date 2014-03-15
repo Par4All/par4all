@@ -137,5 +137,7 @@ Warnings
 
 unknown[unknown] (activate_phase) Rule `C_SYMBOL_TABLE' already active
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
 TRANSFORMERS_INTRA_FAST[duff_device01] (transformers_intra_fast) Property SEMANTICS_FLOW_SENSITIVE is ignored
 TRANSFORMERS_INTRA_FAST[duff_device01] (transformers_intra_fast) Property SEMANTICS_FIX_POINT is ignored
