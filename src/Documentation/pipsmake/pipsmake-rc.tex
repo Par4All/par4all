@@ -12333,6 +12333,21 @@ ARRAY_RESIZING_BOTTOM_UP_OPTION 0
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SCALARIZATION
 
 \subsection{Scalarization}
+\index{Scalarization}
+
+Three scalarization pass have been developped. The first one,
+\PipsPassRef{scalarization}, is based on convex array regions. The
+second one, \PipsPassRef{constant_array_scalarization}, is based on
+constant array references. The third one,
+\PipsPassRef{quick_scalarization}, is based on proper and cumulated
+effects and on the dependence graph. It is supposed equivalent to the
+first one, but much faster because convex array regions may be slow to
+compute.
+
+Pass \PipsPassRef{constant_array_scalarization} intends to eliminate
+array references, e.g. for VHDL generation.
+
+\subsubsection{Scalarization Based on Convex Array Regions}
 
 \begin{PipsPass}{scalarization}
   Scalarization is the process of replacing array references with
@@ -12523,6 +12538,8 @@ SCALARIZATION_ACROSS_CONTROL_TEST "exactness"
 This pass was designed by Fran\c{c}ois Irigoin and implemented by
 Laurent Daverio and Fran\c{c}ois Irigoin.
 
+\subsubsection{Scalarization Based on Constant Array References}
+
 \begin{PipsPass}{constant_array_scalarization}
   Similar to \PipsPassRef{scalarization}, but with a different
   criterion: if an array is only accessed with numerical constant subscript
@@ -12542,6 +12559,8 @@ only analyze scalar variables.
 
 
 This pass was designed and implemented by Serge Guelton.
+
+\subsubsection{Scalarization Based on Memory Effects and Dependence Graph}
 
 Pass \PipsPassRef{scalarization} may be costly because it relies on
 array regions analyses and uses them to check its legality
