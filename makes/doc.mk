@@ -41,7 +41,7 @@ ifdef use_pdflatex
 %.pdf: %.tex
 	-grep '\\makeindex' $*.tex && touch $*.ind
 	$(PDFLTX) $<
-	-grep '\\bibdata{' \*.aux && { $(BIBTEX) $* ; $(PDFLTX) $< ;}
+	-grep '\\bibdata{' *.aux && { $(BIBTEX) $* ; $(PDFLTX) $< ;}
 	test ! -f $*.idx || { $(MAKEIDX) $*.idx ; $(PDFLTX) $< ;}
 	$(PDFLTX) $<
 	# Twice for the backref bibliography with hyperref:
@@ -68,7 +68,7 @@ endif # use_pdflatex
 %.dvi: %.tex
 	-grep '\\makeindex' $*.tex && touch $*.ind
 	$(LATEX) $<
-	-grep '\\bibdata{' \*.aux && { $(BIBTEX) $* ; $(LATEX) $< ;}
+	-grep '\\bibdata{' *.aux && { $(BIBTEX) $* ; $(LATEX) $< ;}
 	test ! -f $*.idx || { $(MAKEIDX) $*.idx ; $(LATEX) $< ;}
 	$(LATEX) $<
 	# Twice for the backref bibliography with hyperref:
