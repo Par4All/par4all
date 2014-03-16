@@ -101,9 +101,13 @@ ifdef PUBLISH_LOCATION
 publish: make_destination_dir
 	$(RSYNC) $(TO_BE_PUBLISH) $(PUBLISH_LOCATION)
 
-
 # Just to avoid publish to complaining if not implemented in the including
 # Makefile:
-make_destination_dir :
+make_destination_dir:
 
 endif
+
+# cleanup
+clean: doc-clean-2
+doc-clean-2:
+	$(RM) *.bbl *.blg
