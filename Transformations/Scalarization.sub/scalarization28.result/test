@@ -19,16 +19,14 @@ void compute(int count, float input[0][0], float output[1][512])
    float *output0 = output[0];
 
    int i;
-   //PIPS generated variable
-   int iRec00, iRec01;
 
    for(i = 0; i <= count-1; i += 1)
       output0[i] = output[0][i];
 
    for(i = 0; i <= count-1; i += 1) {
-      iRec00 = 12+5*iRec01;
-      output0[i] = (float) (0.5f*iRec00);
+      iRec0[0] = 12+5*iRec0[1];
+      output0[i] = (float) (0.5f*iRec0[0]);
       // post processing
-      iRec01 = iRec00;
+      iRec0[1] = iRec0[0];
    }
 }
