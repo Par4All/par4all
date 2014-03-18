@@ -159,8 +159,6 @@ int mainInt()
 
 Warnings
 
-unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
-unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning mainInt instead
 TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[mainInt] (have_null_value_in_pointer_expression_p) TODO : Need to check if q is indirectly NULL
 TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[mainInt] (pointer_binary_operation_to_transformer) Operator TOP-LEVEL:+C not analyzed

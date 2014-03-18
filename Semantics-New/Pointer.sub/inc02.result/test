@@ -66,6 +66,4 @@ void inc02(int *p)
 
 Warnings
 
-unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
-unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
 TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[inc02] (points_to_unary_operation_to_transformer) The pointer p can points to NULL

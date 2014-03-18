@@ -154,7 +154,6 @@ int main()
 
 Warnings
 
-unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
 PROPER_EFFECTS_WITH_POINTS_TO[main] (abstract_locations_max) property "ALIASING_ACROSS_TYPES" is assumed true for abstract locations.
 TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (pointer_expression_to_transformer) cast for pointer analysis not be tested (except for NULL pointer)
 TRANSFORMERS_INTER_FULL_WITH_POINTS_TO[main] (points_to_unary_operation_to_transformer) The pointer p can points to NULL
