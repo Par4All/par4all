@@ -48,6 +48,11 @@ ifdef use_pdflatex
 	$(PDFLTX) $<
 	touch $@
 
+# cleanup
+clean: doc-clean-bibtex
+doc-clean-bibtex:
+	$(RM) *.bbl *.blg
+
 else # tex -> dvi -> ps -> pdf
 
 # pdf (portable document format)
@@ -106,8 +111,3 @@ publish: make_destination_dir
 make_destination_dir:
 
 endif
-
-# cleanup
-clean: doc-clean-2
-doc-clean-2:
-	$(RM) *.bbl *.blg
