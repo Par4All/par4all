@@ -1,0 +1,75 @@
+void constant_array_scalarization05()
+{
+   int a[3] = {1, 2, 3}, b[3], c[3], i;
+
+   b[2] = a[2];
+   b[1] = a[1];
+   b[0] = a[0];
+
+   c[i] = 0;
+
+   printf("%d %d %d %d\n", b[0], b[1], b[2], c[i]);
+}
+void constant_array_scalarization05()
+{
+   int a[3] = {1, 2, 3}, b[3], c[3], i;
+   //PIPS generated variable
+   int a0, a1, a2, b0, b1, b2;
+
+   b0 = a0;
+   b1 = a1;
+   b2 = a2;
+
+   c[i] = 0;
+
+   printf("%d %d %d %d\n", b2, b1, b0, c[i]);
+}
+void constant_array_scalarization05()
+{
+   int a[3], b[3], c[3], i;
+   a[0] = 1;
+   a[1] = 2;
+   a[2] = 3;
+
+   b[2] = a[2];
+   b[1] = a[1];
+   b[0] = a[0];
+
+   c[i] = 0;
+
+   printf("%d %d %d %d\n", b[0], b[1], b[2], c[i]);
+}
+void constant_array_scalarization05()
+{
+   int a[3], b[3], c[3], i;
+   //PIPS generated variable
+   int a0, a1, a2, b0, b1, b2;
+   a0 = 1;
+   a1 = 2;
+   a2 = 3;
+
+   b0 = a2;
+   b1 = a1;
+   b2 = a0;
+
+   c[i] = 0;
+
+   printf("%d %d %d %d\n", b2, b1, b0, c[i]);
+}
+void constant_array_scalarization05()
+{
+   int c[3], i;
+   //PIPS generated variable
+   int a0, a1, a2, b0, b1, b2;
+   a0 = 1;
+   a1 = 2;
+   a2 = 3;
+
+   b0 = a2;
+   b1 = a1;
+   b2 = a0;
+
+   c[i] = 0;
+
+   printf("%d %d %d %d\n", b2, b1, b0, c[i]);
+}
