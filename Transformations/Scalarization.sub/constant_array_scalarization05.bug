@@ -1,0 +1,1 @@
+The array initialization is neither detected nor handled. The initialization steps are lost.
