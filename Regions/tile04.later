@@ -1,0 +1,3 @@
+Improved do loop pattern matching, use cumulated memory effects
+Improved region analysis for DO loops
+Improved while loop region analysis

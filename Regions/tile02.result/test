@@ -1,0 +1,115 @@
+
+Transformers for "tile02"
+
+
+//  T() {}
+
+void tile02(int n, int ts, int a[n])
+{
+
+//  T(i,ti) {}
+
+   int ti, i;
+
+//  T(ti) {ti==0}
+
+   ti = 0;
+
+//  T(i,ti) {ti+1<=n, ti#init+1<=n}
+
+   while (ti<n) {
+
+//  T(i) {i==ti}
+
+      i = ti;
+
+//  T(i) {i#init<=i, i+1<=n, i+1<=ti+ts, i#init+1<=n, i#init+1<=ti+ts}
+
+      while (i<ti+ts&&i<n) {
+
+//  T() {}
+
+         a[i] = 0;
+
+//  T(i) {i==i#init+1}
+
+         i++;
+      }
+
+//  T(ti) {ti#init+ts==ti}
+
+      ti += ts;
+   }
+}
+
+Preconditions for "tile02"
+
+
+//  P() {}
+
+void tile02(int n, int ts, int a[n])
+{
+
+//  P() {}
+
+   int ti, i;
+
+//  P(i,ti) {}
+
+   ti = 0;
+
+//  P(i,ti) {ti==0}
+
+   while (ti<n) {
+
+//  P(i,ti) {1<=n, ti+1<=n}
+
+      i = ti;
+
+//  P(i,ti) {i==ti, i+1<=n, 1<=n}
+
+      while (i<ti+ts&&i<n) {
+
+//  P(i,ti) {i+1<=n, ti<=i, i+1<=ti+ts, 1<=n}
+
+         a[i] = 0;
+
+//  P(i,ti) {i+1<=n, ti<=i, i+1<=ti+ts, 1<=n}
+
+         i++;
+      }
+
+//  P(i,ti) {i<=n, ti<=i, 1<=n, ti+1<=n}
+
+      ti += ts;
+   }
+}
+
+Regions for "tile02"
+
+
+//  <a[PHI1]-W-MAY-{PHI1+1<=n, 1<=n, 1<=ts}>
+
+void tile02(int n, int ts, int a[n])
+{
+   int ti, i;
+   ti = 0;
+
+//  <a[PHI1]-W-MAY-{PHI1+1<=n, ti+1<=n, 1<=n, 1<=ts}>
+
+   while (ti<n) {
+      i = ti;
+
+//  <a[PHI1]-W-MAY-{i<=PHI1, ti<=PHI1, PHI1+1<=ti+ts, PHI1+1<=n,
+//    1<=n}>
+
+      while (i<ti+ts&&i<n) {
+
+//  <a[PHI1]-W-EXACT-{PHI1==i, ti<=i, i+1<=ti+ts, i+1<=n, 1<=n}>
+
+         a[i] = 0;
+         i++;
+      }
+      ti += ts;
+   }
+}

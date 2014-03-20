@@ -1,0 +1,135 @@
+
+Transformers for tile05
+
+
+C  T() {}
+
+C     Test if the region of a 1-D tile is precise
+
+C     Part of tests tile01, tile02, tile03
+
+      SUBROUTINE TILE05(N, TS, A)
+      INTEGER N, TS, A(N)
+      INTEGER TI, I, M
+
+C  T() {}
+
+
+C     if(.true.) does not disturb exact region computation
+      IF (.TRUE.) A(1) = 0                                              0010
+
+C  T(I,M,TI) {}
+
+
+      DO TI = 0, N, TS                                                  0014
+
+C  T(I,M) {M+1<=I, TI<=I, M<=N, M<=TI+TS}
+
+         IF (.TRUE.) THEN                                               0015
+
+C  T(M) {M<=N, M<=TI+TS}
+
+C           Must be a case of *exact* transformer that Beatrice would
+C           like to capture...
+            M = MIN(TI+TS, N)                                           0018
+
+C  T(I) {I<=M, TI<=I}
+
+            DO I = TI, M                                                0019
+
+C  T() {}
+
+               A(I) = 0                                                 0020
+            ENDDO
+         ENDIF
+      ENDDO
+      END
+
+Preconditions for tile05
+
+
+C  P() {}
+
+C     Test if the region of a 1-D tile is precise
+
+C     Part of tests tile01, tile02, tile03
+
+      SUBROUTINE TILE05(N, TS, A)
+      INTEGER N, TS, A(N)
+      INTEGER TI, I, M
+
+C  P() {}
+
+
+C     if(.true.) does not disturb exact region computation
+      IF (.TRUE.) A(1) = 0                                              0010
+
+C  P() {}
+
+
+      DO TI = 0, N, TS                                                  0014
+
+C  P(I,M,TI) {}
+
+         IF (.TRUE.) THEN                                               0015
+
+C  P(I,M,TI) {}
+
+C           Must be a case of *exact* transformer that Beatrice would
+C           like to capture...
+            M = MIN(TI+TS, N)                                           0018
+
+C  P(I,M,TI) {M<=N, M<=TI+TS}
+
+            DO I = TI, M                                                0019
+
+C  P(I,M,TI) {I<=M, TI<=I, M<=N, M<=TI+TS}
+
+               A(I) = 0                                                 0020
+            ENDDO
+         ENDIF
+      ENDDO
+      END
+
+Regions for tile05
+
+
+C  <A(PHI1)-W-MAY-{}>
+
+C     Test if the region of a 1-D tile is precise
+
+C     Part of tests tile01, tile02, tile03
+
+      SUBROUTINE TILE05(N, TS, A)
+      INTEGER N, TS, A(N)
+      INTEGER TI, I, M
+
+C  <A(PHI1)-W-EXACT-{PHI1==1}>
+
+
+C     if(.true.) does not disturb exact region computation
+      IF (.TRUE.) A(1) = 0                                              0010
+
+C  <A(PHI1)-W-MAY-{PHI1<=N, 0<=TS}>
+
+
+      DO TI = 0, N, TS                                                  0014
+
+C  <A(PHI1)-W-MAY-{PHI1<=N, TI<=PHI1, PHI1<=TI+TS}>
+
+         IF (.TRUE.) THEN                                               0015
+C           Must be a case of *exact* transformer that Beatrice would
+C           like to capture...
+            M = MIN(TI+TS, N)                                           0018
+
+C  <A(PHI1)-W-EXACT-{PHI1<=M, TI<=PHI1, M<=N, M<=TI+TS}>
+
+            DO I = TI, M                                                0019
+
+C  <A(PHI1)-W-EXACT-{PHI1==I, I<=M, TI<=I, M<=N, M<=TI+TS}>
+
+               A(I) = 0                                                 0020
+            ENDDO
+         ENDIF
+      ENDDO
+      END
