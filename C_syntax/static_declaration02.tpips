@@ -1,0 +1,19 @@
+setenv WS=static_declaration02
+delete $WS
+
+create $WS $WS.c
+
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit static declarations
+echo
+
+apply UNSPLIT[%PROGRAM]
+shell cat $WS.database/Src/$WS.c
+
+close
+
+# delete $WS
+
+quit
