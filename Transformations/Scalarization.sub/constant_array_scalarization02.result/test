@@ -35,5 +35,5 @@ void constant_array_scalarization02(int a[3])
 
 Warnings
 
-CONSTANT_ARRAY_SCALARIZATION[constant_array_scalarization02] (constant_array_scalarization) Entity c not changed, because result may be wrong
-CONSTANT_ARRAY_SCALARIZATION[constant_array_scalarization02] (constant_array_scalarization) Entity a not changed, because result may be wrong
+CONSTANT_ARRAY_SCALARIZATION[constant_array_scalarization02] (constant_array_scalarization) Array "a" is not scalarized because the resulting code is likely to be wrong
+CONSTANT_ARRAY_SCALARIZATION[constant_array_scalarization02] (constant_array_scalarization) Array "c" is not scalarized because the resulting code is likely to be wrong

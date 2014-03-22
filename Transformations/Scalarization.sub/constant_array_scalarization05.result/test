@@ -1,3 +1,9 @@
+
+First scenario
+
+
+Initial file
+
 void constant_array_scalarization05()
 {
    int a[3] = {1, 2, 3}, b[3], c[3], i;
@@ -10,20 +16,34 @@ void constant_array_scalarization05()
 
    printf("%d %d %d %d\n", b[0], b[1], b[2], c[i]);
 }
+
+Source code after direct constant_array_scalarization
+
 void constant_array_scalarization05()
 {
    int a[3] = {1, 2, 3}, b[3], c[3], i;
    //PIPS generated variable
-   int a0, a1, a2, b0, b1, b2;
+   int b0, b1, b2;
 
-   b0 = a0;
-   b1 = a1;
-   b2 = a2;
+   b0 = a[2];
+   b1 = a[1];
+   b2 = a[0];
 
    c[i] = 0;
 
    printf("%d %d %d %d\n", b2, b1, b0, c[i]);
 }
+
+Warnings:
+
+CONSTANT_ARRAY_SCALARIZATION[constant_array_scalarization05] (constant_array_scalarization) Array "a" is not scalarized, because its initialization should be split. 
+Apply pass split_initialization first.
+
+Second scenario
+
+
+Source code after split_initializations
+
 void constant_array_scalarization05()
 {
    int a[3], b[3], c[3], i;
@@ -39,6 +59,9 @@ void constant_array_scalarization05()
 
    printf("%d %d %d %d\n", b[0], b[1], b[2], c[i]);
 }
+
+Source code after split_initializations and constant_array_scalarization
+
 void constant_array_scalarization05()
 {
    int a[3], b[3], c[3], i;
@@ -56,6 +79,9 @@ void constant_array_scalarization05()
 
    printf("%d %d %d %d\n", b2, b1, b0, c[i]);
 }
+
+Source code after declaration removal
+
 void constant_array_scalarization05()
 {
    int c[3], i;
