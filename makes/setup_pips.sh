@@ -40,7 +40,6 @@ POLYLIB='polylib-5.22.5'
 # minimal help
 command=${0/*\//}
 usage="$command [--opts] [directory [developer [checkout|export]]]"
-interactive=1
 
 function error()
 {
@@ -57,9 +56,11 @@ function warn()
     for msg in "$@" ; do
       echo $msg ;
     done
-    echo "Type return to continue"
   } >&2
-  [ "$interactive" ] && read
+  if tty -s ; then
+    echo "Type return to continue"
+    read
+  fi
 }
 
 # compilation option
@@ -70,9 +71,6 @@ do
   opt=$1
   shift
   case $opt in
-    --continue)
-      interactive=
-      ;;
     --gpips)
       gpips=1
       ;;
