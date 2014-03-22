@@ -65,6 +65,7 @@ function warn()
 
 # compilation option
 gpips=
+full=1
 
 while [[ $1 == -* ]]
 do
@@ -73,6 +74,12 @@ do
   case $opt in
     --gpips)
       gpips=1
+      ;;
+    --full)
+      full=1
+      ;;
+    --light)
+      full=
       ;;
     -h|--help)
       echo "usage: $usage" ;
@@ -139,20 +146,24 @@ echo
 echo "### downloading pips"
 svn $subcmd $PIPS_SVN/bundles/trunks $prod || error "cannot checkout pips"
 
-valid=$destination/validation
-echo "### downloading validation"
-if ! svn $subcmd $SVN_CRI/validation/trunk $valid
-then
-  # just a warning...
-  warn "cannot checkout validation"
+if [ "$full" ] ; then
+  valid=$destination/validation
+  echo "### downloading validation"
+  if ! svn $subcmd $SVN_CRI/validation/trunk $valid
+  then
+    # just a warning...
+    warn "cannot checkout validation"
+  fi
 fi
 
 # clean environment so as not to interfere with another installation
 PIPS_ARCH=`$prod/pips/makes/arch.sh`
 export PIPS_ARCH
+
+# just in case
 unset NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT
 
-[ "$developer" ] &&
+[ "$developer" -a "$full" ] &&
 {
   # this fails if no such developer...
   echo "### getting user development branches"
@@ -192,8 +203,10 @@ ln -s $config $prod/linear/makes/config.mk
 
 # whether to build the documentation depends on latex and htlatex
 target=compile
-type latex && target=build
-type htlatex && target=full-build
+if [ "$full" ] ; then
+  type latex && target=build
+  type htlatex && target=full-build
+fi
 
 # Find the Fortran compiler:
 type gfortran && export PIPS_F77=gfortran
