@@ -684,8 +684,7 @@ bool split_initializations(const char* module_name)
 }
 
 
-void
-split_update_call(call c)
+void split_update_call(call c)
 {
     entity op = call_function(c);
     list args = call_arguments(c);

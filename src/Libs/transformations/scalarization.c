@@ -1704,7 +1704,14 @@ static void replace_constant_array_references(statement in, entity array) {
 }
 
 /* Pass constant_array_scalarization 
+ *
+ * 
  */
+
+static int inverse_compare_entities(const entity *pe1, const entity *pe2)
+{
+  return -compare_entities(pe1, pe2);
+}
 
 bool constant_array_scalarization(const char * module_name) {
   set_current_module_entity(module_name_to_entity(module_name));
@@ -1715,7 +1722,9 @@ bool constant_array_scalarization(const char * module_name) {
   set sreferenced_entities = get_referenced_entities(cms);
   // Use a sorted list of entities to generate code deterministically
   list rel = set_to_sorted_list(sreferenced_entities,
-				(gen_cmp_func_t) compare_entities);
+				(gen_cmp_func_t) inverse_compare_entities);
+  list del = NIL; // dynamic entity list
+  list sel = NIL; // static entity list
 
   FOREACH(entity, e, rel) {
     if((entity_array_p(e)||entity_pointer_p(e)) &&
@@ -1723,21 +1732,52 @@ bool constant_array_scalarization(const char * module_name) {
       // Check legality...
       if(same_string_p(entity_module_name(e), module_name)
 	 && !formal_parameter_p(e)) {
-	replace_constant_array_references(cms,e);
+	/* Do we have to cope with some array initialization? */
+	if(value_unknown_p(entity_initial(e))) {
+	  if(entity_static_variable_p(e))
+	    sel = CONS(ENTITY, e, sel);
+	  else
+	    del = CONS(ENTITY, e, del);
+	}
+	else {
+	  /* FI: another option would be to split the initialization
+	   * as part of the constant array scalarization pass. It is
+	   * not possible to call brace_expression_to_statements()
+	   * here because we do not iterate over the statements but
+	   * over the variables. Another option would be to add a
+	   * property to split_initialization to restrict the list of
+	   * variables to process.
+	   */
+	  pips_user_warning("Array \"%s\" is not scalarized, "
+			    "because its initialization should be split. "
+			    "\nApply pass split_initialization first.\n",
+			    entity_user_name(e));
+	}
 	// FI: should the initial declaration be removed?
 	// This could be left to another pass cleaning unused declarations:
 	// CLEAN_DECLARATIONS?
       }
       else {
-        pips_user_warning("Entity %s not changed, "
-            "because result may be wrong\n",
+        pips_user_warning("Array \"%s\" is not scalarized "
+            "because the resulting code is likely to be wrong\n",
             entity_user_name(e));
       }
     }
   }
 
+  /* Perform the replacement for non-static arrays */
+  FOREACH(entity, e, del) {
+    replace_constant_array_references(cms,e);
+  }
+
+  /* Perform the replacement for static arrays... once you know how to
+     generate the declarations of the elements properly... */
+  /* FOREACH(entity, e, del) { */
+  /*   replace_constant_array_references(cms,e); */
+  /* } */
+
   set_free(sreferenced_entities);
-  gen_free_list(rel);
+  gen_free_list(rel); gen_free_list(del); gen_free_list(sel);
 
   module_reorder(get_current_module_statement());
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
