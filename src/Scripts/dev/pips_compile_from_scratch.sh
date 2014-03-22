@@ -43,28 +43,33 @@ function report()
 }
 
 # various check & setup
-test $# -ge 2 > out 2> err || report 1 "usage: $0 name log [email]"
-type curl >> out 2>> err || report 2 "curl not found"
-mkdir $dir >> out 2>> err || report 3 "cannot create $dir"
-cd $dir >> out 2>> err || report 4 "cannot cd to $dir"
+test $# -ge 2 || report 1 "usage: $0 name log [email]"
+mkdir $dir || report 3 "cannot create $dir"
+cd $dir || report 4 "cannot cd to $dir"
+
+# start recording out & err
+type curl > out 2> err || report 2 "curl not found"
 curl -s -o $set $url >> out 2>> err || report 5 "cannot get $url"
 chmod a+rx $set >> out 2>> err || report 6 "cannot chmod $set"
 type timeout >> out 2>> err || report 7 "no timeout command"
 
 # must compile pips under 20 minutes
-timeout 20m $set PIPS calvin export < /dev/null > out 2> err || \
+timeout 20m $set --light PIPS calvin export < /dev/null > out 2> err || \
   report 8 "error running $set"
 
-# checks
-ROOT=$dir/PIPS/prod/pips
-arch=$ROOT/makes/arch.sh
-test -x $arch >> out 2>> err || report 10 "no arch script: $arch"
-tpips=$ROOT/bin/$($arch)/tpips
-test -x $tpips >> out 2>> err || report 11 "no generated tpips ($tpips)"
+# simple checks
+root=$dir/PIPS/prod/pips
+test -d $root || report 10 "no pips directory: $root"
+
+arch=$root/makes/arch.sh
+test -x $arch >> out 2>> err || report 11 "no arch script: $arch"
+
+tpips=$root/bin/$($arch)/tpips
+test -x $tpips >> out 2>> err || report 12 "no generated tpips ($tpips)"
 
 # run something!
 source ./PIPS/pipsrc.sh >> out 2>> err || \
-  report 9 "cannot source pips environment"
+  report 13 "cannot source pips environment"
 cat > foo.c 2>> err <<EOF
 int main(void) {
   int i = 3;
@@ -73,7 +78,7 @@ int main(void) {
 }
 EOF
 
-$tpips >> out 2>> err <<EOF || report 12 "cannot run tpips ($tpips)"
+$tpips >> out 2>> err <<EOF || report 14 "cannot run tpips ($tpips)"
 create foo foo.c
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE
@@ -81,11 +86,11 @@ close
 delete foo
 EOF
 
-grep '{i==0}' out > /dev/null 2>> err || report 13 "precondition not found"
+grep '{i==0}' out > /dev/null 2>> err || report 15 "precondition not found"
 
 # cleanup
 cd $HOME
-rm -rf $dir >> out 2>> err || report 14 "cannot remove directory"
+rm -rf $dir >> out 2>> err || report 16 "cannot remove directory"
 
 # done
 report 0 "pips scratch compilation ok"
