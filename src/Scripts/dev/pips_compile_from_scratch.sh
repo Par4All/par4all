@@ -3,6 +3,8 @@
 # $Id$
 #
 # Compile PIPS from scratch in a temporary directory.
+# This contrasts with script "pips_check_compile" which does a faster
+# "svn up" to get up-to-date sources.
 # Can be run from cron.
 #
 # $0 name log [email]
@@ -40,6 +42,8 @@ function report()
         test -f err && tail -100 err
       fi
   } > $log
+  # report is public, for nagios
+  chmod a+r $log
   if [ "$email" ] ; then
     mail -s "$name $message" $email < $log
   else # report on stdout, cron should send a mail
