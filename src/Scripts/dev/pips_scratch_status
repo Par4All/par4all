@@ -1,0 +1,51 @@
+#! /bin/bash
+#
+# $Id$
+#
+# check status of pips_compile_from_scratch
+#
+# usage: $0 warn crit /path/to/log/file
+#
+# status summary:
+# - UNKOWN: cannot conclude, error in running script
+# - WARNING/CRITICAL: file age issues
+# - CRITICAL: pips scratch compilation is failing
+
+# for nagios?
+PATH=/usr/lib/nagios/plugins:$PATH
+
+function res()
+{
+  local status=$1 msg=$2
+  case $status in
+    0) echo "Pips OK: $msg";;
+    1) echo "Pips WARNING: $msg";;
+    2) echo "Pips CRITICAL: $msg";;
+    3) echo "Pips UNKNOWN: $msg";;
+    *) echo "Pips ERROR: $msg";;
+  esac
+  exit $status
+}
+
+[ $# -eq 3 ] || res 3 "expecting 3 args"
+
+warn=$1 crit=$2 log=$3
+shift 3
+
+function get()
+{
+  local what=$1 log=$2
+  sed -n -e "s/^$what: \\(.*\\)/\1/p" $log
+}
+
+test -f $log || res 2 "log file not found '$log'"
+
+name=$(get 'name' $log)
+status=$(get 'status' $log)
+
+check_file_age -w $warn -c $crit $log > /dev/null || res $? "file age '$log'"
+if [ $status -eq 0 ] ; then
+  res 0 "$name is fine"
+else
+  res 2 "$name status is $status"
+fi
