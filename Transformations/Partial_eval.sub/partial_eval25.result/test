@@ -1,0 +1,55 @@
+
+partial_eval25 file
+
+double partial_eval25(double x)
+{
+   double y, z;
+   z = 0.;
+   y = x-z;
+   return y;
+}
+
+partial_eval25 file with preconditions
+
+
+//  P() {}
+
+double partial_eval25(double x)
+{
+
+//  P() {}
+
+   double y, z;
+
+//  P(y,z) {}
+
+   z = 0.;
+
+//  P(y,z) {z==0}
+
+   y = x-z;
+
+//  P(y,z) {x==y, z==0}
+
+   return y;
+}
+
+partial_eval25 file after partial evaluation: not performed!
+
+double partial_eval25(double x)
+{
+   double y, z;
+   z = 0.;
+   y = x-z;
+   return y;
+}
+
+partial_eval25 file after forward substitution
+
+double partial_eval25(double x)
+{
+   double y, z;
+   z = 0.;
+   y = x-0.;
+   return x-0.;
+}

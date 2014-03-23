@@ -1,0 +1,43 @@
+setenv WS=partial_eval25
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
+
+create $WS $WS.c
+
+echo
+echo "$WS" file
+echo
+
+display PRINTED_FILE
+
+echo
+echo "$WS" file with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[$WS]
+
+apply PARTIAL_EVAL[$WS]
+
+echo
+echo "$WS" file after partial evaluation: not performed!
+echo
+
+activate PRINT_CODE
+display PRINTED_FILE
+
+apply FORWARD_SUBSTITUTE[$WS]
+
+echo
+echo "$WS" file after forward substitution
+echo
+
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+delete $WS
+quit
