@@ -3,6 +3,8 @@ This code is not compatible with "cpp -ansi"
 PARSED PRINTED FILE FOR MODULE comment04!
 
 /* This is not -ansi compatible for cpp */
+
 //*ret=-1
+
 /* Let's have some output */
 void foo();

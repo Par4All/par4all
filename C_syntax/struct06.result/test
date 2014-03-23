@@ -4,4 +4,4 @@ union {
    int i;
 } u;
 ### stderr
-user warning in c_parse: Symbol "l" is redefined at line 11 (11)
+user warning in c_parse: Symbol "l" is redefined at line 12 (12)
