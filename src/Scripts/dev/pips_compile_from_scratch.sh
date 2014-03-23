@@ -101,7 +101,7 @@ grep '{i==0}' out > /dev/null 2>> err || report 15 "precondition not found"
 
 # cleanup
 cd $HOME
-rm -rf $dir >> out 2>> err || report 16 "cannot remove directory"
+rm -rf $dir > /dev/null 2>&1 || report 16 "cannot remove directory"
 
 # done
 report 0 "pips scratch compilation ok"
