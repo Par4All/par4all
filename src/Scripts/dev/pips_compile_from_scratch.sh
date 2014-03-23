@@ -7,11 +7,16 @@
 #
 # $0 name log [email]
 
-name=$1 log=$2 email=$3
-
 url="https://scm.cri.ensmp.fr/svn/nlpmake/trunk/makes/setup_pips.sh"
 dir="/tmp/pips_compile_from_scratch.$$"
-set="./setup.sh"
+
+# get arguments
+name=$1 log=$2 email=$3
+
+# extract revision number
+ID='$Id$'
+version=${ID//*.sh /}
+version=${version// */}
 
 function report()
 {
@@ -19,6 +24,7 @@ function report()
   echo "$name: $message" >&2
   {
       echo "script: $0"
+      echo "version: $version"
       echo "name: $name"
       echo "dir: $dir"
       echo "duration: ${SECONDS}s"
@@ -30,13 +36,13 @@ function report()
         echo "### OUT"
         test -f out && tail -100 out
         echo
-        echo "### REPORT"
+        echo "### ERR"
         test -f err && tail -100 err
       fi
   } > $log
   if [ "$email" ] ; then
-    mail -s "$name: $message" $email < $log
-  else
+    mail -s "$name $message" $email < $log
+  else # report on stdout, cron should send a mail
     [ $status -ne 0 ] && cat $log
   fi
   exit $status
@@ -44,16 +50,17 @@ function report()
 
 # various check & setup
 test $# -ge 2 || report 1 "usage: $0 name log [email]"
-mkdir $dir || report 3 "cannot create $dir"
-cd $dir || report 4 "cannot cd to $dir"
+mkdir $dir || report 2 "cannot create $dir"
+cd $dir || report 3 "cannot cd to $dir"
 
 # start recording out & err
-type curl > out 2> err || report 2 "curl not found"
+set="./setup.sh"
+type curl > out 2> err || report 4 "curl not found"
 curl -s -o $set $url >> out 2>> err || report 5 "cannot get $url"
-chmod a+rx $set >> out 2>> err || report 6 "cannot chmod $set"
-type timeout >> out 2>> err || report 7 "no timeout command"
+chmod u+rx $set >> out 2>> err || report 6 "cannot chmod $set"
 
 # must compile pips under 20 minutes
+type timeout >> out 2>> err || report 7 "no timeout command"
 timeout 20m $set --light PIPS calvin export < /dev/null > out 2> err || \
   report 8 "error running $set"
 
