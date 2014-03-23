@@ -32,6 +32,7 @@ function report()
       echo "duration: ${SECONDS}s"
       echo "status: $status"
       echo "message: $message"
+      lsb_release -d
 
       if [ $status != 0 ] ; then
         echo
