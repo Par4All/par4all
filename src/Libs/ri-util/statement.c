@@ -2520,9 +2520,10 @@ static statement generic_add_declaration_statement(statement s, entity e, bool b
             statement spl = STATEMENT(CAR(pl));
             entity ecar = ENTITY(CAR(statement_declarations(spl)));
             if( comments_equal_p(statement_comments(spl),comment) &&
-                    !basic_undefined_p(entity_basic(e)) && !basic_undefined_p(entity_basic(ecar)) &&
-                    basic_equal_p(entity_basic(e),entity_basic(ecar)) &&
-                    qualifiers_equal_p(entity_qualifiers(e),entity_qualifiers(ecar))
+		!basic_undefined_p(entity_basic(e)) && !basic_undefined_p(entity_basic(ecar)) &&
+		basic_equal_p(entity_basic(e),entity_basic(ecar)) &&
+		qualifiers_equal_p(entity_qualifiers(e),entity_qualifiers(ecar)) &&
+		ram_section(storage_ram(entity_storage(ecar)))==ram_section(storage_ram(entity_storage(e)))
               )
             {
                 free_statement(ds);
@@ -2546,7 +2547,8 @@ static statement generic_add_declaration_statement(statement s, entity e, bool b
 		if( comments_equal_p(statement_comments(ssl),comment) &&
                     !basic_undefined_p(entity_basic(e)) && !basic_undefined_p(entity_basic(ecar)) &&
                     basic_equal_p(entity_basic(e),entity_basic(ecar)) &&
-                    qualifiers_equal_p(entity_qualifiers(e),entity_qualifiers(ecar))
+                    qualifiers_equal_p(entity_qualifiers(e),entity_qualifiers(ecar)) &&
+		    ram_section(storage_ram(entity_storage(ecar)))==ram_section(storage_ram(entity_storage(e)))
 		    )
 		{
 		  free_statement(ds);

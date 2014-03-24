@@ -187,7 +187,7 @@ GenericAddLocalEntityToDeclarations(entity e, entity module, statement s,
      stored in code_declarations, in the symbol table. */
   AddEntityToDeclarations(e, module);
 
-  /* In C the variables, but the formal parameters, are local to a
+  /* In C, the variables, but the formal parameters, are local to a
      statement */
   if (c_module_p(module)) {
     /* If undeclared in s, variable e is added in the
@@ -197,7 +197,8 @@ GenericAddLocalEntityToDeclarations(entity e, entity module, statement s,
       pips_assert("add declarations to statement block",statement_block_p(s));
 
     list l = statement_declarations(s);
-    pips_assert("Calling AddLocalEntityToDeclarations from c_module with valid statement", !statement_undefined_p(s) );
+    pips_assert("Calling AddLocalEntityToDeclarations from c_module "
+		"with valid statement", !statement_undefined_p(s) );
 
     /* The entity may have already been declared... This could be an
        assert but Serge seems to redeclare several times the same
@@ -207,7 +208,7 @@ GenericAddLocalEntityToDeclarations(entity e, entity module, statement s,
 
       /* The C prettyprinter is not based on code_declarations or
 	 statement_declarations but on declaration statements, which
-	 happen to be continue statment for the time being. */
+	 happen to be continue statement for the time being. */
       if(!declaration_statement_p(s) && add_declaration_statement_p) {
 	/* To preserve the source layout, declarations are
 	   statements */

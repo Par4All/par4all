@@ -1683,6 +1683,18 @@ static void replace_constant_array_references_walker(reference ref,
       var = make_new_scalar_variable_with_prefix(entity_user_name(p->array),
                                                  get_current_module_entity(),
                                                  basic_of_reference(ref));
+      /* FI: let's try to maintain the storage section */
+      storage as = entity_storage(p->array);
+      if(storage_ram_p(as)) {
+	ram ar = storage_ram(as);
+	storage vs = entity_storage(var);
+	ram vr = storage_ram(vs);
+	ram_section(vr) = ram_section(ar);
+      }
+      else {
+	pips_internal_error("Arrays should be allocated in RAM.\n");
+      }
+
       hash_put(p->mapping,(void*)(1+value),var);
       AddEntityToCurrentModule(var);
     }
@@ -1701,6 +1713,7 @@ static void replace_constant_array_references(statement in, entity array) {
                       reference_domain,
                       gen_true,
                       replace_constant_array_references_walker);
+  // FI: hos is the hash-table freed?
 }
 
 /* Pass constant_array_scalarization 
@@ -1767,6 +1780,11 @@ bool constant_array_scalarization(const char * module_name) {
 
   /* Perform the replacement for non-static arrays */
   FOREACH(entity, e, del) {
+    replace_constant_array_references(cms,e);
+  }
+
+  /* Perform the replacement for static arrays */
+  FOREACH(entity, e, sel) {
     replace_constant_array_references(cms,e);
   }
 
