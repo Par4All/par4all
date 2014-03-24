@@ -2523,7 +2523,7 @@ static statement generic_add_declaration_statement(statement s, entity e, bool b
 		!basic_undefined_p(entity_basic(e)) && !basic_undefined_p(entity_basic(ecar)) &&
 		basic_equal_p(entity_basic(e),entity_basic(ecar)) &&
 		qualifiers_equal_p(entity_qualifiers(e),entity_qualifiers(ecar)) &&
-		ram_section(storage_ram(entity_storage(ecar)))==ram_section(storage_ram(entity_storage(e)))
+		(storage_ram_p(entity_storage(ecar))?ram_section(storage_ram(entity_storage(ecar)))==ram_section(storage_ram(entity_storage(e))):true)
               )
             {
                 free_statement(ds);
@@ -2548,7 +2548,7 @@ static statement generic_add_declaration_statement(statement s, entity e, bool b
                     !basic_undefined_p(entity_basic(e)) && !basic_undefined_p(entity_basic(ecar)) &&
                     basic_equal_p(entity_basic(e),entity_basic(ecar)) &&
                     qualifiers_equal_p(entity_qualifiers(e),entity_qualifiers(ecar)) &&
-		    ram_section(storage_ram(entity_storage(ecar)))==ram_section(storage_ram(entity_storage(e)))
+		    (storage_ram_p(entity_storage(ecar))?ram_section(storage_ram(entity_storage(ecar)))==ram_section(storage_ram(entity_storage(e))):true)
 		    )
 		{
 		  free_statement(ds);
