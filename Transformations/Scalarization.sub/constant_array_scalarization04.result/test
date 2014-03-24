@@ -20,7 +20,9 @@ void constant_array_scalarization04()
    int a[3], b[3];
    static int c[3];
    //PIPS generated variable
-   int a0, a1, a2, b0, b1, b2, c0, c1, c2;
+   int a0, a1, a2, b0, b1, b2;
+   //PIPS generated variable
+   static int c0, c1, c2;
 
    b0 = 1;
    a0 = 1;

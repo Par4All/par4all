@@ -1,4 +1,4 @@
-// Check that the new variables are declared in alphabetical order
+// Check that the new static variables are properly declared
 
 void constant_array_scalarization04()
 {

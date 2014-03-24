@@ -1,50 +1,68 @@
+Validation of scalarization passes: scalarization and constant_array_scalarization
+
+
 conditional01.c: bug according to Mehdi Amini
+
+constant_array_scalarization01.c: generated scalar variables shuold be
+         declared in alphabetical order to have a deterministic output
+constant_array_scalarization02.c: beware of global and formal arrays
+constant_array_scalarization03.c: check alphabetical order again
+constant_array_scalarization04.c: check handling of static variables
+constant_array_scalarization05.c: check handling of array initializations
+         either they inihibit the scalarization or use split_initialization pass
+constant_array_scalarization06.c: check scalarization with arrays of different
+         types
+constant_array_scalarization07.c: check handling of scopes
 
 constant_array_reference01.c: make sure that scalarization is performed at any statement level, not only within loops (ticket 531)
 
-constant_array_reference02.c
+constant_array_reference02.c: reference a[k] is constant within loops on i and j
 
-constant_array_reference03.c
+constant_array_reference03.c: reference a[0] is constant within loop on i
 
-constant_array_reference04.c
+constant_array_reference04.c: reference E[i][j] is constant within loop on k
 
-contant_reference_in_loop.c
+constant_reference_in_loop.c: used to be a bug spotted by Mehdi
 
 missing_copy_out.c
 
-perfect_loop01.c: check property 
+perfect_loop01.c: check property to preserve perfect nesting when scalarizing
 
-scalarization01.f
-scalarization02.f
-scalarization03.f
-scalarization04.f
+scalarization01.f: scalarization of a temporary array used within a loop
+scalarization02.f: same as 01, but with a copy-out
+scalarization03.f: do not scalarize because if is not profitable
+scalarization04.f: temporary array cannot be scalarized because of a
+		   a loop-carried dependence
 
-scalarization05.c
-scalarization06.c
-scalarization07.c
-scalarization08.c
-scalarization09.c
-scalarization10.c
-scalarization11.c
-scalarization12.c
-scalarization13.f
-scalarization14.c
-scalarization15.c
-scalarization16.c
-scalarization17.c
-scalarization18.c
-scalarization19.c
-scalarization20.c
-scalarization21.c
-scalarization22.c
-scalarization23.c
-scalarization24.c
-scalarization25.c
-scalarization26.c
-scalarization27.c
-scalarization28.c
-scalarization29.c
-scalarization31.c: mistake?
+scalarization05.c: scalarization of a temporary array used within a C loop
+scalarization06.c: use of pointer dereferencing - array regions are not
+                   computed and no scalarization occurs
+scalarization07.c: array declaration hidden by a typedef
+scalarization08.c: copy back within a loop
+scalarization09.c: array element must be copied in
+scalarization10.c: array acces hidden in a function call
+scalarization11.c: no benefit for a and b; illegal for t
+scalarization12.c: similar to previous one, with reversed dependence
+scalarization13.f: bug fixed; no scalarization because of profitability
+scalarization14.c: no copy-out, but the resulting code should be cleaned-up
+                   by other passes
+scalarization15.c: same as above, but bug detected for return statements (?)
+scalarization16.c: same as 14 and 15, with different return statement
+scalarization17.c: copy-in and our due to a formal parameter A
+scalarization18.c: same as 17, but sequence of two loops
+scalarization19.c: check profitability and do not scalarize
+scalarization20.c: check scalarization within a sequence
+scalarization21.c: check scalarization within an expression
+scalarization22.c: variation od scalarization10, access hiden in a call
+scalarization23.c: same as 22, with more references
+scalarization24.c: 22 + side-effects, no scalarization
+scalarization25.c: same as 24, but complex expression split in two statements,
+                   some scalarization
+scalarization26.c: scalarization of a convolution
+scalarization27.c: scalarization of a constant reference, prevents loop
+                   parallelization
+scalarization28.c: global variables, no scalarization
+scalarization29.c: scalarization within a sequence + copy-out (Python)
 
 scalarization30.f: first example by Carr and Kennedy (SPE)
 scalarization31.f: second example by Carr and Kennedy (SPE)
@@ -54,30 +72,42 @@ scalarization34.f: fifth example by Carr and Kennedy (SPE) [partial failure]
 scalarization35.f: sixth example by Carr and Kennedy (SPE) [failed]
 scalarization36.f: sixth (?) example by Carr and Kennedy (SPE) [region analysis]
 
-scalarization37.f: same as scalarization01, but different tpips to check property SCALARIZATION_PREFIX
+scalarization37.f: same as scalarization01, but different tpips to
+                   check property SCALARIZATION_PREFIX
 
 scalarization38.f: same as scalarization37, but with a name conflict
 
-scalarization39.f: same as scalarization38, but with a name conflict linked to Fortran uppercase normalization
+scalarization39.f: same as scalarization38, but with a name conflict
+                   linked to Fortran uppercase normalization
 
-scalarization40.f: same as scalarization01, but different name for the enw variable (FI: ?)
+scalarization40.f: same as scalarization01, but different name for the
+                   new variable (FI: ?)
 
-scalarization41.c: ?
-scalarization42.c
-scalarization43.c
+scalarization41.c: ? check out regions? dead code in test case
+scalarization42.c: nothing is scalarized
+scalarization43.c: bug fixed
 
 sequence01.c: x is always scalarized because it is neither copied in nor out
 
 sequence02.c: x is copied in and thresholding blocks the scalarization
 
-sequence03.c: x and y could be scalarized, but thresholding is used to scalarize x only
+sequence03.c: x and y could be scalarized, but thresholding is used to
+              scalarize x only
 
-sequence04.c: no scalarization because the index variables are not constant over the block; they are declared insid the block
+sequence04.c: no scalarization because the index variables are not
+              constant over the block; they are declared insid the block
 
-sequence05.c: same as sequence04, but the index variables are declared outside of the block
+sequence05.c: same as sequence04, but the index variables are declared
+              outside of the block
 
-sequence06.c: check memory access strictness, but because the inner loop bound is the same as the outer loop bound, the scalarization is safe
+sequence06.c: check memory access strictness, but because the inner
+              loop bound is the same as the outer loop bound, the
+              scalarization is safe
 
-sequence07.c: check memory access strictness; since m and n are unknown, the sclarization should not occur
+sequence07.c: check memory access strictness; since m and n are
+              unknown, the scalarization should not occur
 
-sequence08.c: check memory access strictness; since m and n are unknown, the sclarization of out-of-bound reference a[100] occurs at different level, depending on the strictness required for memory accesses.
+sequence08.c: check memory access strictness; since m and n are
+              unknown, the scalarization of out-of-bound reference
+              a[100] occurs at different level, depending on the
+              strictness required for memory accesses.
