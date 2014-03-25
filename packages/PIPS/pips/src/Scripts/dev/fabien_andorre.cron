@@ -6,4 +6,7 @@
 # bootstrap with: login@andorre> setup_pips.sh /home/local/fabien/<version>
 # fix <version>/pipsrc.sh
 # must fix PIPS_F77 and PIPS_FLINT, g77 package is needed
+# this run updates the online documentation
 03 23 * * * /home/fabien/NIGHT/pips_check_compile --force --report --nlpmake=htdoc --source=/home/fabien/NIGHT/pipsrc.sh --exec=/home/fabien/NIGHT/pips_publish_www.sh pips-validation@cri.ensmp.fr /home/fabien/NIGHT/prod /home/fabien/NIGHT/validation
+# compile from scratch
+22 23 * * * /home/fabien/pips_compile_from_scratch.sh SCRATCH $HOME/SCRATCH.log coelho@cri.ensmp.fr

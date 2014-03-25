@@ -96,6 +96,8 @@
 
 /********************************************************** static variables */
 extern bool tpips_execution_mode;
+extern bool consistency_enforced_p;
+static bool processing_started_p=false;
 
 #define YYERROR_VERBOSE 1 /* MUCH better error messages with bison */
 
@@ -457,16 +459,16 @@ commands: commands command { $$ = $1 && $2; }
 	;
 
 command: TK_ENDOFLINE { /* may be empty! */ }
-	| i_open
-	| i_create
-	| i_close
-	| i_delete
+        | i_open {processing_started_p=true;}
+	| i_create {processing_started_p=false;}
+	| i_close {processing_started_p=false;}
+	| i_delete {processing_started_p=false;}
 	| i_checkpoint
 	| i_module
-	| i_make
-	| i_apply
-	| i_capply
-	| i_display
+	| i_make {processing_started_p=true;}
+	| i_apply {processing_started_p=true;}
+	| i_capply {processing_started_p=true;}
+	| i_display {processing_started_p=true;}
 	| i_show
 	| i_rm
 	| i_activate
@@ -531,11 +533,26 @@ i_help: TK_HELP TK_NAME TK_ENDOFLINE
 
 i_setprop: TK_SET_PROPERTY TK_LINE TK_ENDOFLINE
 	{
+	  consistency_enforced_p = get_bool_property("CONSISTENCY_ENFORCED_P");
+	  if(!consistency_enforced_p || !processing_started_p) {
 		user_log("setproperty %s\n", $2);
 		reset_property_error(); // We start again at tpips
 					// level and should be able to
 					// avoid the fatal loop...
-		parse_properties_string($2);
+		parse_properties_string($2, processing_started_p);
+		if(processing_started_p) {
+		  pips_user_warning("Properties should not be updated during "
+				    "tpips processing."
+				    " Move the setproperty statement at the "
+				    "beginning of your tpips script.\n");
+		}
+	  }
+	  else {
+	    pips_user_error("Properties should not be updated during tpips "
+			    "processing."
+			    " Move the setproperty statement at the beginning "
+			    "of your tpips script.\n");
+	  }
 		fflush(stdout);
 		free($2);
 	}

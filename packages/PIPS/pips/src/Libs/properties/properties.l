@@ -92,21 +92,21 @@ static char * string_to_parse = (char*) 0; /* shared pointer! */
   result = i==0? YY_NULL: i;				\
 }
 
-static void parse_properties(void);
+static void parse_properties(bool processing_p);
 
-void parse_properties_string(char *s)
+void parse_properties_string(char *s, bool processing_p)
 {
     yyrestart(NULL); // In case, lex has been interrupted by an error
     update_property = true;
     string_to_parse = s;
-    parse_properties();
+    parse_properties(processing_p);
     string_to_parse = (char *) 0;
     update_property = false;
 }
 
 #else /* ATT/POSIX just seem to like parsing yyin... */
 
-void parse_properties_string(char *s)
+void parse_properties_string(char *s, bool processing_p)
 {
     property_user_error("cannot parse string (%s) without flex\n", s);
 }
@@ -165,7 +165,7 @@ static string property_tag_to_string(tag t)
     }
 }
 
-static void parse_properties(void)
+static void parse_properties(bool processing_p)
 {
     int tok;
     property pr = property_undefined, opr;
@@ -231,6 +231,17 @@ static void parse_properties(void)
 				  n);
 	      free_property(pr);
 	    }
+	    else if(processing_p
+		    && strcmp(n, "CONSISTENCY_ENFORCED_P")==0
+		    && !property_equal_p(pr, opr))
+	    {
+	    property_user_error("Property %s cannot be redefined when "
+				"processing is started because consistenty "
+				"can no longer be enforced. Move the set "
+				"property command earlier in the compilaton "
+				"process.\n", n);
+	      free_property(pr);
+	    }
 	    else
 	    {
 	      hash_update(pl, n, (char *) pr);
@@ -251,7 +262,8 @@ static void parse_properties_file(FILE * fd)
     update_property = false; // FI: Tpips/property.tpips, to survive
 			     // the open after the close
     yyrestart(fd);
-    parse_properties();
+    // FI: we assume no PIPS database is open when parsing a property file
+    parse_properties(false);
 }
 
 static void read_properties(void)

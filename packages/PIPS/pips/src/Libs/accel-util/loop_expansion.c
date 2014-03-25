@@ -255,7 +255,7 @@ void do_loop_expansion(statement st, expression size,bool center,bool apply_guar
 }
 
 
-bool loop_expansion(const const char* module_name)
+bool loop_expansion(const char* module_name)
 {
     set_current_module_entity(module_name_to_entity(module_name));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true));

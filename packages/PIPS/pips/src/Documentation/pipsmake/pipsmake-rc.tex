@@ -102,7 +102,6 @@
 %%  \usepackage{breakurl}}{%
 %%  % else we are generating HTML with TeX4ht, use plain url:
 %%  \usepackage{url}}
-\usepackage{url}
 \usepackage{makeidx}
 \usepackage{listings}
 \lstset{extendedchars=true, language=C}
@@ -142,9 +141,9 @@
 
 
 \title{PIPS High-Level Software Interface \\
-    Pipsmake configuration}
-\author{R\'emi Triolet and Fran\c{c}ois Irigoin\\
-  with many other contributors\\
+    Pipsmake Configuration}
+\author{R\'emi Triolet, Fran\c{c}ois Irigoin\\
+  and many other contributors\\
         MINES ParisTech \\
         Math\'ematiques et Syst\`emes \\
         Centre de Recherche en Informatique \\
@@ -280,6 +279,7 @@
 
 
 \chapter{Introduction}
+\label{chapter:introduction}
 
 This paper describes high-level objects and functions that are
 potentially user-visible in a \PIPS{}~\cite{IJT91} interactive
@@ -733,6 +733,18 @@ ACTIVE_PHASES "PRINT_SOURCE PRINT_CODE PRINT_PARALLELIZED77_CODE
 \end{verbatim}
 They still are used for the old non-regression tests.
 
+
+Property
+\begin{PipsProp}{CONSISTENCY_ENFORCED_P}
+CONSISTENCY_ENFORCED_P FALSE
+\end{PipsProp}
+specifies that properties cannot be set once a PIPS database has been
+created. Pipsmake does not know the impacts of properties on the
+resources. Setting a property can make a resource obsolete, but
+pipsmake is going to use it as consistent. To avoid the issue, set
+\PipsPropRef{CONSISTENCY_ENFORCED_P} to true and \TPIPS{} will detect
+a user error if a property is possibly altered during a processing
+phase.
 
 
 
@@ -2132,7 +2144,8 @@ representation does not differ fundamentally from a sequential code.
 
 %% FI-> ??: why is it located here?
 
-\chapter{Pedagogical phases}
+\chapter{Pedagogical Phases}
+\label{chapter:pedagogical-phases}
 \label{cha:pedagogical-phases}
 
 Although this phases should be spread elsewhere in this manual, we have
@@ -12321,6 +12334,21 @@ ARRAY_RESIZING_BOTTOM_UP_OPTION 0
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SCALARIZATION
 
 \subsection{Scalarization}
+\index{Scalarization}
+
+Three scalarization pass have been developped. The first one,
+\PipsPassRef{scalarization}, is based on convex array regions. The
+second one, \PipsPassRef{constant_array_scalarization}, is based on
+constant array references. The third one,
+\PipsPassRef{quick_scalarization}, is based on proper and cumulated
+effects and on the dependence graph. It is supposed equivalent to the
+first one, but much faster because convex array regions may be slow to
+compute.
+
+Pass \PipsPassRef{constant_array_scalarization} intends to eliminate
+array references, e.g. for VHDL generation.
+
+\subsubsection{Scalarization Based on Convex Array Regions}
 
 \begin{PipsPass}{scalarization}
   Scalarization is the process of replacing array references with
@@ -12352,10 +12380,16 @@ criteria, a Legality criterion and a Profitability criterion:
 \end{itemize}
 
 The legality test is based on convex array regions, and not on the
-dependence graph as is the Carr's algorithm. Currently, loop carried
-dependence arcs prevent scalarization by PIPS, although some can be
-processed by Carr's algorithm. See non-regression tests
-Transformations/scalarization30 to 36.
+dependence graph as is the Carr's
+algorithm~\cite{Car92}\cite{CK94}. Currently, loop carried dependence
+arcs prevent scalarization by PIPS, although some can be processed by
+Carr's algorithm. See non-regression tests
+Transformations/scalarization30 to 36. Procedure calls do not derail
+our legality test, but Carr's benchmark does not include any procedure
+call. Also, the convex array regions related to the same array are
+merged in PIPS as a unique region, even when they have provably no
+intersection. As a result, each array can result in at most one scalar
+when Carr's algorithm can generate several ones.
 
 This transformation is useful 1) to improve the readability of the
 source code with constructs similar to {\em let x be ...}, 2) to
@@ -12511,6 +12545,8 @@ SCALARIZATION_ACROSS_CONTROL_TEST "exactness"
 This pass was designed by Fran\c{c}ois Irigoin and implemented by
 Laurent Daverio and Fran\c{c}ois Irigoin.
 
+\subsubsection{Scalarization Based on Constant Array References}
+
 \begin{PipsPass}{constant_array_scalarization}
   Similar to \PipsPassRef{scalarization}, but with a different
   criterion: if an array is only accessed with numerical constant subscript
@@ -12530,6 +12566,8 @@ only analyze scalar variables.
 
 
 This pass was designed and implemented by Serge Guelton.
+
+\subsubsection{Scalarization Based on Memory Effects and Dependence Graph}
 
 Pass \PipsPassRef{scalarization} may be costly because it relies on
 array regions analyses and uses them to check its legality

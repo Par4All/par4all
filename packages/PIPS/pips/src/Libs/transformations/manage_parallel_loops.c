@@ -76,7 +76,7 @@ static void  process_loop (loop l) {
 
 /**
 **/
-bool limit_nested_parallelism (const const char* module_name) {
+bool limit_nested_parallelism (const char* module_name) {
 
   // Use this module name and this environment variable to set
   statement mod_stmt = PIPS_PHASE_PRELUDE(module_name,
@@ -243,7 +243,7 @@ static void limit_uninteresting_parallelism_statement_out(statement s,
 
 /**
 **/
-bool limit_parallelism_using_complexity(const const char* module_name)
+bool limit_parallelism_using_complexity(const char* module_name)
 {
 
   statement mod_stmt = PIPS_PHASE_PRELUDE(module_name,

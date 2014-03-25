@@ -1752,7 +1752,7 @@ bool safe_set_property(const char* propname, const char* value)
   strcat(line, " ");
   strcat(line, value);
   user_log("set %s\n", line);
-  parse_properties_string(line);
+  parse_properties_string(line, false);
   free(line);
   // parse_properties_string() doesn't return whether it succeeded
   return true;

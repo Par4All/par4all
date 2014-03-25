@@ -137,7 +137,7 @@ the reports about NewGen~\cite{Jouv:89,Jouv:90}. A good understanding of
 
 The sources of NewGen, Linear and Pips are managed under subversion
 (svn). They are accessible from anywhere in the world by the http
-protocol at \url{http://svn.cri.ensmp.fr/pips.html}
+protocol at \url{http://scm.cri.ensmp.fr/pips.html}
 
 \subsection{Directories overview}
 \label{sec:directories-overview}
@@ -176,7 +176,7 @@ Moreover the \texttt{pips} repository includes
 
 
 A crude script \texttt{setup\_pips.sh} on the web site 
-(\url{http://svn.cri.ensmp.fr/svn/nlpmake/trunk/makes/setup_pips.sh})
+(\url{http://scm.cri.ensmp.fr/svn/nlpmake/trunk/makes/setup_pips.sh})
 and in \texttt{pips/trunk/makes} allows to download \texttt{polylib},
 \texttt{newgen}, \texttt{linear} and \texttt{pips} and to build a local
 installation of the softwares.  For instance developer \texttt{calvin} can
@@ -591,7 +591,7 @@ If you are doing something non trivial or do not have commit rights on
 pips' trunk, you shoud develop in a branch of your own. To do so:
 
 \begin{enumerate}
-\item Obtain an svn user account on \texttt{svn.cri.ensmp.fr}
+\item Obtain an svn user account on \texttt{scm.cri.ensmp.fr}
   by asking for it to Fabien Coelho.
 
   For instance, a login \texttt{calvin} and some password may be attributed.
@@ -626,7 +626,7 @@ pips' trunk, you shoud develop in a branch of your own. To do so:
     your \texttt{MYPIPS} directory (or wherever you want) later with:
 {\small
 \begin{verbatim}
-sh> svn co https://svn.cri.ensmp.fr/svn/pips/branches/calvin pips_dev
+sh> svn co https://scm.cri.ensmp.fr/svn/pips/branches/calvin pips_dev
 \end{verbatim}
 }
     Branches may also be used for \emph{linear} and \emph{newgen} development,
@@ -644,7 +644,7 @@ sh> svn co https://svn.cri.ensmp.fr/svn/pips/branches/calvin pips_dev
 {\small
 \begin{verbatim}
 sh> cd pips_dev
-sh> svn cp https://svn.cri.ensmp.fr/svn/pips/trunk my-branch-name
+sh> svn cp https://scm.cri.ensmp.fr/svn/pips/trunk my-branch-name
 sh> svn commit my-branch-name
 \end{verbatim}
 }
@@ -677,7 +677,7 @@ sh> svn commit my-branch-name
 sh> cd my-branch-name
 # the above cd is useful: it aims at going into the branch root,
 # i.e. the copy of the "trunk", before merging.
-sh> svn merge https://svn.cri.ensmp.fr/svn/pips/trunk
+sh> svn merge https://scm.cri.ensmp.fr/svn/pips/trunk
 # this does the merging into the branch working copy
 # - consider options -x -b or -x -w
 #   to ignore space-related changes
@@ -718,8 +718,8 @@ svn revert -R .
   To know about where you are compared to the trunk, you can try a:
   {\small
 \begin{verbatim}
-svn diff https://svn.cri.ensmp.fr/svn/pips/branches/calvin/graph \
-   https://svn.cri.ensmp.fr/svn/pips/trunk
+svn diff https://scm.cri.ensmp.fr/svn/pips/branches/calvin/graph \
+   https://scm.cri.ensmp.fr/svn/pips/trunk
 \end{verbatim}
   }
 
@@ -740,11 +740,11 @@ svn diff https://svn.cri.ensmp.fr/svn/pips/branches/calvin/graph \
 \begin{verbatim}
 sh> cd prod/pips  # cd in your pips trunk copy, or better a fresh copy
 sh> svn mergeinfo \
-  https://svn.cri.ensmp.fr/svn/pips/branches/calvin/my-branch-name \
+  https://scm.cri.ensmp.fr/svn/pips/branches/calvin/my-branch-name \
   --show-revs eligible
 # revisions that need be reintegrated...
 sh> svn merge \
-  https://svn.cri.ensmp.fr/svn/pips/branches/calvin/my-branch-name \
+  https://scm.cri.ensmp.fr/svn/pips/branches/calvin/my-branch-name \
   --reintegrate
 # consider options -x -b or -x -w
 # to ignore space-related changes
@@ -849,7 +849,7 @@ It shows the various \texttt{svn} commands which are going to be issued.
 If you are happy with them, do that again with the \texttt{-D} option
 to actually run them. The created \emph{bundle} can be extracted with:
 \begin{verbatim}
-  sh> svn co https://svn.cri.ensmp.fr/svn/pips/bundles/foo/bla
+  sh> svn co https://scm.cri.ensmp.fr/svn/pips/bundles/foo/bla
   extracting newgen... linear... pips... validation... nlpmake...
 \end{verbatim}
 
@@ -950,7 +950,7 @@ for r in nlpmake newgen linear pips validation ; do
   svnadmin create $r
   echo -e '#!/bin/sh\nexit 0' > $r/hooks/pre-revprop-change
   chmod +x $r/hooks/pre-revprop-change
-  svnsync init file://$PWD/$r https://svn.cri.ensmp.fr/svn/$r
+  svnsync init file://$PWD/$r https://scm.cri.ensmp.fr/svn/$r
 done
 
 # then sync from time to time.
@@ -994,13 +994,13 @@ or is at least error prone. Fabien.}:
 \begin{verbatim}
 # create copies of the repositories' trunks that
 # you may wish to edit. Example:
-git svn clone --stdlayout https://svn.cri.ensmp.fr/svn/nlpmake
+git svn clone --stdlayout https://scm.cri.ensmp.fr/svn/nlpmake
 
-git svn clone --stdlayout https://svn.cri.ensmp.fr/svn/newgen
+git svn clone --stdlayout https://scm.cri.ensmp.fr/svn/newgen
 ln -s ../nlpmake/makes newgen/makes
 echo /makes >> newgen/.git/info/exclude
 
-git svn clone --stdlayout https://svn.cri.ensmp.fr/svn/linear
+git svn clone --stdlayout https://scm.cri.ensmp.fr/svn/linear
 ln -s ../nlpmake/makes linear/makes
 echo /makes >> linear/.git/info/exclude
 
@@ -1008,11 +1008,11 @@ echo /makes >> linear/.git/info/exclude
 # Deal with the fact that branches are hierarchized per user,
 # so if I'm the user coelho
 git svn clone --stdlayout -branches=branches/coelho \
-    https://svn.cri.ensmp.fr/svn/pips
+    https://scm.cri.ensmp.fr/svn/pips
 ln -s ../nlpmake/makes pips/makes
 echo /makes >> pips/.git/info/exclude
 
-git svn clone --stdlayout https://svn.cri.ensmp.fr/svn/validation
+git svn clone --stdlayout https://scm.cri.ensmp.fr/svn/validation
 
 # live your life within git
 # what about properties?
@@ -1044,11 +1044,11 @@ copy of the repository with \texttt{git-svn} without using the
 %%
 For this, just use a plain \texttt{git-svn} with:
 \begin{verbatim}
-git svn clone https://svn.cri.ensmp.fr/svn/nlpmake
-git svn clone https://svn.cri.ensmp.fr/svn/linear
-git svn clone https://svn.cri.ensmp.fr/svn/newgen
-git svn clone https://svn.cri.ensmp.fr/svn/validation
-git svn clone https://svn.cri.ensmp.fr/svn/pips
+git svn clone https://scm.cri.ensmp.fr/svn/nlpmake
+git svn clone https://scm.cri.ensmp.fr/svn/linear
+git svn clone https://scm.cri.ensmp.fr/svn/newgen
+git svn clone https://scm.cri.ensmp.fr/svn/validation
+git svn clone https://scm.cri.ensmp.fr/svn/pips
 \end{verbatim}
 
 To have GIT ignoring the same files than SVN, you should try in each GIT
@@ -1643,7 +1643,7 @@ the \texttt{make} invocation.
 \label{sec:validation}
 
 The validation is stored in a separate subversion repository
-\url{https://svn.cri.ensmp.fr/svn/validation}
+\url{https://scm.cri.ensmp.fr/svn/validation}
 
 For an overview of the validation daily use case, you should also have a
 look to \S~\ref{sec:devel-branch-valid}.

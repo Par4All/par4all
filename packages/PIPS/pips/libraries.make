@@ -90,7 +90,7 @@ PIPS_MAIN	= main_pips.o
 
 ######################################################################### TPIPS
 
-tpips_add.libs	= readline termcap
+tpips_add.libs	= readline ncurses
 tpips.libs	= $(pips.libs) $(tpips_add.libs)
 
 TPIPS_MAIN	= main_tpips.o

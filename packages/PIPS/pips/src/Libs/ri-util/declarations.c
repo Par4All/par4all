@@ -3460,7 +3460,8 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
 
    - it must be a local declaration
 
-   - the initial value, if any, must be a valid rhs expression
+   - the initial value, if any, must be a valid rhs expression or an
+     array initialization; struct initialization are not (yet) supported
  */
 void split_initializations_in_statement(statement s)
 {
@@ -3594,7 +3595,7 @@ void split_initializations_in_statement(statement s)
 	      entity_initial(var) = make_value_unknown();
 	    }
 	    else if(entity_array_p(var)) {
-          inits=gen_nconc(inits,brace_expression_to_statements(var,ie));
+	      inits=gen_nconc(inits,brace_expression_to_statements(var,ie));
 	      entity_initial(var) = make_value_unknown();
 	    }
         else {

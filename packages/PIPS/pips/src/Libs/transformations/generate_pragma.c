@@ -139,7 +139,7 @@ static void generate_str_omp_pragma_loop (loop l) {
 //////////////////////////////////////////////////////////////
 // the phases function name
 
-bool ompify_code (const const char* module_name) {
+bool ompify_code (const char* module_name) {
   // Use this module name and this environment variable to set
   statement module_statement = PIPS_PHASE_PRELUDE(module_name,
 						  "OMPIFY_CODE_DEBUG_LEVEL");
