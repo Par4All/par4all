@@ -1,10 +1,6 @@
 
 Splitted file for "decl33!"
 
-# 1 "./decl33.c"
-# 1 "<built-in>"
-# 1 "<command-line>"
-# 1 "./decl33.c"
 extern int decl33();
 int decl33(int, int);
 extern int decl33();

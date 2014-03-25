@@ -1,0 +1,38 @@
+# Check that a user error is detected before a wrong output is
+# produced by the dead code elimination pass
+
+setenv WS=dead_code_elimination03
+delete $WS
+create $WS $WS.c
+
+# No abort: we want to check that a user error is detected
+# setproperty ABORT_ON_USER_ERROR TRUE
+
+echo
+echo Source code for $WS with effects
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[$WS]
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+# Let's check the buggy result with this property set at the wrong time
+setproperty CONSISTENCY_ENFORCED_P TRUE
+
+echo
+echo Source code for "$WS" after dead-code elimination 
+echo
+
+apply DEAD_CODE_ELIMINATION[$WS]
+activate PRINT_CODE
+display PRINTED_FILE[$WS]
+
+close
+echo
+echo Warnings
+echo
+shell cat $WS.database/Warnings
+delete $WS
+quit
+

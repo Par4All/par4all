@@ -1,3 +1,9 @@
+/* The scalarization of iRec[0] and iRec[1] is not applied because
+ * iRec[] is a global array.
+ *
+ * FI: I wonder if the previous result was executed and checked
+ */
+
 #include <stdio.h>
 //-----------------------------------------------------
 //

@@ -1,0 +1,35 @@
+setenv WS tile05
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WS $WS.f
+
+#setproperty CONSTANT_PATH_EFFECTS  FALSE
+
+echo
+echo Transformers for "$WS"
+echo
+
+activate PRINT_CODE_TRANSFORMERS 
+display PRINTED_FILE[$WS]
+
+echo
+echo Preconditions for "$WS"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[$WS]
+
+echo
+echo Regions for "$WS"
+echo
+
+activate MUST_REGIONS
+
+activate PRINT_CODE_REGIONS 
+display PRINTED_FILE[$WS]
+
+close
+#delete $WS
+quit

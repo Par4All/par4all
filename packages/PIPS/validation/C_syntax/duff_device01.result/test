@@ -1,0 +1,143 @@
+"initial file:"
+int duff_device01(char *from, char *to, int count)
+{
+   int i = 0;
+
+loop1:
+   for(i = 0; i <= count-1; i += 1)
+      to[i] = from[i];
+
+   return i;
+}
+
+"parsed file:"
+int duff_device01(char *from, char *to, int count)
+{
+   int i = 0;
+
+loop1:   for (i = 0;i<count;i++)
+      to[i] = from[i];
+
+   return i;
+}
+
+"loop unrolling..."
+int duff_device01(char *from, char *to, int count)
+{
+   int i = 0;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+
+
+loop1:   LU_NUB0 = (count-1-0+1)/1;
+   LU_IB0 = MOD(LU_NUB0, 8);
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+      to[LU_IND0*1+0] = from[LU_IND0*1+0];
+l99999:      ;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 8) {
+      to[(LU_IND0+0)*1+0] = from[(LU_IND0+0)*1+0];
+      to[(LU_IND0+1)*1+0] = from[(LU_IND0+1)*1+0];
+      to[(LU_IND0+2)*1+0] = from[(LU_IND0+2)*1+0];
+      to[(LU_IND0+3)*1+0] = from[(LU_IND0+3)*1+0];
+      to[(LU_IND0+4)*1+0] = from[(LU_IND0+4)*1+0];
+      to[(LU_IND0+5)*1+0] = from[(LU_IND0+5)*1+0];
+      to[(LU_IND0+6)*1+0] = from[(LU_IND0+6)*1+0];
+      to[(LU_IND0+7)*1+0] = from[(LU_IND0+7)*1+0];
+l99998:      ;
+   }
+   i = 0+MAX0(LU_NUB0, 0)*1;
+
+   return i;
+}
+
+"partial eval..."
+int duff_device01(char *from, char *to, int count)
+{
+   int i = 0;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+
+
+loop1:   LU_NUB0 = count;
+   LU_IB0 = MOD(LU_NUB0, 8);
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+      to[LU_IND0] = from[LU_IND0];
+l99999:      ;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 8) {
+      to[LU_IND0] = from[LU_IND0];
+      to[LU_IND0+1] = from[LU_IND0+1];
+      to[LU_IND0+2] = from[LU_IND0+2];
+      to[LU_IND0+3] = from[LU_IND0+3];
+      to[LU_IND0+4] = from[LU_IND0+4];
+      to[LU_IND0+5] = from[LU_IND0+5];
+      to[LU_IND0+6] = from[LU_IND0+6];
+      to[LU_IND0+7] = from[LU_IND0+7];
+l99998:      ;
+   }
+   i = MAX0(LU_NUB0, 0);
+
+   return i;
+}
+
+"simplify control..."
+int duff_device01(char *from, char *to, int count)
+{
+   int i = 0;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+
+   LU_NUB0 = count;
+   LU_IB0 = MOD(LU_NUB0, 8);
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1)
+      to[LU_IND0] = from[LU_IND0];
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 8) {
+      to[LU_IND0] = from[LU_IND0];
+      to[LU_IND0+1] = from[LU_IND0+1];
+      to[LU_IND0+2] = from[LU_IND0+2];
+      to[LU_IND0+3] = from[LU_IND0+3];
+      to[LU_IND0+4] = from[LU_IND0+4];
+      to[LU_IND0+5] = from[LU_IND0+5];
+      to[LU_IND0+6] = from[LU_IND0+6];
+      to[LU_IND0+7] = from[LU_IND0+7];
+   }
+   i = MAX0(LU_NUB0, 0);
+
+   return i;
+}
+
+"dead code elimination"
+int duff_device01(char *from, char *to, int count)
+{
+   int i = 0;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+
+   LU_NUB0 = count;
+   LU_IB0 = MOD(LU_NUB0, 8);
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1)
+      to[LU_IND0] = from[LU_IND0];
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 8) {
+      to[LU_IND0] = from[LU_IND0];
+      to[LU_IND0+1] = from[LU_IND0+1];
+      to[LU_IND0+2] = from[LU_IND0+2];
+      to[LU_IND0+3] = from[LU_IND0+3];
+      to[LU_IND0+4] = from[LU_IND0+4];
+      to[LU_IND0+5] = from[LU_IND0+5];
+      to[LU_IND0+6] = from[LU_IND0+6];
+      to[LU_IND0+7] = from[LU_IND0+7];
+   }
+   i = MAX0(LU_NUB0, 0);
+
+   return i;
+}
+
+Warnings
+
+unknown[unknown] (activate_phase) Rule `C_SYMBOL_TABLE' already active
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
+TRANSFORMERS_INTRA_FAST[duff_device01] (transformers_intra_fast) Property SEMANTICS_FLOW_SENSITIVE is ignored
+TRANSFORMERS_INTRA_FAST[duff_device01] (transformers_intra_fast) Property SEMANTICS_FIX_POINT is ignored

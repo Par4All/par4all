@@ -1,0 +1,63 @@
+
+"initial file:"
+static OSStatus SSLVerifySignedServerKeyExchange(SSLContext *ctx, _Bool isRsa, SSLBuffer signedParams, uint8_t *signature, UInt16 signatureLen)
+{
+   OSStatus err;
+   SSLBuffer hashOut, hashCtx, clientRandom, serverRandom;
+   uint8_t hashes[20+16];
+   SSLBuffer signedHashes;
+   uint8_t *dataToSign;
+   size_t dataToSignLen;
+
+   signedHashes.data = 0;
+   hashCtx.data = 0;
+
+   clientRandom.data = ctx->clientRandom;
+   clientRandom.length = 32;
+   serverRandom.data = ctx->serverRandom;
+   serverRandom.length = 32;
+
+
+   if (isRsa) goto l99999;
+   /* DSA, ECDSA - just use the SHA1 hash */
+   dataToSign = &hashes[16];
+   dataToSignLen = 20;
+l99998:   ;
+
+   hashOut.data = hashes+16;
+   hashOut.length = 20;
+   if ((err = SSLFreeBuffer(&hashCtx))!=0) goto fail;
+   if ((err = ReadyHash(&SSLHashSHA1, &hashCtx))!=0) goto fail;
+   if ((err = (SSLHashSHA1.update)(&hashCtx,&clientRandom))!=0) goto fail;
+   if ((err = (SSLHashSHA1.update)(&hashCtx,&serverRandom))!=0) goto fail;
+   if ((err = (SSLHashSHA1.update)(&hashCtx,&signedParams))!=0) {
+      goto fail;
+   }
+   else {
+      goto fail;
+   }
+l99999:   ;
+   /* skip this if signing with DSA */
+   dataToSign = hashes;
+   dataToSignLen = 20+16;
+   hashOut.data = hashes;
+   hashOut.length = 16;
+   if ((err = ReadyHash(&SSLHashMD5, &hashCtx))!=0) goto fail;
+   if ((err = (SSLHashMD5.update)(&hashCtx,&clientRandom))!=0) goto fail;
+   if ((err = (SSLHashMD5.update)(&hashCtx,&serverRandom))!=0) goto fail;
+   if ((err = (SSLHashMD5.update)(&hashCtx,&signedParams))!=0) goto fail;
+   if ((err = (SSLHashMD5.final)(&hashCtx,&hashOut))!=0) {
+   }
+   else {
+      goto l99998;
+   }
+
+fail:   ;
+   SSLFreeBuffer(&signedHashes);
+   SSLFreeBuffer(&hashCtx);
+   return err;
+}
+
+Warnings
+
+CONTROLIZER[apple_goto_fail!SSLVerifySignedServerKeyExchange] (control_graph) Some statements are unreachable

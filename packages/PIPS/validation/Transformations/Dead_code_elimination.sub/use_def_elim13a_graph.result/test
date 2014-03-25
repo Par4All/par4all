@@ -1,0 +1,47 @@
+"initial file:"
+int use_def_elim13a_graph()
+{
+   int r;                                                               /*0009*/
+
+   if (rand())                                                          /*0011*/
+      r = 1;                                                            /*0012*/
+   if (rand())                                                          /*0013*/
+      r = 0;                                                            /*0014*/
+
+   return r;                                                            /*0016*/
+}
+
+"use def graph..."
+
+ *********************** Use-Def Chains *********************
+
+	09 --> 12 with conflicts
+		from <r-WE-EXACT> to <r-RE-EXACT>
+	09 --> 14 with conflicts
+		from <r-WE-EXACT> to <r-RE-EXACT>
+	09 --> 16 with conflicts
+		from <r-WE-EXACT> to <r-RE-EXACT>
+	12 --> 14 with conflicts
+		from <r-W-EXACT> to <r-W-EXACT>
+	12 --> 16 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
+	14 --> 16 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
+
+****************** End of Dependence Graph ******************
+
+"dead code elim..."
+int use_def_elim13a_graph()
+{
+   int r;                                                               /*0009*/
+
+   if (rand())                                                          /*0011*/
+      r = 1;                                                            /*0012*/
+   if (rand())                                                          /*0013*/
+      r = 0;                                                            /*0014*/
+
+   return r;                                                            /*0016*/
+}
+
+Warnings
+

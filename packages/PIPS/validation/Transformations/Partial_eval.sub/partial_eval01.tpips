@@ -1,8 +1,9 @@
-delete partial_eval01
+setenv WS=partial_eval01
+delete $WS
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create partial_eval01 partial_eval01.c
+create $WS $WS.c
 
 echo
 echo "foo" file
@@ -27,5 +28,5 @@ activate PRINT_CODE
 display PRINTED_FILE
 
 close
-delete partial_eval01
+delete $WS
 quit

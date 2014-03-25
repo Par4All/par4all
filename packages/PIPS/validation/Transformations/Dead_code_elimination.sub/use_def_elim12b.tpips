@@ -1,0 +1,31 @@
+setenv WSPACE=use_def_elim12b
+delete $WSPACE
+create $WSPACE $WSPACE.c 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS TRUE
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+echo "initial file:"
+#activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[$WSPACE]
+
+echo
+echo "dead code elim..."
+apply DEAD_CODE_ELIMINATION
+display PRINTED_FILE[$WSPACE]
+
+
+close
+echo
+echo Warnings
+echo
+shell cat $WSPACE.database/Warnings
+
+delete $WSPACE
+quit

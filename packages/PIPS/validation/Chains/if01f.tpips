@@ -1,0 +1,30 @@
+setenv WSPACEm=if01f
+setenv WSPACE=IF01F
+delete $WSPACEm
+create $WSPACEm $WSPACEm.f
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+echo "initial file:"
+display PRINTED_FILE[$WSPACE]
+
+echo
+echo "use def graph..."
+activate PRINT_CHAINS_GRAPH
+display DG_FILE
+
+#apply PRINT_DOT_CHAINS_GRAPH[$WSPACE]
+#shell dot -Tpng $WSPACE.database/$WSPACE/$WSPACE.dot > $WSPACE.database/$WSPACE/usedefchains.png
+#shell eog $WSPACE.database/$WSPACE/usedefchains.png
+
+
+close
+echo
+echo Warnings
+echo
+shell cat $WSPACEm.database/Warnings
+
+delete $WSPACEm
+quit

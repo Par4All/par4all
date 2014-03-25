@@ -1164,6 +1164,7 @@
 *
 *     Test the input parameters.
 *
+      INFO = 0                                                          0060
       IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0061
      &, 'T')) THEN                                                      0061
          INFO = 1                                                       0064
@@ -1356,6 +1357,7 @@
 *
 *     Test the input parameters.
 *
+      INFO = 0                                                          0060
       IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0061
      &, 'T')) THEN                                                      0061
          INFO = 1                                                       0064
@@ -1642,6 +1644,7 @@
 *
 *     Test the input parameters.
 *
+      INFO = 0                                                          0060
       IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0061
      &, 'T')) THEN                                                      0061
          INFO = 1                                                       0064
@@ -2034,6 +2037,7 @@
 *
 *     Test the input parameters.
 *
+      INFO = 0                                                          0060
       IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0061
      &, 'T')) THEN                                                      0061
          INFO = 1                                                       0064
@@ -2423,6 +2427,7 @@
 *
 *     Test the input parameters.
 *
+      INFO = 0                                                          0060
       IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0061
      &, 'T')) THEN                                                      0061
          INFO = 1                                                       0064
@@ -2765,14 +2770,14 @@
       EXTERNAL LSAME
       INTEGER*4 SIZE
       PARAMETER (SIZE = 10)
-      INTEGER NROWB0, NROWA0, J5, J4, J3, J2, J1, J0, INFO0, I_00, 
-     &I_10, I_20, LU_IND00, LU_IND10, LU_IND20, LU_IND30, LU_IND40, 
-     &LU_IND50, LU_IND60, LU_IND70, LU_IND80, LU_IND90, LU_IND9, 
-     &LU_IB9, LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, LU_IND7, LU_IB7, 
-     &LU_NUB7, LU_IND6, LU_IB6, LU_NUB6, LU_IND5, LU_IB5, LU_NUB5, 
-     &LU_IND4, LU_IB4, LU_NUB4, LU_IND3, LU_IB3, LU_NUB3, LU_IND2, 
-     &LU_IB2, LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, 
-     &LU_NUB0, M, N, K, LDA, LDB, LDC, I, L
+      INTEGER NROWB0, NROWA0, J5, J4, J3, J2, J1, J0, INFO1, INFO0, 
+     &I_00, I_10, I_20, LU_IND00, LU_IND10, LU_IND20, LU_IND30, 
+     &LU_IND40, LU_IND50, LU_IND60, LU_IND70, LU_IND80, LU_IND90, 
+     &LU_IND9, LU_IB9, LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, LU_IND7, 
+     &LU_IB7, LU_NUB7, LU_IND6, LU_IB6, LU_NUB6, LU_IND5, LU_IB5, 
+     &LU_NUB5, LU_IND4, LU_IB4, LU_NUB4, LU_IND3, LU_IB3, LU_NUB3, 
+     &LU_IND2, LU_IB2, LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, 
+     &LU_IB0, LU_NUB0, M, N, K, LDA, LDB, LDC, I, L
       REAL*4 ZERO0, ONE0, TEMP1, TEMP0, F_03, F_02, F_01, F_00, F_13
      &, F_12, F_11, F_10, F_43, F_42, F_41, F_40, F_53, F_52, F_51, 
      &F_50, F_7, F_6, F_5, F_4, F_3, F_2, F_1, F_0, C3, C2, C1, C0, 
@@ -2807,9 +2812,11 @@
 *
 *     Test the input parameters.
 *
+      INFO0 = 0                                                         0060
       IF (.NOT.NOTA0.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(        0061
      &TRANSA, 'T')) THEN                                                0061
-         INFO0 = 1                                                      0064
+         INFO1 = 1                                                      0064
+         INFO0 = INFO1
       ELSE
          L_911 = .NOT.NOTB0
          L_110 = LSAME(TRANSB, 'C')
@@ -3294,6 +3301,7 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
   int j2;
   int j1;
   int j0;
+  int info1;
   int info0;
   int notb0;
   int nota0;
@@ -3471,11 +3479,13 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
   zero0 = 0.0e+0;
   nota0 = lsame (&transa, 'n');
   notb0 = lsame (&transb, 'n');
+  info0 = 0;
   nrowa0 = __c - conditional__ (&nota0, &m, &k);
   nrowb0 = __c - conditional__ (&notb0, &k, &n);
   if ((!nota0 && !lsame (&transa, 'c')) && !lsame (&transa, 't'))
     {
-      info0 = 1;
+      info1 = 1;
+      info0 = info1;
     }
   else
     {

@@ -1290,3 +1290,4 @@ RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Depend
 RICE_SEMANTICS_DEPENDENCE_GRAPH[sumMatrices_SOA] (TestCoupleOfReferences) Dependence between differents variables: pos and *ANYWHERE*
 unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
 unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.

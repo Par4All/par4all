@@ -2,11 +2,12 @@ delete laguer
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
+setenv PIPS_CPP "cpp -C -P -ffreestanding"
 create laguer laguer.c
 
 # This file cannot be preprocessed because "complex.h" is not available
 
-shell cc -C -E laguer.database/Tmp/laguer.cpp_processed.c
+shell cpp -C -ffreestanding laguer.database/Tmp/laguer.cpp_processed.c
 
 # echo cat laguer.database/[a-z_]*[a-z_]/*.c
 display C_SOURCE_FILE[%ALL]

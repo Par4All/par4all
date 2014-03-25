@@ -29,6 +29,12 @@ dereference.c	    NOK the source code is not easy to compile with gcc, even
 		    	using the options available in the tpips script
 			Seems to work with tpips
 
+duff_device01-03.c  OK  the switch and the while loop are properly destructured.
+		        Pips is not able to recover the loop structure because of the
+			many labels.
+			No transformation seems to exist to build a prologue with labels
+			and a loop body without labels.
+
 extension02	    NOK	__attribute__ not parsed by PIPS preprocessor
 		        Moved to C_syntax_enhancements
 

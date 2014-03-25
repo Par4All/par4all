@@ -1,18 +1,8 @@
 # 1 "fixrts.database/Tmp/fixrts.cpp_processed.c"
-# 1 "<built-in>"
 # 1 "<command-line>"
 # 1 "fixrts.database/Tmp/fixrts.cpp_processed.c"
-# 1 "./fixrts.c"
-# 1 "<built-in>"
-# 1 "<command-line>"
-# 1 "./fixrts.c"
 // #include <math.h>
 // #include "complex.h"
-
-
-
-
-
 void fixrts(d,npoles)
 float d[];
 int npoles;
@@ -27,7 +17,6 @@ int npoles;
  int i,j,polish;
  fcomplex a[100],roots[100];
  void zroots();
-
  a[npoles]=Complex(1.0,0.0);
  for (j=npoles-1;j>=0;j--)
   a[j]=Complex(-d[npoles-j],0.0);
@@ -47,7 +36,7 @@ int npoles;
  for (j=0;j<=npoles-1;j++)
   d[npoles-j] = -a[j].r;
 }
-# 8
+# 3
 void fixrts(d,npoles)
 float d[];
 int npoles;
@@ -62,7 +51,6 @@ int npoles;
  int i,j,polish;
  fcomplex a[100],roots[100];
  void zroots();
-
  a[npoles]=Complex(1.0,0.0);
  for (j=npoles-1;j>=0;j--)
   a[j]=Complex(-d[npoles-j],0.0);
@@ -82,17 +70,8 @@ int npoles;
  for (j=0;j<=npoles-1;j++)
   d[npoles-j] = -a[j].r;
 }
-# 1 "./fixrts.c"
-# 1 "<built-in>"
-# 1 "<command-line>"
-# 1 "./fixrts.c"
 // #include <math.h>
 // #include "complex.h"
-
-
-
-
-
 extern void fixrts();
 void fixrts(float d[], int npoles)
 {
@@ -109,7 +88,6 @@ void fixrts(float d[], int npoles)
    int i, j, polish;
    fcomplex a[100], roots[100];
    void zroots(fcomplex *, int, fcomplex *, int);
-
    a[npoles] = Complex(1.0, 0.0);
    for (j = npoles-1;j>=0;j--)
       a[j] = Complex(-d[npoles-j], 0.0);
