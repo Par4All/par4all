@@ -495,7 +495,11 @@ static void initialize_readline(void)
   rl_basic_word_break_characters = " \t\n\"\\@$><=;|&{(";
 
   /* Tell the completer that we want a crack first. */
+#if defined (_RL_FUNCTION_TYPEDEF)
+  rl_attempted_completion_function = (rl_completion_func_t *) fun_completion;
+#else
   rl_attempted_completion_function = (CPPFunction *) fun_completion;
+#endif
 
   /* function for completing parameters */
   rl_completion_entry_function = (rl_compentry_func_t *) param_generator;
@@ -921,6 +925,10 @@ static string tp_substitutions(string line)
 
 /* variable globale, utilisee par le parser helas */
 bool tpips_init_done = false;
+/* Pipsmake does not enforce consistency when properties are
+   changed. The consistency can be enforced by forbidding setproperty
+   during a processing phase. */
+bool consistency_enforced_p = false;
 
 void tpips_init(void)
 {
@@ -937,6 +945,7 @@ void tpips_init(void)
   /* initialize_signal_catcher(); */
 
   set_bool_property("ABORT_ON_USER_ERROR", false); /* ??? */
+  consistency_enforced_p = get_bool_property("CONSISTENCY_ENFORCED_P");
 
   pips_log_handler = smart_log_handler;
   pips_request_handler = tpips_user_request;

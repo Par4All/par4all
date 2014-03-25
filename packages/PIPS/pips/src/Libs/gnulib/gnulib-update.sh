@@ -1,5 +1,5 @@
 #!/bin/sh
-# use this script to update gunlib
+# use this script to update gnulib
 # because of naming convention limitations introduced by FC
 # we cannot solely rely on a gnulib-tool --update
 
