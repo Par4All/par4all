@@ -41,7 +41,9 @@ void * P4A_scmp_flow(void **flow)
 void P4A_scmp_kernel_0(int a_0[1], int b_0[1], int c[10])
 {
    //PIPS generated variable
-   int i, a, b;
+   int i;
+   //PIPS generated variable
+   int a, b;
    b = *b_0;
    a = *a_0;
 
@@ -56,7 +58,9 @@ void P4A_scmp_kernel_0(int a_0[1], int b_0[1], int c[10])
 void P4A_scmp_kernel_1(int a_0[1], int b_0[1])
 {
    //PIPS generated variable
-   int i, a, b;
+   int i;
+   //PIPS generated variable
+   int a, b;
    b = *b_0;
    a = *a_0;
 
