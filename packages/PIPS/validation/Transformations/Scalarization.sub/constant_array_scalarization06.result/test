@@ -1,0 +1,42 @@
+void constant_array_scalarization06()
+{
+   int a[3];
+   double b[3];
+   long long int c[3];
+
+   a[0] = 1;
+   a[1] = 1;
+   a[2] = 1;
+
+   c[0] = 1L;
+   c[1] = 1L;
+   c[2] = 1L;
+
+   b[2] = 1.;
+   b[1] = 1.;
+   b[0] = 1.;
+}
+void constant_array_scalarization06()
+{
+   int a[3];
+   double b[3];
+   long long int c[3];
+   //PIPS generated variable
+   int a0, a1, a2;
+   //PIPS generated variable
+   double b0, b1, b2;
+   //PIPS generated variable
+   long long int c0, c1, c2;
+
+   a0 = 1;
+   a1 = 1;
+   a2 = 1;
+
+   c0 = 1L;
+   c1 = 1L;
+   c2 = 1L;
+
+   b0 = 1.;
+   b1 = 1.;
+   b2 = 1.;
+}

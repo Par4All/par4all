@@ -3,6 +3,7 @@ delete $WS
 
 # This piece of code is no longer OK with gcc
 setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+setenv PIPS_CPP "cpp -C -P -ffreestanding"
 
 create $WS $WS.c
 

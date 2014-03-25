@@ -1,0 +1,58 @@
+"initial file:"
+int use_def_elim16c_graph()
+{
+//             <    is written>: r
+//             <    is referenced>: r
+//             <    is declared>: r
+   int r = 0;                                                           /*0006*/
+//             <    is written>: r
+//             <    is referenced>: r
+
+   r = 1;                                                               /*0008*/
+//             <    is written>: r
+//             <    is referenced>: r
+   r = 0;                                                               /*0009*/
+//             <    is read   >: r
+//             <    is referenced>: r
+
+   return r;                                                            /*0011*/
+}
+
+"use def graph..."
+
+ *********************** Use-Def Chains *********************
+
+	06 --> 08 with conflicts
+		from <r-W-EXACT> to <r-W-EXACT>
+		from <r-WE-EXACT> to <r-RE-EXACT>
+	06 --> 09 with conflicts
+		from <r-WE-EXACT> to <r-RE-EXACT>
+	06 --> 11 with conflicts
+		from <r-WE-EXACT> to <r-RE-EXACT>
+	08 --> 09 with conflicts
+		from <r-W-EXACT> to <r-W-EXACT>
+	09 --> 11 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
+
+****************** End of Dependence Graph ******************
+
+"dead code elim..."
+int use_def_elim16c_graph()
+{
+//             <    is written>: r
+//             <    is referenced>: r
+//             <    is declared>: r
+   int r = 0;                                                           /*0006*/
+
+
+//             <    is written>: r
+//             <    is referenced>: r
+   r = 0;                                                               /*0009*/
+//             <    is read   >: r
+//             <    is referenced>: r
+
+   return r;                                                            /*0011*/
+}
+
+Warnings
+

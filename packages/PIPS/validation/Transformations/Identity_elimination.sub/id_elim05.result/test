@@ -1,0 +1,35 @@
+
+Initial code
+
+int id_elim05()
+{
+   int b[5];
+   int i = 0;
+   
+   //not useless because side effect;
+   b[i++] = b[i++];
+   b[i--] = b[i--];
+   //useless
+   b[i] = b[i];
+
+   return 0;
+}
+
+Code after IDENTITY_ELIMINATION
+
+int id_elim05()
+{
+   int b[5];
+   int i = 0;
+   
+   //not useless because side effect;
+   b[i++] = b[i++];
+   b[i--] = b[i--];
+   //useless
+   ;
+
+   return 0;
+}
+
+Warnings
+

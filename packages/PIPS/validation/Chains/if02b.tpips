@@ -1,0 +1,32 @@
+setenv WSPACE=if02b
+delete $WSPACE
+create $WSPACE $WSPACE.c 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS TRUE
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+echo "initial file:"
+display PRINTED_FILE[$WSPACE]
+
+echo
+echo "use def graph..."
+activate PRINT_CHAINS_GRAPH
+display DG_FILE
+
+#apply PRINT_DOT_CHAINS_GRAPH[$WSPACE]
+#shell dot -Tpng $WSPACE.database/$WSPACE/$WSPACE.dot > $WSPACE.database/$WSPACE/usedefchains.png
+#shell eog $WSPACE.database/$WSPACE/usedefchains.png
+
+
+close
+echo
+echo Warnings
+echo
+shell cat $WSPACE.database/Warnings
+
+delete $WSPACE
+quit

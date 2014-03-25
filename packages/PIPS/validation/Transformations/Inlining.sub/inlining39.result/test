@@ -1,0 +1,32 @@
+"initial file:"
+int main(void)
+{
+   return maxim(4^2, 0);
+}
+int maxim(int a, int b)
+{
+   if (a<b)
+      return b;
+   return a;
+}
+
+"inlining..."
+int main(void)
+{
+   //PIPS generated variable
+   int _return0;
+   {
+      //PIPS generated variable
+      int I_0;
+      I_0 = 4^2;
+      if (I_0<0)
+         _return0 = 0;
+      else
+         _return0 = I_0;
+   }
+   return _return0;
+}
+
+Warnings
+
+CONTROLIZER[main] (control_graph) Some statements are unreachable

@@ -1,0 +1,28 @@
+"initial file:"
+int use_def_elim13a()
+{
+   int r;                                                               /*0009*/
+
+   if (rand())                                                          /*0011*/
+      r = 1;                                                            /*0012*/
+   if (rand())                                                          /*0013*/
+      r = 0;                                                            /*0014*/
+
+   return r;                                                            /*0016*/
+}
+
+"dead code elim..."
+int use_def_elim13a()
+{
+   int r;                                                               /*0009*/
+
+   if (rand())                                                          /*0011*/
+      r = 1;                                                            /*0012*/
+   if (rand())                                                          /*0013*/
+      r = 0;                                                            /*0014*/
+
+   return r;                                                            /*0016*/
+}
+
+Warnings
+

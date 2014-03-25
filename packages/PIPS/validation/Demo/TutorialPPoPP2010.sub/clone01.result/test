@@ -30,6 +30,8 @@ int main()
    i = clone01(i, 1);
 //  P(i) {0<=i+1, i<=3}
    i = clone01(i, 0);
+//  P(i) {0<=i+2, i<=4}
+   return i;
 }
 # new callgraph
  main
@@ -94,6 +96,7 @@ int main()
    i = clone01_0(i, -1);
    i = clone01_1(i, 1);
    i = clone01_2(i, 0);
+   return i;
 }
 # applying partial evaluation...
 int clone01(int n, int s)
@@ -153,6 +156,7 @@ int main()
    i = clone01_0(i, -1);
    i = clone01_1(i, 1);
    i = clone01_2(i, 0);
+   return 1;
 }
 # applying use-def elimination...
 int clone01_1(int n, int s)
@@ -197,6 +201,7 @@ int main()
    i = clone01_0(i, -1);
    i = clone01_1(i, 1);
    i = clone01_2(i, 0);
+   return 1;
 }
 //  P() {}
 int main()
@@ -209,4 +214,6 @@ int main()
    i = clone01_1(i, 1);
 //  P(i) {i==1}
    i = clone01_2(i, 0);
+//  P(i) {i==1}
+   return 1;
 }

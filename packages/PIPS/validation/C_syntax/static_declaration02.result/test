@@ -1,0 +1,28 @@
+int main()
+{
+   static int x = 2;
+   static int y = 3, z = 0;
+   z++;
+   x++;
+   return y;
+}
+
+Unsplit static declarations
+
+/*
+ * file for static_declaration02.c
+ */
+// Static and int can be interchange, but PIPS prettyprinted knows
+// only static int
+
+// All variables declared together have the same storage: z is static
+
+int main();
+int main()
+{
+   static int x = 2;
+   static int y = 3, z = 0;
+   z++;
+   x++;
+   return y;
+}

@@ -1261,7 +1261,9 @@ PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning sumMatrices_AO
 unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
 unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
 PRINT_CODE[sumMatrices_AOS] (C_loop_range) loop increment sign is unknown: assumed positive
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning sumMatrices_AOS instead
 PRINT_CODE[sumMatrices_AOS] (C_loop_range) loop increment sign is unknown: assumed positive
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning sumMatrices_AOS instead
 PRINT_CODE[sumMatrices_AOS] (C_loop_range) loop increment sign is unknown: assumed positive

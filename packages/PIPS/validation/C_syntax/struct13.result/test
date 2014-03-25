@@ -1,11 +1,11 @@
-COMPILATION_UNIT_PARSER[struct13!] (c_parse) Dummy parameter "l" is redefined at line 5 (9)
+COMPILATION_UNIT_PARSER[struct13!] (c_parse) Dummy parameter "l" is redefined at line 5 (5)
 COMPILATION_UNIT_PARSER[struct13!] (CParserError) 
 Recovery from C parser failure not (fully) implemented yet.
 C parser is likely to fail later if re-used.
 COMPILATION_UNIT_PARSER[struct13!] (CParserError) user error
 COMPILATION_UNIT_PARSER[struct13!] (CParserError) 
 Dummy redefinition accepted by gcc but not compatible with ISO standard. Try to compile with "gcc -ansi -c"
- at user line 5 (local line 9) in file "./struct13.database/struct13!/struct13!.c"
+ at user line 5 (local line 5) in file "./struct13.database/struct13!/struct13!.c"
 COMPILATION_UNIT_PARSER[struct13!] (set_debug_stack_pointer) debug level stack is set to 2
 unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PARSED_PRINTED_FILE for module struct13!.
 unknown[unknown] (display_a_resource) user error

@@ -1,0 +1,63 @@
+"initial file:"
+int use_def_elim14_graph()
+{
+   int r;                                                               /*0009*/
+
+   if (rand()) {                                                        /*0011*/
+      r = 1;                                                            /*0013*/
+      r = r;                                                            /*0014*/
+   }
+   else {
+      r = 0;                                                            /*0018*/
+      r = r;                                                            /*0019*/
+   }
+
+   return r;                                                            /*0022*/
+}
+
+"use def graph..."
+
+ *********************** Use-Def Chains *********************
+
+	09 --> 13 with conflicts
+		from <r-WE-EXACT> to <r-RE-EXACT>
+	09 --> 14 with conflicts
+		from <r-WE-EXACT> to <r-RE-EXACT>
+	09 --> 18 with conflicts
+		from <r-WE-EXACT> to <r-RE-EXACT>
+	09 --> 19 with conflicts
+		from <r-WE-EXACT> to <r-RE-EXACT>
+	09 --> 22 with conflicts
+		from <r-WE-EXACT> to <r-RE-EXACT>
+	13 --> 14 with conflicts
+		from <r-W-EXACT> to <r-W-EXACT>
+		from <r-W-EXACT> to <r-R-EXACT>
+	14 --> 22 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
+	18 --> 19 with conflicts
+		from <r-W-EXACT> to <r-W-EXACT>
+		from <r-W-EXACT> to <r-R-EXACT>
+	19 --> 22 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
+
+****************** End of Dependence Graph ******************
+
+"dead code elim..."
+int use_def_elim14_graph()
+{
+   int r;                                                               /*0009*/
+
+   if (rand()) {                                                        /*0011*/
+      r = 1;                                                            /*0013*/
+      r = r;                                                            /*0014*/
+   }
+   else {
+      r = 0;                                                            /*0018*/
+      r = r;                                                            /*0019*/
+   }
+
+   return r;                                                            /*0022*/
+}
+
+Warnings
+

@@ -1,0 +1,32 @@
+delete sven04
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+##TODO: explain
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+create sven04 sven04.c
+
+## Needed for substracting set approximations
+activate MUST_REGIONS
+
+setproperty SCALARIZATION_PREFIX "__scalar__"
+# apply SCALARIZATION[sven04]
+apply FORWARD_SUBSTITUTE[sven04]
+display PRINTED_FILE[sven04]
+
+apply DISTRIBUTER[sven04]
+display PRINTED_FILE[sven04]
+
+display DG_FILE[sven04]
+
+apply DEAD_CODE_ELIMINATION[sven04]
+# apply USE_DEF_ELIMINATION[sven04]
+display PRINTED_FILE[sven04]
+
+close
+delete sven04
+quit
+

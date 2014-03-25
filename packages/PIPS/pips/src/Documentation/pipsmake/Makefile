@@ -53,7 +53,7 @@ DERIVED_FILES=	$(INSTALL_ETC) $(DERIVED_INC) $(INSTALL_DOC)
 all: $(DERIVED_FILES)
 
 # the documentation must generate its derived headers as soon as possible
-# beacause it is expected to compute the dependencies of some librairies
+# because it is expected to compute the dependencies of some librairies
 # especially Passes/tpips
 phase0: .build_inc .build_etc
 

@@ -643,8 +643,8 @@ static void inout_test( statement s, test t ) {
   set ref_out = current_refs;
 
   // Restore DEF and REF
-  set current_defs = def_in;
-  set current_refs = ref_in;
+  current_defs = def_in;
+  current_refs = ref_in;
 
   /*
    * Compute false path
@@ -656,8 +656,8 @@ static void inout_test( statement s, test t ) {
   set_union( current_refs, current_refs, ref_out );
 
   // Free temporary set
-  set_free(def_in);
-  set_free(ref_in);
+  set_free(def_out);
+  set_free(ref_out);
 
 }
 

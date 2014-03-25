@@ -2,7 +2,11 @@
 int main(int argc, char *argv[])
 {
    //PIPS generated variable
-   int size, a[size], b[size], i, bi, j, bj;
+   int size;
+   //PIPS generated variable
+   int a[size], b[size];
+   //PIPS generated variable
+   int i, bi, j, bj;
 #pragma omp parallel default(shared) 
    {
 #pragma omp single

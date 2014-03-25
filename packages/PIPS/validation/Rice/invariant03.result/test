@@ -64,3 +64,4 @@ unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_SUMMARY_PRECONDITION' al
 unknown[unknown] (activate_phase) Rule `TRANSFORMERS_INTER_FULL' already active
 unknown[unknown] (activate_phase) Rule `PRECONDITIONS_INTER_FULL' already active
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning invariant03 instead
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.

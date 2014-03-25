@@ -22,9 +22,10 @@ int main(int argc, char **argv)
    }
    else {
       a1 = 3;
+      a0 = a1;
       printf("%d", a1);
    }
-   printf("%d", a1);
+   printf("%d", a0);
    return 0;
 }
 

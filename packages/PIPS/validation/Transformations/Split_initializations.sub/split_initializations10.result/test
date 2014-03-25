@@ -1,0 +1,15 @@
+
+Initial code
+
+int split_initializations10()
+{
+   static int i = 1;
+}
+
+Code after split_initializations
+
+int split_initializations10()
+{
+   static int i;
+   i = 1;
+}

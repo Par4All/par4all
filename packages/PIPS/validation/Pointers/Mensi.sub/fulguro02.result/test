@@ -140,4 +140,5 @@ void fulguro02(FLGR_Data2D *img)
 }
 unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_POINTS_TO_ANALYSIS' already active
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[fulguro02] (points_to_set_block_projection) Memory leak for bucket "fulguro02:*HEAP*_l_31".
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning fulguro02 instead
