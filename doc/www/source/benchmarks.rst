@@ -106,7 +106,7 @@ double precision:
 To test it by yourself on the main computational part, go to the
 examples/P4A/Hyantes directory of Par4All or look in the ``git``
 repository
-https://github.com/keryell/par4all/tree/p4a/examples/P4A/Hyantes
+https://github.com/Par4All/par4all/tree/p4a/examples/P4A/Hyantes
 
 For mobile users, it is interesting to show result figures on a laptop:
 for the single precision (compiled with make USE_FLOAT=1) on a HP
@@ -171,7 +171,7 @@ Matrix multiplication
 The classical Hello World in Fortran can be found in
 ``examples/F77_matmul_OpenMP`` directory of Par4All or look in the ``git``
 repository
-https://github.com/keryell/par4all/tree/p4a/examples/F77_matmul_OpenMP so
+https://github.com/Par4All/par4all/tree/p4a/examples/F77_matmul_OpenMP so
 you can try by yourself.
 
 On a Wild Node, we get a **speed-up of 12.1** (thanks to cache effects)

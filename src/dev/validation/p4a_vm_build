@@ -6,6 +6,21 @@
 export HOME=~
 export P4A_TOP=$HOME
 
+# Try to guess the user name that launched this script through ssh -A,
+# from the key filename which is something like "[...]
+# /home/keryell/.ssh/id_dsa"
+ssh_user=`ssh-add -L`
+ssh_user=`dirname $ssh_user`
+ssh_user=`dirname $ssh_user`
+ssh_user=`basename "$ssh_user"`
+
+# Use the genuine user name for publishing purpose on the servers
+echo "Host *" > ~/.ssh/config
+echo "    User $ssh_user">> ~/.ssh/config
+# Since we are in a VM that has never met before the remote host, just do not
+# use the remote finger print anyway
+echo "    StrictHostKeyChecking no">> ~/.ssh/config
+
 # Change the umask so that the package construction does not fail with:
 # dpkg-deb: error: control directory has bad permissions 750 (must be >=0755 and <=0775)
 umask 022
@@ -19,7 +34,11 @@ cd
 # Update the list of available packages
 until sudo apt-get update ; do
   echo Waiting for the network to be up...
+  sleep 1
 done
+
+ssh download.par4all.org ls
+
 
 # Update the current OS, just in case
 sudo apt-get --assume-yes upgrade
@@ -32,9 +51,12 @@ sudo apt-get --assume-yes install cproto ed gfortran gnuplot ipython libmpfr-dev
 echo System installation done
 
 cd $P4A_TOP
+# Just in cas we are testing this script and there is already an old
+# par4all here, erase it
+rm -rf par4all
 git clone --branch p4a file:///mnt/par4all
 cd par4all
-
+if false; then
 # Compile and install Par4All
 src/simple_tools/p4a_setup.py -z -vvv --jobs=4
 
@@ -45,7 +67,7 @@ cd $P4A_TOP
 git clone file:///mnt/par4all-priv
 cd par4all-priv/validation
 P4A_VALIDATION_DO_NOT_RUN=1 make validate-out --jobs=4
-
+fi
 
 # Compile, install and create a distribution of Par4All
 cd $P4A_TOP/par4all

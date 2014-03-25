@@ -93,7 +93,7 @@ def main():
                         url = os.path.abspath(url)
                 else:
                     # Use the default location:
-                    url = "git://git.hpc-project.com/par4all"
+                    url = "git://git.par4all.org/par4all"
 
                 # Create and jump into a temporary directory:
                 work_dir = tempfile.mkdtemp(prefix = "p4a_coffee_")

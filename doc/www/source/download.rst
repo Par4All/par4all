@@ -5,11 +5,11 @@ Because of current limitations in PIPS there are some specific bugs on
 recent 32-bit *x*\ 86 Linux target so please use a 64-bit platform to run
 Par4All.
 
-`Release note <https://github.com/keryell/par4all/blob/p4a/LICENSE.txt>`_
+`Release note <https://github.com/Par4All/par4all/blob/p4a/LICENSE.txt>`_
 
-`Changelog <https://github.com/keryell/par4all/blob/p4a/src/simple_tools/DEBIAN/changelog>`_
+`Changelog <https://github.com/Par4All/par4all/blob/p4a/src/simple_tools/DEBIAN/changelog>`_
 
-`License <https://github.com/keryell/par4all/blob/p4a/LICENSE.txt>`_
+`License <https://github.com/Par4All/par4all/blob/p4a/LICENSE.txt>`_
 
 If you need to run Par4All on unsupported system, please run Par4All
 inside a virtual machine running a supported OS.
@@ -203,10 +203,10 @@ You can also access to the latest Par4All source code and contribute using
 ``git``:
 
 =================================  =========================================
-``git`` source viewer @ GitHub     https://github.com/keryell/par4all.git
+``git`` source viewer @ GitHub     https://github.com/Par4All/par4all.git
 ``git`` source viewer @ SILKAN     https://git.silkan.com/cgit/par4all
-GitHub ``ssh`` access              git@github.com:keryell/par4all.git
-Anonymous ``git`` access @ SILKAN  git://git.silkan.com/git/par4all.git
+GitHub ``ssh`` access              git@github.com:Par4All/par4all.git
+Anonymous ``git`` access @ SILKAN  git://git.par4all.org/par4all
 Commit ``git`` access @ SILKAN     ssh://git.silkan.com/git/par4all.git
 =================================  =========================================
 
