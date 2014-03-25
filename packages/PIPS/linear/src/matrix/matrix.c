@@ -233,8 +233,8 @@ void matrix_swap_rows(Pmatrix A, int r1, int r2)
   int n = MATRIX_NB_COLUMNS(A);
   assert(n > 0);
   assert(m > 0);
-  assert(0 < r1 && r1 <= n);
-  assert(0 < r2 && r2 <= n);
+  assert(0 < r1 && r1 <= m);
+  assert(0 < r2 && r2 <= m);
 
   int i;
   for(i=1; i<=n; i++) {
