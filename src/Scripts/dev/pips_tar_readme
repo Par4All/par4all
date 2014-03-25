@@ -1,0 +1,44 @@
+PIPS: Automatic Parallelizer and Code Transformation Framework
+
+Copyright (C) 1989-2014 MINES ParisTech
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+PIPS is a source-to-source compilation framework for analyzing and transforming
+C and Fortran programs.
+
+The goal of the PIPS project is to develop a free, open and extensible
+workbench for automatically analyzing and transforming scientific and signal
+processing applications. The PIPS workbench is especially relevant for people
+interested in whole program compilation, a.k.a. application compilation or
+interprocedural compilation, reverse-engineering, program verification,
+source-to-source program optimization and parallelization. Its interprocedural
+analyses help with program understanding and with checking legality and impact
+of automatic program transformations. These transformations are used to reduce
+the execution cost and latency, as well as the optimization cost itself. They
+can also be used to support or ease code debugging and maintenance, and to
+check and enforce coding rules.
+
+Techniques developed for PIPS can be re-used for signal processing code written
+in C, because pointers, data structures and dynamic allocation are not used
+much, and for Java code optimization because array boundary checking must be
+minimized conservatively.
+
+PIPS is a free open workbench which has been used as support to develop new
+analyses or program transformations by several teams from MINES ParisTech (the
+initiator of the project in 1988!), CEA-DAM, Southampton University, TÉLÉCOM
+Bretagne, Telecom SudParis, SRU (Slippery Rock University), HPC Project, RPI
+(Rensselaer Polytechnic Institute) and ENS Cachan. These new developments
+benefit at no cost from the general infrastructure and from already available
+analyses and transformations. PIPS has also been used to develop a HPF
+prototype compiler and to study optimizations for HPF.
+
+PIPS is not primarily designed to support compiler back-end research like SUIF
+but is much better as a C and Fortran source-to-source tool because the data
+types (e.g. complex) the code structures, the comments and, to some extent, the
+initial statement numbers are preserved. However, PIPS can be used to generate
+assembly code by lowering and specializing the interal representation.
+
+PIPS used to stand for the French Parallélisation Interprocédurale de Programme
+Scientifiques but can also be understood now as Programming Integrated Parallel
+System or Parallelization Infrastructure for Parallel Systems.
