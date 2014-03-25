@@ -1,0 +1,29 @@
+
+Source code for dead_code_elimination04 with effects
+
+int dead_code_elimination04()
+{
+//             <    is declared>: r
+   int r;
+//             <    is written>: r
+//             <    is referenced>: r
+   r = 1;
+//             <    is written>: r
+//             <    is referenced>: r
+   r = 2;
+//             <    is read   >: r
+//             <    is referenced>: r
+   return r;
+}
+
+Source code for dead_code_elimination04 after dead-code elimination
+
+int dead_code_elimination04()
+{
+   int r;
+   r = 2;
+   return r;
+}
+
+Warnings
+

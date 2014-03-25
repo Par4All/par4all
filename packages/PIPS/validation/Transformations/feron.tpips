@@ -1,0 +1,83 @@
+setenv WSPACE=feron
+delete $WSPACE
+create $WSPACE $WSPACE.c 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+activate C_SYMBOL_TABLE
+activate C_PARSER
+activate PROPER_EFFECTS_WITH_POINTS_TO
+
+echo "initial file:"
+display PRINTED_FILE[$WSPACE]
+
+
+echo
+echo "inlining..."
+apply INLINING[$WSPACE!mat_mul]
+apply INLINING[$WSPACE!mat_mul_const]
+apply INLINING[$WSPACE!mat_add]
+apply INLINING[$WSPACE!mat_zero]
+apply INLINING[$WSPACE!minim]
+apply INLINING[$WSPACE!maxim]
+display PRINTED_FILE[$WSPACE]
+
+
+echo
+echo "flattening..."
+apply FLATTEN_CODE
+display PRINTED_FILE[$WSPACE]
+
+
+echo
+echo "split initialization..."
+apply SPLIT_INITIALIZATIONS
+display PRINTED_FILE[$WSPACE]
+
+
+echo
+echo "constarr scalar..."
+apply CONSTANT_ARRAY_SCALARIZATION
+display PRINTED_FILE[$WSPACE]
+
+
+echo
+echo "forw subst..."
+apply FORWARD_SUBSTITUTE
+apply PARTIAL_EVAL
+display PRINTED_FILE[$WSPACE]
+
+
+echo
+echo "code cleaning..."
+apply PARTIAL_EVAL
+apply PARTIAL_EVAL
+apply CLEAN_DECLARATIONS
+apply SIMPLIFY_CONTROL
+# activate PRINT_CODE_CUMULATED_EFFECTS
+# activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[$WSPACE]
+
+echo
+echo "dead code elim..."
+apply DEAD_CODE_ELIMINATION
+display PRINTED_FILE[$WSPACE]
+
+
+close
+echo
+echo Warnings
+echo
+shell cat $WSPACE.database/Warnings
+
+delete $WSPACE
+quit

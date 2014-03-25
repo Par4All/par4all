@@ -1,0 +1,24 @@
+
+Source code for dead_code_elimination02 with effects
+
+int dead_code_elimination02()
+{
+   int r;
+//             <    is written>: r
+   r = 1;
+//             <    is written>: r
+   r = 2;
+//             <    is read   >: r
+   return r;
+}
+
+Source code for dead_code_elimination02 after dead-code elimination
+int dead_code_elimination02()
+{
+   r = 2;
+   return r;
+}
+
+Warnings
+
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.

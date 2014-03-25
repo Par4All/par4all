@@ -1,0 +1,34 @@
+# A false result is produced because the PIPS database consistency is
+# not enforced
+
+setenv WS=dead_code_elimination02
+delete $WS
+create $WS $WS.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+# Let's check the buggy result without this property:
+# setproperty CONSISTENCY_ENFORCED_P TRUE
+
+echo
+echo Source code for $WS with effects
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[$WS]
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+echo
+echo Source code for "$WS" after dead-code elimination 
+apply DEAD_CODE_ELIMINATION[$WS]
+activate PRINT_CODE
+display PRINTED_FILE[$WS]
+
+close
+echo
+echo Warnings
+echo
+shell cat $WS.database/Warnings
+delete $WS
+quit
+

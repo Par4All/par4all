@@ -22,23 +22,23 @@ int main()
 // p -> undefined , EXACT
 // q -> undefined , EXACT
 
-   p = &i0;
+   p = &i1;
 
 // Points To:
-// p -> i0 , EXACT
+// p -> i1 , EXACT
 // q -> undefined , EXACT
 
-   q = &i1;
+   q = &i0;
 
 // Points To:
-// p -> i0 , EXACT
-// q -> i1 , EXACT
+// p -> i1 , EXACT
+// q -> i0 , EXACT
 
-   j = 1?*p:*q;
+   j = 0?*p:*q;
 
 // Points To:
-// p -> i0 , EXACT
-// q -> i1 , EXACT
+// p -> i1 , EXACT
+// q -> i0 , EXACT
 
 
    return j;
@@ -52,12 +52,12 @@ int main()
    int i0 = 0, i1 = 1, j = -1;
    int *p, *q;
 //             <    is written>: p
-   p = &i0;
+   p = &i1;
 //             <    is written>: q
-   q = &i1;
+   q = &i0;
 //             <may be read   >: i0 i1 p q
 //             <    is written>: j
-   j = 1?*p:*q;
+   j = 0?*p:*q;
 //             <    is read   >: j
 
    return j;
@@ -79,19 +79,19 @@ int main()
 
    int *p, *q;
 
-//  T(p) {&i0==p, i0==0, i1==1, j==-1}
+//  T(p) {&i1==p, i0==0, i1==1, j==-1}
 
-   p = &i0;
+   p = &i1;
 
-//  T(q) {&i0==p, &i1==q, i0==0, i1==1, j==-1}
+//  T(q) {&i0==q, &i1==p, i0==0, i1==1, j==-1}
 
-   q = &i1;
+   q = &i0;
 
-//  T(j) {&i0==p, &i1==q, i0==0, i1==1, j==0, j#init==-1}
+//  T(j) {&i0==q, &i1==p, i0==0, i1==1, j==0, j#init==-1}
 
-   j = 1?*p:*q;
+   j = 0?*p:*q;
 
-//  T(main) {&i0==p, &i1==q, i0==0, i1==1, j==0, main==0}
+//  T(main) {&i0==q, &i1==p, i0==0, i1==1, j==0, main==0}
 
 
    return j;
@@ -115,17 +115,17 @@ int main()
 
 //  P(i0,i1,j,p,q) {i0==0, i1==1, j==-1}
 
-   p = &i0;
+   p = &i1;
 
-//  P(i0,i1,j,p,q) {&i0==p, i0==0, i1==1, j==-1}
+//  P(i0,i1,j,p,q) {&i1==p, i0==0, i1==1, j==-1}
 
-   q = &i1;
+   q = &i0;
 
-//  P(i0,i1,j,p,q) {&i0==p, &i1==q, i0==0, i1==1, j==-1}
+//  P(i0,i1,j,p,q) {&i0==q, &i1==p, i0==0, i1==1, j==-1}
 
-   j = 1?*p:*q;
+   j = 0?*p:*q;
 
-//  P(i0,i1,j,p,q) {&i0==p, &i1==q, i0==0, i1==1, j==0}
+//  P(i0,i1,j,p,q) {&i0==q, &i1==p, i0==0, i1==1, j==0}
 
 
    return j;

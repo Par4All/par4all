@@ -146,11 +146,11 @@ int main()
    }
    else {
 
-//  T(p) {p+sizeof(double)==&a[5], &a[5]==p#init, &b[4]==q}
+//  T(p) {p+sizeof(int)==&a[5], &a[5]==p#init, &b[4]==q}
 
       p--;
 
-//  T(q) {p+sizeof(double)==&a[5], &b[4]+sizeof(double)==q,
+//  T(q) {p+sizeof(int)==&a[5], &b[4]+sizeof(double)==q,
 //    &b[4]==q#init}
 
       q++;

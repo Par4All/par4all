@@ -1,5 +1,6 @@
 setenv WS=struct07
 setenv PIPS_CHECK_C=No
+setenv PIPS_CPP "cpp -C -P -ffreestanding"
 
 delete $WS
 create $WS $WS.c

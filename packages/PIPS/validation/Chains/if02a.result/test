@@ -1,0 +1,28 @@
+"initial file:"
+int if02a()
+{
+   int r;                                                               /*0007*/
+
+   if (rand())                                                          /*0009*/
+      r = 1;                                                            /*0010*/
+   if (rand())                                                          /*0011*/
+      r = 0;                                                            /*0012*/
+
+   return r;                                                            /*0014*/
+}
+
+"use def graph..."
+
+ *********************** Use-Def Chains *********************
+
+	10 --> 12 with conflicts
+		from <r-W-EXACT> to <r-W-EXACT>
+	10 --> 14 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
+	12 --> 14 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
+
+****************** End of Dependence Graph ******************
+
+Warnings
+

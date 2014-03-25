@@ -2,6 +2,7 @@ delete csplit19
 
 #setproperty ABORT_ON_USER_ERROR TRUE
 setenv PIPS_CHECK_C="N"
+setenv PIPS_CPP "cpp -C -P -ffreestanding"
 
 create csplit19 csplit19.c
 

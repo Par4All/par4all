@@ -11,11 +11,11 @@ Parsed printed file for "decl13!"
 Parsed printed file for "decl13"
 
 ### stderr
-user warning in c_parse: Dummy parameter "a" is redefined at line 2 (6)
+user warning in c_parse: Dummy parameter "a" is redefined at line 2 (2)
 Dummy redefinition accepted by gcc but not compatible with ISO standard. Try to compile with "gcc -ansi -c"
-user warning in c_parse: Dummy parameter "a" is redefined at line 2 (6)
+user warning in c_parse: Dummy parameter "a" is redefined at line 2 (2)
 Dummy redefinition accepted by gcc but not compatible with ISO standard. Try to compile with "gcc -ansi -c"
-user warning in c_parse: Dummy parameter "a" is redefined at line 2 (6)
+user warning in c_parse: Dummy parameter "a" is redefined at line 2 (2)
 Dummy redefinition accepted by gcc but not compatible with ISO standard. Try to compile with "gcc -ansi -c"
-user warning in c_parse: Dummy parameter "a" is redefined at line 2 (6)
+user warning in c_parse: Dummy parameter "a" is redefined at line 2 (2)
 Dummy redefinition accepted by gcc but not compatible with ISO standard. Try to compile with "gcc -ansi -c"

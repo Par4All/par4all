@@ -1,0 +1,25 @@
+setenv WSPACE=id_elim01
+delete $WSPACE
+create $WSPACE $WSPACE.c
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv IDENTITY_ELIMINATION_DEBUG_LEVEL 5
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[$WSPACE]
+
+echo
+echo Code after IDENTITY_ELIMINATION
+echo
+apply IDENTITY_ELIMINATION[$WSPACE]
+display PRINTED_FILE[$WSPACE]
+
+close
+echo
+echo Warnings
+echo
+shell cat $WSPACE.database/Warnings
+
+delete $WSPACE
+quit

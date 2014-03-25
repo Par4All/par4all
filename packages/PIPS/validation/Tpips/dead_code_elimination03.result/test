@@ -1,0 +1,27 @@
+
+Source code for dead_code_elimination03 with effects
+
+int dead_code_elimination03()
+{
+   int r;
+//             <    is written>: r
+   r = 1;
+//             <    is written>: r
+   r = 2;
+//             <    is read   >: r
+   return r;
+}
+
+Source code for dead_code_elimination03 after dead-code elimination
+
+int dead_code_elimination03()
+{
+   r = 2;
+   return r;
+}
+
+Warnings
+
+unknown[unknown] (tp_parse) Properties should not be updated during tpips processing. Move the setproperty statement at the beginning of your tpips script.
+unknown[unknown] (parse_properties) user error
+unknown[unknown] (parse_properties) Property CONSISTENCY_ENFORCED_P cannot be redefined when processing is started because consistenty can no longer be enforced. Move the set property command earlier in the compilaton process.

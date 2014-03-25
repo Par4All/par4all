@@ -4,6 +4,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 setenv SHELL /bin/bash
 set PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 setproperty PRETTYPRINT_LANGUAGE "C"
+setenv PIPS_CPP "cpp -C -P -ffreestanding"
 
 create missing01 missing01.c
 

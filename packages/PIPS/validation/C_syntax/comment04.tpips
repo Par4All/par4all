@@ -1,7 +1,7 @@
 delete comment04
 
 echo This code is not compatible with "cpp -ansi"
-setenv PIPS_CPP "cpp -C -P"
+setenv PIPS_CPP "cpp -C -P -ffreestanding"
 #setenv PIPS_CPP "cpp -ansi"
 
 create comment04 comment04.c
@@ -18,6 +18,6 @@ display PARSED_PRINTED_FILE[comment04!]
 
 close
 
-delete comment04  
+delete comment04
 
 quit

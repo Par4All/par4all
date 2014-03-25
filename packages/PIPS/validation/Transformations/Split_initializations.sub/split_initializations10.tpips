@@ -1,0 +1,20 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete split_initializations10
+create split_initializations10 split_initializations10.c
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[split_initializations10]
+
+echo
+echo Code after split_initializations
+echo
+apply SPLIT_INITIALIZATIONS[split_initializations10]
+activate PRINT_CODE
+display PRINTED_FILE[split_initializations10]
+
+close
+delete split_initializations10
+quit
+

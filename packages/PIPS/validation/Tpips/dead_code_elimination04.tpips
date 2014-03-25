@@ -1,0 +1,34 @@
+# Correct version for dead_code_elimination01, 02, 03 and 04
+
+setenv WS=dead_code_elimination04
+delete $WS
+create $WS $WS.c
+
+# No abort: we want to check that a user error is detected
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty CONSISTENCY_ENFORCED_P TRUE
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+echo
+echo Source code for $WS with effects
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[$WS]
+
+echo
+echo Source code for "$WS" after dead-code elimination 
+echo
+
+apply DEAD_CODE_ELIMINATION[$WS]
+activate PRINT_CODE
+display PRINTED_FILE[$WS]
+
+close
+echo
+echo Warnings
+echo
+shell cat $WS.database/Warnings
+delete $WS
+quit
+

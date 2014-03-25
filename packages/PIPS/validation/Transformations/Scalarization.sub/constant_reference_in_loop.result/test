@@ -1,0 +1,33 @@
+int main()
+{
+   int n;
+   int a[n], b[n], c[n];
+   int i, j;
+   //PIPS generated variable
+   register int __scalar__0_0, __scalar__1_0;
+   
+   // initalize
+   for(i = 0; i <= n-1; i += 1)
+      a[i] = i*rand();
+   //PIPS generated variable
+   __scalar__0_0 = a[0];
+   
+   // This loop use only one element of a, it should be scalarized
+   for(i = 0; i <= n-1; i += 1)
+      b[i] = rand()*__scalar__0_0;
+   //PIPS generated variable
+   __scalar__1_0 = a[0];
+   
+   
+   // This is exactly the same loop, but with a surrounding one !
+   for(j = 0; j <= n-1; j += 1)
+      for(i = 0; i <= n-1; i += 1)
+         c[i] = rand()*__scalar__1_0;
+   
+   // Use b and c, just for region !
+   int x;
+   for(i = 1; i <= n; i += 1) {
+      x += b[i];
+      x += c[i];
+   }
+}

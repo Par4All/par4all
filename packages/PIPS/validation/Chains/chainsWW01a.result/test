@@ -1,0 +1,24 @@
+"initial file:"
+int chainsWW01a()
+{
+   int r;                                                               /*0005*/
+
+   r = 1;                                                               /*0007*/
+   r = 0;                                                               /*0008*/
+
+   return r;                                                            /*0010*/
+}
+
+"use def graph..."
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 08 with conflicts
+		from <r-W-EXACT> to <r-W-EXACT>
+	08 --> 10 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
+
+****************** End of Dependence Graph ******************
+
+Warnings
+

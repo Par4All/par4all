@@ -2,12 +2,13 @@ delete fixrts
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
+setenv PIPS_CPP "cpp -C -P -ffreestanding"
 create fixrts fixrts.c
 
 # This file cannot be preprocessed as such because its specific "complex.h" is not available
 # Fixed with a few declarations
 
-shell cc -C -E fixrts.database/Tmp/fixrts.cpp_processed.c
+shell cpp -C -ffreestanding fixrts.database/Tmp/fixrts.cpp_processed.c
 
 # echo cat fixrts.database/[a-z_]*[a-z_]/*.c
 display C_SOURCE_FILE[%ALL]

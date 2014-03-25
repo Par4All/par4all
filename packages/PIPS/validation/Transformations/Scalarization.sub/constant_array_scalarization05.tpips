@@ -1,0 +1,66 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS "constant_array_scalarization05"
+delete $WS
+
+echo
+echo First scenario
+echo
+
+create $WS $WS.c 
+
+echo
+echo Initial file
+echo
+
+display PRINTED_FILE[$WS]
+apply CONSTANT_ARRAY_SCALARIZATION[$WS]
+
+echo
+echo Source code after direct constant_array_scalarization
+echo
+
+display PRINTED_FILE[$WS]
+
+close
+
+echo
+echo Warnings:
+echo
+shell cat $WS.database/Warnings
+
+delete $WS
+
+echo
+echo Second scenario
+echo
+
+create $WS $WS.c 
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+apply SPLIT_INITIALIZATIONS[$WS]
+
+echo
+echo Source code after split_initializations
+echo
+
+display PRINTED_FILE[$WS]
+apply CONSTANT_ARRAY_SCALARIZATION[$WS]
+
+echo
+echo Source code after split_initializations and constant_array_scalarization
+echo
+
+display PRINTED_FILE[$WS]
+
+echo
+echo Source code after declaration removal
+echo
+
+# Get rid of useless declarations
+apply DEAD_CODE_ELIMINATION[$WS]
+display PRINTED_FILE[$WS]
+
+close
+delete $WS
+quit

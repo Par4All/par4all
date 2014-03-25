@@ -1,5 +1,6 @@
 delete decl13
 setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+setenv PIPS_CPP "cpp -C -P -ffreestanding"
 create decl13 decl13.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 1
