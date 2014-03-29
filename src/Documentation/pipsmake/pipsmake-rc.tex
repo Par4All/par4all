@@ -9796,7 +9796,7 @@ precondition analyses.
 This transformation is implemented by Thi Viet Nga \textsc{Nguyen}.
 \end{PipsPass}
 
-See also the transformation in \S~{sec:comm-subexpr-elim-1}, the partial
+See also the transformation in \ref{sec:comm-subexpr-elim-1}, the partial
 evaluation, and so on.
 
 \begin{PipsMake}
@@ -9806,6 +9806,48 @@ partial_redundancy_elimination             > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.preconditions
+\end{PipsMake}
+
+
+\subsection{Identity Elimination}
+\label{subsection-identity_elimination}
+\index{Identity elimination}
+
+This pass was done by Nelson LOSSING.
+
+\begin{PipsPass}{identity_elimination}
+Function \PipsPassRef{identity_elimination} deletes identity statements like
+x=x; when x is an expression without side effect.
+
+This pass also imply that if the instruction x=x; raise an exception, this exception
+disapear with the instructon.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias identity_elimination 'Identity Elimination'
+
+identity_elimination             > MODULE.code
+        < PROGRAM.entities
+        < MODULE.proper_effects
+        < MODULE.code
+\end{PipsMake}
+
+\begin{PipsPass}{identity_elimination_with_points_to}
+Function \PipsPassRef{identity_elimination_with_points_to} is an extension
+of \PipsPassRef{identity_elimination} to also consider identity with pointer.
+So we want to eliminate x=*p or *p=x, when p is a pointer who points-to x.
+
+This extension is not implemented and only compute an \PipsPassRef{identity_elimination}.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias identity_elimination_with_points_to 'Identity Elimination with Points-to'
+
+identity_elimination_with_points_to > MODULE.code
+        < PROGRAM.entities
+        < MODULE.points_to
+        < MODULE.proper_effects
+        < MODULE.code
 \end{PipsMake}
 
 %-----------End of Redundancy Elimination -------------------------
