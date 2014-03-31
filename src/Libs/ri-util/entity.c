@@ -811,6 +811,8 @@ bool entity_pointer_p(entity e)
     return !basic_undefined_p(b) && basic_pointer_p(b);
 }
 
+/* Is e a variable with an array type? 
+ */
 bool entity_array_p(entity e)
 {
   if (entity_variable_p(e)) {
@@ -1055,6 +1057,10 @@ bool entity_enum_variable_p(entity e) {
     return !basic_undefined_p(b) && basic_derived_p(b) && entity_enum_p(basic_derived(b));
 }
 
+/* Is entity e the entity corresponding to a struct declaration?
+ *
+ * Note the difference with entity_array_p()
+ */
 bool entity_struct_p(entity e)
 {
   const char* ln = entity_local_name(e);
@@ -1072,6 +1078,10 @@ bool same_struct_entity_p(const entity e0, const entity e1)
     return same_entity_p(s0,s1);
 }
 
+/* Is entity e an entity representing the union declaration?
+ *
+ * See entity_struct_p(), but different from entity_array_p()
+ */
 bool entity_union_p(entity e)
 {
   const char* ln = entity_local_name(e);
