@@ -12778,16 +12778,19 @@ analyses simpler.
 
 This transformation recurses through all variable declarations, and
 creates a new statement each time an initial value is specified in the
-declaration, if the initial value can be assigned. The declarations
-are modified by eliminating the initial value, and a new assignment
-statement with the initial value is added to the source code.
+declaration, if the initial value can be assigned and if the variable
+is not static.
+%%
+The declarations are modified by eliminating the initial value, and a
+new assignment statement with the initial value is added to the source
+code.
 
 This transformation can be used, for instance, to improve reduction
 detection (see TRAC Ticket 181).
 
 Note that C array and structure initializations, which use braces,
 cannot be converted into assignments. In such cases, the initial
-declaration is left untouched\marginpar{FI->SG: improved?}.
+declaration is either left untouched or expanded into a statement list.
 
 \begin{PipsMake}
 alias split_initializations 'Split Initializations'
@@ -12799,7 +12802,8 @@ split_initializations > MODULE.code
 This transformation uses the \verb/C89_CODE_GENERATION/ property to
 generate either C89 or C99 code.
 
-
+This pass has been developed by Serge Guelton~\cite{Guelton11}. Its
+validation suite is still too limited.
 
 \subsection{Set Return Type}
 \label{subsec:set-return-type}
