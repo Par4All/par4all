@@ -1,4 +1,4 @@
-setenv WS "split_initializations02"
+setenv WS "split_initializations12"
 setproperty ABORT_ON_USER_ERROR TRUE
 delete $WS
 create $WS $WS.c

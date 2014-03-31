@@ -25,6 +25,7 @@ void dereferencing03()
 
 Cumulated pointer effects for "dereferencing03"
 
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 void dereferencing03()
 {
    double *p;

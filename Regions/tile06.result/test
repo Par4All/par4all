@@ -1,0 +1,78 @@
+
+Transformers for tile06
+
+
+C  T() {}
+
+C     Test if the region of a 1-D tile is precise
+
+      SUBROUTINE TILE06(N, TS, A)
+      INTEGER N, TS, A(N)
+      INTEGER TI, I
+
+C  T(I,TI) {}
+
+      DO TI = 0, N, TS                                                  0006
+
+C  T(I) {TI<=I, I<=TI+TS}
+
+         DO I = TI, TI+TS                                               0007
+
+C  T() {}
+
+            A(I) = 0                                                    0008
+         ENDDO
+      ENDDO
+      END
+
+Preconditions for tile06
+
+
+C  P() {}
+
+C     Test if the region of a 1-D tile is precise
+
+      SUBROUTINE TILE06(N, TS, A)
+      INTEGER N, TS, A(N)
+      INTEGER TI, I
+
+C  P() {}
+
+      DO TI = 0, N, TS                                                  0006
+
+C  P(I,TI) {}
+
+         DO I = TI, TI+TS                                               0007
+
+C  P(I,TI) {TI<=I, I<=TI+TS}
+
+            A(I) = 0                                                    0008
+         ENDDO
+      ENDDO
+      END
+
+Regions for tile06
+
+
+C  <A(PHI1)-W-MAY-{0<=TS}>
+
+C     Test if the region of a 1-D tile is precise
+
+      SUBROUTINE TILE06(N, TS, A)
+      INTEGER N, TS, A(N)
+      INTEGER TI, I
+
+C  <A(PHI1)-W-MAY-{0<=TS}>
+
+      DO TI = 0, N, TS                                                  0006
+
+C  <A(PHI1)-W-EXACT-{TI<=PHI1, PHI1<=TI+TS}>
+
+         DO I = TI, TI+TS                                               0007
+
+C  <A(PHI1)-W-EXACT-{PHI1==I, TI<=I, I<=TI+TS}>
+
+            A(I) = 0                                                    0008
+         ENDDO
+      ENDDO
+      END

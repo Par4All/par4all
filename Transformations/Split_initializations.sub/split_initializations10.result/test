@@ -10,6 +10,10 @@ Code after split_initializations
 
 int split_initializations10()
 {
-   static int i;
-   i = 1;
+   static int i = 1;
 }
+
+Warnings
+
+SPLIT_INITIALIZATIONS[split_initializations10] (split_initializations_in_statement) Initialization of variable "i" cannot be split from its declaration because "i" is a static variable.
+unknown[unknown] (activate_phase) Rule `PRINT_CODE' already active
