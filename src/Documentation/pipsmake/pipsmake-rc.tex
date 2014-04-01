@@ -12388,7 +12388,16 @@ first one, but much faster because convex array regions may be slow to
 compute.
 
 Pass \PipsPassRef{constant_array_scalarization} intends to eliminate
-array references, e.g. for VHDL generation.
+array references, e.g. for VHDL generation, for scalar constant
+propagations, e.g. to propagate constant arrays, and, ultimately, to
+explicit the control of automata encoded with a array containing
+pointers to transition functions and the next state, e.g. a protocol
+controler.
+
+The other two scalarization passes intend to reduce the number of
+array accesses by replacing them with scalar accesses. Combined with
+loop fusion and/or used on automatically generated code, scalarization
+may eliminate intermediate arrays and improve locality.
 
 \subsubsection{Scalarization Based on Convex Array Regions}
 
@@ -12410,8 +12419,11 @@ criteria, a Legality criterion and a Profitability criterion:
   determines if replacing the reference might lead to breaking
   dependence arcs, due to hidden references to the element,
   e.g. ``get(A,i)'' instead of ``A[i]''. Also, one and only one array
-  element must be accessed at each iteration. If these two conditions
-  are not met, no scalarization takes place.
+  element must be accessed at each iteration because the algorithm
+  used is based on convex array regions and because their
+  implementation assumes only one region per array and per access
+  type. If these two conditions are not met, no scalarization takes
+  place.
 
 \item The Profitability criterion is then evaluated, to try and
   eliminate cases where scalarization would yield no satisfactory
@@ -12445,7 +12457,9 @@ different atomizer passes.
 
 The new scalar variables use the default prefix \verb/___scalar__/ and
 are thus easily identified, but a new prefix can be user defined with
-Property~\PipsPropRef{SCALARIZATION_PREFIX}. If\PipsPropRef{SCALARIZATION_PREFIX}
+Property~\PipsPropRef{SCALARIZATION_PREFIX}.
+%%
+If\PipsPropRef{SCALARIZATION_PREFIX}
 is the empty string, the names of the scalarized variables are used.
 
 If needed according to the IN and OUT convex array regions, the new
