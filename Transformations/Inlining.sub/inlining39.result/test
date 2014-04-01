@@ -30,3 +30,7 @@ int main(void)
 Warnings
 
 CONTROLIZER[main] (control_graph) Some statements are unreachable
+CONTROLIZER[main] (control_graph) Unreachable statements:
+CONTROLIZER[main] (control_graph) Statement:
+goto l99999;
+CONTROLIZER[main] (control_graph) Statement number: 12

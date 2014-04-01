@@ -537,7 +537,15 @@ Warnings
 unknown[unknown] (activate_phase) Rule `C_SYMBOL_TABLE' already active
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 CONTROLIZER[feron] (control_graph) Some statements are unreachable
+CONTROLIZER[feron] (control_graph) Unreachable statements:
+CONTROLIZER[feron] (control_graph) Statement:
+goto l99999;
+CONTROLIZER[feron] (control_graph) Statement number: 29
 CONTROLIZER[feron] (control_graph) Some statements are unreachable
+CONTROLIZER[feron] (control_graph) Unreachable statements:
+CONTROLIZER[feron] (control_graph) Statement:
+goto l99998;
+CONTROLIZER[feron] (control_graph) Statement number: 40
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "send" has no side effect on its formal context via pointer variables.
 INTERPROCEDURAL_POINTS_TO_ANALYSIS[feron] (user_call_to_points_to_interprocedural) Function "skip" has no side effect on its formal context via pointer variables.
