@@ -206,6 +206,7 @@ class p4a_processor(object):
 
     astrad_postproc = None
     astrad_module_name = None
+    astrad_kernel_name = None
 
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
@@ -304,7 +305,7 @@ class p4a_processor(object):
                 # Mark this file as a stub to avoid copying it out later:
                 self.accel_files += [ accel_stubs ]
 
-            if (self.astrad and not self.fortran):
+            if (self.astrad and (not self.fortran) and (not self.spear)):
                 astrad_stubs = os.path.join(os.environ["P4A_ASTRAD_DIR"],
                                             "p4a_astrad_stubs.c")
                 # Add the stubs file to the list to use in PIPS:
@@ -429,14 +430,18 @@ class p4a_processor(object):
         # this is however incomplete
         filter_exclude_desc_re = None
         filter_exclude_astrad_re = None
+        filter_exclude_bswap_re = None
+
         if (self.astrad):
             filter_exclude_desc_re = re.compile('DESC')
             filter_exclude_astrad_re = re.compile('astrad')
+            filter_exclude_bswap_re = re.compile('bswap')
 
         filter = (lambda module: self.main_filter(module)
             and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
             and (filter_exclude_astrad_re == None or not filter_exclude_astrad_re.search(module.name))
             and (filter_exclude_desc_re == None or not filter_exclude_desc_re.match(module.name))
+            and (filter_exclude_bswap_re == None or not filter_exclude_bswap_re.match(module.name))
             and (filter_select_re == None or filter_select_re.match(module.name))
             and other_filter(module.name))
 
@@ -640,11 +645,20 @@ class p4a_processor(object):
 
         if (self.astrad and not self.spear):
             # find top function name
+            top_function_name = ""
             for m in all_modules:
-                if not m.callers:
-                    self.astrad_module_name = m.name
-                    #print("ASTRAD: method_name" + m.name)
+                if (not m.callers) and not ('bswap' in m.name):
+                    top_function_name = m.name
+                    #print("ASTRAD: top function name " + m.name)
                     break
+            if ('_kernel' in top_function_name):
+                self.astrad_module_name = top_function_name.split('_kernel')[0]
+                #print ("ASTRAD: astrad module name " + self.astrad_module_name)
+                self.astrad_kernel_name = top_function_name
+            else:
+                self.astrad_module_name = top_function_name
+                #print ("ASTRAD: astrad module name " + self.astrad_module_name)
+                self.astrad_kernel_name = top_function_name + '_kernel'
 
         if fine_grain:
             # Set to False (mandatory) for A&K algorithm on C source file
@@ -1373,11 +1387,10 @@ class p4a_processor(object):
             # find out C99 inner function knowing that its name
             # is the name of the top-level module plus the _kernel suffix
             # beware of compilation units
-            kernel_name = self.astrad_module_name + "_kernel"
-            if kernel_name in self.workspace:
-                kernel = self.workspace[kernel_name]
+            if self.astrad_kernel_name in self.workspace:
+                kernel = self.workspace[self.astrad_kernel_name]
             else:
-                kernel_filter_re = re.compile(".*!" + kernel_name)
+                kernel_filter_re = re.compile(".*!" + self.astrad_kernel_name)
                 possible_kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
                 if len(possible_kernels) ==0:
                     p4a_util.die("ASTRAD post processor ERROR: no C99 kernel found")
