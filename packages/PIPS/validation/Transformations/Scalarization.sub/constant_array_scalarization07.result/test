@@ -1,32 +1,22 @@
 void constant_array_scalarization07()
 {
-   int a[3];
+   int *pa[3], a[3];
+   double *pb[3], b[3];
 
-   a[0] = 1;
-   a[1] = 1;
-   a[2] = 1;
-   {
-      int a[3];
-
-      a[0] = 1;
-      a[1] = 1;
-      a[2] = 1;
-   }
+   pa[0] = &a[0];
+   pa[1] = &a[1];
+   pa[2] = &a[2];
 }
 void constant_array_scalarization07()
 {
-   int a[3];
+   int *pa[3], a[3];
+   double *pb[3], b[3];
    //PIPS generated variable
-   int a0, a1, a2, a3, a4, a5;
+   int a0, a1, a2;
+   //PIPS generated variable
+   int *pa0, *pa1, *pa2;
 
-   a3 = 1;
-   a4 = 1;
-   a5 = 1;
-   {
-      int a[3];
-
-      a0 = 1;
-      a1 = 1;
-      a2 = 1;
-   }
+   pa0 = &a0;
+   pa1 = &a1;
+   pa2 = &a2;
 }

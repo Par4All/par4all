@@ -1,0 +1,39 @@
+setenv WSPACE=while01
+delete $WSPACE
+create $WSPACE $WSPACE.c 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS TRUE
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+#setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+#setproperty MEMORY_EFFECTS_ONLY FALSE
+
+echo 
+echo  initial file:
+echo 
+display PRINTED_FILE[$WSPACE]
+
+echo 
+echo  PROPER_EFFECTS
+echo 
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[$WSPACE]
+
+echo 
+echo  CUMULATED_EFFECTS 
+echo 
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[$WSPACE]
+
+
+close
+echo
+echo Warnings
+echo
+shell cat $WSPACE.database/Warnings
+
+delete $WSPACE
+quit

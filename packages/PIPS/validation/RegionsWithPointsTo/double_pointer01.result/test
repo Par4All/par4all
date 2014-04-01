@@ -1,94 +1,143 @@
 
-PROPER  EFFECTS
-
-void array_addition01(float **a1, float **a2, int m, int n)
-{
-   int i, j;
-//             <    is read   >: m
-//             <    is written>: i
-   for(i = 0; i <= m-1; i += 1)
-//             <    is read   >: m n
-//             <    is written>: j
-      for(j = 0; j <= n-1; j += 1)
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-         a2[i][j] = a1[i][j]+2;
-   return;
-}
-
-POINTS-TO
+Points-to for "double_pointer01"
 
 
 // Points To IN:
+// _a1_1[*] -> *NULL* , MAY
+// _a1_1[*] -> _a1_1_1[*][0] , MAY
 // a1 -> *NULL* , MAY
 // a1 -> _a1_1[0] , MAY
-// a2 -> *NULL* , MAY
-// a2 -> _a2_2[0] , MAY
 
 
 // Points To OUT:
+// _a1_1[*] -> _a1_1_1[*][0] , MAY
 // a1 -> _a1_1[0] , EXACT
-// a2 -> _a2_2[0] , EXACT
 
-void array_addition01(float **a1, float **a2, int m, int n)
+void double_pointer01(float **a1)
 {
 
 // Points To: none
 
    int i, j;
 
-// Points To: none
-
-   for(i = 0; i <= m-1; i += 1)
-
 // Points To:
-// a1 -> _a1_1[0] , EXACT
-// a2 -> _a2_2[0] , EXACT
-
-      for(j = 0; j <= n-1; j += 1)
-
-// Points To:
+// _a1_1[*] -> *NULL* , MAY
+// _a1_1[*] -> _a1_1_1[*][0] , MAY
 // a1 -> *NULL* , MAY
 // a1 -> _a1_1[0] , MAY
-// a2 -> *NULL* , MAY
-// a2 -> _a2_2[0] , MAY
 
-         a2[i][j] = a1[i][j]+2;
+   a1[i][j] = 0.;
 
 // Points To:
+// _a1_1[*] -> _a1_1_1[*][0] , MAY
 // a1 -> _a1_1[0] , EXACT
-// a2 -> _a2_2[0] , EXACT
+
+   *a1[0] = 0;
+
+// Points To:
+// _a1_1[*] -> _a1_1_1[*][0] , MAY
+// a1 -> _a1_1[0] , EXACT
+
+   **a1 = 0;
+
+// Points To:
+// _a1_1[*] -> _a1_1_1[*][0] , MAY
+// a1 -> _a1_1[0] , EXACT
 
    return;
 }
 
-PROPER  EFFECTS WITH POINTS-TO
+Proper effects with points-to for "double_pointer01"
 
-void array_addition01(float **a1, float **a2, int m, int n)
+void double_pointer01(float **a1)
 {
    int i, j;
-//             <    is read   >: m
-//             <    is written>: i
-   for(i = 0; i <= m-1; i += 1)
-//             <    is read   >: m n
-//             <    is written>: j
-      for(j = 0; j <= n-1; j += 1)
-//             <    is read   >: _a1_1[i] _a2_2[i] a1 a2 i j m n
-         a2[i][j] = a1[i][j]+2;
+//             <may be written>: _a1_1_1[*][j]
+//             <    is read   >: _a1_1[i] a1 i j
+   a1[i][j] = 0.;
+//             <may be written>: _a1_1_1[*][0]
+//             <    is read   >: _a1_1[0] a1
+   *a1[0] = 0;
+//             <may be written>: _a1_1_1[*][0]
+//             <    is read   >: _a1_1[0] a1
+   **a1 = 0;
    return;
 }
 
-RW regions
+Cumulated effects with points-to for "double_pointer01"
 
-void array_addition01(float **a1, float **a2, int m, int n)
+//             <may be read   >: _a1_1[*]
+//             <may be written>: _a1_1_1[*][*]
+//             <    is read   >: a1
+void double_pointer01(float **a1)
 {
    int i, j;
-   for(i = 0; i <= m-1; i += 1)
-      for(j = 0; j <= n-1; j += 1)
+//             <may be read   >: _a1_1[*]
+//             <may be written>: _a1_1_1[*][*]
+//             <    is read   >: a1 i j
+   a1[i][j] = 0.;
+//             <may be written>: _a1_1_1[*][0]
+//             <    is read   >: _a1_1[0] a1
+   *a1[0] = 0;
+//             <may be written>: _a1_1_1[*][0]
+//             <    is read   >: _a1_1[0] a1
+   **a1 = 0;
+   return;
+}
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+Proper read-write convex array regions for "double_pointer01"
 
-         a2[i][j] = a1[i][j]+2;
+void double_pointer01(float **a1)
+{
+   int i, j;
+
+//  <_a1_1[PHI1]-R-EXACT-{PHI1==i}>
+//  <_a1_1_1[PHI1][PHI2]-W-MAY-{PHI2==j}>
+//  <a1-R-EXACT-{}>
+
+   a1[i][j] = 0.;
+
+//  <_a1_1[PHI1]-R-EXACT-{PHI1==0}>
+//  <_a1_1_1[PHI1][PHI2]-W-MAY-{PHI2==0}>
+//  <a1-R-EXACT-{}>
+
+   *a1[0] = 0;
+
+//  <_a1_1[PHI1]-R-EXACT-{PHI1==0}>
+//  <_a1_1_1[PHI1][PHI2]-W-MAY-{PHI2==0}>
+//  <a1-R-EXACT-{}>
+
+   **a1 = 0;
+   return;
+}
+
+Read-write convex array regions for "double_pointer01"
+
+
+//  <_a1_1[PHI1]-R-MAY-{}>
+//  <_a1_1_1[PHI1][PHI2]-W-MAY-{}>
+//  <a1-R-EXACT-{}>
+
+void double_pointer01(float **a1)
+{
+   int i, j;
+
+//  <_a1_1[PHI1]-R-EXACT-{PHI1==i}>
+//  <_a1_1_1[PHI1][PHI2]-W-MAY-{PHI2==j}>
+//  <a1-R-EXACT-{}>
+
+   a1[i][j] = 0.;
+
+//  <_a1_1[PHI1]-R-EXACT-{PHI1==0}>
+//  <_a1_1_1[PHI1][PHI2]-W-MAY-{PHI2==0}>
+//  <a1-R-EXACT-{}>
+
+   *a1[0] = 0;
+
+//  <_a1_1[PHI1]-R-EXACT-{PHI1==0}>
+//  <_a1_1_1[PHI1][PHI2]-W-MAY-{PHI2==0}>
+//  <a1-R-EXACT-{}>
+
+   **a1 = 0;
    return;
 }

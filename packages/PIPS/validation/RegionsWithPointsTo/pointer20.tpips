@@ -2,7 +2,10 @@ setenv WS=pointer20
 delete $WS
 create $WS $WS.c
 
-# Enforce type checking
+# Suggestion by Amira: it has no effect for RegionsWithPointsTo/pointer20
+# setproperty CONSTANT_PATH_EFFECTS=TRUE
+
+# Enforce type checking as often as possible
 setenv POINTS_TO_DEBUG_LEVEL=1
 setenv PROPER_EFFECTS_DEBUG_LEVEL=1
 setenv CUMULATED_EFFECTS_DEBUG_LEVEL=1
@@ -32,12 +35,20 @@ activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[pointer20]
 
 echo
+echo Proper must regions with points-to for "pointer20"
+echo
+
+# activate MUST_POINTER_REGIONS_WITH_POINTS_TO
+activate MUST_REGIONS_WITH_POINTS_TO
+
+activate PRINT_CODE_PROPER_REGIONS
+display PRINTED_FILE[pointer20]
+
+echo
 echo Must regions with points-to for "pointer20"
 echo
 
-activate MUST_POINTER_REGIONS_WITH_POINTS_TO
-
-activate PRINT_CODE_PROPER_REGIONS
+activate PRINT_CODE_REGIONS
 display PRINTED_FILE[pointer20]
 
 close

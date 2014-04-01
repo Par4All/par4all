@@ -1,0 +1,170 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void rotation01()
+{
+
+//  T(x,y) {x==1, y==0}
+
+   int x = 1, y = 0;
+
+//  T(x,y) {x#init==1, y#init==0}
+
+   while (1) {
+
+//  T(x) {x#init<=x, x<=x#init+1}
+
+      if (x==1&&y==0)
+
+//  T(x) {x==2, x#init==1, y==0}
+
+         x++;
+
+//  T(x,y) {x+y#init==x#init+y, y#init<=y, y<=y#init+1}
+
+      if (x==2&&y==0)
+
+//  T(x,y) {x==3, x#init==2, y==1, y#init==0}
+
+         x++, y++;
+
+//  T(y) {y#init<=y, y<=y#init+1}
+
+
+      if (x==3&&y==1)
+
+//  T(y) {x==3, y==2, y#init==1}
+
+         y++;
+
+//  T(x,y) {x+y==x#init+y#init, y#init<=y, y<=y#init+1}
+
+      if (x==3&&y==2)
+
+//  T(x,y) {x==2, x#init==3, y==3, y#init==2}
+
+         x--, y++;
+
+//  T(x) {x<=x#init, x#init<=x+1}
+
+
+      if (x==2&&y==3)
+
+//  T(x) {x==1, x#init==2, y==3}
+
+         x--;
+
+//  T(x,y) {x+y#init==x#init+y, y<=y#init, y#init<=y+1}
+
+      if (x==1&&y==3)
+
+//  T(x,y) {x==0, x#init==1, y==2, y#init==3}
+
+         x--, y--;
+
+//  T(y) {y<=y#init, y#init<=y+1}
+
+
+      if (x==0&&y==2)
+
+//  T(y) {x==0, y==1, y#init==2}
+
+         y--;
+
+//  T(x,y) {x+y==x#init+y#init, y<=y#init, y#init<=y+1}
+
+      if (x==0&&y==1)
+
+//  T(x,y) {x==1, x#init==0, y==0, y#init==1}
+
+         x++, y--;
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void rotation01()
+{
+
+//  P() {}
+
+   int x = 1, y = 0;
+
+//  P(x,y) {x==1, y==0}
+
+   while (1) {
+
+//  P(x,y) {x==1, y==0}
+
+      if (x==1&&y==0)
+
+//  P(x,y) {x==1, y==0}
+
+         x++;
+
+//  P(x,y) {x==2, y==0}
+
+      if (x==2&&y==0)
+
+//  P(x,y) {x==2, y==0}
+
+         x++, y++;
+
+//  P(x,y) {x==3, y==1}
+
+
+      if (x==3&&y==1)
+
+//  P(x,y) {x==3, y==1}
+
+         y++;
+
+//  P(x,y) {x==3, y==2}
+
+      if (x==3&&y==2)
+
+//  P(x,y) {x==3, y==2}
+
+         x--, y++;
+
+//  P(x,y) {x==2, y==3}
+
+
+      if (x==2&&y==3)
+
+//  P(x,y) {x==2, y==3}
+
+         x--;
+
+//  P(x,y) {x==1, y==3}
+
+      if (x==1&&y==3)
+
+//  P(x,y) {x==1, y==3}
+
+         x--, y--;
+
+//  P(x,y) {x==0, y==2}
+
+
+      if (x==0&&y==2)
+
+//  P(x,y) {x==0, y==2}
+
+         y--;
+
+//  P(x,y) {x==0, y==1}
+
+      if (x==0&&y==1)
+
+//  P(x,y) {x==0, y==1}
+
+         x++, y--;
+   }
+}

@@ -3507,33 +3507,47 @@ void split_initializations_in_statement(statement s)
 	//statement sc = statement_undefined; // statement copy
 
 	FOREACH(ENTITY, var, decls) {
-	  const char* mn  = entity_module_name(var);
-	  const char* cmn =get_current_module_name();
-	  if ( same_string_p(mn,cmn)
-	       && !value_unknown_p(entity_initial(var))
-	       ) {
-	    expression ie = variable_initial_expression(var);
-	    if (expression_is_C_rhs_p(ie)) {
-	      statement is = make_assign_statement(entity_to_expression(var), ie);
-	      inits = gen_nconc(inits, CONS(statement, is, NIL));
-	      entity_initial(var) = make_value_unknown();
+	  /* The initialization of a static variable cannot be split */
+	  if(entity_static_variable_p(var)) {
+	    pips_user_warning("Initialization of variable \"%s\" cannot be "
+			      "split from its declaration because \"%s\" "
+			      "is a static variable.\n",
+			      entity_user_name(var), entity_user_name(var));
+	  }
+	  else {
+	    const char* mn  = entity_module_name(var);
+	    const char* cmn = get_current_module_name();
+	    if ( same_string_p(mn,cmn)
+		 && !value_unknown_p(entity_initial(var))
+		 ) {
+	      expression ie = variable_initial_expression(var);
+	      if (expression_is_C_rhs_p(ie)) {
+		statement is = make_assign_statement(entity_to_expression(var), ie);
+		inits = gen_nconc(inits, CONS(statement, is, NIL));
+		entity_initial(var) = make_value_unknown();
+	      }
+	      else if(entity_array_p(var)) {
+		inits = gen_nconc(inits, brace_expression_to_statements(var,ie));
+		brace_expression_to_updated_type(var,ie);
+		entity_initial(var) = make_value_unknown();
+	      }
+	      else if(struct_type_p(entity_basic_concrete_type(var))) {
+		inits = gen_nconc(inits, brace_expression_to_statements(var,ie));
+		entity_initial(var) = make_value_unknown();
+	      }
+	      else {
+		pips_user_warning("split initializations not implemented yet for structures\n");
+	      }
+	      /* if this transformation led to an uninitialized const, remove the const qualifier */
+	      if(value_unknown_p(entity_initial(var))) {
+		list tmp = gen_copy_seq(entity_qualifiers(var));
+		FOREACH(QUALIFIER,q,tmp) {
+		  if(qualifier_const_p(q))
+		    gen_remove_once(&variable_qualifiers(type_variable(entity_type(var))),q);
+		}
+		gen_free_list(tmp);
+	      }
 	    }
-	    else if(entity_array_p(var)) {
-          inits=gen_nconc(inits,brace_expression_to_statements(var,ie));
-	      entity_initial(var) = make_value_unknown();
-	    }
-	    else {
-          pips_user_warning("split initializations not implemented yet for structures\n");
-	    }
-        /* if this transformation led to an uninitialized const, remove the const qualifier */
-        if(value_unknown_p(entity_initial(var))) {
-            list tmp = gen_copy_seq(entity_qualifiers(var));
-            FOREACH(QUALIFIER,q,tmp) {
-                if(qualifier_const_p(q))
-                    gen_remove_once(&variable_qualifiers(type_variable(entity_type(var))),q);
-            }
-            gen_free_list(tmp);
-        }
 	  }
 	}
 

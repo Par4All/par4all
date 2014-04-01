@@ -2193,14 +2193,14 @@ statement st;
     //statement_consistent_p(st);
 
     if(!ENDP(Unreachable)) {
-	pips_user_warning("Some statements are unreachable\n");
-	ifdebug(2) {
-	    pips_debug(2, "Unreachable statements:\n");
-	    MAP(STATEMENT, s, {
-		pips_debug(2, "Statement %p:\n", s);
-		print_statement(s);
-	    }, Unreachable);
-	}
+      pips_user_warning("Some statements are unreachable\n");
+      pips_user_warning("Unreachable statements:\n");
+      MAP(STATEMENT, s, {
+          pips_user_warning("Statement:\n%s\n", text_to_string(statement_to_text(s)));
+          if (statement_number(s) != -1) {
+            pips_user_warning("Statement number: %d\n", statement_number(s));
+          }
+      }, Unreachable);
     }
     hash_table_free(Label_statements);
     hash_table_free(Label_control);
