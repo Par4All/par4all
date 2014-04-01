@@ -41,7 +41,7 @@ $(ARCH)/hpfc_interactive.o: $(ARCH)/.dir
 
 $(ARCH)/hpfc_interactive: $(ARCH)/hpfc_interactive.o
 	$(LINK) $(ARCH)/hpfc_interactive \
-		$(ARCH)/hpfc_interactive.o -lreadline -ltermcap
+		$(ARCH)/hpfc_interactive.o -lreadline -lncurses
 
 # the direct version of the stubs need not be filtered by hpfc_directives.
 hpfc_stubs.direct.f: hpfc_stubs.f

@@ -3529,7 +3529,7 @@ make_list_of_constant(int val,    /* the constant value */
 
   return l;
 }
-
+
 /**
  * Return bool indicating if expression e is a brace expression
  */
@@ -3549,21 +3549,75 @@ static list do_brace_expression_to_statements(entity arr,expression e, list curr
   int new_index = 0;
   list out = NIL;
   FOREACH(EXPRESSION,arg,call_arguments(expression_call(e))) {
-    expression ee = int_to_expression(new_index);
-    list ind = gen_append(gen_full_copy_list(curr_indices),make_expression_list(ee));
+    // FI: we need to know the type of arr[curr_indices] to determine
+    // if it is a struct or an array
+
+    // A reference r is built temporarily to call reference_to_type()
+    reference r = make_reference(arr, curr_indices);
+    // FI: I have no idea if t should be freed; no documentation for
+    // reference_to_type()
+    type t = reference_to_type(r);
+    reference_indices(r) = NIL;
+    free_reference(r);
+
+    expression ee = expression_undefined;
+    if(array_type_p(t)) {
+      ee = int_to_expression(new_index);
+    }
+    else if(type_struct_variable_p(t)) {
+      list fl = struct_type_to_fields(t);
+      entity f = ENTITY(gen_nth(new_index, fl));
+      ee = entity_to_expression(f);
+      // The field will appear as an index, not as a field selector
+    }
+    else
+      pips_internal_error("Unexpected type.\n");
+
+    list ind = gen_append(gen_full_copy_list(curr_indices),
+			  make_expression_list(ee));
     if(brace_expression_p(arg)) {
-      list out_bis = do_brace_expression_to_statements(arr,arg,ind);
+      list out_bis = do_brace_expression_to_statements(arr, arg,ind);
       gen_full_free_list(ind);
-      out=gen_append(out,out_bis);
+      out = gen_append(out, out_bis);
     }
     else {
-      out=gen_append(out,make_statement_list(
-            make_assign_statement(
-              reference_to_expression(
-                make_reference(arr,ind)
-                ),
-              copy_expression(arg)
-              )
+      reference r = make_reference(arr,NIL);
+      expression e = reference_to_expression(r);
+      // FI: the expression should be normalized and field subscripts
+      // replaced by field accesses, with the field operator...
+      FOREACH(expression, ie, ind) {
+	if(expression_reference_p(ie)) {
+	  entity i = reference_variable(expression_reference(ie));
+	  if(entity_field_p(i)) {
+	    // FI: this is not going to work for structs of arrays...
+	    // expression ne = make_op_exp(FIELD_OPERATOR_NAME, e, ie);
+	    // expression ne = make_op_exp(FIELD_OPERATOR_NAME, e, ie);
+	    entity op = CreateIntrinsic(FIELD_OPERATOR_NAME);
+	    expression ne = MakeBinaryCall(op, e, ie);
+	    e = ne;
+	  }
+	  else
+	    pips_internal_error("Unexpected entity.\n");
+	}
+	else {
+	  // list ind is memory leaked...
+	  if(expression_reference_p(e)) {
+	    reference_indices(r) = gen_nconc(reference_indices(r),
+					     CONS(expression, ie, NIL));
+	  }
+	  else {
+	    subscript s = make_subscript(e, CONS(expression, ie, NIL));
+	    syntax ss = make_syntax_subscript(s);
+	    e = make_expression(ss, normalized_undefined);
+	    //entity op = CreateIntrinsic(SUBSCRIPT_OPERATOR_NAME);
+	    //expression ne = MakeBinaryCall(op, e, ie);
+	    //e = ne;
+	  }
+	}
+      }
+      gen_free_list(ind);
+      out = gen_append(out,make_statement_list(
+            make_assign_statement(e, copy_expression(arg))
             )
           );
     }
@@ -3577,14 +3631,54 @@ static list do_brace_expression_to_statements(entity arr,expression e, list curr
  */
 list brace_expression_to_statements(entity arr, expression e) {
   pips_assert("is a brace expression\n",brace_expression_p(e));
-  pips_assert("is an array\n",array_entity_p(arr));//SG: needs work to support structures
+  //SG: needs work to support structures
+  // pips_assert("is an array\n",array_entity_p(arr));
   list curr_index = NIL;
   list out = do_brace_expression_to_statements(arr,e,curr_index);
   return out;
 }
+
+/* helper for brace_expression_to_updated_type
+ *
+ * Side-effect on dl, the dimension list of e's type
+ */
+static void do_brace_expression_to_updated_type(entity arr,
+						expression e,
+						list dl)
+{
+  dimension d = DIMENSION(CAR(dl));
+  expression u = dimension_upper(d);
+  if(unbounded_expression_p(u)) {
+    list al = call_arguments(expression_call(e));
+    int nu = (int) gen_length(al) -1 ;
+    expression nue = int_to_expression(nu);
+    dimension_upper(d) = nue;
+    free_expression(u);
+    if(!ENDP(CDR(dl))) {
+      // This is probably useless because only the first dimension can
+      // be undefined
+      expression se = EXPRESSION(CAR(al));
+      do_brace_expression_to_updated_type(arr, se, CDR(dl));
+    }
+  }
+}
+
+/* use a brace expression to update the type of array "arr" if the
+   dimensions are implicit
+ */
+void brace_expression_to_updated_type(entity arr, expression e) {
+  pips_assert("is a brace expression\n",brace_expression_p(e));
+  //SG: needs work to support structures
+  //pips_assert("is an array\n",array_entity_p(arr));
+  // type t = entity_basic_concrete_type(arr);
+  type t = entity_type(arr);
+  variable v = type_variable(t);
+  list dl = variable_dimensions(v);
+  do_brace_expression_to_updated_type(arr, e, dl);
+}
+
 /* This function returns true if Reference r is scalar
 */
-
 bool reference_scalar_p(reference r)
 {
   entity v = reference_variable(r);
