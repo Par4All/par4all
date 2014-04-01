@@ -5,49 +5,42 @@ create $WSPACE $WSPACE.c
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
-#setenv POINTER_VALUES_DEBUG_LEVEL 2
-
-# Key property for this test case
-# setproperty POINTS_TO_STRICT_POINTER_TYPES TRUE
-
-#module main
-
 
 echo 
-echo PROPER  EFFECTS
-echo
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
-
-
-
-echo 
-echo POINTS-TO
+echo Points-to for "double_pointer01"
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[double_pointer01]
 
 echo 
-echo PROPER EFFECTS WITH POINTS-TO
+echo Proper effects with points-to for "double_pointer01"
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
-
+display PRINTED_FILE[double_pointer01]
 
 echo 
-echo CUMULATED EFFECTS WITH POINTS-TO
+echo Cumulated effects with points-to for "double_pointer01"
 echo
 activate CUMULATED_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[double_pointer01]
 
 echo
-echo RW regions
+echo Proper read-write convex array regions for "double_pointer01"
 echo
+
 activate MUST_REGIONS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_REGIONS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[double_pointer01]
+
+echo
+echo Read-write convex array regions for "double_pointer01"
+echo
+
+#activate MUST_REGIONS_WITH_POINTS_TO
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[double_pointer01]
 
 close
 delete $WSPACE

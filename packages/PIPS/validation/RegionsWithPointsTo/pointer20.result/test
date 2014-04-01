@@ -56,15 +56,34 @@ int pointer20(int (*pa)[5], int i)
    return j;
 }
 
-Must regions with points-to for "pointer20"
+Proper must regions with points-to for "pointer20"
 
 int pointer20(int (*pa)[5], int i)
 {
    int j;
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <_pa_1[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==0}>
+//  <pa-R-EXACT-{}>
 
    j = pa[i][0];
    return j;
 }
+
+Must regions with points-to for "pointer20"
+
+
+//  <_pa_1[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==0}>
+//  <pa-R-EXACT-{}>
+
+int pointer20(int (*pa)[5], int i)
+{
+   int j;
+
+//  <_pa_1[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==0}>
+//  <pa-R-EXACT-{}>
+
+   j = pa[i][0];
+   return j;
+}
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning pointer20 instead
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning pointer20 instead
