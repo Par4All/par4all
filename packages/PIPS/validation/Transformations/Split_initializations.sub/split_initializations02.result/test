@@ -16,18 +16,18 @@ Code after split_initializations
 
 void split_initializations02(void)
 {
-   int k[];
+   int k[3];
    k[0] = 1;
    k[1] = 2;
    k[2] = 3;
    {
-      int k[];
+      int k[3];
       k[0] = 1;
       k[1] = 2;
       k[2] = 3;
    }
    if (1) {
-      int k[];
+      int k[3];
       k[0] = 1;
       k[1] = 2;
       k[2] = 3;

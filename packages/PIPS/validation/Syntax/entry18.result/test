@@ -63,11 +63,36 @@ Layout for common /*STATIC*/ of size 48:
 End of declarations for module ENTRY18
 
 user warning in control_graph: Some statements are unreachable
+user warning in control_graph: Unreachable statements:
+user warning in control_graph: Statement:
+GOTO 99999
 user warning in control_graph: Some statements are unreachable
+user warning in control_graph: Unreachable statements:
+user warning in control_graph: Statement:
+
+RETURN
+user warning in control_graph: Statement:
+GOTO 99998
 user warning in control_graph: Some statements are unreachable
+user warning in control_graph: Unreachable statements:
+user warning in control_graph: Statement:
+
+RETURN
+user warning in control_graph: Statement:
+GOTO 99997
 user warning in control_graph: Some statements are unreachable
+user warning in control_graph: Unreachable statements:
+user warning in control_graph: Statement:
+
+RETURN
+user warning in control_graph: Statement:
+GOTO 99996
   CONTROLIZER                    building   CODE(ENTRY18)
 user warning in control_graph: Some statements are unreachable
+user warning in control_graph: Unreachable statements:
+user warning in control_graph: Statement:
+
+RETURN
   PRINT_CODE                     building   PRINTED_FILE(ENTRY18)
 PRINTED_FILE made for ENTRY18.
       SUBROUTINE ENTRY18(N)

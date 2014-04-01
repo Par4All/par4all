@@ -1,0 +1,114 @@
+
+initial file:
+
+int dowhile01()
+{
+   int i, x, y, a[10];
+
+   i = 0;
+   x = 10;
+   y = 1;
+
+   i = 0;
+   do {
+      y = 0;
+      i++;
+   }
+   while (i<x);
+
+   i = 0;
+   do {
+      a[i] = 0;
+      i++;
+   }
+   while (i<x);
+
+   return 0;
+}
+
+PROPER_EFFECTS
+
+int dowhile01()
+{
+   int i, x, y, a[10];
+//             <    is written>: i
+
+   i = 0;
+//             <    is written>: x
+   x = 10;
+//             <    is written>: y
+   y = 1;
+//             <    is written>: i
+
+   i = 0;
+//             <    is read   >: i x
+   do {
+//             <    is written>: y
+      y = 0;
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+   }
+   while (i<x);
+//             <    is written>: i
+
+   i = 0;
+//             <    is read   >: i x
+   do {
+//             <    is read   >: i
+//             <    is written>: a[i]
+      a[i] = 0;
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+   }
+   while (i<x);
+
+   return 0;
+}
+
+CUMULATED_EFFECTS 
+
+int dowhile01()
+{
+   int i, x, y, a[10];
+//             <    is written>: i
+
+   i = 0;
+//             <    is written>: x
+   x = 10;
+//             <    is written>: y
+   y = 1;
+//             <    is written>: i
+
+   i = 0;
+//             <may be written>: i y
+//             <    is read   >: i x
+   do {
+//             <    is written>: y
+      y = 0;
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+   }
+   while (i<x);
+//             <    is written>: i
+
+   i = 0;
+//             <may be written>: a[*] i
+//             <    is read   >: i x
+   do {
+//             <may be written>: a[*]
+//             <    is read   >: i
+      a[i] = 0;
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+   }
+   while (i<x);
+
+   return 0;
+}
+
+Warnings
+

@@ -25,7 +25,9 @@ Controlizer output
 static int block_scope13()
 {
    //PIPS generated variable
-   int x_ = -1, x_0;
+   static int x_ = -1;
+   //PIPS generated variable
+   int x_0;
    int x = 6;
    x_0 = 7;
 lab1:   printf("First internal x=%d\n", x_0);

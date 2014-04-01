@@ -58,8 +58,15 @@ Layout for common /*STATIC*/ of size 0:
 End of declarations for module ENTRY21
 
 user warning in control_graph: Some statements are unreachable
+user warning in control_graph: Unreachable statements:
+user warning in control_graph: Statement:
+GOTO 99999
   CONTROLIZER                    building   CODE(ENTRY21)
 user warning in control_graph: Some statements are unreachable
+user warning in control_graph: Unreachable statements:
+user warning in control_graph: Statement:
+
+RETURN
   PRINT_CODE                     building   PRINTED_FILE(ENTRY21)
 PRINTED_FILE made for ENTRY21.
       SUBROUTINE ENTRY21(K, M)

@@ -1,0 +1,12 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS "split_initializations13"
+delete $WS
+create $WS $WS.c 
+
+display PRINTED_FILE[$WS]
+apply SPLIT_INITIALIZATIONS[$WS]
+display PRINTED_FILE[$WS]
+
+close
+delete $WS
+quit

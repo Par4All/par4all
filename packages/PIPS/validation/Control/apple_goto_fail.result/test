@@ -61,3 +61,10 @@ fail:   ;
 Warnings
 
 CONTROLIZER[apple_goto_fail!SSLVerifySignedServerKeyExchange] (control_graph) Some statements are unreachable
+CONTROLIZER[apple_goto_fail!SSLVerifySignedServerKeyExchange] (control_graph) Unreachable statements:
+CONTROLIZER[apple_goto_fail!SSLVerifySignedServerKeyExchange] (control_graph) Statement:
+goto fail;
+CONTROLIZER[apple_goto_fail!SSLVerifySignedServerKeyExchange] (control_graph) Statement number: 105
+CONTROLIZER[apple_goto_fail!SSLVerifySignedServerKeyExchange] (control_graph) Statement:
+goto fail;
+CONTROLIZER[apple_goto_fail!SSLVerifySignedServerKeyExchange] (control_graph) Statement number: 92
