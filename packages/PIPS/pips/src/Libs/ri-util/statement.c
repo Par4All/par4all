@@ -2457,8 +2457,54 @@ string generated_variable_comment(entity e)
 {
     return generated_variable_commenters[nb_commenters-1](e);;
 }
+
+/* Check if declaration of variable nv can be added to the declaration
+ * list of statement s.
+ *
+ * This is considered legal if:
+ *
+ *  - the comments match; 
+ *
+ *  - the basic of the types of nv and a variable already declared in
+ *    s, fv, are equal;
+ *
+ *  - the qualifiers of nv and fv are equal
+ *
+ *  - the storage are equal if ram storage are used for both fv and nv
+ *
+ * This function impacts the layout of the declarations and hence the
+ * prettyprint. Any modification is likely to disturb the validation.
+ *
+ * This function is not safe. Statement s must be a declaration
+ * statement with a non-empty declaration list.
+ *
+ * The code could be shortened by using a big logical expression, but
+ * this would not improve readability or debugability.
+ */
+static bool add_declaration_to_declaration_statement_p(statement s,
+						       string c,
+						       entity nv)
+{
+  bool add_p = false;
+  entity fv = ENTITY(CAR(statement_declarations(s)));
+  bool comment_p = comments_equal_p(statement_comments(s),c);
+  bool basic_p = false;
+  if(!basic_undefined_p(entity_basic(nv))
+     && !basic_undefined_p(entity_basic(fv))) {
+    basic_p = basic_equal_p(entity_basic(nv),entity_basic(fv));
+  }
+  bool qualifiers_p = 
+    qualifiers_equal_p(entity_qualifiers(nv),entity_qualifiers(fv));
+  bool storage_p = 
+    storage_ram_p(entity_storage(fv))?(storage_ram_p(entity_storage(nv))?
+				       (ram_section(storage_ram(entity_storage(fv)))
+					==ram_section(storage_ram(entity_storage(nv)))):false)
+    :true;
 
+  add_p = comment_p && basic_p && qualifiers_p && storage_p;
 
+  return add_p;
+}
 
 /* Add a new declaration statement
  *
@@ -2518,14 +2564,7 @@ static statement generic_add_declaration_statement(statement s, entity e, bool b
         if(!ENDP(pl)) {
             /* SG: if CAR(pl) has same comment and same type as ds, merge them */
             statement spl = STATEMENT(CAR(pl));
-            entity ecar = ENTITY(CAR(statement_declarations(spl)));
-            if( comments_equal_p(statement_comments(spl),comment) &&
-		!basic_undefined_p(entity_basic(e)) && !basic_undefined_p(entity_basic(ecar)) &&
-		basic_equal_p(entity_basic(e),entity_basic(ecar)) &&
-		qualifiers_equal_p(entity_qualifiers(e),entity_qualifiers(ecar)) &&
-		(storage_ram_p(entity_storage(ecar))?ram_section(storage_ram(entity_storage(ecar)))==ram_section(storage_ram(entity_storage(e))):true)
-              )
-            {
+	    if(add_declaration_to_declaration_statement_p(spl, comment, e))                 {
                 free_statement(ds);
                 statement_declarations(spl)=gen_nconc(statement_declarations(spl),CONS(ENTITY,e,NIL));
                 nsl=sl;
@@ -2543,13 +2582,7 @@ static statement generic_add_declaration_statement(statement s, entity e, bool b
 	    if (before_p && !ENDP(sl) && declaration_statement_p(STATEMENT(CAR(sl))))
 	      {
 		statement ssl = STATEMENT(CAR(sl));
-		entity ecar = ENTITY(CAR(statement_declarations(ssl)));
-		if( comments_equal_p(statement_comments(ssl),comment) &&
-                    !basic_undefined_p(entity_basic(e)) && !basic_undefined_p(entity_basic(ecar)) &&
-                    basic_equal_p(entity_basic(e),entity_basic(ecar)) &&
-                    qualifiers_equal_p(entity_qualifiers(e),entity_qualifiers(ecar)) &&
-		    (storage_ram_p(entity_storage(ecar))?ram_section(storage_ram(entity_storage(ecar)))==ram_section(storage_ram(entity_storage(e))):true)
-		    )
+		if(add_declaration_to_declaration_statement_p(ssl, comment, e))
 		{
 		  free_statement(ds);
 		  statement_declarations(ssl)= CONS(ENTITY,e,statement_declarations(ssl));

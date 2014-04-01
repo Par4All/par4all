@@ -802,13 +802,16 @@ static void inout_statement( statement st ) {
   static int indent = 0;
 
   ifdebug(2) {
-    fprintf( stderr,
-             "%*s> Computing DEF and REF for statement %p (%td %td):\n",
+    pips_debug( 2,
+             "%*s> Computing DEF and REF for statement %p (%td %td):\n"
+             "current_defs %p, current_refs %p\n",
              indent++,
              "",
              st,
              statement_number( st ),
-             statement_ordering( st ) );
+             statement_ordering( st ),
+             current_defs,
+             current_refs );
     local_print_statement_set( "DEF_IN", current_defs );
     local_print_statement_set( "REF_IN", current_refs );
   }
@@ -821,6 +824,21 @@ static void inout_statement( statement st ) {
   /* Compute Use-Def conflicts from Ref_in set */
   SET_FOREACH( effect, refIn, current_refs) {
     add_conflicts( refIn, st, statement_vertex, effects, ud );
+  }
+
+  ifdebug(3) {
+    pips_debug( 3,
+             "%*s> After add conflicts for statement %p (%td %td):\n"
+             "current_defs %p, current_refs %p\n",
+             indent,
+             "",
+             st,
+             statement_number( st ),
+             statement_ordering( st ),
+             current_defs,
+             current_refs );
+    local_print_statement_set( "DEF_IN", current_defs );
+    local_print_statement_set( "REF_IN", current_refs );
   }
 
   /* Compute "out" sets for the instruction : recursion */
@@ -857,13 +875,16 @@ static void inout_statement( statement st ) {
       pips_internal_error("Unknown tag %d", instruction_tag(i) );
   }
   ifdebug(2) {
-    fprintf( stderr,
-             "%*s> Statement %p (%td %td):\n",
+    pips_debug( 2,
+             "%*s> Statement %p (%td %td):\n"
+             "current_defs %p, current_refs %p\n",
              indent--,
              "",
              st,
              statement_number( st ),
-             statement_ordering( st ) );
+             statement_ordering( st ),
+             current_defs,
+             current_refs );
     local_print_statement_set( "DEF_OUT", DEF_OUT( st ) );
     local_print_statement_set( "REF_OUT", REF_OUT( st ) );
   }

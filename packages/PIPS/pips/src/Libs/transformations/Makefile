@@ -59,7 +59,9 @@ LIB_CFILES =	\
 		set_return_type.c \
 		cast_at_call_sites.c \
 		manage_parallel_loops.c \
-		registers.c
+		registers.c \
+		identity_elimination.c \
+		
 
 INC_TARGET =    $(TARGET).h
 
