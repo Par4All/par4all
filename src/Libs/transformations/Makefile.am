@@ -41,6 +41,7 @@ libtransformations_la_SOURCES=\
 		set_return_type.c \
 		cast_at_call_sites.c \
 		manage_parallel_loops.c \
-		registers.c
+		registers.c \
+		identity_elimination.c
 
 include $(srcdir)/../pipslibs_includes.mk
