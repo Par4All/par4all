@@ -1,5 +1,5 @@
 Unlike Semantics, the tpips scripts use the current pipsmake
-environment (Fall 20009) and not the initial one.
+environment (Fall 2009) and not the initial one.
 
 anywhere01: *p = ... impact of anywhere effects with different options
             (see pointer01, 02, 03, 04 for interprocedural issues)
