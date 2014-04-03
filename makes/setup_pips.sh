@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 #
 # $Id$
 #
@@ -25,8 +25,8 @@
 # Setup a basic pips installation from scratch
 
 [ "$BASH_VERSION" ] || {
-   echo "ERROR: script $0 to be interpreted with bash" >&2
-   exit 1
+    echo "ERROR: script $0 to be interpreted with bash" >&2
+    exit 1
 }
 
 # where to get pips
@@ -41,62 +41,59 @@ POLYLIB='polylib-5.22.5'
 command=${0/*\//}
 usage="$command [--opts] [directory [developer [checkout|export]]]"
 
-function error()
-{
-  echo "$@" >&2
-  echo "usage: $usage" >&2
-  exit 1
+function error {
+    echo "$@" >&2
+    echo "usage: $usage" >&2
+    exit 1
 }
 
-function warn()
-{
-  {
-    echo
-    echo "WARNING"
-    for msg in "$@" ; do
-      echo $msg ;
-    done
-  } >&2
-  if tty -s ; then
-    echo "Type return to continue"
-    read
-  fi
+function warn {
+    {
+        echo
+        echo "WARNING"
+        for msg in "$@"; do
+            echo $msg
+        done
+    } >&2
+    if tty -s; then
+        echo "Type return to continue"
+        read
+    fi
 }
 
 # compilation option
 gpips=
 full=1
 
-while [[ $1 == -* ]]
-do
-  opt=$1
-  shift
-  case $opt in
+while [[ $1 == -* ]]; do
+    opt=$1
+    shift
+    case $opt in
     --gpips)
-      gpips=1
-      ;;
+        gpips=1
+        ;;
     --full)
-      full=1
-      ;;
+        full=1
+        ;;
     --light)
-      full=
-      ;;
+        full=
+        ;;
     -h|--help)
-      echo "usage: $usage" ;
-      echo " directory defaults to ./MYPIPS" ;
-      echo " default user is current user" ;
-      echo " default svn command is checkout" ;
-      echo " options: --gpips to compile gpips" ;
-      exit 0 ;
-      ;;
+        echo "usage: $usage"
+        echo " directory defaults to ./MYPIPS"
+        echo " default user is current user"
+        echo " default svn command is checkout"
+        echo " options: --gpips to compile gpips"
+        exit 0
+        ;;
     -v|--version)
-    echo 'version is $Id$' ;
-      exit 0 ;
-      ;;
+        echo 'version is $Id$'
+        exit 0
+        ;;
     -*)
-      error "unexpected option $1" ;
-      ;;
-  esac
+        error "unexpected option $1"
+        ;;
+    esac
 done
 
 # arguments
@@ -113,8 +110,8 @@ make=${MAKE:-make}
 
 test -d $destination  && \
     warn "Directory $destination already exists!" \
-      " If you are not trying to finish a previous installation of PIPS" \
-      " in $destination you should stop and choose another directory name."
+        " If you are not trying to finish a previous installation of PIPS" \
+        " in $destination you should stop and choose another directory name."
 mkdir -p $destination || error "cannot mkdir $destination"
 
 [ $subcmd = 'export' -o $subcmd = 'checkout' ] || \
@@ -125,39 +122,37 @@ prod=$destination/prod
 echo
 echo "### checking needed softwares"
 # ed is used within the "newgen" script
-for exe in svn wget tar gunzip $make cproto flex bison gcc perl sed tr ctags
-do
-  type $exe || error "no such executable, please install: $exe"
+for exe in svn wget tar gunzip $make cproto flex bison gcc perl sed tr ctags; do
+    type $exe || error "no such executable, please install: $exe"
 done
 
 # check for readline
 [ -d /usr/include/readline -o -d /usr/local/include/readline ] ||
-  error "readline headers seem to be missing: /usr/include/readline"
+    error "readline headers seem to be missing: /usr/include/readline"
 
 # check for ncurses
 [ -e /usr/include/ncurses.h -o -e /usr/local/include/ncurses.h ] ||
-  error "ncurses header seems to be missing: /usr/include/ncurses.h"
+    error "ncurses header seems to be missing: /usr/include/ncurses.h"
 
 # check cproto version... 4.6 is still available on many distributions
 [[ $(cproto -V 2>&1) = 4.7* ]] || \
-  error "Pips compilation requires at least cproto 4.7c"
+    error "Pips compilation requires at least cproto 4.7c"
 
 # reject old svn versions because of relative externals used
 [[ $(svn --version | head -1) == *' '1.[01234].* ]] &&
-  error "Checking out pips requires svn 1.5 or better"
+    error "Checking out pips requires svn 1.5 or better"
 
 echo
 echo "### downloading pips"
 svn $subcmd $PIPS_SVN/bundles/trunks $prod || error "cannot checkout pips"
 
 if [ "$full" ] ; then
-  valid=$destination/validation
-  echo "### downloading validation"
-  if ! svn $subcmd $SVN_CRI/validation/trunk $valid
-  then
-    # just a warning...
-    warn "cannot checkout validation"
-  fi
+    valid=$destination/validation
+    echo "### downloading validation"
+    if ! svn $subcmd $SVN_CRI/validation/trunk $valid; then
+        # just a warning...
+        warn "cannot checkout validation"
+    fi
 fi
 
 # clean environment so as not to interfere with another installation
@@ -167,13 +162,12 @@ export PIPS_ARCH
 # just in case
 unset NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT
 
-[ "$developer" -a "$full" ] &&
-{
-  # this fails if no such developer...
-  echo "### getting user development branches"
-  svn $subcmd $PIPS_SVN/branches/$developer $destination/pips_dev
-  #svn $subcmd $LINEAR_SVN/branches/$developer $destination/linear_dev
-  #svn $subcmd $NEWGEN_SVN/branches/$developer $destination/newgen_dev
+[ "$developer" -a "$full" ] && {
+    # this fails if no such developer...
+    echo "### getting user development branches"
+    svn $subcmd $PIPS_SVN/branches/$developer $destination/pips_dev
+    #svn $subcmd $LINEAR_SVN/branches/$developer $destination/linear_dev
+    #svn $subcmd $NEWGEN_SVN/branches/$developer $destination/newgen_dev
 }
 
 echo
@@ -188,17 +182,15 @@ type htlatex && echo '_HAS_HTLATEX_ = 1' >> $config
 type emacs && echo '_HAS_EMACS_ = 1' >> $config
 type pkg-config && has_pkgconfig=1
 
-if [ "$has_pkgconfig" -a "$gpips" ]
-then
-  echo '_HAS_PKGCONFIG_ = 1' >> $config
-  if pkg-config --exists gtk+-2.0
-  then
-    echo '_HAS_GTK2_ = 1' >> $config
- else
-    echo 'PIPS_NO_GPIPS = 1' >> $config
-  fi
+if [ "$has_pkgconfig" -a "$gpips" ]; then
+    echo '_HAS_PKGCONFIG_ = 1' >> $config
+    if pkg-config --exists gtk+-2.0; then
+        echo '_HAS_GTK2_ = 1' >> $config
+    else
+        echo 'PIPS_NO_GPIPS = 1' >> $config
+    fi
 else
-  echo 'PIPS_NO_GPIPS = 1' >> $config
+    echo 'PIPS_NO_GPIPS = 1' >> $config
 fi
 
 # others? copy config to newgen and linear?
@@ -207,9 +199,9 @@ ln -s $config $prod/linear/makes/config.mk
 
 # whether to build the documentation depends on latex and htlatex
 target=compile
-if [ "$full" ] ; then
-  type latex && target=build
-  type htlatex && target=full-build
+if [ "$full" ]; then
+    type latex && target=build
+    type htlatex && target=full-build
 fi
 
 # Find the Fortran compiler:
@@ -218,7 +210,7 @@ type g77 && export PIPS_F77=g77
 
 echo
 echo "### creating pipsrc.sh"
-cat <<EOF > $destination/pipsrc.sh
+cat > $destination/pipsrc.sh << EOF
 # minimum rc file for sh-compatible shells
 
 # default architecture is not necessary
@@ -257,11 +249,10 @@ $prod/pips/src/Scripts/env/sh2csh.pl \
 echo
 echo "### downloading $POLYLIB"
 cd /tmp
-if test -f $POLYLIB.tar.gz
-then
-  warn "some /tmp/$POLYLIB.tar.gz file already there. Continue using it?"
+if test -f $POLYLIB.tar.gz; then
+    warn "some /tmp/$POLYLIB.tar.gz file already there. Continue using it?"
 else
-  wget -nd $POLYLIB_SITE/$POLYLIB.tar.gz || error "cannot wget polylib"
+    wget -nd $POLYLIB_SITE/$POLYLIB.tar.gz || error "cannot wget polylib"
 fi
 
 echo
@@ -312,7 +303,6 @@ PATH=$prod/newgen/bin:$prod/newgen/bin/$PIPS_ARCH:$PATH \
 echo
 echo "### checking for useful softwares"
 # not really: wish htlatex
-for exe in bash m4 latex javac emacs indent
-do
-  type $exe || echo "no such executable, consider installing: $exe"
+for exe in bash m4 latex javac emacs indent; do
+    type $exe || echo "no such executable, consider installing: $exe"
 done
