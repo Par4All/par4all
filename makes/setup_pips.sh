@@ -134,6 +134,10 @@ done
 [ -d /usr/include/readline -o -d /usr/local/include/readline ] ||
   error "readline headers seem to be missing: /usr/include/readline"
 
+# check for ncurses
+[ -e /usr/include/ncurses.h -o -e /usr/local/include/ncurses.h ] ||
+  error "ncurses header seems to be missing: /usr/include/ncurses.h"
+
 # check cproto version... 4.6 is still available on many distributions
 [[ $(cproto -V 2>&1) = 4.7* ]] || \
   error "Pips compilation requires at least cproto 4.7c"
