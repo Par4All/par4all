@@ -11932,6 +11932,7 @@ By default this list is empty and hence all call sites are inlined.
 
 \subsection{Outlining}
 \label{subsection-outlining}
+\index{Outlining}
 
 \begin{PipsPass}{outline}
 This documentation is a work in progress, as well as the documented
@@ -11939,11 +11940,16 @@ topic\marginpar{Serge? Still true? What do you mean?}.
 
 
 Outlining is the opposite transformation of \PipsPassRef{inlining}.
-It replaces some statements in an
-existing module by a call site to a new function whose execution is
-equivalent to the execution of the replaced statements.
-The body of the new function is similar to the piece of code replaced in the existing module.
-The user is prompted for various pieces of information in order to perform the outlining:
+%%
+It replaces some statements in an existing module by a call site to a
+new function whose execution is equivalent to the execution of the
+replaced statements.
+%%
+The body of the new function is similar to the piece of code replaced
+in the existing module.
+%%
+The user is prompted for various pieces of information in order to
+perform the outlining:
 \begin{itemize}
     \item a new module name,
     \item the statement number of the first outlined statement,
@@ -11952,8 +11958,10 @@ The user is prompted for various pieces of information in order to perform the o
 The statements are a subset of a sequence. They are counted in the
 sequence\marginpar{Serge: I invent...(FI)}.
 
-\PipsPropRef{OUTLINE_WRITTEN_SCALAR_BY_REFERENCE} controls whether we pass
-written scalar by reference or not. This property might lead to incorrect code !
+\PipsPropRef{OUTLINE_WRITTEN_SCALAR_BY_REFERENCE} controls whether we
+pass written scalar by reference or not.
+%%
+This property might lead to incorrect code !
 
 \end{PipsPass}
 
@@ -11970,11 +11978,12 @@ outline      > MODULE.code
 
 The property \PipsPropRef{OUTLINE_SMART_REFERENCE_COMPUTATION} is used
 to limit the number of entities passed by reference.
-With it, \lstinline|a[0][0]| is passed as an
-\lstinline|a[n][m]| entity, without it it is passed as an
-\lstinline|int| or \lstinline|int*| depending on the cumulated read/write memory
-effects of the outlined statements\marginpar{Serge: but cumulated
-  effects are always required?}.
+%%
+With it, \lstinline|a[0][0]| is passed as an \lstinline|a[n][m]|
+entity, without it it is passed as an \lstinline|int| or
+\lstinline|int*| depending on the cumulated read/write memory effects
+of the outlined statements\marginpar{Serge: but cumulated effects are
+  always required?}.
 
 If you need to pass the upper bound expression of a particular loop as
 a parameter, which is used in Ter@pix code generation (see Section~???), set
@@ -12008,13 +12017,20 @@ are declared into this new compilation unit\marginpar{Serge: Consistency
 new compilation unit through the sub-callgraph are declared static and
 prefixed with \PipsPropRef{OUTLINE_CALLEES_PREFIX}.
 
-Added two properties for R-Stream compatibility.
-If \PipsPropRef{OUTLINE_REMOVE_VARIABLE_RSTREAM_IMAGE} is set to True, instead of outlining
-loop indexes and written scalar variables the outliner declares them as local variables inside the
-outlined function. Therefore they are not added to the effective or formal parameters.
+Two properties were added for R-Stream compatibility.
+%%
+If \PipsPropRef{OUTLINE_REMOVE_VARIABLE_RSTREAM_IMAGE} is set to True,
+instead of outlining loop indexes and written scalar variables the
+outliner declares them as local variables inside the outlined
+function.
+%%
+Therefore they are not added to the effective or formal parameters.
 
-The behavior of \PipsPropRef{OUTLINE_REMOVE_VARIABLE_RSTREAM_SCOP} is the same as above. Except that this property
-only excludes loop indexes from being outlined. 
+The behavior of \PipsPropRef{OUTLINE_REMOVE_VARIABLE_RSTREAM_SCOP} is
+the same as above.
+%%
+Except that this property only excludes loop indexes from being
+outlined.
 
 \begin{PipsProp}{OUTLINE_MODULE_NAME}
 OUTLINE_MODULE_NAME ""
@@ -12050,6 +12066,7 @@ OUTLINE_REMOVE_VARIABLE_RSTREAM_IMAGE FALSE
 OUTLINE_REMOVE_VARIABLE_RSTREAM_SCOP FALSE
 \end{PipsProp}
 
+This pass was developped by Serge Guelton, as part of his PhD work.
 
 \subsection{Cloning}
 \index{Cloning}
