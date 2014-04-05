@@ -767,7 +767,7 @@ void outliner_parameters(entity new_fun,  statement new_body, list referenced_en
     /* we need to patch parameters , effective parameters and body in C
      * because parameters are passed by copy in function call
      * it's not needed if
-     * - the parameter is only read
+     * - the parameter is only read (FI: or if it is written before it is read?)
      * - it's an array / pointer
      *
      * Here a scalar will be passed by address and a prelude/postlude
@@ -781,6 +781,11 @@ void outliner_parameters(entity new_fun,  statement new_body, list referenced_en
      *   ...
      *   *scalar_0 = scalar;
      * }
+     *
+     * Note FI: this is also useless when the variable does not appear
+     * in the out region of the outlined piece of code. However, the
+     * out effets and out regions are not available for every piece of
+     * code.
      *
      */
 void outliner_patch_parameters(list statements_to_outline, list referenced_entities, list effective_parameters, list formal_parameters,
