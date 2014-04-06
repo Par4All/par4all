@@ -1,0 +1,1 @@
+The declarations of i and j in the kernel source code should appear on the same line. They are distributed on two lines because j is internally a formal variable. I decided not to check that the storage of a variable is consistent when adding a new declaration because I am afraid too many core dumps would be triggered by such a PIPS internal error (FI, 6 April 2014).
