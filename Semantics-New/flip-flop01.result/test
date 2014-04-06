@@ -1,0 +1,127 @@
+
+Transformers
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T() {}
+
+   int s[2][10];
+
+//  T(i,j) {}
+
+   int i, j;
+
+//  T(cur,next) {}
+
+   int cur, next;
+
+//  T(cur) {cur==0}
+
+   cur = 0;
+
+//  T(next) {cur==0, next==1}
+
+   next = 1;
+
+//  T(i) {cur==0, i==1, next==1}
+
+   i = 1;
+
+//  T(cur,i,next) {cur+next==1, cur#init==0, i#init==1, next#init==1,
+//    1<=i, i<=9}
+
+   while (i<10)
+
+//  T(cur,i,next) {cur+next==1, cur==next#init, i==i#init+1, i<=10}
+
+      if (1) {
+
+//  T(cur) {cur==next, i<=9}
+
+         /* for (j = 1; j< 10; j++) */
+         /*   { */
+         /*     s[cur][j] = s[next][j] + j; */
+         /*     s[next][j] = s[cur][j]; */
+         /*   } */
+         cur = next;
+
+//  T(next) {cur+next==1, cur==next#init, i<=9}
+
+         next = 1-next;
+
+//  T(i) {cur+next==1, i==i#init+1, i<=10}
+
+         i++;
+      }
+
+//  T(main) {cur+next==1, i==10, main==0}
+
+   return 0;
+}
+
+Preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int s[2][10];
+
+//  P() {}
+
+   int i, j;
+
+//  P(i,j) {}
+
+   int cur, next;
+
+//  P(cur,i,j,next) {}
+
+   cur = 0;
+
+//  P(cur,i,j,next) {cur==0}
+
+   next = 1;
+
+//  P(cur,i,j,next) {cur==0, next==1}
+
+   i = 1;
+
+//  P(cur,i,j,next) {cur==0, i==1, next==1}
+
+   while (i<10)
+
+//  P(cur,i,j,next) {cur+next==1, 1<=i, i<=9}
+
+      if (1) {
+
+//  P(cur,i,j,next) {cur+next==1, 1<=i, i<=9}
+
+         /* for (j = 1; j< 10; j++) */
+         /*   { */
+         /*     s[cur][j] = s[next][j] + j; */
+         /*     s[next][j] = s[cur][j]; */
+         /*   } */
+         cur = next;
+
+//  P(cur,i,j,next) {cur==next, 1<=i, i<=9}
+
+         next = 1-next;
+
+//  P(cur,i,j,next) {cur+next==1, 1<=i, i<=9}
+
+         i++;
+      }
+
+//  P(cur,i,j,next) {cur+next==1, i==10}
+
+   return 0;
+}

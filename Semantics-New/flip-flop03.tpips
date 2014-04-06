@@ -1,4 +1,4 @@
-setenv WS=flip-flop01
+setenv WS=flip-flop03
 
 delete $WS
 create $WS $WS.c
