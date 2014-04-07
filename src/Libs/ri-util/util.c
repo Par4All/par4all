@@ -465,6 +465,16 @@ entity module_to_heap_area(entity f)
   return a;
 }
 
+entity module_to_dynamic_area(entity f)
+{
+  entity a = FindEntity(entity_local_name(f), DYNAMIC_AREA_LOCAL_NAME);
+
+  pips_assert("The dynamic area is defined for module f.\n",
+	      !entity_undefined_p(a));
+
+  return a;
+}
+
 bool entity_area_p(entity e)
 {
   return !type_undefined_p(entity_type(e)) && type_area_p(entity_type(e));//static_area_p(e) || dynamic_area_p(e) || heap_area_p(e) || stack_area_p(e);
