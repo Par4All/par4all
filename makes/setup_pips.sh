@@ -200,7 +200,8 @@ unset NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT
 [ "$developer" -a "$full" ] && {
     # this fails if no such developer...
     info "getting user development branches"
-    svn "$subcmd" "$PIPS_SVN"/branches/"$developer" "$destination"/pips_dev
+    svn "$subcmd" "$PIPS_SVN"/branches/"$developer" "$destination"/pips_dev || \
+        info "cannot checkout PIPS development branches"
     #svn "$subcmd" "$LINEAR_SVN"/branches/"$developer" "$destination"/linear_dev
     #svn "$subcmd" "$NEWGEN_SVN"/branches/"$developer" "$destination"/newgen_dev
 }
