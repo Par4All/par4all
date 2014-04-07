@@ -303,7 +303,7 @@ cd "$prod"/extern/lib/"$PIPS_ARCH" || error "cannot cd"
 rm -f libpolylib.a
 ln -s ../libpolylib*.a libpolylib.a || error "cannot create links"
 
-warn "cproto header generation results in many cpp warnings..."
+info "cproto header generation results in many cpp warnings..."
 
 info "building newgen"
 "$make" $makeflags -j $numjobs -C "$prod"/newgen clean "$target"
