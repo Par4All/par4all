@@ -191,7 +191,7 @@
       v                                                      |
       x loop postcondition <----------------------------------
 
-  The same scheme is used for all kinds of loops. Of coursse, t_inc,
+  The same scheme is used for all kinds of loops. Of course, t_inc,
   t_exit, t_skip and t_continue have to be adapted to the loop kind.
  */
 
@@ -235,8 +235,18 @@ transformer any_loop_to_k_transformer(transformer t_init,
     print_transformer(post_init);
   }
 
-  /* Compute a first rough body precondition pre_body using a very approximate
-     fix-point and the conditions met for the body to execute, pre_iteration. */
+  /* Compute a first rough body precondition, pre_body, using
+   * different heuristics:
+   *
+   * - a very approximate fix-point and the conditions met for the
+   * body to execute, pre_iteration.
+   *
+   * -
+   *
+   * - the convex hull of the precondition holding for the first
+   *   iteration and the range of the extended body transformer,
+   *   t_next.
+   */
   //
   // First heuristics:
   //pre_body = invariant_wrt_transformer(post_enter, t_effects);
@@ -250,7 +260,16 @@ transformer any_loop_to_k_transformer(transformer t_init,
   // temporary memory leaks
   t_next_star = (* transformer_fix_point_operator)(t_next);
   post_next = transformer_range(transformer_apply(transformer_combine(t_next_star, t_next), post_body));
-  pre_body = transformer_range(transformer_convex_hull(post_next, post_enter));
+  transformer pre_body_2 = transformer_range(transformer_convex_hull(post_next, post_enter));
+  //
+  // Third heuristics: either it is the first iteration, or we are in
+  // the range of t_next (added for Semantics-New/flip-flop01.c, but
+  // turns out to be useless for flip-flop02)
+  // transformer pre_body_3 = transformer_convex_hull(post_enter, transformer_range(t_next));
+
+  // pre_body = transformer_intersection(pre_body_2, pre_body_3);
+  //free_transformers(pre_body_2, pre_body_3, NULL);
+  pre_body = pre_body_2;
 
   /* Compute the body transformer */
   // THIS PART SHOULD BE CLEANED-UP and k not used to avoid
