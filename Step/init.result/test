@@ -4,8 +4,10 @@
 void main_PARFOR_HYBRID(int array[10], int i_0[1]);
 void main_PARFOR_HYBRID(int array[10], int i_0[1])
 {
+   // Declared as a patch variable by Pass Outlining
+   int i;
    //PIPS generated variable
-   int i, STEP_COMM_SIZE, STEP_i_LOW, STEP_i_UP, STEP_COMM_RANK, STEP_SR_array[STEP_MAX_NB_LOOPSLICES][1][STEP_INDEX_SLICE_UP], IDX;
+   int STEP_COMM_SIZE, STEP_i_LOW, STEP_i_UP, STEP_COMM_RANK, STEP_SR_array[STEP_MAX_NB_LOOPSLICES][1][STEP_INDEX_SLICE_UP], IDX;
 #pragma omp master
    {
       i = *i_0;

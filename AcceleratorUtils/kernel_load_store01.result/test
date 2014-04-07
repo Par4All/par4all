@@ -25,7 +25,7 @@ l99999:      parteeeeeez(n, i, result, src0, src1);
 }
 void parteeeeeez(int n, unsigned int i, short result[n][n], short src0[n][n], short src1[n][n])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    unsigned int j;
 l99999:
    for(j = 0; j <= n-1; j += 1)

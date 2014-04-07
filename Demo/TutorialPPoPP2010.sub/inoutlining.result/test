@@ -50,7 +50,7 @@ l99996:      convol_outlined(n, i, a, b, kernel);
 }
 void convol_outlined(int n, int i, int a[n][n], int b[n][n], int kernel[3][3])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int j;
 l99996:
    for(j = 0; j <= n-1; j += 1) {

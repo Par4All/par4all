@@ -23,7 +23,7 @@ int main()
 }
 void p4a_launcher_main(int N, double a[N], double b[N], double c[N])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i;
 
    for(i = 0; i <= 9999; i += 1)
@@ -64,7 +64,7 @@ int main()
 }
 void p4a_launcher_main(int N, double a[N], double b[N], double c[N])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i;
 
    for(i = 0; i <= 9999; i += 1)
@@ -106,7 +106,7 @@ void P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block
 void P4A_accel_free(void *address);
 void p4a_launcher_main(int N, double a[N], double b[N], double c[N])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i;
 
    for(i = 0; i <= 9999; i += 1)

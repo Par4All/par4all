@@ -30,8 +30,10 @@ int b(int i)
 }
 void kernel(int j_0[1])
 {
-   //PIPS generated variable
-   int i, j;
+   // Declared by Pass Outlining
+   int i;
+   // Declared as a patch variable by Pass Outlining
+   int j;
    j = *j_0;
 kernel:
    for(i = 0; i <= 255; i += 1)

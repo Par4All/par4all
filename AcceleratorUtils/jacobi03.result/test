@@ -141,14 +141,14 @@ void get_data(char filename[])
 }
 void kernel1(float_t save[64][64], float_t space[64][64], int i)
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int j;
    for(j = 1; j <= 62; j += 1)
       save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
 }
 void launch_kernel1(float_t save[64][64], float_t space[64][64])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i;
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
