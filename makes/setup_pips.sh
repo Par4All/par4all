@@ -44,12 +44,18 @@ POLYLIB='polylib-5.22.5'
 
 # minimal help
 command="${0/*\//}"
-usage="$command [--opts] [directory [developer [checkout|export]]]"
+usage="$command [options] [directory [developer [{checkout,export}]]]"
 help="usage: $usage
-  directory defaults to ./MYPIPS
-  default user is current user
-  default svn command is checkout
-  options: --gpips to compile gpips"
+
+positional arguments:
+  directory             installation directory (default is ./MYPIPS)
+  developer             login to checkout development branches (default is
+                        current login)
+  {checkout,export}     SVN command to run (default is checkout)
+
+optional arguments:
+  --gpips               enable gpips compilation
+  -j JOBS, --jobs JOBS  number of compilation jobs to run simultaneously"
 
 function info {
     echo
@@ -95,6 +101,7 @@ function warn {
 # compilation option
 gpips=
 full=1
+numjobs=1
 
 while [[ ${1:-} == -* ]]; do
     opt=$1
@@ -116,6 +123,13 @@ while [[ ${1:-} == -* ]]; do
     -v|--version)
         echo 'version is $Id$'
         exit 0
+        ;;
+    -j[0-9]*)
+        numjobs=$(echo $opt | cut -c 3-)
+        ;;
+    -j|--jobs)
+        numjobs="$1"
+        shift
         ;;
     -*)
         error "unexpected option $1"
@@ -292,15 +306,15 @@ ln -s ../libpolylib*.a libpolylib.a || error "cannot create links"
 warn "cproto header generation results in many cpp warnings..."
 
 info "building newgen"
-"$make" $makeflags -C "$prod"/newgen clean "$target"
+"$make" $makeflags -j $numjobs -C "$prod"/newgen clean "$target"
 
 info "building linear"
-"$make" $makeflags -C "$prod"/linear clean "$target"
+"$make" $makeflags -j $numjobs -C "$prod"/linear clean "$target"
 
 info "building pips"
 # must find newgen and newC executable...
 PATH="$prod"/newgen/bin:"$prod"/newgen/bin/"$PIPS_ARCH":"$PATH" \
-    "$make" $makeflags -C "$prod"/pips clean "$target"
+    "$make" $makeflags -j $numjobs -C "$prod"/pips clean "$target"
 
 info "checking for useful softwares"
 # not really: wish htlatex
