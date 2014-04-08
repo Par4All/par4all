@@ -34,8 +34,8 @@ set -o pipefail
 
 # where to get pips
 SVN_CRI='https://scm.cri.ensmp.fr/svn'
-#NEWGEN_SVN="$SVN_CRI"/newgen
-#LINEAR_SVN="$SVN_CRI"/linear
+NEWGEN_SVN="$SVN_CRI"/newgen
+LINEAR_SVN="$SVN_CRI"/linear
 PIPS_SVN="$SVN_CRI"/pips
 
 # where to get polylib
