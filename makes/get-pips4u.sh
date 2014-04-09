@@ -445,7 +445,7 @@ to your .bashrc or whatever:
   export PATH=${INSTALL_PREFIX}/bin:$PATH
   export LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib
   export PKG_CONFIG_PATH=${INSTALL_PREFIX}/lib/pkgconfig
-  export PYTHONPATH=${INSTALL_PREFIX}/lib/python2.6/site-packages/pips
+  export PYTHONPATH=${INSTALL_PREFIX}/lib/python2.7/site-packages/pips
 
 ================================================================================
 EOF
