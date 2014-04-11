@@ -113,7 +113,7 @@ or button \emph{Open Perspective} (left picture).
 \end{enumerate}
 
 
-\item Add The repository location of PIPS \\(https://svn.cri.ensmp.fr/svn/pips/).
+\item Add The repository location of PIPS \\(https://scm.cri.ensmp.fr/svn/pips/).
 \begin{enumerate}
 \item Open the \emph{New Repository Location} wizard.
 \begin{center}
@@ -121,7 +121,8 @@ or button \emph{Open Perspective} (left picture).
 \includegraphics[scale=0.4]{eclipse/02-eclipseJUNO-newRepositories2.jpg}
 \end{center}
 
-\item Put the URL of PIPS https://svn.cri.ensmp.fr/svn/pips/ and your authentication login of PIPS.
+\item Put the URL of PIPS https://scm.cri.ensmp.fr/svn/pips/ and your authentication login of PIPS. 
+The authentication login of PIPS is optional. 
 \begin{center}
 \noindent
 \includegraphics[scale=0.4]{eclipse/02-eclipseJUNO-newRepositories3.png}
@@ -130,7 +131,7 @@ or button \emph{Open Perspective} (left picture).
 \item click \emph{Finish}.
 \end{enumerate}
 
-\item Do the same for linear (https://svn.cri.ensmp.fr/svn/linear/) and Newgen (https://svn.cri.ensmp.fr/svn/newgen/).
+\item Do the same for linear (https://scm.cri.ensmp.fr/svn/linear/) and Newgen (https://scm.cri.ensmp.fr/svn/newgen/).
 
 You will normally have something like that at the end:
 \begin{center}
@@ -221,6 +222,8 @@ For this purpose you can see the developer\_guide part \textbf{Section 3.2.2 Mis
 In summary, these configurations are done in the property project, menu ``C/C++ General'', submenu ``Paths and Symbols'', ``Include'' tab.
 
 Without these includes, you won't be able to use the power of Eclipse.
+Some folders are only present after a first compilation (the \textit{include} folders). 
+But you can put them manually into the configuration without problems.
 
 List of includes for the different projects:
 \begin{enumerate}
