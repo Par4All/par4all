@@ -29,6 +29,10 @@ function report()
       echo "version: $version"
       echo "name: $name"
       echo "dir: $dir"
+      echo "setup: $url"
+      svn info $url | sed -n \
+	  -e 's/Last Changed Rev: /revision: /p' \
+	  -e 's/Last Changed Date: /date: /p'
       echo "duration: ${SECONDS}s"
       echo "status: $status"
       echo "message: $message"
