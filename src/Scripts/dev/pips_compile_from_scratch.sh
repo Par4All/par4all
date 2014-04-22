@@ -4,7 +4,7 @@
 #
 # Compile PIPS from scratch in a temporary directory.
 # This contrasts with script "pips_check_compile" which does a faster
-# "svn up" to get up-to-date sources.
+# "svn up" to get up-to-date sources and validation.
 # Can be run from cron.
 #
 # $0 name log [email]
@@ -28,6 +28,7 @@ function report()
       echo "script: $0"
       echo "version: $version"
       echo "name: $name"
+      echo "host: $(hostname)"
       echo "dir: $dir"
       echo "setup: $url"
       svn info $url | sed -n \
