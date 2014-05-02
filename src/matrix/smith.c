@@ -149,5 +149,84 @@ Pmatrix Q;
     matrix_print(Q);
 #endif
 }
-	
 
+/* Under the assumption A x = B, A[n,m] and B[n], compute the 1-D
+ * lattice for x_i as
+ *
+ * x_i = gcd lambda + c 
+ *
+ * when possible, using the Smith form of A, with D = P A Q and P and
+ * Q unimodular
+ *
+ * inv(P) S inv(Q) x = b
+ *
+ * inv(P) S y = b => S y = P b => some components of y are constants, yc
+ *
+ * y = inv(Q) x => x = Q y
+ *
+ * c = Q y_c
+ *
+ * gcd = gcd_{j s.t. yc_j = 0} Q_{i,j}
+ *
+ * Return false if the system Ax=b has no solution
+ *
+ * This implements a partial parametric resolution of A x = B. It
+ * might be better from an engineering viewpoint to solve the system
+ * fully and then to exploit the equation for x_i.
+ */
+int matrices_to_1D_lattice(Pmatrix A, Pmatrix B, int n, int m, int i, Value * gcd_p, Value * c_p)
+{
+  // The number of equations is smaller than the number of variables
+  assert(n<=m);
+  int success = 1;
+  Pmatrix P, D, Q;
+  P = matrix_new(n,n);
+  D = matrix_new(n,m);
+  Q = matrix_new(m,m);
+  matrix_smith(A,P,D,Q);
+  // Compute P b
+  Pmatrix Pb = matrix_new(n, 1);
+  matrix_multiply(P, B, Pb);
+  // Compute yc by solving D yc = P b
+  Pmatrix yc = matrix_new(m, 1);
+  int j;
+  for(j=1; j <= m; j++)
+    MATRIX_ELEM(yc, j, 1) = VALUE_ZERO;
+  // FI: it might be sufficient to check the pseudo-diagonal element Dii
+  for(j=1; j <= n; j++) {
+    Value Pbj = MATRIX_ELEM(Pb, j, 1);
+    if(!value_zero_p(Pbj)) {
+      Value Djj = MATRIX_ELEM(D, j, j);
+      if(!value_zero_p(Djj)) {
+	Value r = modulo(Pbj, Djj);
+	if(value_zero_p(r))
+	  MATRIX_ELEM(yc, j, 1) = DIVIDE(Pbj, Djj);
+	else
+	  success = false;
+      }
+    }
+  }
+  if(success) {
+    // Compute the constant term "c" and the gcd "gcd" with x = Q yc
+    *c_p = VALUE_ZERO;
+    for(j=1; j <= n; j++) {
+      *c_p += value_mult(MATRIX_ELEM(Q, i, j), MATRIX_ELEM(yc, j, 1));
+    }
+    *gcd_p = VALUE_ZERO;
+    for(j=n+1; j <= m; j++) {
+      if(value_zero_p(*gcd_p))
+	*gcd_p = MATRIX_ELEM(Q, i, j);
+      else if(!value_zero_p(MATRIX_ELEM(Q, i, j)))
+	*gcd_p = pgcd(*gcd_p, MATRIX_ELEM(Q, i, j));
+    }
+    // Reduce constant by gcd if possible
+    if(!value_zero_p(*gcd_p))
+      *c_p = modulo(*c_p, *gcd_p);
+  }
+  free(P);
+  free(Pb);
+  free(D);
+  free(Q);
+  free(yc);
+  return success;
+}
