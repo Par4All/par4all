@@ -1,0 +1,81 @@
+
+Source code with transformers
+
+
+//  T() {0==-1}
+
+void foo()
+{
+
+//  T(n) {n==0}
+
+   int n = 0;
+
+//  T() {n==0}
+
+   float x;
+
+//  T(n) {n#init==0}
+
+   while (1)
+
+//  T(n) {n<=n#init+1}
+
+      if (x)
+
+//  T(n) {n<=60, n<=n#init+1}
+
+         if (n<60)
+
+//  T(n) {n==n#init+1, n<=60}
+
+            n++;
+         else
+
+//  T(n) {n==0, 60<=n#init}
+
+            n = 0;
+
+//  T() {0==-1}
+
+   return;
+}
+
+//  P() {}
+
+void foo()
+{
+
+//  P() {}
+
+   int n = 0;
+
+//  P(n) {n==0}
+
+   float x;
+
+//  P(n) {n==0}
+
+   while (1)
+
+//  P(n) {0<=n, n<=60}
+
+      if (x)
+
+//  P(n) {0<=n, n<=60}
+
+         if (n<60)
+
+//  P(n) {0<=n, n<=59}
+
+            n++;
+         else
+
+//  P(n) {n==60}
+
+            n = 0;
+
+//  P() {0==-1}
+
+   return;
+}

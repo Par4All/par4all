@@ -269,10 +269,7 @@ void foo_0(int flag)
       a++;
       b += j-i;
       i += 2;
-      if (i%2==0)
-         j += 2;
-      else
-         j++;
+      j++;
    }
 }
 # new codes.
@@ -286,10 +283,7 @@ void foo_1(int flag)
       a++;
       b += j-i;
       i += 2;
-      if (i%2==0)
-         j += 2;
-      else
-         j++;
+      j += 2;
    }
    if (!(a==b))
       abort();
@@ -320,30 +314,21 @@ void foo_0(int flag)
 
    while (x>0.) {
 
-//  P(a,b,i,j) {2a==i-1, flag==0, j<=2a+1, a+1<=j}
+//  P(a,b,i,j) {2a==i-1, a==j-1, flag==0, 0<=a}
 
       a++;
 
-//  P(a,b,i,j) {2a==i+1, flag==0, a<=j, j+1<=2a}
+//  P(a,b,i,j) {2a==i+1, a==j, flag==0, 1<=a}
 
       b += j-i;
 
-//  P(a,b,i,j) {2a==i+1, flag==0, a<=j, j+1<=2a}
+//  P(a,b,i,j) {2a==i+1, a==j, flag==0, 1<=a}
 
       i += 2;
 
-//  P(a,b,i,j) {2a==i-1, flag==0, a<=j, j+1<=2a}
+//  P(a,b,i,j) {2a==i-1, a==j, flag==0, 1<=a}
 
-      if (i%2==0)
-
-//  P(a,b,i,j) {2a==i-1, flag==0, a<=j, j+1<=2a}
-
-         j += 2;
-      else
-
-//  P(a,b,i,j) {2a==i-1, flag==0, a<=j, j+1<=2a}
-
-         j++;
+      j++;
    }
 }
 
@@ -372,37 +357,28 @@ void foo_1(int flag)
 
    while (x>0.) {
 
-//  P(a,b,i,j) {2a==i, flag==1, j<=2a+1, a+1<=j}
+//  P(a,b,i,j) {2a==i, 2a==j-1, flag==1, 0<=a}
 
       a++;
 
-//  P(a,b,i,j) {2a==i+2, flag==1, a<=j, j+1<=2a}
+//  P(a,b,i,j) {2a==i+2, 2a==j+1, flag==1, 1<=a}
 
       b += j-i;
 
-//  P(a,b,i,j) {2a==i+2, flag==1, a<=j, j+1<=2a}
+//  P(a,b,i,j) {2a==i+2, 2a==j+1, flag==1, 1<=a}
 
       i += 2;
 
-//  P(a,b,i,j) {2a==i, flag==1, a<=j, j+1<=2a}
+//  P(a,b,i,j) {2a==i, 2a==j+1, flag==1, 1<=a}
 
-      if (i%2==0)
-
-//  P(a,b,i,j) {2a==i, flag==1, a<=j, j+1<=2a}
-
-         j += 2;
-      else
-
-//  P(a,b,i,j) {2a==i, flag==1, a<=j, j+1<=2a}
-
-         j++;
+      j += 2;
    }
 
-//  P(a,b,i,j) {2a==i, flag==1, j<=2a+1, a+1<=j}
+//  P(a,b,i,j) {2a==i, 2a==j-1, flag==1, 0<=a}
 
    if (!(a==b))
 
-//  P(a,b,i,j) {2a==i, flag==1, j<=2a+1, a+1<=j}
+//  P(a,b,i,j) {2a==i, 2a==j-1, flag==1, 0<=a}
 
       abort();
 }
@@ -416,9 +392,6 @@ void foo_0(int flag)
       a++;
       b += j-i;
       i += 2;
-      if (i%2==0)
-         j += 2;
-      else
-         j++;
+      j++;
    }
 }
