@@ -138,7 +138,8 @@ void dbm_stop_timer()
 }
 
 #define MAX_TIME_STRING_LENGTH 128
-#define HZ 60
+
+#include <unistd.h>
 
 /* compute times elapsed since init_log_timers(), i.e. for one phase */
 void get_string_timers(string *with_io, string *io)
@@ -153,6 +154,8 @@ void get_string_timers(string *with_io, string *io)
     total_phase_time.tms_stime -= phase_time.tms_stime;
     get_real_timer(&real_total_phase_time);
     real_total_phase_time -= real_phase_time;
+
+    long HZ = sysconf(_SC_CLK_TCK);
 
     sprintf (s1,"(r%.3f u%.2f s%.2f)\n",
 	     real_total_phase_time,
@@ -192,6 +195,8 @@ void get_request_string_timers(string *global, string *phases, string *dbm)
     total_request_time.tms_stime -= request_time.tms_stime;
     get_real_timer(&real_total_request_time);
     real_total_request_time -= real_request_time;
+
+    long HZ = sysconf(_SC_CLK_TCK);
 
     sprintf (s1,"(r%.3f u%.2f s%.2f)\n",
 	     real_total_request_time,
