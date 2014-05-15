@@ -211,10 +211,15 @@ config="$prod"/pips/makes/config.mk
 # Save an old config file if we run again this script:
 [ -f "$config" ] && mv "$config" "$config".old
 
+# falls back to "ctags -e" otherwise
+type etags && echo 'ETAGS = etags' >> "$config"
+
 type javac && echo '_HAS_JDK_ = 1' >> "$config"
 type latex && echo '_HAS_LATEX_ = 1' >> "$config"
 type htlatex && echo '_HAS_HTLATEX_ = 1' >> "$config"
 type emacs && echo '_HAS_EMACS_ = 1' >> "$config"
+
+# gpips is not really supported, should not be compiled?
 type pkg-config && has_pkgconfig=1
 
 if [ "$has_pkgconfig" -a "$gpips" ]; then
