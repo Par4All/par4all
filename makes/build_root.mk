@@ -92,17 +92,19 @@ uninstall:unbuild
 
 # all about tags, with temporary files
 # should it generate tags only for src/?
-ETAGS	= /tmp/etags.$$$$
+etags	= /tmp/etags.$$$$
+# may be overrident in config
+ETAGS	?= ctags -e
 TAGS:
 	find $(CURDIR) -name '*.[chly]' -print0 | \
-		xargs -0 ctags -e --append -o $(ETAGS) ; \
-	mv $(ETAGS) TAGS
+		xargs -0 $(ETAGS) --append -o $(etags) ; \
+	mv $(etags) TAGS
 
-CTAGS	= /tmp/ctags.$$$$
+ctags	= /tmp/ctags.$$$$
 CTAGS:
 	find $(CURDIR) -name '*.[chly]' -print0 | \
-		xargs -0 ctags --append -o $(CTAGS) ; \
-	mv $(CTAGS) CTAGS
+		xargs -0 ctags --append -o $(ctags) ; \
+	mv $(ctags) CTAGS
 
 cscope.out:cscope-clean
 	cd / && \
