@@ -237,11 +237,12 @@ But you can put them manually into the configuration without problems.
 List of includes for the different projects:
 \begin{enumerate}
 \item \textbf{newgen} needs: /newgen/include
-\item \textbf{linear} needs: /linear/inlcude AND include from polylib
+\item \textbf{linear} needs: /linear/inlcude AND include from {\color{red} polylib}
 \item \textbf{PIPS} needs:   /newgen/include, /linear/inlcude and /pips/include
 \end{enumerate}
 
 \textbf{Note:} For polylib, when you add a path choose ``File System...'' and find where you install polylib (into extern).
+\textbf{Note:} If you want to compile in consol mode, I recommand to copy the extern folder make by the standard version installation of PIPS \footnote{\LINK{http://pips4u.org/copy_of_getting-pips/building-and-installing-pips-from svn}}.
 
 \item Modify the \emph{Path} Environnement to add pipsrc. 
 It corresponds to the path added with pipsrc.sh.
