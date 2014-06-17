@@ -2489,61 +2489,6 @@ bool type_used_in_type_declarations_p(entity e, list ldecl)
 }
 
 
-/* Create a copy of an entity, with (almost) identical type, storage
-   and initial value, but a slightly different name as entities are
-   uniquely known by their names, and a different offset if the
-   storage is ram.
-
-   Entity e must be defined or the function core dumps.
-
-   Depending on its storage, the new entity might have to be inserted
-   in code_declarations and the memory allocation recomputed.
-
-   Depending on the language, the new entity might have to be inserted
-   in statement declarations. This is left up to the user of this function.
-
-   @return the new entity.
-*/
-entity make_entity_copy(entity e)
-{
-  entity ne = entity_undefined;
-  char * variable_name = strdup(entity_name(e));
-  int number = 0;
-
-  /* Find the first matching non-already existent variable name: */
-  do {
-    if (variable_name != NULL)
-      /* Free the already allocated name in the previous iteration that
-         was conflicting: */
-      free(variable_name);
-    asprintf(&variable_name, "%s_%d", entity_name(e), number++);
-  }
-  while(gen_find_tabulated(variable_name, entity_domain)
-    != entity_undefined);
-
-  ne = make_entity(variable_name,
-                   copy_type(entity_type(e)),
-                   copy_storage(entity_storage(e)),
-                   copy_value(entity_initial(e)));
-
-  if(storage_ram_p(entity_storage(ne))) {
-    /* We are in trouble. Up to now, we have created a static alias of
-     * the variable e (it's a variable entity because of its
-     * storage). Note that static aliases do not exist in C.
-     */
-    ram r = storage_ram(entity_storage(ne));
-    entity m = ram_function(r);
-
-    /* FI: It would be better to perorm the memory allocation right
-       away, instead of waiting for a later core dump in chains or
-       ricedg, but I'm in a hurry. */
-    ram_offset(r) = UNKNOWN_RAM_OFFSET;
-
-    AddEntityToDeclarations(ne, m);
-  }
-
-  return ne;
-}
 
 /* Create a copy of an entity, with (almost) identical type, storage
    and initial value if move_initialization_p is false, but with a slightly
@@ -2561,9 +2506,14 @@ entity make_entity_copy(entity e)
    For C, name collisions with the compilation unit are not checked
    here. They are unlikely, but should be checked by the caller.
 
+   /param e         entity to copy
+   /param global_new_name               new name wished
+   /param systematically_add_suffix     if true, automatically add a suffix number
+   /param move_initialization_p         if true, also copy the initial value
+
    @return the new entity.
 */
-entity generic_make_entity_copy_with_new_name(entity e,
+static entity generic_make_entity_copy_with_new_name(entity e,
                                               string global_new_name,
                                               bool systematically_add_suffix,
                                               bool move_initialization_p)
@@ -2572,8 +2522,10 @@ entity generic_make_entity_copy_with_new_name(entity e,
   char * variable_name = strdup(global_new_name);
   int number = 0;
 
-  if (systematically_add_suffix)
+  if (systematically_add_suffix) {
+    free(variable_name);
     asprintf(&variable_name, "%s_%d", global_new_name, number++);
+  }
 
   /* Find the first matching non-already existent variable name: */
   while(gen_find_tabulated(variable_name, entity_domain)
@@ -2633,7 +2585,56 @@ entity generic_make_entity_copy_with_new_name(entity e,
   return ne;
 }
 
+/* Create a copy of an entity, with (almost) identical type, storage
+   and initial value if move_initialization_p is false, but with a slightly
+   different name as entities are uniquely known by their names, and a
+   different offset if the storage is ram (still to be done).
 
+   Entity e must be defined or the function core dumps.
+
+   Depending on its storage, the new entity might have to be inserted
+   in code_declarations (done) and the memory allocation recomputed (not done).
+
+   Depending on the language, the new entity might have to be inserted
+   in statement declarations. This is left up to the user of this function.
+
+   For C, name collisions with the compilation unit are not checked
+   here. They are unlikely, but should be checked by the caller.
+
+   /param e         entity to copy
+
+   @return the new entity.
+*/
+entity make_entity_copy(entity e)
+{
+  return generic_make_entity_copy_with_new_name(e,
+                                                entity_name(e),
+                                                false,
+                                                true);
+}
+
+/* Create a copy of an entity, with (almost) identical type, storage
+   and initial value if move_initialization_p is false, but with a slightly
+   different name as entities are uniquely known by their names, and a
+   different offset if the storage is ram (still to be done).
+
+   Entity e must be defined or the function core dumps.
+
+   Depending on its storage, the new entity might have to be inserted
+   in code_declarations (done) and the memory allocation recomputed (not done).
+
+   Depending on the language, the new entity might have to be inserted
+   in statement declarations. This is left up to the user of this function.
+
+   For C, name collisions with the compilation unit are not checked
+   here. They are unlikely, but should be checked by the caller.
+
+   /param e         entity to copy
+   /param global_new_name               new name wished
+   /param move_initialization_p         if true, also copy the initial value
+
+   @return the new entity.
+*/
 entity make_entity_copy_with_new_name(entity e,
                                       string global_new_name,
                                       bool move_initialization_p)
@@ -2644,6 +2645,28 @@ entity make_entity_copy_with_new_name(entity e,
                                                 move_initialization_p);
 }
 
+/* Create a copy of an entity, with (almost) identical type, storage
+   and initial value if move_initialization_p is false, but with a slightly
+   different name as entities are uniquely known by their names, and a
+   different offset if the storage is ram (still to be done).
+
+   Entity e must be defined or the function core dumps.
+
+   Depending on its storage, the new entity might have to be inserted
+   in code_declarations (done) and the memory allocation recomputed (not done).
+
+   Depending on the language, the new entity might have to be inserted
+   in statement declarations. This is left up to the user of this function.
+
+   For C, name collisions with the compilation unit are not checked
+   here. They are unlikely, but should be checked by the caller.
+
+   /param e         entity to copy
+   /param global_new_name               new name wished
+   /param move_initialization_p         if true, also copy the initial value
+
+   @return the new entity.
+*/
 entity make_entity_copy_with_new_name_and_suffix(entity e,
                                       string global_new_name,
                                       bool move_initialization_p)
