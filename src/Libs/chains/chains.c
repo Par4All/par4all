@@ -1066,7 +1066,7 @@ static void add_conflicts(effect fin,
 	     ORDERING_STATEMENT(stout_o),
 	     stout,
 	     ( which == ud ) ? "ud" : "dd_du",
-	     entity_local_name(effect_to_entity(fin)));
+	     entity_local_name(effect_any_entity(fin)));
   }
 
   /* To speed up pushnew_conflict() without damaging the integrity of
