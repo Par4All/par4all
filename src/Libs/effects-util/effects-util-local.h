@@ -48,7 +48,7 @@
 /* some useful SHORTHANDS for EFFECT:
  */
 /* FI: Let's hope this one is not used as lhs! */
-#define effect_any_entity(e) reference_variable(effect_any_reference(e))
+#define effect_any_entity(e) effect_to_entity(e)
 #define effect_action_tag(eff) action_tag(effect_action(eff))
 #define effect_approximation_tag(eff) \
 	approximation_tag(effect_approximation(eff))
