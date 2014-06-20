@@ -2940,10 +2940,15 @@ cases may arise:
 \item The new data structure is defined in a \emph{new} file
   \texttt{mysd.tex}:
 
-  This file has to be declared in the local {\tt Makefile} (in
+%   This file has to be declared in the local {\tt Makefile} (in
+%   \verb+$PIPS_ROOT/src/Documentation/newgen+) for its further installation
+%   in the PIPS hierarchy. It merely consists in adding its name
+%   \texttt{mysd.tex} to the \texttt{F.tex} variable list.
+  
+  This file has to be declared in the local {\tt newgen.mk} (in
   \verb+$PIPS_ROOT/src/Documentation/newgen+) for its further installation
   in the PIPS hierarchy. It merely consists in adding its name
-  \texttt{mysd.tex} to the \texttt{F.tex} variable list.
+  \texttt{mysd.c} to the \texttt{F\_c} variable list.
 
   If the data structure is to be managed by \texttt{pipsdbm}, \emph{i.e.}
   it is declared as a resource in \texttt{pipsmake-rc.tex}, then
