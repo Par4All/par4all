@@ -177,7 +177,8 @@ Pmatrix Q;
 int matrices_to_1D_lattice(Pmatrix A, Pmatrix B, int n, int m, int i, Value * gcd_p, Value * c_p)
 {
   // The number of equations is smaller than the number of variables
-  assert(n<=m);
+  // Not necessarily because you may have redundant equations
+  // assert(n<=m);
   int success = 1;
   Pmatrix P, D, Q;
   P = matrix_new(n,n);
@@ -219,9 +220,10 @@ int matrices_to_1D_lattice(Pmatrix A, Pmatrix B, int n, int m, int i, Value * gc
       else if(!value_zero_p(MATRIX_ELEM(Q, i, j)))
 	*gcd_p = pgcd(*gcd_p, MATRIX_ELEM(Q, i, j));
     }
-    // Reduce constant by gcd if possible
-    if(!value_zero_p(*gcd_p))
-      *c_p = modulo(*c_p, *gcd_p);
+    // With no information at all, the gcd default value is one
+    if(value_zero_p(*gcd_p))
+      *gcd_p = VALUE_ONE;
+    *c_p = modulo(*c_p, *gcd_p);
   }
   free(P);
   free(Pb);
