@@ -1454,6 +1454,8 @@ static transformer modulo_to_transformer(entity e, /* assumed to be an integer v
 	  tf3 = transformer_add_inequality_with_integer_constraint(tf3,
 								   e, -lb2-1, true);
 	}
+	else
+	  tf3 = transformer_identity();
       }
     }
   }
