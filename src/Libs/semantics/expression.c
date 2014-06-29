@@ -1329,8 +1329,7 @@ transformer modulo_by_a_constant_to_transformer(entity v1, transformer tf, entit
   transformer mtf = transformer_identity();
   Value gcd, c, K = (Value) k;
 
-  // FI: waiting for function by Corinne
-  // func(v, tf, &gcd, &c); 
+  // exists lambda s.t. v2 = lambda gcd + c ^ 0<=c<gcd
   if(transformer_to_1D_lattice(v2, tf, &gcd, &c)) {
 
   // false because we are waiting for function by Corinne
@@ -1523,13 +1522,18 @@ static transformer generic_abs_to_transformer(entity v, /* assumed to be a value
 					      bool is_internal)
 {
   transformer tf = transformer_identity();
+  /* Expression expr may be of a type different from v's type because
+     abs maybe generic and because type conversions may be implicit */
   entity tv = make_local_temporary_value_entity(entity_type(v));
+  type et = expression_to_type(expr);
   transformer etf = any_expression_to_transformer(tv, expr, pre, is_internal);
-  int lb, ub;
+  int lb=INT_MIN, ub=INT_MAX;
 
   pips_debug(8, "begin\n");
 
-  integer_expression_and_precondition_to_integer_interval(expr, pre, &lb, &ub);
+  if(integer_type_p(et))
+    integer_expression_and_precondition_to_integer_interval(expr, pre, &lb, &ub);
+  free_type(et);
 
   if(ub==lb) {
     tf = transformer_add_equality_with_integer_constant(tf, v, abs(lb));
