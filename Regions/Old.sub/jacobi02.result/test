@@ -695,7 +695,7 @@ void p4a_kernel_get_data(float_t space[501][501], int i, int j)
 void p4a_kernel_launcher_compute(float_t save[501][501], float_t space[501][501])
 {
    // BEGIN BLOCK
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i, j;
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
@@ -709,7 +709,7 @@ kernel1:
 void p4a_kernel_launcher_compute_1(float_t save[501][501], float_t space[501][501])
 {
    // BEGIN BLOCK
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i, j;
 kernel2:
    for(i = 1; i <= 499; i += 1)
@@ -720,7 +720,7 @@ kernel2:
 void p4a_kernel_launcher_get_data(float_t space[501][501])
 {
    // BEGIN BLOCK
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i, j;
    
    /* Erase the memory, in case the image is not big enough: */
