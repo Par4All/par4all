@@ -1321,8 +1321,8 @@ transformer loop_initialization_to_transformer(loop l, transformer pre)
  * There is only one attachment for the unbounded transformer and
  * for the bounded one.
  */
-//transformer loop_to_transformer(loop l, transformer pre, list e)
-transformer old_loop_to_transformer(loop l, transformer pre, list e)
+transformer loop_to_transformer(loop l, transformer pre, list e)
+//transformer old_loop_to_transformer(loop l, transformer pre, list e)
 {
   /* loop transformer tf = tfb* or tf = tfb+ or ... */
   transformer tf = transformer_undefined;
@@ -1518,8 +1518,8 @@ transformer loop_to_continue_transformer(loop l, transformer pre)
 /* loop_to_transformer() was developed first but is not as powerful as
  * the new algorithm used for all kinds of loops. See flip-flop01.c.
  */
-//transformer new_loop_to_transformer(loop l, transformer pre, list lel)
-transformer loop_to_transformer(loop l, transformer pre, list lel)
+transformer new_loop_to_transformer(loop l, transformer pre, list lel)
+//transformer loop_to_transformer(loop l, transformer pre, list lel)
 {
   /* Equation:
    *
