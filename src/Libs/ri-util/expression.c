@@ -1003,6 +1003,12 @@ expression e;
     return operator_expression_p(e, ABS_OPERATOR_NAME);
 }
 
+bool unary_minus_expression_p(e)
+expression e;
+{
+    return operator_expression_p(e, UNARY_MINUS_OPERATOR_NAME);
+}
+
 bool iabs_expression_p(e)
 expression e;
 {
@@ -1425,6 +1431,7 @@ void print_normalized(normalized n)
 	vect_debug((Pvecteur)normalized_linear(n));
 }
 
+/* Syntactic equality e1==e2 */
 bool expression_equal_p(expression e1, expression e2)
 {
   syntax s1, s2;
@@ -1441,6 +1448,44 @@ bool expression_equal_p(expression e1, expression e2)
   s2 = expression_syntax(e2);
 
   return syntax_equal_p(s1, s2);
+}
+
+/* e1==e2 or -e1==e2 or e1==-e2 syntactically */
+bool expression_equal_or_opposite_p(expression e1, expression e2)
+{
+  bool equal_or_opposite_p = false;
+  if(expression_equal_p(e1,e2)) {
+    equal_or_opposite_p = true;
+  }
+  else if(unary_intrinsic_expression(UNARY_MINUS_OPERATOR_NAME, e1)) {
+    call c1 = expression_call(e1);
+    expression e11 = EXPRESSION(CAR(call_arguments(c1)));
+    equal_or_opposite_p = expression_equal_p(e11, e2);
+  }
+  else if(unary_intrinsic_expression(UNARY_MINUS_OPERATOR_NAME, e2)) {
+    call c2 = expression_call(e2);
+    expression e22 = EXPRESSION(CAR(call_arguments(c2)));
+    equal_or_opposite_p = expression_equal_p(e1, e22);
+  }
+  return  equal_or_opposite_p;
+}
+
+/* e1+e2==0, i.e. -e1==e2 or e1==-e2 syntactically */
+bool expression_opposite_p(expression e1, expression e2)
+{
+  bool opposite_p = false;
+
+  if(unary_minus_expression_p(e1)) {
+    call c1 = expression_call(e1);
+    expression e11 = EXPRESSION(CAR(call_arguments(c1)));
+    opposite_p = expression_equal_p(e11, e2);
+  }
+  else if(unary_minus_expression_p(e2)) {
+    call c2 = expression_call(e2);
+    expression e22 = EXPRESSION(CAR(call_arguments(c2)));
+    opposite_p = expression_equal_p(e1, e22);
+  }
+  return  opposite_p;
 }
 
 // FI: renamed because of gcc
