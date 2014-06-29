@@ -488,7 +488,7 @@ transformer transformer_add_inequality_with_integer_constraint(transformer tf, e
 /* Add the inequality v <= a x + cst or v >= a x + cst */
 transformer transformer_add_inequality_with_affine_term(transformer tf, entity v, entity x, int a, int cst, bool less_than_p)
 {
-  Pvecteur eq = vect_new((Variable) v, VALUE_ONE);
+  Pvecteur eq = VECTEUR_NUL;
 
   if(less_than_p) {
     eq = vect_new((Variable) v, VALUE_ONE);
@@ -502,6 +502,19 @@ transformer transformer_add_inequality_with_affine_term(transformer tf, entity v
   }
 
   tf = transformer_inequality_add(tf, eq);
+
+  return tf;
+}
+
+/* Add the equality v = a x + cst */
+transformer transformer_add_equality_with_affine_term(transformer tf, entity v, entity x, int a, int cst)
+{
+  Pvecteur eq = vect_new((Variable) v, VALUE_ONE);
+
+  vect_add_elem(&eq, (Variable) x, (Value) -a);
+  vect_add_elem(&eq, TCST, (Value) -cst);
+
+  tf = transformer_equality_add(tf, eq);
 
   return tf;
 }
