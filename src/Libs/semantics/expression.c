@@ -1316,6 +1316,40 @@ static transformer modulo_of_a_positive_value_to_transformer(entity e,
   return tf3;
 }
 
+/* Analyze v % k, with v constrainted by tf, assuming tf is a precondition
+ *
+ * See if exist a set v_i such that v = sum_i a_i v_i + c. Then v can
+ * be rewritten v = gcd_i(a_i) lambda + c.
+ *
+ * if k divides gcd(a_i) then v % k = c % k
+ *
+ */
+transformer modulo_by_a_constant_to_transformer(entity v1, transformer tf, entity v2, int k)
+{
+  transformer mtf = transformer_identity();
+  Value gcd, c, K = (Value) k;
+
+  // FI: waiting for function by Corinne
+  // func(v, tf, &gcd, &c); 
+  if(transformer_to_1D_lattice(v2, tf, &gcd, &c)) {
+
+  // false because we are waiting for function by Corinne
+  if(gcd!=0) {
+    if(gcd%k==0)
+      mtf = transformer_add_equality_with_integer_constant(mtf, v1, c%K);
+  }
+  else
+      mtf = transformer_add_equality_with_integer_constant(mtf, v1, c%K);
+  }
+  else {
+    // There is no solution...
+    // This case should be detected earlier and this piece of code is
+    // probably unreachable
+    mtf = empty_transformer(mtf);
+  }
+  return mtf;
+}
+
 /* Modulo and integer division
  *
  * Apparently identical in both C and Fortran
@@ -1332,6 +1366,13 @@ static transformer modulo_of_a_positive_value_to_transformer(entity e,
  *
  * FI: to be improved by using expression_to_transformer() and the
  * precondition pre.
+ *
+ * FI: to be improved by using the lattice information in the
+ * equations of the precondition.
+ *
+ * matrice_hermite()
+ *
+ * sc_to_matrices()
  */
 static transformer modulo_to_transformer(entity e, /* assumed to be an integer value */
 					 expression arg1,
@@ -1372,36 +1413,48 @@ static transformer modulo_to_transformer(entity e, /* assumed to be an integer v
     free_expression(ev1);
     free_expression(ev2);
 
-    if(lb2==ub2 && ub2==0) {
+    if(lb2==ub2) {
+      if(ub2==0) {
       /* Let's get rid of the exception case right away */
       /* A floating point exception is going to be raised */
       pips_user_warning("Zero divide encountered\n");
       tf3 = transformer_empty();
-    }
-    else if(lb1==ub1) {
-      tf3 = modulo_of_a_constant_to_transformer(e, lb1, lb2, ub2);
-    }
-    else if(ub1<=0) {
-      tf3 = modulo_of_a_negative_value_to_transformer(e, lb1, ub1, lb2, ub2);
-    }
-    else if(lb1>=0) {
-      tf3 = modulo_of_a_positive_value_to_transformer(e, lb1, ub1, lb2, ub2);
-    }
-    else {
-      /* No sign information available about arg1 */
-      if(lb2>0) {
-	/* arg2 is positive: -ub2+1<=r<=ub2-1 */
-	tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
-								 e, -ub2+1, false);
-	tf3 = transformer_add_inequality_with_integer_constraint(tf3,
-								 e, ub2-1, true);
       }
-      else if(ub2<0) {
-	/* arg2 is negative: lb2+1<=r<=-lb2-1 */
-	tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
-								 e, lb2+1, false);
-	tf3 = transformer_add_inequality_with_integer_constraint(tf3,
-								 e, -lb2-1, true);
+      else {
+      // lb2==ub2!=0
+      // FI: we might have to impose lb2>0
+      // FI: let's assume that pre is carried by tf1
+	tf3 = modulo_by_a_constant_to_transformer(e, tf1, v1, lb2);
+      }
+    }
+
+    if(transformer_identity_p(tf3)) {
+      free_transformer(tf3);
+      if(lb1==ub1) {
+	tf3 = modulo_of_a_constant_to_transformer(e, lb1, lb2, ub2);
+      }
+      else if(ub1<=0) {
+	tf3 = modulo_of_a_negative_value_to_transformer(e, lb1, ub1, lb2, ub2);
+      }
+      else if(lb1>=0) {
+	tf3 = modulo_of_a_positive_value_to_transformer(e, lb1, ub1, lb2, ub2);
+      }
+      else {
+	/* No sign information available about arg1 */
+	if(lb2>0) {
+	  /* arg2 is positive: -ub2+1<=r<=ub2-1 */
+	  tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+								   e, -ub2+1, false);
+	  tf3 = transformer_add_inequality_with_integer_constraint(tf3,
+								   e, ub2-1, true);
+	}
+	else if(ub2<0) {
+	  /* arg2 is negative: lb2+1<=r<=-lb2-1 */
+	  tf3 = transformer_add_inequality_with_integer_constraint(transformer_identity(),
+								   e, lb2+1, false);
+	  tf3 = transformer_add_inequality_with_integer_constraint(tf3,
+								   e, -lb2-1, true);
+	}
       }
     }
   }
@@ -1409,24 +1462,9 @@ static transformer modulo_to_transformer(entity e, /* assumed to be an integer v
     /* Might be as good to leave it undefined... for the time
        being. Information about either arg1 or arg2 could be used */
     tf3 = transformer_identity();
+    ;
   }
 
-#if 0
-  if(integer_constant_expression_p(arg2)) {
-    int d = integer_constant_expression_value(arg2);
-    Pvecteur ub = vect_new((Variable) e, VALUE_ONE);
-    Pvecteur lb = vect_new((Variable) e, VALUE_MONE);
-    Pcontrainte clb = contrainte_make(lb);
-    Pcontrainte cub = CONTRAINTE_UNDEFINED;
-
-    vect_add_elem(&ub, TCST, int_to_value(1-d));
-    vect_add_elem(&lb, TCST, int_to_value(d-1));
-    cub = contrainte_make(ub);
-    clb->succ = cub;
-    tf3 = make_transformer(NIL,
-			  make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
-  }
-#endif
 
   /* Take care of side effects: tf = tf1 o tf2 o tf3 */
   tf = transformer_combine(tf1, tf2);
@@ -1487,17 +1525,34 @@ static transformer generic_abs_to_transformer(entity v, /* assumed to be a value
   transformer tf = transformer_identity();
   entity tv = make_local_temporary_value_entity(entity_type(v));
   transformer etf = any_expression_to_transformer(tv, expr, pre, is_internal);
-  Pvecteur vlb1 = vect_new((Variable) tv, VALUE_ONE);
-  Pvecteur vlb2 = vect_new((Variable) tv, VALUE_MONE);
+  int lb, ub;
 
   pips_debug(8, "begin\n");
 
+  integer_expression_and_precondition_to_integer_interval(expr, pre, &lb, &ub);
 
-  vect_add_elem(&vlb1, (Variable) v, VALUE_MONE);
-  vect_add_elem(&vlb2, (Variable) v, VALUE_MONE);
+  if(ub==lb) {
+    tf = transformer_add_equality_with_integer_constant(tf, v, abs(lb));
+  }
+  else if(lb>=0) {
+    tf = transformer_add_equality(tf, v, tv);
+  }
+  else if(ub<=0) {
+    tf = transformer_add_equality_with_affine_term(tf, v, tv,
+						   VALUE_MONE, VALUE_ZERO);
+  }
+  else {
+    Pvecteur vlb1 = vect_new((Variable) tv, VALUE_ONE);
+    Pvecteur vlb2 = vect_new((Variable) tv, VALUE_MONE);
 
-  tf = transformer_inequality_add(tf, vlb1);
-  tf = transformer_inequality_add(tf, vlb2);
+
+    vect_add_elem(&vlb1, (Variable) v, VALUE_MONE);
+    vect_add_elem(&vlb2, (Variable) v, VALUE_MONE);
+
+    tf = transformer_inequality_add(tf, vlb1);
+    tf = transformer_inequality_add(tf, vlb2);
+  }
+
   tf = transformer_safe_image_intersection(tf, etf);
   free_transformer(etf);
 
@@ -1841,11 +1896,33 @@ static transformer integer_multiply_to_transformer(entity v,
         tf = transformer_inequality_add(tf, vineq);
       }
     }
+    else if(expression_opposite_p(e1, e2)) {
+      /* v is less than v1 and -v1. This makes v<=0 redundant */
+      if(!transformer_undefined_p(t1)) {
+        tf = transformer_add_inequality(t1, v, v1, false);
+        tf = transformer_add_inequality_with_affine_term(tf, v,
+            v1, VALUE_MONE, VALUE_ZERO,
+            true);
+        /* Memory leak with tf... */
+        tf = transformer_intersection(tf, t1);
+      }
+      else {
+        /* The result is always negative: v<=0 */
+        Pvecteur vineq = vect_new((Variable) v, VALUE_ONE);
+        tf = transformer_identity();
+        tf = transformer_inequality_add(tf, vineq);
+      }
+    }
   }
   else {
     if(expression_equal_p(e1, e2)) {
       /* The result is always positive: v>=0 */
       Pvecteur vineq = vect_new((Variable) v, VALUE_MONE);
+      tf = transformer_inequality_add(tf, vineq);
+    }
+    else if(expression_opposite_p(e1, e2)) {
+      /* The result is always negative: v<=0 */
+      Pvecteur vineq = vect_new((Variable) v, VALUE_ONE);
       tf = transformer_inequality_add(tf, vineq);
     }
   }

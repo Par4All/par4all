@@ -217,9 +217,12 @@ transformer any_loop_to_k_transformer(transformer t_init,
   transformer t_body_star = transformer_undefined; // result: t_init ; t_enter ; tfbodystar
   transformer pre_body = transformer_undefined;
   transformer post_body = transformer_undefined;
-  list bel = load_cumulated_rw_effects_list(body);
+  // This does not include the loop effects, e.g. the index incrementation
+  //list bel = load_cumulated_rw_effects_list(body);
+  //transformer t_effects = effects_to_transformer(bel);
+  transformer t_effects = effects_to_transformer(lel);
   transformer post_enter = transformer_apply(t_enter, post_init);
-  transformer t_effects = effects_to_transformer(bel);
+  //post_enter = transformer_normalize(post_enter, 0);
   transformer post_next = transformer_undefined;
   transformer t_next_star = transformer_undefined;
 
@@ -260,6 +263,7 @@ transformer any_loop_to_k_transformer(transformer t_init,
   // temporary memory leaks
   t_next_star = (* transformer_fix_point_operator)(t_next);
   post_next = transformer_range(transformer_apply(transformer_combine(t_next_star, t_next), post_body));
+  //post_next = transformer_normalize(post_next, 0);
   transformer pre_body_2 = transformer_range(transformer_convex_hull(post_next, post_enter));
   //
   // Third heuristics: either it is the first iteration, or we are in
@@ -1317,7 +1321,8 @@ transformer loop_initialization_to_transformer(loop l, transformer pre)
  * There is only one attachment for the unbounded transformer and
  * for the bounded one.
  */
-transformer loop_to_transformer(loop l, transformer pre, list e)
+//transformer loop_to_transformer(loop l, transformer pre, list e)
+transformer old_loop_to_transformer(loop l, transformer pre, list e)
 {
   /* loop transformer tf = tfb* or tf = tfb+ or ... */
   transformer tf = transformer_undefined;
@@ -1424,6 +1429,152 @@ list loop_to_transformer_list(loop l __attribute__ ((unused)),
   list tfl = NIL;
   pips_internal_error("Not implemented yet.");
   return tfl;
+}
+
+/* Transformer expression the loop initialization */
+transformer loop_to_initialization_transformer(loop l, transformer pre)
+{
+  entity i = loop_index(l);
+  range r = loop_range(l);
+  expression low = range_lower(r);
+  transformer t = assigned_expression_to_transformer(i, low, pre);
+  return t;
+}
+
+/* Transformer expressiong the conditions between the index and the
+ * loop bounds according to the sign of the increment.
+ */
+transformer loop_to_enter_transformer(loop l, transformer pre)
+{
+  entity i = loop_index(l);
+  range r = loop_range(l);
+  expression low = range_lower(r);
+  expression up = range_upper(r);
+  expression inc = range_increment(r);
+  int il, iu;
+  transformer t = transformer_identity();
+
+  if(scalar_integer_type_p(entity_type(i))) {
+
+    integer_expression_and_precondition_to_integer_interval(inc, pre, &il, &iu);
+
+    if(il==iu && il==0) {
+      /* A zero increment is not legal because the Fortran standard
+	 imposes a division by the increment. */
+      /* Only the loop bopy statement number is available... */
+      pips_user_error("Null increment for DO loop detected.\n");
+    }
+    else if(il>0||iu<0) {
+      /* Assumption: no side effect in loop bound expressions */
+      entity lv = make_local_temporary_value_entity(entity_type(i));
+      transformer lt = safe_integer_expression_to_transformer(lv, low, pre, true);
+      entity uv = make_local_temporary_value_entity(entity_type(i));
+      transformer ut = safe_integer_expression_to_transformer(uv, up, pre, true);
+
+      if(il>0) {
+	/* The increment is strictly positive */
+	t = transformer_add_inequality_with_linear_term(t, lv, i, 1, true);
+	t = transformer_add_inequality_with_linear_term(t, i, uv, 1, true);
+      }
+      else if(iu<0) {
+	/* The increment is strictly negative */
+	t = transformer_add_inequality_with_linear_term(t, uv, i, 1, true);
+	t = transformer_add_inequality_with_linear_term(t, i, lv, 1, true);
+      }
+      t = transformer_intersection(t, lt);
+      t = transformer_intersection(t, ut);
+      t = transformer_temporary_value_projection(t);
+      //t = transformer_normalize(t, 0);
+      t = transformer_normalize(t, 1);
+      free_transformers(lt, ut, NULL);
+    }
+    else {
+      /* The sign of the increment is unknown, no information is available */
+      ;
+    }
+  }
+  else {
+    /* No information is available for loop indices that are not integer */
+    /* This could be improved, but floating point indices should never
+       be used. */
+    ;
+  }
+
+  return t;
+}
+
+transformer loop_to_continue_transformer(loop l, transformer pre)
+{
+  transformer t = transformer_identity();
+  /* FI: the function transformer_add_loop_index_incrementation should
+     be rewritten to exploit preconditions better. */
+  t = transformer_add_loop_index_incrementation(t, l, pre);
+  transformer et = loop_to_enter_transformer(l, pre);
+  t = transformer_combine(t, et);
+  free_transformer(et);
+  return t;
+}
+
+/* loop_to_transformer() was developed first but is not as powerful as
+ * the new algorithm used for all kinds of loops. See flip-flop01.c.
+ */
+//transformer new_loop_to_transformer(loop l, transformer pre, list lel)
+transformer loop_to_transformer(loop l, transformer pre, list lel)
+{
+  /* Equation:
+   *
+   * t_body_star =  t_init ; t_enter ;(t_body ; t_inc; t_continue)*
+   *
+   * t_init, t_enter and t_continue, which includes t_inc, must be
+   * computed from the loop and its precondition, pre, and extended
+   * body effects, lel. In case the loop index appears in the bound or
+   * increment expressions, the Fortran standard should be used to
+   * determine the precondition to use. The same is true in case of
+   * side-effects in the loop expressions.
+   *
+   * t_body must be computed from the loop body and a preliminary loop
+   * invariant.
+   */
+  transformer t_body_star = transformer_undefined;
+  statement body_s = loop_body(l);
+
+  /* Deal with initialization expression, which may be included in
+     the condition as in while(i++, j=0, i<m)? No because the
+     expression is going to be evaluated at each cycle. The ised
+     effects must be part of the condition transformer, tcond */
+  transformer t_init = loop_to_initialization_transformer(l, pre);
+  // FI Memory leak
+  transformer post_i = transformer_range(transformer_apply(t_init, pre));
+
+  /* Deal with enter transformers */
+  transformer t_enter = loop_to_enter_transformer(l, post_i);
+  transformer pre_b = transformer_apply(t_enter, post_i);
+
+  /* An effort could be made to compute the precondition for t_continue. 
+   * Precondition pre and the loop effect list lel could be used.
+   */
+  //transformer p_continue = transformer_identity();
+  /* approximate loop transformer, including loop index updates */
+  transformer abtf = effects_to_transformer(lel);
+  /* first approximation of the loop body precondition */
+  // invariant_wrt_transformer() seems to add arguments to the
+  // filtered precondition...
+  // FI: memory leak
+  transformer p_continue = transformer_range(invariant_wrt_transformer(pre_b, abtf));
+  /* FI: could do better with body_transformer */
+  transformer t_continue = loop_to_continue_transformer(l, p_continue);
+
+  t_body_star = any_loop_to_transformer(t_init, t_enter, t_continue, body_s, lel, pre_b);
+
+  /* Let's clean up the memory */
+
+  free_transformer(p_continue);
+  free_transformer(t_enter);
+  free_transformer(t_continue);
+  free_transformer(post_i);
+  free_transformer(pre_b);
+
+  return t_body_star;
 }
 
 /* FI: used to be complete_any_loop_transformer() with a direct
