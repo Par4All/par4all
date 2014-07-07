@@ -2582,7 +2582,7 @@ pt_map boolean_intrinsic_call_condition_to_points_to(call c, pt_map in, bool tru
 #define GREATER_THAN 2
 #define GREATER_THAN_OR_EQUAL_TO 3
 
-bool cell_is_xxx_p(cell c1, cell c2, int xxx)
+static bool cell_is_xxx_p(cell c1, cell c2, int xxx)
 {
   bool xxx_p = true;
   reference r1 = cell_any_reference(c1);

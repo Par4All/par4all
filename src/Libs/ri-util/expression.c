@@ -2921,82 +2921,75 @@ void davinci_dump_all_expressions(FILE * out, statement s)
   out_flt = NULL;
 }
 
+
+typedef struct ctx_substitute {
+  entity old;
+  entity new;
+} ctx_substitute_t;
+
+static void substitute_variable_in_reference (reference r, ctx_substitute_t *ctx) {
+  entity old = ctx->old;
+  entity new = ctx->new;
+
+  if (same_entity_p(reference_variable(r), old)) {
+    reference_variable(r) = new;
+  }
+}
+
+static void substitute_entity_in_call (call c, ctx_substitute_t *ctx) {
+  entity old = ctx->old;
+  entity new = ctx->new;
+
+  if (same_entity_p(call_function(c),old)) {
+    call_function(c) = new;
+  }
+}
+
+/**
+ * (This function isn't use for the moment)
+ * This function replaces all the occurrences of an old entity in the
+ * expression exp by the new entity. It returns the expression modified.
+ * It replaces only entity when it's an variable.
+ * So a recurse can be made on reference to replace the entity.
+ * (to not consider only variable entity have to make a special case for call, call_function)
+ * Modify the entry expression e by side effect
+ * \param old       entity to replace
+ * \param new       entity that will replace old
+ * \param e         expression in will the entity old will be replaced
+ * \return          e expression modified by side effect
+ */
+expression substitute_entity_variable_in_expression(entity old, entity new, expression e)
+{
+  ctx_substitute_t ctx;
+  ctx.old = old;
+  ctx.new = new;
+
+  gen_context_recurse(e, &ctx, reference_domain, gen_true, substitute_variable_in_reference);
+  return e;
+}
+
 /* This function replaces all the occurences of an old entity in the
  * expression exp by the new entity. It returns the expression modified.
- * I think we  can write this function by using gen_context_multi_recurse  ... * To do .... NN */
+ * I think we  can write this function by using gen_context_multi_recurse  ... * To do .... NN
+ *   gen_context_multi_recurse done in r22231
+ * Modify the entry expression e by side effect
+ * \param old       entity to replace
+ * \param new       entity that will replace old
+ * \param e         expression in will the entity old will be replaced
+ * \return          e expression modified by side effect
+ */
 expression substitute_entity_in_expression(entity old, entity new, expression e)
 {
-  syntax s;
-  tag t;
-  call c;
-  range ra;
-  reference re;
-  list args,tempargs= NIL;
-  expression retour = copy_expression(e), exp,temp,low,up,inc;
+  ctx_substitute_t ctx;
+  ctx.old = old;
+  ctx.new = new;
 
-  s = expression_syntax(e);
-  t = syntax_tag(s);
-  switch (t){
-  case is_syntax_call:
-    {
-      c = syntax_call(s);
-      args = call_arguments(c);
-      while (!ENDP(args))
-	{
-	  exp = EXPRESSION(CAR(args));
-	  temp = substitute_entity_in_expression(old,new,exp);
-	  tempargs = gen_nconc(tempargs,CONS(EXPRESSION,temp,NIL));
-	  args = CDR(args);
-	}
-
-      call_arguments(syntax_call(expression_syntax(retour))) = tempargs;
-
-      if (same_entity_p(call_function(c),old))
-	call_function(syntax_call(expression_syntax(retour))) = new;
-      else
-	call_function(syntax_call(expression_syntax(retour))) = call_function(c);
-
-      break;
-    }
-  case is_syntax_reference:
-    {
-      re = syntax_reference(s);
-      args = reference_indices(re);
-      while (!ENDP(args))
-	{
-	  exp = EXPRESSION(CAR(args));
-	  temp = substitute_entity_in_expression(old,new,exp);
-	  tempargs = gen_nconc(tempargs,CONS(EXPRESSION,temp,NIL));
-	  args = CDR(args);
-	}
-
-      reference_indices(syntax_reference(expression_syntax(retour))) = tempargs;
-
-      if (same_entity_p(reference_variable(re),old))
-	reference_variable(syntax_reference(expression_syntax(retour))) = new;
-      else
-	reference_variable(syntax_reference(expression_syntax(retour))) = reference_variable(re);
-
-      break;
-    }
-  case is_syntax_range:
-    {
-      ra = syntax_range(s);
-      low = range_lower(ra);
-      range_lower(syntax_range(expression_syntax(retour))) = substitute_entity_in_expression(old,new,low);
-
-      up = range_upper(ra);
-      range_upper(syntax_range(expression_syntax(retour))) = substitute_entity_in_expression(old,new,up);
-
-
-      inc = range_increment(ra);
-      range_increment(syntax_range(expression_syntax(retour))) = substitute_entity_in_expression(old,new,inc);
-
-      break;
-    }
-  }
-
-  return retour;
+  gen_context_multi_recurse(
+      e, &ctx,
+      reference_domain, gen_true, substitute_variable_in_reference,
+      call_domain, gen_true, substitute_entity_in_call,
+      NULL);
+  return e;
 }
 
 /* Replace C operators "+C" and "-C" which can handle pointers by
