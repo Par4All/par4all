@@ -1,6 +1,6 @@
 //dependence on the index of the array need to cmmunicate it
 
-int main(int toto) {
+int main() {
   int a[10];
   int x, y;
   int r;

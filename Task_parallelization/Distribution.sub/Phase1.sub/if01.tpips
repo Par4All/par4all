@@ -1,4 +1,4 @@
-setenv WSPACE=harris
+setenv WSPACE=if01
 delete $WSPACE
 create $WSPACE $WSPACE.c 
 

@@ -2,7 +2,7 @@
 //init b and all cluster use the first column for that
 //transform 2D array (b) into 1D array (c)
 
-int main(int toto) {
+int main() {
   int i;
   int a[4];
   int b[4][5];

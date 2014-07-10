@@ -1,4 +1,4 @@
-int main(int toto) {
+int main() {
   int i;
   int a[10];
   int r;

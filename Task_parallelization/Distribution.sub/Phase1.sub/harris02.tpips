@@ -32,6 +32,8 @@ setproperty PRETTYPRINT_ALL_LABELS TRUE
 #setproperty PRETTYPRINT_ALL_C_BRACES TRUE
 #setproperty PRETTYPRINT_GCC_C_BRACES TRUE
 
+setproperty MPI_DUPLICATE_VARIABLE_PREFIX "__"
+
 #echo
 #echo Parse Code
 #echo
@@ -75,6 +77,16 @@ display PRINTED_FILE[main]
 
 echo
 echo IDENTITY_ELIMINATION
+echo
+apply IDENTITY_ELIMINATION[main]
+display PRINTED_FILE[main]
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_ALL_LABELS FALSE
+
+echo
+echo
+echo Final Code
 echo
 apply IDENTITY_ELIMINATION[main]
 display PRINTED_FILE[main]
