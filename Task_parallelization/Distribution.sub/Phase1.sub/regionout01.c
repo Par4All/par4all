@@ -31,13 +31,13 @@ int main() {
   //T1 modify even cell without the last even cell (to be more tricky)
 #pragma distributed on_cluster=1
   for (i=0; i<4; i++) {
-    a[2i] = 0;
+    a[2*i] = 0;
   }
   
   //T2 modify odd cell without the first odd cell (to be more tricky)
 #pragma distributed on_cluster=2
   for (i=1; i<5; i++) {
-    a[2i+1] = 1;
+    a[2*i+1] = 1;
   }
   
   //T3 use all the array
