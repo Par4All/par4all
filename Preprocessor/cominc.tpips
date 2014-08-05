@@ -1,0 +1,9 @@
+setenv WSPACE=cominc
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+make PRINTED_FILE[main]
+
+close
+#delete $WSPACE
+quit
