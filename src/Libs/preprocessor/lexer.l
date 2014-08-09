@@ -684,7 +684,13 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
 				return(TK_EOF);
 			}
 .			{
-			        pips_user_warning("Unrecognized character %s\n",yytext);
+                                if(*yytext=='#') {
+			          pips_user_warning("Unrecognized character %s\n",yytext);
+			          pips_user_warning("Preprocessor directives must appear first in a line.\n"
+"For instance, insert a LF if a comment precedes a directive.");
+                                }
+				else
+			          pips_user_warning("Unrecognized character %s\n",yytext);
 			}
 %%
 
