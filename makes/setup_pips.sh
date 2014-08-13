@@ -245,6 +245,7 @@ if [ "$full" ]; then
 fi
 
 # Find the Fortran compiler:
+export PIPS_F77=
 type gfortran && export PIPS_F77=gfortran
 type g77 && export PIPS_F77=g77
 
