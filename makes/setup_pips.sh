@@ -55,7 +55,8 @@ positional arguments:
 
 optional arguments:
   --gpips               enable gpips compilation
-  -j JOBS, --jobs JOBS  number of compilation jobs to run simultaneously"
+  -j JOBS, --jobs JOBS  number of compilation jobs to run simultaneously
+  --light               do not download the PIPS validation"
 
 function info {
     echo
