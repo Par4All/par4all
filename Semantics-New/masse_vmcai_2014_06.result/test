@@ -1,0 +1,135 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void masse_vmcai_2014_06(int x, int y)
+{
+
+//  T(x,y) {0<=x, 0<=x#init, y<=y#init}
+
+   while (x>=0) {
+
+//  T(x) {x#init+y==x, 0<=x#init}
+
+      x = x+y;
+
+//  T(y) {y#init<=x, y<=y#init, y#init<=y+1}
+
+      if (y>=0)
+
+//  T(y) {y==y#init-1, y+1<=x, 0<=y+1}
+
+         y--;
+
+//  T() {y<=x}
+
+      // Body postcondition:
+      ;
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void masse_vmcai_2014_06(int x, int y)
+{
+
+//  P() {}
+
+   while (x>=0) {
+
+//  P(x,y) {0<=x}
+
+      x = x+y;
+
+//  P(x,y) {y<=x}
+
+      if (y>=0)
+
+//  P(x,y) {y<=x, 0<=y}
+
+         y--;
+
+//  P(x,y) {y<=x}
+
+      // Body postcondition:
+      ;
+   }
+}
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void masse_vmcai_2014_06_transformed(int x, int y)
+{
+
+//  T() {0<=x}
+
+   while (x>=0) {
+
+//  T(x,y) {0<=x, x#init+y#init<=x+y, 0<=x#init, 0<=y, y<=y#init,
+//    0<=y#init}
+
+      while (x>=0&&y>=0)
+
+//  T(x,y) {x#init+y==x-1, y==y#init-1, 0<=x#init, 0<=y+1}
+
+         x = x+y, y--;
+
+//  T(x) {0<=x, x<=x#init, 0<=x#init, y+1<=0}
+
+
+      while (x>=0&&y<0)
+
+//  T(x) {x#init+y==x, 0<=x#init, y+1<=0}
+
+         x = x+y;
+
+//  T() {x+1<=0, y<=x, y+1<=0}
+
+      // Body postcondition:
+      ;
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void masse_vmcai_2014_06_transformed(int x, int y)
+{
+
+//  P() {}
+
+   while (x>=0) {
+
+//  P() {0<=x}
+
+      while (x>=0&&y>=0)
+
+//  P(x,y) {0<=x, 0<=y}
+
+         x = x+y, y--;
+
+//  P(x,y) {0<=x, y+1<=0}
+
+
+      while (x>=0&&y<0)
+
+//  P(x,y) {0<=x, y+1<=0}
+
+         x = x+y;
+
+//  P(x,y) {x+1<=0, y<=x, y+1<=0}
+
+      // Body postcondition:
+      ;
+   }
+}
