@@ -12071,13 +12071,16 @@ This pass was developped by Serge Guelton, as part of his PhD work.
 \subsection{Cloning}
 \index{Cloning}
 \index{TRANSFORMATION\_CLONE\_ON\_ARGUMENT}
+\index{Slicing}
 
 \begin{PipsPass}{clone}
 Procedures can be cloned to obtain several specialized versions. The
 call sites must be updated to refer to the desired version.
 
-User assisted cloning.See examples in clone validation
-suite. \marginpar{RK: terse; to be improved by FC}
+Cloning can be automatic or assisted by the user. Several examples are
+available in clone validation suite.
+
+Slicing and specialization slicing have been introduced in~\cite{AHJR2014} and are more general than cloning. For the time being, no slicing transformation is available in \PIPS since they usually do not preserve the program semantics.
 \end{PipsPass}
 
 \begin{PipsMake}
