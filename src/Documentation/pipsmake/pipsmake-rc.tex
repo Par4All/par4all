@@ -2800,16 +2800,16 @@ These two properties should not be true simultaneously.
 
 \section{Live Memory Access Paths}
 \label{subsection-live-memory-paths}
-\index{Effect}
+\index{Live variables}
 
 There are many cases in which it is necessary to know if a variable
 may be used in the remainder of the execution of the analyzed
 application. For instance, a global variable cannot be privatized, or
-a global array be scalarized, if we don't know whether their values
+a global array be scalarized, if we do not know whether their values
 are used afterwards, or a copy-out must be generated, which is not
 currently implemented in the simplest algorithms. Similarly,
 preconditions do not need to propagate information about variables
-which are no more alive.
+that are no longer alive.
 
 Traditional liveness analyzes deals with scalar variables. However,
 with C code, it is interesting to be able to distinguish between
@@ -2826,8 +2826,8 @@ memory paths alive in the store immediately following the statement
 execution. For sequences of instructions, the \emph{Live\_out} set of
 an instruction is equal to the \emph{Live\_in} set of the next
 instruction. However, this not true for the last statement of
-conditional or loop bodies and the first statement of the next
-instruction.
+conditional or loop bodies and the first statements of the next
+instructions.
 
 \begin{PipsPass}{live_out_summary_paths}
 \end{PipsPass}
@@ -14199,7 +14199,7 @@ print_code_out_effects       > MODULE.printed_file
 \subsection{Sequential View with Live Paths}
 
 \begin{PipsPass}{print_code_live_in_paths}
-Display the code decorated with the cumulated effects.
+Display the code decorated with the live in paths.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -14211,7 +14211,7 @@ print_code_live_in_paths    > MODULE.printed_file
 \end{PipsMake}
 
 \begin{PipsPass}{print_code_live_out_paths}
-Display the code decorated with the cumulated effects.
+Display the code decorated with the live out paths.
 \end{PipsPass}
 
 \begin{PipsMake}
