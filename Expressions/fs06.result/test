@@ -18,3 +18,11 @@ int main(void)
    return 0;
 }
 
+"after dead code elimination"
+int main(void)
+{
+   int z;
+   printf("%d\n", z+1);
+   return 0;
+}
+
