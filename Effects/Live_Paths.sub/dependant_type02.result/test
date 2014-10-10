@@ -3,12 +3,17 @@ Init File
 
 int main()
 {
-   int i;
+   int i, result = 0;
    int size = 10;
    int a[size];
 
    for(i = 0; i <= size-1; i += 1)
       a[i] = i;
+
+   for(i = 0; i <= size-1; i += 1)
+      result += a[i];
+
+   return result;
 }
 
 Regions for "main"
@@ -17,8 +22,11 @@ int main()
 {
 
 //  <i-WE-EXACT-{}>
+//  <result-RE-EXACT-{}>
+//  <result-W-EXACT-{}>
+//  <result-WE-EXACT-{}>
 
-   int i;
+   int i, result = 0;
 
 //  <size-RE-EXACT-{}>
 //  <size-W-EXACT-{}>
@@ -33,7 +41,7 @@ int main()
    int a[size];
 
 //  <a-RE-EXACT-{}>
-//  <a[PHI1]-W-MAY-{0<=PHI1, PHI1<=9, size==10}>
+//  <a[PHI1]-W-MAY-{0<=PHI1, PHI1<=9, result==0, size==10}>
 //  <i-RE-EXACT-{}>
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
@@ -44,40 +52,88 @@ int main()
    for(i = 0; i <= size-1; i += 1)
 
 //  <a-RE-EXACT-{}>
-//  <a[PHI1]-W-EXACT-{PHI1==i, size==10, 0<=i, i<=9}>
+//  <a[PHI1]-W-EXACT-{PHI1==i, result==0, size==10, 0<=i, i<=9}>
 //  <i-RE-EXACT-{}>
 //  <i-R-EXACT-{}>
 //  <size-RE-EXACT-{}>
 //  <size-R-EXACT-{}>
 
       a[i] = i;
+
+//  <a-RE-EXACT-{}>
+//  <a[PHI1]-R-MAY-{0<=PHI1, PHI1<=9, size==10}>
+//  <i-RE-EXACT-{}>
+//  <i-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+//  <result-R-EXACT-{}>
+//  <result-RE-EXACT-{}>
+//  <result-W-EXACT-{}>
+//  <size-RE-EXACT-{}>
+//  <size-R-EXACT-{}>
+
+
+   for(i = 0; i <= size-1; i += 1)
+
+//  <a-RE-EXACT-{}>
+//  <a[PHI1]-R-EXACT-{PHI1==i, size==10, 0<=i, i<=9}>
+//  <i-RE-EXACT-{}>
+//  <i-R-EXACT-{}>
+//  <result-R-EXACT-{}>
+//  <result-RE-EXACT-{}>
+//  <result-W-EXACT-{}>
+//  <size-RE-EXACT-{}>
+//  <size-R-EXACT-{}>
+
+      result += a[i];
+
+//  <result-RE-EXACT-{}>
+//  <result-R-EXACT-{}>
+
+
+   return result;
 }
 
 INV Regions for "main"
 
 int main()
 {
-   int i;
+   int i, result = 0;
    int size = 10;
    int a[size];
 
    for(i = 0; i <= size-1; i += 1)
 
 //  <a-RE-EXACT-{}>
-//  <a[PHI1]-W-EXACT-{PHI1==i, size==10, 0<=i, i<=9}>
+//  <a[PHI1]-W-EXACT-{PHI1==i, result==0, size==10, 0<=i, i<=9}>
 //  <i-RE-EXACT-{}>
 //  <i-R-EXACT-{}>
 //  <size-RE-EXACT-{}>
 //  <size-R-EXACT-{}>
 
       a[i] = i;
+
+   for(i = 0; i <= size-1; i += 1)
+
+//  <a-RE-EXACT-{}>
+//  <a[PHI1]-R-MAY-{PHI1==i, size==10, 0<=i, i<=9}>
+//  <i-RE-EXACT-{}>
+//  <i-R-EXACT-{}>
+//  <result-R-EXACT-{}>
+//  <result-RE-EXACT-{}>
+//  <result-W-EXACT-{}>
+//  <size-RE-EXACT-{}>
+//  <size-R-EXACT-{}>
+
+      result += a[i];
+
+   return result;
 }
 
 IN Regions for "main"
 
 int main()
 {
-   int i;
+   int i, result = 0;
    int size = 10;
 
 //  <size-IN-EXACT-{}>
@@ -93,29 +149,67 @@ int main()
 //  <size-IN-EXACT-{}>
 
       a[i] = i;
+
+//  <a[PHI1]-IN-EXACT-{0<=PHI1, PHI1<=9, size==10}>
+//  <result-IN-EXACT-{1<=size}>
+//  <size-IN-EXACT-{}>
+
+
+   for(i = 0; i <= size-1; i += 1)
+
+//  <a[PHI1]-IN-EXACT-{PHI1==i, size==10, 0<=i, i<=9}>
+//  <i-IN-EXACT-{}>
+//  <result-IN-EXACT-{}>
+//  <size-IN-EXACT-{}>
+
+      result += a[i];
+
+//  <result-IN-EXACT-{}>
+
+
+   return result;
 }
 
 OUT Regions for "main"
 
 int main()
 {
-   int i;
+
+//  <result-OUT-EXACT-{}>
+
+   int i, result = 0;
 
 //  <size-OUT-EXACT-{}>
 
    int size = 10;
    int a[size];
 
+//  <a[PHI1]-OUT-MAY-{0<=PHI1, PHI1<=9, result==0, size==10}>
+
+
    for(i = 0; i <= size-1; i += 1)
+
+//  <a[PHI1]-OUT-MAY-{PHI1==i, result==0, size==10, 0<=i, i<=9}>
+
       a[i] = i;
+
+//  <result-OUT-EXACT-{}>
+
+
+   for(i = 0; i <= size-1; i += 1)
+      result += a[i];
+
+   return result;
 }
 
 PROPER_EFFECTS
 
 int main()
 {
-//             <    is declared>: i
-   int i;
+//             <    is written>: result
+//             <    is referenced>: result
+//             <    is declared>: i result
+   int i, result = 0;
 //             <    is written>: size
 //             <    is referenced>: size
 //             <    is declared>: size
@@ -133,14 +227,29 @@ int main()
 //             <    is written>: a[i]
 //             <    is referenced>: a i size
       a[i] = i;
+//             <    is read   >: size
+//             <    is written>: i
+//             <    is referenced>: i size
+
+   for(i = 0; i <= size-1; i += 1)
+//             <    is read   >: a[i] i result size
+//             <    is written>: result
+//             <    is referenced>: a i result size
+      result += a[i];
+//             <    is read   >: result
+//             <    is referenced>: result
+
+   return result;
 }
 
 CUMULATED_EFFECTS
 
 int main()
 {
-//             <    is declared>: i
-   int i;
+//             <    is written>: result
+//             <    is referenced>: result
+//             <    is declared>: i result
+   int i, result = 0;
 //             <    is written>: size
 //             <    is referenced>: size
 //             <    is declared>: size
@@ -161,13 +270,30 @@ int main()
 //             <    is read   >: i size
 //             <    is referenced>: a i size
       a[i] = i;
+//             <may be read   >: a[*] i result
+//             <may be written>: result
+//             <may be referenced>: a result
+//             <    is read   >: size
+//             <    is written>: i
+//             <    is referenced>: i size
+
+   for(i = 0; i <= size-1; i += 1)
+//             <may be read   >: a[*]
+//             <    is read   >: i result size
+//             <    is written>: result
+//             <    is referenced>: a i result size
+      result += a[i];
+//             <    is read   >: result
+//             <    is referenced>: result
+
+   return result;
 }
 
 IN_EFFECTS
 
 int main()
 {
-   int i;
+   int i, result = 0;
    int size = 10;
 //             <    is imported>: size
    int a[size];
@@ -176,61 +302,97 @@ int main()
    for(i = 0; i <= size-1; i += 1)
 //             <    is imported>: i size
       a[i] = i;
+//             <may be imported>: a[*] result
+//             <    is imported>: size
+
+   for(i = 0; i <= size-1; i += 1)
+//             <may be imported>: a[*]
+//             <    is imported>: i result size
+      result += a[i];
+//             <    is imported>: result
+
+   return result;
 }
 
 OUT_EFFECTS
 
 int main()
 {
-   int i;
+//             <    is exported>: result
+   int i, result = 0;
 //             <    is exported>: size
    int size = 10;
    int a[size];
+//             <may be exported>: a[*]
 
    for(i = 0; i <= size-1; i += 1)
+//             <may be exported>: a[*]
       a[i] = i;
+//             <may be exported>: result
+
+   for(i = 0; i <= size-1; i += 1)
+//             <may be exported>: result
+      result += a[i];
+
+   return result;
 }
 
 LIVE_IN_PATHS
 
 int main()
 {
-   int i;
+   int i, result = 0;
+//             <may be alive (in)>: result
    int size = 10;
+//             <may be alive (in)>: result
 //             <    is alive (in)>: size
    int a[size];
+//             <may be alive (in)>: a[*] result
 //             <    is alive (in)>: size
 
    for(i = 0; i <= size-1; i += 1)
+//             <may be alive (in)>: a[*] result
 //             <    is alive (in)>: i size
       a[i] = i;
+//             <may be alive (in)>: a[*] result
+//             <    is alive (in)>: size
+
+   for(i = 0; i <= size-1; i += 1)
+//             <may be alive (in)>: a[*]
+//             <    is alive (in)>: i result size
+      result += a[i];
+//             <    is alive (in)>: result
+
+   return result;
 }
 
 LIVE_OUT_PATHS
 
 int main()
 {
-   int i;
+//             <may be alive (out)>: result
+   int i, result = 0;
+//             <may be alive (out)>: result
 //             <    is alive (out)>: size
    int size = 10;
+//             <may be alive (out)>: a[*] result
 //             <    is alive (out)>: size
    int a[size];
+//             <may be alive (out)>: a[*] result
+//             <    is alive (out)>: size
 
    for(i = 0; i <= size-1; i += 1)
+//             <may be alive (out)>: a[*] result
 //             <    is alive (out)>: i size
       a[i] = i;
-}
-
-ARRAY_BOUND_CHECK_TOP_DOWN
-
-int main()
-{
-   int i;
-   int size = 10;
-   int a[size];
+//             <    is alive (out)>: result
 
    for(i = 0; i <= size-1; i += 1)
-      a[i] = i;
+//             <may be alive (out)>: a[*] result
+//             <    is alive (out)>: i size
+      result += a[i];
+
+   return result;
 }
 
 Warnings
@@ -241,6 +403,3 @@ IN_SUMMARY_REGIONS[main] (init_convex_in_out_regions)
 MUST REGIONS not selected - Do not expect wonderful results
 OUT_REGIONS[main] (init_convex_in_out_regions) 
 MUST REGIONS not selected - Do not expect wonderful results
-ARRAY_BOUND_CHECK_TOP_DOWN[main] (array_bound_check_top_down) 
- MUST REGIONS not selected - 
- Do not expect wonderful results

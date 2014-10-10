@@ -84,15 +84,6 @@ activate PRINT_CODE_LIVE_OUT_PATHS
 display PRINTED_FILE[main]
 
 
-echo
-echo ARRAY_BOUND_CHECK_TOP_DOWN
-echo
-activate PRINT_CODE
-apply ARRAY_BOUND_CHECK_TOP_DOWN[main]
-display PRINTED_FILE[main]
-
-
-
 
 close
 echo
