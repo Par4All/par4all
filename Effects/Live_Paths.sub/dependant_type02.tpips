@@ -1,0 +1,104 @@
+setenv WSPACE=dependant_type02
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+
+#setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+#set PRETTYPRINT_ALL_C_BLOCKS TRUE
+
+setproperty CONSTANT_PATH_EFFECTS FALSE
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+
+echo
+echo Init File
+echo
+display PRINTED_FILE[main]
+
+
+echo
+echo Regions for "main"
+echo
+activate PRINT_CODE_REGIONS 
+display PRINTED_FILE[main]
+
+echo
+echo INV Regions for "main"
+echo
+activate PRINT_CODE_INV_REGIONS
+display PRINTED_FILE[main]
+
+echo
+echo IN Regions for "main"
+echo
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE[main]
+
+echo
+echo OUT Regions for "main"
+echo
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE[main]
+
+echo
+echo PROPER_EFFECTS
+echo
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo CUMULATED_EFFECTS
+echo
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo IN_EFFECTS
+echo
+activate PRINT_CODE_IN_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo OUT_EFFECTS
+echo
+activate PRINT_CODE_OUT_EFFECTS
+display PRINTED_FILE[main]
+
+
+#setenv LIVE_PATHS_DEBUG_LEVEL 5
+
+echo
+echo LIVE_IN_PATHS
+echo
+activate PRINT_CODE_LIVE_IN_PATHS
+display PRINTED_FILE[main]
+
+echo
+echo LIVE_OUT_PATHS
+echo
+activate PRINT_CODE_LIVE_OUT_PATHS
+display PRINTED_FILE[main]
+
+
+echo
+echo ARRAY_BOUND_CHECK_TOP_DOWN
+echo
+activate PRINT_CODE
+apply ARRAY_BOUND_CHECK_TOP_DOWN[main]
+display PRINTED_FILE[main]
+
+
+
+
+close
+echo
+echo Warnings
+echo
+shell cat $WSPACE.database/Warnings
+
+delete $WSPACE
+quit

@@ -1,0 +1,226 @@
+
+Init File
+
+int main()
+{
+   int i;
+   int size = 10;
+   int a[size];
+
+   for(i = 0; i <= 9; i += 1)
+      a[i] = i;
+}
+
+Regions for "main"
+
+int main()
+{
+
+//  <i-WE-EXACT-{}>
+
+   int i;
+
+//  <size-RE-EXACT-{}>
+//  <size-W-EXACT-{}>
+//  <size-WE-EXACT-{}>
+
+   int size = 10;
+
+//  <a-WE-EXACT-{}>
+//  <size-RE-EXACT-{}>
+//  <size-R-EXACT-{}>
+
+   int a[size];
+
+//  <a-RE-EXACT-{}>
+//  <a[PHI1]-W-MAY-{0<=PHI1, PHI1<=9, size==10}>
+//  <i-RE-EXACT-{}>
+//  <i-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+
+
+   for(i = 0; i <= 9; i += 1)
+
+//  <a-RE-EXACT-{}>
+//  <a[PHI1]-W-EXACT-{PHI1==i, size==10, 0<=i, i<=9}>
+//  <i-RE-EXACT-{}>
+//  <i-R-EXACT-{}>
+
+      a[i] = i;
+}
+
+INV Regions for "main"
+
+int main()
+{
+   int i;
+   int size = 10;
+   int a[size];
+
+   for(i = 0; i <= 9; i += 1)
+
+//  <a-RE-EXACT-{}>
+//  <a[PHI1]-W-EXACT-{PHI1==i, size==10, 0<=i, i<=9}>
+//  <i-RE-EXACT-{}>
+//  <i-R-EXACT-{}>
+
+      a[i] = i;
+}
+
+IN Regions for "main"
+
+int main()
+{
+   int i;
+   int size = 10;
+
+//  <size-IN-EXACT-{}>
+
+   int a[size];
+
+   for(i = 0; i <= 9; i += 1)
+
+//  <i-IN-EXACT-{}>
+
+      a[i] = i;
+}
+
+OUT Regions for "main"
+
+int main()
+{
+   int i;
+   int size = 10;
+   int a[size];
+
+   for(i = 0; i <= 9; i += 1)
+      a[i] = i;
+}
+
+PROPER_EFFECTS
+
+int main()
+{
+//             <    is declared>: i
+   int i;
+//             <    is written>: size
+//             <    is referenced>: size
+//             <    is declared>: size
+   int size = 10;
+//             <    is read   >: size
+//             <    is referenced>: size
+//             <    is declared>: a
+   int a[size];
+//             <    is written>: i
+//             <    is referenced>: i
+
+   for(i = 0; i <= 9; i += 1)
+//             <    is read   >: i
+//             <    is written>: a[i]
+//             <    is referenced>: a i
+      a[i] = i;
+}
+
+CUMULATED_EFFECTS
+
+int main()
+{
+//             <    is declared>: i
+   int i;
+//             <    is written>: size
+//             <    is referenced>: size
+//             <    is declared>: size
+   int size = 10;
+//             <    is read   >: size
+//             <    is referenced>: size
+//             <    is declared>: a
+   int a[size];
+//             <may be written>: a[*]
+//             <    is read   >: i
+//             <    is written>: i
+//             <    is referenced>: a i
+
+   for(i = 0; i <= 9; i += 1)
+//             <may be written>: a[*]
+//             <    is read   >: i
+//             <    is referenced>: a i
+      a[i] = i;
+}
+
+IN_EFFECTS
+
+int main()
+{
+   int i;
+   int size = 10;
+//             <    is imported>: size
+   int a[size];
+
+   for(i = 0; i <= 9; i += 1)
+//             <    is imported>: i
+      a[i] = i;
+}
+
+OUT_EFFECTS
+
+int main()
+{
+   int i;
+   int size = 10;
+   int a[size];
+
+   for(i = 0; i <= 9; i += 1)
+      a[i] = i;
+}
+
+LIVE_IN_PATHS
+
+int main()
+{
+   int i;
+   int size = 10;
+//             <    is alive (in)>: size
+   int a[size];
+
+   for(i = 0; i <= 9; i += 1)
+//             <    is alive (in)>: i
+      a[i] = i;
+}
+
+LIVE_OUT_PATHS
+
+int main()
+{
+   int i;
+//             <    is alive (out)>: size
+   int size = 10;
+   int a[size];
+
+   for(i = 0; i <= 9; i += 1)
+//             <    is alive (out)>: i
+      a[i] = i;
+}
+
+ARRAY_BOUND_CHECK_TOP_DOWN
+
+int main()
+{
+   int i;
+   int size = 10;
+   int a[size];
+
+   for(i = 0; i <= 9; i += 1)
+      a[i] = i;
+}
+
+Warnings
+
+IN_REGIONS[main] (init_convex_in_out_regions) 
+MUST REGIONS not selected - Do not expect wonderful results
+IN_SUMMARY_REGIONS[main] (init_convex_in_out_regions) 
+MUST REGIONS not selected - Do not expect wonderful results
+OUT_REGIONS[main] (init_convex_in_out_regions) 
+MUST REGIONS not selected - Do not expect wonderful results
+ARRAY_BOUND_CHECK_TOP_DOWN[main] (array_bound_check_top_down) 
+ MUST REGIONS not selected - 
+ Do not expect wonderful results
