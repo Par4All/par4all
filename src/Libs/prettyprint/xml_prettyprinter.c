@@ -1269,9 +1269,9 @@ static bool call_selection(call c, nest_context_p nest __attribute__ ((unused)))
   /* pour le moment distribution systematique de tout call */
   /* il faut recuperer les appels de fonction value_code_p(entity_initial(f)*/
   entity f = call_function(c);
-  // if  ((ENTITY_ASSIGN_P(f) && array_in_call_p(c)) || entity_subroutine_p(f)|| entity_function_p(f))
- if  (ENTITY_ASSIGN_P(f)  || entity_subroutine_p(f)|| entity_function_p(f))
-   {
+  if  ((ENTITY_ASSIGN_P(f) && array_in_call_p(c)) || entity_subroutine_p(f)|| entity_function_p(f))
+    //if  (ENTITY_ASSIGN_P(f)  || entity_subroutine_p(f)|| entity_function_p(f))
+    {
       return true;
     }
   else return false;
