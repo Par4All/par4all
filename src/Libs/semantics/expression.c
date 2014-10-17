@@ -2608,8 +2608,8 @@ static transformer points_to_unary_operation_to_transformer(entity e,
     }
   }
 
-  ifdebug (0) dump_transformer(tf);
-  pips_debug(0, "end \n");
+  ifdebug (8) dump_transformer(tf);
+  pips_debug(8, "end \n");
   return tf;
 }
 
