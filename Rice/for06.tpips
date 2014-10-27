@@ -1,0 +1,64 @@
+setenv WSPACE=for06
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+echo
+echo "with MEMORY_EFFECTS_ONLY set to TRUE"
+setproperty MEMORY_EFFECTS_ONLY TRUE
+
+echo
+echo "DG_FILE"
+echo
+display DG_FILE[$WSPACE]
+
+apply PRINT_DOT_CHAINS_GRAPH[$WSPACE]
+shell dot -Tpng $WSPACE.database/$WSPACE/$WSPACE.dot > $WSPACE.database/$WSPACE/usedefchains.png
+#shell eog $WSPACE.database/$WSPACE/usedefchains.png
+shell cp $WSPACE.database/$WSPACE/usedefchains.png ./$WSPACE.result/CusedefchainsMemoryOnlyTrue.png
+
+echo
+echo "DISTRIBUTER"
+echo
+apply DISTRIBUTER[$WSPACE]
+display PRINTED_FILE[$WSPACE]
+
+
+close
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+echo
+echo
+echo "with MEMORY_EFFECTS_ONLY set to FALSE"
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+echo
+echo "DG_FILE"
+echo
+display DG_FILE[$WSPACE]
+
+apply PRINT_DOT_CHAINS_GRAPH[$WSPACE]
+shell dot -Tpng $WSPACE.database/$WSPACE/$WSPACE.dot > $WSPACE.database/$WSPACE/usedefchains.png
+#shell eog $WSPACE.database/$WSPACE/usedefchains.png
+shell cp $WSPACE.database/$WSPACE/usedefchains.png ./$WSPACE.result/CusedefchainsMemoryOnlyFalse.png
+
+echo
+echo "DISTRIBUTER"
+echo
+apply DISTRIBUTER[$WSPACE]
+display PRINTED_FILE[$WSPACE]
+
+close
+delete $WSPACE
+quit
