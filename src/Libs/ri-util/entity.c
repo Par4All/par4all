@@ -2078,7 +2078,7 @@ bool typedef_entity_p(entity e)
   /* Its name must contain the TYPEDEF_PREFIX just after the
      MODULE_SEP_STRING and the scope information */
   string en = entity_name(e);
-  string ms = strchr(en, BLOCK_SEP_CHAR);
+  string ms = strrchr(en, BLOCK_SEP_CHAR);
   bool is_typedef = false;
 
   /* If there is no scope information, use the module separator */
