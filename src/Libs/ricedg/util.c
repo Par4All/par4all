@@ -179,7 +179,8 @@ int conflicts_sort_callback( conflict *c1, conflict *c2 ) {
 /* Print all edges and arcs */
 void prettyprint_dependence_graph( FILE * fd,
                                    statement mod_stat,
-                                   graph mod_graph ) {
+                                   graph mod_graph )
+{
   cons *pv1, *ps, *pc;
   Ptsg gs;
   int banner_number = 0;
@@ -728,30 +729,30 @@ void prettyprint_dot_dependence_graph( FILE * fd,
         if(mask_loop_carried && conflict_cone(c) != cone_undefined) {
           list lls = cone_levels(conflict_cone(c));
           keep_this_conflict = false;
-	  FOREACH(int, level, lls) {
+          FOREACH(int, level, lls) {
             if(level > nbrcomloops ) {
-	      keep_this_conflict = true;
+              keep_this_conflict = true;
               break;
             }
           }
         }
-	bool keep_this_conflict_privatized = true;
-	if(mask_loop_privatized && conflict_cone(c) != cone_undefined) {
+        bool keep_this_conflict_privatized = true;
+        if(mask_loop_privatized && conflict_cone(c) != cone_undefined) {
           list lls = cone_levels(conflict_cone(c));
           keep_this_conflict_privatized = true;
-	  FOREACH(int, level, lls) {
+          FOREACH(int, level, lls) {
             if(level > nbrcomloops || ignore_this_conflict(v1,v2,c,level)) {
-	      keep_this_conflict_privatized=false;
+              keep_this_conflict_privatized=false;
               //break;
             }
           }
-	}
-	 
-	keep_this_conflict =  keep_this_conflict &&  keep_this_conflict_privatized;
-	//verify also for level = 0
-	if(mask_loop_privatized && ignore_this_conflict(v1,v2,c,0))  
-	  keep_this_conflict=false;
-	
+        }
+
+        keep_this_conflict =  keep_this_conflict &&  keep_this_conflict_privatized;
+        //verify also for level = 0
+        if(mask_loop_privatized && ignore_this_conflict(v1,v2,c,0))
+          keep_this_conflict=false;
+
         if(!keep_this_conflict) {
           continue;
         }
@@ -770,24 +771,24 @@ void prettyprint_dot_dependence_graph( FILE * fd,
           style = flowdep_style;
         }
         fprintf( fd,
-                 "%d -> %d [color=%s,style=%s,label=\"",
-                 (int) statement_ordering(s1),
-                 (int) statement_ordering(s2),
-                 color,
-                 style );
+            "%d -> %d [color=%s,style=%s,label=\"",
+            (int) statement_ordering(s1),
+            (int) statement_ordering(s2),
+            color,
+            style );
         fprintf( fd,
-                 "%c <",
-                 action_read_p( source_act ) ? 'R'
-                                             : 'W' );
+            "%c <",
+            action_read_p( source_act ) ? 'R'
+                : 'W' );
         print_words( fd,
-                     effect_words_reference( source_ref ) );
+            effect_words_reference( source_ref ) );
         fprintf( fd, ">\\n" );
         fprintf( fd,
-                 "%c <",
-                 action_read_p( sink_act ) ? 'R'
-                                           : 'W' );
+            "%c <",
+            action_read_p( sink_act ) ? 'R'
+                : 'W' );
         print_words( fd,
-                     effect_words_reference( sink_ref ) );
+            effect_words_reference( sink_ref ) );
         fprintf( fd, ">\\n" );
 
 
@@ -795,9 +796,9 @@ void prettyprint_dot_dependence_graph( FILE * fd,
         if ( conflict_cone( c ) != cone_undefined ) {
           fprintf( fd, " levels(" );
           MAPL(pl, {
-                fprintf(fd, pl==cone_levels(conflict_cone(c))? "%td" : ",%td",
-                    INT(CAR(pl)));
-              }, cone_levels(conflict_cone(c)));
+              fprintf(fd, pl==cone_levels(conflict_cone(c))? "%td" : ",%td",
+                  INT(CAR(pl)));
+          }, cone_levels(conflict_cone(c)));
           fprintf( fd, ") " );
 
           if ( get_bool_property( "PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES" ) ) {
@@ -839,37 +840,37 @@ void prettyprint_dot_dependence_graph( FILE * fd,
  */
 void 
 prettyprint_dependence_graph_view(FILE * fd,
-				  statement mod_stat,
-				  graph mod_graph)
+    statement mod_stat,
+    graph mod_graph)
 {
-    cons *pv1, *ps, *pc;
-    Ptsg gs;
-    int banner_number = 0;
+  cons *pv1, *ps, *pc;
+  Ptsg gs;
+  int banner_number = 0;
 
-    banner_number =
-	get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS") +
-	    2*get_bool_property
-		("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS") +
-		    4*get_bool_property
-			("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES");
+  banner_number =
+      get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS") +
+      2*get_bool_property
+      ("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS") +
+      4*get_bool_property
+      ("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES");
 
-    fprintf(fd, "%s\n", dependence_graph_banner[banner_number]);
+  fprintf(fd, "%s\n", dependence_graph_banner[banner_number]);
 
-    set_enclosing_loops_map( loops_mapping_of_statement(mod_stat) );
+  set_enclosing_loops_map( loops_mapping_of_statement(mod_stat) );
 
-    debug_on("RICEDG_DEBUG_LEVEL");
+  debug_on("RICEDG_DEBUG_LEVEL");
 
-    for (pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1)) {
-	vertex v1 = VERTEX(CAR(pv1));
-	statement s1 = vertex_to_statement(v1);
-	list loops1 = load_statement_enclosing_loops(s1);
+  for (pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1)) {
+    vertex v1 = VERTEX(CAR(pv1));
+    statement s1 = vertex_to_statement(v1);
+    list loops1 = load_statement_enclosing_loops(s1);
 
-	for (ps = vertex_successors(v1); !ENDP(ps); ps = CDR(ps)) {
-	    successor su = SUCCESSOR(CAR(ps));
-	    vertex v2 = successor_vertex(su);
-	    statement s2 = vertex_to_statement(v2);
-	    list loops2 = load_statement_enclosing_loops(s2);
-	    dg_arc_label dal = (dg_arc_label) successor_arc_label(su);
+    for (ps = vertex_successors(v1); !ENDP(ps); ps = CDR(ps)) {
+      successor su = SUCCESSOR(CAR(ps));
+      vertex v2 = successor_vertex(su);
+      statement s2 = vertex_to_statement(v2);
+      list loops2 = load_statement_enclosing_loops(s2);
+      dg_arc_label dal = (dg_arc_label) successor_arc_label(su);
 
       /*
        * If we have more than one conflict, let's sort them !
@@ -883,84 +884,84 @@ prettyprint_dependence_graph_view(FILE * fd,
         gen_array_t conflicts_array = gen_array_make( 20 );
         list_to_array( dg_arc_label_conflicts(dal), conflicts_array );
         qsort( gen_array_pointer( conflicts_array ),
-               gen_array_nitems( conflicts_array ),
-               sizeof(void *),
-               (gen_cmp_func_t) conflicts_sort_callback);
+            gen_array_nitems( conflicts_array ),
+            sizeof(void *),
+            (gen_cmp_func_t) conflicts_sort_callback);
         list conflicts_list = NIL;
         GEN_ARRAY_FOREACH(conflict, s, conflicts_array)
-          conflicts_list = CONS(conflict, s, conflicts_list);
+        conflicts_list = CONS(conflict, s, conflicts_list);
         gen_array_free(conflicts_array);
         dg_arc_label_conflicts(dal)=conflicts_list;
       }
-	    int nbrcomloops = FindMaximumCommonLevel(loops1, loops2);
-	    for (pc = dg_arc_label_conflicts(dal); !ENDP(pc); pc = CDR(pc)) {
-		conflict c = CONFLICT(CAR(pc));
+      int nbrcomloops = FindMaximumCommonLevel(loops1, loops2);
+      for (pc = dg_arc_label_conflicts(dal); !ENDP(pc); pc = CDR(pc)) {
+        conflict c = CONFLICT(CAR(pc));
 
-		if(conflict_cone(c) == cone_undefined) continue;
-		else {
-		    cons * lls = cone_levels(conflict_cone(c));
-		    cons *llsred =NIL;
-		    if (get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS")){
-			MAPL(pl,{
-			    _int level = INT(CAR(pl));
-			    if (level <= nbrcomloops) {
-				if (! ignore_this_conflict(v1,v2,c,level)) {
-				    llsred = gen_nconc(llsred, CONS(INT, level, NIL));
-				}
-			    }
-			    else {
-				if (get_bool_property
-				    ("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS")) {
-				    continue;
-				}
-				else llsred = gen_nconc(llsred, CONS(INT, level, NIL));
-			    }
-			}, lls);
-		    }
-		    if (llsred == NIL) continue;
-		    else {
-			/*if (!	entity_scalar_p(reference_variable
+        if(conflict_cone(c) == cone_undefined) continue;
+        else {
+          cons * lls = cone_levels(conflict_cone(c));
+          cons *llsred =NIL;
+          if (get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS")){
+            MAPL(pl,{
+                _int level = INT(CAR(pl));
+                if (level <= nbrcomloops) {
+                  if (! ignore_this_conflict(v1,v2,c,level)) {
+                    llsred = gen_nconc(llsred, CONS(INT, level, NIL));
+                  }
+                }
+                else {
+                  if (get_bool_property
+                      ("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS")) {
+                    continue;
+                  }
+                  else llsred = gen_nconc(llsred, CONS(INT, level, NIL));
+                }
+            }, lls);
+          }
+          if (llsred == NIL) continue;
+          else {
+            /*if (!	entity_scalar_p(reference_variable
 			  (effect_any_reference(conflict_source(c))))) { */
 
-			fprintf(fd, "\t%02td --> %02td with conflicts\n", 
-				statement_number(s1), statement_number(s2));
-			
-			fprintf(fd, "\t\tfrom ");
-			print_words(fd, words_effect(conflict_source(c)));
+            fprintf(fd, "\t%02td --> %02td with conflicts\n",
+                statement_number(s1), statement_number(s2));
 
-			fprintf(fd, " to ");
-			print_words(fd, words_effect(conflict_sink(c)));
-			
-			fprintf(fd, " at levels ");
-			MAPL(pl, {
-			    fprintf(fd, " %td", INT(CAR(pl)));
-			}, llsred);
+            fprintf(fd, "\t\tfrom ");
+            print_words(fd, words_effect(conflict_source(c)));
 
-			fprintf(fd, "\n");
-			if(get_bool_property
-			   ("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES")) {
-			    gs = (Ptsg)cone_generating_system(conflict_cone(c));
-			    if (!SG_UNDEFINED_P(gs)) {
-				/* sg_fprint(fd,gs,entity_local_name); */
-				sg_fprint_as_dense(fd, gs, gs->base);
-				ifdebug(2) {
-				    Psysteme sc1 = sc_new();
-				    sc1 = sg_to_sc_chernikova(gs);
-				    (void) fprintf(fd,"syst. lin. correspondant au  syst. gen.:\n");
-				    sc_fprint(fd, sc1, (get_variable_name_t) entity_local_name);
-				}
-			    }
-			    fprintf(fd, "\n");
-			}
-		    }
-		}
-	    }
-	}
+            fprintf(fd, " to ");
+            print_words(fd, words_effect(conflict_sink(c)));
+
+            fprintf(fd, " at levels ");
+            MAPL(pl, {
+                fprintf(fd, " %td", INT(CAR(pl)));
+            }, llsred);
+
+            fprintf(fd, "\n");
+            if(get_bool_property
+                ("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES")) {
+              gs = (Ptsg)cone_generating_system(conflict_cone(c));
+              if (!SG_UNDEFINED_P(gs)) {
+                /* sg_fprint(fd,gs,entity_local_name); */
+                sg_fprint_as_dense(fd, gs, gs->base);
+                ifdebug(2) {
+                  Psysteme sc1 = sc_new();
+                  sc1 = sg_to_sc_chernikova(gs);
+                  (void) fprintf(fd,"syst. lin. correspondant au  syst. gen.:\n");
+                  sc_fprint(fd, sc1, (get_variable_name_t) entity_local_name);
+                }
+              }
+              fprintf(fd, "\n");
+            }
+          }
+        }
+      }
     }
-    clean_enclosing_loops();
-    debug_off();
-    fprintf(fd, "\n****************** End of Dependence Graph "
-	    "******************\n");
+  }
+  clean_enclosing_loops();
+  debug_off();
+  fprintf(fd, "\n****************** End of Dependence Graph "
+      "******************\n");
 }
 
 void 
