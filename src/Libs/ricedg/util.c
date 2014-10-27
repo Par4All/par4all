@@ -299,9 +299,9 @@ void prettyprint_dependence_graph( FILE * fd,
            statement_number(s1), statement_number(s2));
            */
           fprintf( fd,
-                   "%c %c ",
-                   action_read_p(effect_action(conflict_source(c))) ? 'R' : 'W',
-                   action_read_p(effect_action(conflict_sink(c))) ? 'R' : 'W' );
+                   "%s %s ",
+                   full_action_to_short_string(effect_action(conflict_source(c))),
+                   full_action_to_short_string(effect_action(conflict_sink(c))));
           fprintf( fd, "<" );
           print_words( fd,
                        effect_words_reference(
@@ -777,16 +777,14 @@ void prettyprint_dot_dependence_graph( FILE * fd,
             color,
             style );
         fprintf( fd,
-            "%c <",
-            action_read_p( source_act ) ? 'R'
-                : 'W' );
+            "%s <",
+            full_action_to_short_string( source_act ));
         print_words( fd,
             effect_words_reference( source_ref ) );
         fprintf( fd, ">\\n" );
         fprintf( fd,
-            "%c <",
-            action_read_p( sink_act ) ? 'R'
-                : 'W' );
+            "%s <",
+            full_action_to_short_string( sink_act ));
         print_words( fd,
             effect_words_reference( sink_ref ) );
         fprintf( fd, ">\\n" );
