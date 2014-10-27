@@ -1,0 +1,25 @@
+
+"with MEMORY_EFFECTS_ONLY set to TRUE"
+
+"DISTRIBUTER"
+
+void for07(int n)
+{
+   int a[n], b[n];
+   {
+      int i;
+      for(i = 0; i <= n-1; i += 1) {
+         a[i] = i;
+      }
+      for(i = 0; i <= n-1; i += 1) {
+         typedef int mytype;
+      }
+      for(i = 0; i <= n-1; i += 1) {
+         mytype x;
+      }
+      for(i = 0; i <= n-1; i += 1) {
+         x = rand();
+         b[i] = x;
+      }
+   }
+}
