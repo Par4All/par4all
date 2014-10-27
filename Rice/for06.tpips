@@ -11,15 +11,20 @@ echo
 echo "with MEMORY_EFFECTS_ONLY set to TRUE"
 setproperty MEMORY_EFFECTS_ONLY TRUE
 
+activate PRINT_EFFECTIVE_DEPENDENCE_GRAPH
+#activate PRINT_WHOLE_DEPENDENCE_GRAPH
+#activate PRINT_LOOP_CARRIED_DEPENDENCE_GRAPH
+#activate PRINT_CHAINS_GRAPH
+#activate PRINT_FILTERED_DEPENDENCE_GRAPH
+
 echo
 echo "DG_FILE"
 echo
 display DG_FILE[$WSPACE]
 
-apply PRINT_DOT_CHAINS_GRAPH[$WSPACE]
-shell dot -Tpng $WSPACE.database/$WSPACE/$WSPACE.dot > $WSPACE.database/$WSPACE/usedefchains.png
-#shell eog $WSPACE.database/$WSPACE/usedefchains.png
-shell cp $WSPACE.database/$WSPACE/usedefchains.png ./$WSPACE.result/CusedefchainsMemoryOnlyTrue.png
+apply PRINT_DOT_DEPENDENCE_GRAPH[$WSPACE]
+shell dot -Tpng $WSPACE.database/$WSPACE/$WSPACE.dot > ./$WSPACE.result/DependenceGraphMemoryOnlyTrue.png
+#shell eog ./$WSPACE.result/DependenceGraphMemoryOnlyTrue.png
 
 echo
 echo "DISTRIBUTER"
@@ -43,15 +48,20 @@ echo
 echo "with MEMORY_EFFECTS_ONLY set to FALSE"
 setproperty MEMORY_EFFECTS_ONLY FALSE
 
+activate PRINT_EFFECTIVE_DEPENDENCE_GRAPH
+#activate PRINT_WHOLE_DEPENDENCE_GRAPH
+#activate PRINT_LOOP_CARRIED_DEPENDENCE_GRAPH
+#activate PRINT_CHAINS_GRAPH
+#activate PRINT_FILTERED_DEPENDENCE_GRAPH
+
 echo
 echo "DG_FILE"
 echo
 display DG_FILE[$WSPACE]
 
-apply PRINT_DOT_CHAINS_GRAPH[$WSPACE]
-shell dot -Tpng $WSPACE.database/$WSPACE/$WSPACE.dot > $WSPACE.database/$WSPACE/usedefchains.png
-#shell eog $WSPACE.database/$WSPACE/usedefchains.png
-shell cp $WSPACE.database/$WSPACE/usedefchains.png ./$WSPACE.result/CusedefchainsMemoryOnlyFalse.png
+apply PRINT_DOT_DEPENDENCE_GRAPH[$WSPACE]
+shell dot -Tpng $WSPACE.database/$WSPACE/$WSPACE.dot > ./$WSPACE.result/DependenceGraphMemoryOnlyFalse.png
+#shell eog ./$WSPACE.result/DependenceGraphMemoryOnlyFalse.png
 
 echo
 echo "DISTRIBUTER"
