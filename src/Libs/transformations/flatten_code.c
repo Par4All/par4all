@@ -347,7 +347,11 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 
 	  /* Build the new variable */
 	  const char* eun  = entity_user_name(v);
-	  string negn = strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope, eun, NULL));
+	  string negn = typedef_entity_p(v)?
+	    strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope, 
+			       TYPEDEF_PREFIX, eun, NULL))
+	    :
+	    strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope, eun, NULL));
 	  entity nv   = entity_undefined;
 	  //list unused_nvs = NIL;
 
