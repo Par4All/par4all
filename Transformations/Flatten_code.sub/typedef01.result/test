@@ -1,6 +1,3 @@
-typedef disapear
---> the new code is invalide.
-
 
 "Initial Code"
 
@@ -22,7 +19,7 @@ void typedef01()
    //PIPS generated variable
    int i_0;
    //PIPS generated variable
-   int mytype;
+   typedef int mytype;
    //PIPS generated variable
    mytype j;
 }
