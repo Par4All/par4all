@@ -1,0 +1,30 @@
+Move declaration with dependent type when it's not permitted.
+
+"Initial Code"
+
+void dependenttype01()
+{
+   int i;
+   {
+      int i;
+      i = 10;
+      int a[i];
+      a[0] = 0;
+   }
+}
+
+"FLATTEN_CODE"
+
+void dependenttype01()
+{
+   int i;
+   //PIPS generated variable
+   int i_0;
+   //PIPS generated variable
+   int a[i_0];
+   i_0 = 10;
+   a[0] = 0;
+}
+
+Warnings
+
