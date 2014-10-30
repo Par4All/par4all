@@ -1,0 +1,53 @@
+
+"Initial Code"
+
+void struct02(void)
+{
+   int i;
+   {
+      int i;
+      struct foo {
+         int a;
+      };
+      struct foo j;
+      j.a = 1;
+   }
+   {
+      int i;
+      struct foo {
+         double a;
+      };
+      struct foo j;
+      j.a = 0.;
+   }
+   return;
+}
+
+"FLATTEN_CODE"
+
+void struct02(void)
+{
+   int i;
+   //PIPS generated variable
+   int i_0;
+   //PIPS generated variable
+   struct foo {
+      int a;
+   };
+   //PIPS generated variable
+   struct foo j_0;
+   //PIPS generated variable
+   int i_1;
+   //PIPS generated variable
+   struct foo_0 {
+      double a;
+   };
+   //PIPS generated variable
+   struct foo j_1;
+   j_0.a = 1;
+   j_1.a = 0.;
+   return;
+}
+
+Warnings
+
