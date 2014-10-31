@@ -111,6 +111,29 @@ static void rename_loop_index(loop l, hash_table renamings)
   }
 }
 
+/* If the type of variable var is a typedefed type, it may have been
+   renamed and the symbol table must be updated. */
+void rename_variable_type(entity var, hash_table renamings)
+{
+  type t = entity_type(var);
+  if(typedef_type_p(t)) {
+    variable v = type_variable(t);
+    basic b = variable_basic(v);
+    entity tt = basic_typedef(b);
+    entity ntt = (entity)hash_get(renamings, tt);
+    if(!entity_undefined_p(ntt))
+      basic_typedef(b) = ntt;
+  }
+  else if(struct_type_p(t) || union_type_p(t)){
+    variable v = type_variable(t);
+    basic b = variable_basic(v);
+    entity tt = basic_derived(b);
+    entity nst = (entity)hash_get(renamings, tt);
+    if(!entity_undefined_p(nst))
+      basic_typedef(b) = nst;
+  }
+}
+
 /* gen_multi_recurse callback on exiting a statement: recompute the
    declaration list for statement s and transform initializations into
    assignments when required according to the renaming map
@@ -170,6 +193,9 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 	pips_debug(1, "Declaration for external variable \"%s\" moved.\n",
 		   entity_name(var));
       }
+      /* Should we worry that the type itself has been renamed because
+	 a typedef is used? */
+      rename_variable_type(var, renamings);
     }
 
     /* calling RemoveLocalEntityFromDeclarations will tidy the
