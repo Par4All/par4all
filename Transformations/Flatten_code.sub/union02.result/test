@@ -1,23 +1,25 @@
 
 "Initial Code"
 
-void struct02(void)
+void union02(void)
 {
    int i;
    {
       int i;
-      struct foo {
+      union foo {
          int a;
+         double b;
       };
-      struct foo j;
+      union foo j;
       j.a = 1;
    }
    {
       int i;
-      struct foo {
+      union foo {
          double a;
+         int b;
       };
-      struct foo j;
+      union foo j;
       j.a = 0.;
    }
    return;
@@ -25,25 +27,27 @@ void struct02(void)
 
 "FLATTEN_CODE"
 
-void struct02(void)
+void union02(void)
 {
    int i;
    //PIPS generated variable
    int i_0;
    //PIPS generated variable
-   struct foo {
+   union foo {
       int a;
+      double b;
    };
    //PIPS generated variable
-   struct foo j_0;
+   union foo j_0;
    //PIPS generated variable
    int i_1;
    //PIPS generated variable
-   struct foo_0 {
+   union foo_0 {
       double a;
+      int b;
    };
    //PIPS generated variable
-   struct foo_0 j_1;
+   union foo_0 j_1;
    j_0.a = 1;
    j_1.a = 0.;
    return;

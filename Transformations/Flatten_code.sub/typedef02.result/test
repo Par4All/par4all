@@ -28,13 +28,13 @@ void typedef02()
    //PIPS generated variable
    typedef int mytype_0;
    //PIPS generated variable
-   mytype j;
+   mytype_0 j;
    //PIPS generated variable
    int i_1;
    //PIPS generated variable
    typedef double mytype_1;
    //PIPS generated variable
-   mytype j_0;
+   mytype_1 j_0;
 }
 
 Warnings
