@@ -169,15 +169,24 @@ do_clone_entity(entity e, clone_context cc, hash_table ht)
     entity new_entity = entity_undefined;
     if( (new_entity=hash_get(ht,entity_name(e))) == HASH_UNDEFINED_VALUE)
     {
+      //string ln = entity_user_name(e);
+      string en = entity_name(e);
+      string ms = strrchr(en, BLOCK_SEP_CHAR);
+      if(ms==NULL)
+	ms = strchr(en, MODULE_SEP)+1;
+      string ln = ms;
+
         if(entity_scalar_p(e))
             new_entity = make_new_scalar_variable_with_prefix(
-                    entity_user_name(e),
+		    //entity_user_name(e),
+                    ln,
                     clone_context_new_module(cc),
                     copy_basic(entity_basic(e))
                     );
         else
             new_entity = make_new_array_variable_with_prefix(
-                    entity_user_name(e),
+		    //entity_user_name(e),
+                    ln,
                     clone_context_new_module(cc),
                     copy_basic(entity_basic(e)),
                     gen_full_copy_list(variable_dimensions(type_variable(entity_type(e))))

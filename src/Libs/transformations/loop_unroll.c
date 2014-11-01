@@ -279,6 +279,7 @@ static void do_loop_unroll_with_epilogue(statement loop_statement,
 	pips_assert("The expression for the initial index is consistent",
 		    expression_consistent_p(expr));
       }
+      /* FI: beware of dependent types? 31/10/2014 */
       replace_entity_by_expression(transformed_stmt,ind,expr);
 
       ifdebug(9) {
