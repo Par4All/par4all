@@ -124,7 +124,7 @@ void rename_variable_type(entity var, hash_table renamings)
     if(!entity_undefined_p(ntt))
       basic_typedef(b) = ntt;
   }
-  else if(struct_type_p(t) || union_type_p(t)){
+  else if(struct_type_p(t) || union_type_p(t) || enum_type_p(t)){
     variable v = type_variable(t);
     basic b = variable_basic(v);
     entity tt = basic_derived(b);
