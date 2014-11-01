@@ -1,0 +1,32 @@
+
+"Initial Code"
+
+void enum01(void)
+{
+   int i;
+   {
+      int i;
+      enum foo {zero, un, deux};
+      enum foo j;
+      j = un;
+   }
+   return;
+}
+
+"FLATTEN_CODE"
+
+void enum01(void)
+{
+   int i;
+   //PIPS generated variable
+   int i_0;
+   //PIPS generated variable
+   enum foo {zero, un, deux};
+   //PIPS generated variable
+   enum foo j_0;
+   j_0 = un;
+   return;
+}
+
+Warnings
+
