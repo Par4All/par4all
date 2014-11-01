@@ -622,48 +622,64 @@ static void statement_purge_declarations(statement s)
  */
 bool flatten_code(const char* module_name)
 {
-  entity module;
-  statement module_stat;
   bool good_result_p = true;
 
   set_current_module_entity(module_name_to_entity(module_name));
-  module = get_current_module_entity();
-
-  set_current_module_statement( (statement)
-				db_get_memory_resource(DBR_CODE, module_name, true) );
-  module_stat = get_current_module_statement();
+  entity module = get_current_module_entity();
+  value mv = entity_initial(module);
+  code c = value_code(mv); // No check on value's kind
+  list dl = code_declarations(c);
 
   debug_on("FLATTEN_CODE_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
 
-  // Step 1 and 2: flatten declarations and clean up sequences
-  if ((good_result_p=statement_flatten_declarations(module,module_stat)))
-  {
-    statement_purge_declarations(module_stat);
-    // call sequence flattening as some declarations may have been moved up
-    clean_up_sequences(module_stat);
-
-    // Step 3 and 4: unroll loops and clean up sequences
-    if(get_bool_property("FLATTEN_CODE_UNROLL"))
-    {
-      gen_recurse(module_stat,
-                  statement_domain, gen_true, unroll_loops_in_statement);
-      clean_up_sequences(module_stat); // again
+  // Step 0: the algorithms used do not deal with dependent or
+  // variable-length array (VLA) types
+  FOREACH(ENTITY, v, dl) {
+    type t = entity_type(v);
+    if(dependent_type_p(t)) {
+      good_result_p = false;
+      break;
     }
+  }
 
-    // This might not be necessary, thanks to clean_up_sequences
-    module_reorder(module_stat);
-    // Save modified code to database
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
+  if(!good_result_p) {
+    pips_user_warning("Module \"%s\" could not be flattened because it uses a variable-length array (VLA).\n", entity_user_name(module));
+  }
+  else {
+    set_current_module_statement( (statement)
+				  db_get_memory_resource(DBR_CODE, module_name, true) );
+    statement module_stat = get_current_module_statement();
+
+    // Step 1 and 2: flatten declarations and clean up sequences
+    if ((good_result_p=statement_flatten_declarations(module,module_stat)))
+      {
+	statement_purge_declarations(module_stat);
+	// call sequence flattening as some declarations may have been moved up
+	clean_up_sequences(module_stat);
+
+	// Step 3 and 4: unroll loops and clean up sequences
+	if(get_bool_property("FLATTEN_CODE_UNROLL"))
+	  {
+	    gen_recurse(module_stat,
+			statement_domain, gen_true, unroll_loops_in_statement);
+	    clean_up_sequences(module_stat); // again
+	  }
+
+	// This might not be necessary, thanks to clean_up_sequences
+	module_reorder(module_stat);
+	// Save modified code to database
+	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
+      }
+  reset_current_module_statement();
   }
 
   pips_debug(1, "end\n");
   debug_off();
 
   reset_current_module_entity();
-  reset_current_module_statement();
 
-  return (good_result_p);
+  return good_result_p;
 }
 
 
