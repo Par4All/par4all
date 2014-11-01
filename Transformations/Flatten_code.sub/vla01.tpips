@@ -1,0 +1,26 @@
+setenv WSPACE=vla01
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+# No abort: we must detect the mistake
+#setproperty ABORT_ON_USER_ERROR TRUE
+setproperty FLATTEN_CODE_UNROLL FALSE
+
+echo
+echo "Initial Code"
+echo
+display PRINTED_FILE[$WSPACE]
+
+echo
+echo "FLATTEN_CODE"
+echo
+apply FLATTEN_CODE[$WSPACE]
+display PRINTED_FILE[$WSPACE]
+
+close
+echo
+echo Warnings
+echo
+shell cat $WSPACE.database/Warnings
+delete $WSPACE
+quit
