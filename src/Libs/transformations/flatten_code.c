@@ -634,12 +634,14 @@ bool flatten_code(const char* module_name)
   pips_debug(1, "begin\n");
 
   // Step 0: the algorithms used do not deal with dependent or
-  // variable-length array (VLA) types
+  // variable-length array (VLA) types unless they are formal parameters
   FOREACH(ENTITY, v, dl) {
-    type t = entity_type(v);
-    if(dependent_type_p(t)) {
-      good_result_p = false;
-      break;
+    if(!entity_formal_p(v)) {
+      type t = entity_type(v);
+      if(dependent_type_p(t)) {
+	good_result_p = false;
+	break;
+      }
     }
   }
 
