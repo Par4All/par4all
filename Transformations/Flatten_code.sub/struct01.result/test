@@ -26,8 +26,8 @@ void struct01()
       int a;
    };
    //PIPS generated variable
-   struct foo j_0;
-   j_0.a = 1;
+   struct foo j;
+   j.a = 1;
 }
 
 Warnings

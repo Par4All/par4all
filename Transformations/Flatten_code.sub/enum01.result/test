@@ -23,8 +23,8 @@ void enum01(void)
    //PIPS generated variable
    enum foo {zero, un, deux};
    //PIPS generated variable
-   enum foo j_0;
-   j_0 = un;
+   enum foo j;
+   j = un;
    return;
 }
 

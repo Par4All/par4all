@@ -1,0 +1,26 @@
+
+"Initial Code"
+
+int flatten_code19()
+{
+   int i = 1;
+   {
+      int j = 2;
+      j = 3;
+   }
+   i = 2;
+}
+
+"FLATTEN_CODE"
+
+int flatten_code19()
+{
+   int i = 1;
+   //PIPS generated variable
+   int j = 2;
+   j = 3;
+   i = 2;
+}
+
+Warnings
+

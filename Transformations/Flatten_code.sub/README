@@ -1,0 +1,40 @@
+dependenttype01.c	make sur VLA block flattening
+dependenttype02.c	make sur VLA block flattening
+empty.c
+enum01.c		make sure enum are properly renamed
+enum02.c		make sure enum are properly renamed
+flatten_code01.c
+flatten_code02.c
+flatten_code03.c
+flatten_code04.c
+flatten_code05.c
+flatten_code06.c
+flatten_code07.c
+flatten_code08.c
+flatten_code09.c
+flatten_code10.c
+flatten_code11.c
+flatten_code12.c
+flatten_code13.c
+flatten_code14.c
+flatten_code15.c
+flatten_code16.c
+flatten_code17.c
+flatten_code18.c
+flatten_code19.c	avoid useless renaming of standard variables
+flatten_code20.c	avoid useless renaming of typedef
+flatten_code21.c	check renaming of typedef when it is necessary
+flatten_code22.c	check minimal renaming of typedef
+flatten_code23.c	check minimal renaming for standard variables
+loop_local_array.c
+loop_private.c
+pragma_renaming.c
+struct01.c		make sure struct are properly renamed
+			useless renaming -> bug
+struct02.c		make sure struct are properly renamed
+typedef01.c		make sure typedef are properly renamed
+typedef02.c		make sure typedef are properly renamed
+union01.c		make sure union are properly renamed
+union02.c		make sure union are properly renamed
+unnormalize_expression.c
+vla01.c			make sure variable lenght array declarations are not moved

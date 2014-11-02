@@ -29,8 +29,8 @@ void union01(void)
       double b;
    };
    //PIPS generated variable
-   union foo j_0;
-   j_0.a = 1;
+   union foo j;
+   j.a = 1;
    return;
 }
 
