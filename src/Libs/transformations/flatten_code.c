@@ -275,7 +275,7 @@ typedef struct redeclaration_context {
 } redeclaration_context_t;
 
 /* This function makes the key decision about the renaming: should
-   the variable be renamed? Is the renaming and declaration move
+   the variable be renamed? Are the renaming and declaration move
    compatible with its initialization expression and its control
    context? */
 static bool redeclaration_enter_statement(statement s, redeclaration_context_t * rdcp)
@@ -314,7 +314,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	hash_put_or_update(rdcp->renamings, v, v);
       }
       else { /* This is a block local stack allocated or static
-		variable */
+		variable or a derived type or a typedef type */
 	/* FI: the case of static variables is not taken into account
 	   properly. */
 	expression ie = variable_initial_expression(v);
@@ -372,12 +372,18 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	if(redeclare_p) {
 
 	  /* Build the new variable */
-	  const char* eun  = entity_user_name(v);
-	  string negn = typedef_entity_p(v)?
-	    strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope, 
-			       TYPEDEF_PREFIX, eun, NULL))
-	    :
-	    strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope, eun, NULL));
+	  /* const char* eun  = entity_user_name(v); */
+	  /* string negn = typedef_entity_p(v)? */
+	  /*   strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope,  */
+	  /* 		       TYPEDEF_PREFIX, eun, NULL)) */
+	  /*   : */
+	  /*   strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope, eun, NULL)); */
+	  // const char* eun  = entity_name_without_scope(v);
+	  const char* eun  = strrchr(entity_name(v), BLOCK_SEP_CHAR);
+	  if(eun==NULL)
+	    eun  = strrchr(entity_name(v), MODULE_SEP_CHAR);
+	  string negn = 
+	    strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope, eun+1, NULL));
 	  entity nv   = entity_undefined;
 	  //list unused_nvs = NIL;
 
@@ -389,6 +395,8 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	  */
 
 	  statement ds = rdcp->declaration_statement;
+	  /* FI: I do not undestand why we look for references instead
+	     of declarations... (02/11/2014) */
 	  list dselist = statement_to_referenced_entities(ds);
 	  bool is_same_name    = false;
 
@@ -509,21 +517,36 @@ bool statement_flatten_declarations(entity module, statement s)
         list declarations = instruction_to_declarations(statement_instruction(s)); // Recursive
         hash_table renamings = hash_table_make(hash_pointer, HASH_DEFAULT_SIZE);
         bool renaming_p = false;
+	string cs = string_undefined;
+	int csl = INT_MAX;
 
         /* Can we find out what the local scope of statement s is? */
+	/* FI: Shouldn't it be "0`"? */
+	const char* cmn = entity_user_name(module);
         FOREACH(ENTITY, se, entity_declarations(module)) {
             string sen  = entity_name(se);
             const char* seln = entity_local_name(se);
-            string cs   = local_name_to_scope(seln); /* current scope for s */
+            string cs_se   = local_name_to_scope(seln); /* current scope for se */
             const char* mn   = module_name(sen);
-            const char* cmn = entity_user_name(module);
 
             if(same_string_p(mn, cmn)) {
-                compute_renamings(s, cs, mn, renamings);
-                renaming_p = true;
-                break;
+	      renaming_p = true;
+	      int cs_se_l = strlen(cs_se);
+	      if(cs_se_l>0 && cs_se_l<csl) {
+		csl = cs_se_l;
+		cs = cs_se;
+	      }
+	      else
+		free(cs_se);
             }
+	    else
+	      free(cs_se);
         }
+
+	if(renaming_p) {
+	  compute_renamings(s, cs, cmn, renamings);
+	  free(cs);
+	}
 
         if(renaming_p) {
             ifdebug(1)
