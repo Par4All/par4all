@@ -161,15 +161,15 @@ list effects_must_union(effect eff1, effect eff2)
  */
 effect effect_may_union(effect eff1, effect eff2)
 {
-    effect eff;
-    tag app1 = effect_approximation_tag(eff1);
-    tag app2 = effect_approximation_tag(eff2);
+  effect eff;
+  tag app1 = effect_approximation_tag(eff1);
+  tag app2 = effect_approximation_tag(eff2);
 
-    bool al1_p = effect_abstract_location_p(eff1);
-    bool al2_p = effect_abstract_location_p(eff2);
+  bool al1_p = effect_abstract_location_p(eff1);
+  bool al2_p = effect_abstract_location_p(eff2);
 
-    /* Abstract locations cases */
-    /* In fact, we could have :
+  /* Abstract locations cases */
+  /* In fact, we could have :
        if (al1_p || al_2_p)
        {
          entity e1 = effect_entity(e1);
@@ -187,64 +187,78 @@ effect effect_may_union(effect eff1, effect eff2)
        we already know that the abstract location is the max of both locations
        (because they are combinable (see effects_combinable_p))
 
-     */
-    if (al1_p && al2_p)
+   */
+  if (al1_p && al2_p)
+  {
+    entity e1 = effect_entity(eff1);
+    entity e2 = effect_entity(eff2);
+
+    entity new_ent = entity_locations_max(e1, e2);
+
+    eff = make_simple_effect(make_reference(new_ent, NIL),
+        copy_action(effect_action(eff1)),
+        make_approximation(approximation_and(app1,app2), UU));
+  }
+  else if (al1_p) {
+    // functions that can be pointed by effect_dup_func:
+    // simple_effect_dup
+    // region_dup
+    // copy_effect
+    eff = (*effect_dup_func)(eff1);
+  }
+  else if (al2_p) {
+    // functions that can be pointed by effect_dup_func:
+    // simple_effect_dup
+    // region_dup
+    // copy_effect
+    eff = (*effect_dup_func)(eff2);
+  }
+
+  /* concrete locations cases */
+  else if (effect_scalar_p(eff1))
+  {
+    eff = make_simple_effect(make_reference(effect_entity(eff1), NIL),
+        copy_action(effect_action(eff1)),
+        make_approximation(approximation_and(app1,app2), UU));
+  }
+  else
+  {
+    // functions that can be pointed by effect_dup_func:
+    // simple_effect_dup
+    // region_dup
+    // copy_effect
+    eff = (*effect_dup_func)(eff1);
+    cell eff_c = effect_cell(eff);
+
+    if (cell_preference_p(eff_c))
+    {
+      /* it's a preference : we change for a reference cell */
+      pips_debug(8, "It's a preference\n");
+      reference ref = copy_reference(preference_reference(cell_preference(eff_c)));
+      free_cell(eff_c);
+      effect_cell(eff) = make_cell_reference(ref);
+    }
+
+    /* let us check the indices */
+    list l1 = reference_indices(effect_any_reference(eff));
+    list l2 = reference_indices(effect_any_reference(eff2));
+
+    tag app_tag =  approximation_and(app1,app2);
+
+    for(; !ENDP(l1); POP(l1), POP(l2))
+    {
+      expression exp1 = EXPRESSION(CAR(l1));
+      expression exp2 = EXPRESSION(CAR(l2));
+      if (!expression_equal_p(exp1, exp2))
       {
-	entity e1 = effect_entity(eff1);
-	entity e2 = effect_entity(eff2);
-
-	entity new_ent = entity_locations_max(e1, e2);
-
-	eff = make_simple_effect(make_reference(new_ent, NIL),
-			  copy_action(effect_action(eff1)),
-			  make_approximation(approximation_and(app1,app2), UU));
+        EXPRESSION_(CAR(l1)) =  make_unbounded_expression();
+        app_tag = is_approximation_may;
       }
-    else if (al1_p)
-      eff = (*effect_dup_func)(eff1);
-    else if (al2_p)
-      eff = (*effect_dup_func)(eff2);
-
-    /* concrete locations cases */
-    else if (effect_scalar_p(eff1))
-    {
-	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL),
-			  copy_action(effect_action(eff1)),
-			  make_approximation(approximation_and(app1,app2), UU));
     }
-    else
-    {
-      eff = (*effect_dup_func)(eff1);
-      cell eff_c = effect_cell(eff);
 
-      if (cell_preference_p(eff_c))
-	{
-	  /* it's a preference : we change for a reference cell */
-	  pips_debug(8, "It's a preference\n");
-	  reference ref = copy_reference(preference_reference(cell_preference(eff_c)));
-	  free_cell(eff_c);
-	  effect_cell(eff) = make_cell_reference(ref);
-	}
-
-      /* let us check the indices */
-      list l1 = reference_indices(effect_any_reference(eff));
-      list l2 = reference_indices(effect_any_reference(eff2));
-
-      tag app_tag =  approximation_and(app1,app2);
-
-      for(; !ENDP(l1); POP(l1), POP(l2))
-	{
-	  expression exp1 = EXPRESSION(CAR(l1));
-	  expression exp2 = EXPRESSION(CAR(l2));
-	  if (!expression_equal_p(exp1, exp2))
-	    {
-	      EXPRESSION_(CAR(l1)) =  make_unbounded_expression();
-	      app_tag = is_approximation_may;
-	    }
-	}
-
-      approximation_tag(effect_approximation(eff)) = app_tag;
-    }
-    return(eff);
+    approximation_tag(effect_approximation(eff)) = app_tag;
+  }
+  return(eff);
 }
 
 /**
@@ -256,15 +270,15 @@ effect effect_may_union(effect eff1, effect eff2)
  */
 effect effect_must_union(effect eff1, effect eff2)
 {
-    effect eff;
-    tag app1 = effect_approximation_tag(eff1);
-    tag app2 = effect_approximation_tag(eff2);
+  effect eff;
+  tag app1 = effect_approximation_tag(eff1);
+  tag app2 = effect_approximation_tag(eff2);
 
-    bool al1_p = effect_abstract_location_p(eff1);
-    bool al2_p = effect_abstract_location_p(eff2);
+  bool al1_p = effect_abstract_location_p(eff1);
+  bool al2_p = effect_abstract_location_p(eff2);
 
-    /* Abstract locations cases */
-    /* In fact, we could have :
+  /* Abstract locations cases */
+  /* In fact, we could have :
        if (al1_p || al_2_p)
        {
          entity e1 = effect_entity(e1);
@@ -282,94 +296,122 @@ effect effect_must_union(effect eff1, effect eff2)
        we already know that the abstract location is the max of both locations
        (because they are combinable (see effects_combinable_p))
 
-     */
-    if (al1_p && al2_p)
+   */
+  if (al1_p && al2_p)
+  {
+    entity e1 = effect_entity(eff1);
+    entity e2 = effect_entity(eff2);
+
+    entity new_ent = entity_locations_max(e1, e2);
+
+    eff = make_simple_effect(make_reference(new_ent, NIL),
+        copy_action(effect_action(eff1)),
+        make_approximation(approximation_and(app1,app2), UU));
+  }
+  else if (al1_p) {
+    // functions that can be pointed by effect_dup_func:
+    // simple_effect_dup
+    // region_dup
+    // copy_effect
+    eff = (*effect_dup_func)(eff1);
+  }
+  else if (al2_p) {
+    // functions that can be pointed by effect_dup_func:
+    // simple_effect_dup
+    // region_dup
+    // copy_effect
+    eff = (*effect_dup_func)(eff2);
+  }
+
+  /* concrete locations cases */
+  else if (effect_scalar_p(eff1))
+  {
+    eff = make_simple_effect(make_reference(effect_entity(eff1), NIL),
+        copy_action(effect_action(eff1)),
+        make_approximation(approximation_or(app1,app2), UU));
+  }
+  else
+  {
+    // functions that can be pointed by effect_dup_func:
+    // simple_effect_dup
+    // region_dup
+    // copy_effect
+    eff = (*effect_dup_func)(eff1);
+    cell eff_c = effect_cell(eff);
+    if (cell_preference_p(eff_c))
+    {
+      /* it's a preference : we change for a reference cell */
+      pips_debug(8, "It's a preference\n");
+      reference ref = copy_reference(preference_reference(cell_preference(eff_c)));
+      free_cell(eff_c);
+      effect_cell(eff) = make_cell_reference(ref);
+    }
+
+    /* let us check the indices */
+    list l1 = reference_indices(effect_any_reference(eff));
+    list l2 = reference_indices(effect_any_reference(eff2));
+
+    tag app_tag = approximation_or(app1,app2);
+
+    for(; !ENDP(l1); POP(l1), POP(l2))
+    {
+      expression exp1 = EXPRESSION(CAR(l1));
+      expression exp2 = EXPRESSION(CAR(l2));
+      if (!expression_equal_p(exp1, exp2))
       {
-	entity e1 = effect_entity(eff1);
-	entity e2 = effect_entity(eff2);
-
-	entity new_ent = entity_locations_max(e1, e2);
-
-	eff = make_simple_effect(make_reference(new_ent, NIL),
-			  copy_action(effect_action(eff1)),
-			  make_approximation(approximation_and(app1,app2), UU));
+        EXPRESSION_(CAR(l1)) =  make_unbounded_expression();
+        app_tag = is_approximation_may;
       }
-    else if (al1_p)
-      eff = (*effect_dup_func)(eff1);
-    else if (al2_p)
-      eff = (*effect_dup_func)(eff2);
-
-    /* concrete locations cases */
-    else if (effect_scalar_p(eff1))
-    {
-	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL),
-			  copy_action(effect_action(eff1)),
-			  make_approximation(approximation_or(app1,app2), UU));
     }
-    else
-    {
-      eff = (*effect_dup_func)(eff1);
-      cell eff_c = effect_cell(eff);
-      if (cell_preference_p(eff_c))
-	{
-	  /* it's a preference : we change for a reference cell */
-	  pips_debug(8, "It's a preference\n");
-	  reference ref = copy_reference(preference_reference(cell_preference(eff_c)));
-	  free_cell(eff_c);
-	  effect_cell(eff) = make_cell_reference(ref);
-	}
 
-      /* let us check the indices */
-      list l1 = reference_indices(effect_any_reference(eff));
-      list l2 = reference_indices(effect_any_reference(eff2));
-
-      tag app_tag = approximation_or(app1,app2);
-
-      for(; !ENDP(l1); POP(l1), POP(l2))
-	{
-	  expression exp1 = EXPRESSION(CAR(l1));
-	  expression exp2 = EXPRESSION(CAR(l2));
-	  if (!expression_equal_p(exp1, exp2))
-	    {
-	      EXPRESSION_(CAR(l1)) =  make_unbounded_expression();
-	      app_tag = is_approximation_may;
-	    }
-	}
-
-      effect_approximation_tag(eff) = app_tag;
-    }
-    return(eff);
+    effect_approximation_tag(eff) = app_tag;
+  }
+  return(eff);
 }
 
 
 static list
 effect_sup_difference(/* const */ effect eff1, /* const */ effect eff2)
 {
-    list l_res = NIL;
-    reference ref1 = effect_any_reference(eff1);
-    reference ref2 = effect_any_reference(eff2);
+  list l_res = NIL;
+  reference ref1 = effect_any_reference(eff1);
+  reference ref2 = effect_any_reference(eff2);
 
-    /* We already know that effects are combinable and they are not abstract locations
-       (or they are context_sensitive heap locations)
-    */
-    if (reference_equal_p(ref1, ref2)) // a[1] - a[1] or a[*] - a[*]_may
-      {
-	if (effect_may_p(eff2))
-	  l_res = effect_to_may_effect_list((*effect_dup_func)(eff1));
-	// else: empty list
-      }
+  /* We already know that effects are combinable and they are not abstract locations
+   * (or they are context_sensitive heap locations)
+   */
+  if (reference_equal_p(ref1, ref2)) // a[1] - a[1] or a[*] - a[*]_may
+  {
+    if (effect_may_p(eff2)) {
+      // functions that can be pointed by effect_dup_func:
+      // simple_effect_dup
+      // region_dup
+      // copy_effect
+      l_res = effect_to_may_effect_list((*effect_dup_func)(eff1));
+    }
+    // else: empty list
+  }
+  else
+  {
+    if (effect_exact_p(eff1) && effect_exact_p(eff2)) {// a[1] - a[2]
+      // functions that can be pointed by effect_dup_func:
+      // simple_effect_dup
+      // region_dup
+      // copy_effect
+      l_res = effect_to_list((*effect_dup_func)(eff1));
+    }
     else
-      {
-	if (effect_exact_p(eff1) && effect_exact_p(eff2)) // a[1] - a[2]
-	  l_res = effect_to_list((*effect_dup_func)(eff1));
-	else
-	  {
-	    // a[*] - a[1] or a[1] - a[*]_may for instance
-	    l_res = effect_to_may_effect_list((*effect_dup_func)(eff1));
-	  }
-      }
+    {
+      // a[*] - a[1] or a[1] - a[*]_may for instance
+      // functions that can be pointed by effect_dup_func:
+      // simple_effect_dup
+      // region_dup
+      // copy_effect
+      l_res = effect_to_may_effect_list((*effect_dup_func)(eff1));
+    }
+  }
 
-    return(l_res);
+  return(l_res);
 }
 
 static list
@@ -465,7 +507,7 @@ effect proper_to_summary_simple_effect(effect eff)
 
     ifdebug(8) {
       pips_debug(8, "Proper effect %p with reference %p: %s\n", eff, ref,
-		 words_to_string(words_effect(eff)));
+          words_to_string(words_effect(eff)));
     }
 
     list inds = reference_indices(ref);
@@ -474,22 +516,22 @@ effect proper_to_summary_simple_effect(effect eff)
       expression se = EXPRESSION(CAR(cind));
 
       ifdebug(8) {
-	pips_debug(8, "Subscript expression :\n");
-	print_expression(se);
+        pips_debug(8, "Subscript expression :\n");
+        print_expression(se);
       }
 
       if(!extended_integer_constant_expression_p(se)) {
-	if(!unbounded_expression_p(se))
-	  {
-	    /* it may still be a field entity */
-	    if (!(expression_reference_p(se) &&
-		  entity_field_p(expression_variable(se))))
-	    {
-	      may_p = true;
-	      free_expression(se);
-	      EXPRESSION_(CAR(cind)) = make_unbounded_expression();
-	    }
-	  }
+        if(!unbounded_expression_p(se))
+        {
+          /* it may still be a field entity */
+          if (!(expression_reference_p(se) &&
+              entity_field_p(expression_variable(se))))
+          {
+            may_p = true;
+            free_expression(se);
+            EXPRESSION_(CAR(cind)) = make_unbounded_expression();
+          }
+        }
       }
     }
 
@@ -498,7 +540,7 @@ effect proper_to_summary_simple_effect(effect eff)
 
     ifdebug(8) {
       pips_debug(8, "Summary simple effect %p with reference %p: %s\n", eff, ref,
-		 words_to_string(words_effect(eff)));
+          words_to_string(words_effect(eff)));
     }
 
     /*
@@ -515,7 +557,7 @@ effect proper_to_summary_simple_effect(effect eff)
 	cell_reference(c) = nr;
       }
     }
-    */
+     */
   }
   return(eff);
 }

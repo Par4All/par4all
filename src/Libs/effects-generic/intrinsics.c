@@ -1465,10 +1465,19 @@ conditional_effects(entity e __attribute__ ((__unused__)),list args)
   list lt = generic_proper_effects_of_expression(et);
   list lf = generic_proper_effects_of_expression(ef);
 
+  // functions that can be pointed by effects_test_union_op:
+  // EffectsMayUnion
+  // RegionsMayUnion
+  // ReferenceTestUnion
   le = (*effects_test_union_op)(lt, lf, effects_scalars_and_same_action_p);
 
   pips_debug_effects(8, "Effects for the two branches:\n", le);
 
+  // functions that can be pointed by effects_union_op:
+  // ProperEffectsMustUnion
+  // RegionsMustUnion
+  // ReferenceUnion
+  // EffectsMustUnion
   le = (*effects_union_op)(le, lc, effects_scalars_and_same_action_p);
 
   pips_debug(5, "end\n");
@@ -1714,6 +1723,11 @@ static list read_io_effects(entity e, list args)
   if (!transformer_undefined_p(t)) /* hummm... */
   {
     /* reverse-apply transformer to le. */
+    // functions that can be pointed by effects_transformer_composition_op:
+    // effects_composition_with_transformer_nop
+    // effects_undefined_composition_with_transformer
+    // convex_regions_transformer_compose
+    // simple_effects_composition_with_effect_transformer
     le = (*effects_transformer_composition_op)(le, t);
   }
 
@@ -1803,7 +1817,7 @@ static list generic_io_effects(entity e, list args, bool system_p)
     return (  unix_io_effects( e,  args));
     else
     return ( c_io_effects( e,  args));
-  */
+   */
   list le = NIL, lep;
   entity private_io_entity;
   //reference ref;
@@ -1822,127 +1836,134 @@ static list generic_io_effects(entity e, list args, bool system_p)
   lenght=strlen(p->IoElementName);
 
   FOREACH(EXPRESSION, arg, args)
+  {
+    //if we have * as last argument, we repeat the effect of the
+    //penultimate argument for the rest of the arguments
+
+    if(p->IoElementName[lenght-1]=='*' && i>=lenght-1)
+      lep = effects_of_C_ioelem(arg, p->IoElementName[lenght-2]);
+    else
+      lep = effects_of_C_ioelem(arg, p->IoElementName[i]);
+
+    i=i+1;
+
+    if (p->MayOrMust == is_approximation_may)
+      effects_to_may_effects(lep);
+
+    le = gen_nconc(le, lep);
+
+    ifdebug(8)
     {
-      //if we have * as last argument, we repeat the effect of the
-      //penultimate argument for the rest of the arguments
-
-      if(p->IoElementName[lenght-1]=='*' && i>=lenght-1)
-	lep = effects_of_C_ioelem(arg, p->IoElementName[lenght-2]);
-      else
-	lep = effects_of_C_ioelem(arg, p->IoElementName[i]);
-
-      i=i+1;
-
-      if (p->MayOrMust == is_approximation_may)
-	effects_to_may_effects(lep);
-
-      le = gen_nconc(le, lep);
-
-      ifdebug(8)
-	{
-	  pips_debug(8, "effects for argument %s :\n",
-		     words_to_string(words_expression(arg,NIL)));
-	  (*effects_prettyprint_func)(lep);
-	}
+      pips_debug(8, "effects for argument %s :\n",
+          words_to_string(words_expression(arg,NIL)));
+      (*effects_prettyprint_func)(lep);
     }
+  }
 
   /* special cases */
   /* We simulate actions on files by read/write actions
-     to a special static integer array.
-     GO:
-     It is necessary to do a read and and write action to
-     the array, because it updates the file-pointer so
-     it reads it and then writes it ...*/
+   * to a special static integer array.
+   * GO:
+   * It is necessary to do a read and and write action to
+   * the array, because it updates the file-pointer so
+   * it reads it and then writes it ...*/
 
   if(!system_p)
+  {
+    reference std_ref = reference_undefined;
+    /* FILE * file descriptors are used */
+    if(ENTITY_PRINTF_P(e) || ENTITY_PUTCHAR_P(e) ||
+        ENTITY_PUTS_P(e)|| ENTITY_VPRINTF_P(e))
     {
-      reference std_ref = reference_undefined;
-      /* FILE * file descriptors are used */
-      if(ENTITY_PRINTF_P(e) || ENTITY_PUTCHAR_P(e) ||
-	 ENTITY_PUTS_P(e)|| ENTITY_VPRINTF_P(e))
-	{
-	  // The output is written to stdout
-	  entity std_ent =  get_stdout_entity();
-	  if (entity_undefined_p(std_ent))
-	    pips_user_irrecoverable_error("stdout is not defined: check if \"stdio.h\""
-			    " is included)\n");
-	  else
-	    std_ref = make_reference(std_ent, NIL);
+      // The output is written to stdout
+      entity std_ent =  get_stdout_entity();
+      if (entity_undefined_p(std_ent))
+        pips_user_irrecoverable_error("stdout is not defined: check if \"stdio.h\""
+            " is included)\n");
+      else
+        std_ref = make_reference(std_ent, NIL);
 
-	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
-	    unit = int_to_expression(STDOUT_FILENO);
-	  else
-	    /* we cannot use STDOUT_FILENO because the stdout variable may have been modified by the user */
-	    unit = make_unbounded_expression();
-	}
-      else if (ENTITY_SCANF_P(e) || ENTITY_ISOC99_SCANF_P(e)
-	       || ENTITY_VSCANF_P(e) || ENTITY_ISOC99_VSCANF_P(e)
-	       || ENTITY_GETS_P(e)
-	       || ENTITY_GETCHAR_P(e))
-	{
-	  //The input is obtained from stdin
-	  entity std_ent =  get_stdin_entity();
-	  if (entity_undefined_p(std_ent))
-	    pips_user_irrecoverable_error("stdin is not defined (check if <stdio.h> is included)\n");
-	  else
-	    std_ref = make_reference(std_ent, NIL);
-
-	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
-	    unit = int_to_expression(STDIN_FILENO);
-	  else
-	    /* we cannot use STDIN_FILENO because the stdin variable may have been modified by the user */
-	    unit = make_unbounded_expression();
-	}
-      else if (ENTITY_PERROR_P(e))
-	{
-	  entity std_ent =  get_stderr_entity();
-	  if (entity_undefined_p(std_ent))
-	    pips_user_irrecoverable_error("stderr is not defined (check if <stdio.h> is included)\n");
-	  else
-	    std_ref = make_reference(std_ent, NIL);
-
-	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
-	    unit = int_to_expression(STDERR_FILENO);
-	  else
-	    /* we cannot use STDERR_FILENO because the stderr variable may have been modified by the user */
-	    unit = make_unbounded_expression();
-	}
-
-      else if(ENTITY_FOPEN_P(e) || ENTITY_UNLINK_SYSTEM_P(e) || ENTITY_LINK_SYSTEM_P(e)
-	      || ENTITY_SYMLINK_SYSTEM_P(e))
-	// the fopen and link/unlink functions the path's file as arguments.
-	unit = make_unbounded_expression();
-
-      else if(ENTITY_BUFFERIN_P(e) || ENTITY_BUFFEROUT_P(e))
-	// the first argument is an integer specifying the logical unit
-	// The expression should be evaluated and used if an integer is returned
-	unit = make_unbounded_expression();
-
-      if (!reference_undefined_p(std_ref))
-	{
-	  effect fp_eff_w = (*reference_to_effect_func)(std_ref, make_action_write_memory(), false);
-	  effect fp_eff_r = (*reference_to_effect_func)(copy_reference(std_ref), make_action_read_memory(), false);
-	  list l_fp_eff = CONS(EFFECT, copy_effect(fp_eff_r), NIL);
-	  effect_add_dereferencing_dimension(fp_eff_w);
-	  effect_to_may_effect(fp_eff_w);
-	  effect_add_dereferencing_dimension(fp_eff_r);
-	  effect_to_may_effect(fp_eff_r);
-	  l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, fp_eff_r, CONS(EFFECT, fp_eff_w, NIL)));
-	  le = gen_nconc(le, l_fp_eff);
-	}
-
+      if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
+        unit = int_to_expression(STDOUT_FILENO);
+      else
+        /* we cannot use STDOUT_FILENO because the stdout variable may have been modified by the user */
+        unit = make_unbounded_expression();
     }
+    else if (ENTITY_SCANF_P(e) || ENTITY_ISOC99_SCANF_P(e)
+        || ENTITY_VSCANF_P(e) || ENTITY_ISOC99_VSCANF_P(e)
+        || ENTITY_GETS_P(e)
+        || ENTITY_GETCHAR_P(e))
+    {
+      //The input is obtained from stdin
+      entity std_ent =  get_stdin_entity();
+      if (entity_undefined_p(std_ent))
+        pips_user_irrecoverable_error("stdin is not defined (check if <stdio.h> is included)\n");
+      else
+        std_ref = make_reference(std_ent, NIL);
+
+      if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
+        unit = int_to_expression(STDIN_FILENO);
+      else
+        /* we cannot use STDIN_FILENO because the stdin variable may have been modified by the user */
+        unit = make_unbounded_expression();
+    }
+    else if (ENTITY_PERROR_P(e))
+    {
+      entity std_ent =  get_stderr_entity();
+      if (entity_undefined_p(std_ent))
+        pips_user_irrecoverable_error("stderr is not defined (check if <stdio.h> is included)\n");
+      else
+        std_ref = make_reference(std_ent, NIL);
+
+      if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
+        unit = int_to_expression(STDERR_FILENO);
+      else
+        /* we cannot use STDERR_FILENO because the stderr variable may have been modified by the user */
+        unit = make_unbounded_expression();
+    }
+
+    else if(ENTITY_FOPEN_P(e) || ENTITY_UNLINK_SYSTEM_P(e) || ENTITY_LINK_SYSTEM_P(e)
+        || ENTITY_SYMLINK_SYSTEM_P(e))
+      // the fopen and link/unlink functions the path's file as arguments.
+      unit = make_unbounded_expression();
+
+    else if(ENTITY_BUFFERIN_P(e) || ENTITY_BUFFEROUT_P(e))
+      // the first argument is an integer specifying the logical unit
+      // The expression should be evaluated and used if an integer is returned
+      unit = make_unbounded_expression();
+
+    if (!reference_undefined_p(std_ref))
+    {
+      // functions that can be pointed by reference_to_effect_func:
+      // reference_to_simple_effect
+      // reference_to_convex_region
+      // reference_to_reference_effect
+      effect fp_eff_w = (*reference_to_effect_func)(std_ref, make_action_write_memory(), false);
+      // functions that can be pointed by reference_to_effect_func:
+      // reference_to_simple_effect
+      // reference_to_convex_region
+      // reference_to_reference_effect
+      effect fp_eff_r = (*reference_to_effect_func)(copy_reference(std_ref), make_action_read_memory(), false);
+      list l_fp_eff = CONS(EFFECT, copy_effect(fp_eff_r), NIL);
+      effect_add_dereferencing_dimension(fp_eff_w);
+      effect_to_may_effect(fp_eff_w);
+      effect_add_dereferencing_dimension(fp_eff_r);
+      effect_to_may_effect(fp_eff_r);
+      l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, fp_eff_r, CONS(EFFECT, fp_eff_w, NIL)));
+      le = gen_nconc(le, l_fp_eff);
+    }
+  }
   else
+  {
+    if(ENTITY_SELECT_SYSTEM_P(e) || ENTITY_PSELECT_SYSTEM_P(e))
     {
-      if(ENTITY_SELECT_SYSTEM_P(e) || ENTITY_PSELECT_SYSTEM_P(e))
-	{
-	  /* Several file descriptors are read */
-	  ;
-	}
+      /* Several file descriptors are read */
+      ;
     }
+  }
 
   if(!expression_undefined_p(unit))
-    {
+  {
     reference ref1 = reference_undefined;
     effect eff1 = effect_undefined;
     reference ref2 = reference_undefined;
@@ -1953,21 +1974,29 @@ static list generic_io_effects(entity e, list args, bool system_p)
     private_io_entity = FindEntity(IO_EFFECTS_PACKAGE_NAME, IO_EFFECTS_ARRAY_NAME);
 
     pips_assert("private_io_entity is defined",
-		private_io_entity != entity_undefined);
+        private_io_entity != entity_undefined);
 
     ref1 = make_reference(private_io_entity, indices);
     ref2 = copy_reference(ref1);
     /* FI: I would like not to use "preference" instead of
-       "reference", but this causes a bug in cumulated effects and I
-       do not have time to chase it. */
+     * "reference", but this causes a bug in cumulated effects and I
+     * do not have time to chase it. */
+    // functions that can be pointed by reference_to_effect_func:
+    // reference_to_simple_effect
+    // reference_to_convex_region
+    // reference_to_reference_effect
     eff1 = (*reference_to_effect_func)(ref1, make_action_read_memory(), false);
+    // functions that can be pointed by reference_to_effect_func:
+    // reference_to_simple_effect
+    // reference_to_convex_region
+    // reference_to_reference_effect
     eff2 = (*reference_to_effect_func)(ref2, make_action_write_memory(), false);
 
     if(unbounded_expression_p(unit))
-      {
-	effect_approximation_tag(eff1) = is_approximation_may;
-	effect_approximation_tag(eff2) = is_approximation_may;
-      }
+    {
+      effect_approximation_tag(eff1) = is_approximation_may;
+      effect_approximation_tag(eff2) = is_approximation_may;
+    }
 
     ifdebug(8) print_reference(ref1);
     le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
@@ -2014,9 +2043,9 @@ generic_string_effects(entity e, list args)
 
   // then effects on special entities for memmove intrinsic
   if (same_string_p(lname,MEMMOVE_FUNCTION_NAME))
-    {
-      le = gen_nconc(le,memmove_effects(e, args));
-    }
+  {
+    le = gen_nconc(le,memmove_effects(e, args));
+  }
 
   // finally write effects on some elements of first argument depending on third argument
   // if the main effect is not on a char *, or if we don't know the number of copied elements,
@@ -2027,125 +2056,131 @@ generic_string_effects(entity e, list args)
 
   if (expression_call_p(arg1)
       && call_constant_p(expression_call(arg1)))
-    {
-      pips_user_error("constant expression as first argument not allowed "
-		      "for intrinsic %s\n", entity_name(e));
-    }
+  {
+    pips_user_error("constant expression as first argument not allowed "
+        "for intrinsic %s\n", entity_name(e));
+  }
   else
-    {
-      list l_eff1 = NIL; /* main effects on first arg */
-      list l_tmp = generic_proper_effects_of_complex_address_expression(arg1, &l_eff1, true);
-      gen_full_free_list(l_tmp);
+  {
+    list l_eff1 = NIL; /* main effects on first arg */
+    list l_tmp = generic_proper_effects_of_complex_address_expression(arg1, &l_eff1, true);
+    gen_full_free_list(l_tmp);
 
-      FOREACH(EFFECT, eff1, l_eff1)
-	{
-	  if (!anywhere_effect_p(eff1))
-	    {
-	      if (gen_length(args) == 3) // we may know the number of elements
-		{
-		  /* first check whether the argument main effect is on a char *. */
-		  type t = simple_effect_reference_type(effect_any_reference(eff1));
-		  variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
-		  if (!variable_undefined_p(v)
-		      && ((basic_pointer_p(variable_basic(v))
-			   && ENDP(variable_dimensions(v))
-			   && char_type_p(basic_pointer(variable_basic(v))))
-			  ||
-			  (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1))))
-		    {
-		      /* Effect is on eff11_ref[0..arg3-1]*/
-		      expression arg3 = EXPRESSION(CAR(CDR(CDR(args))));
-		      expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
-							copy_expression(arg3),
-							int_to_expression(1));
-		      range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
-		      expression ie = make_expression(make_syntax_range(r),
-						      make_normalized_complex());
-		      (*effect_add_expression_dimension_func)(eff1, ie);
-		      le = gen_nconc(le, CONS(EFFECT, eff1, NIL));
-		    }
-		  else
-		    {
-		      le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg1, 'w'));
-		      free_effect(eff1);
-		    }
-		}
-	      else
-		{
-		  le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg1, 'w'));
-		  free_effect(eff1);
-		}
-	    }
-	  else
-	    le = gen_nconc(le, CONS(EFFECT, eff1, NIL)); /* write is after reads */
-	}
-      gen_free_list(l_eff1);
+    FOREACH(EFFECT, eff1, l_eff1)
+    {
+      if (!anywhere_effect_p(eff1))
+      {
+        if (gen_length(args) == 3) // we may know the number of elements
+        {
+          /* first check whether the argument main effect is on a char *. */
+          type t = simple_effect_reference_type(effect_any_reference(eff1));
+          variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
+          if (!variable_undefined_p(v)
+              && ((basic_pointer_p(variable_basic(v))
+                  && ENDP(variable_dimensions(v))
+                  && char_type_p(basic_pointer(variable_basic(v))))
+                  ||
+                  (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1))))
+          {
+            /* Effect is on eff11_ref[0..arg3-1]*/
+            expression arg3 = EXPRESSION(CAR(CDR(CDR(args))));
+            expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+                copy_expression(arg3),
+                int_to_expression(1));
+            range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
+            expression ie = make_expression(make_syntax_range(r),
+                make_normalized_complex());
+            // functions that can be pointed by effect_add_expression_dimension_func:
+            // simple_effect_add_expression_dimension
+            // convex_region_add_expression_dimension
+            (*effect_add_expression_dimension_func)(eff1, ie);
+            le = gen_nconc(le, CONS(EFFECT, eff1, NIL));
+          }
+          else
+          {
+            le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg1, 'w'));
+            free_effect(eff1);
+          }
+        }
+        else
+        {
+          le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg1, 'w'));
+          free_effect(eff1);
+        }
+      }
+      else
+        le = gen_nconc(le, CONS(EFFECT, eff1, NIL)); /* write is after reads */
     }
+    gen_free_list(l_eff1);
+  }
 
   // and on the same number of elements of the second one for all handled intrinsics
   // except memset.
   if (!same_string_p(lname,MEMSET_FUNCTION_NAME))
-    {
-      /* this is almost the same code as for arg1 just before,
+  {
+    /* this is almost the same code as for arg1 just before,
 	 maybe this could be factorized. */
-      expression arg2 = EXPRESSION(CAR(CDR(args)));
-      //type t2 = expression_to_type(arg2);
-      if (expression_call_p(arg2)
-	  && call_constant_p(expression_call(arg2)))
-	{
-	  pips_debug(5, "constant expression as ssecond argument -> no effect");
-	}
-      else
-	{
-	  list l_eff2; /* main effects on second arg */
-	  list l_tmp = generic_proper_effects_of_complex_address_expression(arg2, &l_eff2, false);
-	  gen_full_free_list(l_tmp);
-
-	  FOREACH(EFFECT, eff2, l_eff2)
-	    {
-	      if (!anywhere_effect_p(eff2))
-		{
-		  if (gen_length(args) == 3) // we may know the number of elements
-		    {
-		      /* first check whether the argument main effect is on a char *. */
-		      type t = simple_effect_reference_type(effect_any_reference(eff2));
-		      variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
-		      if (!variable_undefined_p(v)
-			  && ((basic_pointer_p(variable_basic(v))
-			       && ENDP(variable_dimensions(v))
-			       && char_type_p(basic_pointer(variable_basic(v))))
-			      ||
-			      (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1))))
-			{
-			  /* Effect is on eff12_ref[0..arg3-1]*/
-			  expression arg3 = EXPRESSION(CAR(CDR(CDR(args))));
-			  expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
-							    copy_expression(arg3),
-							    int_to_expression(1));
-			  range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
-			  expression ie = make_expression(make_syntax_range(r),
-							  make_normalized_complex());
-			  (*effect_add_expression_dimension_func)(eff2, ie);
-			  le = gen_nconc(le, CONS(EFFECT, eff2, NIL));
-			}
-		      else
-			{
-			  le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg2, 'r'));
-			  free_effect(eff2);
-			}
-		    }
-		  else
-		    {
-		      le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg2, 'r'));
-		      free_effect(eff2);
-		    }
-		}
-	      else
-		le = gen_nconc(le, CONS(EFFECT, eff2, NIL));
-	    }
-	  gen_free_list(l_eff2);
-	}
+    expression arg2 = EXPRESSION(CAR(CDR(args)));
+    //type t2 = expression_to_type(arg2);
+    if (expression_call_p(arg2)
+        && call_constant_p(expression_call(arg2)))
+    {
+      pips_debug(5, "constant expression as ssecond argument -> no effect");
     }
+    else
+    {
+      list l_eff2; /* main effects on second arg */
+      list l_tmp = generic_proper_effects_of_complex_address_expression(arg2, &l_eff2, false);
+      gen_full_free_list(l_tmp);
+
+      FOREACH(EFFECT, eff2, l_eff2)
+      {
+        if (!anywhere_effect_p(eff2))
+        {
+          if (gen_length(args) == 3) // we may know the number of elements
+          {
+            /* first check whether the argument main effect is on a char *. */
+            type t = simple_effect_reference_type(effect_any_reference(eff2));
+            variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
+            if (!variable_undefined_p(v)
+                && ((basic_pointer_p(variable_basic(v))
+                    && ENDP(variable_dimensions(v))
+                    && char_type_p(basic_pointer(variable_basic(v))))
+                    ||
+                    (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1))))
+            {
+              /* Effect is on eff12_ref[0..arg3-1]*/
+              expression arg3 = EXPRESSION(CAR(CDR(CDR(args))));
+              expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+                  copy_expression(arg3),
+                  int_to_expression(1));
+              range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
+              expression ie = make_expression(make_syntax_range(r),
+                  make_normalized_complex());
+              // functions that can be pointed by effect_add_expression_dimension_func:
+              // simple_effect_add_expression_dimension
+              // convex_region_add_expression_dimension
+              (*effect_add_expression_dimension_func)(eff2, ie);
+              le = gen_nconc(le, CONS(EFFECT, eff2, NIL));
+            }
+            else
+            {
+              le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg2, 'r'));
+              free_effect(eff2);
+            }
+          }
+          else
+          {
+            le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg2, 'r'));
+            free_effect(eff2);
+          }
+        }
+        else
+          le = gen_nconc(le, CONS(EFFECT, eff2, NIL));
+      }
+      gen_free_list(l_eff2);
+    }
+  }
 
   pips_debug_effects(5,"returning:\n", le);
   pips_debug(5, "end\n");
@@ -2218,14 +2253,14 @@ static list any_heap_effects(entity e, list args)
   pips_debug(5, "begin for function \"%s\"\n", entity_user_name(e));
 
   MAP(EXPRESSION,exp,{
-    lep = generic_proper_effects_of_expression(exp);
-    le = gen_nconc(le, lep);
-    //ifdebug(8) print_effects(le);
-    //ifdebug(8) print_effects(lep);
+      lep = generic_proper_effects_of_expression(exp);
+      le = gen_nconc(le, lep);
+      //ifdebug(8) print_effects(le);
+      //ifdebug(8) print_effects(lep);
   }, args);
 
   malloc_entity = FindEntity(MALLOC_EFFECTS_PACKAGE_NAME,
-     MALLOC_EFFECTS_NAME);
+      MALLOC_EFFECTS_NAME);
 
   pips_assert("malloc entity pre-exists", !entity_undefined_p(malloc_entity));
 
@@ -2234,11 +2269,19 @@ static list any_heap_effects(entity e, list args)
   ifdebug(8) print_reference(ref);
 
   /* Read first. */
+  // functions that can be pointed by reference_to_effect_func:
+  // reference_to_simple_effect
+  // reference_to_convex_region
+  // reference_to_reference_effect
   malloc_effect = (*reference_to_effect_func)(ref, make_action_read_memory(), false);
 
   le = CONS(EFFECT, malloc_effect, le);
 
   /* Write back. */
+  // functions that can be pointed by reference_to_effect_func:
+  // reference_to_simple_effect
+  // reference_to_convex_region
+  // reference_to_reference_effect
   malloc_effect = (*reference_to_effect_func)(copy_reference(ref), make_action_write_memory(), false);
   le = CONS(EFFECT, malloc_effect, le);
 
@@ -2259,15 +2302,15 @@ static list memmove_effects(entity e, list args __attribute__ ((unused)))
 
   pips_debug(5, "begin for function \"%s\"\n", entity_user_name(e));
 
-/*   MAP(EXPRESSION,exp,{ */
-/*     lep = generic_proper_effects_of_expression(exp); */
-/*     le = gen_nconc(le, lep); */
-/*     //ifdebug(8) print_effects(le); */
-/*     //ifdebug(8) print_effects(lep); */
-/*   }, args); */
+  /*   MAP(EXPRESSION,exp,{ */
+  /*     lep = generic_proper_effects_of_expression(exp); */
+  /*     le = gen_nconc(le, lep); */
+  /*     //ifdebug(8) print_effects(le); */
+  /*     //ifdebug(8) print_effects(lep); */
+  /*   }, args); */
 
   memmove_entity = FindEntity(MEMMOVE_EFFECTS_PACKAGE_NAME,
-     MEMMOVE_EFFECTS_NAME);
+      MEMMOVE_EFFECTS_NAME);
 
   pips_assert("memmove entity pre-exists", !entity_undefined_p(memmove_entity));
 
@@ -2276,14 +2319,21 @@ static list memmove_effects(entity e, list args __attribute__ ((unused)))
   ifdebug(8) print_reference(ref);
 
   /* Write First. */
+  // functions that can be pointed by reference_to_effect_func:
+  // reference_to_simple_effect
+  // reference_to_convex_region
+  // reference_to_reference_effect
   memmove_effect = (*reference_to_effect_func)(copy_reference(ref), make_action_write_memory(), false);
   le = CONS(EFFECT, memmove_effect, le);
 
   /* Read Back. */
+  // functions that can be pointed by reference_to_effect_func:
+  // reference_to_simple_effect
+  // reference_to_convex_region
+  // reference_to_reference_effect
   memmove_effect = (*reference_to_effect_func)(copy_reference(ref), make_action_read_memory(), false);
 
   le = CONS(EFFECT, memmove_effect, le);
-
 
   pips_debug_effects(5, "output effects :\n", le);
 
@@ -2300,17 +2350,17 @@ static entity make_dummy_io_ptr()
     type pt = make_scalar_integer_type(1); /* char */
     type t = make_type_variable(make_variable(make_basic_pointer(pt), NIL, NIL));
 
-   dummy_c_io_ptr =
-      make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
-				   IO_EFFECTS_PTR_NAME),
-		  t,
-		  make_storage(is_storage_ram,
-			       make_ram(FindEntity(TOP_LEVEL_MODULE_NAME,
-							      IO_EFFECTS_PACKAGE_NAME),
-					FindEntity(IO_EFFECTS_PACKAGE_NAME,
-							      STATIC_AREA_LOCAL_NAME),
-					0, NIL)),
-		  make_value_unknown());
+    dummy_c_io_ptr =
+        make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
+            IO_EFFECTS_PTR_NAME),
+            t,
+            make_storage(is_storage_ram,
+                make_ram(FindEntity(TOP_LEVEL_MODULE_NAME,
+                    IO_EFFECTS_PACKAGE_NAME),
+                    FindEntity(IO_EFFECTS_PACKAGE_NAME,
+                        STATIC_AREA_LOCAL_NAME),
+                        0, NIL)),
+                        make_value_unknown());
   }
 
   return dummy_c_io_ptr;
@@ -2322,9 +2372,9 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
   //syntax s = expression_syntax(exp);
 
   pips_debug(5, "begin with expression %s, act=%s\n",
-	     words_to_string(words_expression(exp,NIL)),
-	     (act == is_action_write) ? "w" :
-	     ((act == 'x') ? "read-write" : "r"));
+      words_to_string(words_expression(exp,NIL)),
+      (act == is_action_write) ? "w" :
+          ((act == 'x') ? "read-write" : "r"));
 
   if (act == 'w' || act == 'x' || act == is_action_write) {
     pips_debug(6, "is_action_write or read-write\n");
@@ -2338,73 +2388,76 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
       /* This is not generic! */
       entity ioptr = make_dummy_io_ptr();
       reference r = make_reference(ioptr, CONS(EXPRESSION, make_unbounded_expression(), NIL));
+      // functions that can be pointed by reference_to_effect_func:
+      // reference_to_simple_effect
+      // reference_to_convex_region
+      // reference_to_reference_effect
       effect eff = (*reference_to_effect_func)(r, make_action_write_memory(),false);
       effect_approximation_tag(eff) = is_approximation_may;
       /* FI: this is really not generic! removed because should be useless BC. */
       // le = c_summary_effect_to_proper_effects(eff, exp);
       /* FI: We also need the read effects implied by the evaluation
-	 of exp... but I do not know any function available to do
-	 that. generic_proper_effects_of_expression() is ging to
-	 return a bit too much. */
-
+       *     of exp... but I do not know any function available to do
+       *     that. generic_proper_effects_of_expression() is ging to
+       *     return a bit too much. */
 
       if(false) {
-	/* FI: short term simplification... We need pointers for side effects... */
-	syntax s = expression_syntax(exp);
+        /* FI: short term simplification... We need pointers for side effects... */
+        syntax s = expression_syntax(exp);
 
-	if(syntax_reference_p(s)) {
-	  /* This is not possible as parameters are passed by value,
-	     except if an address is passed, for instance an array or a
-	     pointer */
-	  reference r = syntax_reference(s);
-	  entity v = reference_variable(r);
-	  type t = entity_type(v);
-	  type ut = ultimate_type(t); /* FI: is ultimate_type() enough? */
+        if(syntax_reference_p(s)) {
+          /* This is not possible as parameters are passed by value,
+           * except if an address is passed, for instance an array or a
+           * pointer */
+          reference r = syntax_reference(s);
+          entity v = reference_variable(r);
+          type t = entity_type(v);
+          type ut = ultimate_type(t); /* FI: is ultimate_type() enough? */
 
-	  if(type_variable_p(ut)) {
-	    variable vt = type_variable(ut);
+          if(type_variable_p(ut)) {
+            variable vt = type_variable(ut);
 
-	    if(!ENDP(variable_dimensions(vt))) {
-	      /* Fine, this is an array */
-	      le = generic_proper_effects_of_any_lhs(exp);
-	      /* Is it fully written? More information about the IO and
-		 about the array would be needed to make the
-		 decision...*/
-	      pips_assert("Only one effect for this reference?", gen_length(le)==1);
-	      effects_to_may_effects(le);
-	    }
-	    else if(basic_pointer_p(variable_basic(vt))) {
-	      /* This is going to be called for the FILE descriptors */
-	      /* pips_internal_error("Effects thru pointers not implemented yet"); */
-	      pips_user_warning("Effects thru pointers not implemented yet\n");
-	    }
-	    else
-	      pips_user_error("IO element update for \"\%s\": an address should be passed",
-			      entity_user_name(v));
-	  }
-	  else {
-	    pips_user_error("IO element update for \"\%s\": incompatible type",
-			    entity_user_name(v));
-	  }
-	}
-	else if(syntax_call_p(s)) {
-	  call c = syntax_call(s);
-	  entity op = call_function(c);
-	  list nargs = call_arguments(c);
+            if(!ENDP(variable_dimensions(vt))) {
+              /* Fine, this is an array */
+              le = generic_proper_effects_of_any_lhs(exp);
+              /* Is it fully written? More information about the IO and
+               * about the array would be needed to make the
+               * decision...*/
+              pips_assert("Only one effect for this reference?", gen_length(le)==1);
+              effects_to_may_effects(le);
+            }
+            else if(basic_pointer_p(variable_basic(vt))) {
+              /* This is going to be called for the FILE descriptors */
+              /* pips_internal_error("Effects thru pointers not implemented yet"); */
+              pips_user_warning("Effects thru pointers not implemented yet\n");
+            }
+            else
+              pips_user_error("IO element update for \"\%s\": an address should be passed",
+                  entity_user_name(v));
+          }
+          else {
+            pips_user_error("IO element update for \"\%s\": incompatible type",
+                entity_user_name(v));
+          }
+        }
+        else if(syntax_call_p(s)) {
+          call c = syntax_call(s);
+          entity op = call_function(c);
+          list nargs = call_arguments(c);
 
-	  if(ENTITY_DEREFERENCING_P(op)) {
-	    pips_internal_error("Effects thru dereferenced pointers not implemented yet");
-	  }
-	  if(ENTITY_ADDRESS_OF_P(op)) {
-	    expression e = EXPRESSION(CAR(nargs));
+          if(ENTITY_DEREFERENCING_P(op)) {
+            pips_internal_error("Effects thru dereferenced pointers not implemented yet");
+          }
+          if(ENTITY_ADDRESS_OF_P(op)) {
+            expression e = EXPRESSION(CAR(nargs));
 
-	    pips_assert("one argument", gen_length(nargs)==1);
-	    le = generic_proper_effects_of_any_lhs(e);
-	  }
-	  else {
-	    pips_internal_error("Operator \"\%s\" not handled", entity_name(op));
-	  }
-	}
+            pips_assert("one argument", gen_length(nargs)==1);
+            le = generic_proper_effects_of_any_lhs(e);
+          }
+          else {
+            pips_internal_error("Operator \"\%s\" not handled", entity_name(op));
+          }
+        }
       }
     }
   }
@@ -2413,7 +2466,6 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
     pips_debug(6, "is_action_read or read-write\n");
     le = gen_nconc(le, generic_proper_effects_of_expression(exp));
   }
-
 
   pips_debug(5, "end\n");
 
@@ -2445,157 +2497,174 @@ static list effects_of_C_ioelem(expression arg, tag act)
   entity private_io_entity;
 
   pips_debug(5, "begin with expression %s and tag %c\n",
-	     words_to_string(words_expression(arg,NIL)), act);
+      words_to_string(words_expression(arg,NIL)), act);
 
   le = gen_nconc(le, generic_proper_effects_of_expression(arg));
 
   switch (act)
+  {
+  case 'f':
+    unit = copy_expression(arg);
+    /* We simulate actions on files by read/write actions
+     * to a special static integer array.
+     * GO:
+     * It is necessary to do a read and write action to
+     * the array, because it updates the file-pointer so
+     * it reads it and then writes it ...
+     */
+    indices = CONS(EXPRESSION, unit, NIL);
+    private_io_entity = FindEntity(IO_EFFECTS_PACKAGE_NAME,
+        IO_EFFECTS_ARRAY_NAME);
+
+    pips_assert("private_io_entity is defined\n",
+        private_io_entity != entity_undefined);
+
+    ref1 = make_reference(private_io_entity, indices);
+    ref2 = copy_reference(ref1);
+    // functions that can be pointed by reference_to_effect_func:
+    // reference_to_simple_effect
+    // reference_to_convex_region
+    // reference_to_reference_effect
+    eff1 = (*reference_to_effect_func)(ref1, make_action_read_memory(), false);
+    // functions that can be pointed by reference_to_effect_func:
+    // reference_to_simple_effect
+    // reference_to_convex_region
+    // reference_to_reference_effect
+    eff2 = (*reference_to_effect_func)(ref2, make_action_write_memory(), false);
+
+    le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
+    break;
+  case 's':
+    pips_debug(5, "stream or integer file descriptor case \n");
+
+
+    /* first the effects on the file pointer */
+    /* We should maybe check here that the argument has the right type (FILE *) */
+    list l_fp_eff_r = NIL;
+    list l_fp_eff = generic_proper_effects_of_complex_address_expression(arg, &l_fp_eff_r, false);
+
+    FOREACH(EFFECT, fp_eff_r, l_fp_eff_r)
     {
-    case 'f':
-      unit = copy_expression(arg);
-            /* We simulate actions on files by read/write actions
-	       to a special static integer array.
-	       GO:
-	       It is necessary to do a read and write action to
-	       the array, because it updates the file-pointer so
-	       it reads it and then writes it ...
-	    */
-      indices = CONS(EXPRESSION, unit, NIL);
+      effect fp_eff_w = effect_undefined;
+      if (effect_undefined_p(fp_eff_r))
+      {
+        fp_eff_w = make_anywhere_effect(make_action_write_memory());
+        fp_eff_r = make_anywhere_effect(make_action_read_memory());
+      }
+      else
+      {
+        if( anywhere_effect_p(fp_eff_r))
+          fp_eff_w = make_anywhere_effect(make_action_write_memory());
+        else
+        {
+          /* the read effect on the file pointer will be added later */
+          /* l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, copy_effect(fp_eff_r), NIL)); */
+          effect_add_dereferencing_dimension(fp_eff_r);
+          effect_to_may_effect(fp_eff_r);
+          fp_eff_w = copy_effect(fp_eff_r);
+          effect_action(fp_eff_w) = make_action_write_memory();
+        }
+      }
+      l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, fp_eff_w, CONS(EFFECT, fp_eff_r, NIL)));
+
+      /* Then we simulate actions on files by read/write actions
+       * to a special static integer array.
+       * GO: It is necessary to do a read and write action to
+       * the array, because it updates the file-pointer so
+       * it reads it and then writes it ...
+       * We try to identify if the stream points to a std file
+       */
+
+      if ((!get_bool_property("USER_EFFECTS_ON_STD_FILES")) && std_file_effect_p(fp_eff_r))
+      {
+        const char* s = entity_user_name(effect_entity(fp_eff_r));
+        if (same_string_p(s, "stdout"))
+          unit = int_to_expression(STDOUT_FILENO);
+        else if (same_string_p(s, "stdin"))
+          unit = int_to_expression(STDIN_FILENO);
+        else /* (same_string_p(s, "stderr")) */
+          unit = int_to_expression(STDERR_FILENO);
+        must_p = true;
+
+      }
+      else
+      {
+        unit = make_unbounded_expression();
+        must_p = false;
+      }
+      indices = CONS(EXPRESSION,
+          unit,
+          NIL);
       private_io_entity = FindEntity(IO_EFFECTS_PACKAGE_NAME,
-	 IO_EFFECTS_ARRAY_NAME);
+          IO_EFFECTS_ARRAY_NAME);
 
       pips_assert("private_io_entity is defined\n",
-		  private_io_entity != entity_undefined);
+          private_io_entity != entity_undefined);
 
       ref1 = make_reference(private_io_entity, indices);
       ref2 = copy_reference(ref1);
+      // functions that can be pointed by reference_to_effect_func:
+      // reference_to_simple_effect
+      // reference_to_convex_region
+      // reference_to_reference_effect
       eff1 = (*reference_to_effect_func)(ref1, make_action_read_memory(), false);
+      // functions that can be pointed by reference_to_effect_func:
+      // reference_to_simple_effect
+      // reference_to_convex_region
+      // reference_to_reference_effect
       eff2 = (*reference_to_effect_func)(ref2, make_action_write_memory(), false);
 
+      if(!must_p)
+      {
+        effect_approximation_tag(eff1) = is_approximation_may;
+        effect_approximation_tag(eff2) = is_approximation_may;
+      }
       le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
-      break;
-    case 's':
-      pips_debug(5, "stream or integer file descriptor case \n");
-
-
-       /* first the effects on the file pointer */
-       /* We should maybe check here that the argument has the right type (FILE *) */
-       list l_fp_eff_r = NIL;
-       list l_fp_eff = generic_proper_effects_of_complex_address_expression(arg, &l_fp_eff_r, false);
-
-       FOREACH(EFFECT, fp_eff_r, l_fp_eff_r)
-	 {
-	   effect fp_eff_w = effect_undefined;
-	   if (effect_undefined_p(fp_eff_r))
-	     {
-	       fp_eff_w = make_anywhere_effect(make_action_write_memory());
-	       fp_eff_r = make_anywhere_effect(make_action_read_memory());
-	     }
-	   else
-	     {
-	       if( anywhere_effect_p(fp_eff_r))
-		 fp_eff_w = make_anywhere_effect(make_action_write_memory());
-	       else
-		 {
-		   /* the read effect on the file pointer will be added later */
-		   /* l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, copy_effect(fp_eff_r), NIL)); */
-		   effect_add_dereferencing_dimension(fp_eff_r);
-		   effect_to_may_effect(fp_eff_r);
-		   fp_eff_w = copy_effect(fp_eff_r);
-		   effect_action(fp_eff_w) = make_action_write_memory();
-		 }
-	     }
-	   l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, fp_eff_w, CONS(EFFECT, fp_eff_r, NIL)));
-
-	   /* Then we simulate actions on files by read/write actions
-	      to a special static integer array.
-	      GO: It is necessary to do a read and write action to
-	      the array, because it updates the file-pointer so
-	      it reads it and then writes it ...
-	      We try to identify if the stream points to a std file
-	   */
-
-	   if ((!get_bool_property("USER_EFFECTS_ON_STD_FILES")) && std_file_effect_p(fp_eff_r))
-	     {
-	       const char* s = entity_user_name(effect_entity(fp_eff_r));
-	       if (same_string_p(s, "stdout"))
-		 unit = int_to_expression(STDOUT_FILENO);
-	       else if (same_string_p(s, "stdin"))
-		 unit = int_to_expression(STDIN_FILENO);
-	       else /* (same_string_p(s, "stderr")) */
-		 unit = int_to_expression(STDERR_FILENO);
-	       must_p = true;
-
-	     }
-	   else
-	     {
-	       unit = make_unbounded_expression();
-	       must_p = false;
-	     }
-	   indices = CONS(EXPRESSION,
-			  unit,
-			  NIL);
-	   private_io_entity = FindEntity(IO_EFFECTS_PACKAGE_NAME,
-	      IO_EFFECTS_ARRAY_NAME);
-
-	   pips_assert("private_io_entity is defined\n",
-		       private_io_entity != entity_undefined);
-
-	   ref1 = make_reference(private_io_entity, indices);
-	   ref2 = copy_reference(ref1);
-	   eff1 = (*reference_to_effect_func)(ref1, make_action_read_memory(), false);
-	   eff2 = (*reference_to_effect_func)(ref2, make_action_write_memory(), false);
-
-	   if(!must_p)
-	     {
-	       effect_approximation_tag(eff1) = is_approximation_may;
-	       effect_approximation_tag(eff2) = is_approximation_may;
-	     }
-	   le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
-	 }
-       le = gen_nconc(le, l_fp_eff);
-
-       break;
-    case 'v':
-      pips_debug(5, "va_list case \n");
-
-      /* we generate a read and a write effect on the va_list :
-         this is not really correct, since the va_list itself cannot be
-	 modified, but it's internal fields only. BC.
-      */
-
-      le = gen_nconc(le, generic_proper_effects_of_any_lhs(arg));
-      break;
-    case 'r':
-    case 'w':
-    case 'x':
-      pips_debug(5, "potential pointer \n");
-      le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg, act));
-      break;
-    case 'R':
-    case 'W':
-      pips_debug(5, "formatted IOs\n");
-      /* first check whether the argument is a char *. */
-      type t = expression_to_type(arg);
-      variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
-      if (act == 'W'
-	  ||
-	  (!variable_undefined_p(v)
-	   && ((basic_pointer_p(variable_basic(v))
-		&& ENDP(variable_dimensions(v))
-		&& char_type_p(basic_pointer(variable_basic(v))))
-	       ||
-	       (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1)))))
-	     {
-	  le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg, tolower(act)));
-	}
-      break;
-    case 'n':
-      pips_debug(5, "only effects on actual argument evaluation\n");
-      break;
-    default :
-      pips_internal_error("unknown tag");
     }
+    le = gen_nconc(le, l_fp_eff);
+
+    break;
+  case 'v':
+    pips_debug(5, "va_list case \n");
+
+    /* we generate a read and a write effect on the va_list :
+     * this is not really correct, since the va_list itself cannot be
+     * modified, but it's internal fields only. BC.
+     */
+
+    le = gen_nconc(le, generic_proper_effects_of_any_lhs(arg));
+    break;
+  case 'r':
+  case 'w':
+  case 'x':
+    pips_debug(5, "potential pointer \n");
+    le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg, act));
+    break;
+  case 'R':
+  case 'W':
+    pips_debug(5, "formatted IOs\n");
+    /* first check whether the argument is a char *. */
+    type t = expression_to_type(arg);
+    variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
+    if (act == 'W'
+        ||
+        (!variable_undefined_p(v)
+            && ((basic_pointer_p(variable_basic(v))
+                && ENDP(variable_dimensions(v))
+                && char_type_p(basic_pointer(variable_basic(v))))
+                ||
+                (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1)))))
+    {
+      le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg, tolower(act)));
+    }
+    break;
+  case 'n':
+    pips_debug(5, "only effects on actual argument evaluation\n");
+    break;
+  default :
+    pips_internal_error("unknown tag");
+    break;
+  }
 
   return le;
 }
@@ -2657,53 +2726,52 @@ effects_of_iolist(list exprs, tag act)
  * remaining ones are expressions to be written or references to be read,
  * or another implied_do (BA).
  */
-
 static list
 effects_of_implied_do(expression exp, tag act)
 {
-    list le, lep, lr, args;
-    expression arg1, arg2;
-    entity index;
-    range r;
-    reference ref;
-    transformer context = effects_private_current_context_head();
-    transformer local_context = transformer_undefined;
+  list le, lep, lr, args;
+  expression arg1, arg2;
+  entity index;
+  range r;
+  reference ref;
+  transformer context = effects_private_current_context_head();
+  transformer local_context = transformer_undefined;
 
-    pips_assert("effects_of_implied_do", expression_implied_do_p(exp));
+  pips_assert("effects_of_implied_do", expression_implied_do_p(exp));
 
-    pips_debug(5, "begin\n");
+  pips_debug(5, "begin\n");
 
-    args = call_arguments(syntax_call(expression_syntax(exp)));
-    arg1 = EXPRESSION(CAR(args));       /* loop index */
-    arg2 = EXPRESSION(CAR(CDR(args)));  /* range */
+  args = call_arguments(syntax_call(expression_syntax(exp)));
+  arg1 = EXPRESSION(CAR(args));       /* loop index */
+  arg2 = EXPRESSION(CAR(CDR(args)));  /* range */
 
-    pips_assert("effects_of_implied_do",
-                syntax_reference_p(expression_syntax(arg1)));
+  pips_assert("effects_of_implied_do",
+      syntax_reference_p(expression_syntax(arg1)));
 
-    pips_assert("effects_of_implied_do",
-                syntax_range_p(expression_syntax(arg2)));
+  pips_assert("effects_of_implied_do",
+      syntax_range_p(expression_syntax(arg2)));
 
-    index = reference_variable(syntax_reference(expression_syntax(arg1)));
-    ref = make_reference(index, NIL);
+  index = reference_variable(syntax_reference(expression_syntax(arg1)));
+  ref = make_reference(index, NIL);
 
-    r = syntax_range(expression_syntax(arg2));
+  r = syntax_range(expression_syntax(arg2));
 
-    /* effects of implied do index
-     * it is must_written but may read because the implied loop
-     * might execute no iteration.
-     */
+  /* effects of implied do index
+   * it is must_written but may read because the implied loop
+   * might execute no iteration.
+   */
 
-    le = generic_proper_effects_of_written_reference(ref); /* the loop index is must-written */
-    /* Read effects are masked by the first write to the implied-do loop variable */
+  le = generic_proper_effects_of_written_reference(ref); /* the loop index is must-written */
+  /* Read effects are masked by the first write to the implied-do loop variable */
 
-    /* effects of implied-loop bounds and increment */
-    le = gen_nconc(le, generic_proper_effects_of_expression(arg2));
+  /* effects of implied-loop bounds and increment */
+  le = gen_nconc(le, generic_proper_effects_of_expression(arg2));
 
-    /* Do we use context information */
-    if (! transformer_undefined_p(context))
-    {
-        transformer tmp_trans;
-        Psysteme context_sc;
+  /* Do we use context information */
+  if (! transformer_undefined_p(context))
+  {
+    transformer tmp_trans;
+    Psysteme context_sc;
 
     /* the preconditions of the current statement don't include those
      * induced by the implied_do, because they are local to the statement.
@@ -2716,95 +2784,98 @@ effects_of_implied_do(expression exp, tag act)
      * BA, September 27, 1993.
      */
 
-        local_context = transformer_dup(context);
-        /* we first eliminate the implied-do index variable */
-        context_sc = predicate_system(transformer_relation(local_context));
-        if(base_contains_variable_p(context_sc->base, (Variable) index))
-        {
-            sc_and_base_projection_along_variable_ofl_ctrl(&context_sc,
-                                                           (Variable) index,
-                                                           NO_OFL_CTRL);
-            predicate_system_(transformer_relation(local_context)) =
-                newgen_Psysteme(context_sc);
-        }
-        /* tmp_trans simulates the transformer of the implied-do loop body */
-        tmp_trans = transformer_identity();
-        local_context = add_index_range_conditions(local_context, index, r,
-                                                   tmp_trans);
-        free_transformer(tmp_trans);
-        transformer_arguments(local_context) =
-            arguments_add_entity(transformer_arguments(local_context),
-                                 entity_to_new_value(index));
-
-
-        ifdebug(7) {
-            pips_debug(7, "local context : \n%s\n",
-                       precondition_to_string(local_context));
-        }
-    }
-    else
-        local_context = transformer_undefined;
-
-    effects_private_current_context_push(local_context);
-
-    MAP(EXPRESSION, expr,
+    local_context = transformer_dup(context);
+    /* we first eliminate the implied-do index variable */
+    context_sc = predicate_system(transformer_relation(local_context));
+    if(base_contains_variable_p(context_sc->base, (Variable) index))
     {
-      syntax s = expression_syntax(expr);
-
-      if (syntax_reference_p(s))
-        if (act == is_action_write)
-          lep = generic_proper_effects_of_written_reference(syntax_reference(s));
-        else
-          lep = generic_proper_effects_of_expression(expr);
-      else
-        if (syntax_range_p(s))
-          lep = generic_proper_effects_of_range(syntax_range(s));
-        else
-          /* syntax_call_p(s) is true here */
-          if (expression_implied_do_p(expr))
-            lep = effects_of_implied_do(expr, act);
-          else
-            lep = generic_r_proper_effects_of_call(syntax_call(s));
-
-      /* indices are removed from effects because this is a loop */
-      lr = NIL;
-      MAP(EFFECT, eff,
-      {
-        if (effect_entity(eff) != index)
-          lr =  CONS(EFFECT, eff, lr);
-        else if(act==is_action_write /* This is a read (FI: I do not
-					understand this comment) */
-                && action_write_p(effect_action(eff))) {
-          pips_user_error("Index %s in implied DO is read. "
-                          "Standard violation, see Section 12.8.2.3\n",
-                          entity_local_name(index));
-        }
-        else
-        {
-          debug(5, "effects_of_implied_do", "index removed");
-          free_effect(eff);
-        }
-      }, lep);
-      gen_free_list(lep);
-      lr = gen_nreverse(lr); /* preserve initial order??? */
-      le = gen_nconc(le, lr);
-    }, CDR(CDR(args)));
-
-
-    (*effects_union_over_range_op)(le,
-                                   index,
-                                   r, descriptor_undefined);
-
-    ifdebug(6) {
-      pips_debug(6, "effects:\n");
-      (*effects_prettyprint_func)(le);
-      fprintf(stderr, "\n");
+      sc_and_base_projection_along_variable_ofl_ctrl(&context_sc,
+          (Variable) index,
+          NO_OFL_CTRL);
+      predicate_system_(transformer_relation(local_context)) =
+          newgen_Psysteme(context_sc);
     }
+    /* tmp_trans simulates the transformer of the implied-do loop body */
+    tmp_trans = transformer_identity();
+    local_context = add_index_range_conditions(local_context, index, r,
+        tmp_trans);
+    free_transformer(tmp_trans);
+    transformer_arguments(local_context) =
+        arguments_add_entity(transformer_arguments(local_context),
+            entity_to_new_value(index));
 
-    effects_private_current_context_pop();
-    pips_debug(5, "end\n");
 
-    return le;
+    ifdebug(7) {
+      pips_debug(7, "local context : \n%s\n",
+          precondition_to_string(local_context));
+    }
+  }
+  else
+    local_context = transformer_undefined;
+
+  effects_private_current_context_push(local_context);
+
+  MAP(EXPRESSION, expr,
+      {
+          syntax s = expression_syntax(expr);
+
+          if (syntax_reference_p(s))
+            if (act == is_action_write)
+              lep = generic_proper_effects_of_written_reference(syntax_reference(s));
+            else
+              lep = generic_proper_effects_of_expression(expr);
+          else
+            if (syntax_range_p(s))
+              lep = generic_proper_effects_of_range(syntax_range(s));
+            else
+              /* syntax_call_p(s) is true here */
+              if (expression_implied_do_p(expr))
+                lep = effects_of_implied_do(expr, act);
+              else
+                lep = generic_r_proper_effects_of_call(syntax_call(s));
+
+          /* indices are removed from effects because this is a loop */
+          lr = NIL;
+          MAP(EFFECT, eff,
+              {
+                  if (effect_entity(eff) != index)
+                    lr =  CONS(EFFECT, eff, lr);
+                  else if(act==is_action_write /* This is a read (FI: I do not understand this comment) */
+                      && action_write_p(effect_action(eff))) {
+                    pips_user_error("Index %s in implied DO is read. "
+                        "Standard violation, see Section 12.8.2.3\n",
+                        entity_local_name(index));
+                  }
+                  else
+                  {
+                    debug(5, "effects_of_implied_do", "index removed");
+                    free_effect(eff);
+                  }
+              }, lep);
+          gen_free_list(lep);
+          lr = gen_nreverse(lr); /* preserve initial order??? */
+          le = gen_nconc(le, lr);
+      }, CDR(CDR(args)));
+
+
+  // functions that can be pointed by effects_union_over_range_op:
+  // effects_union_over_range_nop
+  // simple_effects_union_over_range
+  // convex_regions_union_over_range
+  (*effects_union_over_range_op)(le,
+      index,
+      r, descriptor_undefined);
+
+  ifdebug(6) {
+    pips_debug(6, "effects:\n");
+    (*effects_prettyprint_func)(le);
+    fprintf(stderr, "\n");
+  }
+
+  effects_private_current_context_pop();
+  pips_debug(5, "end\n");
+
+  return le;
 }
 
 /* Add a time effect, that is a read and a write on a particular hidden time variable */
@@ -2995,34 +3066,38 @@ static list strtod_like_effects(entity e __attribute__ ((unused)), list args)
 
   /* the second expression target is initialized if it is a non-null pointer */
   if (expression_address_of_p(endptr_exp))
-    {
-      call c = expression_call(endptr_exp);
-      endptr_exp = EXPRESSION(CAR(call_arguments(c)));
-      list lme_endptr = NIL;
-      list le_endptr = generic_proper_effects_of_complex_address_expression(endptr_exp, &lme_endptr, true);
-      pips_debug_effects(8, "main effects for address of expression\n", lme_endptr);
-      le = gen_nconc(le, lme_endptr);
-      le = gen_nconc(le, le_endptr);
-    }
+  {
+    call c = expression_call(endptr_exp);
+    endptr_exp = EXPRESSION(CAR(call_arguments(c)));
+    list lme_endptr = NIL;
+    list le_endptr = generic_proper_effects_of_complex_address_expression(endptr_exp, &lme_endptr, true);
+    pips_debug_effects(8, "main effects for address of expression\n", lme_endptr);
+    le = gen_nconc(le, lme_endptr);
+    le = gen_nconc(le, le_endptr);
+  }
   else if (!expression_null_p(endptr_exp)) /* if its a NULL pointer, it is not assigned */
-    {
-      list lme_endptr = NIL;
-      list le_endptr = generic_proper_effects_of_complex_address_expression(endptr_exp, &lme_endptr, true);
-      pips_debug_effects(8, "main effects on second argument\n", lme_endptr);
+  {
+    list lme_endptr = NIL;
+    list le_endptr = generic_proper_effects_of_complex_address_expression(endptr_exp, &lme_endptr, true);
+    pips_debug_effects(8, "main effects on second argument\n", lme_endptr);
 
-      FOREACH(EFFECT, me, lme_endptr)
-	{
-	  /* there is a read effect on the main pointer */
-	  effect me_dup = (*effect_dup_func)(me);
-	  effect_to_read_effect(me_dup);
-	  le = gen_nconc(le, effect_to_list(me_dup));
-	  effect_add_dereferencing_dimension(me);
-	  effect_to_may_effect(me); /* well, if its a NULL pointer, it is not assigned, but we may not know it */
-	}
-      pips_debug_effects(8, "main effects after adding dereferencing dimension\n", lme_endptr);
-      le = gen_nconc(le, lme_endptr);
-      le = gen_nconc(le, le_endptr);
+    FOREACH(EFFECT, me, lme_endptr)
+    {
+      /* there is a read effect on the main pointer */
+      // functions that can be pointed by effect_dup_func:
+      // simple_effect_dup
+      // region_dup
+      // copy_effect
+      effect me_dup = (*effect_dup_func)(me);
+      effect_to_read_effect(me_dup);
+      le = gen_nconc(le, effect_to_list(me_dup));
+      effect_add_dereferencing_dimension(me);
+      effect_to_may_effect(me); /* well, if its a NULL pointer, it is not assigned, but we may not know it */
     }
+    pips_debug_effects(8, "main effects after adding dereferencing dimension\n", lme_endptr);
+    le = gen_nconc(le, lme_endptr);
+    le = gen_nconc(le, le_endptr);
+  }
 
   pips_debug_effects(8,"final_effects:", le);
   return le;

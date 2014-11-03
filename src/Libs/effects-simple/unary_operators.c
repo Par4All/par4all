@@ -597,30 +597,30 @@ simple_effects_descriptor_normalize(list l_eff __attribute__ ((unused)))
  * modified.
 */
 list simple_effects_composition_with_effect_transformer(list l_eff,
-						   transformer trans
-						   __attribute__((__unused__)))
+    transformer trans
+    __attribute__((__unused__)))
 {
   list l_res=NIL;
 
   ifdebug(8)
-    {
-      pips_debug(8, "Begin\n");
-      print_effects(l_eff);
-    }
+  {
+    pips_debug(8, "Begin\n");
+    print_effects(l_eff);
+  }
 
   FOREACH (EFFECT, eff, l_eff)
-    {
-      l_res =
-	gen_nconc(l_res,
-		  effect_to_store_independent_sdfi_list(eff, false)
-		  );
-    }
+  {
+    l_res =
+        gen_nconc(l_res,
+            effect_to_store_independent_sdfi_list(eff, false)
+        );
+  }
 
   ifdebug(8)
-    {
-      pips_debug(8, "End\n");
-      print_effects(l_res);
-    }
+  {
+    pips_debug(8, "End\n");
+    print_effects(l_res);
+  }
 
   return(l_res);
 }

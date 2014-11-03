@@ -137,17 +137,17 @@ set_a_generic_prettyprint(
     generic_prettyprint_function tp,
     generic_attachment_function ta)
 {
-    p_prettyprint_stuff pps = 
-	(p_prettyprint_stuff) malloc(sizeof(prettyprint_stuff));
+  p_prettyprint_stuff pps =
+      (p_prettyprint_stuff) malloc(sizeof(prettyprint_stuff));
 
-    pps->name         = resource_name;
-    pps->is_a_summary = is_a_summary;
-    pps->resource     = res;
-    pps->get_text     = tf;
-    pps->prettyprint  = tp;
-    pps->attach       = ta;
+  pps->name         = resource_name;
+  pps->is_a_summary = is_a_summary;
+  pps->resource     = res;
+  pps->get_text     = tf;
+  pps->prettyprint  = tp;
+  pps->attach       = ta;
 
-    lp = CONS(STRING, (char*) pps, lp); /* hum... */
+  lp = CONS(STRING, (char*) pps, lp); /* hum... */
 }
 
 void 
@@ -158,20 +158,19 @@ add_a_generic_prettyprint(
     generic_prettyprint_function tp,
     generic_attachment_function ta)
 {
-    set_a_generic_prettyprint
-	(resource_name, is_a_summary, gen_chunk_undefined, tf, tp, ta);
+  set_a_generic_prettyprint(resource_name, is_a_summary, gen_chunk_undefined, tf, tp, ta);
 }
 
 static void 
 load_resources(const char* module_name)
 {
-    list l;
-    for (l=lp; l; POP(l))
-    {
-	p_prettyprint_stuff pps = (p_prettyprint_stuff) STRING(CAR(l));
-	pps->resource = 
-	    (gen_chunk*) db_get_memory_resource(pps->name, module_name, true);
-    }
+  list l;
+  for (l=lp; l; POP(l))
+  {
+    p_prettyprint_stuff pps = (p_prettyprint_stuff) STRING(CAR(l));
+    pps->resource =
+        (gen_chunk*) db_get_memory_resource(pps->name, module_name, true);
+  }
 }
 
 static list
@@ -436,19 +435,19 @@ push_prettyprints(
     string summary_resource_name)
 {
 
-    if (!string_undefined_p(resource_name))
-	add_a_generic_prettyprint(resource_name, 
-				  false, 
-				  effects_to_text_func,
-				  effects_prettyprint_func, 
-				  attach_effects_decoration_to_text_func);
+  if (!string_undefined_p(resource_name))
+    add_a_generic_prettyprint(resource_name,
+        false,
+        effects_to_text_func,
+        effects_prettyprint_func,
+        attach_effects_decoration_to_text_func);
 
-    if (!string_undefined_p(summary_resource_name))
-	add_a_generic_prettyprint(summary_resource_name, 
-				  true,
-				  effects_to_text_func,
-				  effects_prettyprint_func, 
-				  attach_effects_decoration_to_text_func);
+  if (!string_undefined_p(summary_resource_name))
+    add_a_generic_prettyprint(summary_resource_name,
+        true,
+        effects_to_text_func,
+        effects_prettyprint_func,
+        attach_effects_decoration_to_text_func);
 }
 
 /* get the text
@@ -489,17 +488,16 @@ void generic_print_effects( list pc)
 {
   /* Well that should not be done this way BC. */
   if(effect_consistent_p_func == region_consistent_p &&
-     effects_reference_sharing_p(pc, false)) {
-      pips_internal_error("A list of regions share some references");
-    }
+      effects_reference_sharing_p(pc, false)) {
+    pips_internal_error("A list of regions share some references");
+  }
 
   if (pc != NIL) {
-    FOREACH(EFFECT, e, pc)
-      {
-	if(store_effect_p(e))
-	  (*effect_consistent_p_func)(e);
-	(*effect_prettyprint_func)(e);
-      }
+    FOREACH(EFFECT, e, pc) {
+      if(store_effect_p(e))
+        (*effect_consistent_p_func)(e);
+      (*effect_prettyprint_func)(e);
+    }
   }
   else
     fprintf(stderr, "\t<NONE>\n");
