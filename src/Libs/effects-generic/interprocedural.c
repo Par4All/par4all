@@ -224,11 +224,8 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
         }
         break;
       }
-      else {
-        pips_internal_error("This case never happen??\n");
-        break;
-      }
     }
+    // no break
     case is_syntax_reference:
     case is_syntax_subscript:
     {

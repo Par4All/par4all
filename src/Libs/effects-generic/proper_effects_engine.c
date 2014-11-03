@@ -216,6 +216,7 @@ static list generic_r_proper_effects_of_derived_reference(effect input_eff, type
       }
 
       le = gen_nconc(CONS(EFFECT, current_eff, NIL), le);
+      break;
     }
     }
   }
@@ -1588,6 +1589,7 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
   }
   case is_syntax_call:
     pips_debug(5, "call case\n");
+    // no break
   case is_syntax_subscript:
   {
     list l_pme = NIL; /* main data read-write effect: p[*] */
@@ -1867,6 +1869,7 @@ generic_proper_effects_of_expression(expression e)
       }
     default:
       pips_internal_error("unexpected tag %d", syntax_tag(s));
+      break;
     }
 
   ifdebug(8)
@@ -2252,6 +2255,7 @@ static void proper_effects_of_expression_instruction(instruction i)
     default :
       pips_internal_error("Instruction expression case %d not implemented",
 			  syntax_tag(is));
+      break;
     }
 
     pips_debug(2, "Effects for expression instruction in statement%03zd:\n",
