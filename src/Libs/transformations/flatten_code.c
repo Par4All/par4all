@@ -536,11 +536,13 @@ bool statement_flatten_declarations(entity module, statement s)
 		csl = cs_se_l;
 		cs = cs_se;
 	      }
-	      else
+	      else {
 		free(cs_se);
+	      }
             }
-	    else
+	    else {
 	      free(cs_se);
+	    }
         }
 
 	if(renaming_p) {
