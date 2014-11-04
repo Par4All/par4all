@@ -136,25 +136,26 @@ static int cost_of_constant_operations(Pvecteur v)
 
 #define RETURN_HARDER(b) RESULT(complex_for_compare ? (b) : -(b))
 #define RETURN_ORDER(b) RESULT(inner_for_compare ? (b) : -(b))
-#define same_sign_p(v,w) ((value_neg_p(v) && value_neg_p(w)) || \
-			  (value_pos_p(v) && value_pos_p(w)))
 
-/* returns -1: c1<c2, 0: c1==c2, +1: c1>c2
+#define same_sign_p(v,w)                                                \
+  ((value_neg_p(v) && value_neg_p(w)) || (value_pos_p(v) && value_pos_p(w)))
+
+/* compare two constraints with a loop complexity cost in mind?
+ * not exactly, some of the choices attempt to avoid large coefs?
+ *
+ * returns -1: c1<c2, 0: c1==c2, +1: c1>c2
  */
 static int compare_the_constraints(const Pcontrainte * pc1, const Pcontrainte * pc2)
 {
-  Pvecteur
-    v1 = (*pc1)->vecteur,
-    v2 = (*pc2)->vecteur;
-  int null_1, null_2, i, irank=0, cost_1, cost_2;
-  Value val_1=VALUE_ZERO, val_2=VALUE_ZERO,
-    val=VALUE_ZERO, val_p=VALUE_ZERO;
-  Pbase b, high=NULL;
+  Pvecteur v1 = (*pc1)->vecteur, v2 = (*pc2)->vecteur;
+  bool null_1, null_2;
+  int i, irank = 0, cost_1, cost_2;
+  Value val_1 = VALUE_ZERO, val_2 = VALUE_ZERO,
+    val = VALUE_ZERO, val_p = VALUE_ZERO;
+  Pbase b, high = NULL;
 
-  /*  for each inner first indexes,
-   *  the first constraint with a null coeff while the other one is non
-   *  null is the simplest.
-   */
+  // for each inner first indexes, the first constraint with a null coeff
+  // while the other one is not is the simplest
   for (i=1, b=rbase_for_compare; !BASE_NULLE_P(b); i++, b=b->succ)
   {
     val_1 = vect_coeff(var_of(b), v1);
@@ -162,65 +163,74 @@ static int compare_the_constraints(const Pcontrainte * pc1, const Pcontrainte * 
     val_2 = vect_coeff(var_of(b), v2);
     null_2 = value_zero_p(val_2);
 
-    if (irank==0 && !same_sign_p(val_1,val_2))
+    // first loop index with something
+    // BUG too early
+    if (irank == 0 && !same_sign_p(val_1, val_2))
+      // BUG: condition is always false?
 	    RETURN_ORDER(value_neg_p(val_1) && value_neg_p(val_2) ?
-                   value_compare(val_2,val_1):
-                   value_compare(val_1,val_2));
+                   value_compare(val_2, val_1):
+                   value_compare(val_1 ,val_2));
 
-    if (null_1 ^ null_2) {
-	    if (irank==0)
-	    { RETURN_ORDER(value_compare(null_1,null_2));}
+    // *one* coef is zero and the other *not*, we can conclude
+    if (null_1 ^ null_2)
+    {
+	    if (irank == 0) // ???
+      { RETURN_ORDER(value_compare(null_1, null_2)); }
 	    else
-	    { RETURN_HARDER(value_compare(null_1,null_2));}
+      { RETURN_HARDER(value_compare(null_1, null_2)); }
     }
-    if (irank==0 && (!null_1||!null_2))
+
+    // keep track of first inner loop with non zero values?
+    if (irank == 0 && (!null_1 || !null_2))
 	    val=val_1, val_p=val_2, irank=i, high=b;
   }
 
-  if (value_ne(val_p,val))
+  // BUG?
+  // why conclude now on these values, and not on the cost below first?
+  if (value_ne(val_p, val))
     RETURN_HARDER(value_neg_p(val_1) && value_neg_p(val_2) ?
-                  value_compare(val_2,val_1):
-                  value_compare(val_1,val_2));
+                  value_compare(val_2, val_1):
+                  value_compare(val_1, val_2));
 
-  /*   constant operations
-   */
+  //   constant operations
   cost_1 = cost_of_constant_operations(v1);
   cost_2 = cost_of_constant_operations(v2);
 
   if (cost_1 != cost_2) RETURN_HARDER(cost_2-cost_1);
 
-  /*   compare the coefficients for the base
-   */
+  // the depth & cost are equal, we need another criterion base on values
+  // compare the coefficients for the base, starting from the first after
+  // the first non null.
   for (b=high==NULL ? NULL : high->succ; !BASE_NULLE_P(b); b=b->succ)
   {
-    val_1 = vect_coeff(var_of(b), v1),
-      val_2 = vect_coeff(var_of(b), v2);
+    val_1 = vect_coeff(var_of(b), v1);
+    val_2 = vect_coeff(var_of(b), v2);
 
-    if (value_ne(val_1,val_2))
+    if (value_ne(val_1, val_2))
 	    RETURN_HARDER(value_neg_p(val_1) && value_neg_p(val_2)?
-                    value_compare(val_1,val_2):
-                    value_compare(val_2,val_1));
+                    value_compare(val_1, val_2):
+                    value_compare(val_2, val_1));
   }
 
-  /*   do it for the for the parameters
-   */
+  // all equals, do it for the for the parameters
   for (b=others_for_compare; !BASE_NULLE_P(b); b=b->succ)
   {
     val_1 = vect_coeff(var_of(b), v1);
     val_2 = vect_coeff(var_of(b), v2);
 
-    if (value_ne(val_1,val_2))
+    if (value_ne(val_1, val_2))
 	    RETURN_HARDER(value_compare(val_2,val_1));
   }
 
-  /*   at last the constant
-   */
+  // at last the constant
   val_1 = vect_coeff(TCST, v1);
   val_2 = vect_coeff(TCST, v2);
 
+  // the sign is needed so that equalities are normalized...
+  // here we have val==val_p
   RETURN_HARDER(value_pos_p(val)?
-                value_compare(val_2,val_1):
-                value_compare(val_1,val_2));
+                value_compare(val_2, val_1):
+                value_compare(val_1, val_2));
 }
 
 /*
