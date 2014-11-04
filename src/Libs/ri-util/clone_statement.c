@@ -173,8 +173,8 @@ do_clone_entity(entity e, clone_context cc, hash_table ht)
       string en = entity_name(e);
       string ms = strrchr(en, BLOCK_SEP_CHAR);
       if(ms==NULL)
-	ms = strchr(en, MODULE_SEP)+1;
-      string ln = ms;
+	ms = strchr(en, MODULE_SEP);
+      string ln = ms+1;
 
         if(entity_scalar_p(e))
             new_entity = make_new_scalar_variable_with_prefix(
