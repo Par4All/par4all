@@ -187,9 +187,6 @@ static void do_loop_unroll_with_epilogue(statement loop_statement,
   //intptr_t lbval, ubval, incval;
   //bool numeric_range_p = false;
 
-  /* Validity of transformation should be checked */
-  /* ie.: - no side effects in replicated expressions */
-
   /* get rid of labels in loop body */
   (void) clear_labels (loop_body (il));
 
@@ -1073,17 +1070,41 @@ unroll(char *mod_name)
             set_current_module_entity(module_name_to_entity( mod_name ));
             set_current_module_statement( mod_stmt);
 
-            /* do the job */
             statement loop_statement = find_loop_from_label(mod_stmt,lb_ent);
-            if( ! statement_undefined_p(loop_statement) )
-                loop_unroll(loop_statement,rate);
+            if( ! statement_undefined_p(loop_statement) ) {
+	      instruction i = statement_instruction(loop_statement);
+	      loop l = instruction_loop(i);
+	      /* Validity of transformation should be checked */
+	      /* ie.: - no side effects in replicated expressions */
+	      /* No dependent types in C */
+	      list vl = statement_declarations(loop_body(l));
+	      bool dependent_p = false;
+	      FOREACH(ENTITY, v, vl) {
+		type t = entity_type(v);
+		if(dependent_type_p(t)) {
+		  dependent_p = true;
+		  break;
+		}
+	      }
+
+	      if(dependent_p) {
+		pips_user_warning("Loop cannot be unrolled because it contains a dependent type.\n");
+		return_status = false;
+	      }
+	      else {
+		/* do the job */
+		loop_unroll(loop_statement,rate);
+	      }
+	    }
             else
                 pips_user_error("label '%s' is not linked to a loop\n", lp_label);
 
-            /* Reorder the module, because new statements have been generated. */
-            module_reorder(mod_stmt);
+	    if(return_status) {
+	      /* Reorder the module, because new statements have been generated. */
+	      module_reorder(mod_stmt);
 
-            DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
+	      DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
+	    }
             /*postlude*/
             reset_current_module_entity();
             reset_current_module_statement();
