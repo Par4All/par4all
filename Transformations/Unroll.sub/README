@@ -5,13 +5,13 @@ unroll07.f
 unroll08.f
 unroll09.f
 unroll10.f
-unroll11.c
+unroll11.c	unroll C code with local declarations
 unroll12.f
 unroll13.f
 unroll14.f
 unroll15.f
-unroll16.c
-unroll17.c
-unroll18.c
-unroll19.c
+unroll16.c	unroll with typedef
+unroll17.c	full unroll with typedef
+unroll18.c	unroll with dependent type typedef
+unroll19.c	full unroll with dependent type typedef
 unroll20.c
