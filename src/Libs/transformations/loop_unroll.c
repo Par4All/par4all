@@ -849,9 +849,9 @@ bool loop_fully_unrollable_p(loop l)
   return unroll_p;
 }
 
-/* get rid of the loop by body duplication;
+/* get rid of the loop by body replication;
  *
- * the loop body is duplicated as many times as there were iterations
+ * the loop body is replicated as many times as there are iterations
  *
  * FI: could be improved to handle symbolic lower bounds (18 January 1993)
  */
@@ -918,7 +918,16 @@ void full_loop_unroll(statement loop_statement)
         ifdebug(9) {
             pips_assert("full_loop_unroll", expression_consistent_p(expr));
         }
+	/* FI: clone_statement() has been used above to perform
+	   flatten_code. Hence the declarations are no longer
+	   accessible from "transformed_stmt". And when dependent
+	   types are used, they are not updated. */
         replace_entity_by_expression(transformed_stmt,ind,expr);
+	/* Try to update dependent types. Too bad the declarations are
+	   scanned again and again. */
+	FOREACH(ENTITY,e,statement_declarations(get_current_module_statement()))
+	  replace_entity_by_expression(entity_type(e),ind,expr);
+
         ifdebug(9) {
             pips_assert("full_loop_unroll", statement_consistent_p(transformed_stmt));
         }
@@ -1182,7 +1191,7 @@ full_unroll(char * mod_name)
     }
     if( !return_status)
         user_log("transformation has been cancelled\n");
-    debug(2,"unroll","done for %s\n", mod_name);
+    pips_debug(2,"done for %s\n", mod_name);
     debug_off();
         /* Reorder the module, because new statements have been generated. */
         module_reorder(mod_stmt);
