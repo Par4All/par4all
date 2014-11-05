@@ -191,6 +191,39 @@ do_clone_entity(entity e, clone_context cc, hash_table ht)
                     copy_basic(entity_basic(e)),
                     gen_full_copy_list(variable_dimensions(type_variable(entity_type(e))))
                     );
+
+	/* The entity can be a typedef instead of a
+	   variable... Hopefully not a derived type (struct, union or
+	   enum). */
+	if(typedef_entity_p(e)) {
+	  storage s = entity_storage(new_entity);
+	  free_storage(s);
+	  s = make_storage_rom();
+	  entity_storage(new_entity) = s;
+	}
+
+	/* The type of the entity can be a typedef that has been renamed... */
+	/* FI: I am adding this for loop_unroll, but I believe 1) that
+	   typedef variables should not be renamed since only
+	   non-dependent types are supported, and 2) that loop unroll
+	   should be implemented in a simpler way and complemented by
+	   flatten_code */
+	type nt = entity_type(new_entity);
+	if(type_variable_p(nt)) {
+	  variable nv = type_variable(nt);
+	  /* For dependent types, the variables used in dimension
+	     might have been renamed, but the cloning is not
+	     compatible with dependent types because declarations are
+	     moved... */
+	  basic nb = variable_basic(nv);
+	  if(basic_typedef_p(nb)) {
+	    entity otd = basic_typedef(nb);
+	    entity ntd = hash_get(ht,entity_name(otd));
+	    if(ntd != HASH_UNDEFINED_VALUE)
+	      basic_typedef(nb) = ntd;
+	  }
+	}
+
         AddLocalEntityToDeclarations(new_entity,clone_context_new_module(cc),clone_context_new_module_statement(cc));
         hash_put(ht,entity_name(e),new_entity);
     }
