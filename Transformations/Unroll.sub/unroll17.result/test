@@ -2,45 +2,45 @@ void unroll17()
 {
    int i, j[10];
    //PIPS generated variable
-   int mtype0;
+   typedef int mtype0;
    //PIPS generated variable
-   mtype x0;
+   mtype0 x0;
    //PIPS generated variable
-   int mtype1;
+   typedef int mtype1;
    //PIPS generated variable
-   mtype x1;
+   mtype1 x1;
    //PIPS generated variable
-   int mtype2;
+   typedef int mtype2;
    //PIPS generated variable
-   mtype x2;
+   mtype2 x2;
    //PIPS generated variable
-   int mtype3;
+   typedef int mtype3;
    //PIPS generated variable
-   mtype x3;
+   mtype3 x3;
    //PIPS generated variable
-   int mtype4;
+   typedef int mtype4;
    //PIPS generated variable
-   mtype x4;
+   mtype4 x4;
    //PIPS generated variable
-   int mtype5;
+   typedef int mtype5;
    //PIPS generated variable
-   mtype x5;
+   mtype5 x5;
    //PIPS generated variable
-   int mtype6;
+   typedef int mtype6;
    //PIPS generated variable
-   mtype x6;
+   mtype6 x6;
    //PIPS generated variable
-   int mtype7;
+   typedef int mtype7;
    //PIPS generated variable
-   mtype x7;
+   mtype7 x7;
    //PIPS generated variable
-   int mtype8;
+   typedef int mtype8;
    //PIPS generated variable
-   mtype x8;
+   mtype8 x8;
    //PIPS generated variable
-   int mtype9;
+   typedef int mtype9;
    //PIPS generated variable
-   mtype x9;
+   mtype9 x9;
 bar:   ;
    x0 = 0;
    x0 = 0;
