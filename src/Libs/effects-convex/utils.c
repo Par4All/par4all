@@ -2605,7 +2605,8 @@ region_constraints_sort(
     c = constraints_sort_with_compare
       //	(c, BASE_NULLE, equality_p?
       (c, sorted_base, equality_p?
-       ((int (*)()) compare_region_equalities): ((int (*)()) compare_region_inequalities));
+       ((int (*)()) compare_region_equalities):
+       ((int (*)()) compare_region_inequalities), NULL);
     reset_bases_for_compare();
     return(c);
 }
