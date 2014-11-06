@@ -14,4 +14,7 @@ unroll16.c	unroll with typedef
 unroll17.c	full unroll with typedef
 unroll18.c	unroll with dependent type typedef
 unroll19.c	full unroll with dependent type typedef
-unroll20.c
+unroll20.c	unroll with struct
+unroll21.c	full unroll with struct
+unroll22.c	unroll with initialized struct (bug)
+unroll23.c	full unroll with initialized struct (bug)

@@ -1,0 +1,45 @@
+void unroll20()
+{
+   int i, a[2];
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   //PIPS generated variable
+   struct s0 {
+      int f;
+   };
+   //PIPS generated variable
+   struct s0 j0;
+   //PIPS generated variable
+   struct s1 {
+      int f;
+   };
+   //PIPS generated variable
+   struct s1 j1;
+   //PIPS generated variable
+   struct s2 {
+      int f;
+   };
+   //PIPS generated variable
+   struct s2 j2;
+bar:   LU_NUB0 = 2;
+   LU_IB0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+
+
+      j0.f = LU_IND0*1+0+2;
+      a[LU_IND0*1+0] = j0.f;
+l99999:      ;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 2) {
+
+
+      j2.f = (LU_IND0+0)*1+0+2;
+      a[(LU_IND0+0)*1+0] = j2.f;
+
+
+      j1.f = (LU_IND0+1)*1+0+2;
+      a[(LU_IND0+1)*1+0] = j1.f;
+l99998:      ;
+   }
+   i = 0+MAX0(LU_NUB0, 0)*1;
+}
