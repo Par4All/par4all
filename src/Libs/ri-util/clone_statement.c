@@ -183,7 +183,7 @@ do_clone_entity(entity e, clone_context cc, hash_table ht)
                     clone_context_new_module(cc),
                     copy_basic(entity_basic(e))
                     );
-        else
+        else if(entity_array_p(e))
             new_entity = make_new_array_variable_with_prefix(
 		    //entity_user_name(e),
                     ln,
@@ -191,10 +191,22 @@ do_clone_entity(entity e, clone_context cc, hash_table ht)
                     copy_basic(entity_basic(e)),
                     gen_full_copy_list(variable_dimensions(type_variable(entity_type(e))))
                     );
+	else if(entity_struct_p(e) || entity_union_p(e) || entity_enum_p(e)) {
+	  /* There is no reason to replicate such an entity when
+	     cloning since they are left unchanged, except maybe if
+	     they contain dependent types... */
+            new_entity = make_new_derived_entity_with_prefix(
+                    ln,
+                    clone_context_new_module(cc),
+                    entity_type(e)
+                    );
+	}
+	else {
+	  pips_internal_error("Unexpected case\n");
+	}
 
 	/* The entity can be a typedef instead of a
-	   variable... Hopefully not a derived type (struct, union or
-	   enum). */
+	   variable... */
 	if(typedef_entity_p(e)) {
 	  storage s = entity_storage(new_entity);
 	  free_storage(s);
@@ -221,6 +233,12 @@ do_clone_entity(entity e, clone_context cc, hash_table ht)
 	    entity ntd = hash_get(ht,entity_name(otd));
 	    if(ntd != HASH_UNDEFINED_VALUE)
 	      basic_typedef(nb) = ntd;
+	  }
+	  else if(basic_derived_p(nb)) {
+	    entity de = basic_derived(nb);
+	    entity nde = hash_get(ht,entity_name(de));
+	    if(nde != HASH_UNDEFINED_VALUE)
+	      basic_derived(nb) = nde;
 	  }
 	}
 
