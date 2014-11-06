@@ -992,10 +992,12 @@ out_effects_from_block_to_statements(sequence seq, out_effects_context *ctxt)
 static bool
 out_effects_statement_filter(statement s, out_effects_context *ctxt)
 {
+  ifdebug(1) {
     pips_debug(1, "Entering statement %03zd :\n", statement_ordering(s));
     print_statement(s);
-    effects_private_current_stmt_push(s);
-    return true;
+  }
+  effects_private_current_stmt_push(s);
+  return true;
 }
 
 static void
