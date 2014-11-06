@@ -167,6 +167,9 @@ int main()
 
    int i, result = 0;
    int size;
+
+//  <size-OUT-EXACT-{}>
+
    size = 10;
    int a[size];
 
@@ -303,6 +306,7 @@ int main()
 //             <    is exported>: result
    int i, result = 0;
    int size;
+//             <    is exported>: size
    size = 10;
    int a[size];
 //             <may be exported>: a[*]
