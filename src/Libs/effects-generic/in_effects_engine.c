@@ -318,15 +318,23 @@ static list in_effects_of_declarations(list lin_after_decls, list l_decl, in_eff
   return lin_before_decls;
 }
 
-
+/**
+ *
+ * TODO: There are certainly many memory leak in this piece of code?
+ *       NL: but I don't understand enough the code to know
+ *           when the lists are modify or when a new list is return...
+ *           before my modification (r22288), there certainly are some memory leak
+ *           and after it I certainly add more :(...
+ */
 static list r_in_effects_of_sequence(list l_inst, in_effects_context *ctxt)
 {
   statement first_statement;
   list remaining_block = NIL;
 
   list s1_lin; /* in effects of first statement */
-  list rb_lin; /* in effects of remaining block */
+  list rb_lin = NIL; /* in effects of remaining block */
   list l_in = NIL; /* resulting in effects */
+  list l_cumul_in = NIL; /* cumulated in effects */
   list s1_lrw; /* rw effects of first statement */
   transformer t1; /* transformer of first statement */
 
@@ -377,81 +385,75 @@ static list r_in_effects_of_sequence(list l_inst, in_effects_context *ctxt)
     // simple_effects_composition_with_effect_transformer
     (*effects_transformer_composition_op)(rb_lin, t1);
 
-    if (c_module_p(get_current_module_entity()) &&
-        (declaration_statement_p(first_statement) ))
+    s1_lrw = convert_rw_effects(load_rw_effects_list(first_statement),ctxt);
+    ifdebug(6)
     {
-      // if it's a declaration statement, effects will be added on the fly
-      // as declarations are handled.
-      pips_debug(5, "first statement is a declaration statement\n");
-      list l_decl = statement_declarations(first_statement);
-      l_in = in_effects_of_declarations(rb_lin, l_decl, ctxt);
-      rb_lin = NIL; /* the list has been freed by the previous function */
+      pips_debug(6," rw effects for first statement:\n");
+      (*effects_prettyprint_func)(s1_lrw);
     }
-    else // not a declaration statement
+    s1_lin = effects_dup(load_in_effects_list(first_statement));
+    ifdebug(6)
     {
-      s1_lrw = convert_rw_effects(load_rw_effects_list(first_statement),ctxt);
-      ifdebug(6)
-      {
-        pips_debug(6," rw effects for first statement:\n");
-        (*effects_prettyprint_func)(s1_lrw);
-      }
-      s1_lin = effects_dup(load_in_effects_list(first_statement));
-      ifdebug(6)
-      {
-        pips_debug(6," in effects for first statement:\n");
-        (*effects_prettyprint_func)(s1_lin);
-      }
-
-      /* Nga Nguyen, 25/04/2002.rb_lin may contain regions with infeasible system {0==-1}
-       *     => remove them from rb_lin*/
-
-      // rb_lin = (*remove_effects_with_infeasible_system_func)(rb_lin);
-
-      /* IN(block) = (IN(rest_of_block) - W(S1)) U IN(S1) */
-      // functions that can be pointed by effects_union_op:
-      // ProperEffectsMustUnion
-      // RegionsMustUnion
-      // ReferenceUnion
-      // EffectsMustUnion
-      // functions that can be pointed by effects_sup_difference_op:
-      // effects_undefined_binary_operator
-      // RegionsSupDifference
-      // EffectsSupDifference
-      l_in = (*effects_union_op)(
-          s1_lin,
-          (*effects_sup_difference_op)(rb_lin, effects_dup(s1_lrw),
-              r_w_combinable_p),
-              effects_same_action_p);
-
-      // no leak
-      reset_converted_rw_effects(&s1_lrw,ctxt);
+      pips_debug(6," in effects for first statement:\n");
+      (*effects_prettyprint_func)(s1_lin);
     }
+
+    /* Nga Nguyen, 25/04/2002.rb_lin may contain regions with infeasible system {0==-1}
+     *     => remove them from rb_lin*/
+    // rb_lin = (*remove_effects_with_infeasible_system_func)(rb_lin);
+
+    /* IN(block) = (IN(rest_of_block) - W(S1)) U IN(S1) */
+    // functions that can be pointed by effects_union_op:
+    // ProperEffectsMustUnion
+    // RegionsMustUnion
+    // ReferenceUnion
+    // EffectsMustUnion
+    // functions that can be pointed by effects_sup_difference_op:
+    // effects_undefined_binary_operator
+    // RegionsSupDifference
+    // EffectsSupDifference
+    l_cumul_in = (*effects_union_op)(
+        s1_lin,
+        (*effects_sup_difference_op)(effects_dup(rb_lin),
+            effects_dup(s1_lrw),
+            r_w_combinable_p),
+        effects_same_action_p);
+
+    // no leak
+    reset_converted_rw_effects(&s1_lrw,ctxt);
   } // if (!ENDP(remaining_block))
   else
   {
-    if (c_module_p(get_current_module_entity()) &&
-        (declaration_statement_p(first_statement) ))
-    {
-      // if it's a declaration statement, effects will be added on the fly
-      // as declarations are handled.
-      pips_debug(5, "first statement is a declaration statement\n");
-      list l_decl = statement_declarations(first_statement);
-      l_in = in_effects_of_declarations(NIL, l_decl, ctxt);
-    }
-    else
-    {
-      l_in = effects_dup(load_in_effects_list(first_statement));
-    }
+    l_cumul_in = effects_dup(load_in_effects_list(first_statement));
   }
 
   ifdebug(6)
   {
+    pips_debug(6,"for statement:\n");
+    print_statement(first_statement);
     pips_debug(6,"cumulated_in_effects:\n");
-    (*effects_prettyprint_func)(l_in);
+    (*effects_prettyprint_func)(l_cumul_in);
+    debug_consistent(l_cumul_in);
   }
-  store_cumulated_in_effects_list(first_statement, effects_dup(l_in));
+  store_cumulated_in_effects_list(first_statement, l_cumul_in);
 
-  debug_consistent(l_in);
+  // NL: For declaration statement, we don't want to keep effects
+  //     on variables that doesn't exist, for previous statement
+  //     (before the declaration).
+  if (c_module_p(get_current_module_entity()) &&
+      (declaration_statement_p(first_statement) ))
+  {
+    // if it's a declaration statement, effects will be added on the fly
+    // as declarations are handled.
+    pips_debug(5, "first statement is a declaration statement\n");
+    list l_decl = statement_declarations(first_statement);
+    l_in = in_effects_of_declarations(rb_lin, l_decl, ctxt);
+  }
+  else {
+    l_in = effects_dup(l_cumul_in);
+  }
+
+  //debug_consistent(l_in);
   return l_in;
 }
 
