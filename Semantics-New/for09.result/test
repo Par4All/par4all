@@ -10,7 +10,7 @@ int main()
       i = 0;
       while (i<b) {
          i = i+1;
-         tab[a] += tab[a-1];
+         tab[a++] += tab[a-1];
       }
    }
    return a+tab[a];
@@ -50,7 +50,7 @@ int main()
 
       i = 0;
 
-//  T(i) {i+1<=b, i#init+1<=b, i#init<=i}
+//  T(a,i) {i+1<=b, i#init+1<=b, i#init<=i}
 
       while (i<b) {
 
@@ -58,9 +58,9 @@ int main()
 
          i = i+1;
 
-//  T() {}
+//  T(a) {}
 
-         tab[a] += tab[a-1];
+         tab[a++] += tab[a-1];
       }
    }
 

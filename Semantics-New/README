@@ -10,6 +10,9 @@ atoll:      call site located in a declaration initialization (P. Villalon)
 
 continue01:
 
+for08:	    check recursive analysis of update operators (analyzed as a while loop)
+for09:	    check recursive analysis of update operators (analyzed as a while loop)
+
 global01.c: take abstract locations into account (derived from
 	    Benchmarks/whetstone, submitted by Serge Guelton)
 
