@@ -451,6 +451,19 @@ transformer any_assign_operation_to_transformer(entity tmp,
   return tf;
 }
 
+transformer safe_any_assign_operation_to_transformer(entity tmp,
+						list args, /* arguments for assign */
+						transformer pre, /* precondition */
+						bool is_internal)
+{
+  transformer tf = any_assign_operation_to_transformer(tmp, args, pre, is_internal);
+  if(transformer_undefined_p(tf)) {
+    // FI: I'd like tmp to appear in the basis...
+    tf = transformer_identity();
+  }
+  return tf;
+}
+
 /* v = (e1 = e1 op e2) ; e1 must be a reference; does not compute
    information for dereferenced pointers such as in "*p += 2;" */
 static transformer update_operation_to_transformer(entity v,
@@ -481,7 +494,8 @@ static transformer update_operation_to_transformer(entity v,
     gen_free_list(args);
     free_expression(n_exp);
 
-    tf = transformer_add_equality(tf, v, v1);
+    if(!transformer_undefined_p(tf))
+      tf = transformer_add_equality(tf, v, v1);
 
     ifdebug(8) {
       pips_debug(8, "before projection, with temporaries v=%s, tmp1=%s, tmp2=%s,"
@@ -501,7 +515,7 @@ static transformer update_operation_to_transformer(entity v,
     //free_transformer(tf_op);
   }
 
-  pips_debug(9, "End with transformer tf=%p\n", tf);
+  pips_debug(8, "End with transformer tf=%p\n", tf);
   ifdebug(8) dump_transformer(tf);
 
   return tf;
