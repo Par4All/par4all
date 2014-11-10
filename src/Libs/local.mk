@@ -49,5 +49,12 @@ FWD_DIRS	= \
 	regions_to_loops task_parallelization
 
 # janusvalue
-
 FWD_PARALLEL	= 1
+ 
+# (re)build inter library header dependencies
+deps.mk:
+	{ \
+	  echo 'ifeq ($$(FWD_TARGET),phase0)'; \
+	  inc2deps.sh $(FWD_DIRS) | sed -e 's/:/:fwd-/;s/^/fwd-/'; \
+	  echo 'endif'; \
+	} > $@

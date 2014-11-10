@@ -28,7 +28,12 @@ INSTALL_UTL =	analyze_libraries \
 		pips_svn_stat \
 		build_so_files \
 		pips_branch \
-		pips_git
+		pips_git \
+		inc2deps.sh \
+		inc2deps.pl
+
+# early script install?
+#phase0: phase2
 
 # common stuff
 ROOT    = ../../..
