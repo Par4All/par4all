@@ -3472,60 +3472,19 @@ RICEDG_STATISTICS_ALL_ARRAYS FALSE
 \index{Def-Use Chains}
 \index{RICE\_DATAFLOW\_DEPENDENCE\_ONLY}
 
-Only take into account true flow dependences (Def -- Use) during the
-computation of SCC?  Note that this is different from the
-CHAINS\_DATAFLOW\_DEPENDENCE\_ONLY option which doesn't compute the
-whole graph.  Warning: this option potentially yields incorrect parallel
-code.
+This property can be set to only take into account true flow
+dependences (Def -- Use) during the computation of SCC by the
+Allen\&Kennendy algorithm.
+
+Note that this is different from the
+CHAINS\_DATAFLOW\_DEPENDENCE\_ONLY property, which is set to compute a
+partial data dependence graph.
+
+Warning: if set, this property may potentially yields incorrect parallel
+code because dynamic single assignment is not guaranteed.
 
 \begin{PipsProp}{RICE_DATAFLOW_DEPENDENCE_ONLY}
 RICE_DATAFLOW_DEPENDENCE_ONLY FALSE
-\end{PipsProp}
-
-\subsubsection{Printout}
-\index{Dependence Graph}
-\index{Prettyprinter (DG)}
-\index{DG Prettyprinter}
-\index{PRINT\_DEPENDENCE\_GRAPH}
-\index{PRINT\_DEPENDENCE\_GRAPH\_WITHOUT\_PRIVATIZED\_DEPS}
-\index{PRINT\_DEPENDENCE\_GRAPH\_WITHOUT\_NOLOOPCARRIED\_DEPS}
-\index{PRINT\_DEPENDENCE\_GRAPH\_WITH\_DEPENDENCE\_CONES}
-\index{PRINT\_DEPENDENCE\_GRAPH\_USING\_SRU\_FORMAT}
-
-Here are the properties used to control the printing of dependence
-graphs in a file called {\em module\_name}.{\tt dg}. These properties
-should not be used explicitly because they are set implicitly by the
-different print-out procedures available in \verb/pipsmake.rc/. However,
-not all combinations are available from \verb/pipsmake.rc/.
-
-\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH}
-PRINT_DEPENDENCE_GRAPH FALSE
-\end{PipsProp}
-
-To print the dependence graph without the dependences on privatized
-variables
-
-\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS}
-PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS FALSE
-\end{PipsProp}
-
-To print the dependence graph without the non-loop-carried dependences:
-
-\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS}
-PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS FALSE
-\end{PipsProp}
-
-To print the dependence graph with the dependence cones:
-
-\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES}
-PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES FALSE
-\end{PipsProp}
-
-To print the dependence graph in a computer friendly format defined by
-Deborah Whitfield (SRU):
-
-\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT}
-PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT FALSE
 \end{PipsProp}
 
 \subsubsection{Optimization}
@@ -16002,29 +15961,33 @@ print_icfg_with_control_out_regions     > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{PipsMake}
 
-\section{Dependence Graph File}
+\section{Data Dependence Graph File}
 \label{subsection-dependence-graph-file}
-\index{DG}
-\index{Dependence Graph}
+\index{FDG}
+\index{Data Dependence Graph}
 
 \begin{PipsPass}{dg_file}
-This file shows the dependence graph.
+This file contains the data dependence graph.
 
 Known bug: there is no precise relationship between the dependence graph
-seen by the parallelization algorithm selected and any of its view...
+seen by the parallelization algorithms selected and any of its many views...
 \end{PipsPass}
 
-Two formats are available: the default format which includes
+Two text formats are available: the default format which includes
 dependence cone and a SRU format which packs all information about one
 arc on one line and which replaces the dependence cone by the
 dependence direction vector (DDV). The line numbers given with this
 format are in fact relative (approximatively...) to the statement line
-in the \Pips{} output.  The SRU format was defined with researchers at
-Slippery Rock University (PA). The property
+in the \Pips{} output.
+
+The SRU format was defined with researchers at Slippery Rock
+University (PA). The property
 \begin{center}
 \PipsPropRef{PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT}
 \end{center}
 is set to FALSE by default.
+
+Two graph format, daVinci and GraphViz, are also available.
 
 \subsection{Menu For Dependence Graph Views}
 
@@ -16034,12 +15997,12 @@ alias dg_file 'Dependence Graph View'
 alias   print_effective_dependence_graph    'Default'
 alias   print_loop_carried_dependence_graph 'Loop Carried Only'
 alias   print_whole_dependence_graph        'All arcs'
-alias   print_chains_graph                  'Chains'
-alias   print_dot_chains_graph              'Chains (for dot)'
-alias   print_dot_dependence_graph          'Dependence graph (for dot)'
 alias   print_filtered_dependence_graph     'Filtered Arcs'
 alias   print_filtered_dependence_daVinci_graph   'Filtered Arcs Output to uDrawGraph'
 alias   impact_check                        'Check alias impact'
+alias   print_chains_graph                  'Chains'
+alias   print_dot_chains_graph              'Chains (for dot)'
+alias   print_dot_dependence_graph          'Dependence graph (for dot)'
 \end{PipsMake}
 
 \subsection{Effective Dependence Graph View}
@@ -16115,12 +16078,15 @@ print_filtered_dependence_daVinci_graph          > MODULE.dvdg_file
         < MODULE.dg
 \end{PipsMake}
 
-\subsection{Filtered Dependence Graph View}
+\subsection{Impact Check}
 
 \begin{PipsPass}{impact_check}
 Check impact of alias on the dependance graph.\marginpar{RK: What is
-that? FI: Maybe, we should sign how contributions? See validation?}
+that? FI: Maybe, we should sign our contributions? See validation?}
 \end{PipsPass}
+
+Note: the signature of the pass implies that it is a transformation
+pass, not a display pass. The location of its description is wrong.
 
 \begin{PipsMake}
 impact_check    > MODULE.code
@@ -16138,13 +16104,17 @@ impact_check    > MODULE.code
 \subsection{Chains Graph View}
 
 \begin{PipsPass}{print_chains_graph}
-Display the chains graph in a textual format. The following properties control
-the output :
+Display the def-use or chains graph in a textual format. The following
+properties control the output:
 
 \PipsPropRef{PRINT_DEPENDENCE_GRAPH}
+
 \PipsPropRef{PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS}
+
 \PipsPropRef{PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS}
+
 \PipsPropRef{PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES}
+
 \PipsPropRef{PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT}
 
 \end{PipsPass}
@@ -16171,7 +16141,7 @@ print_dot_chains_graph  > MODULE.dotdg_file
 \end{PipsMake}
 
 
-\subsection{Dependence Graph Graphviz Dot View}
+\subsection{Data Dependence Graph Graphviz Dot View}
 
 \begin{PipsPass}{print_dot_dependence_graph}
 Display the dependence graph in graphviz dot format.
@@ -16186,7 +16156,8 @@ w = workspace(...)
 w.fun.my_function_name.view_dg()
 \end{lstlisting}
 
-which will produce in current directory a file named my\_function\_name.png.
+\noindent
+which generate in the current directory a file named my\_function\_name.png.
 
 \end{PipsPass}
 
@@ -16196,6 +16167,52 @@ print_dot_dependence_graph          > MODULE.dotdg_file
         < MODULE.code
         < MODULE.dg
 \end{PipsMake}
+
+\subsubsection{Properties Used to Select Arcs to Display}
+\index{Data Dependence Graph}
+\index{Prettyprinter (DDG)}
+\index{DDG Prettyprinter}
+\index{PRINT\_DEPENDENCE\_GRAPH}
+\index{PRINT\_DEPENDENCE\_GRAPH\_WITHOUT\_PRIVATIZED\_DEPS}
+\index{PRINT\_DEPENDENCE\_GRAPH\_WITHOUT\_NOLOOPCARRIED\_DEPS}
+\index{PRINT\_DEPENDENCE\_GRAPH\_WITH\_DEPENDENCE\_CONES}
+\index{PRINT\_DEPENDENCE\_GRAPH\_USING\_SRU\_FORMAT}
+
+Here are the properties used to control the printing of dependence
+graphs in a file called {\em module\_name}.{\tt dg}. These properties
+should not be used explicitly because they are set implicitly by the
+different print-out procedures available in \verb/pipsmake.rc/. However,
+not all combinations are available from \verb/pipsmake.rc/.
+
+\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH}
+PRINT_DEPENDENCE_GRAPH FALSE
+\end{PipsProp}
+
+To print the dependence graph without the dependences on privatized
+variables
+
+\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS}
+PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS FALSE
+\end{PipsProp}
+
+To print the dependence graph without the non-loop-carried dependences:
+
+\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS}
+PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS FALSE
+\end{PipsProp}
+
+To print the dependence graph with the dependence cones:
+
+\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES}
+PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES FALSE
+\end{PipsProp}
+
+To print the dependence graph in a computer friendly format defined by
+Deborah Whitfield (SRU):
+
+\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT}
+PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT FALSE
+\end{PipsProp}
 
 \subsection{Properties for Dot output}
 
