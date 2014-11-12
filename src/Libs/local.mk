@@ -50,11 +50,17 @@ FWD_DIRS	= \
 
 # janusvalue
 FWD_PARALLEL	= 1
- 
+
+ifeq ($(FWD_TARGET),phase0)
+USE_DEPS = 1
+else ifeq ($(FWD_TARGET),phase2)
+USE_DEPS = 1
+endif # phase0
+
 # (re)build inter library header dependencies
 deps.mk:
 	{ \
-	  echo 'ifeq ($$(FWD_TARGET),phase0)'; \
+	  echo 'ifdef USE_DEPS'; \
 	  inc2deps.sh $(FWD_DIRS) | sed -e 's/:/:fwd-/;s/^/fwd-/'; \
-	  echo 'endif'; \
+	  echo 'endif # USE DEPS'; \
 	} > $@

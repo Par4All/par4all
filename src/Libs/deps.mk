@@ -1,4 +1,4 @@
-ifeq ($(FWD_TARGET),phase0)
+ifdef USE_DEPS
 fwd-misc:fwd-properties
 fwd-properties:fwd-pipsdbm
 fwd-properties:fwd-top-level
@@ -537,4 +537,4 @@ fwd-task_parallelization:fwd-semantics
 fwd-task_parallelization:fwd-syntax
 fwd-task_parallelization:fwd-text-util
 fwd-task_parallelization:fwd-transformations
-endif
+endif # USE DEPS
