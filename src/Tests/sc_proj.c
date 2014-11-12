@@ -39,11 +39,19 @@ int main(int argc, char * const argv[])
   // option management
   bool reverse = false, bound = false;
   int debug = 0, opt;
-  while ((opt = getopt(argc, argv, "rbD")) != -1) {
+  while ((opt = getopt(argc, argv, "bhrD")) != -1) {
     switch (opt) {
     case 'r': reverse = true; break;
     case 'b': bound = true; break;
     case 'D': debug++; break;
+    case 'h':
+      fprintf(stdout,
+              "usage: %s [-r or -b] variables... < system\n"
+              "\tdefault: project listed variables\n"
+              "\t-r: project all but the listed variables\n"
+              "\t-b: show bounds on listed variables\n",
+              argv[0]);
+      exit(0);
     default: exit(1);
     }
   }
