@@ -1,4 +1,4 @@
-ifeq ($(FWD_TARGET),phase0)
+ifdef USE_DEPS
 fwd-contrainte:fwd-vecteur
 fwd-sc:fwd-contrainte
 fwd-sc:fwd-vecteur
@@ -29,4 +29,4 @@ fwd-polyedre:fwd-sc
 fwd-polyedre:fwd-sg
 fwd-polyedre:fwd-sommet
 fwd-polyedre:fwd-vecteur
-endif
+endif # USE_DEPS
