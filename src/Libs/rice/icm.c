@@ -1088,7 +1088,7 @@ static graph SupressDependances(graph g, set region, int level, unsigned int cou
  * Simplify the dependence graph.
  */
 static graph
-                    (graph g,
+SimplifyGraph(graph g,
     set /* of statement */ region,
     int level,
     unsigned int count)
