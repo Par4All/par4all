@@ -424,9 +424,13 @@ The following variables are defined to handle interprocedurality:
 \end{description}
 
 These variables are used in the rule definitions and instantiated
-before {\tt pipsmake} infers which resources are pre-requisites for a
+before \texttt{pipsmake} infers which resources are pre-requisites for a
 rule.
 
+The environment variable \verb|PIPS_IGNORE_FUNCTION_RX| is taken as
+a regular expression to filter out unwanted functions, such as
+static inline functions which arise in some standard header files
+from time to time.
 
 \section{Properties}
 
@@ -1078,7 +1082,7 @@ to true when dealing with new sources files. \Pips{} is not designed to
 process non-standard source code. Bugs in source files are not well
 explained or localized. They can result in weird behaviors and
 inexpected core dumps. Before complaining about \Pips{}, it is higly
-recommended to set this property to \verb|TRUE|. 
+recommended to set this property to \verb|TRUE|.
 
 Note: the C and Fortran syntactic verifications could be controlled by
 a unique property.
