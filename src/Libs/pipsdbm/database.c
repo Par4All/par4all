@@ -1231,13 +1231,14 @@ gen_array_t db_get_module_or_function_list(bool module_p)
     pips_assert("some symbol name", on);
     pips_debug(9, "considering %s -> %p\n", on, or);
     if (!same_string_p(on, "") && (module_p || !compilation_unit_p(on)) &&
-        regexec(&ignore, on, 0, NULL, 0))
+        (!ignore_rx || regexec(&ignore, on, 0, NULL, 0)))
       gen_array_dupappend(a, on);
   },
                    get_pips_database());
 
   gen_array_sort(a);
-  regfree(&ignore);
+  if (ignore_rx)
+    regfree(&ignore);
   return a;
 }
 
