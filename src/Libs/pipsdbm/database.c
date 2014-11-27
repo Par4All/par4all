@@ -22,7 +22,7 @@
 
 */
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+  #include "pips_config.h"
 #endif
 #include "genC.h"
 #include "linear.h"
@@ -38,6 +38,8 @@
 
 #include "private.h"
 #include "pipsdbm_private.h"
+
+#include <regex.h>
 
 /******************************************************************** UTILS */
 
@@ -1206,24 +1208,37 @@ gen_array_t db_get_module_list_initial_order(void)
  *
  * @param module_p is used to select or not compilation units too. If
  * true, compilation units are also included.
+ *
+ * the environment variable PIPS_IGNORE_FUNCTION_RX helps
+ * filtering out functions, typically static inlined functions
+ * added by some "standard" header files.
  */
+#define IGNORE_RX "PIPS_IGNORE_FUNCTION_RX"
 gen_array_t db_get_module_or_function_list(bool module_p)
 {
-    gen_array_t a = gen_array_make(0);
-    DB_OK;
+  gen_array_t a = gen_array_make(0);
+  string ignore_rx = getenv(IGNORE_RX);
+  regex_t ignore;
 
-    DB_RESOURCES_MAP(os, or,
-    {
-	string on = db_symbol_name(os);
-	pips_assert("some symbol name", on);
-	pips_debug(9, "considering %s -> %p\n", on, or);
-	if (!same_string_p(on, "") && (module_p || !compilation_unit_p(on)))
-	    gen_array_dupappend(a, on);
-    },
-		     get_pips_database());
+  DB_OK;
 
-    gen_array_sort(a);
-    return a;
+  if (ignore_rx && regcomp(&ignore, ignore_rx, 0))
+    pips_user_error("recomp failed for \"%s\"", ignore_rx);
+
+  DB_RESOURCES_MAP(os, or,
+  {
+    string on = db_symbol_name(os);
+    pips_assert("some symbol name", on);
+    pips_debug(9, "considering %s -> %p\n", on, or);
+    if (!same_string_p(on, "") && (module_p || !compilation_unit_p(on)) &&
+        regexec(&ignore, on, 0, NULL, 0))
+      gen_array_dupappend(a, on);
+  },
+                   get_pips_database());
+
+  gen_array_sort(a);
+  regfree(&ignore);
+  return a;
 }
 
 
