@@ -1,6 +1,6 @@
 # $Id$
 #
-# Ubuntu 11.10 Oneiric x86_64
+# Ubuntu 14.04 Trusty
 #
 # account crontab at CRI on andorre
 # bootstrap with: login@andorre> setup_pips.sh /home/local/fabien/<version>
