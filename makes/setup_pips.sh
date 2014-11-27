@@ -221,6 +221,7 @@ type htlatex && echo '_HAS_HTLATEX_ = 1' >> "$config"
 type emacs && echo '_HAS_EMACS_ = 1' >> "$config"
 
 # gpips is not really supported, should not be compiled?
+has_pkgconfig=0
 type pkg-config && has_pkgconfig=1
 
 if [ "$has_pkgconfig" -a "$gpips" ]; then
