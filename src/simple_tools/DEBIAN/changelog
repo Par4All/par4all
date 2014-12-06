@@ -1,3 +1,12 @@
+2014-12-06 Ronan Keryell <Ronan.Keryell@silkan.com>
+
+ * Par4All 1.4.6
+
+   * Integrate latest PIPS version for recent Linux version
+
+   * There are stills issues with headers of modern GNU libc
+
+
 2014-02-03 Ronan Keryell <Ronan.Keryell@silkan.com>
 
  * Par4All 1.4.5

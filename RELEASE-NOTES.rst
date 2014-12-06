@@ -81,8 +81,8 @@ Additions
   - Can use PoCC to optimize some loop nests
 
 
-Knowing issues
---------------
+Known issues
+------------
 
 - C:
 

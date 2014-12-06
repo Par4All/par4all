@@ -1,4 +1,4 @@
-Par4All version 1.4.5
+Par4All version 1.4.6
 =====================
 
 The WWW site for the project is http://www.par4all.org
@@ -8,9 +8,9 @@ achieve the migration of software to multi-core and other parallel
 processors, as well as to accelerating processors such as GPU. It is based
 on multiple components, including the source-to-source compiler framework
 `PIPS <http://pips4u.org>`_ (Inter Procedural Parallelization of
-scientific programs), and is developed by `SILKAN
-<http://www.silkan.com>`_, `MINES ParisTech
-<http://cri.mines-paristech.fr>`_ and `Institut Télécom
+scientific programs, the oldest research compiler still alive on Earth
+\o/), and is developed by `SILKAN <http://www.silkan.com>`_, `MINES
+ParisTech <http://cri.mines-paristech.fr>`_ and `Institut Télécom
 <http://departements.telecom-bretagne.eu/info/>`_.
 
 With one command line, Par4All automatically transforms C and Fortran
@@ -62,6 +62,7 @@ New features :
 
 - This version of Par4All can generate OpenCL host and kernel codes.
 - Generation codes for the SCMP dataflow architecture from CEA.
+- Generation for SIMILAN project.
 - Some more options on ``p4a``, such as ``--atomic`` to use atomic operations
   for parallelizing reductions on GPU, ``--com-optimization`` to optimize
   communications between the host and the GPU, ``--kernel-unroll=...`` to
@@ -74,13 +75,16 @@ details.
 Hardware and software requirements
 ----------------------------------
 
-To install Par4All, GNU/Linux Debian, Ubuntu or Fedora is needed. For more
+To install Par4All, GNU/Linux Debian or Ubuntu is preferred. For more
 detailed information about Par4All requirements and installation, please
 refer to Par4All installation guide.
 
 
 Contact
 -------
+
+**Warning**: Since the project is no longer supported by SILKAN, the
+  following is for information only. Use GitHub mechanisms instead.
 
 | SILKAN
 | 9, route du Colonel Marcel Moraine
