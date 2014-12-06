@@ -1,4 +1,4 @@
-Par4All version 1.4.5
+Par4All version 1.4.6
 =====================
 
 The WWW site for the project is http://www.par4all.org
