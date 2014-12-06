@@ -73,7 +73,7 @@ typedef struct Ssysteme {
 	int nb_ineq;
 	int dimension;
 	Pbase base;
-	} *Psysteme,Ssysteme;
+} *Psysteme,Ssysteme;
 
 /* - Traitement des overflows :
  *  ~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -241,5 +241,8 @@ les anciens noms des fonctions */
  sc_integer_projection_along_variable((sci),(sc),(v))
 
 typedef int (*two_int_infop)[2];
+
+typedef int (* constraint_cmp_func_t)
+(const Pcontrainte *, const Pcontrainte *, void *);
 
 #endif /* SYSTEME */
