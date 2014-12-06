@@ -60,6 +60,10 @@ The main development of the 1.4 branch is almost stopped since we are
 focusing our developments on the 2.0 version based on Clang that takes
 most of our time.
 
+**Warning:** since the project is no longer supported by SILKAN, most of
+the developments are frozen, such as the Clang/LLVM/SoSlang for 2.x
+version. :-(
+
 - Switching to Clang as the base framework for Par4All 2.*x*
 
 - Scilab/Xcos and MATLAB/Simulink to OpenMP/CUDA/OpenCL with Wild Cruncher
@@ -82,7 +86,7 @@ most of our time.
 
 - Java compilation & parallelization to OpenMP/CUDA/OpenCL
 
-- Fortran 95 support with the ``gcc``/``gfc`` front-end
+- Finish the Fortran 95 support with the ``gcc``/``gfc`` front-end
 
 
 Roadmap
@@ -107,7 +111,8 @@ Roadmap
 
 - Par4All 1.4.3 (09/2012) deal with Spear-DE output;
 
-- Par4All 2.0 : new version based on Clang/LLVM.
+- Par4All 2.0 : new version based on Clang/LLVM. The developments are on
+  hold...
 
 
 Internals
