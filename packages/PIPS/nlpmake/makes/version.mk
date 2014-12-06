@@ -47,4 +47,4 @@ revisions.h: .revisions_h
 clean: version-clean
 # keep revision if cannot be regenerated?
 version-clean:
-	[ -d $(ROOT)/.svn -o -d $(ROOT)/.git ] && $(RM) revisions.h
+	-[ -d $(ROOT)/.svn -o -d $(ROOT)/.git ] && $(RM) revisions.h
