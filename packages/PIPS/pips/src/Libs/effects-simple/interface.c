@@ -830,6 +830,10 @@ bool simple_cumulated_effects(const char* module_name, statement current)
   bool ok = true;
   set_methods_for_proper_simple_effects();
 
+  // functions that can be pointed by effects_computation_init_func:
+  // effects_computation_no_init
+  // init_convex_in_out_regions
+  // init_convex_rw_regions
   (*effects_computation_init_func)(module_name);
 
   /* We also need the proper effects of the module */
@@ -852,6 +856,10 @@ bool simple_cumulated_effects(const char* module_name, statement current)
   (*db_put_rw_effects_func)(module_name, get_rw_effects());
   (*db_put_invariant_rw_effects_func)(module_name, get_invariant_rw_effects());
 
+  // functions that can be pointed by effects_computation_reset_func:
+  // effects_computation_no_reset
+  // reset_convex_in_out_regions
+  // reset_convex_rw_regions
   (*effects_computation_reset_func)(module_name);
 
   generic_effects_reset_all_methods();

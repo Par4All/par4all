@@ -1,6 +1,6 @@
 void P4A_sesam_task_main()
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i;
    //PIPS generated variable
    int *P_0;
@@ -16,7 +16,7 @@ void P4A_sesam_task_main()
 }
 void P4A_sesam_task_main_1()
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i;
    //PIPS generated variable
    int *P_2, *P_1;

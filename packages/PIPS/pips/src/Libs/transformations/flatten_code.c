@@ -111,6 +111,29 @@ static void rename_loop_index(loop l, hash_table renamings)
   }
 }
 
+/* If the type of variable var is a typedefed type, it may have been
+   renamed and the symbol table must be updated. */
+void rename_variable_type(entity var, hash_table renamings)
+{
+  type t = entity_type(var);
+  if(typedef_type_p(t)) {
+    variable v = type_variable(t);
+    basic b = variable_basic(v);
+    entity tt = basic_typedef(b);
+    entity ntt = (entity)hash_get(renamings, tt);
+    if(!entity_undefined_p(ntt))
+      basic_typedef(b) = ntt;
+  }
+  else if(struct_type_p(t) || union_type_p(t) || enum_type_p(t)){
+    variable v = type_variable(t);
+    basic b = variable_basic(v);
+    entity tt = basic_derived(b);
+    entity nst = (entity)hash_get(renamings, tt);
+    if(!entity_undefined_p(nst))
+      basic_typedef(b) = nst;
+  }
+}
+
 /* gen_multi_recurse callback on exiting a statement: recompute the
    declaration list for statement s and transform initializations into
    assignments when required according to the renaming map
@@ -170,6 +193,9 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 	pips_debug(1, "Declaration for external variable \"%s\" moved.\n",
 		   entity_name(var));
       }
+      /* Should we worry that the type itself has been renamed because
+	 a typedef is used? */
+      rename_variable_type(var, renamings);
     }
 
     /* calling RemoveLocalEntityFromDeclarations will tidy the
@@ -249,7 +275,7 @@ typedef struct redeclaration_context {
 } redeclaration_context_t;
 
 /* This function makes the key decision about the renaming: should
-   the variable be renamed? Is the renaming and declaration move
+   the variable be renamed? Are the renaming and declaration move
    compatible with its initialization expression and its control
    context? */
 static bool redeclaration_enter_statement(statement s, redeclaration_context_t * rdcp)
@@ -288,7 +314,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	hash_put_or_update(rdcp->renamings, v, v);
       }
       else { /* This is a block local stack allocated or static
-		variable */
+		variable or a derived type or a typedef type */
 	/* FI: the case of static variables is not taken into account
 	   properly. */
 	expression ie = variable_initial_expression(v);
@@ -346,8 +372,18 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	if(redeclare_p) {
 
 	  /* Build the new variable */
-	  const char* eun  = entity_user_name(v);
-	  string negn = strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope, eun, NULL));
+	  /* const char* eun  = entity_user_name(v); */
+	  /* string negn = typedef_entity_p(v)? */
+	  /*   strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope,  */
+	  /* 		       TYPEDEF_PREFIX, eun, NULL)) */
+	  /*   : */
+	  /*   strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope, eun, NULL)); */
+	  // const char* eun  = entity_name_without_scope(v);
+	  const char* eun  = strrchr(entity_name(v), BLOCK_SEP_CHAR);
+	  if(eun==NULL)
+	    eun  = strrchr(entity_name(v), MODULE_SEP_CHAR);
+	  string negn = 
+	    strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope, eun+1, NULL));
 	  entity nv   = entity_undefined;
 	  //list unused_nvs = NIL;
 
@@ -359,6 +395,8 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	  */
 
 	  statement ds = rdcp->declaration_statement;
+	  /* FI: I do not undestand why we look for references instead
+	     of declarations... (02/11/2014) */
 	  list dselist = statement_to_referenced_entities(ds);
 	  bool is_same_name    = false;
 
@@ -479,21 +517,38 @@ bool statement_flatten_declarations(entity module, statement s)
         list declarations = instruction_to_declarations(statement_instruction(s)); // Recursive
         hash_table renamings = hash_table_make(hash_pointer, HASH_DEFAULT_SIZE);
         bool renaming_p = false;
+	string cs = string_undefined;
+	int csl = INT_MAX;
 
         /* Can we find out what the local scope of statement s is? */
+	/* FI: Shouldn't it be "0`"? */
+	const char* cmn = entity_user_name(module);
         FOREACH(ENTITY, se, entity_declarations(module)) {
             string sen  = entity_name(se);
             const char* seln = entity_local_name(se);
-            string cs   = local_name_to_scope(seln); /* current scope for s */
+            string cs_se   = local_name_to_scope(seln); /* current scope for se */
             const char* mn   = module_name(sen);
-            const char* cmn = entity_user_name(module);
 
             if(same_string_p(mn, cmn)) {
-                compute_renamings(s, cs, mn, renamings);
-                renaming_p = true;
-                break;
+	      renaming_p = true;
+	      int cs_se_l = strlen(cs_se);
+	      if(cs_se_l>0 && cs_se_l<csl) {
+		csl = cs_se_l;
+		cs = cs_se;
+	      }
+	      else {
+		free(cs_se);
+	      }
             }
+	    else {
+	      free(cs_se);
+	    }
         }
+
+	if(renaming_p) {
+	  compute_renamings(s, cs, cmn, renamings);
+	  free(cs);
+	}
 
         if(renaming_p) {
             ifdebug(1)
@@ -592,48 +647,78 @@ static void statement_purge_declarations(statement s)
  */
 bool flatten_code(const char* module_name)
 {
-  entity module;
-  statement module_stat;
   bool good_result_p = true;
 
   set_current_module_entity(module_name_to_entity(module_name));
-  module = get_current_module_entity();
-
-  set_current_module_statement( (statement)
-				db_get_memory_resource(DBR_CODE, module_name, true) );
-  module_stat = get_current_module_statement();
+  entity module = get_current_module_entity();
+  value mv = entity_initial(module);
+  code c = value_code(mv); // No check on value's kind
+  list dl = code_declarations(c);
 
   debug_on("FLATTEN_CODE_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
 
-  // Step 1 and 2: flatten declarations and clean up sequences
-  if ((good_result_p=statement_flatten_declarations(module,module_stat)))
-  {
-    statement_purge_declarations(module_stat);
-    // call sequence flattening as some declarations may have been moved up
-    clean_up_sequences(module_stat);
-
-    // Step 3 and 4: unroll loops and clean up sequences
-    if(get_bool_property("FLATTEN_CODE_UNROLL"))
-    {
-      gen_recurse(module_stat,
-                  statement_domain, gen_true, unroll_loops_in_statement);
-      clean_up_sequences(module_stat); // again
+  // Step 0: the algorithms used do not deal with dependent or
+  // variable-length array (VLA) types unless they are formal parameters
+  // or appear at top-level... (see TRAC ticket 751)
+  // Declarations are moved to the top, without any regard to data dependencies
+  FOREACH(ENTITY, v, dl) {
+    if(!entity_formal_p(v)) {
+      type t = entity_type(v);
+      if(dependent_type_p(t)) {
+	string eln = (string) entity_local_name(v);
+	string s = local_name_to_scope(eln);
+	/* Is it a top-level entity? */
+	if(strlen(s)>2) {
+	  good_result_p = false;
+	  break;
+	}
+	else {
+	  pips_user_warning("Code generated by pass Flatten_code may be wrong"
+			    " because of VLA type of variable \"%s\"\n",
+			    entity_user_name(v));
+	}
+      }
     }
+  }
 
-    // This might not be necessary, thanks to clean_up_sequences
-    module_reorder(module_stat);
-    // Save modified code to database
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
+  if(!good_result_p) {
+    pips_user_warning("Module \"%s\" could not be flattened because it uses a variable-length array (VLA).\n", entity_user_name(module));
+  }
+  else {
+    set_current_module_statement( (statement)
+				  db_get_memory_resource(DBR_CODE, module_name, true) );
+    statement module_stat = get_current_module_statement();
+
+    // Step 1 and 2: flatten declarations and clean up sequences
+    if ((good_result_p=statement_flatten_declarations(module,module_stat)))
+      {
+	statement_purge_declarations(module_stat);
+	// call sequence flattening as some declarations may have been moved up
+	clean_up_sequences(module_stat);
+
+	// Step 3 and 4: unroll loops and clean up sequences
+	if(get_bool_property("FLATTEN_CODE_UNROLL"))
+	  {
+	    gen_recurse(module_stat,
+			statement_domain, gen_true, unroll_loops_in_statement);
+	    clean_up_sequences(module_stat); // again
+	  }
+
+	// This might not be necessary, thanks to clean_up_sequences
+	module_reorder(module_stat);
+	// Save modified code to database
+	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
+      }
+  reset_current_module_statement();
   }
 
   pips_debug(1, "end\n");
   debug_off();
 
   reset_current_module_entity();
-  reset_current_module_statement();
 
-  return (good_result_p);
+  return good_result_p;
 }
 
 

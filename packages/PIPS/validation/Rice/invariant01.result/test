@@ -48,8 +48,8 @@ void invariant01(int n, int ni, int nj)
 
    for(i = 0; i <= ni-1; i += 1) {                                      /*0010*/
       // BEGIN BLOCK
-      j = MAX(INT(nj), 0);
       s = y[i];                                                         /*0012*/
+      j = MAX(INT(nj), 0);
 #pragma omp parallel for 
       for(j = 0; j <= nj-1; j += 1)                                     /*0011*/
          x[i][j] = s;                                                   /*0013*/

@@ -203,7 +203,8 @@ bool entity_written_p(entity ent, effects fx)
       effect ft = EFFECT(CAR(ftl));
       if( ENDP(reference_indices(effect_any_reference(ft)))
 	  && same_entity_p(ent, reference_variable(effect_any_reference(ft)))
-	  && action_write_p(effect_action(ft)) )
+	  && action_write_p(effect_action(ft)) 
+	  && action_kind_store_p(effect_action_kind(ft)) )
 	return(true);
     }, effects_effects(fx));
 

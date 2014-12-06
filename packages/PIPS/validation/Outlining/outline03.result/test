@@ -79,7 +79,7 @@ compute_kernel:
 The kernels should be parallel. Unfotunately, current OUTLINE version relies on reparsing the code, so parallelism information is lost...
 void compute_kernel(float imagein_im[64][64], float imagein_re[64][64])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i, j;
 
 compute_kernel:
@@ -89,7 +89,7 @@ compute_kernel:
 }
 void init_kernel(float imagein_im[64][64], float imagein_re[64][64])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i, j;
 
 init_kernel:
@@ -117,7 +117,7 @@ compute_kernel:   compute_kernel(imagein_im, imagein_re);
 All the kernel loops should be //
 void compute_kernel(float imagein_im[64][64], float imagein_re[64][64])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i, j;
 
 #pragma omp parallel for private(j)
@@ -129,7 +129,7 @@ compute_kernel:
 }
 void init_kernel(float imagein_im[64][64], float imagein_re[64][64])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i, j;
 
 #pragma omp parallel for private(j)

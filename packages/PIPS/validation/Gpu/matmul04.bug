@@ -1,0 +1,15 @@
+Internal error in kernel_load_store pass.
+Might be due to Fortran, because the default offset is 1 instead of 0.
+
+The error message is explicit and yes this is[DThe error message is explicit and, yes, this is a Fortran code:
+
+user warning in do_check_isolate_statement_preconditions_on_call: Trying to isol
+ate a statement with a call that touches a multi-dimensional array `A'
+user warning in do_isolate_statement: isolated statement has callees, transfers 
+will be approximated
+user warning in region_to_minimal_dimensions: failed to analyse region
+user warning in region_to_dimensions: failed to convert regions to minimal array
+ dimensions, using whole array instead
+pips error in declarations_to_dimensions: (/home/francois/MYPIPS/prod/pips/src/L
+ibs/accel-util/isolate_statement.c:188) We shouldn't have an offset in the array
+ declaration, are you using Fortran?

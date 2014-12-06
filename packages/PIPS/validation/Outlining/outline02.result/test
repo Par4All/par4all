@@ -23,7 +23,7 @@ compute_kernel:   j = i+2;
 All the kernel parameters should be passed correctly
 void compute_kernel(int i, int j_0[1])
 {
-   //PIPS generated variable
+   // Declared as a patch variable by Pass Outlining
    int j;
    j = *j_0;
 compute_kernel:   j = i+2;
@@ -31,7 +31,7 @@ compute_kernel:   j = i+2;
 }
 void init_kernel(int i_0[1])
 {
-   //PIPS generated variable
+   // Declared as a patch variable by Pass Outlining
    int i;
    i = *i_0;
 
@@ -50,7 +50,7 @@ compute_kernel:   compute_kernel(i, &j);
 }
 void compute_kernel(int i, int j_0[1])
 {
-   //PIPS generated variable
+   // Declared as a patch variable by Pass Outlining
    int j;
    j = *j_0;
 compute_kernel:   j = i+2;
@@ -58,7 +58,7 @@ compute_kernel:   j = i+2;
 }
 void init_kernel(int i_0[1])
 {
-   //PIPS generated variable
+   // Declared as a patch variable by Pass Outlining
    int i;
    i = *i_0;
 

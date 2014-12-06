@@ -1,0 +1,45 @@
+
+Parsed code
+
+void for03()
+{
+   // BEGIN BLOCK
+{{
+   int c;
+   float a[10];
+
+   for (c = 0;c<10;c++)
+      a[c] = 0.;
+}}
+   // END BLOCK
+}
+
+Old controlized code
+
+void for03()
+{
+   // BEGIN BLOCK
+{{
+   int c;
+   float a[10];
+
+   for(c = 0; c <= 9; c += 1)
+      a[c] = 0.;
+}}
+   // END BLOCK
+}
+
+New controlized code
+
+void for03()
+{
+   // BEGIN BLOCK
+{{
+   int c;
+   float a[10];
+
+   for(c = 0; c <= 9; c += 1)
+      a[c] = 0.;
+}}
+   // END BLOCK
+}

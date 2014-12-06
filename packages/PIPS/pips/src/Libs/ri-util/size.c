@@ -292,7 +292,7 @@ int type_memory_size(type t)
   return s;
 }
 
-/* This function returns the length in bytes of the fortran or C type
+/* This function returns the length in bytes of the Fortran or C type
    represented by a basic, except for a varying size string (formal
    parameter).
 

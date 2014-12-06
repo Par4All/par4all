@@ -101,9 +101,8 @@ update_first()
 	
 	case $VERSION in
 	$LISP )
-		ed -s $first <<!
-0r $DEP
-0a
+        tmpfile=$(mktemp /tmp/newgen.XXXX)
+        cat > $tmpfile << EOF
 (lisp:in-package :newgen :use '())
 (lisp:defvar *gen-tabulated-alloc*)
 (lisp:setf *gen-tabulated-alloc*
@@ -130,10 +129,9 @@ update_first()
 		(lisp:make-array max-tabulated-elements
 					 :initial-element lisp:nil)))))
 
-.
-w
-q
-!
+EOF
+        cat $DEP $first >> $tmpfile
+        mv $tmpfile $first
 		;;
 	$C )
 		;;
@@ -208,13 +206,7 @@ go () {
 	     exit 1
 	  fi
 
-	  ed -s $base.spec <<!
-0a
---NEWGEN-START $start
-.
-w
-q
-!
+	  sed -i -e "1i--NEWGEN-START $start\\" $base.spec
 	    #echo "$start $domains" >&2
 	    exit_package $include $base
 	    start=`expr $start + $domains`

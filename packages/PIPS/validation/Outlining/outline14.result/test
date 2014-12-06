@@ -18,9 +18,9 @@ here:
 }
 void kernel(int H, int R, int W, float sum_0[1], int x, int y, float Kernel[R], float Src[W][H])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int k;
-   //PIPS generated variable
+   // Declared as a patch variable by Pass Outlining
    float sum;
    sum = *sum_0;
 here:

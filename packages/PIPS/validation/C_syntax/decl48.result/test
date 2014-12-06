@@ -24,6 +24,10 @@ Derived entities:
 
 	Variable "decl48!flat_color_z_triangle:0`1`#_PIPS_STRUCT_1"	kind = struct
 
+Typedef entities:
+
+	Typedef "decl48!flat_color_z_triangle:0`1`$EdgeT"	with type "variable" "struct {int v0;}"
+
 Layouts for memory areas:
 
 Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:

@@ -1381,6 +1381,19 @@ transformer any_transformer_to_k_closure(transformer t_init,
     free_transformer(old_npre_iteration);
   }
   t_body_star = transformer_combine(t_body_star, npre_iteration);
+  /* FI: this is a very strong normalization
+   *
+   * obvious redundancy like 0<=x, x<=y, 0<=y is detected
+   *
+   * Integer redundancy elimination is aso used and leads potentially
+   * to larger coefficients and ultimately to an accuracy reduction
+   * when a convex hull is performed.
+   */
+  // FI: I remove it for the time being because it slows down PIPS a lot
+  // according to measurements for NSAD2014, nested01-09.c
+  // t_body_star = transformer_normalize(t_body_star, 0);
+  // Not sufficient for the simple case in Semantics-New/do01
+  // t_body_star = transformer_normalize(t_body_star, 2);
 
   /* Any transformer or other data structure to free? */
   //free_transformer(t_body); transformed into t_fbody

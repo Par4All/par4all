@@ -133,7 +133,8 @@ free_substitution(p_substitution subs)
 static bool no_write_effects_on_var(entity var, list le)
 {
     FOREACH(EFFECT, e, le)
-        if (effect_write_p(e) && entities_may_conflict_p(effect_variable(e), var))
+      if (effect_write_p(e) && entities_may_conflict_p(effect_variable(e), var) 
+	  && action_kind_store_p(effect_action_kind(e)))
             return false;
     return true;  
 }
@@ -141,6 +142,7 @@ static bool no_write_effects_on_var(entity var, list le)
 static bool functionnal_on_effects(reference ref, list /* of effect */ le)
 {
     FOREACH(EFFECT, e, le) {
+      if(action_kind_store_p(effect_action_kind(e)))
         if ((effect_write_p(e) && effect_variable(e)!=reference_variable(ref)) ||
                 (effect_read_p(e) && entities_may_conflict_p(effect_variable(e), reference_variable(ref))))
             return false;
@@ -283,7 +285,7 @@ static void perform_substitution_in_expression(expression e, p_substitution subs
         else
         {
             ifdebug(2) {
-                pips_debug(2,"not substituing ");
+                pips_debug(2,"not substituting ");
                 print_reference(subs->ref);
                 fputs(" to ",stderr);
                 print_reference(r);
@@ -350,7 +352,8 @@ some_conflicts_between(hash_table successors, statement s1, statement s2, p_subs
             FOREACH(CONFLICT,c,dg_arc_label_conflicts(successor_arc_label(s)))
             {
                 /* if there is a write-* conflict, we cannot do much */
-                if ( effect_write_p(conflict_sink(c)) /*&& effect_write_p(conflict_sink(c))*/ )
+	      if ( effect_write_p(conflict_sink(c)) &&
+		   action_kind_store_p(effect_action_kind(conflict_sink(c))) )
                 {
                     /* this case is safe */
                     if( ENDP(reference_indices(effect_any_reference(conflict_source(c)))) && 

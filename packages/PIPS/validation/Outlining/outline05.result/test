@@ -115,7 +115,7 @@ init_kernel:
 
 void init_kernel(float imagein_re[64][64])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i, j;
 
 init_kernel:
@@ -171,7 +171,7 @@ init_kernel:   init_kernel(imagein_re);
 
 void init_kernel(float imagein_re[64][64])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i;
 
 init_kernel:
@@ -192,7 +192,7 @@ init_kernel:
 
 void init_kernel(float imagein_re[64][64])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i;
 
 init_kernel:
@@ -213,7 +213,7 @@ init_kernel:
 
 void init_kernel(float imagein_re[64][64])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i;
 
 #pragma omp parallel for 

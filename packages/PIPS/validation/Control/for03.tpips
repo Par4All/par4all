@@ -1,0 +1,35 @@
+setenv WSPACE=for03
+delete $WSPACE
+create $WSPACE $WSPACE.c 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_ALL_C_BLOCKS TRUE
+
+echo
+echo Parsed code
+echo
+
+display PARSED_PRINTED_FILE
+
+echo
+echo Old controlized code
+echo
+
+display PRINTED_FILE
+
+
+activate NEW_CONTROLIZER
+
+#setenv CONTROL_DEBUG_LEVEL 9
+
+echo
+echo New controlized code
+echo
+
+display PRINTED_FILE
+
+close
+delete $WSPACE
+quit

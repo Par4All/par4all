@@ -1,0 +1,81 @@
+setenv WS "dilig-oopsla-2013-1"
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WS $WS.c
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT  TRUE
+
+echo
+echo Source code with transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[foo]
+
+echo
+echo Source code with transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+# FI: nothing interesting in "main"
+echo
+echo Source code with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+echo
+echo Source code with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[foo]
+
+setproperty TRANSFORMATION_CLONE_ON_ARGUMENT 1
+apply CLONE_ON_ARGUMENT[foo]
+echo # new callgraph
+display CALLGRAPH_FILE[main]
+activate PRINT_CODE
+echo # new codes.
+display PRINTED_FILE[main]
+echo # new codes.
+display PRINTED_FILE[foo_0]
+echo # new codes.
+display PRINTED_FILE[foo_1]
+
+echo # applying partial evaluation...
+apply PARTIAL_EVAL[foo_0]
+apply PARTIAL_EVAL[foo_1]
+apply SIMPLIFY_CONTROL[foo_0]
+apply SIMPLIFY_CONTROL[foo_1]
+
+echo # new codes.
+display PRINTED_FILE[foo_0]
+echo # new codes.
+display PRINTED_FILE[foo_1]
+
+echo
+echo Source code with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[foo_0]
+
+echo
+echo Source code with preconditions
+echo
+
+display PRINTED_FILE[foo_1]
+
+# To retrieve a simpler case to improve the handling of modulo operators
+activate PRINT_CODE
+display PRINTED_FILE[foo_0]
+
+close
+quit

@@ -5437,6 +5437,95 @@ list struct_type_to_fields(type lt)
   list fl = type_struct(st); // field list
   return fl;
 }
+
+/* A type is dependent in many ways according to definitions given in
+ * Wikipedia. Dependent types lead to many issues both theoretical and
+ * practical. The semantics of predicate type_equal_p() should be
+ * precised.
+ *
+ * Here, for practical purposes, we need to know if the storage space
+ * required to store a value of a C type is constant and known at
+ * compile-time, or if it depends on the environment and the store and
+ * must be computed at run-time.
+ *
+ * By this definition, functional types are always constant because
+ * functions are stored as pointer to functions in C. So in C as in
+ * Fortran, only varying dimensions can lead to dependent types. Such
+ * variables are called variable-length array (VLA). So this function
+ * might be called vla_type_p().
+ *
+ * Some VLA are easy to implement and very convenient for the
+ * programmer. They have been included very early in Fortran
+ * extensions. Hence they have been handled in PIPS for a very long
+ * time and are allocated in the STACK_AREA, the DYNAMIC_AREA and
+ * Fortran commons being reserved for non variable-length variables.
+ *
+ * They were introduced in C99 but relegated to conditional feature in
+ * C11 (I kind of remember, due to Microsoft lobbying). Because
+ * declarations can be placed anywhere in post C99 code, the
+ * implementation of VLA maybe costly. The dimensions must be
+ * evaluated and then alignment and packing are performed in situ by
+ * the gcc implementation, as well as stack management. For non-VLA
+ * variables, gcc seems to perform a pass similar to the flatten code
+ * pass or to the clone_statement() function and move all declarations
+ * at the begining of the current function (alpha-renaming). So the
+ * frame allocation is performed statically, apparently using more
+ * space than necessary because variables with disjoint scopes are
+ * allocated simultaneously. These implementation issues have been
+ * explored by Nelson Lossing.
+ *
+ * This predicate is used by passes to check that declarations can be
+ * moved/rescheduled (flatten_code, loop_unroll, full_loop_unroll...).
+ */
+bool dependent_type_p(type t)
+{
+  bool dependent_p = false;
+  if(type_variable_p(t)) {
+    variable v = type_variable(t);
+    list dl = variable_dimensions(v);
+    FOREACH(DIMENSION, d, dl) {
+      expression l = dimension_lower(d);
+      expression u = dimension_upper(d);
+      if(!extended_expression_constant_p(l)
+	 ||!extended_expression_constant_p(u)) {
+	dependent_p = true;
+	break;
+      }
+    }
+    if(!dependent_p) {
+      basic b = variable_basic(v);
+      extern bool dependent_basic_p(basic);
+      dependent_p = dependent_basic_p(b);
+    }
+  }
+  return dependent_p;
+}
+
+bool dependent_basic_p(basic b)
+{
+  bool dependent_p = false;
+  if(basic_typedef_p(b)) {
+    entity te = basic_typedef(b);
+    type t = entity_type(te);
+    dependent_p = dependent_type_p(t);
+  }
+  else if(basic_derived_p(b)) {
+    entity de = basic_derived(b);
+    type dt = entity_type(de);
+    list fl = NIL; // field list
+    if(type_struct_p(dt))
+      fl = type_struct(dt);
+    else if(type_union_p(dt))
+      fl = type_union(dt);
+    FOREACH(ENTITY, fe, fl) {
+      type ft = entity_type(fe);
+      dependent_p = dependent_type_p(ft);
+      if(dependent_p)
+	break;
+    }
+  }
+  return dependent_p;
+}
 /*
  *  that is all
  */

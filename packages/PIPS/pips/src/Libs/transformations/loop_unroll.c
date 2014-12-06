@@ -187,9 +187,6 @@ static void do_loop_unroll_with_epilogue(statement loop_statement,
   //intptr_t lbval, ubval, incval;
   //bool numeric_range_p = false;
 
-  /* Validity of transformation should be checked */
-  /* ie.: - no side effects in replicated expressions */
-
   /* get rid of labels in loop body */
   (void) clear_labels (loop_body (il));
 
@@ -279,6 +276,7 @@ static void do_loop_unroll_with_epilogue(statement loop_statement,
 	pips_assert("The expression for the initial index is consistent",
 		    expression_consistent_p(expr));
       }
+      /* FI: beware of dependent types? 31/10/2014 */
       replace_entity_by_expression(transformed_stmt,ind,expr);
 
       ifdebug(9) {
@@ -851,9 +849,9 @@ bool loop_fully_unrollable_p(loop l)
   return unroll_p;
 }
 
-/* get rid of the loop by body duplication;
+/* get rid of the loop by body replication;
  *
- * the loop body is duplicated as many times as there were iterations
+ * the loop body is replicated as many times as there are iterations
  *
  * FI: could be improved to handle symbolic lower bounds (18 January 1993)
  */
@@ -920,7 +918,16 @@ void full_loop_unroll(statement loop_statement)
         ifdebug(9) {
             pips_assert("full_loop_unroll", expression_consistent_p(expr));
         }
+	/* FI: clone_statement() has been used above to perform
+	   flatten_code. Hence the declarations are no longer
+	   accessible from "transformed_stmt". And when dependent
+	   types are used, they are not updated. */
         replace_entity_by_expression(transformed_stmt,ind,expr);
+	/* Try to update dependent types. Too bad the declarations are
+	   scanned again and again. */
+	FOREACH(ENTITY,e,statement_declarations(get_current_module_statement()))
+	  replace_entity_by_expression(entity_type(e),ind,expr);
+
         ifdebug(9) {
             pips_assert("full_loop_unroll", statement_consistent_p(transformed_stmt));
         }
@@ -1072,17 +1079,41 @@ unroll(char *mod_name)
             set_current_module_entity(module_name_to_entity( mod_name ));
             set_current_module_statement( mod_stmt);
 
-            /* do the job */
             statement loop_statement = find_loop_from_label(mod_stmt,lb_ent);
-            if( ! statement_undefined_p(loop_statement) )
-                loop_unroll(loop_statement,rate);
+            if( ! statement_undefined_p(loop_statement) ) {
+	      instruction i = statement_instruction(loop_statement);
+	      loop l = instruction_loop(i);
+	      /* Validity of transformation should be checked */
+	      /* ie.: - no side effects in replicated expressions */
+	      /* No dependent types in C */
+	      list vl = statement_declarations(loop_body(l));
+	      bool dependent_p = false;
+	      FOREACH(ENTITY, v, vl) {
+		type t = entity_type(v);
+		if(dependent_type_p(t)) {
+		  dependent_p = true;
+		  break;
+		}
+	      }
+
+	      if(dependent_p) {
+		pips_user_warning("Loop cannot be unrolled because it contains a dependent type.\n");
+		return_status = false;
+	      }
+	      else {
+		/* do the job */
+		loop_unroll(loop_statement,rate);
+	      }
+	    }
             else
                 pips_user_error("label '%s' is not linked to a loop\n", lp_label);
 
-            /* Reorder the module, because new statements have been generated. */
-            module_reorder(mod_stmt);
+	    if(return_status) {
+	      /* Reorder the module, because new statements have been generated. */
+	      module_reorder(mod_stmt);
 
-            DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
+	      DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
+	    }
             /*postlude*/
             reset_current_module_entity();
             reset_current_module_statement();
@@ -1160,7 +1191,7 @@ full_unroll(char * mod_name)
     }
     if( !return_status)
         user_log("transformation has been cancelled\n");
-    debug(2,"unroll","done for %s\n", mod_name);
+    pips_debug(2,"done for %s\n", mod_name);
     debug_off();
         /* Reorder the module, because new statements have been generated. */
         module_reorder(mod_stmt);

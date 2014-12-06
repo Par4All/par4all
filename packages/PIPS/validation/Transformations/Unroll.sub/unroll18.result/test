@@ -1,0 +1,11 @@
+void unroll18()
+{
+   int i, j[10];
+bar:
+   for(i = 0; i <= 9; i += 1) {
+      typedef int mtype[i];
+      mtype x;
+      x[0] = i;
+      j[0] = x[0];
+   }
+}

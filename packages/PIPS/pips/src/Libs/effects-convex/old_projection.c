@@ -383,114 +383,113 @@ void project_regions_with_transformer_inverse(list l_reg, transformer trans,
  *            described in document E/185/CRI.
  */
 void regions_transformer_apply(list l_reg, transformer trans,
-			       list l_var_not_proj, bool backward_p)
+    list l_var_not_proj, bool backward_p)
 {
-    list l_var = arguments_difference(transformer_arguments(trans), l_var_not_proj);
+  list l_var = arguments_difference(transformer_arguments(trans), l_var_not_proj);
 
-    if (ENDP(l_var) || ENDP(l_reg))
-	return;
+  if (ENDP(l_var) || ENDP(l_reg))
+    return;
 
+  debug_on("REGIONS_OPERATORS_DEBUG_LEVEL");
+  debug_regions_consistency(l_reg);
 
-    debug_on("REGIONS_OPERATORS_DEBUG_LEVEL");
-    debug_regions_consistency(l_reg);
+  ifdebug(3)
+  {
+    pips_debug_effects(3, "regions before transformation:\n", l_reg);
+    pips_debug(3, "elimination of variables: \n");
+    print_arguments(l_var);
+  }
 
-    ifdebug(3)
+  if (!must_regions_p())
+  {
+    project_regions_along_parameters(l_reg, l_var);
+  }
+  else
+  {
+    list l_int, l_old;
+    Psysteme sc_trans = sc_dup(predicate_system(transformer_relation(trans)));
+
+    ifdebug(8)
     {
-      pips_debug_effects(3, "regions before transformation:\n", l_reg);
-      pips_debug(3, "elimination of variables: \n");
-      print_arguments(l_var);
+      fprintf(stderr,"transformer:\n");
+      sc_print(sc_trans, (get_variable_name_t) entity_local_name);
     }
 
-    if (!must_regions_p())
+    /* addition of the predicate of the transformer to the predicate of
+     * the regions and elimination of redundances; then, projection of
+     * regions along initial variables, and renaming of old variables
+     * corresponding to the eliminated variables into new variables. */
+
+    /* first we store the names of the old and int variables */
+    l_old = variables_to_old_variables(l_var);
+    l_int = variables_to_int_variables(l_var);
+
+    if(backward_p)
     {
-	project_regions_along_parameters(l_reg, l_var);
+      sc_list_variables_rename(sc_trans, l_var, l_int);
+      sc_list_variables_rename(sc_trans, l_old, l_var);
     }
     else
     {
-	list l_int, l_old;
-	Psysteme sc_trans = sc_dup(predicate_system(transformer_relation(trans)));
-
-	ifdebug(8)
-	    {
-		fprintf(stderr,"transformer:\n");
-		sc_print(sc_trans, (get_variable_name_t) entity_local_name);
-	    }
-
-	/* addition of the predicate of the transformer to the predicate of
-	 * the regions and elimination of redundances; then, projection of
-	 * regions along initial variables, and renaming of old variables
-         * corresponding to the eliminated variables into new variables. */
-
-	/* first we store the names of the old and int variables */
-	l_old = variables_to_old_variables(l_var);
-	l_int = variables_to_int_variables(l_var);
-
-	if(backward_p)
-	{
-	    sc_list_variables_rename(sc_trans, l_var, l_int);
-	    sc_list_variables_rename(sc_trans, l_old, l_var);
-	}
-	else
-	{
-	    sc_list_variables_rename(sc_trans, l_old, l_int);
-	}
-
-	FOREACH(EFFECT, reg, l_reg)
-	  {
-	  if(store_effect_p(reg))
-	    {
-	      Psysteme sc_reg = region_system(reg);
-	      
-	      if (!SC_UNDEFINED_P(sc_reg) && !sc_empty_p(sc_reg) && !sc_rn_p(sc_reg))
-		{
-		  debug_region_consistency(reg);
-
-		  pips_debug_effect(8, "region before transformation: \n", reg);
-
-		  sc_list_variables_rename(sc_reg, l_var, l_int);
-		  pips_debug_effect(8, "region after renaming: \n", reg);
-
-		  /* addition of the predicate of the transformer,
-		     and elimination of redundances */
-		  region_sc_append_and_normalize(reg, sc_trans, 1);
-
-		  debug_region_consistency(reg);
-
-		  pips_debug_effect(8, "region after addition of the transformer: ", reg);
-
-		  /* projection along intermediate variables */
-		  region_exact_projection_along_parameters(reg, l_int);
-		  debug_region_consistency(reg);
-		  pips_debug_effect(8, "region after projection along parameters: \n", reg );
-
-		  /* remove potential old values that may be found in transformer */
-		  list l_old_values = NIL;
-		  sc_reg = region_system(reg);
-		  for(Pbase b = sc_base(sc_reg); !BASE_NULLE_P(b); b = vecteur_succ(b)) {
-		    entity e = (entity) vecteur_var(b);
-		    if(local_old_value_entity_p(e)) {
-		      l_old_values = CONS(ENTITY, e, l_old_values);
-		    }
-		  }
-		  region_exact_projection_along_parameters(reg, l_old_values);
-		  gen_free_list(l_old_values);
-		  debug_region_consistency(reg);
-		  pips_debug_effect(8, "region after transformation: \n", reg );
-		}
-	    }
-	  }
-
-	/* no memory leaks */
-	gen_free_list(l_int);
-	gen_free_list(l_old);
-	sc_rm(sc_trans);
+      sc_list_variables_rename(sc_trans, l_old, l_int);
     }
 
-    pips_debug_effects(3, "regions after transformation:\n", l_reg);
+    FOREACH(EFFECT, reg, l_reg)
+    {
+      if(store_effect_p(reg))
+      {
+        Psysteme sc_reg = region_system(reg);
 
-    gen_free_list(l_var);
-    debug_regions_consistency(l_reg);
-    debug_off();
+        if (!SC_UNDEFINED_P(sc_reg) && !sc_empty_p(sc_reg) && !sc_rn_p(sc_reg))
+        {
+          debug_region_consistency(reg);
+
+          pips_debug_effect(8, "region before transformation: \n", reg);
+
+          sc_list_variables_rename(sc_reg, l_var, l_int);
+          pips_debug_effect(8, "region after renaming: \n", reg);
+
+          /* addition of the predicate of the transformer,
+		     and elimination of redundances */
+          region_sc_append_and_normalize(reg, sc_trans, 1);
+
+          debug_region_consistency(reg);
+
+          pips_debug_effect(8, "region after addition of the transformer: ", reg);
+
+          /* projection along intermediate variables */
+          region_exact_projection_along_parameters(reg, l_int);
+          debug_region_consistency(reg);
+          pips_debug_effect(8, "region after projection along parameters: \n", reg );
+
+          /* remove potential old values that may be found in transformer */
+          list l_old_values = NIL;
+          sc_reg = region_system(reg);
+          for(Pbase b = sc_base(sc_reg); !BASE_NULLE_P(b); b = vecteur_succ(b)) {
+            entity e = (entity) vecteur_var(b);
+            if(local_old_value_entity_p(e)) {
+              l_old_values = CONS(ENTITY, e, l_old_values);
+            }
+          }
+          region_exact_projection_along_parameters(reg, l_old_values);
+          gen_free_list(l_old_values);
+          debug_region_consistency(reg);
+          pips_debug_effect(8, "region after transformation: \n", reg );
+        }
+      }
+    }
+
+    /* no memory leaks */
+    gen_free_list(l_int);
+    gen_free_list(l_old);
+    sc_rm(sc_trans);
+  }
+
+  pips_debug_effects(3, "regions after transformation:\n", l_reg);
+
+  gen_free_list(l_var);
+  debug_regions_consistency(l_reg);
+  debug_off();
 }
 
 
@@ -537,67 +536,67 @@ list regions_dynamic_elim(list l_reg)
   debug_regions_consistency(l_reg);
 
   FOREACH(EFFECT, reg, l_reg)
+  {
+    if(store_effect_p(reg)) {
+      entity reg_ent = region_entity(reg);
+      storage reg_s = entity_storage(reg_ent);
+      bool ignore_this_region = false;
+
+      ifdebug(4)
       {
-	if(store_effect_p(reg)) {
-        entity reg_ent = region_entity(reg);
-        storage reg_s = entity_storage(reg_ent);
-        bool ignore_this_region = false;
-
-	ifdebug(4)
-	  {
-	    pips_debug_effect(4, "current region: \n", reg);
-	  }
-
-	/* If the reference is a common variable (ie. with storage ram but
-	 * not dynamic) or a formal parameter, the region is not ignored.
-	 */
-	if(!anywhere_effect_p(reg)) {
-	  switch (storage_tag(reg_s))
-	    {
-	    case is_storage_return:
-	      pips_debug(5, "return var ignored (%s)\n", entity_name(reg_ent));
-	      ignore_this_region = true;
-	      break;
-	    case is_storage_ram:
-	      {
-		ram r = storage_ram(reg_s);
-		if (dynamic_area_p(ram_section(r)) || heap_area_p(ram_section(r))
-		    || stack_area_p(ram_section(r)))
-		  {
-		    pips_debug(5, "dynamic or pointed var ignored (%s)\n", entity_name(reg_ent));
-		    ignore_this_region = true;
-		  }
-		break;
-	      }
-	    case is_storage_formal:
-	      break;
-	    case is_storage_rom:
-	      if(!entity_special_area_p(reg_ent) && !anywhere_effect_p(reg))
-		ignore_this_region = true;
-	      break;
-	      /* pips_internal_error("bad tag for %s (rom)", entity_name(reg_ent)); */
-	    default:
-	      pips_internal_error("case default reached");
-	    }
-	}
-
-        if (! ignore_this_region)  /* Eliminate dynamic variables. */
-	  {
-	    region r_res = region_dup(reg);
-	    region_dynamic_var_elim(r_res);
-	    ifdebug(4)
-	      {
-		pips_debug_effect(4, "region kept : \n", r_res);
-	      }
-            l_res = region_add_to_regions(r_res,l_res);
-	  }
-	else
-	  ifdebug(4)
-	    {
-	      pips_debug_effect(4, "region removed : \n", reg);
-	    }
-	}
+        pips_debug_effect(4, "current region: \n", reg);
       }
+
+      /* If the reference is a common variable (ie. with storage ram but
+       * not dynamic) or a formal parameter, the region is not ignored.
+       */
+      if(!anywhere_effect_p(reg)) {
+        switch (storage_tag(reg_s))
+        {
+        case is_storage_return:
+          pips_debug(5, "return var ignored (%s)\n", entity_name(reg_ent));
+          ignore_this_region = true;
+          break;
+        case is_storage_ram:
+        {
+          ram r = storage_ram(reg_s);
+          if (dynamic_area_p(ram_section(r)) || heap_area_p(ram_section(r))
+              || stack_area_p(ram_section(r)))
+          {
+            pips_debug(5, "dynamic or pointed var ignored (%s)\n", entity_name(reg_ent));
+            ignore_this_region = true;
+          }
+          break;
+        }
+        case is_storage_formal:
+          break;
+        case is_storage_rom:
+          if(!entity_special_area_p(reg_ent) && !anywhere_effect_p(reg))
+            ignore_this_region = true;
+          break;
+          /* pips_internal_error("bad tag for %s (rom)", entity_name(reg_ent)); */
+        default:
+          pips_internal_error("case default reached");
+        }
+      }
+
+      if (! ignore_this_region)  /* Eliminate dynamic variables. */
+      {
+        region r_res = region_dup(reg);
+        region_dynamic_var_elim(r_res);
+        ifdebug(4)
+        {
+          pips_debug_effect(4, "region kept : \n", r_res);
+        }
+        l_res = region_add_to_regions(r_res,l_res);
+      }
+      else
+        ifdebug(4)
+        {
+        pips_debug_effect(4, "region removed : \n", reg);
+        }
+    }
+  }
   debug_regions_consistency(l_reg);
   debug_off();
 

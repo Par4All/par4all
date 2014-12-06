@@ -16,7 +16,6 @@ int decode_mcu()
 {
    // BEGIN BLOCK
    int blkn;
-   // BEGIN BLOCK
 
    for(blkn = 0; blkn <= 63; blkn += 1) {
 //:      BEGIN UNSTRUCTURED
@@ -27,7 +26,6 @@ l99999:      ;
 
 //:      END UNSTRUCTURED
    }
-   // END BLOCK
    return 1;
    // END BLOCK
 }

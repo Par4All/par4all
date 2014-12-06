@@ -1,0 +1,64 @@
+setenv WSPACE=invariant05
+delete $WSPACE
+create $WSPACE $WSPACE.c 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setproperty GENERATE_MISSING_SOURCE_FILES TRUE
+#activate C_PARSER
+
+#setproperty PRETTYPRINT_LANGUAGE "C"
+#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+#setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+# We use the winning combination, except TRANSFORMERS_IN_CONTEXT
+#activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+#activate TRANSFORMERS_INTER_FULL
+#activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo Initial source code
+echo
+
+display PRINTED_FILE[$WSPACE]
+
+#echo
+#echo Parallelized code
+#echo
+#
+#apply PRIVATIZE_MODULE
+#display PARALLELPRINTED_FILE[$WSPACE]
+
+echo
+echo Source code after invariant code motion
+echo
+
+#activate RICE_FULL_DEPENDENCE_GRAPH
+
+#setproperty PARTIAL_DISTRIBUTION TRUE
+
+apply INVARIANT_CODE_MOTION
+#apply RESTRUCTURE_CONTROL
+display PRINTED_FILE[$WSPACE]
+
+apply UNSPLIT[%PROGRAM]
+
+close
+
+echo
+echo Warnings
+echo
+
+shell cat $WSPACE.database/Warnings
+
+delete $WSPACE
+quit

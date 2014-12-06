@@ -1,0 +1,38 @@
+setenv WS=flip-flop03
+
+delete $WS
+create $WS $WS.c
+setproperty ABORT_ON_USER_ERROR FALSE
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR  "derivative"
+
+#setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING  TRUE
+#setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION  TRUE
+#setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+#setproperty ALIASING_ACROSS_IO_STREAMS FALSE
+
+setproperty CONSTANT_PATH_EFFECTS FALSE
+#setproperty SEMANTICS_K_FIX_POINT 2
+#setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+echo
+echo Transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+echo
+echo Preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+
+close
+delete $WS
+quit

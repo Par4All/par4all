@@ -1,0 +1,1 @@
+bug in the handling of call site to init_array()

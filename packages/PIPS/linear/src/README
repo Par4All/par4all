@@ -19,7 +19,7 @@ The C data type for the coefficients is Value. It can be set to 32 or
 64 bit integers, but is incompatible with big nums. Arithmetic
 overflows are trapped.
 
-The library is also interfaced with the Janus libray.
+The library is also interfaced with the Janus library.
 
 BUILDING THE LIBRARIES
 ----------------------

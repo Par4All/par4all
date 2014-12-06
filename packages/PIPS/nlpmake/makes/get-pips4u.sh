@@ -69,9 +69,9 @@ TGZ_PIPS=http://ridee.enstb.org/pips/pips-${PIPS_AUTOTOOLS_VERSION}.tar.gz
 
 # devel mode (i.e. checkout from the SVN tree)
 # ??? https is prefered?
-SVN_NEWGEN=http://svn.cri.ensmp.fr/svn/newgen/trunk
-SVN_LINEAR=http://svn.cri.ensmp.fr/svn/linear/trunk
-SVN_PIPS=http://svn.cri.ensmp.fr/svn/pips/trunk
+SVN_NEWGEN=https://scm.cri.ensmp.fr/svn/newgen/trunk
+SVN_LINEAR=https://scm.cri.ensmp.fr/svn/linear/trunk
+SVN_PIPS=https://scm.cri.ensmp.fr/svn/pips/trunk
 # ??? what about the validation?
 # ??? what about the user development branches?
 
@@ -445,7 +445,7 @@ to your .bashrc or whatever:
   export PATH=${INSTALL_PREFIX}/bin:$PATH
   export LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib
   export PKG_CONFIG_PATH=${INSTALL_PREFIX}/lib/pkgconfig
-  export PYTHONPATH=${INSTALL_PREFIX}/lib/python2.6/site-packages/pips
+  export PYTHONPATH=${INSTALL_PREFIX}/lib/python2.7/site-packages/pips
 
 ================================================================================
 EOF

@@ -11,9 +11,9 @@
   the Free Software Foundation, either version 3 of the License, or
   any later version.
 
-  Linear/C3 Library is distributed in the hope that it will be useful, but WITHOUT ANY
-  WARRANTY; without even the implied warranty of MERCHANTABILITY or
-  FITNESS FOR A PARTICULAR PURPOSE.
+  Linear/C3 Library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
   See the GNU Lesser General Public License for more details.
 
@@ -42,72 +42,62 @@
 
 #include "sc-private.h"
 
+typedef struct {
+  Pbase rbase;         // reverse loop base
+  Pbase others;        // other variables
+  bool inner_first;    // inner or outer loop first
+  bool complex_first;  // complex or simplest first
+} sort_ctx_t;
 
-/*   COMPARISON of CONSTRAINTS
- *
- *
- *
- *
- *
- */
-
-static Pbase 
-  rbase_for_compare  = BASE_NULLE, 
-  others_for_compare = BASE_NULLE;
-static bool
-  inner_for_compare,
-  complex_for_compare;
-
-static void set_info_for_compare(base, sort_base, inner_first, complex_first)
-Pbase base, sort_base;
-bool inner_first, complex_first;
+static void set_sort_context(
+  sort_ctx_t * context,
+  Pbase base,
+  Pbase sort_base,
+  bool inner_first,
+  bool complex_first)
 {
-    Pbase btmp=BASE_NULLE;
-    assert(BASE_NULLE_P(rbase_for_compare) &&
-	   BASE_NULLE_P(others_for_compare));
+  Pbase btmp = BASE_NULLE;
+  assert(context != NULL);
 
-    /* the base is reversed! inner indexes first!!
-     */
-    rbase_for_compare  = base_normalize(base_reversal(sort_base));
-    btmp = base_difference(base, sort_base);
-    others_for_compare =  base_normalize(btmp);
-    inner_for_compare = inner_first;
-    complex_for_compare = complex_first;
+  // the base is reversed! inner indexes first!!
+  context->rbase  = base_normalize(base_reversal(sort_base));
+  btmp = base_difference(base, sort_base);
+  context->others =  base_normalize(btmp);
+  context->inner_first = inner_first;
+  context->complex_first = complex_first;
 }
 
-static void reset_info_for_compare()
+static void clear_sort_context(sort_ctx_t * context)
 {
-    base_rm(rbase_for_compare),  rbase_for_compare=BASE_NULLE;
-    base_rm(others_for_compare), others_for_compare=BASE_NULLE;
+  assert(context != NULL);
+  base_rm(context->rbase), context->rbase = BASE_NULLE;
+  base_rm(context->others), context->others = BASE_NULLE;
 }
 
 #define ADD_COST (1)
 #define MUL_COST (1)
 #define AFF_COST (1)
-static int cost_of_constant_operations(v) 
-Pvecteur v;
+static int cost_of_constant_operations(Pvecteur v, sort_ctx_t * context)
 {
-    int cost = AFF_COST;
-    Pbase b;
-    Value val;
-    
-    /*   constant
-     */
-    if (value_notzero_p(vect_coeff(TCST, v)))
-	cost += ADD_COST;
+  int cost = AFF_COST;
+  Pbase b;
+  Value val;
 
-    /*   other variables
-     */
-    for (b=others_for_compare; b!=(Pvecteur)NULL; b=b->succ)
-    {
-	val = vect_coeff(var_of(b), v);
-	val = value_abs(val);
+  // constant
+  if (value_notzero_p(vect_coeff(TCST, v)))
+    cost += ADD_COST;
 
-	if (value_notzero_p(val))
+  //  other variables
+  for (b=context->others; b!=(Pvecteur)NULL; b=b->succ)
+  {
+    val = vect_coeff(var_of(b), v);
+    val = value_abs(val);
+
+    if (value_notzero_p(val))
 	    cost+=value_one_p(val)? ADD_COST: (MUL_COST+ADD_COST);
-    }
+  }
 
-    return(cost);
+  return cost;
 }
 
 /* for qsort, returns "is simpler than"
@@ -116,249 +106,265 @@ Pvecteur v;
  *    0 : v1==v2
  *    + : v1 > v2
  *
- * with the following criterion 
+ * with the following criterion
  *
  *  1/ ranks
  *  2/ coef of comparable ranks, +-1 or simpler...
- *  3/ 
+ *  3/
  *
- * rational: 
+ * rational:
  *  - loop sizes are assumed to be infinite
  *  - invariant code motion
  *  - induction variables recognized
  */
-#define DB_RESULT(e)							 \
-{									 \
-      int result = (e);							 \
-      fprintf(stderr, "[compare_the_constraints]\n");			 \
-      vect_debug(v1); vect_debug(v2);					 \
-      fprintf(stderr, "%s\n", result==0 ? "=" : (result>0 ? ">" : "<")); \
-      return(result);							 \
-}
+#define DB_RESULT(e)                                                    \
+  {                                                                     \
+    int result = (e);                                                   \
+    fprintf(stderr, "[compare_the_constraints]\n");                     \
+    vect_debug(v1); vect_debug(v2);                                     \
+    fprintf(stderr, "%s\n", result==0 ? "=" : (result>0 ? ">" : "<"));  \
+    return(result);                                                     \
+  }
 
 #define RESULT(e) { return (e); }
 
-#define RETURN_HARDER(b) RESULT(complex_for_compare ? (b) : -(b))
-#define RETURN_ORDER(b) RESULT(inner_for_compare ? (b) : -(b))
-#define same_sign_p(v,w) ((value_neg_p(v) && value_neg_p(w)) || \
-			  (value_pos_p(v) && value_pos_p(w)))
+#define RETURN_HARDER(b) RESULT(context->complex_first ? (b) : -(b))
+#define RETURN_ORDER(b) RESULT(context->inner_first ? (b) : -(b))
 
-/* returns -1: c1<c2, 0: c1==c2, +1: c1>c2
+#define same_sign_p(v,w)                                                \
+  ((value_neg_p(v) && value_neg_p(w)) || (value_pos_p(v) && value_pos_p(w)))
+
+/* compare two constraints with a loop complexity cost in mind?
+ * not exactly, some of the choices attempt to avoid large coefs?
+ *
+ * returns -1: c1<c2, 0: c1==c2, +1: c1>c2
  */
-static int compare_the_constraints(pc1, pc2)
-Pcontrainte *pc1, *pc2;
+static int compare_the_constraints(
+  const Pcontrainte * pc1,
+  const Pcontrainte * pc2,
+  sort_ctx_t * context)
 {
-    Pvecteur
-	v1 = (*pc1)->vecteur,
-	v2 = (*pc2)->vecteur;
-    int null_1, null_2, i, irank=0, cost_1, cost_2;
-    Value val_1=VALUE_ZERO, val_2=VALUE_ZERO, 
-          val=VALUE_ZERO, val_p=VALUE_ZERO;
-    Pbase b, high=NULL;
+  Pvecteur v1 = (*pc1)->vecteur, v2 = (*pc2)->vecteur;
+  bool null_1, null_2;
+  int i, irank = 0, cost_1, cost_2;
+  Value val_1 = VALUE_ZERO, val_2 = VALUE_ZERO,
+    val = VALUE_ZERO, val_p = VALUE_ZERO;
+  Pbase b, high = NULL;
 
-    /*  for each inner first indexes,
-     *  the first constraint with a null coeff while the other one is non 
-     *  null is the simplest.
-     */
-    for (i=1, b=rbase_for_compare; !BASE_NULLE_P(b); i++, b=b->succ)
+  // for each inner first indexes, the first constraint with a null coeff
+  // while the other one is not is the simplest
+  for (i=1, b=context->rbase; !BASE_NULLE_P(b); i++, b=b->succ)
+  {
+    val_1 = vect_coeff(var_of(b), v1);
+    null_1 = value_zero_p(val_1);
+    val_2 = vect_coeff(var_of(b), v2);
+    null_2 = value_zero_p(val_2);
+
+    // first loop index with something
+    // BUG too early
+    if (irank == 0 && !same_sign_p(val_1, val_2))
+      // BUG: condition is always false?
+	    RETURN_ORDER(value_neg_p(val_1) && value_neg_p(val_2) ?
+                   value_compare(val_2, val_1):
+                   value_compare(val_1 ,val_2));
+
+    // *one* coef is zero and the other *not*, we can conclude
+    if (null_1 ^ null_2)
     {
-	val_1 = vect_coeff(var_of(b), v1), null_1 = value_zero_p(val_1),
-	val_2 = vect_coeff(var_of(b), v2), null_2 = value_zero_p(val_2);
-
-	if (irank==0 && !same_sign_p(val_1,val_2))
-	    RETURN_ORDER(value_neg_p(val_1) && value_neg_p(val_2)? 
-			 value_compare(val_2,val_1): 
-			 value_compare(val_1,val_2));
-
-	if (null_1 ^ null_2) {
-	    if (irank==0)
-	    { RETURN_ORDER(value_compare(null_1,null_2));}
+	    if (irank == 0) // ???
+      { RETURN_ORDER(value_compare(null_1, null_2)); }
 	    else
-	    { RETURN_HARDER(value_compare(null_1,null_2));} 
-	}
-	if (irank==0 && (!null_1||!null_2)) 
+      { RETURN_HARDER(value_compare(null_1, null_2)); }
+    }
+
+    // keep track of first inner loop with non zero values?
+    if (irank == 0 && (!null_1 || !null_2))
 	    val=val_1, val_p=val_2, irank=i, high=b;
-    }
+  }
 
-    if (value_ne(val_p,val))
-	RETURN_HARDER(value_neg_p(val_1) && value_neg_p(val_2)? 
-		      value_compare(val_2,val_1): 
-		      value_compare(val_1,val_2));
-    
-    /*   constant operations
-     */
-    cost_1 = cost_of_constant_operations(v1),
-    cost_2 = cost_of_constant_operations(v2);
+  // BUG?
+  // why conclude now on these values, and not on the cost below first?
+  if (value_ne(val_p, val))
+    RETURN_HARDER(value_neg_p(val_1) && value_neg_p(val_2) ?
+                  value_compare(val_2, val_1):
+                  value_compare(val_1, val_2));
 
-    if (cost_1!=cost_2) RETURN_HARDER(cost_2-cost_1);
+  //   constant operations
+  cost_1 = cost_of_constant_operations(v1, context);
+  cost_2 = cost_of_constant_operations(v2, context);
 
-    /*   compare the coefficients for the base
-     */
-    for (b=high==NULL ? NULL : high->succ; !BASE_NULLE_P(b); b=b->succ)
-    {
-	val_1 = vect_coeff(var_of(b), v1),
-	val_2 = vect_coeff(var_of(b), v2);
-	
-	if (value_ne(val_1,val_2))
-	    RETURN_HARDER(value_neg_p(val_1) && value_neg_p(val_2)? 
-			  value_compare(val_1,val_2): 
-			  value_compare(val_2,val_1));
-    }
+  if (cost_1 != cost_2) RETURN_HARDER(cost_2-cost_1);
 
-    /*   do it for the for the parameters
-     */
-    for (b=others_for_compare; !BASE_NULLE_P(b); b=b->succ)
-    {
-	val_1 = vect_coeff(var_of(b), v1),
-	val_2 = vect_coeff(var_of(b), v2);
-	
-	if (value_ne(val_1,val_2))
+  // the depth & cost are equal, we need another criterion base on values
+  // compare the coefficients for the base, starting from the first after
+  // the first non null.
+  for (b=high==NULL ? NULL : high->succ; !BASE_NULLE_P(b); b=b->succ)
+  {
+    val_1 = vect_coeff(var_of(b), v1);
+    val_2 = vect_coeff(var_of(b), v2);
+
+    if (value_ne(val_1, val_2))
+	    RETURN_HARDER(value_neg_p(val_1) && value_neg_p(val_2)?
+                    value_compare(val_1, val_2):
+                    value_compare(val_2, val_1));
+  }
+
+  // all equals, do it for the for the parameters
+  for (b=context->others; !BASE_NULLE_P(b); b=b->succ)
+  {
+    val_1 = vect_coeff(var_of(b), v1);
+    val_2 = vect_coeff(var_of(b), v2);
+
+    if (value_ne(val_1, val_2))
 	    RETURN_HARDER(value_compare(val_2,val_1));
-    }
-    
-    /*   at last the constant
-     */
-    val_1 = vect_coeff(TCST, v1),
-    val_2 = vect_coeff(TCST, v2);
+  }
 
-    RETURN_HARDER(value_pos_p(val)? 
-		  value_compare(val_2,val_1): 
-		  value_compare(val_1,val_2));
+  // at last the constant
+  val_1 = vect_coeff(TCST, v1);
+  val_2 = vect_coeff(TCST, v2);
+
+  // the sign is needed so that equalities are normalized...
+  // here we have val==val_p
+  RETURN_HARDER(value_pos_p(val)?
+                value_compare(val_2, val_1):
+                value_compare(val_1, val_2));
 }
 
-static int compare_the_constraints_debug(pc1, pc2)
-Pcontrainte *pc1, *pc2;
+/*
+static int compare_the_constraints_debug(Pcontrainte *pc1, Pcontrainte *pc2)
 {
-    int b1, b2;
-    b1 = compare_the_constraints(pc1, pc2),
-    b2 = compare_the_constraints(pc2, pc1);
-    assert((b1+b2)==0);
-    return b1;
+  int b1, b2;
+  b1 = compare_the_constraints(pc1, pc2),
+  b2 = compare_the_constraints(pc2, pc1);
+  assert((b1+b2)==0);
+  return b1;
 }
+*/
 
 /* returns the highest rank pvector of v in b, of rank *prank
  */
-Pvecteur highest_rank_pvector(v, b, prank)
-Pvecteur v;
-Pbase b;
-int *prank;
+Pvecteur highest_rank_pvector(Pvecteur v, Pbase b, int *prank)
 {
-    Pbase pb;
-    Pvecteur pv, result=(Pvecteur) NULL;
-    Variable var;
-    int rank;
+  Pbase pb;
+  Pvecteur pv, result=(Pvecteur) NULL;
+  Variable var;
+  int rank;
 
-    for (*prank=-1, rank=1, pb=b;
-	 !BASE_NULLE_P(pb);
-	 pb=pb->succ, rank++)
-    {
-	var = var_of(pb);
-	
-	for (pv=v; pv!=NULL; pv=pv->succ)
-	    if (var_of(pv)==var) 
+  for (*prank=-1, rank=1, pb=b;
+       !BASE_NULLE_P(pb);
+       pb=pb->succ, rank++)
+  {
+    var = var_of(pb);
+
+    for (pv=v; pv!=NULL; pv=pv->succ)
+	    if (var_of(pv)==var)
 	    {
-		result=pv;
-		*prank=rank;
-		continue;
+        result=pv;
+        *prank=rank;
+        continue;
 	    }
-    }
+  }
 
-    return(result);
+  return result;
 }
 
 /*  sorts the constraints according to the compare function,
  *  and set the number of constraints for each index of the sort base
  */
 
-Pcontrainte constraints_sort_info(c, sort_base, compare, info)
-Pcontrainte c;
-Pbase sort_base;
-int (*compare)();
-two_int_infop info;
+static Pcontrainte constraints_sort_info(
+  Pcontrainte c,
+  Pbase sort_base,
+  constraint_cmp_func_t compare,
+  void * context,
+  two_int_infop info)
 {
-    Pcontrainte pc, *tc;
-    Pvecteur phrank;
-    int	i, rank,
-	nb_of_sort_vars = vect_size(sort_base),
-	nb_of_constraints = nb_elems_list(c);
+  Pcontrainte pc, *tc;
+  Pvecteur phrank;
+  int	i, rank,
+    nb_of_sort_vars = vect_size(sort_base),
+    nb_of_constraints = nb_elems_list(c);
 
-    if (nb_of_constraints<=1) return(c);
+  if (nb_of_constraints<=1) return c;
 
-    tc   = (Pcontrainte*) malloc(sizeof(Pcontrainte)*nb_of_constraints);
+  tc  = (Pcontrainte*) malloc(sizeof(Pcontrainte)*nb_of_constraints);
 
-    for (i=0; i<=nb_of_sort_vars; i++)
-	info[i][0]=0, info[i][1]=0;
+  for (i=0; i<=nb_of_sort_vars; i++)
+    info[i][0]=0, info[i][1]=0;
 
-    /*   the constraints are put in the table
-     *   and info is set.
-     */
-    for (i=0, pc=c; pc!=NULL; i++, pc=pc->succ)
+  /*   the constraints are put in the table
+   *   and info is set.
+   */
+  for (i=0, pc=c; pc!=NULL; i++, pc=pc->succ)
+  {
+    tc[i] = pc;
+    if (!BASE_NULLE_P(sort_base))
     {
-	tc[i] = pc;
-	if (!BASE_NULLE_P(sort_base))
-	{
 	    phrank = highest_rank_pvector(pc->vecteur, sort_base, &rank);
 	    info[rank==-1?0:rank][rank==-1?0:value_pos_p(val_of(phrank))]++;
-	}
     }
-    
-   qsort(tc, nb_of_constraints, sizeof(Pcontrainte), compare);
+  }
 
-    /*  the list of constraints is generated again
-     */
-    for (i=0; i<nb_of_constraints-1; i++)
-    {
-	tc[i]->succ = tc[i+1];
-    }
-    tc[nb_of_constraints-1]->succ=NULL;
-    c = tc[0];
+  qsort_r(tc, nb_of_constraints, sizeof(Pcontrainte),
+          (int(*)(const void *,const void *, void *)) compare,
+          (void *) context);
 
-    /*   clean!
-     */
-    free(tc);
-    return(c);
+  /*  the list of constraints is generated again
+   */
+  for (i=0; i<nb_of_constraints-1; i++)
+  {
+    tc[i]->succ = tc[i+1];
+  }
+  tc[nb_of_constraints-1]->succ=NULL;
+  c = tc[0];
+
+  /*   clean!
+   */
+  free(tc);
+  return c;
 }
 
-Pcontrainte constraints_sort_with_compare(c, sort_base, compare)
-Pcontrainte c;
-Pbase sort_base;
-int (*compare)();
+Pcontrainte constraints_sort_with_compare(
+  Pcontrainte c,
+  Pbase sort_base,
+  constraint_cmp_func_t compare,
+  void * context)
 {
-    int n = vect_size(sort_base)+1;
-    two_int_infop info;
+  int n = vect_size(sort_base)+1;
+  two_int_infop info;
 
-    info = (two_int_infop) malloc(sizeof(int)*2*n);
+  info = (two_int_infop) malloc(sizeof(int)*2*n);
 
-    c = constraints_sort_info(c, sort_base, compare, info);
+  c = constraints_sort_info(c, sort_base, compare, context, info);
 
-    free(info);
-    return(c);
+  free(info);
+  return c;
 }
 
-Pcontrainte contrainte_sort(c, base, sort_base, inner_first, complex_first)
-Pcontrainte c;
-Pbase base, sort_base;
-bool inner_first, complex_first;
+Pcontrainte contrainte_sort(
+  Pcontrainte c,
+  Pbase base,
+  Pbase sort_base,
+  bool inner_first,
+  bool complex_first)
 {
-    set_info_for_compare(base, sort_base, inner_first, complex_first);
-    c = constraints_sort_with_compare(c, sort_base, compare_the_constraints);
-    reset_info_for_compare();
-
-    return(c);
+  sort_ctx_t context;
+  set_sort_context(&context, base, sort_base, inner_first, complex_first);
+  c = constraints_sort_with_compare
+    (c, sort_base, (constraint_cmp_func_t) compare_the_constraints, &context);
+  clear_sort_context(&context);
+  return c;
 }
 
-
-Psysteme sc_sort_constraints(ps, base_index)
-Psysteme ps;
-Pbase base_index;
+Psysteme sc_sort_constraints(Psysteme ps, Pbase base_index)
 {
-    ps->inegalites = 
-	contrainte_sort(ps->inegalites, ps->base, base_index, true, true);
-
-    return(ps);
+  // equalities???
+  ps->inegalites =
+    contrainte_sort(ps->inegalites, ps->base, base_index, true, true);
+  return ps;
 }
 
-/* sort  contrainte c, base b, 
+/* sort  contrainte c, base b,
  * relatively to sort_base, as defined by the switches.
  *
  * inner_first: innermost first
@@ -366,7 +372,7 @@ Pbase base_index;
  */
 
 /* Psysteme sc_triang_elim_redond(Psysteme ps, Pbase base_index):
- * elimination des contraintes lineaires redondantes dans le systeme ps 
+ * elimination des contraintes lineaires redondantes dans le systeme ps
  * par test de faisabilite de contrainte inversee; cette fonction est
  * utilisee pour calculer des bornes de boucles, c'est pourquoi il peut
  * etre necessaire de garder des contraintes redondantes afin d'avoit
@@ -375,12 +381,12 @@ Pbase base_index;
  *
  *  resultat retourne par la fonction :
  *
- *  Psysteme	    : Le systeme initial est modifie. Il est egal a NULL si 
+ *  Psysteme	    : Le systeme initial est modifie. Il est egal a NULL si
  *		      le systeme initial est non faisable.
  *
  *  Les parametres de la fonction :
  *
- *  Psysteme ps    : systeme lineaire 
+ *  Psysteme ps    : systeme lineaire
  *
  *  Attention: pour chaque indice dans base_index, il doit rester au moins deux
  *             contraintes correspondantes (une positive et une negative).
@@ -404,84 +410,83 @@ Pbase base_index;
  *  - a warning is displayed if many inequalities are to be dealt with,
  *    instead of returning the system as is.
  *    (FC 28 Sept 94)
- *  - sc_normalize inserted, in place of many loop that were 
+ *  - sc_normalize inserted, in place of many loop that were
  *    doing nearly the same. (FC 29/09/94)
  */
 /* extern char *entity_local_name(); */
 
-Psysteme sc_triang_elim_redund(ps, base_index)
-Psysteme ps;
-Pbase base_index;
+Psysteme sc_triang_elim_redund(Psysteme ps, Pbase base_index)
 {
-    Pcontrainte ineq, ineq1;
-    int level, n = vect_size(base_index)+1;
-    two_int_infop info;
+  Pcontrainte ineq, ineq1;
+  int level, n = vect_size(base_index)+1;
+  two_int_infop info;
+  sort_ctx_t context;
 
-    ps = sc_normalize(ps);
-     
-    if (ps==NULL)
-	return(NULL);
+  ps = sc_normalize(ps);
 
-    if (ps->nb_ineq > NB_INEQ_MAX1) 
-	fprintf(stderr,
-		"[sc_triang_elim_redund] warning, %d inequalities\n",
-		ps->nb_ineq);
+  if (ps==NULL)
+    return NULL;
 
-    if (!sc_integer_feasibility_ofl_ctrl(ps, OFL_CTRL,true))
+  if (ps->nb_ineq > NB_INEQ_MAX1)
+    fprintf(stderr,
+            "[sc_triang_elim_redund] warning, %d inequalities\n",
+            ps->nb_ineq);
+
+  if (!sc_integer_feasibility_ofl_ctrl(ps, OFL_CTRL,true))
+  {
+    sc_rm(ps), ps=NULL;
+    return NULL;
+  }
+
+  info = malloc(sizeof(int)*2*n);
+
+  set_sort_context(&context, ps->base, base_index, true, true);
+  ps->inegalites =
+    constraints_sort_info(ps->inegalites, base_index,
+                          (constraint_cmp_func_t) compare_the_constraints,
+                          &context, info);
+  clear_sort_context(&context);
+
+  for (ineq = ps->inegalites; ineq != NULL; ineq = ineq1)
+  {
+    ineq1 = ineq->succ;
+    level = level_contrainte(ineq, base_index);
+
+    /* only the variables that have more than one
+     * constraints on a given size and that deal with
+     * the variables of base_index are tested.
+     *
+     * an old comment suggested that keeping contraints on variables
+     * out of base_index would help find redundancy on the base_index
+     * contraints, but this should not be true anymore, since the
+     * variables are sorted... just help to deal with larger systems...
+     *
+     * FC 28/09/94
+     */
+    if (level!=0 && info[abs(level)][level<0?0:1]>1)
     {
-	sc_rm(ps), ps=NULL;
-	return(NULL);
-    }
-
-    info = malloc(sizeof(int)*2*n);
-
-    set_info_for_compare(ps->base, base_index, true, true);
-    ps->inegalites = constraints_sort_info(ps->inegalites, 
-					   base_index,
-					   compare_the_constraints, 
-					   info);
-    reset_info_for_compare();
-
-    for (ineq = ps->inegalites; ineq != NULL; ineq = ineq1)
-    {
-	ineq1 = ineq->succ;
-	level = level_contrainte(ineq, base_index);
-
-	/* only the variables that have more than one 
-	 * constraints on a given size and that deal with 
-	 * the variables of base_index are tested.
-	 *
-	 * an old comment suggested that keeping contraints on variables
-	 * out of base_index would help find redundancy on the base_index
-	 * contraints, but this should not be true anymore, since the
-	 * variables are sorted... just help to deal with larger systems...
-	 *
-	 * FC 28/09/94
-	 */
-	if (level!=0 && info[abs(level)][level<0?0:1]>1)
-	{
 	    /* inversion du sens de l'inegalite par multiplication
 	     * par -1 du coefficient de chaque variable
 	     */
 	    contrainte_reverse(ineq);
 
-	    /* test de sc_faisabilite avec la nouvelle inegalite 
+	    /* test de sc_faisabilite avec la nouvelle inegalite
 	     */
 	    if (sc_integer_feasibility_ofl_ctrl(ps, OFL_CTRL, true))
-		/* restore the initial constraint */
-		contrainte_reverse(ineq);
+        /* restore the initial constraint */
+        contrainte_reverse(ineq);
 	    else
 	    {
-		eq_set_vect_nul(ineq),		
-		info[abs(level)][level<0?0:1]--;		
+        eq_set_vect_nul(ineq);
+        info[abs(level)][level<0?0:1]--;
 	    }
-	}
     }
-    sc_elim_empty_constraints(ps,0);
-    ps = sc_kill_db_eg(ps);
+  }
+  sc_elim_empty_constraints(ps,0);
+  ps = sc_kill_db_eg(ps);
 
-    free(info);
-    return(ps);
+  free(info);
+  return ps;
 }
 
 /* void move_n_first_constraints(source, target, n)
@@ -490,20 +495,17 @@ Pbase base_index;
  *
  * moves the n first constraints from source to target, in order.
  */
-void move_n_first_constraints(source, target, n)
-Pcontrainte *source, *target;
-int n;
+void move_n_first_constraints(Pcontrainte *source, Pcontrainte *target, int n)
 {
-    Pcontrainte tmp, nth;
+  Pcontrainte tmp, nth;
 
-    if (n==0) return; /* nothing to be done */
+  if (n==0) return; /* nothing to be done */
 
-    /*  nth points to the nth constraint.
-     */
-    for (nth=*source; n>1; n--, nth=nth->succ);
+  /*  nth points to the nth constraint.
+   */
+  for (nth=*source; n>1; n--, nth=nth->succ);
 
-    tmp = *target, *target = *source, *source = nth->succ, nth->succ = tmp;
-    
+  tmp = *target, *target = *source, *source = nth->succ, nth->succ = tmp;
 }
 
 /* void sc_triang_elim_redund_n_first(s, n)
@@ -516,101 +518,93 @@ int n;
  *
  * contrainte_reverse() is used and rational points may be added
  */
-void sc_triang_elim_redund_n_first(s, n)
-Psysteme s;
-int n;
+void sc_triang_elim_redund_n_first(Psysteme s, int n)
 {
-    int tested, removed;
-    Pcontrainte ineq;
+  int tested, removed;
+  Pcontrainte ineq;
 
-    if (n<=1) return; /* nothing to be done */
+  if (n<=1) return; /* nothing to be done */
 
-    for (ineq=sc_inegalites(s), tested=0, removed=0;
-	 removed<n-1 && tested<n;
-	 tested++, ineq=ineq->succ)
-    {
-	contrainte_reverse(ineq);
+  for (ineq=sc_inegalites(s), tested=0, removed=0;
+       removed<n-1 && tested<n;
+       tested++, ineq=ineq->succ)
+  {
+    contrainte_reverse(ineq);
 
-	if (sc_integer_feasibility_ofl_ctrl(s, OFL_CTRL, true))
+    if (sc_integer_feasibility_ofl_ctrl(s, OFL_CTRL, true))
 	    contrainte_reverse(ineq); /* restore */
-	else
+    else
 	    eq_set_vect_nul(ineq), removed++; /* remove */
-    }
+  }
 }
 
-Psysteme sc_build_triang_elim_redund(s, indexes)
-Psysteme s;
-Pbase indexes; /* outer to inner */
+Psysteme sc_build_triang_elim_redund(
+  Psysteme s,
+  Pbase indexes) /* outer to inner */
 {
-    Pcontrainte
-	old ;
-    int level, side, n_other_constraints, n = vect_size(indexes)+1;
-    two_int_infop info;
+  Pcontrainte	old;
+  int level, side, n_other_constraints, n = vect_size(indexes)+1;
+  two_int_infop info;
+  sort_ctx_t context;
 
-    s = sc_normalize(s);
-    if (s==NULL || sc_nbre_inegalites(s)==0) return(s);
+  s = sc_normalize(s);
+  if (s==NULL || sc_nbre_inegalites(s)==0) return s;
 
-    info = (two_int_infop) malloc(sizeof(int)*2*n);
+  info = (two_int_infop) malloc(sizeof(int)*2*n);
 
-    /* sort outer first and complex first
-     */
-    set_info_for_compare(s->base, indexes, false, true);
-    s->inegalites = constraints_sort_info(s->inegalites, 
-					  indexes,
-					  compare_the_constraints_debug,
-					  info);
-    reset_info_for_compare();
+  /* sort outer first and complex first
+   */
+  set_sort_context(&context, s->base, indexes, false, true);
+  s->inegalites =
+    constraints_sort_info(s->inegalites, indexes,
+                          (constraint_cmp_func_t) compare_the_constraints,
+                          &context, info);
+  clear_sort_context(&context);
 
-    /* remove the redundancy on others
-     * then triangular clean of what remains.
-     */
+  /* remove the redundancy on others
+   * then triangular clean of what remains.
+   */
 
-    n_other_constraints = info[0][0]+info[0][1];
-    old = sc_inegalites(s), sc_inegalites(s) = NULL, sc_nbre_inegalites(s) = 0;
-    
-    move_n_first_constraints(&old, &s->inegalites, n_other_constraints);
-    sc_nbre_inegalites(s) = n_other_constraints;
-    s = sc_elim_redund(s);
+  n_other_constraints = info[0][0]+info[0][1];
+  old = sc_inegalites(s), sc_inegalites(s) = NULL, sc_nbre_inegalites(s) = 0;
 
-    /* what if s is empty or null ???
-     */
-    
-    /*  build the non redundant triangular system for each level and side.
-     */
-    for (level=1; level<n; level++)
-    {
-	for (side=0; side<=1; side++)
-	    if (info[level][side]) 
+  move_n_first_constraints(&old, &s->inegalites, n_other_constraints);
+  sc_nbre_inegalites(s) = n_other_constraints;
+  s = sc_elim_redund(s);
+
+  /* what if s is empty or null ???
+   */
+
+  /*  build the non redundant triangular system for each level and side.
+   */
+  for (level=1; level<n; level++)
+  {
+    for (side=0; side<=1; side++)
+	    if (info[level][side])
 	    {
-		move_n_first_constraints(&old, &sc_inegalites(s), 
-					 info[level][side]);
-		sc_nbre_inegalites(s)+=info[level][side];
-		
-		sc_triang_elim_redund_n_first(s, info[level][side]);
+        move_n_first_constraints(&old, &sc_inegalites(s), info[level][side]);
+        sc_nbre_inegalites(s)+=info[level][side];
+        sc_triang_elim_redund_n_first(s, info[level][side]);
 	    }
-    }
+  }
 
-    assert(old==NULL); 
+  assert(old==NULL);
 
-    /*  clean!
-     */
-    sc_elim_empty_constraints(s, 0);
-    s = sc_kill_db_eg(s);
-    free(info);
+  /*  clean!
+   */
+  sc_elim_empty_constraints(s, 0);
+  s = sc_kill_db_eg(s);
+  free(info);
 
-    return(s);
+  return s;
 }
 
-Psysteme sc_sort_constraints_simplest_first(ps, base_index)
-Psysteme ps;
-Pbase base_index;
+Psysteme sc_sort_constraints_simplest_first(Psysteme ps, Pbase base_index)
 {
-    ps->inegalites = 
-	contrainte_sort(ps->inegalites, ps->base, base_index, false, false);
-
-    return(ps);
+  ps->inegalites =
+    contrainte_sort(ps->inegalites, ps->base, base_index, false, false);
+  return ps;
 }
-
 
 /*   That is all
  */

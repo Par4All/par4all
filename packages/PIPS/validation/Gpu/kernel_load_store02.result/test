@@ -12,7 +12,7 @@ void p4a_kernel_give(int N, double array[N], int k)
 }
 void p4a_launcher_give(int N, double array[N], int k_0[1])
 {
-   //PIPS generated variable
+   // Declared as a patch variable by Pass Outlining
    int k;
    k = *k_0;
 
@@ -43,7 +43,7 @@ void p4a_wrapper_give(int N, double array[N], int k);
 void p4a_launcher_give(int N, double array[N], int k_0[1]);
 void p4a_launcher_give(int N, double array[N], int k_0[1])
 {
-   //PIPS generated variable
+   // Declared as a patch variable by Pass Outlining
    int k;
    k = *k_0;
 

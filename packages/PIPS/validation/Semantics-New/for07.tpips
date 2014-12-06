@@ -1,0 +1,25 @@
+setenv WSPACE=for07
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+#setproperty PRETTYPRINT_LANGUAGE "C"
+#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo "with MEMORY_EFFECTS_ONLY set to TRUE"
+setproperty MEMORY_EFFECTS_ONLY TRUE
+
+#activate RICE_FULL_DEPENDENCE_GRAPH
+
+echo
+echo "DISTRIBUTER"
+echo
+apply DISTRIBUTER[$WSPACE]
+display PRINTED_FILE[$WSPACE]
+
+
+close
+delete $WSPACE
+quit

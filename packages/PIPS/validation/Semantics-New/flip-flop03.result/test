@@ -1,0 +1,136 @@
+
+Transformers
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T() {}
+
+   int s[2][10];
+
+//  T(i,j,k) {k==0}
+
+   int i, j, k = 0;
+
+//  T(cur,next) {k==0}
+
+   int cur, next;
+
+//  T(cur) {cur==0, k==0}
+
+   cur = 0;
+
+//  T(next) {cur==0, k==0, next==1}
+
+   next = 1;
+
+//  T(i) {cur==0, i==1, k==0, next==1}
+
+   i = 1;
+
+//  T(cur,i,j,k,next) {cur+next==1, cur#init==0, i==k+1, i#init==1,
+//    k#init==0, next#init==1, 1<=i, i<=9}
+
+   while (i<10&&k<100) {
+
+//  T(j) {i<=9, 1<=j, j<=9, k<=99}
+
+      for(j = 1; j <= 9; j += 1) {
+
+//  T() {i<=9, 1<=j, j<=9, k<=99}
+
+         s[cur][j] = s[next][j]+j;
+
+//  T() {i<=9, 1<=j, j<=9, k<=99}
+
+         s[next][j] = s[cur][j];
+      }
+
+//  T(cur) {cur==next, j==10, i<=9, k<=99}
+
+      cur = next;
+
+//  T(next) {cur+next==1, cur==next#init, j==10, i<=9, k<=99}
+
+      next = 1-next;
+
+//  T(i,k) {cur+next==1, i==i#init+1, j==10, k==k#init+1, i<=10,
+//    k<=100}
+
+      i++, k++;
+   }
+
+//  T(main) {cur+next==1, i==10, j==10, k==9, main==0}
+
+   return 0;
+}
+
+Preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int s[2][10];
+
+//  P() {}
+
+   int i, j, k = 0;
+
+//  P(i,j,k) {k==0}
+
+   int cur, next;
+
+//  P(cur,i,j,k,next) {k==0}
+
+   cur = 0;
+
+//  P(cur,i,j,k,next) {cur==0, k==0}
+
+   next = 1;
+
+//  P(cur,i,j,k,next) {cur==0, k==0, next==1}
+
+   i = 1;
+
+//  P(cur,i,j,k,next) {cur==0, i==1, k==0, next==1}
+
+   while (i<10&&k<100) {
+
+//  P(cur,i,j,k,next) {cur+next==1, i==k+1, 1<=i, i<=9}
+
+      for(j = 1; j <= 9; j += 1) {
+
+//  P(cur,i,j,k,next) {cur+next==1, i==k+1, 1<=i, i<=9, 1<=j, j<=9}
+
+         s[cur][j] = s[next][j]+j;
+
+//  P(cur,i,j,k,next) {cur+next==1, i==k+1, 1<=i, i<=9, 1<=j, j<=9}
+
+         s[next][j] = s[cur][j];
+      }
+
+//  P(cur,i,j,k,next) {cur+next==1, i==k+1, j==10, 1<=i, i<=9}
+
+      cur = next;
+
+//  P(cur,i,j,k,next) {cur==next, i==k+1, j==10, 1<=i, i<=9}
+
+      next = 1-next;
+
+//  P(cur,i,j,k,next) {cur+next==1, i==k+1, j==10, 1<=i, i<=9}
+
+      i++, k++;
+   }
+
+//  P(cur,i,j,k,next) {cur+next==1, i==10, j==10, k==9}
+
+   return 0;
+}

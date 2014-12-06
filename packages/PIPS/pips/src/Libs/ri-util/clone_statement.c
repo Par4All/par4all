@@ -169,19 +169,79 @@ do_clone_entity(entity e, clone_context cc, hash_table ht)
     entity new_entity = entity_undefined;
     if( (new_entity=hash_get(ht,entity_name(e))) == HASH_UNDEFINED_VALUE)
     {
+      //string ln = entity_user_name(e);
+      string en = entity_name(e);
+      string ms = strrchr(en, BLOCK_SEP_CHAR);
+      if(ms==NULL)
+	ms = strchr(en, MODULE_SEP);
+      string ln = ms+1;
+
         if(entity_scalar_p(e))
             new_entity = make_new_scalar_variable_with_prefix(
-                    entity_user_name(e),
+		    //entity_user_name(e),
+                    ln,
                     clone_context_new_module(cc),
                     copy_basic(entity_basic(e))
                     );
-        else
+        else if(entity_array_p(e))
             new_entity = make_new_array_variable_with_prefix(
-                    entity_user_name(e),
+		    //entity_user_name(e),
+                    ln,
                     clone_context_new_module(cc),
                     copy_basic(entity_basic(e)),
                     gen_full_copy_list(variable_dimensions(type_variable(entity_type(e))))
                     );
+	else if(entity_struct_p(e) || entity_union_p(e) || entity_enum_p(e)) {
+	  /* There is no reason to replicate such an entity when
+	     cloning since they are left unchanged, except maybe if
+	     they contain dependent types... */
+            new_entity = make_new_derived_entity_with_prefix(
+                    ln,
+                    clone_context_new_module(cc),
+                    entity_type(e)
+                    );
+	}
+	else {
+	  pips_internal_error("Unexpected case\n");
+	}
+
+	/* The entity can be a typedef instead of a
+	   variable... */
+	if(typedef_entity_p(e)) {
+	  storage s = entity_storage(new_entity);
+	  free_storage(s);
+	  s = make_storage_rom();
+	  entity_storage(new_entity) = s;
+	}
+
+	/* The type of the entity can be a typedef that has been renamed... */
+	/* FI: I am adding this for loop_unroll, but I believe 1) that
+	   typedef variables should not be renamed since only
+	   non-dependent types are supported, and 2) that loop unroll
+	   should be implemented in a simpler way and complemented by
+	   flatten_code */
+	type nt = entity_type(new_entity);
+	if(type_variable_p(nt)) {
+	  variable nv = type_variable(nt);
+	  /* For dependent types, the variables used in dimension
+	     might have been renamed, but the cloning is not
+	     compatible with dependent types because declarations are
+	     moved... */
+	  basic nb = variable_basic(nv);
+	  if(basic_typedef_p(nb)) {
+	    entity otd = basic_typedef(nb);
+	    entity ntd = hash_get(ht,entity_name(otd));
+	    if(ntd != HASH_UNDEFINED_VALUE)
+	      basic_typedef(nb) = ntd;
+	  }
+	  else if(basic_derived_p(nb)) {
+	    entity de = basic_derived(nb);
+	    entity nde = hash_get(ht,entity_name(de));
+	    if(nde != HASH_UNDEFINED_VALUE)
+	      basic_derived(nb) = nde;
+	  }
+	}
+
         AddLocalEntityToDeclarations(new_entity,clone_context_new_module(cc),clone_context_new_module_statement(cc));
         hash_put(ht,entity_name(e),new_entity);
     }

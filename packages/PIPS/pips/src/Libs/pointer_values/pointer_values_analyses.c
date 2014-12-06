@@ -928,105 +928,110 @@ void range_to_post_pv(range r, list l_in, pv_results * pv_res, pv_context *ctxt)
 void expression_to_post_pv(expression exp, list l_in, pv_results * pv_res, pv_context *ctxt)
 {
   if (expression_undefined_p(exp))
-    {
-      pips_debug(1, "begin for undefined expression, returning undefined pointer_value\n");
-      pv_res->l_out = l_in;
-      pv_res->result_paths = CONS(EFFECT, make_effect(make_undefined_pointer_value_cell(),
-						      make_action_write_memory(),
-						      make_approximation_exact(),
-						      make_descriptor_none()),NIL);
-      pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
-						  make_cell_interpretation_value_of(), NIL);
-    }
+  {
+    pips_debug(1, "begin for undefined expression, returning undefined pointer_value\n");
+    pv_res->l_out = l_in;
+    pv_res->result_paths = CONS(EFFECT, make_effect(make_undefined_pointer_value_cell(),
+        make_action_write_memory(),
+        make_approximation_exact(),
+        make_descriptor_none()),NIL);
+    pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
+        make_cell_interpretation_value_of(), NIL);
+  }
   else
+  {
+    pips_debug(1, "begin for expression : %s\n",
+        words_to_string(words_expression(exp,NIL)));
+
+    syntax exp_syntax = expression_syntax(exp);
+
+    switch(syntax_tag(exp_syntax))
     {
-      pips_debug(1, "begin for expression : %s\n",
-		 words_to_string(words_expression(exp,NIL)));
-
-      syntax exp_syntax = expression_syntax(exp);
-
-      switch(syntax_tag(exp_syntax))
-	{
-	case is_syntax_reference:
-	  pips_debug(5, "reference case\n");
-	  reference exp_ref = syntax_reference(exp_syntax);
-	  if (same_string_p(entity_local_name(reference_variable(exp_ref)), "NULL"))
-	    {
-	      pv_res->result_paths = CONS(EFFECT, make_effect(make_null_pointer_value_cell(),
-							     make_action_read_memory(),
-							     make_approximation_exact(),
-							     make_descriptor_none()), NIL);
-	      pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
-							  make_cell_interpretation_value_of(),
-							  NIL);
-	    }
-	  else
-	    {
-	      pv_res->result_paths = CONS(EFFECT,
-					 (*reference_to_effect_func)
-					 (copy_reference(exp_ref),
-					  make_action_write_memory(),
-					  false), NIL);
-	      pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
-							  make_cell_interpretation_value_of(),
-							  NIL);
-	    }
-	  /* we assume no effects on aliases due to subscripts evaluations for the moment */
-	  pv_res->l_out = l_in;
-	  break;
-	case is_syntax_range:
-	  pips_internal_error("not yet implemented");
-	  break;
-	case is_syntax_call:
-	  {
-	    call_to_post_pv(syntax_call(exp_syntax), l_in, pv_res, ctxt);
-	    break;
-	  }
-	case is_syntax_cast:
-	  {
-	    expression_to_post_pv(cast_expression(syntax_cast(exp_syntax)),
-				  l_in, pv_res, ctxt);
-	    pips_debug(5, "cast case\n");
-	  break;
-	  }
-	case is_syntax_sizeofexpression:
-	  {
-	    /* we assume no effects on aliases due to sizeof argument expression
-	       for the moment */
-	    pv_res->l_out = l_in;
-	    break;
-	  }
-	case is_syntax_subscript:
-	  {
-	    pips_debug(5, "subscript case\n");
-	    /* aborts if there are calls in subscript expressions */
-	    list l_eff = NIL;
-	    list l_tmp = generic_proper_effects_of_complex_address_expression(exp, &l_eff, true);
-	    gen_full_free_list(l_tmp);
-	    FOREACH(EFFECT, eff, l_eff)
-	      {
-		pv_res->result_paths = CONS(EFFECT, eff, NIL);
-		pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
-							    make_cell_interpretation_value_of(),
-							    NIL);
-	      }
-	    gen_free_list(l_eff); /* free the spine */
-	    /* we assume no effects on aliases due to subscripts evaluations for the moment */
-	    pv_res->l_out = l_in;
-	    break;
-	  }
-	case is_syntax_application:
-	  pips_internal_error("not yet implemented");
-	  break;
-	case is_syntax_va_arg:
-	  {
-	    pips_internal_error("not yet implemented");
-	    break;
-	  }
-	default:
-	  pips_internal_error("unexpected tag %d", syntax_tag(exp_syntax));
-	}
+    case is_syntax_reference:
+      pips_debug(5, "reference case\n");
+      reference exp_ref = syntax_reference(exp_syntax);
+      if (same_string_p(entity_local_name(reference_variable(exp_ref)), "NULL"))
+      {
+        pv_res->result_paths = CONS(EFFECT, make_effect(make_null_pointer_value_cell(),
+            make_action_read_memory(),
+            make_approximation_exact(),
+            make_descriptor_none()), NIL);
+        pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
+            make_cell_interpretation_value_of(),
+            NIL);
+      }
+      else
+      {
+        // functions that can be pointed by reference_to_effect_func:
+        // reference_to_simple_effect
+        // reference_to_convex_region
+        // reference_to_reference_effect
+        pv_res->result_paths = CONS(EFFECT,
+            (*reference_to_effect_func)
+            (copy_reference(exp_ref),
+                make_action_write_memory(),
+                false), NIL);
+        pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
+            make_cell_interpretation_value_of(),
+            NIL);
+      }
+      /* we assume no effects on aliases due to subscripts evaluations for the moment */
+      pv_res->l_out = l_in;
+      break;
+    case is_syntax_range:
+      pips_internal_error("not yet implemented");
+      break;
+    case is_syntax_call:
+    {
+      call_to_post_pv(syntax_call(exp_syntax), l_in, pv_res, ctxt);
+      break;
     }
+    case is_syntax_cast:
+    {
+      expression_to_post_pv(cast_expression(syntax_cast(exp_syntax)),
+          l_in, pv_res, ctxt);
+      pips_debug(5, "cast case\n");
+      break;
+    }
+    case is_syntax_sizeofexpression:
+    {
+      /* we assume no effects on aliases due to sizeof argument expression
+       * for the moment */
+      pv_res->l_out = l_in;
+      break;
+    }
+    case is_syntax_subscript:
+    {
+      pips_debug(5, "subscript case\n");
+      /* aborts if there are calls in subscript expressions */
+      list l_eff = NIL;
+      list l_tmp = generic_proper_effects_of_complex_address_expression(exp, &l_eff, true);
+      gen_full_free_list(l_tmp);
+      FOREACH(EFFECT, eff, l_eff)
+      {
+        pv_res->result_paths = CONS(EFFECT, eff, NIL);
+        pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
+            make_cell_interpretation_value_of(),
+            NIL);
+      }
+      gen_free_list(l_eff); /* free the spine */
+      /* we assume no effects on aliases due to subscripts evaluations for the moment */
+      pv_res->l_out = l_in;
+      break;
+    }
+    case is_syntax_application:
+      pips_internal_error("not yet implemented");
+      break;
+    case is_syntax_va_arg:
+    {
+      pips_internal_error("not yet implemented");
+      break;
+    }
+    default:
+      pips_internal_error("unexpected tag %d", syntax_tag(exp_syntax));
+      break;
+    }
+  }
 
   pips_debug_pv_results(1, "end with pv_results =\n", *pv_res);
   pips_debug(1, "end\n");
@@ -1043,86 +1048,86 @@ external_call_to_post_pv(call c, list l_in, pv_results *pv_res, pv_context *ctxt
   pips_debug(1, "begin for %s\n", entity_local_name(func));
 
   /* the expression that denotes the called function and the arguments
-     are evaluated; then there is a sequence point, and the function is called
-  */
+   * are evaluated; then there is a sequence point, and the function is called
+   */
 
   /* Arguments evaluation: we don't use expressions_to_post_pv because
-     we want to accumulate the results paths
-  */
+   * we want to accumulate the results paths
+   */
 
   list l_cur = l_in;
   pv_results pv_res_exp_eval = make_pv_results();
   FOREACH(EXPRESSION, arg, func_args)
-    {
-      pv_results pv_res_cur = make_pv_results();
-      expression_to_post_pv(arg, l_cur, &pv_res_cur, ctxt);
-      l_cur = pv_res_cur.l_out;
-      pv_res_exp_eval.result_paths = gen_nconc(pv_res_exp_eval.result_paths, pv_res_cur.result_paths);
-      pv_res_exp_eval.result_paths_interpretations = gen_nconc(pv_res_exp_eval.result_paths_interpretations,
-						      pv_res_cur.result_paths_interpretations);
-    }
+  {
+    pv_results pv_res_cur = make_pv_results();
+    expression_to_post_pv(arg, l_cur, &pv_res_cur, ctxt);
+    l_cur = pv_res_cur.l_out;
+    pv_res_exp_eval.result_paths = gen_nconc(pv_res_exp_eval.result_paths, pv_res_cur.result_paths);
+    pv_res_exp_eval.result_paths_interpretations = gen_nconc(pv_res_exp_eval.result_paths_interpretations,
+        pv_res_cur.result_paths_interpretations);
+  }
 
   /* Function call: we generate abstract_location targets for all
-     possible effects from arguments. We should also do the same for
-     all global variables in the current compilation unit...
-  */
+   * possible effects from arguments. We should also do the same for
+   * all global variables in the current compilation unit...
+   */
   list l_ci = pv_res_exp_eval.result_paths_interpretations;
   FOREACH(EFFECT, real_arg_eff, pv_res_exp_eval.result_paths)
+  {
+    pips_debug_effect(3, "considering effect:\n", real_arg_eff);
+    cell_interpretation ci = CELL_INTERPRETATION(CAR(l_ci));
+    bool add_eff = cell_interpretation_address_of_p(ci);
+    bool to_be_freed = false;
+    type t = cell_to_type(effect_cell(real_arg_eff), &to_be_freed);
+
+    // generate all possible effects on pointers from the actual parameter
+    list lw = generic_effect_generate_all_accessible_paths_effects_with_level(real_arg_eff,
+        t,
+        'w',
+        add_eff,
+        10, /* to avoid too long paths until GAPS are handled */
+        true); /* only pointers */
+    if (to_be_freed) free_type(t);
+    pips_debug_effects(3, "effects to be killed:\n", lw);
+
+    if (!ENDP(lw))
     {
-      pips_debug_effect(3, "considering effect:\n", real_arg_eff);
-      cell_interpretation ci = CELL_INTERPRETATION(CAR(l_ci));
-      bool add_eff = cell_interpretation_address_of_p(ci);
-      bool to_be_freed = false;
-      type t = cell_to_type(effect_cell(real_arg_eff), &to_be_freed);
+      // potentially kill these paths and generate abstract location targets (currently anywhere)
+      effects_to_may_effects(lw);
+      list l_abstract_eff = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), NIL);
+      list l_ci_abstract_eff = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(), NIL);
+      FOREACH(EFFECT, eff, lw)
+      {
+        single_pointer_assignment_to_post_pv(eff, l_abstract_eff, l_ci_abstract_eff,
+            false, l_cur,
+            pv_res, ctxt);
+        l_cur = pv_res->l_out;
+      }
 
-      // generate all possible effects on pointers from the actual parameter
-      list lw = generic_effect_generate_all_accessible_paths_effects_with_level(real_arg_eff,
-										t,
-										'w',
-										add_eff,
-										10, /* to avoid too long paths until GAPS are handled */
-										true); /* only pointers */
-      if (to_be_freed) free_type(t);
-      pips_debug_effects(3, "effects to be killed:\n", lw);
-
-      if (!ENDP(lw))
-	{
-	  // potentially kill these paths and generate abstract location targets (currently anywhere)
-	  effects_to_may_effects(lw);
-	  list l_abstract_eff = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), NIL);
-	  list l_ci_abstract_eff = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(), NIL);
-	  FOREACH(EFFECT, eff, lw)
-	    {
-	      single_pointer_assignment_to_post_pv(eff, l_abstract_eff, l_ci_abstract_eff,
-						   false, l_cur,
-						   pv_res, ctxt);
-	      l_cur = pv_res->l_out;
-	    }
-
-	  gen_full_free_list(lw);
-	}
-      POP(l_ci);
+      gen_full_free_list(lw);
     }
+    POP(l_ci);
+  }
   pv_res->l_out = l_cur;
 
   /* Return value: test the type of the result path : if it's a
-     pointer type, generate an abstract location target of the pointed
-     type, else it's an empty set/list.
-  */
+   * pointer type, generate an abstract location target of the pointed
+   * type, else it's an empty set/list.
+   */
   type func_res_t = compute_basic_concrete_type(functional_result(type_functional(entity_type(func))));
   if (pointer_type_p(func_res_t))
-    {
-      pv_res->result_paths = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()),
-				  NIL);
-      pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
-						  make_cell_interpretation_address_of(),
-						  NIL);
-    }
+  {
+    pv_res->result_paths = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()),
+        NIL);
+    pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
+        make_cell_interpretation_address_of(),
+        NIL);
+  }
   else
-    {
-      pv_res->result_paths = NIL;
-      pv_res->result_paths_interpretations = NIL;
-    }
+  {
+    pv_res->result_paths = NIL;
+    pv_res->result_paths_interpretations = NIL;
+  }
   free_type(func_res_t);
 
   pips_debug_pvs(2, "returning pv_res->l_out:", pv_res->l_out);
@@ -1244,9 +1249,9 @@ void call_to_post_pv(call c, list l_in, pv_results *pv_res, pv_context *ctxt)
           computed.
  */
 void single_pointer_assignment_to_post_pv(effect lhs_eff,
-					  list l_rhs_eff, list l_rhs_kind,
-					  bool declaration_p, list l_in,
-					  pv_results *pv_res, pv_context *ctxt)
+    list l_rhs_eff, list l_rhs_kind,
+    bool declaration_p, list l_in,
+    pv_results *pv_res, pv_context *ctxt)
 {
   list l_out = NIL;
   list l_aliased = NIL;
@@ -1256,161 +1261,160 @@ void single_pointer_assignment_to_post_pv(effect lhs_eff,
   pips_debug_effect(1, "begin for lhs_eff =", lhs_eff);
   pips_debug(1, "and l_rhs_eff:\n");
   ifdebug(1)
+  {
+    list l_tmp = l_rhs_kind;
+    FOREACH(EFFECT, rhs_eff, l_rhs_eff)
     {
-      list l_tmp = l_rhs_kind;
-      FOREACH(EFFECT, rhs_eff, l_rhs_eff)
-	{
-	  cell_interpretation ci = CELL_INTERPRETATION(CAR(l_tmp));
-	  pips_debug(1, "%s of:\n", cell_interpretation_value_of_p(ci)?"value": "address");
-	  pips_debug_effect(1, "\t", rhs_eff);
-	  POP(l_tmp);
-	}
+      cell_interpretation ci = CELL_INTERPRETATION(CAR(l_tmp));
+      pips_debug(1, "%s of:\n", cell_interpretation_value_of_p(ci)?"value": "address");
+      pips_debug_effect(1, "\t", rhs_eff);
+      POP(l_tmp);
     }
+  }
   pips_debug_pvs(1, "and l_in =", l_in);
   bool anywhere_lhs_p = false;
 
   /* First search for all killed paths */
   /* we could be more precise/generic on abstract locations */
   if (anywhere_effect_p(lhs_eff))
-    {
-      pips_assert("we cannot have an anywhere lhs for a declaration\n", !declaration_p);
-      pips_debug(3, "anywhere lhs\n");
-      anywhere_lhs_p = true;
-      l_kill = CONS(EFFECT, copy_effect(lhs_eff), NIL);
-      l_aliased = l_kill;
-    }
+  {
+    pips_assert("we cannot have an anywhere lhs for a declaration\n", !declaration_p);
+    pips_debug(3, "anywhere lhs\n");
+    anywhere_lhs_p = true;
+    l_kill = CONS(EFFECT, copy_effect(lhs_eff), NIL);
+    l_aliased = l_kill;
+  }
   else
+  {
+    if (!declaration_p) /* no aliases for a newly declared entity */
     {
-      if (!declaration_p) /* no aliases for a newly declared entity */
-	{
-	  l_aliased = effect_find_aliased_paths_with_pointer_values(lhs_eff, l_in, ctxt);
-	  if (!ENDP(l_aliased) && anywhere_effect_p(EFFECT(CAR(l_aliased))))
-	    {
-	      pips_debug(3, "anywhere lhs (from aliases)\n");
-	      anywhere_lhs_p = true;
-	      l_kill = l_aliased;
-	    }
-	  else if (!ENDP(l_aliased) && ((int) gen_length(l_aliased) == 1)
-		   && (null_pointer_value_effect_p(EFFECT(CAR(l_aliased)))))
-	    {
-	      // dereferencing a null pointer is considered as undefined by the standard
-	      // with gcc (without any option) the compiler does not complain, but the execution aborts
-	      // I make the choice here that if the pointer value is exactly NULL, then
-	      // the program abort; hence there is no pointer anymore and the pointer values list is empty.
-	      pips_user_warning("null pointer is dereferenced on lhs(%s)\n",
-				effect_to_string(lhs_eff));
-	      gen_full_free_list(l_in);
-	      l_in = NIL;
-	      l_kill = NIL;
-	    }
-	  else if (!ENDP(l_aliased) && ((int) gen_length(l_aliased) == 1)
-		   && (undefined_pointer_value_effect_p(EFFECT(CAR(l_aliased)))))
-		{
-		  // dereferencing a non-initialized pointer is considered as undefined by the standard
-		  // However, with gcc (without any option), the compiler does not complain,
-		  // and the execution is sometimes correct.
-		  // I make the choice here that if the pointer value is (exactly) undefined
-		  // then the program does not necessarily abort;
-		  // as I can keep dereferencements in pointer values (I'm not limited
-		  // to constant paths), I still generate a kill and a gen. BC.
-		  pips_user_warning("undefined pointer is dereferenced on lhs(%s)\n",
-				    effect_to_string(lhs_eff));
-		  l_kill = CONS(EFFECT, copy_effect(lhs_eff), NIL);
-		}
-	  else
-	    {
-	      /* if lhs_eff is a may-be-killed, then all aliased effects are also
-		 may-be-killed effects */
-	      if (effect_may_p(lhs_eff))
-		{
-		  pips_debug(3, "may lhs effect, changing all aliased effects to may\n");
-		  effects_to_may_effects(l_aliased);
-		}
-	      l_kill = CONS(EFFECT, copy_effect(lhs_eff), l_aliased);
-	    }
-	}
+      l_aliased = effect_find_aliased_paths_with_pointer_values(lhs_eff, l_in, ctxt);
+      if (!ENDP(l_aliased) && anywhere_effect_p(EFFECT(CAR(l_aliased))))
+      {
+        pips_debug(3, "anywhere lhs (from aliases)\n");
+        anywhere_lhs_p = true;
+        l_kill = l_aliased;
+      }
+      else if (!ENDP(l_aliased) && ((int) gen_length(l_aliased) == 1)
+          && (null_pointer_value_effect_p(EFFECT(CAR(l_aliased)))))
+      {
+        // dereferencing a null pointer is considered as undefined by the standard
+        // with gcc (without any option) the compiler does not complain, but the execution aborts
+        // I make the choice here that if the pointer value is exactly NULL, then
+        // the program abort; hence there is no pointer anymore and the pointer values list is empty.
+        pips_user_warning("null pointer is dereferenced on lhs(%s)\n",
+            effect_to_string(lhs_eff));
+        gen_full_free_list(l_in);
+        l_in = NIL;
+        l_kill = NIL;
+      }
+      else if (!ENDP(l_aliased) && ((int) gen_length(l_aliased) == 1)
+          && (undefined_pointer_value_effect_p(EFFECT(CAR(l_aliased)))))
+      {
+        // dereferencing a non-initialized pointer is considered as undefined by the standard
+        // However, with gcc (without any option), the compiler does not complain,
+        // and the execution is sometimes correct.
+        // I make the choice here that if the pointer value is (exactly) undefined
+        // then the program does not necessarily abort;
+        // as I can keep dereferencements in pointer values (I'm not limited
+        // to constant paths), I still generate a kill and a gen. BC.
+        pips_user_warning("undefined pointer is dereferenced on lhs(%s)\n",
+            effect_to_string(lhs_eff));
+        l_kill = CONS(EFFECT, copy_effect(lhs_eff), NIL);
+      }
       else
-	{
-	  l_kill = CONS(EFFECT, copy_effect(lhs_eff), NIL);
-	}
+      {
+        /* if lhs_eff is a may-be-killed, then all aliased effects are also
+		 may-be-killed effects */
+        if (effect_may_p(lhs_eff))
+        {
+          pips_debug(3, "may lhs effect, changing all aliased effects to may\n");
+          effects_to_may_effects(l_aliased);
+        }
+        l_kill = CONS(EFFECT, copy_effect(lhs_eff), l_aliased);
+      }
     }
+    else
+    {
+      l_kill = CONS(EFFECT, copy_effect(lhs_eff), NIL);
+    }
+  }
 
   pips_debug_effects(2, "l_kill =", l_kill);
 
   if (anywhere_lhs_p)
+  {
+    free_pv_results_paths(pv_res);
+    pv_res->result_paths = l_aliased;
+    pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(), NIL);
+
+    /* we must find in l_in all pointers p and generate p == rhs for all rhs if p is
+     * of a type compatible with rhs, and p == &*anywhere* otherwise.
+     * in fact, for the moment we generate p == &*anywhere* in all cases
+     */
+    effect anywhere_eff = make_anywhere_effect(make_action_write_memory());
+    cell_interpretation rhs_kind = make_cell_interpretation_address_of();
+    FOREACH(CELL_RELATION, pv_in, l_in)
     {
-      free_pv_results_paths(pv_res);
-      pv_res->result_paths = l_aliased;
-      pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(), NIL);
+      /* dealing with first cell */
+      /* not generic */
+      effect eff_alias = make_effect(copy_cell(cell_relation_first_cell(pv_in)),
+          make_action_write_memory(),
+          make_approximation_may(),
+          make_descriptor_none());
 
-      /* we must find in l_in all pointers p and generate p == rhs for all rhs if p is
-	 of a type compatible with rhs, and p == &*anywhere* otherwise.
-	 in fact, for the moment we generate p == &*anywhere* in all cases
-      */
-      effect anywhere_eff = make_anywhere_effect(make_action_write_memory());
-      cell_interpretation rhs_kind = make_cell_interpretation_address_of();
-      FOREACH(CELL_RELATION, pv_in, l_in)
-	{
-	  /* dealing with first cell */
-	  /* not generic */
-	  effect eff_alias = make_effect(copy_cell(cell_relation_first_cell(pv_in)),
-					 make_action_write_memory(),
-					 make_approximation_may(),
-					 make_descriptor_none());
+      list l_gen_pv = (* ctxt->make_pv_from_effects_func)
+                        (eff_alias, anywhere_eff, rhs_kind, l_in);
+      l_gen = (*ctxt->pvs_must_union_func)(l_gen_pv, l_gen);
+      free_effect(eff_alias);
 
-	  list l_gen_pv = (* ctxt->make_pv_from_effects_func)
-	    (eff_alias, anywhere_eff, rhs_kind, l_in);
-	  l_gen = (*ctxt->pvs_must_union_func)(l_gen_pv, l_gen);
-	  free_effect(eff_alias);
+      if (cell_relation_second_value_of_p(pv_in)
+          && !undefined_pointer_value_cell_p(cell_relation_second_cell(pv_in))
+          && !null_pointer_value_cell_p(cell_relation_second_cell(pv_in)) )
+      {
+        /* not generic */
+        effect eff_alias = make_effect(copy_cell(cell_relation_second_cell(pv_in)),
+            make_action_write_memory(),
+            make_approximation_may(),
+            make_descriptor_none());
 
-	  if (cell_relation_second_value_of_p(pv_in)
-	      && !undefined_pointer_value_cell_p(cell_relation_second_cell(pv_in))
-	      && !null_pointer_value_cell_p(cell_relation_second_cell(pv_in)) )
-	    {
-	      /* not generic */
-	      effect eff_alias = make_effect(copy_cell(cell_relation_second_cell(pv_in)),
-					     make_action_write_memory(),
-					     make_approximation_may(),
-					     make_descriptor_none());
-
-	      list l_gen_pv = (* ctxt->make_pv_from_effects_func)
-		(eff_alias, anywhere_eff, rhs_kind, l_in);
-	      l_gen = (*ctxt->pvs_must_union_func)(l_gen_pv, l_gen);
-	      free_effect(eff_alias);
-	    }
-	}
-      free_effect(anywhere_eff);
-      free_cell_interpretation(rhs_kind);
+        list l_gen_pv = (* ctxt->make_pv_from_effects_func)
+                            (eff_alias, anywhere_eff, rhs_kind, l_in);
+        l_gen = (*ctxt->pvs_must_union_func)(l_gen_pv, l_gen);
+        free_effect(eff_alias);
+      }
     }
+    free_effect(anywhere_eff);
+    free_cell_interpretation(rhs_kind);
+  }
   else
-    {
-      /* generate for all alias p in l_kill p == rhs_eff */
-      /* except for p==undefined or p==null (should other abstract values/locations be ignored here?) */
-      FOREACH(EFFECT, eff_alias, l_kill)
-	{
-	  if (!null_pointer_value_effect_p(eff_alias)
-	      && ! undefined_pointer_value_effect_p(eff_alias))
-	    {
-	      list l_rhs_kind_tmp = l_rhs_kind;
-	      FOREACH(EFFECT, rhs_eff, l_rhs_eff)
-		{
-		  cell_interpretation rhs_kind =
-		    CELL_INTERPRETATION(CAR(l_rhs_kind_tmp));
-		  //bool exact_preceding_p = true;
-		  list l_gen_pv = (* ctxt->make_pv_from_effects_func)
-		    (eff_alias, rhs_eff, rhs_kind, l_in);
-		  l_gen = gen_nconc(l_gen_pv, l_gen);
-		  POP(l_rhs_kind_tmp);
-		}
-	    }
-	}
-      if (declaration_p)
-	{
-	  gen_full_free_list(l_kill);
-	  l_kill = NIL;
-	}
-      pips_debug_pvs(2, "l_gen =", l_gen);
+  {
+    /* generate for all alias p in l_kill p == rhs_eff */
+    /* except for p==undefined or p==null (should other abstract values/locations be ignored here?) */
+    FOREACH(EFFECT, eff_alias, l_kill) {
+      if (!null_pointer_value_effect_p(eff_alias)
+          && ! undefined_pointer_value_effect_p(eff_alias))
+      {
+        list l_rhs_kind_tmp = l_rhs_kind;
+        FOREACH(EFFECT, rhs_eff, l_rhs_eff)
+        {
+          cell_interpretation rhs_kind =
+              CELL_INTERPRETATION(CAR(l_rhs_kind_tmp));
+          //bool exact_preceding_p = true;
+          list l_gen_pv = (* ctxt->make_pv_from_effects_func)
+                                (eff_alias, rhs_eff, rhs_kind, l_in);
+          l_gen = gen_nconc(l_gen_pv, l_gen);
+          POP(l_rhs_kind_tmp);
+        }
+      }
     }
+    if (declaration_p)
+    {
+      gen_full_free_list(l_kill);
+      l_kill = NIL;
+    }
+    pips_debug_pvs(2, "l_gen =", l_gen);
+  }
 
   /* now take kills into account */
   l_out = kill_pointer_values(l_in, l_kill, ctxt);
@@ -1436,126 +1440,129 @@ void single_pointer_assignment_to_post_pv(effect lhs_eff,
           computed.
  */
 void multiple_pointer_assignment_to_post_pv(effect lhs_base_eff, type lhs_type,
-					    list l_rhs_base_eff, list l_rhs_base_kind,
-					    bool declaration_p, list l_in,
-					    pv_results *pv_res, pv_context *ctxt)
+    list l_rhs_base_eff, list l_rhs_base_kind,
+    bool declaration_p, list l_in,
+    pv_results *pv_res, pv_context *ctxt)
 {
   list l_in_cur = l_in;
   cell rhs_base_cell = gen_length(l_rhs_base_eff) > 0
-    ? effect_cell(EFFECT(CAR(l_rhs_base_eff))): cell_undefined;
+      ? effect_cell(EFFECT(CAR(l_rhs_base_eff))): cell_undefined;
   bool anywhere_lhs_p = false;
 
   pips_debug(1, "begin\n");
 
   pips_assert("assigning NULL to several pointers"
-	      " at the same time is forbidden!\n", !(!cell_undefined_p(rhs_base_cell) && null_pointer_value_cell_p(rhs_base_cell)));
+      " at the same time is forbidden!\n", !(!cell_undefined_p(rhs_base_cell) && null_pointer_value_cell_p(rhs_base_cell)));
 
   /* we could be more precise here on abstract locations */
   if (anywhere_effect_p(lhs_base_eff))
-    {
-      pips_assert("we cannot have an anywhere lhs for a declaration\n", !declaration_p);
-      pips_debug(3, "anywhere lhs\n");
-      anywhere_lhs_p = true;
+  {
+    pips_assert("we cannot have an anywhere lhs for a declaration\n", !declaration_p);
+    pips_debug(3, "anywhere lhs\n");
+    anywhere_lhs_p = true;
 
-      list l_rhs_eff = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), NIL);
-      list l_rhs_kind = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(), NIL);
+    list l_rhs_eff = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), NIL);
+    list l_rhs_kind = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(), NIL);
 
-      single_pointer_assignment_to_post_pv(lhs_base_eff, l_rhs_eff, l_rhs_kind, declaration_p, l_in_cur, pv_res, ctxt);
+    single_pointer_assignment_to_post_pv(lhs_base_eff, l_rhs_eff, l_rhs_kind, declaration_p, l_in_cur, pv_res, ctxt);
 
-      gen_full_free_list(l_rhs_eff);
-      gen_full_free_list(l_rhs_kind);
-    }
+    gen_full_free_list(l_rhs_eff);
+    gen_full_free_list(l_rhs_kind);
+  }
   else /* if (!anywhere_lhs_p) */
-    {
-      /* lhs is not a pointer, but it is an array of pointers or an aggregate type
+  {
+    /* lhs is not a pointer, but it is an array of pointers or an aggregate type
 	 with pointers.... */
-      /* In this case, it cannot be an address_of case */
+    /* In this case, it cannot be an address_of case */
 
-      /* First, search for all accessible pointers */
-      list l_lhs = generic_effect_generate_all_accessible_paths_effects_with_level
-	(lhs_base_eff, lhs_type, is_action_write, false, 0, true);
-      if(effect_exact_p(lhs_base_eff))
-	effects_to_must_effects(l_lhs); /* to work around the fact that exact effects are must effects */
-      pips_debug_effects(2, "l_lhs = ", l_lhs);
+    /* First, search for all accessible pointers */
+    list l_lhs = generic_effect_generate_all_accessible_paths_effects_with_level
+        (lhs_base_eff, lhs_type, is_action_write, false, 0, true);
+    if(effect_exact_p(lhs_base_eff))
+      effects_to_must_effects(l_lhs); /* to work around the fact that exact effects are must effects */
+    pips_debug_effects(2, "l_lhs = ", l_lhs);
 
-      /* Then for each found pointer, do as if there were an assignment by translating
+    /* Then for each found pointer, do as if there were an assignment by translating
          the rhs path accordingly 
-      */
-      if (!ENDP(l_lhs))
-	{
-	  list l_lhs_tmp = l_lhs;
-	  while (!anywhere_lhs_p && !ENDP(l_lhs_tmp))
-	    {
-	      /* build the list of corresponding rhs */
-	      effect lhs_eff = EFFECT(CAR(l_lhs_tmp));
-	      reference lhs_ref = effect_any_reference(lhs_eff);
-	      list lhs_dims = reference_indices(lhs_ref);
+     */
+    if (!ENDP(l_lhs))
+    {
+      list l_lhs_tmp = l_lhs;
+      while (!anywhere_lhs_p && !ENDP(l_lhs_tmp))
+      {
+        /* build the list of corresponding rhs */
+        effect lhs_eff = EFFECT(CAR(l_lhs_tmp));
+        reference lhs_ref = effect_any_reference(lhs_eff);
+        list lhs_dims = reference_indices(lhs_ref);
 
-	      reference lhs_base_ref = effect_any_reference(lhs_base_eff);
-	      size_t lhs_base_nb_dim = gen_length(reference_indices(lhs_base_ref));
-	      list l_rhs_eff = NIL;
-	      list l_rhs_kind = NIL;
+        reference lhs_base_ref = effect_any_reference(lhs_base_eff);
+        size_t lhs_base_nb_dim = gen_length(reference_indices(lhs_base_ref));
+        list l_rhs_eff = NIL;
+        list l_rhs_kind = NIL;
 
-	      bool free_rhs_kind = false;
-	      list l_rhs_base_kind_tmp = l_rhs_base_kind;
-	      FOREACH(EFFECT, rhs_base_eff, l_rhs_base_eff)
-		{
-		  effect rhs_eff = copy_effect(rhs_base_eff);
-		  cell_interpretation rhs_kind = CELL_INTERPRETATION(CAR(l_rhs_base_kind));
+        bool free_rhs_kind = false;
+        list l_rhs_base_kind_tmp = l_rhs_base_kind;
+        FOREACH(EFFECT, rhs_base_eff, l_rhs_base_eff)
+        {
+          effect rhs_eff = copy_effect(rhs_base_eff);
+          cell_interpretation rhs_kind = CELL_INTERPRETATION(CAR(l_rhs_base_kind));
 
-		  if (!undefined_pointer_value_cell_p(rhs_base_cell)
-		      && !anywhere_effect_p(rhs_base_eff))
-		    {
-		      reference rhs_ref = effect_any_reference(rhs_eff);
-		      bool to_be_freed = false;
-		      type rhs_type = cell_reference_to_type(rhs_ref, &to_be_freed);
+          if (!undefined_pointer_value_cell_p(rhs_base_cell)
+              && !anywhere_effect_p(rhs_base_eff))
+          {
+            reference rhs_ref = effect_any_reference(rhs_eff);
+            bool to_be_freed = false;
+            type rhs_type = cell_reference_to_type(rhs_ref, &to_be_freed);
 
-		      if (!type_equal_p(lhs_type, rhs_type))
-			{
-			  pips_debug(5, "not same lhs and rhs types generating anywhere rhs\n");
-			  rhs_eff = make_anywhere_effect(make_action_write_memory()); /* should be refined */
-			  rhs_kind = make_cell_interpretation_address_of();
-			  free_rhs_kind = true;
-			}
-		      else /* general case at least :-) */
-			{
-			  /* This is not generic, I should use a translation algorithm here I guess */
-			  /* first skip dimensions of kill_ref similar to lhs_base_ref */
-			  list lhs_dims_tmp = lhs_dims;
-			  for(size_t i = 0; i < lhs_base_nb_dim; i++, POP(lhs_dims_tmp));
-			  /* add the remaining dimensions to the copy of rhs_base_eff */
-			  FOREACH(EXPRESSION, dim, lhs_dims_tmp)
-			    {
-			      (*effect_add_expression_dimension_func)(rhs_eff, dim);
-			    }
-			}
-		      if (to_be_freed) free_type(rhs_type);
-		    }
-		  l_rhs_eff = CONS(EFFECT, rhs_eff, l_rhs_eff);
-		  l_rhs_kind = CONS(CELL_INTERPRETATION, rhs_kind, l_rhs_kind);
-		  POP(l_rhs_base_kind_tmp);
-		}
+            if (!type_equal_p(lhs_type, rhs_type))
+            {
+              pips_debug(5, "not same lhs and rhs types generating anywhere rhs\n");
+              rhs_eff = make_anywhere_effect(make_action_write_memory()); /* should be refined */
+              rhs_kind = make_cell_interpretation_address_of();
+              free_rhs_kind = true;
+            }
+            else /* general case at least :-) */
+            {
+              /* This is not generic, I should use a translation algorithm here I guess */
+              /* first skip dimensions of kill_ref similar to lhs_base_ref */
+              list lhs_dims_tmp = lhs_dims;
+              for(size_t i = 0; i < lhs_base_nb_dim; i++, POP(lhs_dims_tmp));
+              /* add the remaining dimensions to the copy of rhs_base_eff */
+              FOREACH(EXPRESSION, dim, lhs_dims_tmp)
+              {
+                // functions that can be pointed by effect_add_expression_dimension_func:
+                // simple_effect_add_expression_dimension
+                // convex_region_add_expression_dimension
+                (*effect_add_expression_dimension_func)(rhs_eff, dim);
+              }
+            }
+            if (to_be_freed) free_type(rhs_type);
+          }
+          l_rhs_eff = CONS(EFFECT, rhs_eff, l_rhs_eff);
+          l_rhs_kind = CONS(CELL_INTERPRETATION, rhs_kind, l_rhs_kind);
+          POP(l_rhs_base_kind_tmp);
+        }
 
-	      single_pointer_assignment_to_post_pv(lhs_eff, l_rhs_eff, l_rhs_kind, declaration_p, l_in_cur, pv_res, ctxt);
+        single_pointer_assignment_to_post_pv(lhs_eff, l_rhs_eff, l_rhs_kind, declaration_p, l_in_cur, pv_res, ctxt);
 
-	      gen_full_free_list(l_rhs_eff);
-	      if (free_rhs_kind) gen_full_free_list(l_rhs_kind); else gen_free_list(l_rhs_kind);
+        gen_full_free_list(l_rhs_eff);
+        if (free_rhs_kind) gen_full_free_list(l_rhs_kind); else gen_free_list(l_rhs_kind);
 
-	      list l_out = pv_res->l_out;
-	      if (l_out != l_in_cur)
-		gen_full_free_list(l_in_cur);
-	      l_in_cur = l_out;
+        list l_out = pv_res->l_out;
+        if (l_out != l_in_cur)
+          gen_full_free_list(l_in_cur);
+        l_in_cur = l_out;
 
-	      list l_result_paths = pv_res->result_paths;
+        list l_result_paths = pv_res->result_paths;
 
-	      if (gen_length(l_result_paths) > 0 && anywhere_effect_p(EFFECT(CAR(l_result_paths))))
-		anywhere_lhs_p = true;
+        if (gen_length(l_result_paths) > 0 && anywhere_effect_p(EFFECT(CAR(l_result_paths))))
+          anywhere_lhs_p = true;
 
-	      POP(l_lhs_tmp);
-	    } /* while */
-	} /* if (!ENDP(l_lhs)) */
-      gen_full_free_list(l_lhs);
-    } /* if (!anywhere_lhs_p) */
+        POP(l_lhs_tmp);
+      } /* while */
+    } /* if (!ENDP(l_lhs)) */
+    gen_full_free_list(l_lhs);
+  } /* if (!anywhere_lhs_p) */
 
   return;
 }
@@ -1655,127 +1662,125 @@ static list module_initial_parameter_pv()
   storage pointer_dummy_storage = make_storage_ram(make_ram(module, pointer_dummy_area, UNKNOWN_RAM_OFFSET, NIL));
 
   FOREACH(ENTITY, formal_ent, l_formals)
+  {
+    effect formal_eff = make_reference_simple_effect(make_reference(formal_ent, NIL),
+        make_action_write_memory(),
+        make_approximation_exact());
+    type formal_t = entity_basic_concrete_type(formal_ent);
+
+    // generate all possible effects from the formal parameter
+    list lw = generic_effect_generate_all_accessible_paths_effects_with_level(formal_eff,
+        formal_t,
+        'w',
+        true,
+        10, /* to avoid too long paths until GAPS are handled */
+        false);
+    const char * formal_name = entity_user_name(formal_ent);
+    int nb = 1;
+
+    FOREACH(EFFECT, eff, lw)
     {
-      effect formal_eff = make_reference_simple_effect(make_reference(formal_ent, NIL),
-						       make_action_write_memory(),
-						       make_approximation_exact());
-      type formal_t = entity_basic_concrete_type(formal_ent);
+      // this should be at least partly be embedded in a representation dependent wrapper
+      pips_debug_effect(3, "current effect: \n", eff);
+      bool to_be_freed = false;
+      type eff_t = cell_to_type(effect_cell(eff), &to_be_freed);
+      if (type_variable_p(eff_t) && basic_pointer_p(variable_basic(type_variable(eff_t))))
+      {
 
-      // generate all possible effects from the formal parameter
-      list lw = generic_effect_generate_all_accessible_paths_effects_with_level(formal_eff,
-										formal_t,
-										'w',
-										true,
-										10, /* to avoid too long paths until GAPS are handled */
-										false);
-      const char * formal_name = entity_user_name(formal_ent);
-      int nb = 1;
+        // we generate an address_of pv, the source of which is the effect cell
+        // and the sink of which is the first element of a new entity, whose type
+        // is a one dimensional array of the pointed type.
 
-      FOREACH(EFFECT, eff, lw)
-	{
-	  // this should be at least partly be embedded in a representation dependent wrapper
-	  pips_debug_effect(3, "current effect: \n", eff);
-	  bool to_be_freed = false;
-	  type eff_t = cell_to_type(effect_cell(eff), &to_be_freed);
-	  if (type_variable_p(eff_t) && basic_pointer_p(variable_basic(type_variable(eff_t))))
-	    {
+        // first generate the new entity name
+        entity new_ent = entity_undefined;
+        string new_name = NULL;
+        new_name = strdup(concatenate(mod_name, MODULE_SEP_STRING, "_", formal_name,"_", i2a(nb), NULL));
+        nb ++;
 
-	      // we generate an address_of pv, the source of which is the effect cell
-	      // and the sink of which is the first element of a new entity, whose type
-	      // is a one dimensional array of the pointed type.
+        // then take care of the type and target path indices
+        type pointed_type = basic_pointer(variable_basic(type_variable(eff_t)));
+        type new_type = type_undefined;
+        list new_dims = NIL; // array dimensions of new type
 
-	      // first generate the new entity name
-	      entity new_ent = entity_undefined;
-	      string new_name = NULL;
-	      new_name = strdup(concatenate(mod_name, MODULE_SEP_STRING, "_", formal_name,"_", i2a(nb), NULL));
-	      nb ++;
+        // if the effect path contains multiple paths (a[*] or p.end[*].begin for instance)
+        // then there are several targets;
+        // the indices of the new_path must have an additional dimension
+        // and also the new type
+        bool single_path = true;
+        list new_inds = NIL; // indices of the target path
 
-	      // then take care of the type and target path indices
-	      type pointed_type = basic_pointer(variable_basic(type_variable(eff_t)));
-	      type new_type = type_undefined;
-	      list new_dims = NIL; // array dimensions of new type
+        // Not generic
+        // for simple cells, isn't it sufficient to test the approximation of the effect ?
+        FOREACH(EXPRESSION, eff_ind_exp, reference_indices(effect_any_reference(eff)))
+        {
+          if (unbounded_expression_p(eff_ind_exp))
+          {
+            single_path = false;
+            break;
+          }
+        }
+        if (!single_path)
+        {
+          new_inds = CONS(EXPRESSION, make_unbounded_expression(), NIL);
+          new_dims = CONS(DIMENSION,
+              make_dimension(int_to_expression(0),
+                  make_unbounded_expression()), NIL);
+          // the approximation will be ok because, as the path is not unique
+          // the effect approximation is may by construction
+        }
 
-	      // if the effect path contains multiple paths (a[*] or p.end[*].begin for instance)
-	      // then there are several targets;
-	      // the indices of the new_path must have an additional dimension
-	      // and also the new type
-	      bool single_path = true;
-	      list new_inds = NIL; // indices of the target path
+        if (type_variable_p(pointed_type))
+        {
+          pips_debug(5, "variable case\n");
+          variable pointed_type_v = type_variable(pointed_type);
+          basic new_basic = copy_basic(variable_basic(pointed_type_v));
+          if (ENDP(variable_dimensions(pointed_type_v)))
+          {
+            pips_debug(5, "with 0 dimension\n");
+            new_dims = gen_nconc(new_dims, CONS(DIMENSION,
+                make_dimension(int_to_expression(0),
+                    make_unbounded_expression()), NIL));
+            new_inds = gen_nconc(new_inds, CONS(EXPRESSION, int_to_expression(0), NIL));
+          }
+          else
+          {
+            new_dims = gen_full_copy_list(variable_dimensions(pointed_type_v));
+            pips_debug(5, "with %d dimension\n", (int) gen_length(new_dims));
+            FOREACH(DIMENSION, dim, new_dims)
+            {
+              new_inds = gen_nconc(new_inds, CONS(EXPRESSION, int_to_expression(0), NIL));
+            }
+          }
+          new_type = make_type_variable(make_variable(new_basic, new_dims, NIL));
+          pips_debug(5, "new_type is: %s (%s)\n", words_to_string(words_type(new_type, NIL, false)),
+              type_to_string(new_type));
+          new_ent = make_entity(new_name,
+              new_type,
+              copy_storage(pointer_dummy_storage),
+              make_value_unknown());
+        }
+        else
+        {
+          pips_debug(5, "non-variable formal parameter target type -> anywhere\n");
+          new_ent = entity_all_locations();
+          gen_full_free_list(new_inds);
+          new_inds = NIL;
+        }
 
-	      // Not generic
-	      // for simple cells, isn't it sufficient to test the approximation of the effect ?
-	      FOREACH(EXPRESSION, eff_ind_exp, reference_indices(effect_any_reference(eff)))
-		{
-		  if (unbounded_expression_p(eff_ind_exp))
-		    {
-		      single_path = false;
-		      break;
-		    }
-		}
-	      if (!single_path)
-		{
-		  new_inds = CONS(EXPRESSION, make_unbounded_expression(), NIL);
-		  new_dims = CONS(DIMENSION,
-				      make_dimension(int_to_expression(0),
-						     make_unbounded_expression()), NIL);
-		  // the approximation will be ok because, as the path is not unique
-		  // the effect approximation is may by construction
-		}
-
-	      if (type_variable_p(pointed_type))
-		{
-
-		  pips_debug(5, "variable case\n");
-		  variable pointed_type_v = type_variable(pointed_type);
-		  basic new_basic = copy_basic(variable_basic(pointed_type_v));
-		  if (ENDP(variable_dimensions(pointed_type_v)))
-		    {
-		      pips_debug(5, "with 0 dimension\n");
-		      new_dims = gen_nconc(new_dims, CONS(DIMENSION,
-				      make_dimension(int_to_expression(0),
-						     make_unbounded_expression()), NIL));
-		      new_inds = gen_nconc(new_inds, CONS(EXPRESSION, int_to_expression(0), NIL));
-		    }
-		  else
-		    {
-		      new_dims = gen_full_copy_list(variable_dimensions(pointed_type_v));
-		      pips_debug(5, "with %d dimension\n", (int) gen_length(new_dims));
-		      FOREACH(DIMENSION, dim, new_dims)
-			{
-			  new_inds = gen_nconc(new_inds, CONS(EXPRESSION, int_to_expression(0), NIL));
-			}
-		    }
-		  new_type = make_type_variable(make_variable(new_basic, new_dims, NIL));
-		  pips_debug(5, "new_type is: %s (%s)\n", words_to_string(words_type(new_type, NIL, false)),
-			     type_to_string(new_type));
-		  new_ent = make_entity(new_name,
-					   new_type,
-					   copy_storage(pointer_dummy_storage),
-					   make_value_unknown());
-		}
-	      else
-		{
-		  pips_debug(5, "non-variable formal parameter target type -> anywhere\n");
-		  new_ent = entity_all_locations();
-		  gen_full_free_list(new_inds);
-		  new_inds = NIL;
-		}
-
-
-	      cell new_cell = make_cell_reference(make_reference(new_ent, new_inds));
-	      // then make the new pv
-	      cell_relation new_pv = make_address_of_pointer_value(copy_cell(effect_cell(eff)),
-					    new_cell,
-					    effect_approximation_tag(eff),
-					    make_descriptor_none());
-	      pips_debug_pv(3, "generated pv: \n", new_pv);
-	      // and add it to the return list of pvs
-	      pv_out = CONS(CELL_RELATION, new_pv, pv_out);
-	    }
-	  if (to_be_freed) free_type(eff_t);
-	}
-        gen_full_free_list(lw);
+        cell new_cell = make_cell_reference(make_reference(new_ent, new_inds));
+        // then make the new pv
+        cell_relation new_pv = make_address_of_pointer_value(copy_cell(effect_cell(eff)),
+            new_cell,
+            effect_approximation_tag(eff),
+            make_descriptor_none());
+        pips_debug_pv(3, "generated pv: \n", new_pv);
+        // and add it to the return list of pvs
+        pv_out = CONS(CELL_RELATION, new_pv, pv_out);
+      }
+      if (to_be_freed) free_type(eff_t);
     }
+    gen_full_free_list(lw);
+  }
   free_storage(pointer_dummy_storage);
   return pv_out;
 }
