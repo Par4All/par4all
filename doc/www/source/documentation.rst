@@ -76,7 +76,17 @@ Articles
 ........
 
 You may find also some other publications on the WWW pages of the authors
-and on http://www.cri.ensmp.fr/classement/2013.html
+and on http://www.cri.ensmp.fr/classement/2014.html
+
+- Mehdi AMINI, Corinne ANCOURT, Béatrice CREUSILLET, François IRIGOIN and
+  Ronan KERYELL. Patterns for Parallel Programming on GPUs, Chapter
+  « Program Sequentially, Carefully, and Benefit from Compiler Advances for
+  Parallel Heterogeneous Computing », pages 151–171. Saxe-Coburg
+  Publications, 2014. To appear.
+
+- Mehdi Amini. « Source-to-Source Automatic Program Transformations for
+  GPU-like Hardware Accelerators » PhD defense. 12/2012.
+  http://www.cri.ensmp.fr/classement/doc/A-506.pdf
 
 - Massimo TORQUATI, Marco VANNESCHI, Mehdi AMINI, Serge GUELTON, Ronan
   KERYELL, Vincent LANORE, François-Xavier PASQUIER, Michel BARRETEAU,
