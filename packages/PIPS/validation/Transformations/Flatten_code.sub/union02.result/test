@@ -1,0 +1,57 @@
+
+"Initial Code"
+
+void union02(void)
+{
+   int i;
+   {
+      int i;
+      union foo {
+         int a;
+         double b;
+      };
+      union foo j;
+      j.a = 1;
+   }
+   {
+      int i;
+      union foo {
+         double a;
+         int b;
+      };
+      union foo j;
+      j.a = 0.;
+   }
+   return;
+}
+
+"FLATTEN_CODE"
+
+void union02(void)
+{
+   int i;
+   //PIPS generated variable
+   int i_0;
+   //PIPS generated variable
+   union foo {
+      int a;
+      double b;
+   };
+   //PIPS generated variable
+   union foo j_0;
+   //PIPS generated variable
+   int i_1;
+   //PIPS generated variable
+   union foo_0 {
+      double a;
+      int b;
+   };
+   //PIPS generated variable
+   union foo_0 j_1;
+   j_0.a = 1;
+   j_1.a = 0.;
+   return;
+}
+
+Warnings
+

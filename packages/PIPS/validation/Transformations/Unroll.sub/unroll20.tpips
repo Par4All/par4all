@@ -1,0 +1,12 @@
+setenv WS=unroll20
+setproperty ABORT_ON_USER_ERROR TRUE
+delete $WS
+create $WS $WS.c
+
+apply UNROLL[$WS]
+bar
+2
+display PRINTED_FILE[$WS]
+close
+delete $WS
+quit

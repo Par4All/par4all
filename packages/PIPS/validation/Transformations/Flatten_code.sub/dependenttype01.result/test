@@ -1,0 +1,31 @@
+
+"Initial Code"
+
+void dependenttype01()
+{
+   int i;
+   {
+      int i;
+      i = 10;
+      int a[i];
+      a[0] = 0;
+   }
+}
+
+"FLATTEN_CODE"
+
+void dependenttype01()
+{
+   int i;
+   {
+      int i;
+      i = 10;
+      int a[i];
+      a[0] = 0;
+   }
+}
+
+Warnings
+
+FLATTEN_CODE[dependenttype01] (flatten_code) Module "dependenttype01" could not be flattened because it uses a variable-length array (VLA).
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build phase/rule FLATTEN_CODE for module dependenttype01.

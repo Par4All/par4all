@@ -1,0 +1,41 @@
+
+"Initial Code"
+
+void typedef02()
+{
+   typedef char *mytype;
+   int i;
+   {
+      int i;
+      typedef int mytype;
+      mytype j;
+   }
+   {
+      int i;
+      typedef double mytype;
+      mytype j;
+   }
+}
+
+"FLATTEN_CODE"
+
+void typedef02()
+{
+   typedef char *mytype;
+   int i;
+   //PIPS generated variable
+   int i_0;
+   //PIPS generated variable
+   typedef int mytype_0;
+   //PIPS generated variable
+   mytype_0 j;
+   //PIPS generated variable
+   int i_1;
+   //PIPS generated variable
+   typedef double mytype_1;
+   //PIPS generated variable
+   mytype_1 j_0;
+}
+
+Warnings
+

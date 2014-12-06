@@ -1,0 +1,28 @@
+
+"Initial Code"
+
+void typedef01()
+{
+   int i;
+   {
+      int i;
+      typedef int mytype;
+      mytype j;
+   }
+}
+
+"FLATTEN_CODE"
+
+void typedef01()
+{
+   int i;
+   //PIPS generated variable
+   int i_0;
+   //PIPS generated variable
+   typedef int mytype;
+   //PIPS generated variable
+   mytype j;
+}
+
+Warnings
+

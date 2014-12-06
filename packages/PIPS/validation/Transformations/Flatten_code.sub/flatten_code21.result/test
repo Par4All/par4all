@@ -1,0 +1,22 @@
+
+"Initial Code"
+
+int flatten_code21()
+{
+   typedef int myint1;
+   {
+      typedef int myint1;
+   }
+}
+
+"FLATTEN_CODE"
+
+int flatten_code21()
+{
+   typedef int myint1;
+   //PIPS generated variable
+   typedef int myint1_0;
+}
+
+Warnings
+

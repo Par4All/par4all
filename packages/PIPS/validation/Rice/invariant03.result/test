@@ -46,9 +46,9 @@ void invariant03(int n, int ni, int nj)
    int i, j;                                                            /*0007*/
    float s, a;                                                          /*0008*/
 
-   i = MAX(INT(ni), 0);
-   j = MAX(INT(nj), 0);
    s = a*a;                                                             /*0012*/
+   j = MAX(INT(nj), 0);
+   i = MAX(INT(ni), 0);
 #pragma omp parallel for 
    for(i = 0; i <= ni-1; i += 1)                                        /*0010*/
 #pragma omp parallel for 

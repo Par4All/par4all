@@ -53,7 +53,7 @@ void compute(int M, int a_0[1], int l_0[1], int m_0[1]);
 void compute(int M, int a_0[1], int l_0[1], int m_0[1])
 {
    // BEGIN BLOCK
-   //PIPS generated variable
+   // Declared as a patch variable by Pass Outlining
    int a, l, m;
    m = *m_0;
    l = *l_0;

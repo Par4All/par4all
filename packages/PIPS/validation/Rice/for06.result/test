@@ -1,0 +1,75 @@
+
+"with MEMORY_EFFECTS_ONLY set to TRUE"
+
+"DG_FILE"
+
+
+ **************** Effective Dependence Graph ****************
+
+	09 --> 10 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT> at levels  2
+	09 --> 09 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> at levels  1
+	09 --> 09 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> at levels  1
+	09 --> 09 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> at levels  1
+
+****************** End of Dependence Graph ******************
+
+"DISTRIBUTER"
+
+void for06(int n)
+{
+   int a[n], b[n];                                                      /*0005*/
+   {
+      int i;                                                            /*0006*/
+      for(i = 0; i <= n-1; i += 1) {                                    /*0006*/
+         a[i] = i;                                                      /*0007*/
+         int x;                                                         /*0008*/
+         x = rand();                                                    /*0009*/
+         b[i] = x;                                                      /*0010*/
+      }
+   }
+}
+
+
+"with MEMORY_EFFECTS_ONLY set to FALSE"
+
+"DG_FILE"
+
+
+ **************** Effective Dependence Graph ****************
+
+	09 --> 10 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT> at levels  2
+	09 --> 09 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> at levels  1
+	09 --> 09 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> at levels  1
+	09 --> 09 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> at levels  1
+	08 --> 10 with conflicts
+		from <x-WE-EXACT> to <x-RE-EXACT> at levels  2
+	08 --> 09 with conflicts
+		from <x-WE-EXACT> to <x-RE-EXACT> at levels  2
+
+****************** End of Dependence Graph ******************
+
+"DISTRIBUTER"
+
+void for06(int n)
+{
+   int a[n], b[n];                                                      /*0005*/
+   {
+      int i;                                                            /*0006*/
+      for(i = 0; i <= n-1; i += 1) {                                    /*0006*/
+         a[i] = i;                                                      /*0007*/
+      }
+      for(i = 0; i <= n-1; i += 1) {                                    /*0006*/
+         int x;                                                         /*0008*/
+         x = rand();                                                    /*0009*/
+         b[i] = x;                                                      /*0010*/
+      }
+   }
+}

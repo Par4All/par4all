@@ -48,7 +48,7 @@ Code after outlining
 //             <    is written>: v_0[0]
 void kernel(int v_0[1], int i)
 {
-   //PIPS generated variable
+   // Declared as a patch variable by Pass Outlining
    int v;
 //             <    is read   >: v_0[0]
 //             <    is written>: v

@@ -9,7 +9,7 @@ int main()
 }
 void p4a_launcher_0(int a[100])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i;
 
    for(i = 0; i <= 99; i += 1)

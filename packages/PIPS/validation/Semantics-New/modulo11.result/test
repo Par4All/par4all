@@ -1,0 +1,102 @@
+
+Source code with transformers
+
+
+//  T() {}
+
+void modulo11(int flag)
+{
+   // PIPS: flag is assumed a constant reaching value
+
+//  T(a,b,i,j) {a==0, b==0, j==1}
+
+   int i, j = 1, a = 0, b = 0;
+
+//  T() {a==0, b==0, j==1}
+
+   float x;
+
+//  T(i) {a==0, b==0, i==1, j==1}
+
+   i = 1;
+
+//  T(a,b,i,j) {2a==i-1, 2a#init==i#init-1, 2a#init+j<=2a+j#init,
+//    a+j#init<=a#init+j, j<=2a+1, a+1<=j}
+
+   while (x>0.) {
+
+//  T(a) {a==a#init+1}
+
+      a++;
+
+//  T(b) {b+i==b#init+j}
+
+      b += j-i;
+
+//  T(i) {i==i#init+2}
+
+      i += 2;
+
+//  T(j) {j#init+1<=j, j<=j#init+2}
+
+      if (i%2==0)
+
+//  T(j) {j==j#init+2}
+
+         j += 2;
+      else
+
+//  T(j) {j==j#init+1}
+
+         j++;
+   }
+}
+
+//  P() {}
+
+void modulo11(int flag)
+{
+   // PIPS: flag is assumed a constant reaching value
+
+//  P() {}
+
+   int i, j = 1, a = 0, b = 0;
+
+//  P(a,b,i,j) {a==0, b==0, j==1}
+
+   float x;
+
+//  P(a,b,i,j) {a==0, b==0, j==1}
+
+   i = 1;
+
+//  P(a,b,i,j) {a==0, b==0, i==1, j==1}
+
+   while (x>0.) {
+
+//  P(a,b,i,j) {2a==i-1, j<=2a+1, a+1<=j}
+
+      a++;
+
+//  P(a,b,i,j) {2a==i+1, a<=j, j+1<=2a}
+
+      b += j-i;
+
+//  P(a,b,i,j) {2a==i+1, a<=j, j+1<=2a}
+
+      i += 2;
+
+//  P(a,b,i,j) {2a==i-1, a<=j, j+1<=2a}
+
+      if (i%2==0)
+
+//  P(a,b,i,j) {2a==i-1, a<=j, j+1<=2a}
+
+         j += 2;
+      else
+
+//  P(a,b,i,j) {2a==i-1, a<=j, j+1<=2a}
+
+         j++;
+   }
+}

@@ -1,6 +1,6 @@
 void outlined_0(int x, float A[500])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i;
    x = 0;
 

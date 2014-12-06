@@ -6,8 +6,10 @@ void main_PAR_HYBRID_FOR_HYBRID_1(int a[100000], int b[100000], int d[100000], i
 void main_PAR_HYBRID_FOR_HYBRID(int a[100000], int b[100000], int c[100000], int i_0[1]);
 void main_PAR_HYBRID(int a[100000], int b[100000], int c[100000], int d[100000], int i_0[1])
 {
+   // Declared as a patch variable by Pass Outlining
+   int i;
    //PIPS generated variable
-   int i, STEP_RR_b[1][STEP_INDEX_SLICE_UP], STEP_RR_c[1][STEP_INDEX_SLICE_UP], STEP_SR_a[1][STEP_INDEX_SLICE_UP], STEP_SR_d[1][STEP_INDEX_SLICE_UP];
+   int STEP_RR_b[1][STEP_INDEX_SLICE_UP], STEP_RR_c[1][STEP_INDEX_SLICE_UP], STEP_SR_a[1][STEP_INDEX_SLICE_UP], STEP_SR_d[1][STEP_INDEX_SLICE_UP];
 #pragma omp master
    {
       i = *i_0;
@@ -80,8 +82,10 @@ void main_PAR_HYBRID(int a[100000], int b[100000], int c[100000], int d[100000],
 }
 void main_PAR_HYBRID_FOR_HYBRID_1(int a[100000], int b[100000], int d[100000], int i_0[1])
 {
+   // Declared as a patch variable by Pass Outlining
+   int i;
    //PIPS generated variable
-   int i, STEP_COMM_SIZE, STEP_i_LOW, STEP_i_UP, STEP_COMM_RANK, STEP_RR_a[STEP_MAX_NB_LOOPSLICES][1][STEP_INDEX_SLICE_UP], IDX, STEP_RR_b[STEP_MAX_NB_LOOPSLICES][1][STEP_INDEX_SLICE_UP], STEP_SR_d[STEP_MAX_NB_LOOPSLICES][1][STEP_INDEX_SLICE_UP];
+   int STEP_COMM_SIZE, STEP_i_LOW, STEP_i_UP, STEP_COMM_RANK, STEP_RR_a[STEP_MAX_NB_LOOPSLICES][1][STEP_INDEX_SLICE_UP], IDX, STEP_RR_b[STEP_MAX_NB_LOOPSLICES][1][STEP_INDEX_SLICE_UP], STEP_SR_d[STEP_MAX_NB_LOOPSLICES][1][STEP_INDEX_SLICE_UP];
 #pragma omp master
    {
       i = *i_0;
@@ -160,8 +164,10 @@ void main_PAR_HYBRID_FOR_HYBRID_1(int a[100000], int b[100000], int d[100000], i
 }
 void main_PAR_HYBRID_FOR_HYBRID(int a[100000], int b[100000], int c[100000], int i_0[1])
 {
+   // Declared as a patch variable by Pass Outlining
+   int i;
    //PIPS generated variable
-   int i, STEP_COMM_SIZE, STEP_i_LOW, STEP_i_UP, STEP_COMM_RANK, STEP_RR_b[STEP_MAX_NB_LOOPSLICES][1][STEP_INDEX_SLICE_UP], IDX, STEP_RR_c[STEP_MAX_NB_LOOPSLICES][1][STEP_INDEX_SLICE_UP], STEP_SR_a[STEP_MAX_NB_LOOPSLICES][1][STEP_INDEX_SLICE_UP];
+   int STEP_COMM_SIZE, STEP_i_LOW, STEP_i_UP, STEP_COMM_RANK, STEP_RR_b[STEP_MAX_NB_LOOPSLICES][1][STEP_INDEX_SLICE_UP], IDX, STEP_RR_c[STEP_MAX_NB_LOOPSLICES][1][STEP_INDEX_SLICE_UP], STEP_SR_a[STEP_MAX_NB_LOOPSLICES][1][STEP_INDEX_SLICE_UP];
 #pragma omp master
    {
       i = *i_0;

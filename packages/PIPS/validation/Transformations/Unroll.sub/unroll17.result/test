@@ -1,0 +1,75 @@
+void unroll17()
+{
+   int i, j[10];
+   //PIPS generated variable
+   typedef int mtype0;
+   //PIPS generated variable
+   mtype0 x0;
+   //PIPS generated variable
+   typedef int mtype1;
+   //PIPS generated variable
+   mtype1 x1;
+   //PIPS generated variable
+   typedef int mtype2;
+   //PIPS generated variable
+   mtype2 x2;
+   //PIPS generated variable
+   typedef int mtype3;
+   //PIPS generated variable
+   mtype3 x3;
+   //PIPS generated variable
+   typedef int mtype4;
+   //PIPS generated variable
+   mtype4 x4;
+   //PIPS generated variable
+   typedef int mtype5;
+   //PIPS generated variable
+   mtype5 x5;
+   //PIPS generated variable
+   typedef int mtype6;
+   //PIPS generated variable
+   mtype6 x6;
+   //PIPS generated variable
+   typedef int mtype7;
+   //PIPS generated variable
+   mtype7 x7;
+   //PIPS generated variable
+   typedef int mtype8;
+   //PIPS generated variable
+   mtype8 x8;
+   //PIPS generated variable
+   typedef int mtype9;
+   //PIPS generated variable
+   mtype9 x9;
+bar:   ;
+   x0 = 0;
+   x0 = 0;
+   j[0] = x0;
+   x1 = 1;
+   x1 = 1;
+   j[0] = x1;
+   x2 = 2;
+   x2 = 2;
+   j[0] = x2;
+   x3 = 3;
+   x3 = 3;
+   j[0] = x3;
+   x4 = 4;
+   x4 = 4;
+   j[0] = x4;
+   x5 = 5;
+   x5 = 5;
+   j[0] = x5;
+   x6 = 6;
+   x6 = 6;
+   j[0] = x6;
+   x7 = 7;
+   x7 = 7;
+   j[0] = x7;
+   x8 = 8;
+   x8 = 8;
+   j[0] = x8;
+   x9 = 9;
+   x9 = 9;
+   j[0] = x9;
+}

@@ -98,7 +98,7 @@ kernel:   run_kernel(a, b, c);
 
 void run_kernel(int a[100], int b[100], int c[100])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i;
 
 //  <a[PHI1]-R-MAY-{0<=PHI1, PHI1<=99}>

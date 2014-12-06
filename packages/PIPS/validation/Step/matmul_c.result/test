@@ -7,7 +7,7 @@ void main_PAR_HYBRID_FOR_HYBRID_1(int n, float a[n][n], float b[n][n], float c[n
 void main_PAR_HYBRID_FOR_HYBRID(int n, float a[n][n], float b[n][n], float c[n][n], int i_0[1], int j_0[1]);
 void main_PAR_HYBRID(int n, float a[n][n], float b[n][n], float c[n][n], int i_0[1], int j_0[1], int k_0[1])
 {
-   //PIPS generated variable
+   // Declared as a patch variable by Pass Outlining
    int i, j, k;
 #pragma omp master
    {
@@ -47,8 +47,10 @@ void main_PAR_HYBRID_MASTER_HYBRID(int n, float c[n][n], int i_0[1], int j_0[1])
 {
 #pragma omp master
    {
+      // Declared as a patch variable by Pass Outlining
+      int i, j;
       //PIPS generated variable
-      int i, j, STEP_COMM_RANK, STEP_RR_c[2][STEP_INDEX_SLICE_UP];
+      int STEP_COMM_RANK, STEP_RR_c[2][STEP_INDEX_SLICE_UP];
       j = *j_0;
       i = *i_0;
       STEP_CONSTRUCT_BEGIN(STEP_MASTER);
@@ -87,8 +89,10 @@ void main_PAR_HYBRID_MASTER_HYBRID(int n, float c[n][n], int i_0[1], int j_0[1])
 }
 void main_PAR_HYBRID_FOR_HYBRID_1(int n, float a[n][n], float b[n][n], float c[n][n], int i_0[1], int j_0[1], int k_0[1])
 {
+   // Declared as a patch variable by Pass Outlining
+   int i, j, k;
    //PIPS generated variable
-   int i, j, k, STEP_COMM_SIZE, STEP_i_LOW, STEP_i_UP, STEP_COMM_RANK, STEP_RR_a[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], IDX, STEP_RR_b[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], STEP_RR_c[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], STEP_SR_c[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP];
+   int STEP_COMM_SIZE, STEP_i_LOW, STEP_i_UP, STEP_COMM_RANK, STEP_RR_a[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], IDX, STEP_RR_b[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], STEP_RR_c[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], STEP_SR_c[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP];
 #pragma omp master
    {
       k = *k_0;
@@ -195,8 +199,10 @@ void main_PAR_HYBRID_FOR_HYBRID_1(int n, float a[n][n], float b[n][n], float c[n
 }
 void main_PAR_HYBRID_FOR_HYBRID(int n, float a[n][n], float b[n][n], float c[n][n], int i_0[1], int j_0[1])
 {
+   // Declared as a patch variable by Pass Outlining
+   int i, j;
    //PIPS generated variable
-   int i, j, STEP_COMM_SIZE, STEP_i_LOW, STEP_i_UP, STEP_COMM_RANK, STEP_SR_a[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], IDX, STEP_SR_b[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], STEP_SR_c[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP];
+   int STEP_COMM_SIZE, STEP_i_LOW, STEP_i_UP, STEP_COMM_RANK, STEP_SR_a[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], IDX, STEP_SR_b[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP], STEP_SR_c[STEP_MAX_NB_LOOPSLICES][2][STEP_INDEX_SLICE_UP];
 #pragma omp master
    {
       j = *j_0;

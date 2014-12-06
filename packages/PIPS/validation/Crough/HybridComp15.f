@@ -13,5 +13,10 @@
             a(i,j) = cst(i) * 2.4E5
          enddo
  10   continue
-      PRINT *,a
+      do i = 1, 5
+         do j = 1, 5
+            write(*, 100) a(i,j)
+ 100        format(f10.2)
+         enddo
+      enddo
       end

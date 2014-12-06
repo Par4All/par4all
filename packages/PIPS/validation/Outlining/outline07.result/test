@@ -26,9 +26,9 @@ pas_trop:   kernel(&of);
 }
 void kernel(struct a of_0[1])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int force;
-   //PIPS generated variable
+   // Declared as a patch variable by Pass Outlining
    struct a of;
    of = *of_0;
 pas_trop:

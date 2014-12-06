@@ -1,0 +1,18 @@
+int main() {
+  int i;
+  
+#pragma if1
+  if (i==0) {
+    i++;
+  }
+#pragma X
+  i=0;
+    
+#pragma if2
+  if (i==0) 
+    i++;
+#pragma X
+  i=0;
+  
+  return i;
+}

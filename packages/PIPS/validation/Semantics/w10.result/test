@@ -27,7 +27,7 @@ C (0,3)
 
       DO WHILE (INC(MS).LE.2)                                           0009
 
-C  T() {1<=MS, MS<=2}
+C  T() {MS<=2}
 
 C (0,4)
          PRINT *, MS                                                    0010

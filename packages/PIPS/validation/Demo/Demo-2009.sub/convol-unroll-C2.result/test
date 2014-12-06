@@ -78,7 +78,7 @@ l400:   launch_microcode1(isi, isj, ksi, ksj, image, kernel, new_image);
 }
 void microcode(int isi, int isj, int ksi, int ksj, int i, float image[isi][isj], float kernel[ksi][ksj], float new_image[isi][isj])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int j, ki, kj;
    {
       //PIPS generated variable
@@ -106,7 +106,7 @@ after code cleaning
 
 void microcode(int isi, int isj, int ksi, int ksj, int i, float image[isi][isj], float kernel[ksi][ksj], float new_image[isi][isj])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int j, ki, kj;
    {
       //PIPS generated variable
@@ -131,7 +131,7 @@ l200:            ;
 }
 void microcode(int isi, int isj, int ksi, int ksj, int i, float image[isi][isj], float kernel[ksi][ksj], float new_image[isi][isj])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int j, ki, kj;
    {
       //PIPS generated variable
@@ -157,7 +157,7 @@ After atomization of "microcode"
 
 void microcode(int isi, int isj, int ksi, int ksj, int i, float image[isi][isj], float kernel[ksi][ksj], float new_image[isi][isj])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int j, ki, kj;
    //PIPS generated variable
    float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7, F_8;
@@ -238,7 +238,7 @@ int main()
 }
 void microcode(int isi, int isj, int ksi, int ksj, int i, float *image, float *kernel, float *new_image)
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int j, ki, kj;
    //PIPS generated variable
    float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7, F_8;
@@ -319,7 +319,7 @@ Printed file for "launch_microcode1!
 
 void launch_microcode1(int isi, int isj, int ksi, int ksj, float image[isi][isj], float kernel[ksi][ksj], float new_image[isi][isj])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i;
 
 l400:
@@ -501,7 +501,7 @@ After a last partial evaluation of "microcode"
 
 void microcode(int isi, int isj, int ksi, int ksj, int i, float *image, float *kernel, float *new_image)
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
 
 //  P() {1<=i, i<=510}
 

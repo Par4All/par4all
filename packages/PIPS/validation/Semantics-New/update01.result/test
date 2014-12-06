@@ -1,0 +1,24 @@
+void main()
+{
+   int a, tab[10];
+
+   tab[a++] += tab[a-1];
+}
+
+PRINT_CODE_TRANSFORMERS for "main"
+
+
+//  T() {}
+
+void main()
+{
+
+//  T(a) {}
+
+   int a, tab[10];
+
+//  T(a) {}
+
+
+   tab[a++] += tab[a-1];
+}

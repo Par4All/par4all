@@ -4,7 +4,7 @@ int main()
    int tab[10];
 
    b = 10;
-   a = 0;
+   a = 1;
    {
       int i;
       for (i = 0;i<b;tab[a] += tab[a-1])
@@ -20,7 +20,7 @@ int main()
 
    b = 10;
 //             <may be alive (in)>: b tab[*]
-   a = 0;
+   a = 1;
    {
 //             <may be alive (in)>: b tab[*]
 //             <    is alive (in)>: a
@@ -46,7 +46,7 @@ int main()
    b = 10;
 //             <may be alive (out)>: b tab[*]
 //             <    is alive (out)>: a
-   a = 0;
+   a = 1;
    {
 //             <may be alive (out)>: b i tab[*]
 //             <    is alive (out)>: a
