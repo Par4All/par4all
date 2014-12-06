@@ -78,38 +78,38 @@ list convex_regions_precondition_compose(list l_reg, transformer context)
     /* Only the store effects require preconditions */
     if(store_effect_p(reg)) {
       /* FI: this leads to problems when the context might become
-	 later empty: there won't be any way to find out; in one
-	 case I do not remember, the IN effects end up wrong;
-	 however, adding descriptors for all scalar references may
-	 slow down the region computation a lot. */
+       *     later empty: there won't be any way to find out; in one
+       *     case I do not remember, the IN effects end up wrong;
+       *     however, adding descriptors for all scalar references may
+       *     slow down the region computation a lot. */
       if (!effect_scalar_p(reg) ) {
-	descriptor reg_d = effect_descriptor(reg);
-	Psysteme reg_sc = descriptor_convex_p(reg_d)? descriptor_convex(reg_d) : NULL;
+        descriptor reg_d = effect_descriptor(reg);
+        Psysteme reg_sc = descriptor_convex_p(reg_d)? descriptor_convex(reg_d) : NULL;
 
-	pips_assert("sc_context is weakly consistent", sc_weak_consistent_p(sc_context));
-	pips_assert("reg_sc is weakly consistent (1)", sc_weak_consistent_p(reg_sc));
-	region_sc_append(reg, sc_context, false);
+        pips_assert("sc_context is weakly consistent", sc_weak_consistent_p(sc_context));
+        pips_assert("reg_sc is weakly consistent (1)", sc_weak_consistent_p(reg_sc));
+        region_sc_append(reg, sc_context, false);
 
-	/* remove potential old values that may be found in precondition */
-	list l_old_values = NIL;
-	reg_sc = region_system(reg);
-	for(Pbase b = sc_base(reg_sc); !BASE_NULLE_P(b); b = vecteur_succ(b)) {
-	  entity e = (entity) vecteur_var(b);
-	  if(global_old_value_p(e)) {
-	    l_old_values = CONS(ENTITY, e, l_old_values);
-	  }
-	}
-	region_exact_projection_along_parameters(reg, l_old_values);
-	reg_sc = region_system(reg);
-	gen_free_list(l_old_values);
-	debug_region_consistency(reg);
-	pips_debug_effect(8, "region after transformation: \n", reg );
+        /* remove potential old values that may be found in precondition */
+        list l_old_values = NIL;
+        reg_sc = region_system(reg);
+        for(Pbase b = sc_base(reg_sc); !BASE_NULLE_P(b); b = vecteur_succ(b)) {
+          entity e = (entity) vecteur_var(b);
+          if(global_old_value_p(e)) {
+            l_old_values = CONS(ENTITY, e, l_old_values);
+          }
+        }
+        region_exact_projection_along_parameters(reg, l_old_values);
+        reg_sc = region_system(reg);
+        gen_free_list(l_old_values);
+        debug_region_consistency(reg);
+        pips_debug_effect(8, "region after transformation: \n", reg );
 
-	pips_assert("sc_context is weakly consistent", sc_weak_consistent_p(sc_context));
-	pips_assert("reg_sc is weakly consistent (2)", sc_weak_consistent_p(reg_sc));
+        pips_assert("sc_context is weakly consistent", sc_weak_consistent_p(sc_context));
+        pips_assert("reg_sc is weakly consistent (2)", sc_weak_consistent_p(reg_sc));
       }
       if (!region_empty_p(reg))
-	l_res = CONS(EFFECT, reg, l_res);
+        l_res = CONS(EFFECT, reg, l_res);
     }
   }
 

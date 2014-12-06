@@ -2463,7 +2463,7 @@ static transformer update_cp_with_rhs_to_transformer (
 
 /**
  * \param op        update operator
- * \param rlhs      reference to be update
+ * \param rlhs      reference to update
  * \param rhs       expression to assign
  * \param pre       precondition
  * \param ef        effects of assign

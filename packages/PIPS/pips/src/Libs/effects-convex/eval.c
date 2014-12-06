@@ -64,10 +64,10 @@
 
  */
 bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
-				       reference r2, descriptor d2,
-				       transformer current_precondition,
-				       bool strict_p,
-				       bool * exact_p)
+    reference r2, descriptor d2,
+    transformer current_precondition,
+    bool strict_p,
+    bool * exact_p)
 {
   bool res = true;
   entity e1 = reference_variable(r1);
@@ -78,109 +78,109 @@ bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
   size_t r2_path_length = gen_length(ind2);
 
   pips_debug(8, "input references r1 : %s, r2: %s \n",
-	words_to_string(words_reference(r1, NIL)),
-	words_to_string(words_reference(r2, NIL)));
+      words_to_string(words_reference(r1, NIL)),
+      words_to_string(words_reference(r2, NIL)));
 
   *exact_p = true;
   if (same_entity_p(e1, e2)
       && ((r1_path_length < r2_path_length)
-	  || (!strict_p && r1_path_length == r2_path_length)))
+          || (!strict_p && r1_path_length == r2_path_length)))
+  {
+    /* same entity and the path length of r1 is shorter than the
+     * path length of r2.
+     *
+     * we now have to check that each common index matches
+     */
+    pips_debug(8,"same entities, and r1 path is shorter than r2 path\n");
+    while (res && !ENDP(ind1))
     {
-      /* same entity and the path length of r1 is shorter than the
-	 path length of r2.
+      expression exp1 = EXPRESSION(CAR(ind1));
+      expression exp2 = EXPRESSION(CAR(ind2));
 
-         we now have to check that each common index matches
-      */
-      pips_debug(8,"same entities, and r1 path is shorter than r2 path\n");
-      while (res && !ENDP(ind1))
-	{
-	  expression exp1 = EXPRESSION(CAR(ind1));
-	  expression exp2 = EXPRESSION(CAR(ind2));
+      if(!expression_equal_p(exp1, exp2))
+      {
+        res = false;
+        *exact_p = true;
+      }
 
-	  if(!expression_equal_p(exp1, exp2))
-	    {
-	      res = false;
-	      *exact_p = true;
-	    }
-
-	  POP(ind1);
-	  POP(ind2);
-	}
-      if (res)
-	{
-	  /* only matching reference indices have been found (phi
-	     variables or struct field entities).
-
-	     we must now check the descriptors.
-	  */
-	  region reg1 = make_effect(make_cell(is_cell_reference, r1),
-				    make_action_write_memory(),
-				    make_approximation_exact(), d1);
-	  region reg2 = make_effect(make_cell(is_cell_reference, r2),
-				    make_action_write_memory(),
-				    make_approximation_exact(), d2);
-
-	  pips_debug_effect(6, "reg1 = \n", reg1);
-	  pips_debug_effect(6, "reg2 = \n", reg1);
-
-	  list li = region_intersection(reg1, reg2);
-	  if (ENDP(li))
-	    {
-	      res = false;
-	      *exact_p = true;
-	    }
-	  else
-	    {
-
-	      pips_debug_effect(8, "reg2 before eliminating phi variables: \n ", reg2);
-
-	      effect reg2_dup = copy_effect(reg2);
-	      list l_reg2 = CONS(EFFECT,reg2_dup,NIL);
-	      list l_phi = phi_entities_list(r1_path_length+1,r2_path_length);
-	      project_regions_along_variables(l_reg2, l_phi);
-	      gen_free_list(l_reg2);
-	      gen_free_list(l_phi);
-	      pips_debug_effect(8, "reg2_dup after elimination: \n ", reg2_dup);
-
-	      effect reg1_dup = copy_effect(reg1);
-	      if (!transformer_undefined_p(current_precondition))
-		{
-		  Psysteme sc_context = predicate_system(transformer_relation(current_precondition));
-		  region_sc_append(reg1_dup, sc_context, false);
-		}
-
-	      pips_debug_effect(8, "reg1_dup after adding preconditions: \n ", reg1_dup);
-	      pips_debug_effect(8, "reg1 after adding preconditions: \n ", reg1);
-
-	      list ld = region_sup_difference(reg1_dup, reg2_dup);
-	      if (ENDP(ld))
-		{
-		  res = true;
-		  *exact_p = true;
-		}
-	      else
-		{
-		  res = true;
-		  *exact_p = false;
-		}
-	      gen_full_free_list(ld);
-	    }
-	  gen_full_free_list(li);
-
-	  cell_reference(effect_cell(reg1)) = reference_undefined;
-	  effect_descriptor(reg1) = descriptor_undefined;
-	  free_effect(reg1);
-
-	  cell_reference(effect_cell(reg2)) = reference_undefined;
-	  effect_descriptor(reg2) = descriptor_undefined;
-	  free_effect(reg2);
-	}
+      POP(ind1);
+      POP(ind2);
     }
+    if (res)
+    {
+      /* only matching reference indices have been found (phi
+       * variables or struct field entities).
+       *
+       * we must now check the descriptors.
+       */
+      region reg1 = make_effect(make_cell(is_cell_reference, r1),
+          make_action_write_memory(),
+          make_approximation_exact(), d1);
+      region reg2 = make_effect(make_cell(is_cell_reference, r2),
+          make_action_write_memory(),
+          make_approximation_exact(), d2);
+
+      pips_debug_effect(6, "reg1 = \n", reg1);
+      pips_debug_effect(6, "reg2 = \n", reg1);
+
+      list li = region_intersection(reg1, reg2);
+      if (ENDP(li))
+      {
+        res = false;
+        *exact_p = true;
+      }
+      else
+      {
+
+        pips_debug_effect(8, "reg2 before eliminating phi variables: \n ", reg2);
+
+        effect reg2_dup = copy_effect(reg2);
+        list l_reg2 = CONS(EFFECT,reg2_dup,NIL);
+        list l_phi = phi_entities_list(r1_path_length+1,r2_path_length);
+        project_regions_along_variables(l_reg2, l_phi);
+        gen_free_list(l_reg2);
+        gen_free_list(l_phi);
+        pips_debug_effect(8, "reg2_dup after elimination: \n ", reg2_dup);
+
+        effect reg1_dup = copy_effect(reg1);
+        if (!transformer_undefined_p(current_precondition))
+        {
+          Psysteme sc_context = predicate_system(transformer_relation(current_precondition));
+          region_sc_append(reg1_dup, sc_context, false);
+        }
+
+        pips_debug_effect(8, "reg1_dup after adding preconditions: \n ", reg1_dup);
+        pips_debug_effect(8, "reg1 after adding preconditions: \n ", reg1);
+
+        list ld = region_sup_difference(reg1_dup, reg2_dup);
+        if (ENDP(ld))
+        {
+          res = true;
+          *exact_p = true;
+        }
+        else
+        {
+          res = true;
+          *exact_p = false;
+        }
+        gen_full_free_list(ld);
+      }
+      gen_full_free_list(li);
+
+      cell_reference(effect_cell(reg1)) = reference_undefined;
+      effect_descriptor(reg1) = descriptor_undefined;
+      free_effect(reg1);
+
+      cell_reference(effect_cell(reg2)) = reference_undefined;
+      effect_descriptor(reg2) = descriptor_undefined;
+      free_effect(reg2);
+    }
+  }
   else
-    {
-      res = false;
-      *exact_p = true;
-    }
+  {
+    res = false;
+    *exact_p = true;
+  }
 
   pips_debug(8, "end : r1 is %s a predecessor of r2 (%s exact)\n", res ? "":"not", *exact_p ? "":"not");
   return res;
@@ -205,21 +205,21 @@ void simple_reference_to_convex_reference_conversion(reference ref, reference * 
 {
 
   effect reg = make_effect(make_cell_reference(make_reference(reference_variable(ref), NIL)),
-			   make_action_write_memory(),
-			   make_approximation_exact(),
-			   make_descriptor_convex(sc_new()));
+      make_action_write_memory(),
+      make_approximation_exact(),
+      make_descriptor_convex(sc_new()));
 
   FOREACH(EXPRESSION, exp, reference_indices(ref))
+  {
+    if((expression_reference_p(exp)
+        && entity_field_p(reference_variable(expression_reference(exp)))))
     {
-      if((expression_reference_p(exp)
-	  && entity_field_p(reference_variable(expression_reference(exp)))))
-	{
-	  entity e = reference_variable(expression_reference(exp));
-	  effect_add_field_dimension(reg, e);
-	}
-      else
-	convex_region_add_expression_dimension(reg, exp);
+      entity e = reference_variable(expression_reference(exp));
+      effect_add_field_dimension(reg, e);
     }
+    else
+      convex_region_add_expression_dimension(reg, exp);
+  }
   *output_ref = effect_any_reference(reg);
   *output_desc = effect_descriptor(reg);
 
@@ -288,38 +288,37 @@ list convex_effect_to_constant_path_effects_with_points_to(effect eff)
   reference ref = effect_any_reference(eff);
 
   if (effect_reference_dereferencing_p(ref, &exact_p))
-    {
-      pips_debug(8, "dereferencing case \n");
-      bool exact_p = false;
-      transformer context;
-      if (effects_private_current_context_empty_p())
-	context = transformer_undefined;
-      else {
-	context = effects_private_current_context_head();
-      }
-
-      list l_eval = eval_convex_cell_with_points_to(effect_cell(eff), effect_descriptor(eff),
-						    points_to_list_list(load_pt_to_list(effects_private_current_stmt_head())),
-						    &exact_p, context);
-      if (ENDP(l_eval))
-	{
-	  pips_debug(8, "no equivalent constant path found -> anywhere effect\n");
-	  /* We have not found any equivalent constant path : it may point anywhere */
-	  /* We should maybe contract these effects later. Is it done by the callers ? */
-	  le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), le);
-	}
-      else
-	{
-	  /* change the resulting effects action to the current effect action */
-	  if (effect_read_p(eff))
-	    effects_to_read_effects(l_eval);
-	  le = gen_nconc(l_eval,le);
-	}
+  {
+    pips_debug(8, "dereferencing case \n");
+    bool exact_p = false;
+    transformer context;
+    if (effects_private_current_context_empty_p())
+      context = transformer_undefined;
+    else {
+      context = effects_private_current_context_head();
     }
+
+    list l_eval = eval_convex_cell_with_points_to(effect_cell(eff), effect_descriptor(eff),
+        points_to_list_list(load_pt_to_list(effects_private_current_stmt_head())),
+        &exact_p, context);
+    if (ENDP(l_eval))
+    {
+      pips_debug(8, "no equivalent constant path found -> anywhere effect\n");
+      /* We have not found any equivalent constant path : it may point anywhere */
+      /* We should maybe contract these effects later. Is it done by the callers ? */
+      le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), le);
+    }
+    else
+    {
+      /* change the resulting effects action to the current effect action */
+      if (effect_read_p(eff))
+        effects_to_read_effects(l_eval);
+      le = gen_nconc(l_eval,le);
+    }
+  }
   else
     le = CONS(EFFECT, copy_effect(eff), le);
- return le;
-
+  return le;
 }
 
 
@@ -329,12 +328,12 @@ list convex_effect_find_aliased_paths_with_pointer_values(effect eff, statement 
   list l_pv = cell_relations_list( load_pv(s));
   pv_context ctxt = make_simple_pv_context();
   list l_aliased = generic_effect_find_aliases_with_simple_pointer_values(eff, l_pv, &exact_p, transformer_undefined,
-								convex_cell_preceding_p,
-								convex_cell_with_address_of_cell_translation,
-								convex_cell_with_value_of_cell_translation,
-								convex_cells_intersection_p,
-								convex_cells_inclusion_p,
-								simple_cell_to_convex_cell_conversion);
+      convex_cell_preceding_p,
+      convex_cell_with_address_of_cell_translation,
+      convex_cell_with_value_of_cell_translation,
+      convex_cells_intersection_p,
+      convex_cells_inclusion_p,
+      simple_cell_to_convex_cell_conversion);
 
   reset_pv_context(&ctxt);
   return l_aliased;
@@ -345,43 +344,49 @@ list convex_effect_find_aliased_paths_with_pointer_values(effect eff, statement 
 
 list convex_effect_to_constant_path_effects_with_pointer_values(effect __attribute__ ((unused)) eff)
 {
-
   list le = NIL;
   bool exact_p;
   reference ref = effect_any_reference(eff);
 
   if (effect_reference_dereferencing_p(ref, &exact_p))
+  {
+    pips_debug(8, "dereferencing case \n");
+    bool exact_p = false;
+    list l_aliased = convex_effect_find_aliased_paths_with_pointer_values(eff, effects_private_current_stmt_head());
+    pips_debug_effects(8, "aliased effects\n", l_aliased);
+
+    FOREACH(EFFECT, eff_alias, l_aliased)
     {
-      pips_debug(8, "dereferencing case \n");
-      bool exact_p = false;
-      list l_aliased = convex_effect_find_aliased_paths_with_pointer_values(eff, effects_private_current_stmt_head());
-      pips_debug_effects(8, "aliased effects\n", l_aliased);
-
-      FOREACH(EFFECT, eff_alias, l_aliased)
-	{
-	  entity ent_alias = effect_entity(eff_alias);
-	  if (undefined_pointer_value_entity_p(ent_alias)
-	      || null_pointer_value_entity_p(ent_alias))
-	    {
-	      // currently interpret them as anywhere effects since these values
-	      // are not yet well integrated in abstract locations lattice
-	      // and in effects computations
-	      // to be FIXED later.
-	      le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff_alias))), le);
-	      free_effect(eff_alias);
-	    }
-	  else if (entity_abstract_location_p(effect_entity(eff_alias))
-		   || !effect_reference_dereferencing_p(effect_any_reference(eff_alias), &exact_p))
-	    le = CONS(EFFECT, eff_alias, le); /* it should be a union here.
-						 However, we expect the caller
-						 to perform the contraction afterwards. */
-	  else
-	    free_effect(eff_alias);
-	}
-      gen_free_list(l_aliased);
+      entity ent_alias = effect_entity(eff_alias);
+      if (undefined_pointer_value_entity_p(ent_alias)
+          || null_pointer_value_entity_p(ent_alias))
+      {
+        // currently interpret them as anywhere effects since these values
+        // are not yet well integrated in abstract locations lattice
+        // and in effects computations
+        // to be FIXED later.
+        le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff_alias))), le);
+        free_effect(eff_alias);
+      }
+      else if (entity_abstract_location_p(effect_entity(eff_alias))
+          || !effect_reference_dereferencing_p(effect_any_reference(eff_alias), &exact_p)) {
+        le = CONS(EFFECT, eff_alias, le);
+        /* it should be a union here.
+         * However, we expect the caller
+         * to perform the contraction afterwards. */
+      }
+      else
+        free_effect(eff_alias);
     }
-  else
+    gen_free_list(l_aliased);
+  }
+  else {
+    // functions that can be pointed by effect_dup_func:
+    // simple_effect_dup
+    // region_dup
+    // copy_effect
     le = CONS(EFFECT, (*effect_dup_func)(eff), le);
-  return le;
+  }
 
+  return le;
 }

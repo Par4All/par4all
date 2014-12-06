@@ -3465,35 +3465,6 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
  */
 void split_initializations_in_statement(statement s)
 {
-#if 0
-  if (false && statement_block_p(s)) { // based on old declaration representation
-    list inits = NIL;
-    list decls = statement_declarations(s); // Non-recursive
-    instruction old = statement_instruction(s);
-
-    FOREACH(ENTITY, var, decls) {
-      string mn  = entity_module_name(var));
-      string cmn = entity_user_name(get_current_module_entity());
-      if ( strcmp(mn,cmn) == 0
-	   && !value_unknown_p(entity_initial(var))
-	   ) {
-	expression ie = variable_initial_expression(var);
-	if (expression_is_C_rhs_p(ie)) {
-	  statement is = make_assign_statement(entity_to_expression(var), ie);
-	  inits = gen_nconc(inits, CONS(statement, is, NIL));
-	  entity_initial(var) = make_value_unknown();
-	}
-      }
-    }
-    /* Insert the list of initialisation statements as a sequence at
-       the beginning of s. */
-    inits = gen_nconc(inits,
-		      CONS(statement, instruction_to_statement(old), NIL));
-    statement_instruction(s) = make_instruction_sequence(make_sequence(inits));
-  }
-  //else if(declaration_statement_p(s)) {
-  //else
-#endif
   if(!get_bool_property("C89_CODE_GENERATION") && statement_block_p(s)) {
     /* generate C99 code */
     list cs = list_undefined;

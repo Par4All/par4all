@@ -1107,8 +1107,8 @@ static void assignment_intrinsic_to_post_pv(entity  __attribute__ ((unused))func
 }
 
 static void binary_arithmetic_operator_to_post_pv(entity func, list func_args,
-						  list l_in, pv_results * pv_res,
-						  pv_context *ctxt)
+    list l_in, pv_results * pv_res,
+    pv_context *ctxt)
 {
   list l_in_cur;
 
@@ -1131,13 +1131,13 @@ static void binary_arithmetic_operator_to_post_pv(entity func, list func_args,
   bool pointer_t1 = pointer_type_p(t1);
   bool array_t1 = array_type_p(t1);
   pips_debug(5, "type t1 is: %s (%s)\n", words_to_string(words_type(t1, NIL, false)),
-			     type_to_string(t1));
+      type_to_string(t1));
 
   type t2 = expression_to_type(arg2);
   bool pointer_t2 = pointer_type_p(t2);
   bool array_t2 = array_type_p(t2);
   pips_debug(5, "type t2 is: %s (%s)\n", words_to_string(words_type(t2, NIL, false)),
-			     type_to_string(t2));
+      type_to_string(t2));
 
   int nb_dims = 0;
 
@@ -1160,7 +1160,7 @@ static void binary_arithmetic_operator_to_post_pv(entity func, list func_args,
 	 (as a consequence the result is not of a pointer type)
        - the left operand is a pointer to an object type and the right operand has
          integer type
-  */
+   */
   list l_eff1 = pv_res1.result_paths;
   list l_eff2 = pv_res2.result_paths;
 
@@ -1170,95 +1170,105 @@ static void binary_arithmetic_operator_to_post_pv(entity func, list func_args,
 
   if ((pointer_t1 || array_t1) && !(pointer_t2 || array_t2))
     /* pointer arithmetic, the pointer is in the first expression */
-    {
-      pointer_arithmetic = true;
-      l_eff_pointer = l_eff1;
-      other_arg = arg2;
-      nb_dims = pointer_t1 ? 1 : gen_length(variable_dimensions(type_variable(t1)));
-    }
+  {
+    pointer_arithmetic = true;
+    l_eff_pointer = l_eff1;
+    other_arg = arg2;
+    nb_dims = pointer_t1 ? 1 : gen_length(variable_dimensions(type_variable(t1)));
+  }
   else if ((pointer_t2 || array_t2) && !(pointer_t1 || array_t1))
-    {
-      pointer_arithmetic = true;
-      l_eff_pointer = l_eff2;
-      other_arg = arg1;
-      nb_dims = pointer_t2 ? 1 : gen_length(variable_dimensions(type_variable(t2)));
-    }
+  {
+    pointer_arithmetic = true;
+    l_eff_pointer = l_eff2;
+    other_arg = arg1;
+    nb_dims = pointer_t2 ? 1 : gen_length(variable_dimensions(type_variable(t2)));
+  }
   free_type(t1);
   free_type(t2);
 
   if (pointer_arithmetic)
+  {
+    free_pv_results_paths(pv_res);
+    if (!anywhere_effect_p(EFFECT(CAR(l_eff_pointer))))
     {
-      free_pv_results_paths(pv_res);
-      if (!anywhere_effect_p(EFFECT(CAR(l_eff_pointer))))
-	{
-	  /* build new effects */
-	  list l_new_eff = NIL;
-	  list l_new_eff_kind = NIL;
+      /* build new effects */
+      list l_new_eff = NIL;
+      list l_new_eff_kind = NIL;
 
-	  if (nb_dims == 1)
-	    {
+      if (nb_dims == 1)
+      {
 
-	      pips_debug(3, "one dimension case\n");
-	      expression new_arg = copy_expression(other_arg);
+        pips_debug(3, "one dimension case\n");
+        expression new_arg = copy_expression(other_arg);
 
-	      if (same_string_p(func_name, MINUS_C_OPERATOR_NAME))
-		{
-		  entity unary_minus_ent =
-		    gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-							    UNARY_MINUS_OPERATOR_NAME),
-				       entity_domain);
-		  new_arg = MakeUnaryCall(unary_minus_ent, new_arg);
-		}
+        if (same_string_p(func_name, MINUS_C_OPERATOR_NAME))
+        {
+          entity unary_minus_ent =
+              gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+                  UNARY_MINUS_OPERATOR_NAME),
+                  entity_domain);
+          new_arg = MakeUnaryCall(unary_minus_ent, new_arg);
+        }
 
-	      FOREACH(EFFECT, eff, l_eff_pointer)
-		{
-		  effect new_eff = copy_effect(eff);
-		  reference new_ref = effect_any_reference(new_eff);
-		  list l_inds = reference_indices(new_ref);
-		  if (ENDP(l_inds))
-		    {
-		      (*effect_add_expression_dimension_func)(new_eff, new_arg);
-		    }
-		  else
-		    {
-		      expression last_exp = EXPRESSION(CAR(gen_last(l_inds)));
-		      entity binary_plus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-										       PLUS_C_OPERATOR_NAME),
-								  entity_domain);
-		      new_arg = MakeBinaryCall(binary_plus_ent, copy_expression(last_exp), new_arg);
-		      (*effect_change_ith_dimension_expression_func)(new_eff, new_arg, (int) gen_length(l_inds));
-		    }
-		  l_new_eff = CONS(EFFECT, new_eff, l_new_eff);
-		  l_new_eff_kind = CONS(CELL_INTERPRETATION,
-					make_cell_interpretation_address_of(), NIL);
-		}
-	      free_expression(new_arg);
+        FOREACH(EFFECT, eff, l_eff_pointer)
+        {
+          effect new_eff = copy_effect(eff);
+          reference new_ref = effect_any_reference(new_eff);
+          list l_inds = reference_indices(new_ref);
+          if (ENDP(l_inds))
+          {
+            // functions that can be pointed by effect_add_expression_dimension_func:
+            // simple_effect_add_expression_dimension
+            // convex_region_add_expression_dimension
+            (*effect_add_expression_dimension_func)(new_eff, new_arg);
+          }
+          else
+          {
+            expression last_exp = EXPRESSION(CAR(gen_last(l_inds)));
+            entity binary_plus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+                PLUS_C_OPERATOR_NAME),
+                entity_domain);
+            new_arg = MakeBinaryCall(binary_plus_ent, copy_expression(last_exp), new_arg);
+            // functions that can be pointed by effect_change_ith_dimension_expression_func:
+            // simple_effect_change_ith_dimension_expression
+            // convex_region_change_ith_dimension_expression
+            (*effect_change_ith_dimension_expression_func)(new_eff, new_arg, (int) gen_length(l_inds));
+          }
+          l_new_eff = CONS(EFFECT, new_eff, l_new_eff);
+          l_new_eff_kind = CONS(CELL_INTERPRETATION,
+              make_cell_interpretation_address_of(), NIL);
+        }
+        free_expression(new_arg);
 
-	    }
-	  else
-	    {
-	      pips_debug(3, "several dimensions (%d) case\n", nb_dims);
-	      
-	      // we could do more work to be more precise
-	      expression new_ind = make_unbounded_expression();
-	      FOREACH(EFFECT, eff, l_eff_pointer)
-		{
-		  effect new_eff = copy_effect(eff);
+      }
+      else
+      {
+        pips_debug(3, "several dimensions (%d) case\n", nb_dims);
 
-		  for(int i = 1; i <= nb_dims; i++)
-		    (*effect_add_expression_dimension_func)(new_eff, copy_expression(new_ind));
-		  l_new_eff = CONS(EFFECT, new_eff, l_new_eff);
-		  l_new_eff_kind = CONS(CELL_INTERPRETATION,
-					make_cell_interpretation_address_of(), NIL);
-		}
-	      free_expression(new_ind);
-	    }
-	  gen_nreverse(l_new_eff);
-	  gen_nreverse(l_new_eff_kind);
-	  pv_res->result_paths = l_new_eff;
-	  pv_res->result_paths_interpretations = l_new_eff_kind;
-	}
+        // we could do more work to be more precise
+        expression new_ind = make_unbounded_expression();
+        FOREACH(EFFECT, eff, l_eff_pointer)
+        {
+          effect new_eff = copy_effect(eff);
+
+          for(int i = 1; i <= nb_dims; i++) {
+            // functions that can be pointed by effect_add_expression_dimension_func:
+            // simple_effect_add_expression_dimension
+            // convex_region_add_expression_dimension
+            (*effect_add_expression_dimension_func)(new_eff, copy_expression(new_ind));
+          }
+          l_new_eff = CONS(EFFECT, new_eff, l_new_eff);
+          l_new_eff_kind = CONS(CELL_INTERPRETATION,
+              make_cell_interpretation_address_of(), NIL);
+        }
+        free_expression(new_ind);
+      }
+      gen_nreverse(l_new_eff);
+      gen_nreverse(l_new_eff_kind);
+      pv_res->result_paths = l_new_eff;
+      pv_res->result_paths_interpretations = l_new_eff_kind;
     }
+  }
   pv_res->l_out = pv_res2.l_out;
   free_pv_results_paths(&pv_res1);
   free_pv_results_paths(&pv_res2);
@@ -1266,23 +1276,23 @@ static void binary_arithmetic_operator_to_post_pv(entity func, list func_args,
 }
 
 static void unary_arithmetic_operator_to_post_pv(entity __attribute__ ((unused))func,
-						 list func_args,
-						 list l_in, pv_results * pv_res,
-						 pv_context *ctxt)
+    list func_args,
+    list l_in, pv_results * pv_res,
+    pv_context *ctxt)
 {
   expression arg = EXPRESSION(CAR(func_args));
   expression_to_post_pv(arg, l_in, pv_res, ctxt);
   ifdebug(1)
-    {
-      type t = expression_to_type(arg);
-      pips_assert("unary arithmetic operators should not have pointer arguments",
-		  !pointer_type_p(t));
-      free_type(t);
-    }
+  {
+    type t = expression_to_type(arg);
+    pips_assert("unary arithmetic operators should not have pointer arguments",
+        !pointer_type_p(t));
+    free_type(t);
+  }
 }
 
 static void update_operator_to_post_pv(entity func, list func_args, list l_in,
-				       pv_results * pv_res, pv_context *ctxt)
+    pv_results * pv_res, pv_context *ctxt)
 {
   pips_debug(1, "begin for update operator\n");
 
@@ -1293,46 +1303,49 @@ static void update_operator_to_post_pv(entity func, list func_args, list l_in,
 
   type t = expression_to_type(arg);
   if (pointer_type_p(t))
+  {
+    list l_lhs_eff = pv_res->result_paths;
+    //list l_lhs_kind = pv_res->result_paths_interpretations;
+    const char* func_name = entity_local_name(func);
+
+    pips_assert("update operators admit a single path\n",
+        gen_length(l_lhs_eff) == (size_t) 1);
+
+    effect lhs_eff = EFFECT(CAR(l_lhs_eff));
+    effect rhs_eff = copy_effect(lhs_eff);
+    list l_rhs_kind = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(),
+        NIL);
+
+    if (!anywhere_effect_p(lhs_eff))
     {
-      list l_lhs_eff = pv_res->result_paths;
-      //list l_lhs_kind = pv_res->result_paths_interpretations;
-      const char* func_name = entity_local_name(func);
+      /* build rhs */
+      expression new_dim = expression_undefined;
 
-      pips_assert("update operators admit a single path\n",
-		  gen_length(l_lhs_eff) == (size_t) 1);
+      if (same_string_p(func_name, POST_INCREMENT_OPERATOR_NAME)
+          || same_string_p(func_name, PRE_INCREMENT_OPERATOR_NAME))
+      {
+        new_dim = int_to_expression(1);
+      }
+      else if (same_string_p(func_name, POST_DECREMENT_OPERATOR_NAME)
+          || same_string_p(func_name, PRE_DECREMENT_OPERATOR_NAME))
+      {
+        new_dim = int_to_expression(-1);
+      }
+      else
+        //pips_internal_error("unexpected update operator on pointers");
+        new_dim = make_unbounded_expression();
 
-      effect lhs_eff = EFFECT(CAR(l_lhs_eff));
-      effect rhs_eff = copy_effect(lhs_eff);
-      list l_rhs_kind = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(),
-			     NIL);
-
-      if (!anywhere_effect_p(lhs_eff))
-	{
-	  /* build rhs */
-	  expression new_dim = expression_undefined;
-
-	  if (same_string_p(func_name, POST_INCREMENT_OPERATOR_NAME)
-	      || same_string_p(func_name, PRE_INCREMENT_OPERATOR_NAME))
-	    {
-	      new_dim = int_to_expression(1);
-	    }
-	  else if (same_string_p(func_name, POST_DECREMENT_OPERATOR_NAME)
-		   || same_string_p(func_name, PRE_DECREMENT_OPERATOR_NAME))
-	    {
-	      new_dim = int_to_expression(-1);
-	    }
-	  else
-	    //pips_internal_error("unexpected update operator on pointers");
-	    new_dim = make_unbounded_expression();
-
-	  (*effect_add_expression_dimension_func)(rhs_eff, new_dim);
-	  /*l_lhs_kind = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(),
-			    NIL);*/
-	}
-      list l_rhs_eff = CONS(EFFECT, rhs_eff, NIL);
-      single_pointer_assignment_to_post_pv(lhs_eff, l_rhs_eff, l_rhs_kind, false,
-					   l_in_cur, pv_res, ctxt);
+      // functions that can be pointed by effect_add_expression_dimension_func:
+      // simple_effect_add_expression_dimension
+      // convex_region_add_expression_dimension
+      (*effect_add_expression_dimension_func)(rhs_eff, new_dim);
+      /*l_lhs_kind = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(),
+                          NIL);*/
     }
+    list l_rhs_eff = CONS(EFFECT, rhs_eff, NIL);
+    single_pointer_assignment_to_post_pv(lhs_eff, l_rhs_eff, l_rhs_kind, false,
+        l_in_cur, pv_res, ctxt);
+  }
   pips_debug_pv_results(1, "end with pv_res:\n", *pv_res);
 }
 
@@ -1533,194 +1546,193 @@ static void c_io_function_to_post_pv(entity func, list func_args, list l_in,
 }
 
 static void unix_io_function_to_post_pv(entity func, list func_args, list l_in,
-					pv_results * pv_res, pv_context *ctxt)
+    pv_results * pv_res, pv_context *ctxt)
 {
   safe_intrinsic_to_post_pv(func, func_args, l_in, pv_res, ctxt);
 }
 
 static void string_function_to_post_pv(entity func, list func_args, list l_in,
-				       pv_results * pv_res, pv_context *ctxt)
+    pv_results * pv_res, pv_context *ctxt)
 {
   safe_intrinsic_to_post_pv(func, func_args, l_in, pv_res, ctxt);
 }
 
 static void va_list_function_to_post_pv(entity func, list func_args, list l_in,
-					pv_results * pv_res, pv_context *ctxt)
+    pv_results * pv_res, pv_context *ctxt)
 {
   safe_intrinsic_to_post_pv(func, func_args, l_in, pv_res, ctxt);
 }
 
 
 static void free_to_post_pv(list l_free_eff, list l_in,
-			    pv_results * pv_res, pv_context *ctxt)
+    pv_results * pv_res, pv_context *ctxt)
 {
   pips_debug_effects(5, "begin with input effects :\n", l_free_eff);
 
   FOREACH(EFFECT, eff, l_free_eff)
+  {
+    /* for each freed pointer, find it's targets */
+
+    list l_remnants = NIL;
+    cell_relation exact_eff_pv = cell_relation_undefined;
+    list l_values = NIL;
+
+    pips_debug_effect(4, "begin, looking for an exact target for eff:\n",
+        eff);
+
+    l_values = effect_find_equivalent_pointer_values(eff, l_in,
+        &exact_eff_pv,
+        &l_remnants);
+    pips_debug_pvs(3, "l_values:\n", l_values);
+    pips_debug_pvs(3, "l_remnants:\n", l_remnants);
+    pips_debug_pv(3, "exact_eff_pv:\n", exact_eff_pv);
+
+    list l_heap_eff = NIL;
+
+    if (exact_eff_pv != cell_relation_undefined)
     {
-      /* for each freed pointer, find it's targets */
+      cell heap_c = cell_undefined;
+      /* try to find the heap location */
+      cell c1 = cell_relation_first_cell(exact_eff_pv);
+      entity e1 = reference_variable(cell_reference(c1));
 
-      list l_remnants = NIL;
-      cell_relation exact_eff_pv = cell_relation_undefined;
-      list l_values = NIL;
+      cell c2 = cell_relation_second_cell(exact_eff_pv);
+      entity e2 = reference_variable(cell_reference(c2));
 
-      pips_debug_effect(4, "begin, looking for an exact target for eff:\n",
-			eff);
-
-      l_values = effect_find_equivalent_pointer_values(eff, l_in,
-						       &exact_eff_pv,
-						       &l_remnants);
-      pips_debug_pvs(3, "l_values:\n", l_values);
-      pips_debug_pvs(3, "l_remnants:\n", l_remnants);
-      pips_debug_pv(3, "exact_eff_pv:\n", exact_eff_pv);
-
-      list l_heap_eff = NIL;
-
-      if (exact_eff_pv != cell_relation_undefined)
-	{
-	  cell heap_c = cell_undefined;
-	  /* try to find the heap location */
-	  cell c1 = cell_relation_first_cell(exact_eff_pv);
-	  entity e1 = reference_variable(cell_reference(c1));
-
-	  cell c2 = cell_relation_second_cell(exact_eff_pv);
-	  entity e2 = reference_variable(cell_reference(c2));
-
-	  if (entity_flow_or_context_sentitive_heap_location_p(e1))
-	    heap_c = c1;
-	  else if (entity_flow_or_context_sentitive_heap_location_p(e2))
-	    heap_c = c2;
-	  if (!cell_undefined_p(heap_c))
-	    l_heap_eff =
-	      CONS(EFFECT,
-		   make_effect(copy_cell(heap_c),
-			       make_action_write_memory(),
-			       copy_approximation(effect_approximation(eff)),
-			       make_descriptor_none()),
-		   NIL);
-	  else
-	    {
-	      /* try to find the heap target in remants */
-	      cell other_c = cell_undefined;
-	      if (same_entity_p(effect_entity(eff), e1))
-		other_c = c2;
-	      else other_c = c1;
-	      list l_tmp =
-		CONS(EFFECT,
-		     make_effect(copy_cell(other_c),
-				 make_action_write_memory(),
-				 copy_approximation(effect_approximation(eff)),
-				 make_descriptor_none()),
-		     NIL);
-	      free_to_post_pv(l_tmp, l_remnants, pv_res, ctxt);
-	      pv_res->l_out = CONS(CELL_RELATION,
-				   copy_cell_relation(exact_eff_pv),
-				   pv_res->l_out);
-	      gen_free_list(l_tmp);
-	      return;
-	    }
-	}
+      if (entity_flow_or_context_sentitive_heap_location_p(e1))
+        heap_c = c1;
+      else if (entity_flow_or_context_sentitive_heap_location_p(e2))
+        heap_c = c2;
+      if (!cell_undefined_p(heap_c))
+        l_heap_eff =
+            CONS(EFFECT,
+                make_effect(copy_cell(heap_c),
+                    make_action_write_memory(),
+                    copy_approximation(effect_approximation(eff)),
+                    make_descriptor_none()),
+                    NIL);
       else
-	{
-	  /* try first to find another target */
-	  FOREACH(CELL_RELATION, pv_tmp, l_values)
-	    {
-	      cell heap_c = cell_undefined;
-	      /* try to find the heap location */
-	      cell c1 = cell_relation_first_cell(pv_tmp);
-	      entity e1 = reference_variable(cell_reference(c1));
+      {
+        /* try to find the heap target in remants */
+        cell other_c = cell_undefined;
+        if (same_entity_p(effect_entity(eff), e1))
+          other_c = c2;
+        else other_c = c1;
+        list l_tmp =
+            CONS(EFFECT,
+                make_effect(copy_cell(other_c),
+                    make_action_write_memory(),
+                    copy_approximation(effect_approximation(eff)),
+                    make_descriptor_none()),
+                    NIL);
+        free_to_post_pv(l_tmp, l_remnants, pv_res, ctxt);
+        pv_res->l_out = CONS(CELL_RELATION,
+            copy_cell_relation(exact_eff_pv),
+            pv_res->l_out);
+        gen_free_list(l_tmp);
+        return;
+      }
+    }
+    else
+    {
+      /* try first to find another target */
+      FOREACH(CELL_RELATION, pv_tmp, l_values) {
+        cell heap_c = cell_undefined;
+        /* try to find the heap location */
+        cell c1 = cell_relation_first_cell(pv_tmp);
+        entity e1 = reference_variable(cell_reference(c1));
 
-	      cell c2 = cell_relation_second_cell(pv_tmp);
-	      entity e2 = reference_variable(cell_reference(c2));
+        cell c2 = cell_relation_second_cell(pv_tmp);
+        entity e2 = reference_variable(cell_reference(c2));
 
-	      if (entity_flow_or_context_sentitive_heap_location_p(e1))
-		heap_c = c1;
-	      else if (entity_flow_or_context_sentitive_heap_location_p(e2))
-		heap_c = c2;
-	      if (!cell_undefined_p(heap_c))
-		l_heap_eff =
-		  CONS(EFFECT,
-		       make_effect(copy_cell(heap_c),
-				   make_action_write_memory(),
-				   cell_relation_exact_p(pv_tmp)
-				   ? copy_approximation
-				   (effect_approximation(eff))
-				   :make_approximation_may(),
-				   make_descriptor_none()),
-		       NIL);
+        if (entity_flow_or_context_sentitive_heap_location_p(e1))
+          heap_c = c1;
+        else if (entity_flow_or_context_sentitive_heap_location_p(e2))
+          heap_c = c2;
+        if (!cell_undefined_p(heap_c))
+          l_heap_eff =
+              CONS(EFFECT,
+                  make_effect(copy_cell(heap_c),
+                      make_action_write_memory(),
+                      cell_relation_exact_p(pv_tmp)
+                      ? copy_approximation
+                          (effect_approximation(eff))
+                          :make_approximation_may(),
+                           make_descriptor_none()),
+                           NIL);
 
-	    }
-	}
+      }
+    }
 
-      if (!ENDP(l_heap_eff))
-	{
-	  /* assign an undefined_value to freed pointer */
-	  list l_rhs =
-	    CONS(EFFECT,
-		 make_effect( make_undefined_pointer_value_cell(),
-			      make_action_write_memory(),
-			      make_approximation_exact(),
-			      make_descriptor_none()),
-		 NIL);
-	  list l_kind = CONS(CELL_INTERPRETATION,
-			     make_cell_interpretation_value_of(),
-			     NIL);
-	  single_pointer_assignment_to_post_pv(eff, l_rhs, l_kind,
-					       false, l_in, pv_res, ctxt);
-	  gen_full_free_list(l_rhs);
-	  gen_full_free_list(l_kind);
-	  free_pv_results_paths(pv_res);
-	  if (l_in != pv_res->l_out)
-	    {
-	      gen_full_free_list(l_in);
-	      l_in = pv_res->l_out;
-	    }
-	  pips_debug_pvs(5, "l_in after assigning "
-			 "undefined value to freed pointer:\n",
-			 l_in);
+    if (!ENDP(l_heap_eff))
+    {
+      /* assign an undefined_value to freed pointer */
+      list l_rhs =
+          CONS(EFFECT,
+              make_effect( make_undefined_pointer_value_cell(),
+                  make_action_write_memory(),
+                  make_approximation_exact(),
+                  make_descriptor_none()),
+                  NIL);
+      list l_kind = CONS(CELL_INTERPRETATION,
+          make_cell_interpretation_value_of(),
+          NIL);
+      single_pointer_assignment_to_post_pv(eff, l_rhs, l_kind,
+          false, l_in, pv_res, ctxt);
+      gen_full_free_list(l_rhs);
+      gen_full_free_list(l_kind);
+      free_pv_results_paths(pv_res);
+      if (l_in != pv_res->l_out)
+      {
+        gen_full_free_list(l_in);
+        l_in = pv_res->l_out;
+      }
+      pips_debug_pvs(5, "l_in after assigning "
+          "undefined value to freed pointer:\n",
+          l_in);
 
-	  FOREACH(EFFECT, heap_eff, l_heap_eff)
-	    {
-	      entity heap_e =
-		reference_variable(effect_any_reference(heap_eff));
-	      pips_debug(5, "heap entity found (%s)\n", entity_name(heap_e));
+      FOREACH(EFFECT, heap_eff, l_heap_eff)
+      {
+        entity heap_e =
+            reference_variable(effect_any_reference(heap_eff));
+        pips_debug(5, "heap entity found (%s)\n", entity_name(heap_e));
 
-	      pointer_values_remove_var(heap_e,
-					effect_may_p(eff)
-					|| effect_may_p(heap_eff),
-					l_in,
-					pv_res, ctxt);
-	      l_in= pv_res->l_out;
-	    }
-	}
-      else /* no flow or context sensitive variable found */
-	{
-	  list l_rhs =
-	    CONS(EFFECT,
-		 make_effect( make_undefined_pointer_value_cell(),
-			      make_action_write_memory(),
-			      make_approximation_exact(),
-			      make_descriptor_none()),
-		 NIL);
-	  list l_kind = CONS(CELL_INTERPRETATION,
-			     make_cell_interpretation_value_of(),
-			     NIL);
-	  single_pointer_assignment_to_post_pv(eff, l_rhs, l_kind,
-					       false, l_in, pv_res, ctxt);
-	  gen_full_free_list(l_rhs);
-	  gen_full_free_list(l_kind);
-	  free_pv_results_paths(pv_res);
-	  if (l_in != pv_res->l_out)
-	    {
-	      gen_full_free_list(l_in);
-	      l_in = pv_res->l_out;
-	    }
-	  pips_debug_pvs(5, "l_in after assigning "
-			 "undefined value to freed pointer:\n",
-			 l_in);
-	}
+        pointer_values_remove_var(heap_e,
+            effect_may_p(eff)
+            || effect_may_p(heap_eff),
+            l_in,
+            pv_res, ctxt);
+        l_in= pv_res->l_out;
+      }
+    }
+    else /* no flow or context sensitive variable found */
+    {
+      list l_rhs =
+          CONS(EFFECT,
+              make_effect( make_undefined_pointer_value_cell(),
+                  make_action_write_memory(),
+                  make_approximation_exact(),
+                  make_descriptor_none()),
+                  NIL);
+      list l_kind = CONS(CELL_INTERPRETATION,
+          make_cell_interpretation_value_of(),
+          NIL);
+      single_pointer_assignment_to_post_pv(eff, l_rhs, l_kind,
+          false, l_in, pv_res, ctxt);
+      gen_full_free_list(l_rhs);
+      gen_full_free_list(l_kind);
+      free_pv_results_paths(pv_res);
+      if (l_in != pv_res->l_out)
+      {
+        gen_full_free_list(l_in);
+        l_in = pv_res->l_out;
+      }
+      pips_debug_pvs(5, "l_in after assigning "
+          "undefined value to freed pointer:\n",
+          l_in);
+    }
 
-    } /* FOREACH */
+  } /* FOREACH */
   pips_debug_pvs(5, "end with pv_res->l_out:", pv_res->l_out);
 }
 

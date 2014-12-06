@@ -1240,13 +1240,37 @@ pop_loop(loop l __attribute__ ((unused)),
   stack_pop(nest->loop_indices);
 }
 
+typedef struct {
+  entity e;
+  bool entity_in_p;
+} expression_ctxt;
+
+static bool array_p(reference r, expression_ctxt *ctxt)
+{
+  if (array_entity_p(reference_variable(r)))
+    ctxt->entity_in_p = true;
+  return ctxt->entity_in_p;
+}
+
+static bool array_in_call_p(call c)
+{
+   bool result;
+  expression_ctxt ctxt = {entity_undefined, false};
+  gen_context_recurse(c, &ctxt,reference_domain,gen_true,array_p);
+  result = ctxt.entity_in_p;
+  
+  return (result);
+}
+
+
 static bool call_selection(call c, nest_context_p nest __attribute__ ((unused)))
 {
   /* CA il faut implemeter  un choix judicieux ... distribution ou encapsulation*/
   /* pour le moment distribution systematique de tout call */
   /* il faut recuperer les appels de fonction value_code_p(entity_initial(f)*/
   entity f = call_function(c);
-  if  (ENTITY_ASSIGN_P(f) || entity_subroutine_p(f)|| entity_function_p(f))
+  if  ((ENTITY_ASSIGN_P(f) && array_in_call_p(c)) || entity_subroutine_p(f)|| entity_function_p(f))
+    //if  (ENTITY_ASSIGN_P(f)  || entity_subroutine_p(f)|| entity_function_p(f))
     {
       return true;
     }
@@ -1259,13 +1283,15 @@ static bool call_selection(call c, nest_context_p nest __attribute__ ((unused)))
 static void store_call_context(call c  __attribute__ ((unused)),
 			       nest_context_p nest)
 {
-  stack sl = stack_copy(nest->loops_for_call);
-  stack si = stack_copy(nest->loop_indices);
   /* on sauve le statement associe au call */
   statement statc = (statement) stack_head(nest->current_stat) ;
-  gen_array_append(nest->nested_loop_indices,si);
-  gen_array_append(nest->nested_loops,sl);
-  gen_array_append(nest->nested_call,statc);
+  if (instruction_call_p(statement_instruction(statc))) {
+    stack sl = stack_copy(nest->loops_for_call);
+    stack si = stack_copy(nest->loop_indices);
+    gen_array_append(nest->nested_loop_indices,si);
+    gen_array_append(nest->nested_loops,sl);
+    gen_array_append(nest->nested_call,statc);
+  }
 }
 
 static bool push_test(test t  __attribute__ ((unused)),
@@ -2583,6 +2609,24 @@ int find_effect_actions_for_entity(list leff, effect *effr, effect *effw, entity
   return (effet_rwb);
 }
 
+static bool same_entities_p(reference r, expression_ctxt *ctxt)
+{
+  if (same_entity_p(reference_variable(r),ctxt->e))
+    ctxt->entity_in_p = true;
+  return ctxt->entity_in_p;
+}
+
+static bool entity_in_expression_p(expression exp,entity e)
+{
+  
+  bool result;
+  expression_ctxt ctxt = {e, false};
+  gen_context_recurse(exp, &ctxt, reference_domain,gen_true,same_entities_p);
+  result = ctxt.entity_in_p;
+  
+  return (result);
+}
+
 static void xml_ParameterUseToArrayBound(entity var, string_buffer sb_result)
 {
   string sdim;
@@ -2598,10 +2642,11 @@ static void xml_ParameterUseToArrayBound(entity var, string_buffer sb_result)
       for (ld = ldim, dim =1 ; !ENDP(ld); ld = CDR(ld), dim++) {
 	expression elow = dimension_lower(DIMENSION(CAR(ld)));
 	expression eup = dimension_upper(DIMENSION(CAR(ld)));
-	const char * low= words_to_string(words_syntax(expression_syntax(elow),NIL));
-	const char * up = words_to_string(words_syntax(expression_syntax(eup),NIL));
-	const char * sv = entity_local_name(var);
-	if ((strstr(low,sv)!=NULL) || (strstr(up,sv)!=NULL)) {
+	//const char * low= words_to_string(words_syntax(expression_syntax(elow),NIL));
+	//const char * up = words_to_string(words_syntax(expression_syntax(eup),NIL));
+	//const char * sv = entity_local_name(var);
+	//if ((strstr(low,sv)!=NULL) || (strstr(up,sv)!=NULL)) {
+	if (entity_in_expression_p(elow,var) || entity_in_expression_p(eup,var)) {
 	  sdim= strdup(itoa(variable_entity_dimension(FormalArrayName)-dim+1));
 	  add_margin(global_margin,sb_result);
 	  string_buffer_append(sb_result,
@@ -3312,26 +3357,36 @@ static void xml_Matrix(Pmatrix mat, int n, int m, string_buffer sb_result)
   string_buffer_append_word("/Transposition",sb_result);
 }
 */
-
-static void tri_abc(int tab_ind[4], int a, int b, int c)
+static int int_compare(void const *a, void const *b)
 {
-  if (a==1) {
-    tab_ind[3]=1;
-    if (b<c) {tab_ind[1]=3;tab_ind[2]=2;}
-    else {
-      tab_ind[1]=2;tab_ind[2]=3;}
-  }
-  else if (b==1) {
-    tab_ind[3]=2;
-    if (a<c) {tab_ind[1]=3;tab_ind[2]=1;}
-    else {tab_ind[1]=1;tab_ind[2]=3;}
-  }
-  else {
-    tab_ind[3]=3;
-    if (a<b) {tab_ind[1]=2;tab_ind[2]=1;}
-    else {tab_ind[1]=1;tab_ind[2]=2;}
-  }
+  int const*pa=a;
+  int const*pb=b;
+  return(*pb-*pa);
 }
+
+static void tri_abc(int a[12], int dim, int result[12])
+{
+  int a_copy[12];
+  int i;
+  memcpy(a_copy,a,(2*dim+1)*sizeof(int));
+  //  for (int i =1;i<=2*dim; i++)    printf(" a[%d]",a[i]);
+  //printf("\n");
+  //for (int i =1;i<=2*dim; i++)    printf(" a_copy[%d]",a_copy[i]);
+  //printf("\n");
+  qsort(&a_copy[1],dim,sizeof(int), int_compare);
+  qsort(&a_copy[1+dim],dim,sizeof(int), int_compare);
+  for (int k=0;k<=1;k++)
+    for ( i=1; i<=dim; i++) {
+      for (int j=1; j<=dim; j++)
+	if (a_copy[i+dim*k]==a[j+dim*k])
+	  result[i+dim*k]=j;
+    }
+  //for (int i =1;i<=2*dim; i++)    printf(" a_copy[%d]",a_copy[i]);
+  // printf("\n");
+  // for (int i =1;i<=2*dim; i++)    printf(" result[%d]",result[i]);
+  //printf("\n");
+}
+
 
 static void xml_Transposed_Matrix2D( Pmatrix mat)
 {
@@ -3341,21 +3396,20 @@ static void xml_Transposed_Matrix2D( Pmatrix mat)
   MATRIX_ELEM(mat,2,2)=0;
 }
 
-static void xml_Transposed_Matrix3D( Pmatrix mat,int a[7], int ArrayDim1, int ArrayDim2)
+void xml_Transposed_Matrix3_5D( Pmatrix mat,int a[12], int ArrayDim1, int ArrayDim2)
 {
 
   int i,j,n;
-  int tab_ind[3][4];
-  tri_abc(tab_ind[1],a[1],a[2],a[3]);
-  tri_abc(tab_ind[2],a[4],a[5],a[6]);
+  int result[]={0,0,0,0,0,0,0,0,0,0,0,0};
+  tri_abc(a,ArrayDim1,result);
   for (i=1; i<= ArrayDim1; i++) {
-    n=tab_ind[2][i];
-    for (j=1;j<=3;j++) {
-      if (tab_ind[1][j]==n)
+    n = result[i+ArrayDim1];
+    for (j=1;j<=ArrayDim1;j++) {
+      if (result[j]==n)
 	MATRIX_ELEM(mat,i,j)=1;
     }
   }
- }
+}
 static expression skip_field_and_cast_expression(expression arg)
 {
  if (expression_field_p(arg))
@@ -3368,7 +3422,7 @@ static expression skip_field_and_cast_expression(expression arg)
 // Only to deal with Opengpu cornerturns
 static void  xml_Transposition(call c,int d,string_buffer sb_result)
 {
-  int tab[7];
+  int tab[]={0,0,0,0,0,0,0,0,0,0,0,0};
   int i;
   expression arg1,arg2;
   value v;
@@ -3399,10 +3453,10 @@ static void  xml_Transposition(call c,int d,string_buffer sb_result)
       reference r2 = syntax_reference(expression_syntax(arg2));
       //int ArrayDim1 = variable_entity_dimension(reference_variable(r1));
       //int ArrayDim2 = variable_entity_dimension(reference_variable(r2));
-      if (d==3) {
-	mat = matrix_new(3,3);
+      if (d>2 && d<=5) {
+	mat = matrix_new(d,d);
 	matrix_init(mat,mat->number_of_lines,mat->number_of_columns);
-	xml_Transposed_Matrix3D(mat,tab, mat->number_of_lines,mat->number_of_columns) ;
+	xml_Transposed_Matrix3_5D(mat,tab, mat->number_of_lines,mat->number_of_columns) ;
       }
       if (d==2) {
 	mat = matrix_new(2,2);
@@ -3717,50 +3771,58 @@ bool array_in_effect_list_p(list effects_list)
 static void xml_Call(entity module,  int code_tag,int taskNumber, nest_context_p nest, string_buffer sb_result)
 {
   statement s = gen_array_item(nest->nested_call,taskNumber);
-  stack st = gen_array_item(nest->nested_loops,taskNumber);
-  call c = instruction_call(statement_instruction(s));
-  entity func= call_function(c);
-  list pattern_region=NIL;
-  Pvecteur paving_indices = VECTEUR_NUL;
-  Pvecteur pattern_indices = VECTEUR_NUL;
-  bool motif_in_te_p=false;
-  transformer t = load_statement_precondition(s);
-  Psysteme prec = sc_dup((Psysteme) predicate_system(transformer_relation(t)));
-  const char * strtmp = entity_user_name(func);
+  if (instruction_call_p(statement_instruction(s))) {
+    stack st = gen_array_item(nest->nested_loops,taskNumber);
+    call c = instruction_call(statement_instruction(s));
+    entity func= call_function(c);
+    list pattern_region=NIL;
+    Pvecteur paving_indices = VECTEUR_NUL;
+    Pvecteur pattern_indices = VECTEUR_NUL;
+    bool motif_in_te_p=false;
+    transformer t = load_statement_precondition(s);
+    Psysteme prec = sc_dup((Psysteme) predicate_system(transformer_relation(t)));
+    const char * strtmp = entity_user_name(func);
 
-  pattern_region = regions_dup(load_statement_local_regions(s));
-  if (!ENTITY_ASSIGN_P(func) || array_in_effect_list_p(pattern_region)) {
-    add_margin(global_margin,sb_result);
-    string_buffer_append(sb_result,
-			 concatenate(OPENANGLE,
-				     "Call Name=",
-				     QUOTE,
-				     ENTITY_ASSIGN_P(func) ?
-				     "LocalAssignment" : entity_user_name(func),
-				     QUOTE,
-				     CLOSEANGLE,NL, NULL));
-    global_margin++;
-    //  only detect  Opengpu 2D and 3D cornerturns
-      if (strstr(strtmp,"cornerturn_3D")!=NULL)
+    pattern_region = regions_dup(load_statement_local_regions(s));
+    if (!ENTITY_ASSIGN_P(func) || array_in_effect_list_p(pattern_region)) {
+      add_margin(global_margin,sb_result);
+      string_buffer_append(sb_result,
+			   concatenate(OPENANGLE,
+				       "Call Name=",
+				       QUOTE,
+				       ENTITY_ASSIGN_P(func) ?
+				       "LocalAssignment" : entity_user_name(func),
+				       QUOTE,
+				       CLOSEANGLE,NL, NULL));
+      global_margin++;
+      //  only detect  Opengpu 2D and 3D 4D and 5D cornerturns
+      if (strstr(strtmp,"cornerturn_5D")!=NULL)
+	xml_Transposition(c,5,sb_result);
+      else if (strstr(strtmp,"cornerturn_4D")!=NULL)
+	xml_Transposition(c,4,sb_result);
+      else if (strstr(strtmp,"cornerturn_3D")!=NULL)
 	xml_Transposition(c,3,sb_result);
       else
 	if (strstr(strtmp,"cornerturn_2D")!=NULL)
 	  xml_Transposition(c,2,sb_result);
-    xml_Region_Parameter(pattern_region, sb_result);
-    xml_Loops(st,true,&pattern_region,&paving_indices, &pattern_indices,motif_in_te_p, sb_result);
+      xml_Region_Parameter(pattern_region, sb_result);
+      xml_Loops(st,true,&pattern_region,&paving_indices, &pattern_indices,motif_in_te_p, sb_result);
 
-    if (ENTITY_ASSIGN_P(func))
-      xml_TaskParameters(true,code_tag, module,pattern_region,paving_indices,sb_result);
-    else
-      xml_Arguments(s,func,paving_indices, prec,sb_result);
-    xml_Dependances();
-    global_margin--;
-    string_buffer_append_word("/Call",sb_result);
+      if (ENTITY_ASSIGN_P(func))
+	xml_TaskParameters(true,code_tag, module,pattern_region,paving_indices,sb_result);
+      else
+	xml_Arguments(s,func,paving_indices, prec,sb_result);
+      xml_Dependances();
+      global_margin--;
+      string_buffer_append_word("/Call",sb_result);
+    }
+    regions_free(pattern_region);
+    sc_free(prec);
   }
-  regions_free(pattern_region);
-  sc_free(prec);
+  else { 
+    fprintf(stdout,"Restructuration has been done - The call is encapsulated in new instruction \n");
+  }
 }
-
 void  xml_Compute_and_Need(entity func,list effects_list, Pvecteur vargs,string_buffer sb_result)
 {
   string_buffer buffer_needs = string_buffer_make(true);
@@ -3967,7 +4029,7 @@ static void xml_Boxes(const char* module_name, int code_tag,string_buffer sb_res
     string_buffer_append_word("FormalArrays/",sb_result);
   }
   /* Search calls in Box */
-  find_loops_and_calls_in_box(stat,&nest);
+  find_loops_and_calls_in_box(stat,&nest); 
 
   for (callnumber = 0; callnumber<(int)gen_array_nitems(nest.nested_call); callnumber++)
     xml_Call(module, code_tag, callnumber, &nest,sb_result);

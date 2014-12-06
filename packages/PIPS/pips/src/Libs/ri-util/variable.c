@@ -331,11 +331,9 @@ entity make_stderr_variable()
 
 /* entity make_scalar_entity(name, module_name, base)
  */
-entity
-make_scalar_entity(name, module_name, base)
-const char* name;
-const char* module_name;
-basic base;
+entity make_scalar_entity(const char * name,
+			  const char * module_name, 
+			  basic base)
 {
   string full_name;
   entity e, f, a;
@@ -375,6 +373,32 @@ basic base;
 
   return(e);
 }
+entity make_derived_entity(const char * name,
+			   const char * module_name, 
+			   type t)
+{
+  string full_name;
+  entity e;
+
+  full_name =
+    strdup(concatenate(module_name, MODULE_SEP_STRING, name, NULL));
+
+  pips_debug(8, "name %s\n", full_name);
+
+  message_assert("not already defined",
+		 gen_find_tabulated(full_name, entity_domain)==entity_undefined);
+
+  e = make_entity(full_name, type_undefined,
+		  storage_undefined, value_undefined);
+
+  entity_type(e) = copy_type(t);
+
+  entity_storage(e) = make_storage_rom();
+
+  entity_initial(e) = make_value_unknown();
+
+  return(e);
+}
 
 
 
@@ -410,6 +434,9 @@ reset_unique_variable_numbers()
 #define DEFAULT_STRUCT_PREFIX	"ST_"
 #define DEFAULT_UNION_PREFIX	"U_"
 #define DEFAULT_ENUM_PREFIX	"E_"
+#define DEFAULT_DERIVED_STRUCT_PREFIX	"DS_"
+#define DEFAULT_DERIVED_UNION_PREFIX	"DU_"
+#define DEFAULT_DERIVED_ENUM_PREFIX	"DE_"
 
 /* Generate a new variable name from a seed name to a module
 
@@ -645,6 +672,64 @@ entity make_new_scalar_variable_with_prefix(const char* prefix,
   pips_debug(9, "var %s, tag %d\n", variable_name, basic_tag(b));
 
   e = make_scalar_entity(variable_name, module_name, b);
+  free(variable_name);
+  free(ep);
+
+  return e;
+}
+
+/* derived from make_new_scalar_variable_with_prefix
+ */
+entity make_new_derived_entity_with_prefix(const char* prefix,
+					   entity module,
+					   type t)
+{
+  const char* module_name = module_local_name(module);
+  string ep = strdup(prefix);
+  entity e;
+  char * variable_name = NULL;
+  int number = 0;
+  bool empty_prefix = (strlen(prefix) == 0);
+  /* declare the entity at the highest scope */
+  const string format = "0" BLOCK_SEP_STRING "%s%d";
+
+  /* Find the first matching non-already existent variable name: */
+  do {
+    if (variable_name != NULL)
+      /* Free the already allocated name in the previous iteration that
+	 was conflicting: */
+      free(variable_name);
+
+    if (empty_prefix) {
+      /* Use a default type-dependent variable name since the programmer
+         gave none: */
+      switch(type_tag(t)) {
+      case is_type_struct:
+	asprintf(&variable_name,  format, DEFAULT_DERIVED_STRUCT_PREFIX,
+		unique_integer_number++);
+	break;
+      case is_type_union:
+	asprintf(&variable_name, format, DEFAULT_DERIVED_UNION_PREFIX,
+		unique_float_number++);
+	break;
+      case is_type_enum:
+	asprintf(&variable_name, format, DEFAULT_DERIVED_ENUM_PREFIX,
+		unique_logical_number++);
+	break;
+      default:
+	pips_internal_error("unexpected type kind: %d",
+			    type_tag(t));
+	break;
+      }
+    }
+    else
+      asprintf(&variable_name, format, ep, number++);
+  }
+  while(!unique_entity_name_p(variable_name,module));
+
+  pips_debug(9, "var %s, tag %d\n", variable_name, type_tag(t));
+
+  e = make_derived_entity(variable_name, module_name, t);
   free(variable_name);
   free(ep);
 

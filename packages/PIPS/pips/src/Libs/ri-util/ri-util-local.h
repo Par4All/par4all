@@ -1839,7 +1839,9 @@ remove_a_control_from_a_list_and_relink_direction;
 #define DEFAULT_LONG_INTEGER_TYPE_SIZE (6)
 #define DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE (8)
 
-#define DEFAULT_POINTER_TYPE_SIZE (sizeof(void *)) // could be 4 or 8 or sizeof(pointer)
+// To avoid issues with the PIPS validation suite on a 32-bit pointer machine
+//#define DEFAULT_POINTER_TYPE_SIZE (sizeof(void *)) // could be 4 or 8 or sizeof(pointer)
+#define DEFAULT_POINTER_TYPE_SIZE (8)
 #define DEFAULT_UNSIGNED_TYPE_SIZE (1) // type_size/10==1
 #define DEFAULT_SIGNED_TYPE_SIZE (2) // type_size/10=2
 

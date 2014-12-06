@@ -582,7 +582,7 @@ transformer_list_closure_to_precondition_depth_two(list tl,
   free_transformer(p_01);
   free_transformer(p_012);
   free_transformer(p_0123);
-
+  pips_assert("p_star is consistent", transformer_consistency_p(p_star));
   return p_star;
 }
 
@@ -721,6 +721,7 @@ transformer transformer_list_closure_to_precondition(list tl,
   else
     pips_user_error("Unknown value \"%s\" for property "
 		    "\"SEMANTICS_LIST_FIX_POINT_OPERATOR\"", h);
+  pips_assert("prec is consistent", transformer_consistency_p(p_star));
   return p_star;
 }
 
@@ -817,7 +818,7 @@ list transformer_list_preserved_variables(list vl, list tl, list tl_v)
 
    FI: this may be useless when derivatives are computed before the
    convex union. No. This was due to a bug in the computation of list
-   of derivaties.
+   of derivatives.
 
    FI: this should be mathematically useless but it useful when a
    heuristic is used to compute the invariant. The number of
@@ -853,8 +854,22 @@ transformer transformer_list_multiple_closure_to_precondition(list tl,
 	  = safe_transformer_projection(copy_transformer(c_t), proj_v);
 	transformer prec_v
 	  = transformer_list_closure_to_precondition(ptl_v, c_t_v, p_0_v);
-	transformer_arguments(prec_v) = gen_copy_seq(al); // memory leak
+	if(arguments_subset_p(transformer_arguments(prec_v), al)) {
+	  // FI: this generates an inconsistent transformer if
+	  // transformer_arguments(prec_v) is not a subset of al...
+	  transformer_arguments(prec_v) = gen_copy_seq(al); // memory leak
+	}
+	else {
+	  transformer n_prec_v = transformer_range(prec_v);
+	  free_transformer(prec_v);
+	  prec_v = n_prec_v;
+	  transformer_arguments(prec_v) = gen_copy_seq(al);
+	}
 	prec = transformer_intersection(prec, prec_v); // memory leak
+	// transformer_intersection() returns an inconsistent transformer
+	// The argument list is empty but an old value is used in the conditions
+	// prec = transformer_range(prec); // memory leak
+	pips_assert("prec is consistent", transformer_consistent_p(prec));
 
 	free_transformer(prec_v);
 	free_transformer(c_t_v);

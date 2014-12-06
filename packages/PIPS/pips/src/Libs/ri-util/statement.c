@@ -3114,7 +3114,7 @@ static bool add_ref_entities_in_init(statement s, entities_t * vars)
 /* Get a list of all variables referenced recursively within a statement:
  * - as reference in expressions in the code
  * - as loop indexes, which may not be used anywhere else
- * - as references in initilializations
+ * - as references in initializations
  */
 list statement_to_referenced_entities(statement s)
 {

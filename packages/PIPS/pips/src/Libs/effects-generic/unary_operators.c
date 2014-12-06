@@ -134,23 +134,31 @@ bool effects_write_at_least_once_p(list l_eff)
 list
 effects_read_effects_dup(list l_eff)
 {
-    list l_new = NIL;
-    MAP(EFFECT, eff,
-	if (effect_read_p(eff))
-           l_new = CONS(EFFECT, (*effect_dup_func)(eff), l_new),
-	l_eff);
-    return gen_nreverse(l_new);
+  list l_new = NIL;
+  // functions that can be pointed by effect_dup_func:
+  // simple_effect_dup
+  // region_dup
+  // copy_effect
+  MAP(EFFECT, eff,
+      if (effect_read_p(eff))
+        l_new = CONS(EFFECT, (*effect_dup_func)(eff), l_new),
+        l_eff);
+  return gen_nreverse(l_new);
 }
 
 list
 effects_write_effects_dup(list l_eff)
 {
-    list l_new = NIL;
-    MAP(EFFECT, eff,
-	if (effect_write_p(eff))
-  	   l_new = CONS(EFFECT, (*effect_dup_func)(eff), l_new),
-	l_eff);
-    return gen_nreverse(l_new);
+  list l_new = NIL;
+  // functions that can be pointed by effect_dup_func:
+  // simple_effect_dup
+  // region_dup
+  // copy_effect
+  MAP(EFFECT, eff,
+      if (effect_write_p(eff))
+        l_new = CONS(EFFECT, (*effect_dup_func)(eff), l_new),
+        l_eff);
+  return gen_nreverse(l_new);
 }
 
 effect
@@ -238,68 +246,82 @@ array_effects_to_may_effects(list l_eff)
 list
 effects_dup_without_variables(list l_eff, list l_var)
 {
-    list l_res = NIL;
-    
-    FOREACH(EFFECT, eff,l_eff)
+  list l_res = NIL;
+
+  FOREACH(EFFECT, eff,l_eff)
+  {
+    if (gen_find_eq(effect_entity(eff), l_var) == entity_undefined)
     {
-        if (gen_find_eq(effect_entity(eff), l_var) == entity_undefined)
-        {
-            l_res = CONS(EFFECT, (*effect_dup_func)(eff), l_res);
-        }
-        else
-            pips_debug(7, "Effect on variable %s removed\n",
-                    entity_local_name(effect_entity(eff)));
+      // functions that can be pointed by effect_dup_func:
+      // simple_effect_dup
+      // region_dup
+      // copy_effect
+      l_res = CONS(EFFECT, (*effect_dup_func)(eff), l_res);
     }
-    return gen_nreverse(l_res);
+    else
+      pips_debug(7, "Effect on variable %s removed\n",
+          entity_local_name(effect_entity(eff)));
+  }
+  return gen_nreverse(l_res);
 }
 
 
 list
 effects_dup(list l_eff)
 {
-    list l_new = NIL;
-    list ec = list_undefined;
+  list l_new = NIL;
+  list ec = list_undefined;
 
-    ifdebug(8) {
-      effects e = make_effects(l_eff);
-      pips_assert("input effects are consistent", effects_consistent_p(e));
-      effects_effects(e) = NIL;
-      free_effects(e);
-    }
+  ifdebug(8) {
+    effects e = make_effects(l_eff);
+    pips_assert("input effects are consistent", effects_consistent_p(e));
+    effects_effects(e) = NIL;
+    free_effects(e);
+  }
 
-    for(ec = l_eff; !ENDP(ec); POP(ec)) {
-      effect eff = EFFECT(CAR(ec));
+  for(ec = l_eff; !ENDP(ec); POP(ec)) {
+    effect eff = EFFECT(CAR(ec));
 
-      /* build last to first */
-      l_new = CONS(EFFECT, (*effect_dup_func)(eff), l_new);
-    }
+    /* build last to first */
+    // functions that can be pointed by effect_dup_func:
+    // simple_effect_dup
+    // region_dup
+    // copy_effect
+    l_new = CONS(EFFECT, (*effect_dup_func)(eff), l_new);
+  }
 
-    /* and the order is reversed */
-    l_new =  gen_nreverse(l_new);
+  /* and the order is reversed */
+  l_new =  gen_nreverse(l_new);
 
-    ifdebug(8) {
-      effects e = make_effects(l_new);
-      pips_assert("input effects are consistent", effects_consistent_p(e));
-      effects_effects(e) = NIL;
-      free_effects(e);
-    }
+  ifdebug(8) {
+    effects e = make_effects(l_new);
+    pips_assert("input effects are consistent", effects_consistent_p(e));
+    effects_effects(e) = NIL;
+    free_effects(e);
+  }
 
-    return l_new;
+  return l_new;
 }
 
 void
 effect_free(effect eff)
 {
-    (*effect_free_func)(eff);
+  // functions that can be pointed by effect_free_func:
+  // free_effect
+  // region_free
+  (*effect_free_func)(eff);
 }
 
 void
 effects_free(list l_eff)
 {
-    MAP(EFFECT, eff,
-	{(*effect_free_func)(eff);},
-	l_eff);
-    gen_free_list(l_eff);
+  // functions that can be pointed by effect_free_func:
+  // free_effect
+  // region_free
+  MAP(EFFECT, eff,
+      {(*effect_free_func)(eff);},
+      l_eff);
+  gen_free_list(l_eff);
 }
 
 /* list effect_to_nil_list(effect eff)
@@ -478,40 +500,41 @@ db_get_empty_list(string name)
  */
 void effect_add_dereferencing_dimension(effect eff)
 {
-
   if (!entity_heap_location_p(effect_entity(eff))
       && !entity_flow_or_context_sentitive_heap_location_p(effect_entity(eff))
       && effect_abstract_location_p(eff))
+  {
+    pips_debug(8, "abstract location \n");
+    cell eff_c = effect_cell(eff);
+    if (!anywhere_effect_p(eff))
     {
-
-      pips_debug(8, "abstract location \n");
-      cell eff_c = effect_cell(eff);
-      if (!anywhere_effect_p(eff))
-	{
-	  /* change for an anywhere effect. More work could be done here
-	     in case of a typed abstract location
-	  */
-	  entity anywhere_ent = entity_all_locations();
-	  if (cell_preference_p(eff_c))
-	    {
-	      /* it's a preference : we change for a reference cell */
-	      free_cell(eff_c);
-	      effect_cell(eff) = make_cell_reference(make_reference(anywhere_ent, NIL));
-	    }
-	  else
-	    {
-	      reference_variable(cell_reference(eff_c)) = anywhere_ent;
-	    }
-	}
+      /* change for an anywhere effect. More work could be done here
+         in case of a typed abstract location
+       */
+      entity anywhere_ent = entity_all_locations();
+      if (cell_preference_p(eff_c))
+      {
+        /* it's a preference : we change for a reference cell */
+        free_cell(eff_c);
+        effect_cell(eff) = make_cell_reference(make_reference(anywhere_ent, NIL));
+      }
+      else
+      {
+        reference_variable(cell_reference(eff_c)) = anywhere_ent;
+      }
     }
+  }
   else
-    {
-      expression deref_exp = int_to_expression(0);
-      pips_debug(8, "heap or concrete location \n");
+  {
+    expression deref_exp = int_to_expression(0);
+    pips_debug(8, "heap or concrete location \n");
 
-      (*effect_add_expression_dimension_func)(eff, deref_exp);
-      free_expression(deref_exp);
-    }
+    // functions that can be pointed by effect_add_expression_dimension_func:
+    // simple_effect_add_expression_dimension
+    // convex_region_add_expression_dimension
+    (*effect_add_expression_dimension_func)(eff, deref_exp);
+    free_expression(deref_exp);
+  }
   return;
 }
 
@@ -549,48 +572,48 @@ void effect_add_field_dimension(effect eff, entity field)
   pips_debug(8, "and field: %s\n", entity_name(field));
 
   if (!entity_flow_or_context_sentitive_heap_location_p(effect_entity(eff))
-			      && effect_abstract_location_p(eff))
+      && effect_abstract_location_p(eff))
+  {
+    if (!anywhere_effect_p(eff))
     {
-      if (!anywhere_effect_p(eff))
-	{
-	  /* change for an anywhere effect. More work could be done here
-	     in case of a typed abstract location
-	  */
-	  entity anywhere_ent = entity_all_locations();
-	  if (cell_preference_p(eff_c))
-	    {
-	      /* it's a preference : we change for a reference cell */
-	      free_cell(eff_c);
-	      effect_cell(eff) = make_cell_reference(make_reference(anywhere_ent, NIL));
-	    }
-	  else
-	    {
-	      reference_variable(cell_reference(eff_c)) = anywhere_ent;
-	    }
-	}
-    }
-  else
-    {
-      reference ref;
+      /* change for an anywhere effect. More work could be done here
+       * in case of a typed abstract location
+       */
+      entity anywhere_ent = entity_all_locations();
       if (cell_preference_p(eff_c))
-	{
-	  /* it's a preference : we change for a reference cell */
-	  pips_debug(8, "It's a preference\n");
-	  ref = copy_reference(preference_reference(cell_preference(eff_c)));
-	  free_cell(eff_c);
-	  effect_cell(eff) = make_cell_reference(ref);
-	}
+      {
+        /* it's a preference : we change for a reference cell */
+        free_cell(eff_c);
+        effect_cell(eff) = make_cell_reference(make_reference(anywhere_ent, NIL));
+      }
       else
-	{
-	  /* it's a reference : let'us modify it */
-	  ref = cell_reference(eff_c);
-	}
-
-      reference_indices(ref) = gen_nconc(reference_indices(ref),
-					 CONS(EXPRESSION,
-					      field_entity_to_expression(field),
-					      NIL));
+      {
+        reference_variable(cell_reference(eff_c)) = anywhere_ent;
+      }
     }
+  }
+  else
+  {
+    reference ref;
+    if (cell_preference_p(eff_c))
+    {
+      /* it's a preference : we change for a reference cell */
+      pips_debug(8, "It's a preference\n");
+      ref = copy_reference(preference_reference(cell_preference(eff_c)));
+      free_cell(eff_c);
+      effect_cell(eff) = make_cell_reference(ref);
+    }
+    else
+    {
+      /* it's a reference : let'us modify it */
+      ref = cell_reference(eff_c);
+    }
+
+    reference_indices(ref) = gen_nconc(reference_indices(ref),
+        CONS(EXPRESSION,
+            field_entity_to_expression(field),
+            NIL));
+  }
   pips_debug_effect(8, "end with effect :\n",eff);
 
   return;
@@ -620,121 +643,135 @@ list filter_effects_with_declaration(list l_eff, entity decl)
   storage decl_s = entity_storage(decl);
 
   ifdebug(8)
-    {
-      type ct = entity_basic_concrete_type(decl);
-      pips_debug(8, "dealing with entity : %s with type %s\n",
-		 entity_local_name(decl),words_to_string(words_type(ct,NIL,false)));
-    }
+  {
+    type ct = entity_basic_concrete_type(decl);
+    pips_debug(8, "dealing with entity : %s with type %s\n",
+        entity_local_name(decl),words_to_string(words_type(ct,NIL,false)));
+  }
 
   if (storage_ram_p(decl_s)
       /* static variable declaration has no effect, even in case of initialization. */
       && !static_area_p(ram_section(storage_ram(decl_s)))
       && type_variable_p(entity_type(decl)))
+  {
+    value v_init = entity_initial(decl);
+    expression exp_init = expression_undefined;
+    if(value_expression_p(v_init))
+      exp_init = value_expression(v_init);
+
+    // We must first eliminate effects on the declared variable
+    // except if it is a static or extern variable.
+    // or use the initial value to translate them to the preceding memory state
+    // We should take care of the transformer too for convex effects.
+    // But which transformer ? Is the statement transfomer OK?
+    // or do we need to use the transformer for each variable initialization ?
+    // The last statement is probably the truth, but this is not what is currently implemented
+
+    FOREACH(EFFECT, eff, l_eff)
     {
-      value v_init = entity_initial(decl);
-      expression exp_init = expression_undefined;
-      if(value_expression_p(v_init))
-	exp_init = value_expression(v_init);
+      reference eff_ref = effect_any_reference(eff);
+      entity eff_ent = reference_variable(eff_ref);
 
-      // We must first eliminate effects on the declared variable
-      // except if it is a static or extern variable.
-      // or use the initial value to translate them to the preceding memory state
-      // We should take care of the transformer too for convex effects.
-      // But which transformer ? Is the statement transfomer OK?
-      // or do we need to use the transformer for each variable initialization ?
-      // The last statement is probably the truth, but this is not what is currently implemented
+      pips_debug_effect(8,"dealing_with_effect: \n", eff);
 
-      FOREACH(EFFECT, eff, l_eff)
-	{
-	  reference eff_ref = effect_any_reference(eff);
-	  entity eff_ent = reference_variable(eff_ref);
+      if (eff_ent == decl)
+      {
+        pips_debug(8, "same entity\n");
+        if(ENDP(reference_indices(eff_ref)))
+        {
+          // effect on the variable itself: no need to keep it
+          free_effect(eff);
+        }
+        else
+          /* here, it is a store effect */
+        {
+          bool exact_p;
+          // no need to keep the effect if there is no pointer in the path of the effect
+          // or if it's a FILE* - well the latter is a hack, but with constant path
+          // effects this should not happen - BC
+          if (!effect_reference_contains_pointer_dimension_p(eff_ref, &exact_p)
+              || FILE_star_effect_reference_p(eff_ref))
+          {
+            free_effect(eff);
+          }
+          else
+          {
+            if(!expression_undefined_p(exp_init)) // there is an inital value
+            {
+              // let us re-use an existing method even if it's not the fastest method
+              // interprocedural translation and intra-procedural
+              // propagation will have to be re-packaged later
+              list l_tmp = CONS(EFFECT, eff, NIL);
+              list l_res_tmp;
 
-	  pips_debug_effect(8,"dealing_with_effect: \n", eff);
+              // functions that can be pointed by c_effects_on_formal_parameter_backward_translation_func:
+              // c_simple_effects_on_formal_parameter_backward_translation
+              // c_convex_effects_on_formal_parameter_backward_translation
+              if(c_effects_on_formal_parameter_backward_translation_func
+                  == c_convex_effects_on_formal_parameter_backward_translation)
+              {
+                Psysteme sc = sc_new();
+                sc_creer_base(sc);
+                set_translation_context_sc(sc);
+              }
 
-	  if (eff_ent == decl)
-	    {
-	      pips_debug(8, "same entity\n");
-	      if(ENDP(reference_indices(eff_ref)))
-		{
-		  // effect on the variable itself: no need to keep it
-		  free_effect(eff);
-		}
-	      else
-		/* here, it is a store effect */
-		{
-		  bool exact_p;
-		  // no need to keep the effect if there is no pointer in the path of the effect
-		  // or if it's a FILE* - well the latter is a hack, but with constant path
-		  // effects this should not happen - BC
-		  if (!effect_reference_contains_pointer_dimension_p(eff_ref, &exact_p)
-		      || FILE_star_effect_reference_p(eff_ref))
-		    {
-		      free_effect(eff);
-		    }
-		  else
-		    {
-		      if(!expression_undefined_p(exp_init)) // there is an inital value
-			{
-			  // let us re-use an existing method even if it's not the fastest method
-			  // interprocedural translation and intra-procedural
-			  // propagation will have to be re-packaged later
-			  list l_tmp = CONS(EFFECT, eff, NIL);
-			  list l_res_tmp;
+              /* beware of casts : do not take them into account for the moment */
+              syntax s_init = expression_syntax(exp_init);
+              if (syntax_cast_p(s_init))
+                exp_init = cast_expression(syntax_cast(s_init));
+              // functions that can be pointed by c_effects_on_formal_parameter_backward_translation_func:
+              // c_simple_effects_on_formal_parameter_backward_translation
+              // c_convex_effects_on_formal_parameter_backward_translation
+              l_res_tmp = (*c_effects_on_formal_parameter_backward_translation_func)(
+                  l_tmp, exp_init, transformer_undefined);
 
-			  if(c_effects_on_formal_parameter_backward_translation_func
-			     == c_convex_effects_on_formal_parameter_backward_translation)
-			    {
-			      Psysteme sc = sc_new();
-			      sc_creer_base(sc);
-			      set_translation_context_sc(sc);
-			    }
+              // functions that can be pointed by c_effects_on_formal_parameter_backward_translation_func:
+              // c_simple_effects_on_formal_parameter_backward_translation
+              // c_convex_effects_on_formal_parameter_backward_translation
+              if(c_effects_on_formal_parameter_backward_translation_func
+                  == c_convex_effects_on_formal_parameter_backward_translation)
+              {
+                reset_translation_context_sc();
+              }
 
-			  /* beware of casts : do not take them into account for the moment */
-			  syntax s_init = expression_syntax(exp_init);
-			  if (syntax_cast_p(s_init))
-			    exp_init = cast_expression(syntax_cast(s_init));
-			  l_res_tmp = (*c_effects_on_formal_parameter_backward_translation_func)
-			    (l_tmp, exp_init, transformer_undefined);
+              if (!exact_p) effects_to_may_effects(l_res_tmp);
 
-			  if(c_effects_on_formal_parameter_backward_translation_func
-			     == c_convex_effects_on_formal_parameter_backward_translation)
-			    {
-			      reset_translation_context_sc();
-			    }
+              // functions that can be pointed by effects_union_op:
+              // ProperEffectsMustUnion
+              // RegionsMustUnion
+              // ReferenceUnion
+              // EffectsMustUnion
+              l_res = (*effects_union_op)(
+                  l_res_tmp, l_res, effects_same_action_p);
+              gen_full_free_list(l_tmp); /* also free the input effect */
+            }
+            else
+            {
+              pips_debug(8, "there is no inital_value\n");
+              if (get_constant_paths_p())
+              {
+                pips_debug(8, "-> anywhere effect \n");
+                list l_tmp = gen_nconc(effect_to_list(make_anywhere_effect(copy_action(effect_action(eff)))), l_res);
+                l_res = clean_anywhere_effects(l_tmp);
+                gen_full_free_list(l_tmp);
+              }
+              free_effect(eff);
 
-			  if (!exact_p) effects_to_may_effects(l_res_tmp);
+            }
+          }
+        } /* if( !ENP(reference_indices(eff_ref))) */
+      }
+      else
+      {
+        // keep the effect if it's an effect on another entity
+        l_res = CONS(EFFECT, eff, l_res);
+      }
 
-			  l_res = (*effects_union_op)
-			    (l_res_tmp, l_res, effects_same_action_p);
-			  gen_full_free_list(l_tmp); /* also free the input effect */
-			}
-		      else
-			{
-			  pips_debug(8, "there is no inital_value\n");
-			  if (get_constant_paths_p())
-			    {
-			      pips_debug(8, "-> anywhere effect \n");
-			      list l_tmp = gen_nconc(effect_to_list(make_anywhere_effect(copy_action(effect_action(eff)))), l_res);
-			      l_res = clean_anywhere_effects(l_tmp);
-			      gen_full_free_list(l_tmp);
-			    }
-			  free_effect(eff);
+    } /* FOREACH */
+    gen_free_list(l_eff);
+    l_res = gen_nreverse(l_res); // we try to preserve the order of the input list
 
-			}
-		    }
-		} /* if( !ENP(reference_indices(eff_ref))) */
-	    }
-	  else
-	    {
-	      // keep the effect if it's an effect on another entity
-	      l_res = CONS(EFFECT, eff, l_res);
-	    }
-
-	} /* FOREACH */
-      gen_free_list(l_eff);
-      l_res = gen_nreverse(l_res); // we try to preserve the order of the input list
-
-    }
+  }
   return l_res;
 }
 
@@ -760,128 +797,129 @@ list effect_intermediary_pointer_paths_effect(effect eff)
   bool finished = false;
 
   if (entity_abstract_location_p(e))
-    {
-      if (anywhere_effect_p(eff)
-	  || null_pointer_value_cell_p(effect_cell(eff))
-	  || undefined_pointer_value_cell_p(effect_cell(eff)))
-	return CONS(EFFECT, copy_effect(eff), NIL);
-    }
+  {
+    if (anywhere_effect_p(eff)
+        || null_pointer_value_cell_p(effect_cell(eff))
+        || undefined_pointer_value_cell_p(effect_cell(eff)))
+      return CONS(EFFECT, copy_effect(eff), NIL);
+  }
 
   while (!finished && !ENDP(ref_inds))
+  {
+    switch (type_tag(t))
     {
-      switch (type_tag(t))
-	{
 
-	case is_type_variable:
-	  {
-	    pips_debug(5," variable case\n");
-	    basic b = variable_basic(type_variable(t));
-	    size_t nb_dim = gen_length(variable_dimensions(type_variable(t)));
+    case is_type_variable:
+    {
+      pips_debug(5," variable case\n");
+      basic b = variable_basic(type_variable(t));
+      size_t nb_dim = gen_length(variable_dimensions(type_variable(t)));
 
-	    /* add to tmp_ref as many indices from ref as nb_dim */
-	    for(size_t i = 0; i< nb_dim; i++, POP(ref_inds))
-	      {
-		reference_indices(tmp_ref) =
-		  gen_nconc(reference_indices(tmp_ref),
-			    CONS(EXPRESSION,
-				 copy_expression(EXPRESSION(CAR(ref_inds))),
-				 NIL));
-	      }
+      /* add to tmp_ref as many indices from ref as nb_dim */
+      for(size_t i = 0; i< nb_dim; i++, POP(ref_inds))
+      {
+        reference_indices(tmp_ref) =
+            gen_nconc(reference_indices(tmp_ref),
+                CONS(EXPRESSION,
+                    copy_expression(EXPRESSION(CAR(ref_inds))),
+                    NIL));
+      }
 
-	    if (basic_pointer_p(b))
-	      {
-		pips_debug(5," pointer basic\n");
-		if (!ENDP(ref_inds))
-		  {
-		    pips_debug(5,"and ref_inds is not empty\n");
-		    int nb_phi_tmp_eff = (int) gen_length(reference_indices(tmp_ref));
-		    effect tmp_eff = effect_undefined;
-		    if (descriptor_convex_p(d))
-		      {
-			if (nb_phi_tmp_eff == 0)
-			  {
-			    tmp_eff =
-			      make_effect(make_cell_reference(copy_reference(tmp_ref)),
-					  copy_action(effect_action(eff)),
-					  copy_approximation(effect_approximation(eff)),
-					  make_descriptor_convex(sc_new()));
-			  }
-			else
-			  {
-			    tmp_eff =
-			      make_effect(make_cell_reference(copy_reference(tmp_ref)),
-					  copy_action(effect_action(eff)),
-					  copy_approximation(effect_approximation(eff)),
-					  copy_descriptor(d));
-			    for(int nphi = nb_phi_tmp_eff; nphi <= nb_phi_init; nphi++)
-			      {
-				extern void convex_region_descriptor_remove_ith_dimension(effect, int);
-				convex_region_descriptor_remove_ith_dimension(tmp_eff, nphi);
-			      }
-			  }
-		      }
-		    else if (!descriptor_none_p(d))
-		      {
-			pips_internal_error("invalid effect descriptor kind\n");
-		      }
-		    else
-		      {
-			tmp_eff =
-			      make_effect(make_cell_reference(copy_reference(tmp_ref)),
-					  copy_action(effect_action(eff)),
-					  copy_approximation(effect_approximation(eff)),
-					  make_descriptor_none());
-		      }
+      if (basic_pointer_p(b))
+      {
+        pips_debug(5," pointer basic\n");
+        if (!ENDP(ref_inds))
+        {
+          pips_debug(5,"and ref_inds is not empty\n");
+          int nb_phi_tmp_eff = (int) gen_length(reference_indices(tmp_ref));
+          effect tmp_eff = effect_undefined;
+          if (descriptor_convex_p(d))
+          {
+            if (nb_phi_tmp_eff == 0)
+            {
+              tmp_eff =
+                  make_effect(make_cell_reference(copy_reference(tmp_ref)),
+                      copy_action(effect_action(eff)),
+                      copy_approximation(effect_approximation(eff)),
+                      make_descriptor_convex(sc_new()));
+            }
+            else
+            {
+              tmp_eff =
+                  make_effect(make_cell_reference(copy_reference(tmp_ref)),
+                      copy_action(effect_action(eff)),
+                      copy_approximation(effect_approximation(eff)),
+                      copy_descriptor(d));
+              for(int nphi = nb_phi_tmp_eff; nphi <= nb_phi_init; nphi++)
+              {
+                extern void convex_region_descriptor_remove_ith_dimension(effect, int);
+                convex_region_descriptor_remove_ith_dimension(tmp_eff, nphi);
+              }
+            }
+          }
+          else if (!descriptor_none_p(d))
+          {
+            pips_internal_error("invalid effect descriptor kind\n");
+          }
+          else
+          {
+            tmp_eff =
+                make_effect(make_cell_reference(copy_reference(tmp_ref)),
+                    copy_action(effect_action(eff)),
+                    copy_approximation(effect_approximation(eff)),
+                    make_descriptor_none());
+          }
 
-		    l_res = CONS(EFFECT, tmp_eff, l_res);
-		    reference_indices(tmp_ref) =
-		      gen_nconc(reference_indices(tmp_ref),
-				CONS(EXPRESSION,
-				     copy_expression(EXPRESSION(CAR(ref_inds))),
-				     NIL));
-		    POP(ref_inds);
+          l_res = CONS(EFFECT, tmp_eff, l_res);
+          reference_indices(tmp_ref) =
+              gen_nconc(reference_indices(tmp_ref),
+                  CONS(EXPRESSION,
+                      copy_expression(EXPRESSION(CAR(ref_inds))),
+                      NIL));
+          POP(ref_inds);
 
-		    type new_t = copy_type(basic_pointer(b));
-		    /* free_type(t);*/
-		    t = new_t;
-		  }
-		else
-		  finished = true;
-	      }
-	    else if (basic_derived_p(b))
-	      {
-		pips_debug(5,"derived basic\n");
-		type new_t = entity_basic_concrete_type(basic_derived(b));
-		t = new_t;
-	      }
-	    else
-	      finished = true;
-	  }
-	  break;
-	case is_type_struct:
-	case is_type_union:
-	case is_type_enum:
-	  {
-	    pips_debug(5,"struct union or enum type\n");
-
-	    /* add next index */
-	    expression field_exp = EXPRESSION(CAR(ref_inds));
-	    reference_indices(tmp_ref) =
-	      gen_nconc(reference_indices(tmp_ref),
-			CONS(EXPRESSION,
-			     copy_expression(field_exp),
-			     NIL));
-	    POP(ref_inds);
-	    entity field_ent = expression_to_entity(field_exp);
-	    pips_assert("expression is a field entity\n", !entity_undefined_p(field_ent));
-	    type new_t = entity_basic_concrete_type(field_ent);
-	    t = new_t;
-	  }
-	  break;
-	default:
-	    pips_internal_error("unexpected type tag");
-
-	}
+          type new_t = copy_type(basic_pointer(b));
+          /* free_type(t);*/
+          t = new_t;
+        }
+        else
+          finished = true;
+      }
+      else if (basic_derived_p(b))
+      {
+        pips_debug(5,"derived basic\n");
+        type new_t = entity_basic_concrete_type(basic_derived(b));
+        t = new_t;
+      }
+      else
+        finished = true;
     }
+    break;
+    case is_type_struct:
+    case is_type_union:
+    case is_type_enum:
+    {
+      pips_debug(5,"struct union or enum type\n");
+
+      /* add next index */
+      expression field_exp = EXPRESSION(CAR(ref_inds));
+      reference_indices(tmp_ref) =
+          gen_nconc(reference_indices(tmp_ref),
+              CONS(EXPRESSION,
+                  copy_expression(field_exp),
+                  NIL));
+      POP(ref_inds);
+      entity field_ent = expression_to_entity(field_exp);
+      pips_assert("expression is a field entity\n", !entity_undefined_p(field_ent));
+      type new_t = entity_basic_concrete_type(field_ent);
+      t = new_t;
+    }
+    break;
+    default:
+      pips_internal_error("unexpected type tag");
+      break;
+    }
+  }
+
   return l_res;
 }

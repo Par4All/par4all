@@ -389,7 +389,11 @@ void dprint(expression x)
       free(s);
     }
     else if(ot==transformer_domain) {
-      print_transformer((transformer) x);
+      transformer t = (transformer)x;
+      if(transformer_with_temporary_values_p(t))
+	dump_transformer(t);
+      else
+	print_transformer(t);
     }
     else if(0<=ot && ot<1000)
       (void) fprintf(stderr, "Unprocessed Newgen Object with tag %d\n", ot);
@@ -414,6 +418,15 @@ void dprint(expression x)
 	print_effects((list) x);
       else if(cot==points_to_domain)
 	print_points_to_relations((list) x);
+      else if(cot==transformer_domain) {
+	list tl = (list) x;
+	FOREACH(TRANSFORMER, t, tl) {
+	  if(transformer_with_temporary_values_p(t))
+	    dump_transformer(t);
+	  else
+	    print_transformer(t);
+	}
+      }
       else if(cot==entity_domain) {
 	// print_entities((list) x);
 	list el = (list) x;

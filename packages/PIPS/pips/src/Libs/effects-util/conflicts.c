@@ -628,7 +628,7 @@ bool references_must_conflict_p( reference r1, reference r2 ) {
  *
  * @param must_p if set to true, we enforce a must conflict
  */
-bool cells_maymust_conflict_p( cell c1, cell c2, bool must_p ) {
+static bool cells_maymust_conflict_p( cell c1, cell c2, bool must_p ) {
   bool conflict_p = false;
   reference r1 = reference_undefined;
   reference r2 = reference_undefined;

@@ -249,7 +249,6 @@ set_methods_for_cumulated_references()
 void
 set_default_methods_for_proper_simple_effects()
 {
-
   effect_consistent_p_func = effect_consistent_p;
   effects_computation_init_func = effects_computation_no_init;
   effects_computation_reset_func = effects_computation_no_reset;

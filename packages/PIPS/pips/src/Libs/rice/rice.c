@@ -356,6 +356,19 @@ bool distributer(string mod_name) {
 
   debug_on("RICE_DEBUG_LEVEL");
 
+  entity module = local_name_to_top_level_entity(mod_name);
+  /*
+   * For C code, this pass requires that effects are calculated with property
+   * MEMORY_EFFECTS_ONLY set to false because we need that the Chains includes
+   * arcs for declarations as these latter are separate statements now.
+   */
+  bool memory_effects_only_p = get_bool_property("MEMORY_EFFECTS_ONLY");
+  if(c_module_p(module) && memory_effects_only_p) {
+    pips_user_warning("Distributer should be run with property"
+        "MEMORY_EFFECTS_ONLY set to FALSE.\n");
+    return false; // return to pass manager with a failure code
+  }
+
   success = do_it(mod_name, true, DBR_CODE, &CodeGenerate);
 
   debug_off();

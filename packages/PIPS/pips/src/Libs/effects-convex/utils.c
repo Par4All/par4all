@@ -2605,7 +2605,8 @@ region_constraints_sort(
     c = constraints_sort_with_compare
       //	(c, BASE_NULLE, equality_p?
       (c, sorted_base, equality_p?
-       ((int (*)()) compare_region_equalities): ((int (*)()) compare_region_inequalities));
+       ((int (*)()) compare_region_equalities):
+       ((int (*)()) compare_region_inequalities), NULL);
     reset_bases_for_compare();
     return(c);
 }
@@ -3066,27 +3067,26 @@ Psysteme sc_loop_proper_precondition(loop l)
  */
 bool empty_convex_context_p(transformer context)
 {
-    Psysteme sc_context;
+  Psysteme sc_context;
 
-    if (transformer_undefined_p(context))
-    {
-	/* this happens to the CONTINUE statement of the exit node
-	 * even if unreachable. Thus transformer are not computed,
-	 * orderings are not set... however gen_multi_recurse goes there.
-	 * I just store NIL, what seems reasonnable an answer.
-	 * It seems to be sufficient for other passes.
-	 * I should check that it is indeed the exit node?
-	 * FC (RK).
-	 */
-	pips_debug(3, "undefined contexted found, returned as empty\n");
-	return true;
-    }
-
-    /* else
+  if (transformer_undefined_p(context))
+  {
+    /* this happens to the CONTINUE statement of the exit node
+     * even if unreachable. Thus transformer are not computed,
+     * orderings are not set... however gen_multi_recurse goes there.
+     * I just store NIL, what seems reasonnable an answer.
+     * It seems to be sufficient for other passes.
+     * I should check that it is indeed the exit node?
+     * FC (RK).
      */
+    pips_debug(3, "undefined contexted found, returned as empty\n");
+    return true;
+  }
+  /* else
+   */
 
-    sc_context = predicate_system(transformer_relation(context));
-    return sc_empty_p(sc_context);
+  sc_context = predicate_system(transformer_relation(context));
+  return sc_empty_p(sc_context);
 }
 
 string region_to_string(effect reg __attribute__ ((unused)))
