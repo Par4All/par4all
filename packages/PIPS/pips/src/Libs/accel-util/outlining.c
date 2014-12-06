@@ -60,6 +60,16 @@
  * @name outlining
  * @{ */
 
+static string outlining_variable_commenter(__attribute__((unused))entity e)
+{
+  return strdup(" Declared by Pass Outlining\n");
+}
+
+static string outlining_patched_variable_commenter(__attribute__((unused))entity e)
+{
+  return strdup(" Declared as a patch variable by Pass Outlining\n");
+}
+
 #define STAT_ORDER "PRETTYPRINT_STATEMENT_NUMBER"
 
 static void get_loop_locals_and_remove_walker(statement st, set s) {
@@ -551,7 +561,9 @@ list outliner_scan(entity new_fun, list statements_to_outline, statement new_bod
     }
 
     /* Retrieve declared entities */
+    push_generated_variable_commenter(outlining_variable_commenter);
     list localized = statements_localize_declarations(statements_to_outline,new_fun,new_body);
+    pop_generated_variable_commenter();
     list declared_entities = statements_to_declarations(statements_to_outline);
     FOREACH(ENTITY,e,declared_entities)
         gen_remove_once(&entity_declarations(get_current_module_entity()),e);
@@ -767,7 +779,7 @@ void outliner_parameters(entity new_fun,  statement new_body, list referenced_en
     /* we need to patch parameters , effective parameters and body in C
      * because parameters are passed by copy in function call
      * it's not needed if
-     * - the parameter is only read
+     * - the parameter is only read (FI: or if it is written before it is read?)
      * - it's an array / pointer
      *
      * Here a scalar will be passed by address and a prelude/postlude
@@ -781,6 +793,11 @@ void outliner_parameters(entity new_fun,  statement new_body, list referenced_en
      *   ...
      *   *scalar_0 = scalar;
      * }
+     *
+     * Note FI: this is also useless when the variable does not appear
+     * in the out region of the outlined piece of code. However, the
+     * out effets and out regions are not available for every piece of
+     * code.
      *
      */
 void outliner_patch_parameters(list statements_to_outline, list referenced_entities, list effective_parameters, list formal_parameters,
@@ -847,9 +864,27 @@ void outliner_patch_parameters(list statements_to_outline, list referenced_entit
                 insert_statement(begin,in,true);
                 insert_statement(end,out,false);
 
+		/* e is no longer a formal parameter, but a local variable */
                 pips_debug(4,"Add declaration for %s",entity_name(e));
-                add_declaration_statement(new_body,e);
 
+		/* storage eos = entity_storage(e); // e's old storage */
+		/* pips_assert("eos is a formal storage", storage_formal_p(eos)); */
+		/* formal fs = storage_formal(eos); */
+		/* entity f = formal_function(fs); // In fact, f is *not* a function but a variable! */
+		/* // No dependent type assumed, should be a scalar type */
+		/* // since a pointer had to be introduced */
+		/* entity a = module_to_dynamic_area(f); */
+		/* ram r = make_ram(f, a, UNKNOWN_RAM_OFFSET, NIL); */
+		/* storage ens = make_storage_ram(r); */
+		/* // add_C_variable_to_area() to fix the offset? */
+		/* entity_storage(e) = ens; */
+		/* free_storage(eos); */
+
+		// We could add a push_generated_variable_commenter()
+		// to explain the generation
+		push_generated_variable_commenter(outlining_patched_variable_commenter);
+                add_declaration_statement(new_body,e);
+		pop_generated_variable_commenter();
             }
         }
         if(type_variable_p(entity_type(re))) {
@@ -874,8 +909,8 @@ static void do_remove_entity_from_decl(statement s, entity e) {
     gen_remove(&statement_declarations(s),e);
 }
 
-static
-void outliner_compilation_unit(entity new_fun, list formal_parameters ) {
+static void outliner_compilation_unit(entity new_fun,
+				      list formal_parameters  __attribute__ ((unused))) {
     if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT")
             && !fortran_module_p(get_current_module_entity())){
         string outline_module_name = (string)entity_user_name(new_fun);
@@ -1239,9 +1274,11 @@ void remove_from_effective_parameters(list induction_var, list* effective_parame
 }
 
 void add_induction_var_to_local_declarations(statement* new_body, list induction_var) {
+  push_generated_variable_commenter(outlining_variable_commenter);
   FOREACH(entity, ent, induction_var) {
     *new_body = add_declaration_statement(*new_body, ent);
   }
+  pop_generated_variable_commenter();
 }
 
 /**
@@ -1281,7 +1318,8 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
     outliner_parameters(new_fun, new_body, referenced_entities, entity_to_effective_parameter, &effective_parameters, &formal_parameters);
 
     /* 4 : patch parameters */
-    if(c_module_p(get_current_module_entity()) && get_bool_property("OUTLINE_WRITTEN_SCALAR_BY_REFERENCE"))
+    if(c_module_p(get_current_module_entity())
+       && get_bool_property("OUTLINE_WRITTEN_SCALAR_BY_REFERENCE"))
       outliner_patch_parameters(statements_to_outline, referenced_entities, effective_parameters, formal_parameters, new_body, new_body, new_body);
     
     /* 5 : file */

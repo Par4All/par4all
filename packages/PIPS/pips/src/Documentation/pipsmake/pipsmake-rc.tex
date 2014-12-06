@@ -424,9 +424,13 @@ The following variables are defined to handle interprocedurality:
 \end{description}
 
 These variables are used in the rule definitions and instantiated
-before {\tt pipsmake} infers which resources are pre-requisites for a
+before \texttt{pipsmake} infers which resources are pre-requisites for a
 rule.
 
+The environment variable \verb|PIPS_IGNORE_FUNCTION_RX| is taken as
+a regular expression to filter out unwanted functions, such as
+static inline functions which arise in some standard header files
+from time to time.
 
 \section{Properties}
 
@@ -538,7 +542,7 @@ use this obsolete Fortran feature anymore.
 \index{Logging}
 
 With
-\begin{PipsProp}{LOG_TIMING}
+\begin{PipsProp}{LOG_TIMINGS}
 LOG_TIMINGS FALSE
 \end{PipsProp}
 it is possible to display the amount of real, cpu and system times
@@ -1078,7 +1082,7 @@ to true when dealing with new sources files. \Pips{} is not designed to
 process non-standard source code. Bugs in source files are not well
 explained or localized. They can result in weird behaviors and
 inexpected core dumps. Before complaining about \Pips{}, it is higly
-recommended to set this property to \verb|TRUE|. 
+recommended to set this property to \verb|TRUE|.
 
 Note: the C and Fortran syntactic verifications could be controlled by
 a unique property.
@@ -1864,7 +1868,7 @@ source file extension.
 Some properties useful (have a look at \PROPERTIES) to deal with
 a C program are
 \begin{alltt}
-PRETTYPRINT_C_CODE TRUE
+PRETTYPRINT_C_CODE TRUE (obsolete, replaced by PRETTYPRINT_LANGUAGE ``C'')
 PRETTYPRINT_STATEMENT_NUMBER FALSE
 PRETTYPRINT_BLOCK_IF_ONLY TRUE
 \end{alltt}
@@ -2800,16 +2804,16 @@ These two properties should not be true simultaneously.
 
 \section{Live Memory Access Paths}
 \label{subsection-live-memory-paths}
-\index{Effect}
+\index{Live variables}
 
 There are many cases in which it is necessary to know if a variable
 may be used in the remainder of the execution of the analyzed
 application. For instance, a global variable cannot be privatized, or
-a global array be scalarized, if we don't know whether their values
+a global array be scalarized, if we do not know whether their values
 are used afterwards, or a copy-out must be generated, which is not
 currently implemented in the simplest algorithms. Similarly,
 preconditions do not need to propagate information about variables
-which are no more alive.
+that are no longer alive.
 
 Traditional liveness analyzes deals with scalar variables. However,
 with C code, it is interesting to be able to distinguish between
@@ -2826,8 +2830,8 @@ memory paths alive in the store immediately following the statement
 execution. For sequences of instructions, the \emph{Live\_out} set of
 an instruction is equal to the \emph{Live\_in} set of the next
 instruction. However, this not true for the last statement of
-conditional or loop bodies and the first statement of the next
-instruction.
+conditional or loop bodies and the first statements of the next
+instructions.
 
 \begin{PipsPass}{live_out_summary_paths}
 \end{PipsPass}
@@ -3472,60 +3476,19 @@ RICEDG_STATISTICS_ALL_ARRAYS FALSE
 \index{Def-Use Chains}
 \index{RICE\_DATAFLOW\_DEPENDENCE\_ONLY}
 
-Only take into account true flow dependences (Def -- Use) during the
-computation of SCC?  Note that this is different from the
-CHAINS\_DATAFLOW\_DEPENDENCE\_ONLY option which doesn't compute the
-whole graph.  Warning: this option potentially yields incorrect parallel
-code.
+This property can be set to only take into account true flow
+dependences (Def -- Use) during the computation of SCC by the
+Allen\&Kennendy algorithm.
+
+Note that this is different from the
+CHAINS\_DATAFLOW\_DEPENDENCE\_ONLY property, which is set to compute a
+partial data dependence graph.
+
+Warning: if set, this property may potentially yields incorrect parallel
+code because dynamic single assignment is not guaranteed.
 
 \begin{PipsProp}{RICE_DATAFLOW_DEPENDENCE_ONLY}
 RICE_DATAFLOW_DEPENDENCE_ONLY FALSE
-\end{PipsProp}
-
-\subsubsection{Printout}
-\index{Dependence Graph}
-\index{Prettyprinter (DG)}
-\index{DG Prettyprinter}
-\index{PRINT\_DEPENDENCE\_GRAPH}
-\index{PRINT\_DEPENDENCE\_GRAPH\_WITHOUT\_PRIVATIZED\_DEPS}
-\index{PRINT\_DEPENDENCE\_GRAPH\_WITHOUT\_NOLOOPCARRIED\_DEPS}
-\index{PRINT\_DEPENDENCE\_GRAPH\_WITH\_DEPENDENCE\_CONES}
-\index{PRINT\_DEPENDENCE\_GRAPH\_USING\_SRU\_FORMAT}
-
-Here are the properties used to control the printing of dependence
-graphs in a file called {\em module\_name}.{\tt dg}. These properties
-should not be used explicitly because they are set implicitly by the
-different print-out procedures available in \verb/pipsmake.rc/. However,
-not all combinations are available from \verb/pipsmake.rc/.
-
-\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH}
-PRINT_DEPENDENCE_GRAPH FALSE
-\end{PipsProp}
-
-To print the dependence graph without the dependences on privatized
-variables
-
-\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS}
-PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS FALSE
-\end{PipsProp}
-
-To print the dependence graph without the non-loop-carried dependences:
-
-\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS}
-PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS FALSE
-\end{PipsProp}
-
-To print the dependence graph with the dependence cones:
-
-\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES}
-PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES FALSE
-\end{PipsProp}
-
-To print the dependence graph in a computer friendly format defined by
-Deborah Whitfield (SRU):
-
-\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT}
-PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT FALSE
 \end{PipsProp}
 
 \subsubsection{Optimization}
@@ -11932,6 +11895,7 @@ By default this list is empty and hence all call sites are inlined.
 
 \subsection{Outlining}
 \label{subsection-outlining}
+\index{Outlining}
 
 \begin{PipsPass}{outline}
 This documentation is a work in progress, as well as the documented
@@ -11939,11 +11903,16 @@ topic\marginpar{Serge? Still true? What do you mean?}.
 
 
 Outlining is the opposite transformation of \PipsPassRef{inlining}.
-It replaces some statements in an
-existing module by a call site to a new function whose execution is
-equivalent to the execution of the replaced statements.
-The body of the new function is similar to the piece of code replaced in the existing module.
-The user is prompted for various pieces of information in order to perform the outlining:
+%%
+It replaces some statements in an existing module by a call site to a
+new function whose execution is equivalent to the execution of the
+replaced statements.
+%%
+The body of the new function is similar to the piece of code replaced
+in the existing module.
+%%
+The user is prompted for various pieces of information in order to
+perform the outlining:
 \begin{itemize}
     \item a new module name,
     \item the statement number of the first outlined statement,
@@ -11952,8 +11921,10 @@ The user is prompted for various pieces of information in order to perform the o
 The statements are a subset of a sequence. They are counted in the
 sequence\marginpar{Serge: I invent...(FI)}.
 
-\PipsPropRef{OUTLINE_WRITTEN_SCALAR_BY_REFERENCE} controls whether we pass
-written scalar by reference or not. This property might lead to incorrect code !
+\PipsPropRef{OUTLINE_WRITTEN_SCALAR_BY_REFERENCE} controls whether we
+pass written scalar by reference or not.
+%%
+This property might lead to incorrect code !
 
 \end{PipsPass}
 
@@ -11970,11 +11941,12 @@ outline      > MODULE.code
 
 The property \PipsPropRef{OUTLINE_SMART_REFERENCE_COMPUTATION} is used
 to limit the number of entities passed by reference.
-With it, \lstinline|a[0][0]| is passed as an
-\lstinline|a[n][m]| entity, without it it is passed as an
-\lstinline|int| or \lstinline|int*| depending on the cumulated read/write memory
-effects of the outlined statements\marginpar{Serge: but cumulated
-  effects are always required?}.
+%%
+With it, \lstinline|a[0][0]| is passed as an \lstinline|a[n][m]|
+entity, without it it is passed as an \lstinline|int| or
+\lstinline|int*| depending on the cumulated read/write memory effects
+of the outlined statements\marginpar{Serge: but cumulated effects are
+  always required?}.
 
 If you need to pass the upper bound expression of a particular loop as
 a parameter, which is used in Ter@pix code generation (see Section~???), set
@@ -12008,13 +11980,20 @@ are declared into this new compilation unit\marginpar{Serge: Consistency
 new compilation unit through the sub-callgraph are declared static and
 prefixed with \PipsPropRef{OUTLINE_CALLEES_PREFIX}.
 
-Added two properties for R-Stream compatibility.
-If \PipsPropRef{OUTLINE_REMOVE_VARIABLE_RSTREAM_IMAGE} is set to True, instead of outlining
-loop indexes and written scalar variables the outliner declares them as local variables inside the
-outlined function. Therefore they are not added to the effective or formal parameters.
+Two properties were added for R-Stream compatibility.
+%%
+If \PipsPropRef{OUTLINE_REMOVE_VARIABLE_RSTREAM_IMAGE} is set to True,
+instead of outlining loop indexes and written scalar variables the
+outliner declares them as local variables inside the outlined
+function.
+%%
+Therefore they are not added to the effective or formal parameters.
 
-The behavior of \PipsPropRef{OUTLINE_REMOVE_VARIABLE_RSTREAM_SCOP} is the same as above. Except that this property
-only excludes loop indexes from being outlined. 
+The behavior of \PipsPropRef{OUTLINE_REMOVE_VARIABLE_RSTREAM_SCOP} is
+the same as above.
+%%
+Except that this property only excludes loop indexes from being
+outlined.
 
 \begin{PipsProp}{OUTLINE_MODULE_NAME}
 OUTLINE_MODULE_NAME ""
@@ -12050,17 +12029,21 @@ OUTLINE_REMOVE_VARIABLE_RSTREAM_IMAGE FALSE
 OUTLINE_REMOVE_VARIABLE_RSTREAM_SCOP FALSE
 \end{PipsProp}
 
+This pass was developped by Serge Guelton, as part of his PhD work.
 
 \subsection{Cloning}
 \index{Cloning}
 \index{TRANSFORMATION\_CLONE\_ON\_ARGUMENT}
+\index{Slicing}
 
 \begin{PipsPass}{clone}
 Procedures can be cloned to obtain several specialized versions. The
 call sites must be updated to refer to the desired version.
 
-User assisted cloning.See examples in clone validation
-suite. \marginpar{RK: terse; to be improved by FC}
+Cloning can be automatic or assisted by the user. Several examples are
+available in clone validation suite.
+
+Slicing and specialization slicing have been introduced in~\cite{AHJR2014a,AHJR2014b} and are more general than cloning. For the time being, no slicing transformation is available in \PIPS since they usually do not preserve the program semantics.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -13701,7 +13684,7 @@ the pretty printer used to produce this file.
 To view C programs, it is a good idea to select a C pretty printer, for
 example in \texttt{tpips} with:
 \begin{alltt}
-setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_C_CODE TRUE (obsolete, replaced by PRETTYPRINT_LANGUAGE ``C'')
 \end{alltt}
 
 Transformers and preconditions (and regions?) require cumulated effects
@@ -14179,7 +14162,7 @@ print_code_out_effects       > MODULE.printed_file
 \subsection{Sequential View with Live Paths}
 
 \begin{PipsPass}{print_code_live_in_paths}
-Display the code decorated with the cumulated effects.
+Display the code decorated with the live in paths.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -14191,7 +14174,7 @@ print_code_live_in_paths    > MODULE.printed_file
 \end{PipsMake}
 
 \begin{PipsPass}{print_code_live_out_paths}
-Display the code decorated with the cumulated effects.
+Display the code decorated with the live out paths.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -15982,29 +15965,33 @@ print_icfg_with_control_out_regions     > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{PipsMake}
 
-\section{Dependence Graph File}
+\section{Data Dependence Graph File}
 \label{subsection-dependence-graph-file}
-\index{DG}
-\index{Dependence Graph}
+\index{FDG}
+\index{Data Dependence Graph}
 
 \begin{PipsPass}{dg_file}
-This file shows the dependence graph.
+This file contains the data dependence graph.
 
 Known bug: there is no precise relationship between the dependence graph
-seen by the parallelization algorithm selected and any of its view...
+seen by the parallelization algorithms selected and any of its many views...
 \end{PipsPass}
 
-Two formats are available: the default format which includes
+Two text formats are available: the default format which includes
 dependence cone and a SRU format which packs all information about one
 arc on one line and which replaces the dependence cone by the
 dependence direction vector (DDV). The line numbers given with this
 format are in fact relative (approximatively...) to the statement line
-in the \Pips{} output.  The SRU format was defined with researchers at
-Slippery Rock University (PA). The property
+in the \Pips{} output.
+
+The SRU format was defined with researchers at Slippery Rock
+University (PA). The property
 \begin{center}
 \PipsPropRef{PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT}
 \end{center}
 is set to FALSE by default.
+
+Two graph format, daVinci and GraphViz, are also available.
 
 \subsection{Menu For Dependence Graph Views}
 
@@ -16014,12 +16001,12 @@ alias dg_file 'Dependence Graph View'
 alias   print_effective_dependence_graph    'Default'
 alias   print_loop_carried_dependence_graph 'Loop Carried Only'
 alias   print_whole_dependence_graph        'All arcs'
-alias   print_chains_graph                  'Chains'
-alias   print_dot_chains_graph              'Chains (for dot)'
-alias   print_dot_dependence_graph          'Dependence graph (for dot)'
 alias   print_filtered_dependence_graph     'Filtered Arcs'
 alias   print_filtered_dependence_daVinci_graph   'Filtered Arcs Output to uDrawGraph'
 alias   impact_check                        'Check alias impact'
+alias   print_chains_graph                  'Chains'
+alias   print_dot_chains_graph              'Chains (for dot)'
+alias   print_dot_dependence_graph          'Dependence graph (for dot)'
 \end{PipsMake}
 
 \subsection{Effective Dependence Graph View}
@@ -16095,12 +16082,15 @@ print_filtered_dependence_daVinci_graph          > MODULE.dvdg_file
         < MODULE.dg
 \end{PipsMake}
 
-\subsection{Filtered Dependence Graph View}
+\subsection{Impact Check}
 
 \begin{PipsPass}{impact_check}
 Check impact of alias on the dependance graph.\marginpar{RK: What is
-that? FI: Maybe, we should sign how contributions? See validation?}
+that? FI: Maybe, we should sign our contributions? See validation?}
 \end{PipsPass}
+
+Note: the signature of the pass implies that it is a transformation
+pass, not a display pass. The location of its description is wrong.
 
 \begin{PipsMake}
 impact_check    > MODULE.code
@@ -16118,13 +16108,17 @@ impact_check    > MODULE.code
 \subsection{Chains Graph View}
 
 \begin{PipsPass}{print_chains_graph}
-Display the chains graph in a textual format. The following properties control
-the output :
+Display the def-use or chains graph in a textual format. The following
+properties control the output:
 
 \PipsPropRef{PRINT_DEPENDENCE_GRAPH}
+
 \PipsPropRef{PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS}
+
 \PipsPropRef{PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS}
+
 \PipsPropRef{PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES}
+
 \PipsPropRef{PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT}
 
 \end{PipsPass}
@@ -16151,7 +16145,7 @@ print_dot_chains_graph  > MODULE.dotdg_file
 \end{PipsMake}
 
 
-\subsection{Dependence Graph Graphviz Dot View}
+\subsection{Data Dependence Graph Graphviz Dot View}
 
 \begin{PipsPass}{print_dot_dependence_graph}
 Display the dependence graph in graphviz dot format.
@@ -16166,7 +16160,8 @@ w = workspace(...)
 w.fun.my_function_name.view_dg()
 \end{lstlisting}
 
-which will produce in current directory a file named my\_function\_name.png.
+\noindent
+which generate in the current directory a file named my\_function\_name.png.
 
 \end{PipsPass}
 
@@ -16176,6 +16171,52 @@ print_dot_dependence_graph          > MODULE.dotdg_file
         < MODULE.code
         < MODULE.dg
 \end{PipsMake}
+
+\subsubsection{Properties Used to Select Arcs to Display}
+\index{Data Dependence Graph}
+\index{Prettyprinter (DDG)}
+\index{DDG Prettyprinter}
+\index{PRINT\_DEPENDENCE\_GRAPH}
+\index{PRINT\_DEPENDENCE\_GRAPH\_WITHOUT\_PRIVATIZED\_DEPS}
+\index{PRINT\_DEPENDENCE\_GRAPH\_WITHOUT\_NOLOOPCARRIED\_DEPS}
+\index{PRINT\_DEPENDENCE\_GRAPH\_WITH\_DEPENDENCE\_CONES}
+\index{PRINT\_DEPENDENCE\_GRAPH\_USING\_SRU\_FORMAT}
+
+Here are the properties used to control the printing of dependence
+graphs in a file called {\em module\_name}.{\tt dg}. These properties
+should not be used explicitly because they are set implicitly by the
+different print-out procedures available in \verb/pipsmake.rc/. However,
+not all combinations are available from \verb/pipsmake.rc/.
+
+\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH}
+PRINT_DEPENDENCE_GRAPH FALSE
+\end{PipsProp}
+
+To print the dependence graph without the dependences on privatized
+variables
+
+\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS}
+PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS FALSE
+\end{PipsProp}
+
+To print the dependence graph without the non-loop-carried dependences:
+
+\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS}
+PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS FALSE
+\end{PipsProp}
+
+To print the dependence graph with the dependence cones:
+
+\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES}
+PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES FALSE
+\end{PipsProp}
+
+To print the dependence graph in a computer friendly format defined by
+Deborah Whitfield (SRU):
+
+\begin{PipsProp}{PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT}
+PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT FALSE
+\end{PipsProp}
 
 \subsection{Properties for Dot output}
 

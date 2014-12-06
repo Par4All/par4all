@@ -40,6 +40,9 @@
 
 /* for debug 
 */
+// functions that can be pointed by effect_consistent_p_func:
+// effect_consistent_p
+// region_consistent_p
 #define pips_debug_effect(level, message, eff) \
   ifdebug(level) { pips_debug(level, "%s\n", message); \
   (*effect_consistent_p_func)(eff); \

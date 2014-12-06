@@ -191,15 +191,14 @@ void simple_cell_to_simple_cell_conversion(cell input_cell,
   locations generated.
 */
 list eval_simple_cell_with_points_to(cell c, descriptor __attribute__ ((unused)) d,
-				     list ptl, bool *exact_p,
-				     transformer __attribute__ ((unused)) t)
+    list ptl, bool *exact_p,
+    transformer __attribute__ ((unused)) t)
 {
-
   return generic_eval_cell_with_points_to(c, descriptor_undefined, ptl, exact_p,
-					  transformer_undefined,
-					  simple_cell_reference_preceding_p,
-					  simple_cell_reference_with_address_of_cell_reference_translation,
-					  simple_reference_to_simple_reference_conversion);
+      transformer_undefined,
+      simple_cell_reference_preceding_p,
+      simple_cell_reference_with_address_of_cell_reference_translation,
+      simple_reference_to_simple_reference_conversion);
 }
 
 
@@ -210,41 +209,49 @@ list simple_effect_to_constant_path_effects_with_pointer_values(effect eff)
   reference ref = effect_any_reference(eff);
 
   if (effect_reference_dereferencing_p(ref, &exact_p))
-    {
-      pips_debug(8, "dereferencing case \n");
-      bool exact_p = false;
-      list l_pv = cell_relations_list( load_pv(effects_private_current_stmt_head()) );
-      pv_context ctxt = make_simple_pv_context();
-      list l_aliased = effect_find_aliased_paths_with_pointer_values(eff, l_pv, &ctxt);
-      pips_debug_effects(8, "aliased effects\n", l_aliased);
-      reset_pv_context(&ctxt);
+  {
+    pips_debug(8, "dereferencing case \n");
+    bool exact_p = false;
+    list l_pv = cell_relations_list( load_pv(effects_private_current_stmt_head()) );
+    pv_context ctxt = make_simple_pv_context();
+    list l_aliased = effect_find_aliased_paths_with_pointer_values(eff, l_pv, &ctxt);
+    pips_debug_effects(8, "aliased effects\n", l_aliased);
+    reset_pv_context(&ctxt);
 
-      FOREACH(EFFECT, eff_alias, l_aliased)
-	{
-	  entity ent_alias = effect_entity(eff_alias);
-	  if (undefined_pointer_value_entity_p(ent_alias)
-	      || null_pointer_value_entity_p(ent_alias))
-	    {
-	      // currently interpret them as anywhere effects since these values
-	      // are not yet well integrated in abstract locations lattice
-	      // and in effects computations
-	      // to be FIXED later.
-	      le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff_alias))), le);
-	      free_effect(eff_alias);
-	    }
-	  else if (entity_abstract_location_p(effect_entity(eff_alias))
-	      || !effect_reference_dereferencing_p(effect_any_reference(eff_alias), &exact_p))
-	    le = CONS(EFFECT, eff_alias, le); /* it should be a union here.
-						 However, we expect the caller
-						 to perform the contraction afterwards. */
-	  else
-	    free_effect(eff_alias);
-	}
-      gen_free_list(l_aliased);
+    FOREACH(EFFECT, eff_alias, l_aliased)
+    {
+      entity ent_alias = effect_entity(eff_alias);
+      if (undefined_pointer_value_entity_p(ent_alias)
+          || null_pointer_value_entity_p(ent_alias))
+      {
+        // currently interpret them as anywhere effects since these values
+        // are not yet well integrated in abstract locations lattice
+        // and in effects computations
+        // to be FIXED later.
+        le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff_alias))), le);
+        free_effect(eff_alias);
+      }
+      else if (entity_abstract_location_p(effect_entity(eff_alias))
+          || !effect_reference_dereferencing_p(effect_any_reference(eff_alias), &exact_p)) {
+        le = CONS(EFFECT, eff_alias, le);
+        /* it should be a union here.
+         * However, we expect the caller
+         * to perform the contraction afterwards. */
+      }
+      else
+        free_effect(eff_alias);
     }
-  else
+    gen_free_list(l_aliased);
+  }
+  else {
+    // functions that can be pointed by effect_dup_func:
+    // simple_effect_dup
+    // region_dup
+    // copy_effect
     le = CONS(EFFECT, (*effect_dup_func)(eff), le);
- return le;
+  }
+
+  return le;
 }
 
 list simple_effect_to_constant_path_effects_with_points_to(effect eff)
@@ -258,38 +265,38 @@ list simple_effect_to_constant_path_effects_with_points_to(effect eff)
   points_to_list ptl = load_pt_to_list(effects_private_current_stmt_head());
   if(!points_to_list_bottom(ptl)) {
     if (effect_reference_dereferencing_p(ref, &exact_p))
-      {
-	pips_debug(8, "dereferencing case \n");
-	bool exact_p = false;
-	transformer context;
-	if (effects_private_current_context_empty_p())
-	  context = transformer_undefined;
-	else {
-	  context = effects_private_current_context_head();
-	}
-
-	list l_eval = eval_simple_cell_with_points_to(effect_cell(eff), effect_descriptor(eff),
-						      points_to_list_list(ptl),
-						      &exact_p, context);
-	if (ENDP(l_eval))
-	  {
-	    pips_debug(8, "no equivalent constant path found -> anywhere effect\n");
-	    /* We have not found any equivalent constant path : it may point anywhere */
-	    /* We should maybe contract these effects later. Is it done by the callers ? */
-	    // le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), le);
-	    le = NIL; // A translation failure means an execution
-	    // failure, at least according to the standard
-	  }
-	else
-	  {
-	    /* change the resulting effects action to the current effect action */
-	    if (effect_read_p(eff))
-	      effects_to_read_effects(l_eval);
-	    if (effect_may_p(eff))
-	      effects_to_may_effects(l_eval);
-	    le = gen_nconc(l_eval,le);
-	  }
+    {
+      pips_debug(8, "dereferencing case \n");
+      bool exact_p = false;
+      transformer context;
+      if (effects_private_current_context_empty_p())
+        context = transformer_undefined;
+      else {
+        context = effects_private_current_context_head();
       }
+
+      list l_eval = eval_simple_cell_with_points_to(effect_cell(eff), effect_descriptor(eff),
+          points_to_list_list(ptl),
+          &exact_p, context);
+      if (ENDP(l_eval))
+      {
+        pips_debug(8, "no equivalent constant path found -> anywhere effect\n");
+        /* We have not found any equivalent constant path : it may point anywhere */
+        /* We should maybe contract these effects later. Is it done by the callers ? */
+        // le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), le);
+        le = NIL; // A translation failure means an execution
+        // failure, at least according to the standard
+      }
+      else
+      {
+        /* change the resulting effects action to the current effect action */
+        if (effect_read_p(eff))
+          effects_to_read_effects(l_eval);
+        if (effect_may_p(eff))
+          effects_to_may_effects(l_eval);
+        le = gen_nconc(l_eval,le);
+      }
+    }
     else
       le = CONS(EFFECT, copy_effect(eff), le);
   }

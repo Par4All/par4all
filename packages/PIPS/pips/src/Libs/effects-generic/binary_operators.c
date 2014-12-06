@@ -72,72 +72,76 @@
           concrete locations.
  */
 static list effects_generic_union_op(effect eff1, effect eff2,
-				     bool eff1_abstract_location_p,
-				     bool eff2_abstract_location_p,
-				     bool *eff1_still_combinable_p,
-				     bool *eff2_still_combinable_p,
-				     list (*concrete_effects_union_op)(effect,effect))
+    bool eff1_abstract_location_p,
+    bool eff2_abstract_location_p,
+    bool *eff1_still_combinable_p,
+    bool *eff2_still_combinable_p,
+    list (*concrete_effects_union_op)(effect,effect))
 {
   list l_res = NIL;
 
   ifdebug(1)
-    pips_assert("eff1 and eff2 must be still combinable",
-		*eff1_still_combinable_p && *eff2_still_combinable_p);
+  pips_assert("eff1 and eff2 must be still combinable",
+      *eff1_still_combinable_p && *eff2_still_combinable_p);
 
   pips_debug_effect(8, "eff1: \n", eff1);
   pips_debug_effect(8, "eff2: \n", eff2);
 
   if (eff1_abstract_location_p && eff2_abstract_location_p)
-    {
-      entity al1 = effect_entity(eff1);
-      entity al2 = effect_entity(eff2);
+  {
+    entity al1 = effect_entity(eff1);
+    entity al2 = effect_entity(eff2);
 
-      if (same_entity_p(al1, al2)) /* currently most common case */
-	{
-	  *eff1_still_combinable_p = false;
-	  *eff2_still_combinable_p = false;
-	  l_res = CONS(EFFECT, (*effect_dup_func)(eff1), l_res);
-	}
+    if (same_entity_p(al1, al2)) /* currently most common case */
+    {
+      *eff1_still_combinable_p = false;
+      *eff2_still_combinable_p = false;
+      // functions that can be pointed by effect_dup_func:
+      // simple_effect_dup
+      // region_dup
+      // copy_effect
+      l_res = CONS(EFFECT, (*effect_dup_func)(eff1), l_res);
+    }
+    else
+    {
+      // the result is the max of the two abstract locations, which is one
+      // of them; we remove the lowest from it's list, and keep the
+      // highest for potential combination with another effect.
+      // There is no need to add it in the result list, since
+      // it will belong to the remnants of one of the initial list
+      // and as such be appended to the final result list.
+
+      entity al_max = abstract_locations_max(al1, al2);
+      if (same_entity_p(al1, al_max))
+      {
+        /* *eff1_still_combinable_p = true; (redundant) */
+        *eff2_still_combinable_p = false;
+      }
       else
-	{
-	  // the result is the max of the two abstract locations, which is one
-	  // of them; we remove the lowest from it's list, and keep the
-	  // highest for potential combination with another effect.
-	  // There is no need to add it in the result list, since
-	  // it will belong to the remnants of one of the initial list
-	  // and as such be appended to the final result list.
-
-	  entity al_max = abstract_locations_max(al1, al2);
-	  if (same_entity_p(al1, al_max))
-	    {
-	      /* *eff1_still_combinable_p = true; (redundant) */
-	      *eff2_still_combinable_p = false;
-	    }
-	  else
-	    {
-	      ifdebug(1) pips_assert("combinable abstract locations: one of them is the max of both",
-				     same_entity_p(al2, al_max));
-	      *eff1_still_combinable_p = false;
-	      /* *eff2_still_combinable_p = true; (redundant) */
-	    }
-	}
+      {
+        ifdebug(1) pips_assert("combinable abstract locations: one of them is the max of both",
+            same_entity_p(al2, al_max));
+        *eff1_still_combinable_p = false;
+        /* *eff2_still_combinable_p = true; (redundant) */
+      }
     }
+  }
   else if (eff1_abstract_location_p) /* and eff2 concrete location */
-    {
-      /* *eff1_still_combinable_p = true;  (redundant) */
-      *eff2_still_combinable_p = false;
-    }
+  {
+    /* *eff1_still_combinable_p = true;  (redundant) */
+    *eff2_still_combinable_p = false;
+  }
   else if (eff2_abstract_location_p) /* and eff1 concrete location */
-    {
-      *eff1_still_combinable_p = false;
-      /* *eff2_still_combinable_p = true;  (redundant) */
-    }
+  {
+    *eff1_still_combinable_p = false;
+    /* *eff2_still_combinable_p = true;  (redundant) */
+  }
   else /* two concrete locations */
-    {
-      l_res = gen_nconc((*concrete_effects_union_op)(eff1,eff2), l_res);
-      *eff1_still_combinable_p = false;
-      *eff2_still_combinable_p = false;
-    }
+  {
+    l_res = gen_nconc((*concrete_effects_union_op)(eff1,eff2), l_res);
+    *eff1_still_combinable_p = false;
+    *eff2_still_combinable_p = false;
+  }
 
   pips_debug_effects(8, "returning:\n", l_res);
   return l_res;
@@ -162,78 +166,98 @@ static list effects_generic_union_op(effect eff1, effect eff2,
           concrete locations.
  */
 static list effects_generic_intersection_op(effect eff1, effect eff2,
-				     bool eff1_abstract_location_p,
-				     bool eff2_abstract_location_p,
-				     bool *eff1_still_combinable_p,
-				     bool *eff2_still_combinable_p,
-				     list (*concrete_effects_intersection_op)(effect,effect))
+    bool eff1_abstract_location_p,
+    bool eff2_abstract_location_p,
+    bool *eff1_still_combinable_p,
+    bool *eff2_still_combinable_p,
+    list (*concrete_effects_intersection_op)(effect,effect))
 {
   list l_res = NIL;
 
   ifdebug(1)
-    pips_assert("eff1 and eff2 must be still combinable",
-		*eff1_still_combinable_p && *eff2_still_combinable_p);
+  pips_assert("eff1 and eff2 must be still combinable",
+      *eff1_still_combinable_p && *eff2_still_combinable_p);
 
   pips_debug_effect(8, "eff1: \n", eff1);
   pips_debug_effect(8, "eff2: \n", eff2);
 
 
   if (eff1_abstract_location_p && eff2_abstract_location_p)
-    {
-      entity al1 = effect_entity(eff1);
-      entity al2 = effect_entity(eff2);
+  {
+    entity al1 = effect_entity(eff1);
+    entity al2 = effect_entity(eff2);
 
-      if (same_entity_p(al1, al2)) /* currently most common case */
-	{
-	  effect r = (*effect_dup_func)(eff1);
-	  *eff1_still_combinable_p = false;
-	  *eff2_still_combinable_p = false;
-	  l_res = CONS(EFFECT, r, l_res);
-	}
-      else
-	{
-	  entity al_max = abstract_locations_max(al1, al2);
-
-	  if (same_entity_p(al1, al_max))
-	    {
-	      effect r = (*effect_dup_func)(eff2);
-	      /* *eff1_still_combinable_p = true; (redundant) */
-	      *eff2_still_combinable_p = false;
-	      l_res = CONS(EFFECT, r, l_res);
-	    }
-	  else
-	    {
-	      ifdebug(1) pips_assert("combinable abstract locations: one of them is the max of both",
-				     same_entity_p(al2, al_max));
-	      effect r = (*effect_dup_func)(eff1);
-	      *eff1_still_combinable_p = false;
-	      /* *eff2_still_combinable_p = true; (redundant) */
-	      l_res = CONS(EFFECT, r, l_res);
-	    }
-	}
-    }
-  else if (eff1_abstract_location_p) /* and r2 concrete location */
+    if (same_entity_p(al1, al2)) /* currently most common case */
     {
-      effect r = (*effect_dup_func)(eff2);
-      effect_to_may_effect(r);
-      /* *eff1_still_combinable_p = true;  (redundant) */
-      *eff2_still_combinable_p = false;
-      l_res = CONS(EFFECT, r, l_res);
-    }
-  else if (eff2_abstract_location_p) /* and r1 concrete location */
-    {
+      // functions that can be pointed by effect_dup_func:
+      // simple_effect_dup
+      // region_dup
+      // copy_effect
       effect r = (*effect_dup_func)(eff1);
-      effect_to_may_effect(r);
-      *eff1_still_combinable_p = false;
-      /* *eff2_still_combinable_p = true;  (redundant) */
-      l_res = CONS(EFFECT, r, l_res);
-    }
-  else /* two concrete locations */
-    {
-      l_res = gen_nconc((*concrete_effects_intersection_op)(eff1,eff2), l_res);
       *eff1_still_combinable_p = false;
       *eff2_still_combinable_p = false;
+      l_res = CONS(EFFECT, r, l_res);
     }
+    else
+    {
+      entity al_max = abstract_locations_max(al1, al2);
+
+      if (same_entity_p(al1, al_max))
+      {
+        // functions that can be pointed by effect_dup_func:
+        // simple_effect_dup
+        // region_dup
+        // copy_effect
+        effect r = (*effect_dup_func)(eff2);
+        /* *eff1_still_combinable_p = true; (redundant) */
+        *eff2_still_combinable_p = false;
+        l_res = CONS(EFFECT, r, l_res);
+      }
+      else
+      {
+        ifdebug(1) pips_assert("combinable abstract locations: one of them is the max of both",
+            same_entity_p(al2, al_max));
+        // functions that can be pointed by effect_dup_func:
+        // simple_effect_dup
+        // region_dup
+        // copy_effect
+        effect r = (*effect_dup_func)(eff1);
+        *eff1_still_combinable_p = false;
+        /* *eff2_still_combinable_p = true; (redundant) */
+        l_res = CONS(EFFECT, r, l_res);
+      }
+    }
+  }
+  else if (eff1_abstract_location_p) /* and r2 concrete location */
+  {
+    // functions that can be pointed by effect_dup_func:
+    // simple_effect_dup
+    // region_dup
+    // copy_effect
+    effect r = (*effect_dup_func)(eff2);
+    effect_to_may_effect(r);
+    /* *eff1_still_combinable_p = true;  (redundant) */
+    *eff2_still_combinable_p = false;
+    l_res = CONS(EFFECT, r, l_res);
+  }
+  else if (eff2_abstract_location_p) /* and r1 concrete location */
+  {
+    // functions that can be pointed by effect_dup_func:
+    // simple_effect_dup
+    // region_dup
+    // copy_effect
+    effect r = (*effect_dup_func)(eff1);
+    effect_to_may_effect(r);
+    *eff1_still_combinable_p = false;
+    /* *eff2_still_combinable_p = true;  (redundant) */
+    l_res = CONS(EFFECT, r, l_res);
+  }
+  else /* two concrete locations */
+  {
+    l_res = gen_nconc((*concrete_effects_intersection_op)(eff1,eff2), l_res);
+    *eff1_still_combinable_p = false;
+    *eff2_still_combinable_p = false;
+  }
 
   pips_debug_effects(8, "returning:\n", l_res);
   return l_res;
@@ -259,65 +283,69 @@ static list effects_generic_intersection_op(effect eff1, effect eff2,
           concrete locations.
  */
 static list effects_generic_sup_difference_op(effect eff1, effect eff2,
-				     bool eff1_abstract_location_p,
-				     bool eff2_abstract_location_p,
-				     bool *eff1_still_combinable_p,
-				     bool *eff2_still_combinable_p,
-				     list (*concrete_effects_sup_difference_op)(effect,effect))
+    bool eff1_abstract_location_p,
+    bool eff2_abstract_location_p,
+    bool *eff1_still_combinable_p,
+    bool *eff2_still_combinable_p,
+    list (*concrete_effects_sup_difference_op)(effect,effect))
 {
   list l_res = NIL;
 
   ifdebug(1)
-    pips_assert("eff1 and eff2 must be still combinable",
-		*eff1_still_combinable_p && *eff2_still_combinable_p);
+  pips_assert("eff1 and eff2 must be still combinable",
+      *eff1_still_combinable_p && *eff2_still_combinable_p);
 
   pips_debug_effect(8, "eff1: \n", eff1);
   pips_debug_effect(8, "eff2: \n", eff2);
 
   if (eff1_abstract_location_p || eff2_abstract_location_p)
-    {
-      effect_to_may_effect(eff1);
+  {
+    effect_to_may_effect(eff1);
 
-      if (eff1_abstract_location_p && eff2_abstract_location_p)
-	{
-	  entity al1 = effect_entity(eff1);
-	  entity al2 = effect_entity(eff2);
-	  if (same_entity_p(al1, al2))
-	    *eff1_still_combinable_p = *eff2_still_combinable_p = false;
-	  else
-	    {
-	      entity al_max = abstract_locations_max(al1, al2);
-	      if (same_entity_p(al1, al_max)) /* r2 is strictly less than r1 */
-		{
-		  /* *eff1_still_combinable_p = true; redundant */
-		  *eff2_still_combinable_p = false;
-		}
-	      else /* r1 is strictly less than r2 */
-		{
-		  ifdebug(1) pips_assert("combinable abstract locations: one of them is the max of both",
-					 same_entity_p(al2, al_max));
-		  *eff1_still_combinable_p = false;
-		  /* *eff2_still_combinable_p = true; redundant */
-		}
-	    }
-	}
-      else
-	{
-	  *eff1_still_combinable_p = eff1_abstract_location_p;
-	  *eff2_still_combinable_p = eff2_abstract_location_p;
-	}
-      if (!*eff1_still_combinable_p)
-	{
-	  l_res = CONS(EFFECT, (*effect_dup_func)(eff1), l_res); /* add it now to the result */
-	}
-      /* else it will be added later, since it is still combinable */
-    }
-  else /* two concrete locations */
+    if (eff1_abstract_location_p && eff2_abstract_location_p)
     {
-      l_res = gen_nconc((*concrete_effects_sup_difference_op)(eff1,eff2), l_res);
-      *eff1_still_combinable_p = false;
-      *eff2_still_combinable_p = false;
+      entity al1 = effect_entity(eff1);
+      entity al2 = effect_entity(eff2);
+      if (same_entity_p(al1, al2))
+        *eff1_still_combinable_p = *eff2_still_combinable_p = false;
+      else
+      {
+        entity al_max = abstract_locations_max(al1, al2);
+        if (same_entity_p(al1, al_max)) /* r2 is strictly less than r1 */
+        {
+          /* *eff1_still_combinable_p = true; redundant */
+          *eff2_still_combinable_p = false;
+        }
+        else /* r1 is strictly less than r2 */
+        {
+          ifdebug(1) pips_assert("combinable abstract locations: one of them is the max of both",
+              same_entity_p(al2, al_max));
+          *eff1_still_combinable_p = false;
+          /* *eff2_still_combinable_p = true; redundant */
+        }
+      }
     }
+    else
+    {
+      *eff1_still_combinable_p = eff1_abstract_location_p;
+      *eff2_still_combinable_p = eff2_abstract_location_p;
+    }
+    if (!*eff1_still_combinable_p)
+    {
+      // functions that can be pointed by effect_dup_func:
+      // simple_effect_dup
+      // region_dup
+      // copy_effect
+      l_res = CONS(EFFECT, (*effect_dup_func)(eff1), l_res); /* add it now to the result */
+    }
+    /* else it will be added later, since it is still combinable */
+  }
+  else /* two concrete locations */
+  {
+    l_res = gen_nconc((*concrete_effects_sup_difference_op)(eff1,eff2), l_res);
+    *eff1_still_combinable_p = false;
+    *eff2_still_combinable_p = false;
+  }
 
   pips_debug_effects(8, "returning:\n", l_res);
   return l_res;
@@ -342,64 +370,64 @@ static list effects_generic_sup_difference_op(effect eff1, effect eff2,
           concrete locations.
  */
 static list effects_generic_inf_difference_op(effect eff1, effect eff2,
-				     bool eff1_abstract_location_p,
-				     bool eff2_abstract_location_p,
-				     bool *eff1_still_combinable_p,
-				     bool *eff2_still_combinable_p,
-				     list (*concrete_effects_inf_difference_op)(effect,effect))
+    bool eff1_abstract_location_p,
+    bool eff2_abstract_location_p,
+    bool *eff1_still_combinable_p,
+    bool *eff2_still_combinable_p,
+    list (*concrete_effects_inf_difference_op)(effect,effect))
 {
   list l_res = NIL;
 
   ifdebug(1)
-    pips_assert("eff1 and eff2 must be still combinable",
-		*eff1_still_combinable_p && *eff2_still_combinable_p);
+  pips_assert("eff1 and eff2 must be still combinable",
+      *eff1_still_combinable_p && *eff2_still_combinable_p);
 
   pips_debug_effect(8, "eff1: \n", eff1);
   pips_debug_effect(8, "eff2: \n", eff2);
 
   if (eff1_abstract_location_p || eff2_abstract_location_p)
-    {
-      /* return a NIL list */
-      /* *eff1 is not combinable anymore, because we have already found out that something
-	 must be removed from it
-      */
-      *eff1_still_combinable_p = false;
+  {
+    /* return a NIL list */
+    /* *eff1 is not combinable anymore, because we have already found out that something
+     * must be removed from it
+     */
+    *eff1_still_combinable_p = false;
 
-      if (eff1_abstract_location_p && eff2_abstract_location_p)
-	{
-	  entity al1 = effect_entity(eff1);
-	  entity al2 = effect_entity(eff2);
-	  if (same_entity_p(al1, al2))
-	    *eff2_still_combinable_p = false;
-	  else
-	    {
-	      entity al_max = abstract_locations_max(al1, al2);
-	      if (same_entity_p(al1, al_max)) /* r2 is strictly less than r1 */
-		{
-		  /* *eff1_still_combinable_p = true; redundant */
-		  *eff2_still_combinable_p = false;
-		}
-	      else /* r1 is strictly less than r2 */
-		{
-		  ifdebug(1) pips_assert("combinable abstract locations: one of them is the max of both",
-					 same_entity_p(al2, al_max));
-		  /* *eff1_still_combinable_p = false; redundant */
-		  /* *eff2_still_combinable_p = true; redundant */
-		}
-	    }
-	}
-      else
-	{
-	  /* *eff1_still_combinable_p = eff1_abstract_location_p; redundant */
-	  *eff2_still_combinable_p = eff2_abstract_location_p;
-	}
-    }
-  else /* two concrete locations */
+    if (eff1_abstract_location_p && eff2_abstract_location_p)
     {
-      l_res = gen_nconc((*concrete_effects_inf_difference_op)(eff1,eff2), l_res);
-      *eff1_still_combinable_p = false;
-      *eff2_still_combinable_p = false;
+      entity al1 = effect_entity(eff1);
+      entity al2 = effect_entity(eff2);
+      if (same_entity_p(al1, al2))
+        *eff2_still_combinable_p = false;
+      else
+      {
+        entity al_max = abstract_locations_max(al1, al2);
+        if (same_entity_p(al1, al_max)) /* r2 is strictly less than r1 */
+        {
+          /* *eff1_still_combinable_p = true; redundant */
+          *eff2_still_combinable_p = false;
+        }
+        else /* r1 is strictly less than r2 */
+        {
+          ifdebug(1) pips_assert("combinable abstract locations: one of them is the max of both",
+              same_entity_p(al2, al_max));
+          /* *eff1_still_combinable_p = false; redundant */
+          /* *eff2_still_combinable_p = true; redundant */
+        }
+      }
     }
+    else
+    {
+      /* *eff1_still_combinable_p = eff1_abstract_location_p; redundant */
+      *eff2_still_combinable_p = eff2_abstract_location_p;
+    }
+  }
+  else /* two concrete locations */
+  {
+    l_res = gen_nconc((*concrete_effects_inf_difference_op)(eff1,eff2), l_res);
+    *eff1_still_combinable_p = false;
+    *eff2_still_combinable_p = false;
+  }
 
   pips_debug_effects(8, "returning:\n", l_res);
   return l_res;
@@ -451,97 +479,97 @@ list_of_effects_generic_binary_op(
     list (*r1_unary_op)(effect),
     list (*r2_unary_op)(effect))
 {
-    list l_res = NIL;
-    bool fortran_p = fortran_module_p(get_current_module_entity()); // no need to test for abstract locations
+  list l_res = NIL;
+  bool fortran_p = fortran_module_p(get_current_module_entity()); // no need to test for abstract locations
 
-    debug_on("EFFECTS_OPERATORS_DEBUG_LEVEL");
+  debug_on("EFFECTS_OPERATORS_DEBUG_LEVEL");
 
-    pips_debug_effects(1, "Initial effects : \n\t l1 :\n", l1);
-    pips_debug_effects(1, "\t l2 :\n", l2);
+  pips_debug_effects(1, "Initial effects : \n\t l1 :\n", l1);
+  pips_debug_effects(1, "\t l2 :\n", l2);
 
 
-    /* we first deal with the effects of l1 : those that are combinable with
-     * the effects of l2, and the others, which we call the remnants of l1 */
-    FOREACH(EFFECT, r1, l1)
+  /* we first deal with the effects of l1 : those that are combinable with
+   * the effects of l2, and the others, which we call the remnants of l1 */
+  FOREACH(EFFECT, r1, l1)
+  {
+    list lr2 = l2;
+    list prec_lr2 = NIL;
+    bool r1_still_combinable_p = true;
+    bool r1_abstract_location_p = fortran_p? false : effect_abstract_location_p(r1);
+
+    pips_debug_effect(8, "r1: %s\n", r1);
+
+    while(r1_still_combinable_p && !ENDP(lr2))
+    {
+      effect r2 = EFFECT(CAR(lr2));
+      bool r2_still_combinable_p = true;
+      bool r2_abstract_location_p = fortran_p? false : effect_abstract_location_p(r2);
+
+      pips_debug_effect(8, "r2: \n", r2);
+
+      if ( (*r1_r2_combinable_p)(r1,r2) )
       {
-	list lr2 = l2;
-	list prec_lr2 = NIL;
-	bool r1_still_combinable_p = true;
-	bool r1_abstract_location_p = fortran_p? false : effect_abstract_location_p(r1);
+        pips_debug(8, "combinable\n");
 
-	pips_debug_effect(8, "r1: %s\n", r1);
-
-	while(r1_still_combinable_p && !ENDP(lr2))
-	  {
-	    effect r2 = EFFECT(CAR(lr2));
-	    bool r2_still_combinable_p = true;
-	    bool r2_abstract_location_p = fortran_p? false : effect_abstract_location_p(r2);
-
-	    pips_debug_effect(8, "r2: \n", r2);
-
-	    if ( (*r1_r2_combinable_p)(r1,r2) )
-	      {
-		pips_debug(8, "combinable\n");
-
-		list l_tmp = (*r1_r2_generic_binary_op)(r1, r2,
-							r1_abstract_location_p,
-							r2_abstract_location_p,
-							&r1_still_combinable_p,
-							&r2_still_combinable_p,
-							r1_r2_concrete_binary_op);
-		l_res = gen_nconc(l_tmp, l_res);
-		if (!r2_still_combinable_p) /* remove it from l2 */
-		  {
-		    list new_lr2 = CDR(lr2);
-		    /* gen_remove(&l2, EFFECT(CAR(lr2))); */
-		    if (prec_lr2 != NIL)
-		      CDR(prec_lr2) = CDR(lr2);
-		    else
-		      l2 = CDR(lr2);
-		    free_effect(r2); r2=effect_undefined;
-		    CDR(lr2) = NIL;
-		    free(lr2);
-		    lr2 = new_lr2;
-		  }
-		else
-		  {
-		    prec_lr2 = lr2;
-		    lr2 = CDR(lr2);
-		  }
-	      } /* if (*r1_r2_combinable_p)() */
-	    else
-	      {
-		pips_debug(8,"not combinable\n");
-		prec_lr2 = lr2;
-		lr2 = CDR(lr2);
-	      }
-	  } /* while (r1_still_combinable_p && !ENDP(lr2))*/
-
-	if (r1_still_combinable_p)
-	  l_res = gen_nconc((*r1_unary_op)(r1),l_res);
-	else
-	  free_effect(r1); /* r1 won't be used anymore */
+        list l_tmp = (*r1_r2_generic_binary_op)(r1, r2,
+            r1_abstract_location_p,
+            r2_abstract_location_p,
+            &r1_still_combinable_p,
+            &r2_still_combinable_p,
+            r1_r2_concrete_binary_op);
+        l_res = gen_nconc(l_tmp, l_res);
+        if (!r2_still_combinable_p) /* remove it from l2 */
+        {
+          list new_lr2 = CDR(lr2);
+          /* gen_remove(&l2, EFFECT(CAR(lr2))); */
+          if (prec_lr2 != NIL)
+            CDR(prec_lr2) = CDR(lr2);
+          else
+            l2 = CDR(lr2);
+          free_effect(r2); r2=effect_undefined;
+          CDR(lr2) = NIL;
+          free(lr2);
+          lr2 = new_lr2;
+        }
+        else
+        {
+          prec_lr2 = lr2;
+          lr2 = CDR(lr2);
+        }
+      } /* if (*r1_r2_combinable_p)() */
+      else
+      {
+        pips_debug(8,"not combinable\n");
+        prec_lr2 = lr2;
+        lr2 = CDR(lr2);
       }
+    } /* while (r1_still_combinable_p && !ENDP(lr2))*/
 
-    /* we must finally add the remaining effects of l2 */
-    FOREACH(EFFECT, r2, l2) {
-      l_res = gen_nconc((*r2_unary_op)(r2),l_res);
-    }
+    if (r1_still_combinable_p)
+      l_res = gen_nconc((*r1_unary_op)(r1),l_res);
+    else
+      free_effect(r1); /* r1 won't be used anymore */
+  }
 
-    // necessary to avoid flip-flops in list order
-    // when there are successive invocations, in particular
-    // with proper_effects_combine
-    l_res = gen_nreverse(l_res);
+  /* we must finally add the remaining effects of l2 */
+  FOREACH(EFFECT, r2, l2) {
+    l_res = gen_nconc((*r2_unary_op)(r2),l_res);
+  }
 
-    pips_debug_effects(1, "final effects:\n", l_res);
+  // necessary to avoid flip-flops in list order
+  // when there are successive invocations, in particular
+  // with proper_effects_combine
+  l_res = gen_nreverse(l_res);
 
-    /* no memory leaks: l1 and l2 won't be used anymore */
-    gen_free_list(l1);
-    gen_free_list(l2);
+  pips_debug_effects(1, "final effects:\n", l_res);
 
-    debug_off();
+  /* no memory leaks: l1 and l2 won't be used anymore */
+  gen_free_list(l1);
+  gen_free_list(l2);
 
-    return l_res;
+  debug_off();
+
+  return l_res;
 }
 
 /**
@@ -815,18 +843,26 @@ list proper_effects_combine(list l_eff, bool scalars_only_p)
 {
   list l_res = NIL;
   bool (*effects_comb_p)(effect eff1, effect eff2) =
-    scalars_only_p ? effects_scalars_and_same_action_p : effects_same_action_p;
+      scalars_only_p ? effects_scalars_and_same_action_p : effects_same_action_p;
 
   pips_debug_effects(6, "input effects:", l_eff);
 
   // merge one effect at a time in the result list using the union
   // operator.
   FOREACH(EFFECT, eff, l_eff)
-    {
-      eff = (*proper_to_summary_effect_func)(eff);
+  {
+    // functions that can be pointed by proper_to_summary_effect_func:
+    // effect_nop
+    // proper_to_summary_simple_effect
+    eff = (*proper_to_summary_effect_func)(eff);
 
-      l_res = (*effects_union_op)(effect_to_list(eff), l_res, *effects_comb_p);
-    }
+    // functions that can be pointed by effects_union_op:
+    // ProperEffectsMustUnion
+    // RegionsMustUnion
+    // ReferenceUnion
+    // EffectsMustUnion
+    l_res = (*effects_union_op)(effect_to_list(eff), l_res, *effects_comb_p);
+  }
   gen_free_list(l_eff);
   pips_debug_effects(6, "output effects:", l_res);
   return l_res;
@@ -876,8 +912,7 @@ list proper_effects_combine(list l_eff, bool scalars_only_p)
  * written pointer and to substitue it where needed. Else, the effects
  * to substitute will be gone.
  */
-static list __attribute__((unused)) old_proper_effects_combine(list l_effects, bool scalars_only_p)
-{
+static list __attribute__((unused)) old_proper_effects_combine(list l_effects, bool scalars_only_p) {
   list cur, pred = NIL;
   /* entity name -> consp in effect list. */
   hash_table all_read_effects, all_write_effects;
@@ -893,23 +928,23 @@ static list __attribute__((unused)) old_proper_effects_combine(list l_effects, b
     /* This is a pretty weak assert because it's performed on the
        addresses */
     pips_assert("The very same effect does not appear twice",
-		gen_once_p(l_effects));
+        gen_once_p(l_effects));
 
     FOREACH(EFFECT, eff, l_effects) {
-	cell c = effect_cell(eff);
-	/* FI: the cell tag is not checked here but later a posteriori! */
-	reference ref = cell_reference(c);
+      cell c = effect_cell(eff);
+      /* FI: the cell tag is not checked here but later a posteriori! */
+      reference ref = cell_reference(c);
 
-	if(cell_reference_p(c)) {
-	  refl = gen_nconc(refl, CONS(REFERENCE, ref, NIL));
-	}
-	i++;
-	fprintf(stderr, "Effect %d: %p\tReference %d: %p (%spersistant)\n",
-		i, eff, i, ref, cell_reference_p(c)? "not ":"");
+      if(cell_reference_p(c)) {
+        refl = gen_nconc(refl, CONS(REFERENCE, ref, NIL));
+      }
+      i++;
+      fprintf(stderr, "Effect %d: %p\tReference %d: %p (%spersistant)\n",
+          i, eff, i, ref, cell_reference_p(c)? "not ":"");
     }
 
     pips_assert("The very same reference does not appear twice"
-		" unless it is persistant", gen_once_p(refl));
+        " unless it is persistant", gen_once_p(refl));
   }
 
   all_read_effects = hash_table_make(hash_string, 10);
@@ -933,13 +968,16 @@ static list __attribute__((unused)) old_proper_effects_combine(list l_effects, b
     list next = CDR(cur); /* now, as 'cur' may be removed... */
 
     /* Summarization before combination: let's be as store independent as possible */
+    // functions that can be pointed by proper_to_summary_effect_func:
+    // effect_nop
+    // proper_to_summary_simple_effect
     current = (*proper_to_summary_effect_func)(lcurrent);
 
     ak = action_to_action_kind(effect_action(current));
-   // n = entity_name(effect_entity(current));
+    // n = entity_name(effect_entity(current));
     list w;
     string rn = words_to_string
-      (w=effect_words_reference(effect_any_reference(current)));
+        (w=effect_words_reference(effect_any_reference(current)));
     gen_map(free,w);gen_free_list(w);
     /* Do not combine effects of different kinds: use the kind in the key */
     asprintf(&n,"%s %s",rn,action_kind_to_string(ak));
@@ -961,27 +999,29 @@ static list __attribute__((unused)) old_proper_effects_combine(list l_effects, b
 
 
     /* FI: addressing should be checked below against writing of the
-       underlying pointer. No time right now. */
+     * underlying pointer. No time right now. */
 
     if (may_combine)
     {
       /* did we see it at a previous iteration? */
       switch (a) {
       case is_action_write:
-	if (hash_defined_p(all_write_effects, n))
-	{
-	  do_combine = true;
-	  do_combine_item = hash_get(all_write_effects, n);
-	}
-	break;
+        if (hash_defined_p(all_write_effects, n))
+        {
+          do_combine = true;
+          do_combine_item = hash_get(all_write_effects, n);
+        }
+        break;
       case is_action_read:
-	if (hash_defined_p(all_read_effects, n))
-	{
-	  do_combine = true;
-	  do_combine_item = hash_get(all_read_effects, n);
-	}
-	break;
-      default: pips_internal_error("unexpected action tag %d", a);
+        if (hash_defined_p(all_read_effects, n))
+        {
+          do_combine = true;
+          do_combine_item = hash_get(all_read_effects, n);
+        }
+        break;
+      default:
+        pips_internal_error("unexpected action tag %d", a);
+        return NIL;
       }
     }
 
@@ -991,25 +1031,28 @@ static list __attribute__((unused)) old_proper_effects_combine(list l_effects, b
 
       effect base = EFFECT(CAR(do_combine_item));
       if(effect_comparable_p(base, current)) {
-	/* compute their union */
-	effect combined = (*effect_union_op)(base, current);
+        /* compute their union */
+        // functions that can be pointed by effect_union_op:
+        // effect_must_union
+        // regions_must_convex_hull
+        effect combined = (*effect_union_op)(base, current);
 
-	/* replace the base effect by the new effect */
-	pips_assert("combined is a consistent effect",
-		    effect_consistent_p(combined));
-	EFFECT_(CAR(do_combine_item)) = combined;
+        /* replace the base effect by the new effect */
+        pips_assert("combined is a consistent effect",
+            effect_consistent_p(combined));
+        EFFECT_(CAR(do_combine_item)) = combined;
 
-	/* free the original effects: no memory leak */
-	free_effect(base);
-	//free_effect(current); SG: this free triggers a segfault ...
+        /* free the original effects: no memory leak */
+        free_effect(base);
+        //free_effect(current); SG: this free triggers a segfault ...
 
-	/* remove the current list element from the global list */
-	/* pred!=NIL as on the first items hash's are empty */
-	CDR(pred) = next; /* pred is not changed! */
-	free(cur);
+        /* remove the current list element from the global list */
+        /* pred!=NIL as on the first items hash's are empty */
+        CDR(pred) = next; /* pred is not changed! */
+        free(cur);
       }
       else {
-	do_combine = false;
+        do_combine = false;
       }
     }
     if(!do_combine)
@@ -1018,16 +1061,18 @@ static list __attribute__((unused)) old_proper_effects_combine(list l_effects, b
       EFFECT_(CAR(cur)) = current;
       if (may_combine)
       {
-	/* if we do not combine. ONLY IF we test, we put... */
-	switch (a) {
-	case is_action_write:
-	  hash_put(all_write_effects, strdup(n), cur);
-	  break;
-	case is_action_read:
-	  hash_put(all_read_effects, strdup(n), cur);
-	  break;
-	default: pips_internal_error("unexpected action tag %d", a);
-	}
+        /* if we do not combine. ONLY IF we test, we put... */
+        switch (a) {
+        case is_action_write:
+          hash_put(all_write_effects, strdup(n), cur);
+          break;
+        case is_action_read:
+          hash_put(all_read_effects, strdup(n), cur);
+          break;
+        default:
+          pips_internal_error("unexpected action tag %d", a);
+          return NIL;
+        }
       }
       pred = cur;
     }
@@ -1489,6 +1534,10 @@ static list
 effect_entities_intersection(effect eff1, effect eff2)
 {
   pips_assert("unused argument", eff2==eff2);
+  // functions that can be pointed by effect_dup_func:
+  // simple_effect_dup
+  // region_dup
+  // copy_effect
   return CONS(EFFECT, (*effect_dup_func)(eff1), NIL);
 }
 

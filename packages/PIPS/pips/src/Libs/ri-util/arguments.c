@@ -182,6 +182,8 @@ list arguments_intersection(list a1, list a2)
  *
  * This algorithm is correct if an entity can appear several times in
  * a list.
+ *
+ * Could be implemented with two calls to arguments_subset_p()
  */
 bool arguments_set_equal_p(list a1, list a2)
 {
@@ -203,6 +205,21 @@ bool arguments_set_equal_p(list a1, list a2)
   }
 
   return set_equal_p;
+}
+
+/* Check if a1 is a subset of a2 */
+bool arguments_subset_p(list a1, list a2)
+{
+  bool subset_p = true;
+
+  FOREACH(ENTITY, e1, a1) {
+    if(!entity_is_argument_p(e1, a2)) {
+      subset_p = false;
+      break;
+    }
+  }
+
+  return subset_p;
 }
 
 void free_arguments(args)

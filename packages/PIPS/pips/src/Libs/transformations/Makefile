@@ -60,8 +60,7 @@ LIB_CFILES =	\
 		cast_at_call_sites.c \
 		manage_parallel_loops.c \
 		registers.c \
-		identity_elimination.c \
-		
+		identity_elimination.c
 
 INC_TARGET =    $(TARGET).h
 

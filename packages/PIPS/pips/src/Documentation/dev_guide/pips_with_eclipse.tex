@@ -11,7 +11,8 @@
   % else we are generating HTML with TeX4ht, use plain url:
   \usepackage{url}}
 
-\usepackage{xspace,makeidx}
+\usepackage{xspace}
+% \usepackage{makeidx}
 \usepackage{wasysym}
 \usepackage{graphicx}
 \usepackage{xcolor}
@@ -65,16 +66,21 @@
 
 \section{Introduction}
 
-The goal of this tutorial is to explain how we can use Eclipse as IDE to work on PIPS. 
-You can also read the PIPS developer\_guide 
+This tutorial aims to explain how we can use Eclipse as IDE to work on PIPS. 
+You can also read the PIPS developer guide 
 \footnote{pdf version: \PipsDevGuidePDF \\ HTML version: \PipsDevGuideHTDOC} and 
 the official web site of PIPS \PipsNewWWW for more information.
 
-This document will explain how we can configure the project linked with the SVN sources.
+This document explains how we can configure the project linked with the SVN sources.
 But also how to compile and to launch PIPS with Eclipse and so use the debugger provided by Eclipse.
 
-This tutorial and the screen shoots are done with Eclipse JUNO version.
+This tutorial doesn't explain how to use Eclipse or the different possibilities offer by it.
+(Switch between .c/.h, go to declaration, call Hierarchy, refactor, auto-completion, options during debug mode, etc.)
 
+This tutorial and the screenshots are done with Eclipse JUNO version. 
+So some little diffences can appear for other versions.
+
+Most of the time, figures follow instructions. Think to turn the page to see them.
 
 
 \section{Prerequisites}
@@ -85,7 +91,7 @@ You need to install \emph{subversive} in your Eclipse.
 You can do this in \emph{``Help/Install New Software...''} and search svn to find subversive.
 
 When you relaunch Eclipse after the first installation of \emph{subversive}, 
-it will probably ask you to install a connector. You can install the last version of SVNKit.%For my part, I install SVNKit 1.7.8 (compatible for svn 1.7.x).
+it will probably ask you to install a connector. You can install the lastest version of SVNKit.%For my part, I install SVNKit 1.7.8 (compatible for svn 1.7.x).
 
 
 \section{Add the repositories of PIPS and their dependencies in Eclipse}
@@ -113,7 +119,7 @@ or button \emph{Open Perspective} (left picture).
 \end{enumerate}
 
 
-\item Add The repository location of PIPS \\(https://svn.cri.ensmp.fr/svn/pips/).
+\item Add the repository location of PIPS \\(https://scm.cri.ensmp.fr/svn/pips/).
 \begin{enumerate}
 \item Open the \emph{New Repository Location} wizard.
 \begin{center}
@@ -121,7 +127,8 @@ or button \emph{Open Perspective} (left picture).
 \includegraphics[scale=0.4]{eclipse/02-eclipseJUNO-newRepositories2.jpg}
 \end{center}
 
-\item Put the URL of PIPS https://svn.cri.ensmp.fr/svn/pips/ and your authentication login of PIPS.
+\item Put the URL of PIPS https://scm.cri.ensmp.fr/svn/pips/ and your authentication login of PIPS. 
+The authentication login of PIPS is optional. 
 \begin{center}
 \noindent
 \includegraphics[scale=0.4]{eclipse/02-eclipseJUNO-newRepositories3.png}
@@ -130,7 +137,7 @@ or button \emph{Open Perspective} (left picture).
 \item click \emph{Finish}.
 \end{enumerate}
 
-\item Do the same for linear (https://svn.cri.ensmp.fr/svn/linear/) and Newgen (https://svn.cri.ensmp.fr/svn/newgen/).
+\item Do the same for linear (https://scm.cri.ensmp.fr/svn/linear/) and Newgen (https://scm.cri.ensmp.fr/svn/newgen/).
 
 You will normally have something like that at the end:
 \begin{center}
@@ -140,16 +147,17 @@ You will normally have something like that at the end:
 \end{enumerate}
 
 
-\section{Make the projects for PIPS}
+\section{Create the projects for PIPS}
 \label{sec:makeproject}
 
-You can now make a project that will be managed by Eclipse for PIPS under SVN.
+You can now create a project that will be managed by Eclipse for PIPS under SVN.
 
 \begin{enumerate}
 \item Go back to the \emph{Ressource} Perspective or to the \emph{C/C++} Perspective \\
-(see Sec~\ref{sec:addSVNrepo} step~\ref{enum:it:choosePers} to change the persperctive).
+(see Sec~\ref{sec:addSVNrepo} step~\ref{enum:it:choosePers} to change the perspective).
 
 \item Add a new SVN project for PIPS
+(We want the project to be manage be svn).
 \label{enum:it:newproject}
 \begin{enumerate}
 \item Create a new project (File/New/Project). 
@@ -197,7 +205,7 @@ You can now make a project that will be managed by Eclipse for PIPS under SVN.
 \item Choose to convert into a C project.\\
 %(For project options, I choose a Makefile project and LINUX GCC like toolchains, 
 %but I'm not sure if it's necessary or if an Executable is not better.)\\
-\textbf{Note: } you can convert many projects in one step, if your SVN project is added as Candidate for conversion (empty in my screen shot)
+\textbf{Note:} you can convert many projects in one step, if your SVN project is added as Candidate for conversion (empty in the screenshot)
 \begin{center}
 \noindent
 \includegraphics[scale=0.4]{eclipse/04-eclipseJUNO-convertToCproject2.png}
@@ -216,20 +224,29 @@ You can now make a project that will be managed by Eclipse for PIPS under SVN.
 
 \begin{enumerate}
 \item Add the \emph{include} path for the different dependencies.
+\label{enum:it:addsymb}
 
 For this purpose you can see the developer\_guide part \textbf{Section 3.2.2 Missing includes}.
 In summary, these configurations are done in the property project, menu ``C/C++ General'', submenu ``Paths and Symbols'', ``Include'' tab.
 
 Without these includes, you won't be able to use the power of Eclipse.
 
+Some folders are only present after a first compilation (the \textit{include} folders). 
+But you can put them manually into the configuration without problems.
+
 List of includes for the different projects:
 \begin{enumerate}
 \item \textbf{newgen} needs: /newgen/include
-\item \textbf{linear} needs: /linear/inlcude AND include from polylib
+\item \textbf{linear} needs: /linear/inlcude AND include from {\color{red} polylib}
 \item \textbf{PIPS} needs:   /newgen/include, /linear/inlcude and /pips/include
 \end{enumerate}
 
-\item Modify the \emph{Path} Environnement to add pipsrc. It corresponds to the path added with pipsrc.sh.
+\textbf{Note:} For polylib, when you add a path choose ``File System...'' and find where you install polylib (into extern).
+
+\textbf{Note:} If you want to compile in consol mode, I recommand to copy the extern folder make by the standard version installation of PIPS \footnote{\LINK{http://pips4u.org/copy_of_getting-pips/building-and-installing-pips-from svn}}.
+
+\item Modify the \emph{Path} Environnement to add pipsrc. 
+It corresponds to the path added with pipsrc.sh.
 \label{enum:it:addpath}
 
 \begin{enumerate}
@@ -268,6 +285,10 @@ After this configuration has been done, you can use PIPS in Eclipse.
 \section{How can we compile PIPS with Eclipse?}
 
 Compilation corresponds to build your project in Eclipse.
+
+If you want to use the binary make by the compilation for debug, you have to modify optimization compilation, see \ref{sec:faq:randomdebug}.
+
+For the first compilation, you have to build \emph{newgen} and \emph{linear} before the \emph{pips} project.
 
 \begin{enumerate}
 \item Right click on the project you want to compile and choose build:
@@ -327,10 +348,26 @@ Without them, you have to write yourself the different instructions.
 
 \end{enumerate}
 
+\newpage
 
-\section{Why can I only launch the debug for tpips only once?}
+\section{FAQ}
 
-You have to configure the PATH environnement variable, see step \ref{enum:it:addpath} in part \ref{sec:confProject} Configure your project.
+\subsection{Why do I have many red-underline words?}
+
+When a word is underlined by Eclipse, it's mean that it detects a problem.
+
+If the problem say ``xxx cannot be resolved'', you have to rebuild the index.
+
+First, you have to configure your ``Paths and Symbols'' (see step \ref{enum:it:addsymb} in Sec. \ref{sec:confProject}), if it's not already done.
+
+After that, right click on your project, select Index, and click on \emph{``Rebuild''}.
+
+The problem must be resolved.
+
+
+\subsection{Why can I only launch the debug for tpips only once?}
+
+You have to configure the PATH environnement variable, see step \ref{enum:it:addpath} in Sec. \ref{sec:confProject} Configure your project.
 
 % Eclipse can't execute the command {\em delete} of the tpips file. I don't know why for that moment.
 % 
@@ -339,7 +376,8 @@ You have to configure the PATH environnement variable, see step \ref{enum:it:add
 % After delete it, you can relaucnh your tpips.
 
 
-\section{Why debug step go randomly top and down?}
+\subsection{Why debug step go randomly top and down?}
+\label{sec:faq:randomdebug}
 
 You have to compile without optimization options. The same thing will happens with gdb if the compilation is not configure.
 
@@ -347,7 +385,10 @@ In the file \emph{makes/gnu-stuff.mk}, put -O0 instead of -O2.
 
 
 
-\section{How can I ask Eclipse to not recompil before launch debug?}
+\subsection{How can I ask Eclipse to not recompil before launch debug?}
+
+Because of the complexity of the PIPS project, Eclipse seems to think that there is a modification into this project when it's not the case.
+So we have to disable this option.
 
 In \emph{Windows/Preferences}, select \emph{Run/Debug} menu, \emph{Launching} submenu. Uncheck \emph{Build (if required) before launching}.
 \begin{center}
@@ -355,7 +396,7 @@ In \emph{Windows/Preferences}, select \emph{Run/Debug} menu, \emph{Launching} su
 \includegraphics[scale=0.4]{eclipse/09-eclipseJUNO-launchConfig.png}
 \end{center}
 
-\section{How can I use SVN in Eclipse?}
+\subsection{How can I use SVN in Eclipse?}
 
 You can open the \emph{Team Synchronizing} perspective for this purpose.
 You can also right click on a folder or file and look the different possibilities of \emph{Team}.

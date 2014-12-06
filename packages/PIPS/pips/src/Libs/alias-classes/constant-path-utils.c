@@ -14,131 +14,33 @@ Each dimension represents a lattice with a bottom and a top.
 #include "linear.h"
 #include "ri.h"
 #include "effects.h"
-#include "database.h"
+//#include "database.h"
 #include "ri-util.h"
 #include "effects-util.h"
-#include "control.h"
+//#include "control.h"
 #include "constants.h"
 #include "misc.h"
-#include "parser_private.h"
-#include "syntax.h"
-#include "top-level.h"
+//#include "parser_private.h"
+//#include "syntax.h"
+//#include "top-level.h"
 #include "text-util.h"
 #include "text.h"
 #include "properties.h"
-#include "pipsmake.h"
-#include "semantics.h"
+//#include "pipsmake.h"
+//#include "semantics.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
-#include "effects-convex.h"
-#include "transformations.h"
-#include "preprocessor.h"
-#include "pipsdbm.h"
-#include "resources.h"
-#include "prettyprint.h"
+//#include "effects-convex.h"
+//#include "transformations.h"
+//#include "preprocessor.h"
+//#include "pipsdbm.h"
+//#include "resources.h"
+//#include "prettyprint.h"
 #include "newgen_set.h"
 #include "points_to_private.h"
 #include "alias-classes.h"
 #include "genC.h"
 
-
-/* Already exists in points_to_general_algorithm.c, to be removed later...
-   iterate over the lhs_set, if it contains more than an element
-   approximations are set to MAY, otherwise it's set to EXACT
-   Set the sink to nowhere .*/
-set points_to_nowhere_typed(list lhs_list, set input)
-{
-  set kill= set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set gen = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set res = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set input_kill_diff = set_generic_make(set_private, points_to_equal_p,
-			   points_to_rank);
-  approximation a = make_approximation_exact();
-
-  SET_FOREACH(points_to, p, input) {
-      FOREACH(cell, c, lhs_list) {
-	if(points_to_compare_cell(points_to_source(p),c))
-	    set_add_element(kill, kill, p);
-	}
-    }
-
-  set_difference(input_kill_diff, input, kill);
-
-  /* if the lhs_set or the rhs set contains more than an element, we
-     set the approximation to MAY. */
-  if((int)gen_length(lhs_list) > 1)// || set_size(rhs_set)>1)
-    a = make_approximation_may();
-
-  /* Computing the gen set*/
-  FOREACH(cell, c, lhs_list) {
-      /* we test if lhs is an array, so we change a[i] into a[*]
-       is cell_reference_to_type() the right function to call ?*/
-      /* if(cell_reference_to_type(c) == array) */
-      /*c = array_to_store_independent(c); */
-
-      /* create a new points to with as source the current
-	 element of lhs_set and sink the null value .*/
-    bool to_be_freed = false;
-    type c_type = cell_to_type(c, &to_be_freed);
-      entity e = entity_all_xxx_locations_typed(NOWHERE_LOCATION,
-					      c_type);
-      reference r = make_reference(e, NIL);
-      cell sink = make_cell_reference(r);
-      points_to pt_to = make_points_to(c, sink, a, make_descriptor_none());
-      set_add_element(gen, gen, (void*)pt_to);
-      if(to_be_freed) free_type(c_type);
-    }
-  /* gen + input_kill_diff*/
-  set_union(res, gen, input_kill_diff);
-
-  return res;
-}
-
-/* arg1:  list of cells
-   arg2:  set of points-to
-   Create a points-to set with elements of lhs_list as
-   source and NOWHERE as sink.
-   Iterate over input and kill all points-to relations
-   where sinks are elements of lhs_list.
-*/
-set points_to_nowhere(list lhs_list, set input)
-{
-  set kill = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set gen = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set res = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set input_kill_diff = set_generic_make(set_private, points_to_equal_p,
-			   points_to_rank);
-  approximation a = make_approximation_exact();
-
-  SET_FOREACH(points_to, p, input) {
-      FOREACH(cell, c, lhs_list) {
-	  if(points_to_source(p) == c)
-	    set_add_element(kill, kill, p);
-	}
-    }
-  set_difference(input_kill_diff, input, kill);
-  /* if the lhs_set or the rhs set contains more than an element, we
-     set the approximation to MAY. */
-  if((int)gen_length(lhs_list) > 1)// || set_size(rhs_set)>1)
-    a = make_approximation_may();
-
-  /* Computing the gen set */
-  FOREACH(cell, c, lhs_list) {
-    cell sink = make_nowhere_cell();
-    points_to pt_to = make_points_to(c, sink, copy_approximation(a), make_descriptor_none());
-    set_add_element(gen, gen, (void*)pt_to);
-  }
-  free_approximation(a);
-  set_union(res, gen, input_kill_diff);
-
-  return res;
-}
 
 cell make_nowhere_cell()
 {
@@ -305,373 +207,6 @@ list array_to_constant_paths(expression e, set in __attribute__ ((__unused__)))
   return l;
 }
 
-
-
-
-/*
-  Change dereferenced pointers and filed access into a constant paths
-  When no constant path is found the expression is uninitialized pointer
-*/
-/* list expression_to_constant_paths(statement s, expression e, set in) */
-/* { */
-/*   set cur = set_generic_make(set_private, points_to_equal_p, */
-/* 					 points_to_rank); */
-/*   cell c = cell_undefined; */
-/*   entity nowhere = entity_undefined; */
-/*   list l  = NIL, l_in = NIL, l_eval = NIL, l_cell = NIL; */
-/*   bool exact_p = false, *nowhere_p = false; */
-/*   bool eval_p = true; */
-/*   c = get_memory_path(e, &eval_p); */
-/*   reference cr = cell_any_reference(c); */
-/*   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES"); */
-/*   /\* Take into account global variables which are initialized in demand*\/ */
-/*   /\* entity ce = reference_variable(cr); *\/ */
-/*   /\* cell cc = make_cell_reference(cr); *\/ */
-/*   l_cell = CONS(CELL, c, NIL); */
-/*   in = set_assign(cur, points_to_init_global(s, l_cell, in)); */
-/*   if( eval_p ) { */
-/*     l_cell = CONS(CELL, c, NIL); */
-/*     set_methods_for_proper_simple_effects(); */
-/*     l_in = set_to_sorted_list(in, */
-/* 			      (int(*)(const void*, const void*)) */
-/* 			      points_to_compare_location); */
-/*     l_eval = eval_cell_with_points_to(c, l_in, &exact_p); */
-/*     generic_effects_reset_all_methods(); */
-/*     /\* in = points_to_init_global(s, l_cell, in); *\/ */
-/*     l_cell = gen_nconc(l,possible_constant_paths(l_eval,c,nowhere_p)); */
-
-/*     in =  set_assign(in, points_to_init_global(s, l_cell, in)); */
-/*   } */
-/*   else { */
-/*     l_cell = CONS(CELL, c, NIL); */
-/*     in =  set_assign(cur, points_to_init_global(s, l_cell, in)); */
-/*   } */
-  
-
-/*   /\* if c is an anywhere or a reference we don't evaluate it*\/ */
-/*   if (!eval_p) */
-/*     l = CONS(CELL, c, NIL); */
-/*   else if (set_empty_p(in)|| entity_null_locations_p(reference_variable(cr)) */
-/* 			      || entity_nowhere_locations_p(reference_variable(cr))){ */
-/*     if (!get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING")){ */
-/*       pips_user_error("Uninitialized pointer\n"); */
-/*     } */
-/*     else { */
-/*       pips_user_warning("Uninitialized pointer"); */
-/*       bool to_be_freed = false; */
-/*       type c_type = cell_to_type(c, &to_be_freed); */
-/*       if ( type_sensitive_p )  */
-/* 	nowhere = entity_all_xxx_locations_typed( */
-/* 						      NOWHERE_LOCATION, */
-/* 						      c_type); */
-/*       else */
-/* 	nowhere = entity_all_xxx_locations( NOWHERE_LOCATION ); */
-
-/*       reference r = make_reference(nowhere,NIL); */
-/*       c = make_cell_reference(r); */
-/*       l = CONS(CELL, c, NIL); */
-/*       if (to_be_freed) free_type(c_type); */
-/*     } */
-/*   } */
-/*   else { */
-/*     set_methods_for_proper_simple_effects(); */
-/*     l_in = set_to_sorted_list(in, */
-/* 			      (int(*)(const void*, const void*)) */
-/* 			      points_to_compare_location); */
-/*     l_eval = eval_cell_with_points_to(c, l_in, &exact_p); */
-/*     generic_effects_reset_all_methods(); */
-/*     l = gen_nconc(l,possible_constant_paths(l_eval,c,nowhere_p)); */
-/*   } */
-
-/*   return l; */
-/* } */
-
-/*
- * Change dereferenced pointers and field access into a constant paths.
- *
- * FI: For instance, *p becomes p[0], s.a becomes s[a] and p->a
- * becomes p[a] (to be checked with AM).
- *
- * When no constant path is found, the expression is considered
- * equivalent to an uninitialized pointer. 
- *
- * FI: to be reviewed with AM, obvious memory leaks
- * FI: what is the meaning of eval_p? set by get_memory_path()?
- */
-list expression_to_constant_paths(statement s, expression e, set in)
-{
-  set cur = set_generic_make(set_private, points_to_equal_p,
-					 points_to_rank);
-  cell c = cell_undefined;
-  entity nowhere = entity_undefined;
-  list l  = NIL, l_in = NIL, l_eval = NIL, l_cell = NIL;
-  bool exact_p = false, *nowhere_p = false, changed = true;
-  bool eval_p = true;
-
-  // FI: it looks very complicated when e is a simple reference, but
-  // it may be a general approach
-
-  c = get_memory_path(e, &eval_p);
-
-  c = simple_cell_to_store_independent_cell(c, &changed);
-
-  reference cr = cell_any_reference(c);
-  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
-
-  /* Take into account global variables which are initialized on demand*/
-  /* entity ce = reference_variable(cr); */
-  /* cell cc = make_cell_reference(cr); */
-  l_cell = CONS(CELL, c, NIL);
-  set g_set = points_to_init_global(s, l_cell, in);
-  in = set_assign(cur, g_set);
-  // FI: free_set(g_set);
-
-  if( eval_p ) {
-    // FI: memory leak for l_cell
-    l_cell = CONS(CELL, c, NIL);
-    set_methods_for_proper_simple_effects();
-    l_in = set_to_sorted_list(in,
-			      (int(*)(const void*, const void*))
-			      points_to_compare_location);
-    l_eval = eval_cell_with_points_to(c, l_in, &exact_p);
-    generic_effects_reset_all_methods();
-    /* in = points_to_init_global(s, l_cell, in); */
-    // FI: memory leak for l_cell
-    l_cell = gen_nconc(l, possible_constant_paths(l_eval,c,nowhere_p));
-
-    in =  set_assign(in, points_to_init_global(s, l_cell, in));
-    }
-  else {
-    // FI: memory leak for l_cell
-    l_cell = CONS(CELL, c, NIL);
-    in =  set_assign(cur, points_to_init_global(s, l_cell, in));
-  }
-  
-
-  /* if c is an anywhere or a reference we don't evaluate it*/
-  if (eval_p
-      && !(set_empty_p(in)
-	   || entity_null_locations_p(reference_variable(cr))
-	   || entity_nowhere_locations_p(reference_variable(cr)))
-      && 
-      get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING")) 
-    {
-      set_methods_for_proper_simple_effects();
-      l_in = set_to_sorted_list(in,
-				(int(*)(const void*, const void*))
-				points_to_compare_location);
-      l_eval = eval_cell_with_points_to(c, l_in, &exact_p);
-      generic_effects_reset_all_methods();
-      l = gen_nconc(l,possible_constant_paths(l_eval,c,nowhere_p));
-    }
-  else if (!get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING") && eval_p) {
-      pips_user_warning("Uninitialized pointer");
-      bool to_be_freed = false;
-      type c_type = cell_to_type(c, &to_be_freed);
-	if ( type_sensitive_p )
-	nowhere = entity_all_xxx_locations_typed(
-						      NOWHERE_LOCATION,
-						      c_type);
-      else
-	nowhere = entity_all_xxx_locations( NOWHERE_LOCATION );
-
-      reference r = make_reference(nowhere,NIL);
-      c = make_cell_reference(r);
-      l = CONS(CELL, c, NIL);
-      if (to_be_freed) free_type(c_type);
-    }
-  else if(eval_p)
-    pips_user_error("Uninitialized pointer dereferencing\n");
-  else
-    l = CONS(CELL, c, NIL);
-
-  return l;
-}
-
-
-
-
-/* This function returns a cell
-- we initialize the effect engine
-- we call generic_proper_effects_of complex_address()
-  which transform my_str->field into my_str[.field]
-- we reset the effect engine
-- we create a cell from the main effect returned by
-  generic_proper_effects_of_complex_address()
-- we can't evaluate user call neither translate them into an
-  constant access path, so eval_p is set to false.
-*/
-cell get_memory_path(expression e, bool * eval_p)
-{
-  effect ef = effect_undefined;
-  reference  r = reference_undefined;
-  entity anywhere = entity_undefined;
-  cell c = cell_undefined;
-  bool exact_p = false;
-  /* we assume that we don't need to cover all expression type's, we
-     are only intereseted in user function call, reference or pointer
-     dereferencing */
-
-  if (expression_call_p(e)) {
-    if (user_function_call_p(e)) {
-      (*eval_p) = false;
-      call cl = expression_call(e);
-      bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
-      if(type_sensitive_p)
-	anywhere =entity_all_xxx_locations_typed(ANYWHERE_LOCATION,
-						      call_to_type(cl));
-      else
-	anywhere =  entity_all_xxx_locations(ANYWHERE_LOCATION);
-      reference r = make_reference(anywhere,NIL);
-      /* FI: Should not it be a preference? */
-      c = make_cell_reference(r);
-    }
-    else {
-      entity op = call_function(expression_call(e));
-      if(ENTITY_FIELD_P(op) ||
-	 ENTITY_POINT_TO_P(op) ||
-	 ENTITY_DEREFERENCING_P(op)) {
-
-	/*init the effect's engine*/
-	set_methods_for_proper_simple_effects();
-	list l_ef = NIL;
-	list l1 = generic_proper_effects_of_complex_address_expression(
-								       e,
-								       &l_ef,
-								       true);
-	ef = EFFECT(CAR(l_ef));
-	/* In fact, there should be a FOREACH to scan all elements of l_ef */
-	gen_free_list(l_ef); /* free the spine */
-	r = effect_any_reference(ef);
-	c = make_cell_reference(r);
-	(*eval_p) = effect_reference_dereferencing_p(r, &exact_p);
-	effects_free(l1);
-	generic_effects_reset_all_methods();
-
-      }
-    }
-  }
-  else if (syntax_subscript_p(expression_syntax(e))) {
-    set_methods_for_proper_simple_effects();
-    list l = NIL;
-    list l_ef = NIL;
-    list l2 = generic_proper_effects_of_complex_memory_access_expression(e,
-									&l_ef,
-									&l,
-									true);
-    ef = EFFECT(CAR(l_ef));
-    /* In fact, there should be a FOREACH to scan all elements of l_ef */
-    gen_free_list(l_ef); /* free the spine */
-    r = effect_any_reference(ef);
-    c = make_cell_reference(r);
-    effects_free(l2);
-    generic_effects_reset_all_methods();
-    (*eval_p) = false;
-  }
-  else if (array_argument_p(e)) {
-    (*eval_p) = false;
-    set_methods_for_proper_simple_effects();
-    list l_ef = NIL;
-    list l1 = generic_proper_effects_of_complex_address_expression(e, &l_ef,
-								   true);
-
-    ef = EFFECT(CAR(l_ef));
-    /* In fact, there should be a FOREACH to scan all elements of l_ef */
-    gen_free_list(l_ef); /* free the spine */
-    r = effect_any_reference(ef);
-    c = make_cell_reference(r);
-    effects_free(l1);
-    generic_effects_reset_all_methods();
-  }
-  else if (expression_reference_p(e)) {
-    r = expression_reference(e);
-    if (!ENDP(reference_indices(r)) && !array_argument_p(e)) {
-      list l_ef = NIL;
-      (*eval_p) = true;
-      set_methods_for_proper_simple_effects();
-      list l1 = generic_proper_effects_of_complex_address_expression(e, &l_ef,
-								   true);
-      ef = EFFECT(CAR(l_ef)); 
-      /* In fact, there should be a FOREACH to scan all elements of l_ef */
-      gen_free_list(l_ef); /* free the spine */
-      r = effect_any_reference(ef);
-      c = make_cell_reference(r);
-      effects_free(l1);
-      generic_effects_reset_all_methods();
-    }
-    else {
-      (*eval_p) = false;
-      c = make_cell_reference(r);
-    }
-  }
-
-  return c;
-}
-
-/* This function iterates over the list already computed by
-   eval_cell_with_points_to() and  depending on the length and
-   elements  contained in the list create :
-   - a set containing the constant paths if the list contains elements
-   and there are not anywhere or nowhere paths.
-   - a set containing anywhere paths of the list is empty or contains
-   a nowhere path.
-*/
-list possible_constant_paths(
-			     list l,
-			     cell lhs,
-			     bool *nowhere_p __attribute__ ((__unused__))
-			     )
-{
-  list paths = NIL;
-  entity nowhere = entity_undefined;
-  entity anywhere = entity_undefined;
-  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
-  if (ENDP(l)) {
-    if (!get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING"))
-      pips_user_error("Uninitialized pointer \n");
-    else {
-      pips_user_warning("Uninitialized pointer \n");
-      bool to_be_freed = false;
-      type lhs_type = cell_to_type(lhs, &to_be_freed);
-      if ( type_sensitive_p )
-       nowhere =entity_all_xxx_locations_typed(
-						     NOWHERE_LOCATION,
-						     lhs_type);
-      else
-	nowhere = entity_all_xxx_locations(NOWHERE_LOCATION);
-
-      reference r = make_reference(nowhere,NIL);
-      cell c = make_cell_reference(r);
-      paths = CONS(CELL, c, NIL);
-      if (to_be_freed) free_type(lhs_type);
-    }
-  }
-  else {
-    bool to_be_freed = false;
-    type lhs_type = cell_to_type(lhs, &to_be_freed);
-    FOREACH(cell, c, l){
-      reference r = cell_any_reference(c);
-      entity e = reference_variable(r);
-      if(entity_nowhere_locations_p(e))
-	pips_user_warning("Uninitialized pointer \n");
-      if(entity_all_locations_p(e)){
-	if( type_sensitive_p )
-	 anywhere =entity_all_xxx_locations_typed(
-							ANYWHERE_LOCATION,
-							lhs_type);
-	else
-	  anywhere = entity_all_xxx_locations(ANYWHERE_LOCATION);
-
-	r = make_reference(anywhere,NIL);
-	c = make_cell_reference(r);
-      }
-      paths = gen_nconc(paths, CONS(CELL, c, NIL));
-      if (to_be_freed) free_type(lhs_type);
-    }
-  }
-
-  return paths;
-}
 
 /* we define operator max fot the lattice Module which has any_module
    as top and a bottom which is not yet clearly defined (maybe
@@ -1234,6 +769,7 @@ bool subscript_expression_p(expression e)
 
 /* Should be moved to anywhere_abstract_locations.c */
 
+#if 0
 bool expression_null_locations_p(expression e)
 {
   if (expression_reference_p(e)) {
@@ -1243,6 +779,7 @@ bool expression_null_locations_p(expression e)
   else
     return false;
 }
+#endif
 
 /*
  * Create a new set of points-to arcs "may" from an input points-to
@@ -1363,22 +900,6 @@ set gen_may_set(list L, list R, set in_may, bool *address_of_p)
       // free_set(gen_l);
     }
   }
-
-  // FI->FI: this is a really bad idea; it adds an upperapproximation
-  // that is not needed and that reduces accuracy.
-  // This shows on formal_parameter01
-#if 0
-  FOREACH(cell, l, L) {
-    // Hopefully, l' will be empty most of the time!
-    list L_prime = points_to_cell_to_upper_bound_points_to_cells(l);
-    FOREACH(cell, l_prime, L_prime) {
-      // FI: memory leak due to call to call to gen_may_constant_paths()
-      set gen_l = gen_may_constant_paths(l_prime, R, in_may, address_of_p, len);
-      set_union(gen_may3, gen_may3, gen_l);
-      // free_set(gen_l);
-    }
-  }
-#endif
 
   set_union(gen_may2, gen_may2, gen_may1);
   set_union(gen_may2, gen_may2, gen_may3);
@@ -1778,6 +1299,8 @@ set gen_null =  set_generic_make(set_private, points_to_equal_p,
 /*
   iterate over the points to relation, every tab[i] is changed
   into tab[*] in order to obtain points to relations independent of the store
+
+  Used by statement.c
 */
 set points_to_independent_store(set s)
 {
@@ -1795,90 +1318,6 @@ set points_to_independent_store(set s)
   }
 
   return res;
-}
-
-/* change tab[i] into tab[*] .*/
-cell get_array_path(expression e)
-{
-  effect ef = effect_undefined;
-  reference  r = reference_undefined;
-  cell c = cell_undefined;
-
-  /*init the effect's engine*/
-  list l_ef = NIL;
-  set_methods_for_proper_simple_effects();
-  list l1 = generic_proper_effects_of_complex_address_expression(e, &l_ef,
-								 true);
-  ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
-  gen_free_list(l_ef); /* free the spine */
-
-  list l2 = effect_to_store_independent_sdfi_list(ef, false);
-
-  effects_free(l1);
-  effects_free(l2);
-  generic_effects_reset_all_methods();
-  r = effect_any_reference(ef);
-  c = make_cell_reference(r);
-
-  return c;
-}
-/* Input : a cell c
-   Output : side effect on c
-   This function changes array element b[i] into b[*],
-   it takes care of initializing the effect engine.
-*/
-cell array_to_store_independent(cell c)
-{
-  reference r = cell_reference(c);
-  expression e = reference_to_expression(r);
-  effect e1 = effect_undefined;
-
-  /*init the effect's engine.*/
-  set_methods_for_proper_simple_effects();
-  list l_ef = NIL;
-  list l1 = generic_proper_effects_of_complex_address_expression(e,
-								 &l_ef, false);
-  e1 = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
-  gen_free_list(l_ef); /* free the spine */
-
-  effects_free(l1);
-  list l2 = effect_to_store_independent_sdfi_list(e1, false);
-  e1 = EFFECT(CAR(l2));
-  r = effect_any_reference(e1);
-  effects_free(l2);
-  cell c1 = make_cell_reference(r);
-  generic_effects_reset_all_methods();
-
-  return c1;
-}
-
-/* Input : a cell c
-   Output : side effect on c
-   This function changes array element b[i] into b[0],
-   it takes care of initializing the effect engine.
-*/
-cell add_array_dimension(cell c)
-{
-  reference r = cell_reference(c);
-  expression e = reference_to_expression(r);
-  effect e1 = effect_undefined;
-
-  /*init the effect's engine.*/
-  set_methods_for_proper_simple_effects();
-  list l_ef = NIL;
-  list l1 = generic_proper_effects_of_complex_address_expression(e,
-								 &l_ef, true);
-
-  e1 = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
-  gen_free_list(l_ef); /* free the spine */
-
-  effect_add_dereferencing_dimension(e1);
-  effects_free(l1);
-  generic_effects_reset_all_methods();
-  reference r1 = effect_any_reference(e1);
-  cell c1 = make_cell_reference(r1);
-
-  return c1;
 }
 
 
@@ -1933,6 +1372,49 @@ bool equal_must_vreference(cell c1, cell c2)
   return (i==0? true: false);
 }
 
+/* arg1:  list of cells
+   arg2:  set of points-to
+   Create a points-to set with elements of lhs_list as
+   source and NOWHERE as sink.
+   Iterate over input and kill all points-to relations
+   where sinks are elements of lhs_list.
+*/
+set points_to_nowhere(list lhs_list, set input)
+{
+  set kill = set_generic_make(set_private, points_to_equal_p,
+				    points_to_rank);
+  set gen = set_generic_make(set_private, points_to_equal_p,
+				    points_to_rank);
+  set res = set_generic_make(set_private, points_to_equal_p,
+				    points_to_rank);
+  set input_kill_diff = set_generic_make(set_private, points_to_equal_p,
+			   points_to_rank);
+  approximation a = make_approximation_exact();
+
+  SET_FOREACH(points_to, p, input) {
+      FOREACH(cell, c, lhs_list) {
+	  if(points_to_source(p) == c)
+	    set_add_element(kill, kill, p);
+	}
+    }
+  set_difference(input_kill_diff, input, kill);
+  /* if the lhs_set or the rhs set contains more than an element, we
+     set the approximation to MAY. */
+  if((int)gen_length(lhs_list) > 1)// || set_size(rhs_set)>1)
+    a = make_approximation_may();
+
+  /* Computing the gen set */
+  FOREACH(cell, c, lhs_list) {
+    cell sink = make_nowhere_cell();
+    points_to pt_to = make_points_to(c, sink, copy_approximation(a), make_descriptor_none());
+    set_add_element(gen, gen, (void*)pt_to);
+  }
+  free_approximation(a);
+  set_union(res, gen, input_kill_diff);
+
+  return res;
+}
+
 /*
  * want to test if r can only be a constant path and nothing else
  * WARNING : not totally tested
@@ -1950,6 +1432,8 @@ bool equal_must_vreference(cell c1, cell c2)
  *      can return true for i, j, ... that can be a constant path but not strictly a constant path
  * param r          reference to analyze to see if it's a constant path
  * return           true if r is exactly a constant path
+ *
+ * This function is not used by the points-to analysis, but by semantics
  */
 bool strict_constant_path_p(reference r)
 {
@@ -2032,6 +1516,8 @@ bool strict_constant_path_p(reference r)
  *      can return true for i, j, ... that can be a constant path but not strictly a constant path
  * param r          reference to analyze to see if it's a constant path
  * return           true if r can be constant path
+ *
+ * This function is not used by the points-to analysis, but by semantics
  */
 bool can_be_constant_path_p(reference r)
 {

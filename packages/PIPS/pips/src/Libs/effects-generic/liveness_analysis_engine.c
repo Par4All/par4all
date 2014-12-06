@@ -134,15 +134,22 @@ bool live_in_summary_paths_engine(const char* module_name)
 
   set_current_module_entity(module_name_to_entity(module_name));
   set_current_module_statement( (statement)
-				db_get_memory_resource(DBR_CODE, module_name, true) );
+      db_get_memory_resource(DBR_CODE, module_name, true) );
   module_stat = get_current_module_statement();
 
+  // functions that can be pointed by effects_computation_init_func:
+  // effects_computation_no_init
+  // init_convex_in_out_regions
+  // init_convex_rw_regions
   (*effects_computation_init_func)(module_name);
 
   set_live_in_paths((*db_get_live_in_paths_func)(module_name));
 
   l_loc = load_live_in_paths_list(module_stat);
 
+  // functions that can be pointed by effects_local_to_global_translation_op:
+  // effects_dynamic_elim
+  // regions_dynamic_elim
   l_glob = (*effects_local_to_global_translation_op)(l_loc);
 
   (*db_put_live_in_summary_paths_func)(module_name, l_glob);
@@ -151,6 +158,10 @@ bool live_in_summary_paths_engine(const char* module_name)
   reset_current_module_statement();
   reset_live_in_paths();
 
+  // functions that can be pointed by effects_computation_reset_func:
+  // effects_computation_no_reset
+  // reset_convex_in_out_regions
+  // reset_convex_rw_regions
   (*effects_computation_reset_func)(module_name);
 
   return true;
@@ -184,8 +195,12 @@ update_live_out_summary_engine_context_paths(live_out_summary_engine_context *ct
   if (list_undefined_p(ctxt->l_current_paths))
     ctxt->l_current_paths = l_paths;
   else
+    // functions that can be pointed by effects_test_union_op:
+    // EffectsMayUnion
+    // RegionsMayUnion
+    // ReferenceTestUnion
     ctxt->l_current_paths = (*effects_test_union_op)(ctxt->l_current_paths , l_paths,
-						     effects_same_action_p);
+        effects_same_action_p);
 
   pips_debug_effects(3, "current paths\n", ctxt->l_current_paths);
 }
@@ -194,39 +209,39 @@ static bool
 live_out_paths_from_call_site_to_callee(call c, live_out_summary_engine_context *ctxt)
 {
   pips_debug(1, "considering call to %s\n", entity_name(call_function(c)));
-    pips_debug(2, "current context callee: %s\n",  entity_name(ctxt->current_callee));
+  pips_debug(2, "current context callee: %s\n",  entity_name(ctxt->current_callee));
 
-    if (call_function(c) != ctxt->current_callee)
-      {
-	return (true);
-      }
-    pips_debug(1, "good candidate\n");
+  if (call_function(c) != ctxt->current_callee)
+  {
+    return (true);
+  }
+  pips_debug(1, "good candidate\n");
 
-    statement current_stmt = (statement) gen_get_ancestor(statement_domain, c);
+  statement current_stmt = (statement) gen_get_ancestor(statement_domain, c);
 
-    /* there is a problem here because the context is in the store preceding the statement
-       whereas live_out_paths hold after the statement.
-       So I think I must apply the transformer to get the post-condition.
-       That's ok for simple paths since they are store independent. BC.
-    */
-    transformer stmt_context = (*load_context_func)(current_stmt);
+  /* there is a problem here because the context is in the store preceding the statement
+   * whereas live_out_paths hold after the statement.
+   * So I think I must apply the transformer to get the post-condition.
+   * That's ok for simple paths since they are store independent. BC.
+   */
+  transformer stmt_context = (*load_context_func)(current_stmt);
 
-    /* There may also be a problem here in C, because calls may be
-       anywhere inside an expression, and not solely as standalone
-       statements.  It may be better to call this function during the
-       intraprocedural analysis of callers and not during a standalone
-       phase which would have to deal with calls in sub-expressions,
-       and thus also with store/pointers modifications.
-       BC.
-    */
-    list l_out = load_live_out_paths_list(current_stmt);
+  /* There may also be a problem here in C, because calls may be
+   * anywhere inside an expression, and not solely as standalone
+   * statements.  It may be better to call this function during the
+   * intraprocedural analysis of callers and not during a standalone
+   * phase which would have to deal with calls in sub-expressions,
+   * and thus also with store/pointers modifications.
+   * BC.
+   */
+  list l_out = load_live_out_paths_list(current_stmt);
 
-    pips_debug_effects(3, "current statement live_out_paths:\n", l_out);
-    list l_paths = generic_effects_forward_translation(ctxt->current_callee,
-						call_arguments(c), l_out,
-						stmt_context);
-    update_live_out_summary_engine_context_paths(ctxt, l_paths);
-    return true;
+  pips_debug_effects(3, "current statement live_out_paths:\n", l_out);
+  list l_paths = generic_effects_forward_translation(ctxt->current_callee,
+      call_arguments(c), l_out,
+      stmt_context);
+  update_live_out_summary_engine_context_paths(ctxt, l_paths);
+  return true;
 }
 
 static bool
@@ -239,38 +254,46 @@ live_out_summary_paths_stmt_filter(statement s,
 
 static void
 live_out_paths_from_caller_to_callee(entity caller, entity callee,
-				     live_out_summary_engine_context *ctxt)
+    live_out_summary_engine_context *ctxt)
 {
-   const char *caller_name;
-    statement caller_statement;
+  const char *caller_name;
+  statement caller_statement;
 
-    reset_current_module_entity();
-    set_current_module_entity(caller);
-    caller_name = module_local_name(caller);
-    pips_debug(2, "begin for caller: %s, and callee: %s\n", caller_name,
-	       entity_name(callee));
-    pips_debug(2, "current context callee: %s\n",  entity_name(ctxt->current_callee));
-    /* All we need to perform the translation */
-    set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, caller_name, true) );
-    caller_statement = get_current_module_statement();
+  reset_current_module_entity();
+  set_current_module_entity(caller);
+  caller_name = module_local_name(caller);
+  pips_debug(2, "begin for caller: %s, and callee: %s\n", caller_name,
+      entity_name(callee));
+  pips_debug(2, "current context callee: %s\n",  entity_name(ctxt->current_callee));
+  /* All we need to perform the translation */
+  set_current_module_statement( (statement)
+      db_get_memory_resource(DBR_CODE, caller_name, true) );
+  caller_statement = get_current_module_statement();
 
-    (*effects_computation_init_func)(caller_name);
+  // functions that can be pointed by effects_computation_init_func:
+  // effects_computation_no_init
+  // init_convex_in_out_regions
+  // init_convex_rw_regions
+  (*effects_computation_init_func)(caller_name);
 
-    set_live_out_paths( (*db_get_live_out_paths_func)(caller_name));
+  set_live_out_paths( (*db_get_live_out_paths_func)(caller_name));
 
-    //ctxt->current_callee = callee;
-    gen_context_multi_recurse(caller_statement, ctxt,
-		      statement_domain, live_out_summary_paths_stmt_filter, gen_null,
-		      call_domain, live_out_paths_from_call_site_to_callee, gen_null,
-		      NULL);
+  //ctxt->current_callee = callee;
+  gen_context_multi_recurse(caller_statement, ctxt,
+      statement_domain, live_out_summary_paths_stmt_filter, gen_null,
+      call_domain, live_out_paths_from_call_site_to_callee, gen_null,
+      NULL);
 
-    reset_live_out_paths();
-    reset_current_module_entity();
-    set_current_module_entity(callee);
-    reset_current_module_statement();
+  reset_live_out_paths();
+  reset_current_module_entity();
+  set_current_module_entity(callee);
+  reset_current_module_statement();
 
-    (*effects_computation_reset_func)(caller_name);
+  // functions that can be pointed by effects_computation_reset_func:
+  // effects_computation_no_reset
+  // reset_convex_in_out_regions
+  // reset_convex_rw_regions
+  (*effects_computation_reset_func)(caller_name);
 }
 
 
@@ -332,85 +355,98 @@ bool live_out_summary_paths_engine(const char* module_name)
 
 static void
 live_in_paths_of_statement(statement s,
-			   live_paths_analysis_context *ctxt)
+    live_paths_analysis_context *ctxt)
 {
   /* live in paths may have already been computed,
-     for instance for sequences
-  */
+   * for instance for sequences
+   */
   pips_debug(1,"begin for statement with ordering: %03zd and number: %03zd\n",
-	     statement_ordering(s), statement_number(s));
+      statement_ordering(s), statement_number(s));
 
   if ( !bound_live_in_paths_p(s) )
+  {
+    pips_debug(1, "not bound\n");
+    /* First, we get the live out paths of the statement */
+    list l_live_out = effects_dup(load_live_out_paths_list(s));
+
+    /* Live_in(S) = (live_out(S) o T(S) - W(S)) U IN (S) */
+
+    /* first take care of declarations */
+    if (c_module_p(get_current_module_entity()) &&
+        (declaration_statement_p(s) ))
     {
-      pips_debug(1, "not bound\n");
-      /* First, we get the live out paths of the statement */
-      list l_live_out = effects_dup(load_live_out_paths_list(s));
-
-      /* Live_in(S) = (live_out(S) o T(S) - W(S)) U IN (S) */
-
-      /* first take care of declarations */
-      if (c_module_p(get_current_module_entity()) &&
-	  (declaration_statement_p(s) ))
-	{
-	  FOREACH(ENTITY, decl, statement_declarations(s))
-	    {
-	      storage decl_storage = entity_storage(decl);
-	      if (storage_ram_p(decl_storage)
-		  // keep paths on static variables
-		  && !static_area_p(ram_section(storage_ram(decl_storage))))
-		l_live_out = filter_effects_with_declaration(l_live_out, decl);
-	    }
-	}
-
-      // then move the live_out effects of the statement in the store
-      // before the statement
-      transformer t = (*load_completed_transformer_func)(s);
-
-      (*effects_transformer_composition_op)(l_live_out, t);
-
-      // next, remove the effects written by the statement
-      // and add the in effects of the statement
-      list l_rw =  convert_rw_effects(load_rw_effects_list(s),ctxt);
-      list l_write = effects_write_effects_dup(l_rw);
-      pips_debug_effects(5, "write effects:\n", l_write);
-
-      list l_in = convert_in_effects(load_in_effects_list(s), ctxt);
-      pips_debug_effects(5, "in effects:\n", l_in);
-
-      list l_live_in = (*effects_union_op)
-	(effects_dup(l_in),
-	 (*effects_sup_difference_op)(l_live_out, l_write,
-				      r_w_combinable_p),
-	 effects_same_action_p);
-      pips_debug_effects(5, "resulting live in paths:\n", l_live_in);
-
-
-      store_live_in_paths_list(s, l_live_in);
-
-      reset_converted_rw_effects(&l_rw, ctxt);
-      reset_converted_in_effects(&l_in, ctxt);
-
+      FOREACH(ENTITY, decl, statement_declarations(s)) {
+        storage decl_storage = entity_storage(decl);
+        if (storage_ram_p(decl_storage)
+            // keep paths on static variables
+            && !static_area_p(ram_section(storage_ram(decl_storage))))
+          l_live_out = filter_effects_with_declaration(l_live_out, decl);
+      }
     }
+
+    // then move the live_out effects of the statement in the store
+    // before the statement
+    transformer t = (*load_completed_transformer_func)(s);
+
+    // functions that can be pointed by effects_transformer_composition_op:
+    // effects_composition_with_transformer_nop
+    // effects_undefined_composition_with_transformer
+    // convex_regions_transformer_compose
+    // simple_effects_composition_with_effect_transformer
+    (*effects_transformer_composition_op)(l_live_out, t);
+
+    // next, remove the effects written by the statement
+    // and add the in effects of the statement
+    list l_rw =  convert_rw_effects(load_rw_effects_list(s),ctxt);
+    list l_write = effects_write_effects_dup(l_rw);
+    pips_debug_effects(5, "write effects:\n", l_write);
+
+    list l_in = convert_in_effects(load_in_effects_list(s), ctxt);
+    pips_debug_effects(5, "in effects:\n", l_in);
+
+    // functions that can be pointed by effects_union_op:
+    // ProperEffectsMustUnion
+    // RegionsMustUnion
+    // ReferenceUnion
+    // EffectsMustUnion
+    // functions that can be pointed by effects_sup_difference_op:
+    // effects_undefined_binary_operator
+    // RegionsSupDifference
+    // EffectsSupDifference
+    list l_live_in = (*effects_union_op)(
+        effects_dup(l_in),
+        (*effects_sup_difference_op)(l_live_out, l_write,
+            r_w_combinable_p),
+            effects_same_action_p);
+    pips_debug_effects(5, "resulting live in paths:\n", l_live_in);
+
+
+    store_live_in_paths_list(s, l_live_in);
+
+    reset_converted_rw_effects(&l_rw, ctxt);
+    reset_converted_in_effects(&l_in, ctxt);
+
+  }
   pips_debug(1,"end\n");
   return;
 }
 
 static bool
 live_out_paths_from_unstructured_to_nodes(unstructured unstr,
-					  live_paths_analysis_context *ctxt)
+    live_paths_analysis_context *ctxt)
 {
   pips_debug(1,"begin\n");
 
   /* Adopt a very conservative strategy:
-     live_out(node)=  live_out(unstructured)*may U (U_{n \in nodes} IN(nodes))
-     If convex paths were to be computed, transformers should be taken into account.
-  */
+   * live_out(node)=  live_out(unstructured)*may U (U_{n \in nodes} IN(nodes))
+   * If convex paths were to be computed, transformers should be taken into account.
+   */
   /* The exit node is a particular case: its live_out paths are the live_out paths
-     of the unstructured.
-  */
+   * of the unstructured.
+   */
 
   statement
-    current_stmt = (statement) gen_get_ancestor(statement_domain, unstr);
+  current_stmt = (statement) gen_get_ancestor(statement_domain, unstr);
   control exit_ctrl = unstructured_exit( unstr );
   statement exit_node = control_statement(exit_ctrl);
 
@@ -419,59 +455,69 @@ live_out_paths_from_unstructured_to_nodes(unstructured unstr,
   store_live_out_paths_list(exit_node, l_live_out_unstr);
 
   if(control_predecessors(exit_ctrl) == NIL && control_successors(exit_ctrl) == NIL)
-    {
-      /* there is only one statement in u; */
-      pips_debug(6, "unique node\n");
-    }
+  {
+    /* there is only one statement in u; */
+    pips_debug(6, "unique node\n");
+  }
   else
+  {
+    l_live_out_unstr = effects_dup(l_live_out_unstr);
+    effects_to_may_effects(l_live_out_unstr); /* It may be executed... */
+
+    list l_in = NIL;
+
+    list l_nodes = NIL;
+    UNSTRUCTURED_CONTROL_MAP
+    (ctrl, unstr, l_nodes,
+        {
+            statement node_stmt = control_statement(ctrl);
+            pips_debug(3, "visiting node statement with ordering: "
+                "%03zd and number: %03zd\n",
+                statement_ordering(node_stmt),
+                statement_number(node_stmt));
+
+            list l_in_node = convert_in_effects(load_in_effects_list(node_stmt), ctxt);
+            list l_in_node_may = effects_dup(l_in_node);
+            effects_to_may_effects(l_in_node_may);
+
+            // functions that can be pointed by effects_union_op:
+            // ProperEffectsMustUnion
+            // RegionsMustUnion
+            // ReferenceUnion
+            // EffectsMustUnion
+            l_in = (*effects_union_op)(l_in_node_may, l_in,
+                effects_same_action_p);
+            pips_debug_effects(5, "current in effects:\n", l_in);
+            reset_converted_in_effects(&l_in_node, ctxt);
+        });
+
+    // functions that can be pointed by effects_union_op:
+    // ProperEffectsMustUnion
+    // RegionsMustUnion
+    // ReferenceUnion
+    // EffectsMustUnion
+    list l_live_out_nodes = (*effects_union_op)(l_in, l_live_out_unstr,
+        effects_same_action_p);
+    pips_debug_effects(3, "l_live_out_nodes:\n", l_live_out_nodes);
+
+    FOREACH(CONTROL, ctrl, l_nodes)
     {
-      l_live_out_unstr = effects_dup(l_live_out_unstr);
-      effects_to_may_effects(l_live_out_unstr); /* It may be executed... */
 
-      list l_in = NIL;
+      statement node_stmt = control_statement(ctrl);
 
-      list l_nodes = NIL;
-      UNSTRUCTURED_CONTROL_MAP
-	(ctrl, unstr, l_nodes,
-	 {
-	   statement node_stmt = control_statement(ctrl);
-	   pips_debug(3, "visiting node statement with ordering: "
-		      "%03zd and number: %03zd\n",
-		      statement_ordering(node_stmt),
-		      statement_number(node_stmt));
-
-	   list l_in_node = convert_in_effects(load_in_effects_list(node_stmt), ctxt);
-	   list l_in_node_may = effects_dup(l_in_node);
-	   effects_to_may_effects(l_in_node_may);
-
-	   l_in = (*effects_union_op)(l_in_node_may, l_in,
-				      effects_same_action_p);
-	   pips_debug_effects(5, "current in effects:\n", l_in);
-	   reset_converted_in_effects(&l_in_node, ctxt);
-	 });
-
-      list l_live_out_nodes = (*effects_union_op)(l_in, l_live_out_unstr,
-						  effects_same_action_p);
-      pips_debug_effects(3, "l_live_out_nodes:\n", l_live_out_nodes);
-
-      FOREACH(CONTROL, ctrl, l_nodes)
-	{
-
-	  statement node_stmt = control_statement(ctrl);
-
-	  /* be sure live_out paths are not stored twice, in particular
+      /* be sure live_out paths are not stored twice, in particular
 	     for the exit node
-	  */
-	  if ( !bound_live_out_paths_p(node_stmt) )
-	    {
-	       pips_debug(3, "storing live out paths for node statement "
-			  "with ordering: %03zd and number: %03zd\n",
-			  statement_ordering(node_stmt),
-			  statement_number(node_stmt));
-	      store_live_out_paths_list(node_stmt, effects_dup(l_live_out_nodes));
-	    }
-	}
+       */
+      if ( !bound_live_out_paths_p(node_stmt) )
+      {
+        pips_debug(3, "storing live out paths for node statement "
+            "with ordering: %03zd and number: %03zd\n",
+            statement_ordering(node_stmt),
+            statement_number(node_stmt));
+        store_live_out_paths_list(node_stmt, effects_dup(l_live_out_nodes));
+      }
     }
+  }
 
   pips_debug(1,"end\n");
 
@@ -480,26 +526,25 @@ live_out_paths_from_unstructured_to_nodes(unstructured unstr,
 
 static bool
 live_out_paths_from_forloop_to_body(forloop l,
-				    live_paths_analysis_context *ctxt)
+    live_paths_analysis_context *ctxt)
 {
-
   statement
-    current_stmt = (statement) gen_get_ancestor(statement_domain, l);
+  current_stmt = (statement) gen_get_ancestor(statement_domain, l);
   statement body = forloop_body(l);
 
   pips_debug(1,"begin\n");
 
   /* The live out paths of an iteration are the paths that
-       - belong to the live in paths of the next iteration if it exists,
-         that is to say if the condition evaluates to true;
-	 the write effects of the condition evaluation mask the
-	 live in paths of the next iteration; and the in effects
-	 of the condition evaluation must be added.
-       - or belong to the live out of the whole loop if the next iteration
-         does not exist. However, the condition is evaluated,
-	 and its write effects mask the live out paths at the end of the
-	 whole loop.
-  */
+   *   - belong to the live in paths of the next iteration if it exists,
+   *     that is to say if the condition evaluates to true;
+   *     the write effects of the condition evaluation mask the
+   *     live in paths of the next iteration; and the in effects
+   *     of the condition evaluation must be added.
+   *   - or belong to the live out of the whole loop if the next iteration
+   *     does not exist. However, the condition is evaluated,
+   *     and its write effects mask the live out paths at the end of the
+   *     whole loop.
+   */
 
   /* First, we get the live out paths of the whole loop
    */
@@ -512,45 +557,59 @@ live_out_paths_from_forloop_to_body(forloop l,
   list l_in_next_iter_may = effects_dup(l_in_next_iter);
   effects_to_may_effects(l_in_next_iter_may);
   pips_debug_effects(3, "(may) in effects of next iterations:\n",
-		     l_in_next_iter_may);
+      l_in_next_iter_may);
   reset_converted_in_effects(&l_in_next_iter, ctxt);
 
+  // functions that can be pointed by effects_union_op:
+  // ProperEffectsMustUnion
+  // RegionsMustUnion
+  // ReferenceUnion
+  // EffectsMustUnion
   list l_live_out_after_cond =
-    (*effects_union_op)(l_live_out_loop,
-			l_in_next_iter_may,
-			effects_same_action_p);
+      (*effects_union_op)(l_live_out_loop,
+          l_in_next_iter_may,
+          effects_same_action_p);
 
   pips_debug_effects(3, "live out paths after header evaluation:\n",
-		     l_live_out_after_cond);
+      l_live_out_after_cond);
 
   /* Take into account the effects of the header */
   list l_prop_cond = convert_rw_effects(load_proper_rw_effects_list(current_stmt),
-					  ctxt);
+      ctxt);
 
   list l_write_cond =
-    proper_to_summary_effects(effects_write_effects_dup(l_prop_cond));
+      proper_to_summary_effects(effects_write_effects_dup(l_prop_cond));
   pips_debug_effects(3, "write effects of condition:\n", l_write_cond);
 
 
   /* We don't have the in effects of the header evaluation
-     we safely approximate them by its may read proper effects
-     if there are write effects during its evaluation
-     We could be much more precise here by distinguishing
-     the three different components and re-computing their effects.
-     However, for loops are generally converted to loops or while loops
-     by the controlizer, so I leave this as it is for the time being.
-  */
+   * we safely approximate them by its may read proper effects
+   * if there are write effects during its evaluation
+   * We could be much more precise here by distinguishing
+   * the three different components and re-computing their effects.
+   * However, for loops are generally converted to loops or while loops
+   * by the controlizer, so I leave this as it is for the time being.
+   */
   list l_in_cond =
-    proper_to_summary_effects(effects_read_effects_dup(l_prop_cond));
+      proper_to_summary_effects(effects_read_effects_dup(l_prop_cond));
   if (!ENDP(l_write_cond)) effects_to_may_effects(l_in_cond);
   pips_debug_effects(3, "approximation of in effects of condition:\n", l_in_cond);
 
+  // functions that can be pointed by effects_union_op:
+  // ProperEffectsMustUnion
+  // RegionsMustUnion
+  // ReferenceUnion
+  // EffectsMustUnion
+  // functions that can be pointed by effects_sup_difference_op:
+  // effects_undefined_binary_operator
+  // RegionsSupDifference
+  // EffectsSupDifference
   list l_live_out_body =
-    (*effects_union_op)(l_in_cond,
-			(*effects_sup_difference_op)(l_live_out_after_cond,
-						     l_write_cond,
-						     r_w_combinable_p),
-			effects_same_action_p);
+      (*effects_union_op)(l_in_cond,
+          (*effects_sup_difference_op)(l_live_out_after_cond,
+              l_write_cond,
+              r_w_combinable_p),
+              effects_same_action_p);
 
 
   reset_converted_rw_effects(&l_prop_cond, ctxt);
@@ -568,22 +627,22 @@ static bool
 live_out_paths_from_whileloop_to_body(whileloop l, live_paths_analysis_context *ctxt)
 {
   statement
-    current_stmt = (statement) gen_get_ancestor(statement_domain, l);
+  current_stmt = (statement) gen_get_ancestor(statement_domain, l);
   statement body = whileloop_body(l);
 
   pips_debug(1,"begin\n");
 
   /* The live out paths of an iteration are the paths that
-       - belong to the live in paths of the next iteration if it exists,
-         that is to say if the condition evaluates to true;
-	 the write effects of the condition evaluation mask the
-	 live in paths of the next iteration; and the in effects
-	 of the condition evaluation must be added.
-       - or belong to the live out of the whole loop if the next iteration
-         does not exist. However, the condition is evaluated,
-	 and its write effects mask the live out paths at the end of the
-	 whole loop.
-  */
+   *   - belong to the live in paths of the next iteration if it exists,
+   *     that is to say if the condition evaluates to true;
+   *     the write effects of the condition evaluation mask the
+   *     live in paths of the next iteration; and the in effects
+   *     of the condition evaluation must be added.
+   *   - or belong to the live out of the whole loop if the next iteration
+   *     does not exist. However, the condition is evaluated,
+   *     and its write effects mask the live out paths at the end of the
+   *     whole loop.
+   */
 
   /* First, we get the live out paths of the whole loop
    */
@@ -596,41 +655,55 @@ live_out_paths_from_whileloop_to_body(whileloop l, live_paths_analysis_context *
   list l_in_next_iter_may = effects_dup(l_in_next_iter);
   effects_to_may_effects(l_in_next_iter_may);
   pips_debug_effects(3, "(may) in effects of next iterations:\n",
-		     l_in_next_iter_may);
+      l_in_next_iter_may);
   reset_converted_in_effects(&l_in_next_iter, ctxt);
 
+  // functions that can be pointed by effects_union_op:
+  // ProperEffectsMustUnion
+  // RegionsMustUnion
+  // ReferenceUnion
+  // EffectsMustUnion
   list l_live_out_after_cond =
-    (*effects_union_op)(l_live_out_loop,
-			l_in_next_iter_may,
-			effects_same_action_p);
+      (*effects_union_op)(l_live_out_loop,
+          l_in_next_iter_may,
+          effects_same_action_p);
 
   pips_debug_effects(3, "live out paths after any condition evaluation:\n",
-		     l_live_out_after_cond);
+      l_live_out_after_cond);
 
   /* Take into account the effects of the condition */
   list l_prop_cond = convert_rw_effects(load_proper_rw_effects_list(current_stmt),
-					  ctxt);
+      ctxt);
 
   list l_write_cond =
-    proper_to_summary_effects(effects_write_effects_dup(l_prop_cond));
+      proper_to_summary_effects(effects_write_effects_dup(l_prop_cond));
   pips_debug_effects(3, "write effects of condition:\n", l_write_cond);
 
 
   /* We don't have the in effects of the condition evaluation
-     we safely approximate them by its may read proper effects
-     if there are write effects during its evaluation
-  */
+   * we safely approximate them by its may read proper effects
+   * if there are write effects during its evaluation
+   */
   list l_in_cond =
-    proper_to_summary_effects(effects_read_effects_dup(l_prop_cond));
+      proper_to_summary_effects(effects_read_effects_dup(l_prop_cond));
   if (!ENDP(l_write_cond)) effects_to_may_effects(l_in_cond);
   pips_debug_effects(3, "approximation of in effects of condition:\n", l_in_cond);
 
+  // functions that can be pointed by effects_union_op:
+  // ProperEffectsMustUnion
+  // RegionsMustUnion
+  // ReferenceUnion
+  // EffectsMustUnion
+  // functions that can be pointed by effects_sup_difference_op:
+  // effects_undefined_binary_operator
+  // RegionsSupDifference
+  // EffectsSupDifference
   list l_live_out_body =
-    (*effects_union_op)(l_in_cond,
-			(*effects_sup_difference_op)(l_live_out_after_cond,
-						     l_write_cond,
-						     r_w_combinable_p),
-			effects_same_action_p);
+      (*effects_union_op)(l_in_cond,
+          (*effects_sup_difference_op)(l_live_out_after_cond,
+              l_write_cond,
+              r_w_combinable_p),
+              effects_same_action_p);
 
 
   reset_converted_rw_effects(&l_prop_cond, ctxt);
@@ -648,7 +721,7 @@ static void
 live_in_paths_of_whileloop(whileloop l, live_paths_analysis_context *ctxt)
 {
   statement
-    current_stmt = (statement) gen_get_ancestor(statement_domain, l);
+  current_stmt = (statement) gen_get_ancestor(statement_domain, l);
   bool before_p = evaluation_before_p(whileloop_evaluation(l));
   statement body = whileloop_body(l);
 
@@ -657,95 +730,106 @@ live_in_paths_of_whileloop(whileloop l, live_paths_analysis_context *ctxt)
   pips_debug(1,"begin\n");
 
   /* If the loop belongs to a sequence of statements, which is
-     generally the case, its live in paths have already been computed.
-     I don't yet know if they may be much more precisely computed here.
-     For performance reasons, I don't try to recompute them if they
-     are already available.
-     see also the comment inside the else branch of if (!before_p)
-     about the way of computing live in paths.
-     The code below is likely to be seldom executed;
-     however, it has been tested on small cases.
-  */
+   * generally the case, its live in paths have already been computed.
+   * I don't yet know if they may be much more precisely computed here.
+   * For performance reasons, I don't try to recompute them if they
+   * are already available.
+   * see also the comment inside the else branch of if (!before_p)
+   * about the way of computing live in paths.
+   * The code below is likely to be seldom executed;
+   * however, it has been tested on small cases.
+   */
   if ( !bound_live_in_paths_p(current_stmt) )
+  {
+    list l_live_in_body = effects_dup(load_live_in_paths_list(body));
+    pips_debug_effects(3, "live in paths of loop body:\n", l_live_in_body);
+
+    if (!before_p)
     {
-      list l_live_in_body = effects_dup(load_live_in_paths_list(body));
-      pips_debug_effects(3, "live in paths of loop body:\n", l_live_in_body);
-
-      if (!before_p)
-	{
-	  pips_debug(1, "do while loop: live in paths are those of the body\n");
-	  l_live_in_loop = l_live_in_body;
-	}
-      else
-	{
-	  /* the live in paths of the loop are either those of the
-	     first iteration if there is one, or the live out paths
-	     of the whole loop is there is no iteration;
-	     we must remove the write effects and add the in effects
-	     of the condition evaluation
-	  */
-
-	  /* As we currently only compute simple live paths,
-	     I wonder if there is a difference with the live out paths
-	     of the loop body...
-	  */
-
-	  /* Get the live out paths of the whole loop
-	   */
-	  list l_live_out_loop = effects_dup(load_live_out_paths_list(current_stmt));
-	  pips_debug_effects(3, "live out paths of whole loop:\n", l_live_out_loop);
-	  effects_to_may_effects(l_live_out_loop); /* It may be executed... */
-
-	  /* ...or the first iteration of the loop body */
-	  effects_to_may_effects(l_live_in_body);
-
-	  list l_live_out_after_cond =
-	    (*effects_union_op)(l_live_out_loop,
-				l_live_in_body,
-				effects_same_action_p);
-
-	  pips_debug_effects(3, "live out paths after first condition evaluation:\n",
-			     l_live_out_after_cond);
-
-	  /* Take into account the effects of the condition */
-	  list l_prop_cond =
-	    convert_rw_effects(load_proper_rw_effects_list(current_stmt), ctxt);
-
-	  list l_write_cond =
-	    proper_to_summary_effects(effects_write_effects_dup(l_prop_cond));
-	  pips_debug_effects(3, "write effects of condition:\n", l_write_cond);
-
-	  /* We don't have the in effects of the condition evaluation
-	     we safely approximate them by its may read proper effects
-	     if there are write effects during its evaluation
-	  */
-	  list l_in_cond =
-	    proper_to_summary_effects(effects_read_effects_dup(l_prop_cond));
-	  if (!ENDP(l_write_cond)) effects_to_may_effects(l_in_cond);
-	  pips_debug_effects(3, "approximation of in effects of condition:\n",
-			     l_in_cond);
-
-	  l_live_in_loop =
-	    (*effects_union_op)(l_in_cond,
-				(*effects_sup_difference_op)(l_live_out_after_cond,
-							     l_write_cond,
-							     r_w_combinable_p),
-				effects_same_action_p);
-
-
-	  reset_converted_rw_effects(&l_prop_cond, ctxt);
-
-
-	}
-
-      pips_debug_effects(3, "live in paths of loop:\n", l_live_in_loop);
-
-      store_live_in_paths_list(current_stmt, l_live_in_loop);
+      pips_debug(1, "do while loop: live in paths are those of the body\n");
+      l_live_in_loop = l_live_in_body;
     }
+    else
+    {
+      /* the live in paths of the loop are either those of the
+       * first iteration if there is one, or the live out paths
+       * of the whole loop is there is no iteration;
+       * we must remove the write effects and add the in effects
+       * of the condition evaluation
+       */
+
+      /* As we currently only compute simple live paths,
+       * I wonder if there is a difference with the live out paths
+       * of the loop body...
+       */
+
+      /* Get the live out paths of the whole loop
+       */
+      list l_live_out_loop = effects_dup(load_live_out_paths_list(current_stmt));
+      pips_debug_effects(3, "live out paths of whole loop:\n", l_live_out_loop);
+      effects_to_may_effects(l_live_out_loop); /* It may be executed... */
+
+      /* ...or the first iteration of the loop body */
+      effects_to_may_effects(l_live_in_body);
+
+      // functions that can be pointed by effects_union_op:
+      // ProperEffectsMustUnion
+      // RegionsMustUnion
+      // ReferenceUnion
+      // EffectsMustUnion
+      list l_live_out_after_cond =
+          (*effects_union_op)(l_live_out_loop,
+              l_live_in_body,
+              effects_same_action_p);
+
+      pips_debug_effects(3, "live out paths after first condition evaluation:\n",
+          l_live_out_after_cond);
+
+      /* Take into account the effects of the condition */
+      list l_prop_cond =
+          convert_rw_effects(load_proper_rw_effects_list(current_stmt), ctxt);
+
+      list l_write_cond =
+          proper_to_summary_effects(effects_write_effects_dup(l_prop_cond));
+      pips_debug_effects(3, "write effects of condition:\n", l_write_cond);
+
+      /* We don't have the in effects of the condition evaluation
+       * we safely approximate them by its may read proper effects
+       * if there are write effects during its evaluation
+       */
+      list l_in_cond =
+          proper_to_summary_effects(effects_read_effects_dup(l_prop_cond));
+      if (!ENDP(l_write_cond)) effects_to_may_effects(l_in_cond);
+      pips_debug_effects(3, "approximation of in effects of condition:\n",
+          l_in_cond);
+
+      // functions that can be pointed by effects_union_op:
+      // ProperEffectsMustUnion
+      // RegionsMustUnion
+      // ReferenceUnion
+      // EffectsMustUnion
+      // functions that can be pointed by effects_sup_difference_op:
+      // effects_undefined_binary_operator
+      // RegionsSupDifference
+      // EffectsSupDifference
+      l_live_in_loop =
+          (*effects_union_op)(l_in_cond,
+              (*effects_sup_difference_op)(l_live_out_after_cond,
+                  l_write_cond,
+                  r_w_combinable_p),
+                  effects_same_action_p);
+
+      reset_converted_rw_effects(&l_prop_cond, ctxt);
+    }
+
+    pips_debug_effects(3, "live in paths of loop:\n", l_live_in_loop);
+
+    store_live_in_paths_list(current_stmt, l_live_in_loop);
+  }
   else
-    {
-      pips_debug(1, "already bound\n");
-    }
+  {
+    pips_debug(1, "already bound\n");
+  }
 
   pips_debug(1,"end\n");
 
@@ -757,43 +841,45 @@ static bool
 live_out_paths_from_loop_to_body(loop l, live_paths_analysis_context *ctxt)
 {
   statement
-    current_stmt = (statement) gen_get_ancestor(statement_domain, l);
+  current_stmt = (statement) gen_get_ancestor(statement_domain, l);
   statement
-    body = loop_body(l);
+  body = loop_body(l);
   entity
-    index = loop_index(l);
+  index = loop_index(l);
 
   pips_debug(1,"begin\n");
 
   /* First, we get the live out paths of the statement corresponding to the
-     whole loop
+   * whole loop
    */
   list l_live_out_loop = effects_dup(load_live_out_paths_list(current_stmt));
   pips_debug_effects(3, "live out paths of whole loop:\n", l_live_out_loop);
 
   list l_rw_body = convert_rw_effects(load_rw_effects_list(body),
-					 ctxt);
+      ctxt);
   list l_w_body = effects_write_effects_dup(l_rw_body);
   reset_converted_rw_effects(&l_rw_body, ctxt);
 
   if (!loop_executed_at_least_once_p(l))
     effects_to_may_effects(l_w_body);
+  // functions that can be pointed by effects_sup_difference_op:
+  // effects_undefined_binary_operator
+  // RegionsSupDifference
+  // EffectsSupDifference
   l_live_out_loop = (*effects_sup_difference_op)(l_live_out_loop, l_w_body,
-						 r_w_combinable_p);
+      r_w_combinable_p);
   pips_debug_effects(3, "live out paths of an iteration due to live out paths of whole loop\n", l_live_out_loop);
-
-
 
 
   /* We then compute the live out paths of the loop body */
   /* The live out paths of an iteration are the paths that
-       - belong to the in effects of the next iterations if there exist some,
-         except for the loop locals if the loop is parallel;
-       - or belong to the live out of the whole loop if the next iteration
-         does not exist.
-       - to these, for the C language, we must add the read effects resulting
-         from the evaluation of the incremental expression and of the upper
-	 bound. This includes an exact path for the loop index.
+   *   - belong to the in effects of the next iterations if there exist some,
+   *     except for the loop locals if the loop is parallel;
+   *   - or belong to the live out of the whole loop if the next iteration
+   *     does not exist.
+   *   - to these, for the C language, we must add the read effects resulting
+   *     from the evaluation of the incremental expression and of the upper
+   *     bound. This includes an exact path for the loop index.
    */
   list l_masked_vars = NIL;
   if(loop_parallel_p(l))
@@ -801,30 +887,49 @@ live_out_paths_from_loop_to_body(loop l, live_paths_analysis_context *ctxt)
 
   list l_inv_in_body = convert_in_effects(load_invariant_in_effects_list(body), ctxt);
   list l_inv_in_body_may =
-    effects_dup_without_variables(l_inv_in_body, l_masked_vars);
+      effects_dup_without_variables(l_inv_in_body, l_masked_vars);
   effects_to_may_effects(l_inv_in_body_may);
   pips_debug_effects(3, "(may) live in paths of an iteration:\n", l_inv_in_body_may);
 
+  // functions that can be pointed by effects_union_op:
+  // ProperEffectsMustUnion
+  // RegionsMustUnion
+  // ReferenceUnion
+  // EffectsMustUnion
   list l_live_out_body = (*effects_union_op)(l_live_out_loop,
-					     l_inv_in_body_may,
-					     effects_same_action_p);
+      l_inv_in_body_may,
+      effects_same_action_p);
   reset_converted_in_effects(&l_inv_in_body, ctxt);
 
   list l_prop_header = convert_rw_effects(load_proper_rw_effects_list(current_stmt),
-					  ctxt);
+      ctxt);
   list l_live_in_header =
-    proper_to_summary_effects(effects_read_effects_dup(l_prop_header));
+      proper_to_summary_effects(effects_read_effects_dup(l_prop_header));
   reset_converted_rw_effects(&l_prop_header, ctxt);
+  // functions that can be pointed by reference_to_effect_func:
+  // reference_to_simple_effect
+  // reference_to_convex_region
+  // reference_to_reference_effect
   list l_index = CONS(EFFECT,
-		      (*reference_to_effect_func)(make_reference(index, NIL), make_action_read_memory(), false),
-		      NIL);
+      (*reference_to_effect_func)(make_reference(index, NIL), make_action_read_memory(), false),
+      NIL);
+  // functions that can be pointed by effects_union_op:
+  // ProperEffectsMustUnion
+  // RegionsMustUnion
+  // ReferenceUnion
+  // EffectsMustUnion
   l_live_in_header = (*effects_union_op)(l_index, l_live_in_header, effects_same_action_p);
 
   pips_debug_effects(3, "live in paths of loop header:\n", l_live_in_header);
 
+  // functions that can be pointed by effects_union_op:
+  // ProperEffectsMustUnion
+  // RegionsMustUnion
+  // ReferenceUnion
+  // EffectsMustUnion
   l_live_out_body = (*effects_union_op)(l_live_out_body,
-					l_live_in_header,
-					effects_same_action_p);
+      l_live_in_header,
+      effects_same_action_p);
 
   pips_debug_effects(3, "live out paths of loop body:\n", l_live_out_body);
 
@@ -837,87 +942,94 @@ live_out_paths_from_loop_to_body(loop l, live_paths_analysis_context *ctxt)
 static void
 live_in_paths_of_loop(loop l, live_paths_analysis_context *ctxt)
 {
-
   /* The live in paths of a loop statement are the live in paths of its header
-     plus the live in paths of its first iteration if it is exectuted
-  */
+   * plus the live in paths of its first iteration if it is exectuted
+   */
 
   statement
-    current_stmt = (statement) gen_get_ancestor(statement_domain, l);
+  current_stmt = (statement) gen_get_ancestor(statement_domain, l);
   statement
-    body = loop_body(l);
+  body = loop_body(l);
   entity
-    index = loop_index(l);
+  index = loop_index(l);
 
   pips_debug(1,"begin\n");
 
   /* If the loop belongs to a sequence of statements, which is
-     generally the case, its live in paths have already been computed.
-     I don't yet know if they may be much more precisely computed here.
-     For performance reasons, I don't try to recompute them if they
-     are already available.
-     The code below is likely to be seldom executed;
-     however, it has been tested on small cases.
-  */
+   * generally the case, its live in paths have already been computed.
+   * I don't yet know if they may be much more precisely computed here.
+   * For performance reasons, I don't try to recompute them if they
+   * are already available.
+   * The code below is likely to be seldom executed;
+   * however, it has been tested on small cases.
+   */
   if ( !bound_live_in_paths_p(current_stmt) )
+  {
+
+    /* Live in effects of header  */
+    /* We assume that there is no side effect in the loop header;
+     * thus the live in effects of the header are similar to its proper read effects
+     */
+    list l_prop_header = convert_rw_effects(load_proper_rw_effects_list(current_stmt),
+        ctxt);
+    list l_live_in_header =
+        proper_to_summary_effects(effects_read_effects_dup(l_prop_header));
+    reset_converted_rw_effects(&l_prop_header, ctxt);
+    pips_debug_effects(3, "live in paths of loop header:\n", l_live_in_header);
+
+    /* Live in effects of first iteration if it exists minus read effects
+     * on the loop index, which are masked by its initialization in the header,
+     * and read effects on loop locals if the loop is parallel;
+     */
+    list l_masked_vars = NIL;
+    if(loop_parallel_p(l))
+      l_masked_vars = loop_locals(l);
+    /* beware: potential sharing with loop_locals(l) */
+    l_masked_vars = CONS(ENTITY, index, l_masked_vars);
+
+    list l_live_in_first_iter =
+        effects_dup_without_variables(load_live_in_paths_list(body),
+            l_masked_vars);
+
+    /* free l_masked_vars: beware of the potential sharing with loop_locals */
+    if (loop_parallel_p(l) && !ENDP(l_masked_vars))
+      CDR(l_masked_vars) = NIL;
+    gen_free_list(l_masked_vars);
+
+    if (! normalizable_and_linear_loop_p(index, loop_range(l)))
     {
-
-      /* Live in effects of header  */
-      /* We assume that there is no side effect in the loop header;
-	 thus the live in effects of the header are similar to its proper read effects
-      */
-      list l_prop_header = convert_rw_effects(load_proper_rw_effects_list(current_stmt),
-					      ctxt);
-      list l_live_in_header =
-	proper_to_summary_effects(effects_read_effects_dup(l_prop_header));
-      reset_converted_rw_effects(&l_prop_header, ctxt);
-      pips_debug_effects(3, "live in paths of loop header:\n", l_live_in_header);
-
-      /* Live in effects of first iteration if it exists minus read effects
-	 on the loop index, which are masked by its initialization in the header,
-	 and read effects on loop locals if the loop is parallel;
-      */
-      list l_masked_vars = NIL;
-      if(loop_parallel_p(l))
-	l_masked_vars = loop_locals(l);
-      /* beware: potential sharing with loop_locals(l) */
-      l_masked_vars = CONS(ENTITY, index, l_masked_vars);
-
-      list l_live_in_first_iter =
-	effects_dup_without_variables(load_live_in_paths_list(body),
-				      l_masked_vars);
-
-      /* free l_masked_vars: beware of the potential sharing with loop_locals */
-      if (loop_parallel_p(l) && !ENDP(l_masked_vars))
-	CDR(l_masked_vars) = NIL;
-      gen_free_list(l_masked_vars);
-
-      if (! normalizable_and_linear_loop_p(index, loop_range(l)))
-	{
-	  pips_debug(7, "non linear loop range.\n");
-	  effects_to_may_effects(l_live_in_first_iter);
-	}
-      else if(loop_descriptor_make_func == loop_undefined_descriptor_make)
-	{
-	  if (!loop_executed_at_least_once_p(l))
-	    effects_to_may_effects(l_live_in_first_iter);
-	}
-      else
-	{
-	  pips_internal_error("live paths of loop not implemented for convex paths\n");
-	}
-
-      pips_debug_effects(3, "live in paths of loop first iteration:\n", l_live_in_header);
-
-      /* put them together */
-      list l_live_in_loop = (*effects_union_op)(l_live_in_header,
-						l_live_in_first_iter,
-						effects_same_action_p);
-
-      pips_debug_effects(3, "live in paths of loop:\n", l_live_in_loop);
-
-      store_live_in_paths_list(current_stmt, l_live_in_loop);
+      pips_debug(7, "non linear loop range.\n");
+      effects_to_may_effects(l_live_in_first_iter);
     }
+    // functions that can be pointed by loop_descriptor_make_func:
+    // loop_undefined_descriptor_make
+    // loop_convex_descriptor_make
+    else if(loop_descriptor_make_func == loop_undefined_descriptor_make)
+    {
+      if (!loop_executed_at_least_once_p(l))
+        effects_to_may_effects(l_live_in_first_iter);
+    }
+    else
+    {
+      pips_internal_error("live paths of loop not implemented for convex paths\n");
+    }
+
+    pips_debug_effects(3, "live in paths of loop first iteration:\n", l_live_in_header);
+
+    /* put them together */
+    // functions that can be pointed by effects_union_op:
+    // ProperEffectsMustUnion
+    // RegionsMustUnion
+    // ReferenceUnion
+    // EffectsMustUnion
+    list l_live_in_loop = (*effects_union_op)(l_live_in_header,
+        l_live_in_first_iter,
+        effects_same_action_p);
+
+    pips_debug_effects(3, "live in paths of loop:\n", l_live_in_loop);
+
+    store_live_in_paths_list(current_stmt, l_live_in_loop);
+  }
 
   pips_debug(1,"end\n");
 }
@@ -1055,12 +1167,15 @@ bool live_paths_engine(const char *module_name, effects_representation_val repre
 
   /* Get the code of the module. */
   set_current_module_statement( (statement)
-				db_get_memory_resource(DBR_CODE, module_name, true) );
+      db_get_memory_resource(DBR_CODE, module_name, true) );
   statement module_statement = get_current_module_statement();
 
 
-
   make_effects_private_current_context_stack();
+  // functions that can be pointed by effects_computation_init_func:
+  // effects_computation_no_init
+  // init_convex_in_out_regions
+  // init_convex_rw_regions
   (*effects_computation_init_func)(module_name);
 
   /* Get the various effects and in_effects of the module. */
@@ -1102,6 +1217,10 @@ bool live_paths_engine(const char *module_name, effects_representation_val repre
   reset_invariant_in_effects();
   reset_live_in_paths();
   reset_live_out_paths();
+  // functions that can be pointed by effects_computation_reset_func:
+  // effects_computation_no_reset
+  // reset_convex_in_out_regions
+  // reset_convex_rw_regions
   (*effects_computation_reset_func)(module_name);
 
   free_effects_private_current_context_stack();

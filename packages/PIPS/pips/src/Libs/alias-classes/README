@@ -26,8 +26,9 @@ alias_pairs.c
   incrementaly so as to have results quickly and to explore the
   problems; it is re-used by copy to build the new version so as to
   keep two possible versions; the function names are changed from
-  points_to_xxxx to xxx_points_to_yyy in order to avoid all conflict
-  names
+  points_to_xxxx to xxx_to_points[_to_yyy] in order to avoid name
+  conflicts. For instance, points_to_statement has been replaced by
+  statement_to_points_to(), which is located in statement.c
 
   points_to_init_analysis.c
 

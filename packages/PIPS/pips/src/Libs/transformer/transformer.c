@@ -33,6 +33,9 @@
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
+#include "matrix.h"
+#include "matrice.h"
+#include "sparse_sc.h"
 
 #include "genC.h"
 #include "linear.h"
@@ -879,11 +882,52 @@ static int varval_value_name_is_inferior_p(Pvecteur * pvarval1, Pvecteur * pvarv
 
    Remember that integer redundancy elimination may degrade results
    because some transformer operator such as convex hull use a
-   rational interpretation of the constraints.
+   rational interpretation of the constraints. Unfortunately, no
+   information is given here about the properties used by the
+   different functions of the C3 linear library which are used.
 
    Does not take into account value types. So s=="hello" and
    s=="world" do not result into an empty transformer. But floating
    point values are taken into account.
+
+   Start with sc_bounded_normalization and then according to level:
+
+   0 -> sc_safe_elim_redund(), sc_elim_redund(),
+   sc_inequations_elim_redund(), sc_rational_feasibility_ofl_ctrl()
+
+   1 -> sc_nredund(), build_sc_nredund_2pass(),
+   build_sc_nredund_2pass_ofl_ctrl(), sc_normalize(),
+   build_sc_nredund_1pass_ofl_ctrl(), build_sc_nredund_1pass_ofl_ctrl()
+
+   sc_normalize() is well documented (in French)
+
+   2 -> sc_strong_normalize(), sc_normalize()
+   sc_strong_normalize_and_check_feasibility(),
+   sc_check_inequality_redundancy(), 
+
+   3 -> sc_strong_normalize2(): resolve the equations first, then deal
+   with inequalities
+
+   4 -> sc_normalize2(): well documented; does not detect redundancy
+   in a<=b, b<=c, a<=c
+
+   5 -> sc_strong_normalize3(), sc_strong_normalize_and_check_feasibility
+	    (ps, sc_rational_feasibility);
+
+   6 -> sc_strong_normalize4()
+   sc_strong_normalize_and_check_feasibility2(ps, sc_normalize,
+   variable_name, 2): well documented, deterministic
+
+
+   7 -> sc_strong_normalize5()
+   sc_strong_normalize_and_check_feasibility2(ps,
+   sc_rational_feasibility, variable_name, 2);
+
+   8 -> sc_safe_build_sc_nredund_1pass(): not documented
+   build_sc_nredund_1pass(): do not take equations into consideration
+
+   See timing information in the comments below.
+
  */
 transformer transformer_normalize(transformer t, int level)
 {
@@ -1081,6 +1125,25 @@ list transformers_safe_normalize(list tl, int level)
   }
   ntl = gen_nreverse(ntl);
   return ntl;
+}
+
+/* Does transformer tf use temporary values? */
+bool transformer_with_temporary_values_p(transformer tf)
+{
+  int count = 0;
+
+  if(number_of_temporary_values()>0) {
+    Psysteme r = (Psysteme) predicate_system(transformer_relation(tf));
+    Pbase b = BASE_NULLE;
+
+    for(b = sc_base(r); !BASE_NULLE_P(b); b = vecteur_succ(b)) {
+      entity e = (entity) vecteur_var(b);
+      if(local_temporary_value_entity_p(e)) {
+	count++;
+      }
+    }
+  }
+  return count>0;
 }
 
 transformer transformer_temporary_value_projection(transformer tf)
@@ -2363,4 +2426,45 @@ bool transformer_strongly_empty_p(transformer t)
 {
     bool empty_p = parametric_transformer_empty_p(t, sc_strong_normalize5);
     return empty_p;
+}
+
+/* See if the equations in transformer "pre" constraint variable "v"
+ * by v = gcd x + c, where x is a free variable.
+ *
+ * If "v" is free, gcd==1 and c==0
+ *
+ * Entity "v" is supposed to represent a value
+ *
+ * Returns true unless the equations in "pre" have no integer solutions.
+*/
+bool transformer_to_1D_lattice(entity v, transformer pre, Value * gcd_p, Value *c_p)
+{
+  Psysteme sc = (Psysteme) predicate_system(transformer_relation(pre));
+  Pbase b = sc_base(sc);
+  bool success = true;
+  // Default returned values
+  *gcd_p = 1L;
+  *c_p = 0L;
+
+  if(base_contains_variable_p(b, (Variable) v)) {
+    int rank = rank_of_variable(b, (Variable) v); // could be used in the test
+    int n = sc_nbre_egalites(sc);
+    if(n>0) {
+      int m = base_dimension(sc_base(sc));
+      Pmatrix A, B;
+      A = matrix_new(n, m);
+      B = matrix_new(n, 1);
+      constraints_to_matrices(sc_egalites(sc), sc_base(sc), A, B);
+      // A x + B = 0 is transformed into A x = B
+      for(int i=1;i<=n;i++) MATRIX_ELEM(B, i, 1) = -MATRIX_ELEM(B, i, 1);
+      if(!matrices_to_1D_lattice(A, B, n, m, rank, gcd_p, c_p)) {
+	// The transformer is in fact empty because its diophantine
+	// equations have no solution
+	success = false;
+      }
+      free(A);
+      free(B);
+    }
+  }
+  return success;
 }

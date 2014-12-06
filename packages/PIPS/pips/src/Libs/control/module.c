@@ -167,11 +167,6 @@ bool new_controlizer(const char* module_name)
 		"after the controlizer call",
 		statement_consistent_p(module_stat));
 
-    /* By setting this property, we try to unspaghettify the control graph
-       of the module: */
-    if (get_bool_property("UNSPAGHETTIFY_IN_CONTROLIZER"))
-      unspaghettify_statement(module_stat);
-
     if (get_bool_property("FOR_TO_DO_LOOP_IN_CONTROLIZER")) {
       gen_recurse(module_stat,
 		  // Since for-loop statements can be nested,
@@ -190,6 +185,11 @@ bool new_controlizer(const char* module_name)
 		  statement_domain, gen_true,
 		  transform_a_for_loop_statement_into_a_while_loop);
     }
+
+    /* By setting this property, we try to unspaghettify the control graph
+       of the module: */
+    if (get_bool_property("UNSPAGHETTIFY_IN_CONTROLIZER"))
+      unspaghettify_statement(module_stat);
 
     /* With C code, some local declarations may have been lost by the
        (current) restructurer. FI: not investigated; should be

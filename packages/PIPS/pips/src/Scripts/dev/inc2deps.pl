@@ -6,7 +6,7 @@
 
 use strict;
 
-my %libs = {};
+my %libs = ();
 shift @ARGV;
 for my $l (@ARGV) {
   $libs{$l} = 1;

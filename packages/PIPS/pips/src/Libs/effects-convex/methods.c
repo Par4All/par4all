@@ -310,6 +310,10 @@ void set_methods_for_convex_in_out_effects()
 
 bool in_out_methods_p()
 {
+  // functions that can be pointed by effects_computation_init_func:
+  // effects_computation_no_init
+  // init_convex_in_out_regions
+  // init_convex_rw_regions
   return (effects_computation_init_func == init_convex_in_out_regions);
 }
 
