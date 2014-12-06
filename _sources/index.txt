@@ -27,6 +27,11 @@ from `SILKAN <http://www.silkan.com>`_ it is also possible to compile and
 parallelize `Scilab <http://www.scilab.org>`_ programs to speed up
 computations.
 
+**Warning:** this project is no longer supported by SILKAN. All the former
+team works on some other subjects or in some other companies. But if you
+are interested by this project, feel free to join or contribute to PIPS
+project! :-) Ronan at Keryell dot fr.
+
 ..
   I've not been able to have a better link that this...
 

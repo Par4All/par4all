@@ -14,6 +14,11 @@ Par4All.
 If you need to run Par4All on unsupported system, please run Par4All
 inside a virtual machine running a supported OS.
 
+**Warning:** since this project is no longer supported by SILKAN, if you
+want to use the latest version of Par4All, the only way from the following
+methods is to start from the source from
+https://github.com/Par4All/par4all
+described in section `Distributed version control system`_.
 
 Binary distribution
 -------------------
@@ -199,16 +204,20 @@ Then refer to the infrastructure documentation on how to compile with
 Distributed version control system
 ----------------------------------
 
+Since this project is no longer supported by SILKAN, if you want to use
+the latest version of Par4All, the only way from the following methods is
+to start from the source from https://github.com/Par4All/par4all
+
 You can also access to the latest Par4All source code and contribute using
 ``git``:
 
-=================================  =========================================
-``git`` source viewer @ GitHub     https://github.com/Par4All/par4all.git
-``git`` source viewer @ SILKAN     https://git.silkan.com/cgit/par4all
-GitHub ``ssh`` access              git@github.com:Par4All/par4all.git
-Anonymous ``git`` access @ SILKAN  git://git.par4all.org/par4all
-Commit ``git`` access @ SILKAN     ssh://git.silkan.com/git/par4all.git
-=================================  =========================================
+=============================================  =========================================
+``git`` source viewer @ GitHub (most recent)    https://github.com/Par4All/par4all.git
+``git`` source viewer @ SILKAN (old)            https://git.silkan.com/cgit/par4all
+GitHub ``ssh`` access (most recent)             git@github.com:Par4All/par4all.git
+Anonymous ``git`` access @ SILKAN (old)         git://git.par4all.org/par4all
+Commit ``git`` access @ SILKAN (old)            ssh://git.silkan.com/git/par4all.git
+=============================================  =========================================
 
 
 To compile from the sources or from ``git``, have a look at the Par4All
