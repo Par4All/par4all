@@ -1,0 +1,22 @@
+setenv WS "halbwachs-sas-2012-1b"
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WS $WS.c
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT  TRUE
+
+echo
+echo Source code with transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[foo]
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[foo]
+
+close
+quit

@@ -6,7 +6,7 @@ void sven04(int n, double x[n+1])
       for(j = 0; j <= n-1; j += 1)
          for(k = 0; k <= n-1; k += 1) {
             x[n] = f(i, j, k);
-            x[i] = g(x[i], x[n]);
+            x[i] = g(x[i], f(i, j, k));
          }
    for(i = 0; i <= n-1; i += 1)
       printf("%f ", x[i]);
@@ -18,10 +18,12 @@ void sven04(int n, double x[n+1])
    //double t;
    for(i = 0; i <= n-1; i += 1)
       for(j = 0; j <= n-1; j += 1)
-         for(k = 0; k <= n-1; k += 1) {
+         for(k = 0; k <= n-1; k += 1)
             x[n] = f(i, j, k);
-            x[i] = g(x[i], x[n]);
-         }
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         for(k = 0; k <= n-1; k += 1)
+            x[i] = g(x[i], f(i, j, k));
    for(i = 0; i <= n-1; i += 1)
       printf("%f ", x[i]);
    return;
@@ -47,10 +49,10 @@ void sven04(int n, double x[n+1])
 		from <x[i]-W-EXACT> to <x[i]-R-EXACT> at levels  2 3
 	30 --> 30 with conflicts
 		from <x[i]-R-EXACT> to <x[i]-W-EXACT> at levels  2 3
-	30 --> 29 with conflicts
-		from <x[n]-R-EXACT> to <x[n]-W-EXACT> at levels  1 2 3
-	29 --> 30 with conflicts
-		from <x[n]-W-EXACT> to <x[n]-R-EXACT> at levels  1 2 3 4
+	28 --> 28 with conflicts
+		from <k-W-EXACT> to <k-W-EXACT> at levels  1 2
+	27 --> 27 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT> at levels  1
 	29 --> 29 with conflicts
 		from <x[n]-W-EXACT> to <x[n]-W-EXACT> at levels  1 2 3
 	28 --> 28 with conflicts
@@ -65,10 +67,12 @@ void sven04(int n, double x[n+1])
    //double t;
    for(i = 0; i <= n-1; i += 1)
       for(j = 0; j <= n-1; j += 1)
-         for(k = 0; k <= n-1; k += 1) {
+         for(k = 0; k <= n-1; k += 1)
             x[n] = f(i, j, k);
-            x[i] = g(x[i], x[n]);
-         }
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         for(k = 0; k <= n-1; k += 1)
+            x[i] = g(x[i], f(i, j, k));
    for(i = 0; i <= n-1; i += 1)
       printf("%f ", x[i]);
    return;

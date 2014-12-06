@@ -1,0 +1,25 @@
+setenv WSPACE=pragma03
+delete $WSPACE
+create $WSPACE $WSPACE.c 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+#activate C_PARSER
+#activate C_SYMBOL_TABLE
+setproperty PRETTYPRINT_LANGUAGE "C"
+
+echo
+echo Parsed code
+echo
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Controlized code
+echo
+#setenv CONTROL_DEBUG_LEVEL=8
+activate NEW_CONTROLIZER
+display PRINTED_FILE[main]
+
+close
+delete $WSPACE
+quit

@@ -42,7 +42,7 @@ void assign(int *b, int i)
 
 void ding(int b[100], int i_0[1])
 {
-   //PIPS generated variable
+   // Declared as a patch variable by Pass Outlining
    int i;
 
 //  <i_0[PHI1]-R-EXACT-{PHI1==0}>

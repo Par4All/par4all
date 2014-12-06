@@ -13,7 +13,7 @@ Code after outlining
 
 void kernel(int a_0[1])
 {
-   //PIPS generated variable
+   // Declared as a patch variable by Pass Outlining
    int a;
    a = *a_0;
 #pragma pips outline

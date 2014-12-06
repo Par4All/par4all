@@ -53,7 +53,7 @@ TIMEOUT	= 600
 TEST	= test
 
 # is it a subversion working copy?
-IS_SVN	= test -d .svn
+IS_SVN	= svn info > /dev/null 2> /dev/null
 CHECK	= $(IS_SVN)
 
 # some parametric commands

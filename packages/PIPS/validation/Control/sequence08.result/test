@@ -39,11 +39,9 @@ void sequence08(int argc, char *argv[])
       {
          // BEGIN BLOCK
          int i;
-         // BEGIN BLOCK
          for(i = 0; i <= 9; i += 1)
             // commenting next lines makes unfolding work...
             *x0 = 18;
-         // END BLOCK
 l99998:         ;
          // END BLOCK
       }

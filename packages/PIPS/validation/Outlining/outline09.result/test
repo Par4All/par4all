@@ -37,7 +37,7 @@ l0:   outlined(str, argv);
 }
 void outlined(char *str, char *argv[])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int j, n;
 l0:
    for(j = 0; j <= 0; j += 1) {

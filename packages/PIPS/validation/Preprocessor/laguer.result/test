@@ -1,9 +1,11 @@
 # 1 "laguer.database/Tmp/laguer.cpp_processed.c"
+# 1 "<built-in>"
 # 1 "<command-line>"
 # 1 "laguer.database/Tmp/laguer.cpp_processed.c"
 //#include <math.h>
 //#include "complex.h"
 typedef struct {float r; float i;} fcomplex;
+
 extern fcomplex Complex(float, float);
 extern fcomplex Cdiv(fcomplex, fcomplex);
 extern fcomplex Csub(fcomplex, fcomplex);
@@ -13,6 +15,10 @@ extern fcomplex RCmul(float, fcomplex);
 extern fcomplex Conjg(fcomplex);
 extern fcomplex Csqrt(fcomplex);
 extern float Cabs(fcomplex);
+
+
+
+
 void laguer(a,m,x,eps,polish)
 fcomplex a[],*x;
 int m,polish;
@@ -22,6 +28,7 @@ float eps;
  float err,dxold,cdx,abx;
  fcomplex sq,h,gp,gm,g2,g,b,d,dx,f,x1;
  void nrerror(char *);
+
  dxold=Cabs(*x);
  for (iter=1;iter<=100;iter++) {
   b=a[m];
@@ -55,7 +62,7 @@ float eps;
  }
  nrerror("Too many iterations in routine LAGUER");
 }
-# 13
+# 18
 void laguer(a,m,x,eps,polish)
 fcomplex a[],*x;
 int m,polish;
@@ -65,6 +72,7 @@ float eps;
  float err,dxold,cdx,abx;
  fcomplex sq,h,gp,gm,g2,g,b,d,dx,f,x1;
  void nrerror(char *);
+
  dxold=Cabs(*x);
  for (iter=1;iter<=100;iter++) {
   b=a[m];
@@ -101,6 +109,7 @@ float eps;
 //#include <math.h>
 //#include "complex.h"
 typedef struct {float r; float i;} fcomplex;
+
 extern fcomplex Complex(float, float);
 extern fcomplex Cdiv(fcomplex, fcomplex);
 extern fcomplex Csub(fcomplex, fcomplex);
@@ -110,6 +119,10 @@ extern fcomplex RCmul(float, fcomplex);
 extern fcomplex Conjg(fcomplex);
 extern fcomplex Csqrt(fcomplex);
 extern float Cabs(fcomplex);
+
+
+
+
 extern void laguer();
 void laguer(fcomplex a[], int m, fcomplex *x, float eps, int polish)
 {
@@ -117,6 +130,7 @@ void laguer(fcomplex a[], int m, fcomplex *x, float eps, int polish)
    float err, dxold, cdx, abx;
    fcomplex sq, h, gp, gm, g2, g, b, d, dx, f, x1;
    void nrerror(char *);
+
    dxold = Cabs(*x);
    for (iter = 1;iter<=100;iter++) {
       b = a[m];

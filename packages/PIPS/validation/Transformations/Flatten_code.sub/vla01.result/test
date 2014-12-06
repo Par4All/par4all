@@ -1,0 +1,31 @@
+
+"Initial Code"
+
+void vla01()
+{
+   int i;
+   {
+      int i;
+      scanf("%d", &i);
+      int a[i];
+      a[0] = 1;
+   }
+}
+
+"FLATTEN_CODE"
+
+void vla01()
+{
+   int i;
+   {
+      int i;
+      scanf("%d", &i);
+      int a[i];
+      a[0] = 1;
+   }
+}
+
+Warnings
+
+FLATTEN_CODE[vla01] (flatten_code) Module "vla01" could not be flattened because it uses a variable-length array (VLA).
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build phase/rule FLATTEN_CODE for module vla01.

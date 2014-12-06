@@ -67,9 +67,9 @@ int main()
 }
 void p4a_kernel_STAP_PulseComp(int tf, int tv, float I_0[1], float R_0[1], int i, float ptrfiltre[tf], float ptrin[tv], float ptrout[tv-tf+1])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int j;
-   //PIPS generated variable
+   // Declared as a patch variable by Pass Outlining
    float I, R;
    R = *R_0;
    I = *I_0;
@@ -94,9 +94,9 @@ void p4a_kernel_trt(float filtre[16], int j, int k, float in_pulse[5][32][95], f
 }
 void p4a_launcher_STAP_PulseComp(int tf, int tv, float ptrfiltre[tf], float ptrin[tv], float ptrout[tv-tf+1])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    float I, R;
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i;
 
    for(i = 0; i <= tv-tf+1-1; i += 1)
@@ -104,7 +104,7 @@ void p4a_launcher_STAP_PulseComp(int tf, int tv, float ptrfiltre[tf], float ptri
 }
 void p4a_launcher_trt(float filtre[16], float in_pulse[5][32][95], float out_pulse[5][32][80], int tf, int tv)
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int j, k;
 
    for(j = 0; j <= 4; j += 1)
@@ -113,7 +113,7 @@ void p4a_launcher_trt(float filtre[16], float in_pulse[5][32][95], float out_pul
 }
 void p4a_wrapper_STAP_PulseComp(int tf, int tv, float I_0[1], float R_0[1], int i, float ptrfiltre[tf], float ptrin[tv], float ptrout[tv-tf+1])
 {
-   //PIPS generated variable
+   // Declared as a patch variable by Pass Outlining
    float I, R;
    R = *R_0;
    I = *I_0;

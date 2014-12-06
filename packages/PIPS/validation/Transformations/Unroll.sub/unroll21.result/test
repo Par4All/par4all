@@ -1,0 +1,21 @@
+void unroll21()
+{
+   int i, a[2];
+   //PIPS generated variable
+   struct s0 {
+      int f;
+   };
+   //PIPS generated variable
+   struct s0 j0;
+   //PIPS generated variable
+   struct s1 {
+      int f;
+   };
+   //PIPS generated variable
+   struct s1 j1;
+bar:   ;
+   j0.f = 0+2;
+   a[0] = j0.f;
+   j1.f = 1+2;
+   a[1] = j1.f;
+}

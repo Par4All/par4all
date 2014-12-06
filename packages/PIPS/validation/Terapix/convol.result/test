@@ -68,7 +68,7 @@ l99993:   work(isi, isj, image, kernel, new_image);
 }
 void work(int isi, int isj, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i;
 
 l99993:
@@ -77,7 +77,7 @@ l99993:
 }
 void microcode(int isi, int isj, int i, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int j;
    {
       //PIPS generated variable
@@ -100,7 +100,7 @@ l99996:
 }
 void microcode(int isi, int isj, int i, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int j;
    {
       //PIPS generated variable
@@ -123,7 +123,7 @@ Microcode after scalarization
 
 void microcode(int isi, int isj, int i, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int j;
    {
       //PIPS generated variable
@@ -149,7 +149,7 @@ Microcode After array conversion
 
 void microcode(int isi, int isj, int i, float image[isi*isj], float kernel[9], float new_image[isi*isj])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int j;
    {
       //PIPS generated variable

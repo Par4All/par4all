@@ -1,0 +1,21 @@
+setenv WSPACE=for09
+delete $WSPACE
+create $WSPACE $WSPACE.c
+setproperty ABORT_ON_USER_ERROR TRUE
+
+display PRINTED_FILE[%ALLFUNC]
+
+setproperty CONSTANT_PATH_EFFECTS FALSE
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+
+echo
+echo PRINT_CODE_TRANSFORMERS for "main"
+echo
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+close
+delete $WSPACE
+quit

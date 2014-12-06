@@ -1,0 +1,3 @@
+The index incrementation is not analyzed. Function update_reflhs_with_rhs_to_transformer does not go down the index expressions but test constant_path_analyzed_p() instead. To be seen by Nelson Lossing.
+
+See also for09.

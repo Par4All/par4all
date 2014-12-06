@@ -37,7 +37,7 @@ void allocate_array(parray_t pa)
    return;
 }
 
-POINTS TO for "init_array"
+Points-to for "init_array"
 
 
 // Points To IN:

@@ -1,0 +1,35 @@
+
+"Initial Code"
+
+void dependenttype02()
+{
+   int i;
+   for(i = 0; i <= 9; i += 1) {
+      int a[i+1];
+      {
+         int j;
+         for(j = 0; j <= i+1-1; j += 1)
+            a[j] = j;
+      }
+   }
+}
+
+"FLATTEN_CODE"
+
+void dependenttype02()
+{
+   int i;
+   for(i = 0; i <= 9; i += 1) {
+      int a[i+1];
+      {
+         int j;
+         for(j = 0; j <= i+1-1; j += 1)
+            a[j] = j;
+      }
+   }
+}
+
+Warnings
+
+FLATTEN_CODE[dependenttype02] (flatten_code) Module "dependenttype02" could not be flattened because it uses a variable-length array (VLA).
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build phase/rule FLATTEN_CODE for module dependenttype02.

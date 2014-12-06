@@ -285,11 +285,11 @@ After Double Outlining and load - store generation
 
 void microcode_launcher(int isi, int isj, int I_1, int i_t, int j_t, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int L_0;
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i, j;
-   //PIPS generated variable
+   // Declared by Pass Outlining
    register float new_image_0;
 
 l99991:
@@ -351,11 +351,11 @@ l99991:         microcode_launcher(isi, isj, I_1, i_t, j_t, *p4a_var_image0, *p4
 }
 void microcode_launcher(int isi, int isj, int I_1, int i_t, int j_t, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int L_0;
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i, j;
-   //PIPS generated variable
+   // Declared by Pass Outlining
    register float new_image_0;
 
 l99991:
@@ -364,9 +364,9 @@ l99992:      convol_microcode(isi, isj, i, i_t, image, j_t, kernel, new_image);
 }
 void convol_microcode(int isi, int isj, int i, int i_t, float image[isi][isj], int j_t, float kernel[3][3], float new_image[isi][isj])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int L_0, j;
-   //PIPS generated variable
+   // Declared by Pass Outlining
    register float new_image_0;
 l99992:
    for(j = 1; j <= 5; j += 1) {

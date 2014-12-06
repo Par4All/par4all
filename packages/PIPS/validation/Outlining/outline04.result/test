@@ -163,7 +163,7 @@ init_kernel:
 
 void init_kernel(float imagein_re[64][64])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i, j;
 
 init_kernel:
@@ -220,7 +220,7 @@ The loop nest of init_kernel should be parallel:
 
 void init_kernel(float imagein_re[64][64])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int i, j;
 
 #pragma omp parallel for private(j)

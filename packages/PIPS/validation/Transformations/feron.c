@@ -61,6 +61,7 @@ static double maxim(double a,
 }
 
 static void skip(void){
+  printf("");
   return;
 }
 

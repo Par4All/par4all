@@ -1,0 +1,20 @@
+setenv WSPACE=cominc
+delete $WSPACE
+create $WSPACE $WSPACE.c
+
+make PRINTED_FILE[main]
+
+close
+
+# It is not possible to check the error message because the workspace
+# is not created. The lexical error is detected during thr workspace
+# creation.
+
+#echo
+#echo Error messages
+#echo
+
+#shell cat $WSPACE.database/Logs
+
+#delete $WSPACE
+quit

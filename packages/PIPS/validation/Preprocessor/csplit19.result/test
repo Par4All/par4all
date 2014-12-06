@@ -5,7 +5,7 @@ setenv PIPS_CPP "cpp -C -P -ffreestanding"
 Registering file csplit19.c
 Preprocessing file ./csplit19.c
 Splitting file    ./csplit19.database/Tmp/csplit19.cpp_processed.c
-user warning in splitc_error: C syntax error near "x" at preprocessed line 11 (user line 11)
+user warning in splitc_error: C syntax error near "x" at preprocessed line 17 (user line 17)
 user error in splitc_error: Syntax error
 split error while extracting ./csplit19.database/.csplit_file_list from ./csplit19.database/Tmp/csplit19.cpp_processed.c: parser error
 Closing all modules.

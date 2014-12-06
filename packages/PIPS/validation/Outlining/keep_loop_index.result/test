@@ -18,8 +18,10 @@ there:   outlined(2+1, &j);
 }
 void outlined(int I_0, int j_0[1])
 {
-   //PIPS generated variable
-   int i, j;
+   // Declared by Pass Outlining
+   int i;
+   // Declared as a patch variable by Pass Outlining
+   int j;
    j = *j_0;
 there:
    for(i = 0; i <= I_0-1; i += 1)

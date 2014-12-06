@@ -22,7 +22,7 @@ kernel:      kernel(i, bar);
 }
 void kernel(int i, int bar[256][256])
 {
-   //PIPS generated variable
+   // Declared by Pass Outlining
    int j;
 kernel:
    for(j = 0; j <= 255; j += 1)
