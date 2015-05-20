@@ -1,7 +1,7 @@
 Par4All version 1.4.6
 =====================
 
-The WWW site for the project is http://www.par4all.org
+The WWW site for the project is http://par4all.github.io
 
 Par4all merges various free and open source developments. Par4All aims to
 achieve the migration of software to multi-core and other parallel
@@ -93,7 +93,10 @@ Contact
 | Phone: +33 1 46 01 03 27
 | Fax: +33 1 46 01 05 46
 
-Par4All support : support at par4all.org
+Par4All support used to be at support at par4all.org
+
+You can use the GitHub tools to get some kind of open community support
+instead.
 
 11/11/11, 11:11:11
 

@@ -9,7 +9,11 @@ git clone --bare --branch p4a-own par4all par4all-without-big-file
 #java -jar bfg-1.11.0.jar --delete-files Home_Trailer.yuv par4all-without-big-file
 java -jar bfg-1.11.0.jar --strip-blobs-bigger-than 100M par4all-without-big-file
 cd par4all-without-big-file
+# The source repository + also the old par4all.org WWW site
 git remote add github git@github.com:Par4All/par4all.git
 #git push github --tags
 #git push --force --mirror github
 git push --mirror github
+# The new page on par4all.github.io:
+git remote add par4all.github.io git@github.com:Par4All/par4all.github.io.git
+git push par4all.github.io gh-pages:master
