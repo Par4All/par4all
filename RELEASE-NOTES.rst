@@ -1,4 +1,4 @@
-Release notes for Par4All 1.4.2, 2012/06/22
+Release notes for Par4All 1.4.6, 2015/05/20
 ===========================================
 
 Par4All is an open-source environment to do source-to-source
@@ -23,11 +23,11 @@ installation but can be also compiled on Fedora Linux. More detailed
 information on installation can be found in the Par4All Installation
 guide.
 
-More documentation and information is available on http://par4all.org.
+More documentation and information is available on http://par4all.github.io
 
 If you need more complex transformations, parallelizations and
-optimizations, you may contact SILKAN for professional support and
-you can mail to: support@par4all.org
+optimizations, you may contact SILKAN for professional support, even if it
+is no longer supported.
 
 
 Additions

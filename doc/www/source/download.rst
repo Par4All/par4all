@@ -20,6 +20,9 @@ methods is to start from the source from
 https://github.com/Par4All/par4all
 described in section `Distributed version control system`_.
 
+The http://download.par4all.org URL in the following is no longer working.
+
+
 Binary distribution
 -------------------
 

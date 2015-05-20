@@ -47,5 +47,6 @@ git remote add par4all $P4A_TOP/par4all
 git push par4all gh-pages
 
 # Push the par4all git to GitHub after removing the big files.
-# Since the gh-pages branch has been changed, the WWW site is updated too
+# Since the gh-pages branch has been changed, the WWW site is updated too.
+# Well actually the gh-pages branch is no longer used now
 $P4A_TOP/par4all/src/dev/publish_par4all_without_big_file
