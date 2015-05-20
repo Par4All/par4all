@@ -1,6 +1,10 @@
 Documentation
 =============
 
+Unfortunately the http://download.par4all.org URL is no longer working.
+
+To do: move this to GitHub too.
+
 Users guide
 -----------
 
